@@ -1,0 +1,28 @@
+{
+  "WalletOverview": {
+    "title": "保有ポイント",
+    "giveButton": "あげる",
+    "refreshButton": "再読み込み",
+    "refreshSuccess": "ウォレット情報を更新しました",
+    "refreshError": "再読み込みに失敗しました",
+    "errorTitle": "ウォレット"
+  },
+  "WalletCard": {
+    "balanceLabel": "残高",
+    "pointUnit": "pt",
+    "currentPoints": "現在のポイント",
+    "accumulatedPoints": "累計ポイント"
+  },
+  "DonatePoints": {
+    "title": "ポイントを贈る",
+    "recipientLabel": "贈り先",
+    "amountLabel": "ポイント数",
+    "messageLabel": "メッセージ",
+    "messagePlaceholder": "メッセージを入力してください（任意）",
+    "confirmButton": "贈る",
+    "cancelButton": "キャンセル",
+    "success": "ポイントを贈りました",
+    "error": "ポイントの送信に失敗しました",
+    "insufficientBalance": "ポイントが不足しています"
+  }
+}

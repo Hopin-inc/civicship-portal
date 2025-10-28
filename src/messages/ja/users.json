@@ -1,0 +1,40 @@
+{
+  "UserProfile": {
+    "title": "プロフィール",
+    "editButton": "編集",
+    "saveButton": "保存",
+    "cancelButton": "キャンセル",
+    "nameLabel": "名前",
+    "emailLabel": "メールアドレス",
+    "phoneLabel": "電話番号",
+    "prefectureLabel": "都道府県",
+    "bioLabel": "自己紹介",
+    "bioPlaceholder": "自己紹介を入力してください",
+    "updateSuccess": "プロフィールを更新しました",
+    "updateError": "プロフィールの更新に失敗しました"
+  },
+  "UserProfileHeader": {
+    "memberSince": "登録日",
+    "points": "ポイント",
+    "tickets": "チケット"
+  },
+  "UserTicketsAndPoints": {
+    "pointsTitle": "ポイント",
+    "ticketsTitle": "チケット",
+    "currentPoints": "現在のポイント",
+    "accumulatedPoints": "累計ポイント",
+    "availableTickets": "利用可能なチケット",
+    "usedTickets": "使用済みチケット",
+    "viewWallet": "ウォレットを見る",
+    "viewTickets": "チケット一覧を見る"
+  },
+  "UserSettings": {
+    "title": "設定",
+    "notificationsLabel": "通知設定",
+    "languageLabel": "言語",
+    "privacyLabel": "プライバシー",
+    "logoutButton": "ログアウト",
+    "deleteAccountButton": "アカウントを削除",
+    "deleteAccountConfirm": "本当にアカウントを削除しますか？この操作は取り消せません。"
+  }
+}

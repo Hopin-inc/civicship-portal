@@ -2,6 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useTranslations } from "next-intl";
 import {
   Form,
   FormControl,
@@ -24,22 +25,24 @@ import { logger } from "@/lib/logging";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 
-const FormSchema = z.object({
+const createFormSchema = (t: (key: string) => string) => z.object({
   name: z
-    .string({ required_error: "名前を入力してください。" })
+    .string({ required_error: t("nameRequired") })
     .trim()
-    .nonempty("名前を入力してください。"),
+    .nonempty(t("nameRequired")),
   prefecture: z.nativeEnum(GqlCurrentPrefecture, {
-    required_error: "居住地を選択してください。",
+    required_error: t("prefectureRequired"),
   }),
 });
 
-type FormValues = z.infer<typeof FormSchema>;
-
 export function SignUpForm() {
+  const t = useTranslations("SignUp");
   const { createUser, isAuthenticated, isPhoneVerified, phoneAuth, loading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const firebaseUser = useAuthStore((s) => s.state.firebaseUser);
+
+  const FormSchema = createFormSchema(t);
+  type FormValues = z.infer<typeof FormSchema>;
 
   const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
@@ -53,24 +56,24 @@ export function SignUpForm() {
     setIsLoading(true);
     try {
       if (!firebaseUser) {
-        toast.error("LINE認証が完了していません");
+        toast.error(t("lineAuthRequired"));
         return null;
       }
 
       const phoneUid = phoneAuth.phoneUid;
       if (!phoneUid || !isPhoneVerified) {
-        toast.error("電話番号認証が完了していません");
+        toast.error(t("phoneAuthRequired"));
         return null;
       }
 
       await createUser(values.name, values.prefecture, phoneUid);
-      toast.success("アカウントを作成しました");
+      toast.success(t("success"));
     } catch (error) {
       logger.error("Sign up error", {
         error: error instanceof Error ? error.message : String(error),
         component: "SignUpForm",
       });
-      toast.error("アカウント作成に失敗しました");
+      toast.error(t("error"));
     } finally {
       setIsLoading(false);
     }
@@ -87,7 +90,7 @@ export function SignUpForm() {
   return (
     <div className="w-full max-w-md mx-auto space-y-8">
       <div className="space-y-2">
-        <h1 className="text-2xl font-bold tracking-tight">アカウント情報の登録</h1>
+        <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
       </div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -96,13 +99,12 @@ export function SignUpForm() {
             name="name"
             render={({ field }) => (
               <FormItem className="space-y-3">
-                {/* #NOTE: 運営メンバーが本名でないと、誰かが誰かを区別できなくなる可能性があるため本名としているが、NEO88における特殊対応 */}
-                <FormLabel className="text-base">本名</FormLabel>
+                <FormLabel className="text-base">{t("nameLabel")}</FormLabel>
                 <FormControl>
-                  <Input placeholder="山田太郎" {...field} className="h-12" />
+                  <Input placeholder={t("namePlaceholder")} {...field} className="h-12" />
                 </FormControl>
                 <FormDescription className="text-xs text-muted-foreground">
-                  ※ どなたか分からなくなるため、必ず本名をご入力ください
+                  {t("nameDescription")}
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -115,7 +117,7 @@ export function SignUpForm() {
               name="prefecture"
               render={({ field }) => (
                 <FormItem className="space-y-3">
-                  <FormLabel className="text-base">住んでいるところ</FormLabel>
+                  <FormLabel className="text-base">{t("prefectureLabel")}</FormLabel>
                   <FormControl>
                     <ToggleGroup
                       onValueChange={(val) => field.onChange(val as GqlCurrentPrefecture)}
@@ -154,7 +156,7 @@ export function SignUpForm() {
             className="w-full h-12 text-base"
             disabled={isLoading || !!form.formState.errors.name}
           >
-            {isLoading ? "作成中..." : "アカウントを作成"}
+            {isLoading ? t("submitting") : t("submitButton")}
           </Button>
         </form>
       </Form>

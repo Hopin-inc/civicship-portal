@@ -13,6 +13,8 @@ import { currentCommunityMetadata } from "@/lib/communities/metadata";
 import AnalyticsProvider from "@/components/providers/AnalyticsProvider";
 import ClientPolyfills from "@/components/polyfills/ClientPolyfills";
 import { getUserServer } from "@/lib/auth/init/getUserServer";
+import { NextIntlClientProvider } from 'next-intl';
+import { getLocale, getMessages } from 'next-intl/server';
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -41,28 +43,33 @@ const RootLayout = async ({
   children: React.ReactNode;
 }>) => {
   const { user, lineAuthenticated, phoneAuthenticated } = await getUserServer();
+  
+  const locale = await getLocale();
+  const messages = await getMessages();
 
   return (
-    <html lang="ja">
+    <html lang={locale}>
       <body className={font.className}>
         <ClientPolyfills />
-        <CookiesProvider>
-          <ApolloProvider>
-            <AuthProvider
-              ssrCurrentUser={user}
-              ssrLineAuthenticated={lineAuthenticated}
-              ssrPhoneAuthenticated={phoneAuthenticated}
-            >
-              <HeaderProvider>
-                <LoadingProvider>
-                  <AnalyticsProvider />
-                  <MainContent>{children}</MainContent>
-                  <Toaster richColors className="mx-8" />
-                </LoadingProvider>
-              </HeaderProvider>
-            </AuthProvider>
-          </ApolloProvider>
-        </CookiesProvider>
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          <CookiesProvider>
+            <ApolloProvider>
+              <AuthProvider
+                ssrCurrentUser={user}
+                ssrLineAuthenticated={lineAuthenticated}
+                ssrPhoneAuthenticated={phoneAuthenticated}
+              >
+                <HeaderProvider>
+                  <LoadingProvider>
+                    <AnalyticsProvider />
+                    <MainContent>{children}</MainContent>
+                    <Toaster richColors className="mx-8" />
+                  </LoadingProvider>
+                </HeaderProvider>
+              </AuthProvider>
+            </ApolloProvider>
+          </CookiesProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

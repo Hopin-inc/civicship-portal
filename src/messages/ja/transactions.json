@@ -1,0 +1,33 @@
+{
+  "TransactionList": {
+    "title": "これまでの交換",
+    "communityHistoryLink": "コミュニティ履歴へ",
+    "emptyState": "まだ交換したことがありません",
+    "loadMore": "もっと見る",
+    "loading": "読み込み中..."
+  },
+  "TransactionItem": {
+    "received": "受け取り",
+    "sent": "送信",
+    "pointUnit": "pt",
+    "dateFormat": "YYYY年MM月DD日"
+  },
+  "TransactionDetail": {
+    "title": "取引詳細",
+    "amount": "金額",
+    "date": "日時",
+    "type": "種類",
+    "from": "送信元",
+    "to": "送信先",
+    "message": "メッセージ",
+    "status": "ステータス"
+  },
+  "TransactionTypes": {
+    "POINT_ISSUED": "ポイント発行",
+    "GRANT": "付与",
+    "DONATION": "寄付",
+    "POINT_REWARD": "ポイント報酬",
+    "TICKET_PURCHASED": "チケット購入",
+    "OPPORTUNITY_RESERVATION": "予約"
+  }
+}

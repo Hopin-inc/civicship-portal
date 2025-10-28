@@ -69,6 +69,7 @@
     "micromatch": "^4.0.8",
     "next": "15.5.2",
     "next-client-cookies": "^2.1.0",
+    "next-intl": "^4.4.0",
     "next-themes": "^0.3.0",
     "react": "^18.3.1",
     "react-day-picker": "8.10.1",

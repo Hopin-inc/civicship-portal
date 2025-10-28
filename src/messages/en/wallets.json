@@ -1,0 +1,28 @@
+{
+  "WalletOverview": {
+    "title": "Your Points",
+    "giveButton": "Give",
+    "refreshButton": "Refresh",
+    "refreshSuccess": "Wallet information updated",
+    "refreshError": "Failed to refresh",
+    "errorTitle": "Wallet"
+  },
+  "WalletCard": {
+    "balanceLabel": "Balance",
+    "pointUnit": "pt",
+    "currentPoints": "Current Points",
+    "accumulatedPoints": "Total Accumulated"
+  },
+  "DonatePoints": {
+    "title": "Give Points",
+    "recipientLabel": "Recipient",
+    "amountLabel": "Amount",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Enter a message (optional)",
+    "confirmButton": "Give",
+    "cancelButton": "Cancel",
+    "success": "Points sent successfully",
+    "error": "Failed to send points",
+    "insufficientBalance": "Insufficient balance"
+  }
+}

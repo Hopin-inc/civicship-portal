@@ -3,6 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import { RotateCcw } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 
@@ -19,18 +20,20 @@ const WalletCard: React.FC<WalletCardProps> = ({
   onRefetch,
   showRefreshButton = true,
 }) => {
+  const t = useTranslations("WalletCard");
+  
   return (
     <div className="bg-background rounded-[32px] px-12 py-8 shadow-[0_2px_20px_rgba(0,0,0,0.08)] mt-8 mb-8">
       <div className="flex flex-col items-center mb-12">
         <div className="text-sm text-muted-foreground mb-2">
-          {currentCommunityConfig.tokenName} 残高
+          {currentCommunityConfig.tokenName} {t("balanceLabel")}
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-baseline">
             <span className="text-[40px] font-bold leading-none tracking-tight">
               {isLoading ? "..." : currentPoint.toLocaleString()}
             </span>
-            <span className="text-base ml-0.5">pt</span>
+            <span className="text-base ml-0.5">{t("pointUnit")}</span>
           </div>
         </div>
       </div>
@@ -51,7 +54,7 @@ const WalletCard: React.FC<WalletCardProps> = ({
             className="flex items-center gap-1.5"
           >
             <RotateCcw className="w-4 h-4 text-muted-foreground" />
-            <span className="text-sm">再読み込み</span>
+            <span className="text-sm">{t("refreshButton")}</span>
           </Button>
         )}
       </div>

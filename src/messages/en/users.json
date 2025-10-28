@@ -1,0 +1,40 @@
+{
+  "UserProfile": {
+    "title": "Profile",
+    "editButton": "Edit",
+    "saveButton": "Save",
+    "cancelButton": "Cancel",
+    "nameLabel": "Name",
+    "emailLabel": "Email",
+    "phoneLabel": "Phone Number",
+    "prefectureLabel": "Prefecture",
+    "bioLabel": "Bio",
+    "bioPlaceholder": "Enter your bio",
+    "updateSuccess": "Profile updated successfully",
+    "updateError": "Failed to update profile"
+  },
+  "UserProfileHeader": {
+    "memberSince": "Member Since",
+    "points": "Points",
+    "tickets": "Tickets"
+  },
+  "UserTicketsAndPoints": {
+    "pointsTitle": "Points",
+    "ticketsTitle": "Tickets",
+    "currentPoints": "Current Points",
+    "accumulatedPoints": "Total Accumulated",
+    "availableTickets": "Available Tickets",
+    "usedTickets": "Used Tickets",
+    "viewWallet": "View Wallet",
+    "viewTickets": "View Tickets"
+  },
+  "UserSettings": {
+    "title": "Settings",
+    "notificationsLabel": "Notifications",
+    "languageLabel": "Language",
+    "privacyLabel": "Privacy",
+    "logoutButton": "Logout",
+    "deleteAccountButton": "Delete Account",
+    "deleteAccountConfirm": "Are you sure you want to delete your account? This action cannot be undone."
+  }
+}

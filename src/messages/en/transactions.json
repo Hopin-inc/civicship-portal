@@ -1,0 +1,33 @@
+{
+  "TransactionList": {
+    "title": "Transaction History",
+    "communityHistoryLink": "View Community History",
+    "emptyState": "No transactions yet",
+    "loadMore": "Load More",
+    "loading": "Loading..."
+  },
+  "TransactionItem": {
+    "received": "Received",
+    "sent": "Sent",
+    "pointUnit": "pt",
+    "dateFormat": "MM/DD/YYYY"
+  },
+  "TransactionDetail": {
+    "title": "Transaction Details",
+    "amount": "Amount",
+    "date": "Date",
+    "type": "Type",
+    "from": "From",
+    "to": "To",
+    "message": "Message",
+    "status": "Status"
+  },
+  "TransactionTypes": {
+    "POINT_ISSUED": "Points Issued",
+    "GRANT": "Grant",
+    "DONATION": "Donation",
+    "POINT_REWARD": "Point Reward",
+    "TICKET_PURCHASED": "Ticket Purchase",
+    "OPPORTUNITY_RESERVATION": "Reservation"
+  }
+}
