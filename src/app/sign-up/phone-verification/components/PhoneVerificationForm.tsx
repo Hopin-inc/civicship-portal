@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthProvider";
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -24,6 +24,20 @@ export function PhoneVerificationForm() {
   const [phoneNumber, setPhoneNumber] = useState<string | undefined>(undefined);
   const [verificationCode, setVerificationCode] = useState("");
   const [step, setStep] = useState<VerificationStep>("phone");
+
+  useEffect(() => {
+    const scrollY = window.scrollY;
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = "100%";
+
+    return () => {
+      const y = document.body.style.top;
+      document.body.style.position = "";
+      document.body.style.top = "";
+      window.scrollTo(0, parseInt(y || "0") * -1);
+    };
+  }, []);
 
   const { isDisabled: isResendDisabled, countdown, start: startResendTimer } = useResendTimer();
   const recaptchaManager = useRecaptchaManager();
@@ -139,6 +153,7 @@ export function PhoneVerificationForm() {
 
       {step === "code" && (
         <CodeVerificationStep
+          phoneNumber={phoneNumber}
           verificationCode={verificationCode}
           onCodeChange={handleOTPChange}
           onSubmit={handleCodeSubmit}
