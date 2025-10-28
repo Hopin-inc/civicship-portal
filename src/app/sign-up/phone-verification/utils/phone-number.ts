@@ -9,7 +9,12 @@ export const isValidPhoneNumber = (
   
   try {
     const parsed = parsePhoneNumber(phoneNumber);
-    return parsed.isValid();
+    if (!parsed.isValid()) {
+      return false;
+    }
+    
+    const type = parsed.getType();
+    return type === "MOBILE" || type === "FIXED_LINE_OR_MOBILE";
   } catch {
     return false;
   }
