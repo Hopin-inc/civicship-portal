@@ -193,20 +193,28 @@ export async function completePhoneVerification(
  * These are fictional phone numbers that can be configured in Firebase Console
  * for testing without sending actual SMS.
  *
+ * Provides both international (+81...) and local (90...) formats for convenience.
+ *
  * See: https://firebase.google.com/docs/auth/web/phone-auth#test-with-fictional-phone-numbers
  */
 export const FIREBASE_TEST_NUMBERS = {
   // Japan
   JP_MOBILE_1: '+819012345678',
+  JP_MOBILE_1_LOCAL: '9012345678',
   JP_MOBILE_2: '+818012345678',
+  JP_MOBILE_2_LOCAL: '8012345678',
 
   // United States
   US_MOBILE_1: '+16505551234',
+  US_MOBILE_1_LOCAL: '6505551234',
   US_MOBILE_2: '+12025551234',
+  US_MOBILE_2_LOCAL: '2025551234',
 
   // United Kingdom
   UK_MOBILE_1: '+447911123456',
+  UK_MOBILE_1_LOCAL: '7911123456',
   UK_MOBILE_2: '+447400123456',
+  UK_MOBILE_2_LOCAL: '7400123456',
 
   // Test code (configure in Firebase Console)
   TEST_CODE: '123456',

@@ -39,8 +39,8 @@ describe("PhoneInputStep", () => {
     const input = screen.getByRole("textbox");
     fireEvent.change(input, { target: { value: "9012345678" } });
 
-    // InternationalPhoneField handles the onChange
-    expect(onPhoneNumberChange).toHaveBeenCalled();
+    // InternationalPhoneField handles the onChange and passes the international format
+    expect(onPhoneNumberChange).toHaveBeenCalledWith("+819012345678");
   });
 
   it("should call onSubmit when form is submitted", () => {

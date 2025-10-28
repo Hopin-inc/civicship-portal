@@ -129,9 +129,24 @@ export async function mockIdentityCheckPhoneUser(
  *
  * @param page - Playwright page instance
  * @param errorMessage - Error message to return
+ * @param operationName - Optional operation name to target specific GraphQL operations.
+ *                        If not provided, all GraphQL requests will return the error.
  */
-export async function mockGraphQLAuthError(page: Page, errorMessage: string = 'Authentication required') {
+export async function mockGraphQLAuthError(
+  page: Page,
+  errorMessage: string = 'Authentication required',
+  operationName?: string,
+) {
   await page.route('**/graphql', async (route: Route) => {
+    const request = route.request();
+    const postData = request.postDataJSON();
+
+    // If operationName is specified, only mock that specific operation
+    if (operationName && postData?.operationName !== operationName) {
+      await route.continue();
+      return;
+    }
+
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -153,9 +168,20 @@ export async function mockGraphQLAuthError(page: Page, errorMessage: string = 'A
  * Mocks GraphQL network error
  *
  * @param page - Playwright page instance
+ * @param operationName - Optional operation name to target specific GraphQL operations.
+ *                        If not provided, all GraphQL requests will fail.
  */
-export async function mockGraphQLNetworkError(page: Page) {
+export async function mockGraphQLNetworkError(page: Page, operationName?: string) {
   await page.route('**/graphql', async (route: Route) => {
+    const request = route.request();
+    const postData = request.postDataJSON();
+
+    // If operationName is specified, only mock that specific operation
+    if (operationName && postData?.operationName !== operationName) {
+      await route.continue();
+      return;
+    }
+
     await route.abort('failed');
   });
 }

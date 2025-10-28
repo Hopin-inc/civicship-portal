@@ -160,7 +160,12 @@ describe("InternationalPhoneField", () => {
       // Try to enter a number that's too long (Japanese mobile is 11 digits including 0)
       fireEvent.change(input, { target: { value: "90123456789012345" } });
 
-      // The component should limit the input length
+      // The component should limit the input length via limitMaxLength prop
+      // Verify that onChange was called (the library handles max length internally)
+      expect(onChange).toHaveBeenCalled();
+
+      // The input value may still show the full number, but the library prevents
+      // validation from passing for numbers that are too long
       expect(input).toBeInTheDocument();
     });
   });
@@ -248,14 +253,13 @@ describe("InternationalPhoneField", () => {
 
       const input = screen.getByRole("textbox");
 
-      // Simulate paste
-      fireEvent.paste(input, {
-        clipboardData: {
-          getData: () => "+819012345678",
-        },
-      });
+      // Note: fireEvent.paste doesn't properly trigger react-phone-number-input's paste handling
+      // in jsdom environment. Instead, we test that the component can handle pasted values
+      // via change events, which is how the library processes clipboard data internally.
+      fireEvent.change(input, { target: { value: "+819012345678" } });
 
-      expect(input).toBeInTheDocument();
+      // Verify that onChange was called with the pasted value
+      expect(onChange).toHaveBeenCalledWith("+819012345678");
     });
   });
 

@@ -36,7 +36,7 @@ test.describe('Authentication Integration - New User Flow', () => {
 
   test('should complete new user registration flow', async ({ page }) => {
     // Submit phone number
-    await submitPhoneNumber(page, FIREBASE_TEST_NUMBERS.JP_MOBILE_1.replace('+81', ''));
+    await submitPhoneNumber(page, FIREBASE_TEST_NUMBERS.JP_MOBILE_1_LOCAL);
 
     // Verify we're on code verification step
     await expect(page.getByText(/送信された6桁の認証コードを入力してください/)).toBeVisible();
@@ -56,7 +56,7 @@ test.describe('Authentication Integration - New User Flow', () => {
 
   test('should show success message for new user', async ({ page }) => {
     // Complete phone verification flow
-    await submitPhoneNumber(page, FIREBASE_TEST_NUMBERS.JP_MOBILE_1.replace('+81', ''));
+    await submitPhoneNumber(page, FIREBASE_TEST_NUMBERS.JP_MOBILE_1_LOCAL);
 
     // Wait for code verification screen
     await expect(page.getByText(/送信された6桁の認証コードを入力してください/)).toBeVisible();
@@ -66,7 +66,7 @@ test.describe('Authentication Integration - New User Flow', () => {
   });
 
   test('should redirect to sign-up after successful verification', async ({ page }) => {
-    await submitPhoneNumber(page, FIREBASE_TEST_NUMBERS.JP_MOBILE_1.replace('+81', ''));
+    await submitPhoneNumber(page, FIREBASE_TEST_NUMBERS.JP_MOBILE_1_LOCAL);
 
     await expect(page.getByText(/送信された6桁の認証コードを入力してください/)).toBeVisible();
 
@@ -79,7 +79,7 @@ test.describe('Authentication Integration - New User Flow', () => {
     await page.goto('/sign-up/phone-verification?next=/dashboard');
     await page.waitForLoadState('networkidle');
 
-    await submitPhoneNumber(page, FIREBASE_TEST_NUMBERS.JP_MOBILE_1.replace('+81', ''));
+    await submitPhoneNumber(page, FIREBASE_TEST_NUMBERS.JP_MOBILE_1_LOCAL);
 
     await expect(page.getByText(/送信された6桁の認証コードを入力してください/)).toBeVisible();
 
@@ -96,7 +96,7 @@ test.describe('Authentication Integration - Existing User Flow', () => {
     await page.waitForLoadState('networkidle');
 
     // Submit phone number
-    await submitPhoneNumber(page, FIREBASE_TEST_NUMBERS.JP_MOBILE_2.replace('+81', ''));
+    await submitPhoneNumber(page, FIREBASE_TEST_NUMBERS.JP_MOBILE_2_LOCAL);
 
     // Verify code verification screen
     await expect(page.getByText(/送信された6桁の認証コードを入力してください/)).toBeVisible();
@@ -113,7 +113,7 @@ test.describe('Authentication Integration - Existing User Flow', () => {
     await page.waitForLoadState('networkidle');
 
     // Submit phone number
-    await submitPhoneNumber(page, FIREBASE_TEST_NUMBERS.US_MOBILE_1.replace('+1', ''));
+    await submitPhoneNumber(page, FIREBASE_TEST_NUMBERS.US_MOBILE_1_LOCAL);
 
     // Verify code verification screen
     await expect(page.getByText(/送信された6桁の認証コードを入力してください/)).toBeVisible();
@@ -130,7 +130,7 @@ test.describe('Authentication Integration - Existing User Flow', () => {
     await page.waitForLoadState('networkidle');
 
     // Submit phone number
-    await submitPhoneNumber(page, FIREBASE_TEST_NUMBERS.JP_MOBILE_1.replace('+81', ''));
+    await submitPhoneNumber(page, FIREBASE_TEST_NUMBERS.JP_MOBILE_1_LOCAL);
 
     // Verify code verification screen
     await expect(page.getByText(/送信された6桁の認証コードを入力してください/)).toBeVisible();
@@ -147,7 +147,7 @@ test.describe('Authentication Integration - Error Handling', () => {
     await page.goto('/sign-up/phone-verification');
     await page.waitForLoadState('networkidle');
 
-    await submitPhoneNumber(page, FIREBASE_TEST_NUMBERS.JP_MOBILE_1.replace('+81', ''));
+    await submitPhoneNumber(page, FIREBASE_TEST_NUMBERS.JP_MOBILE_1_LOCAL);
 
     await expect(page.getByText(/送信された6桁の認証コードを入力してください/)).toBeVisible();
 
@@ -162,7 +162,7 @@ test.describe('Authentication Integration - Error Handling', () => {
     await page.goto('/sign-up/phone-verification');
     await page.waitForLoadState('networkidle');
 
-    await submitPhoneNumber(page, FIREBASE_TEST_NUMBERS.JP_MOBILE_1.replace('+81', ''));
+    await submitPhoneNumber(page, FIREBASE_TEST_NUMBERS.JP_MOBILE_1_LOCAL);
 
     await expect(page.getByText(/送信された6桁の認証コードを入力してください/)).toBeVisible();
 
@@ -176,7 +176,7 @@ test.describe('Authentication Integration - Error Handling', () => {
     await page.goto('/sign-up/phone-verification');
     await page.waitForLoadState('networkidle');
 
-    await submitPhoneNumber(page, FIREBASE_TEST_NUMBERS.JP_MOBILE_1.replace('+81', ''));
+    await submitPhoneNumber(page, FIREBASE_TEST_NUMBERS.JP_MOBILE_1_LOCAL);
 
     await expect(page.getByText(/送信された6桁の認証コードを入力してください/)).toBeVisible();
 
@@ -190,7 +190,7 @@ test.describe('Authentication Integration - Error Handling', () => {
     await page.goto('/sign-up/phone-verification');
     await page.waitForLoadState('networkidle');
 
-    await submitPhoneNumber(page, FIREBASE_TEST_NUMBERS.JP_MOBILE_1.replace('+81', ''));
+    await submitPhoneNumber(page, FIREBASE_TEST_NUMBERS.JP_MOBILE_1_LOCAL);
 
     await expect(page.getByText(/送信された6桁の認証コードを入力してください/)).toBeVisible();
 
@@ -301,7 +301,7 @@ test.describe('Authentication Integration - Code Resend', () => {
     await page.waitForLoadState('networkidle');
 
     // Navigate to code verification step
-    await submitPhoneNumber(page, FIREBASE_TEST_NUMBERS.JP_MOBILE_1.replace('+81', ''));
+    await submitPhoneNumber(page, FIREBASE_TEST_NUMBERS.JP_MOBILE_1_LOCAL);
 
     await expect(page.getByText(/送信された6桁の認証コードを入力してください/)).toBeVisible();
   });
@@ -355,7 +355,7 @@ test.describe('Authentication Integration - Back to Phone', () => {
     await page.waitForLoadState('networkidle');
 
     // Navigate to code verification step
-    await submitPhoneNumber(page, FIREBASE_TEST_NUMBERS.JP_MOBILE_1.replace('+81', ''));
+    await submitPhoneNumber(page, FIREBASE_TEST_NUMBERS.JP_MOBILE_1_LOCAL);
 
     await expect(page.getByText(/送信された6桁の認証コードを入力してください/)).toBeVisible();
   });
@@ -400,7 +400,7 @@ test.describe('Authentication Integration - Session Persistence', () => {
     await page.waitForLoadState('networkidle');
 
     // Complete authentication
-    await submitPhoneNumber(page, FIREBASE_TEST_NUMBERS.JP_MOBILE_1.replace('+81', ''));
+    await submitPhoneNumber(page, FIREBASE_TEST_NUMBERS.JP_MOBILE_1_LOCAL);
 
     // After successful auth and redirect, reload page
     // await page.reload();
