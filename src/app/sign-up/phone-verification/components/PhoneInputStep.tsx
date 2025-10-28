@@ -7,7 +7,6 @@ import { InternationalPhoneField } from "./InternationalPhoneField";
 import {
   DEFAULT_COUNTRY,
   getAllowedCountries,
-  COUNTRY_LABELS,
   SHOW_FLAGS,
 } from "@/config/phone-input-config";
 
@@ -54,7 +53,6 @@ export function PhoneInputStep({
             onChange={onPhoneNumberChange}
             defaultCountry={DEFAULT_COUNTRY}
             countries={getAllowedCountries()}
-            labels={COUNTRY_LABELS}
             showFlags={SHOW_FLAGS}
             placeholder="例）09012345678"
             disabled={isSubmitting || isVerifying || isReloading}

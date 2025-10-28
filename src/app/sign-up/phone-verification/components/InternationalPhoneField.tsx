@@ -2,6 +2,7 @@
 
 import React from "react";
 import PhoneInput, { Country } from "react-phone-number-input";
+import { Input } from "@/components/ui/input";
 
 interface InternationalPhoneFieldProps {
   value: string | undefined;
@@ -9,7 +10,6 @@ interface InternationalPhoneFieldProps {
   disabled?: boolean;
   defaultCountry?: Country;
   countries?: Country[];
-  labels?: Record<string, string>;
   showFlags?: boolean;
   placeholder?: string;
   className?: string;
@@ -22,6 +22,7 @@ interface InternationalPhoneFieldProps {
  * - No labels (handled by parent)
  * - No business logic
  * - Fully controlled via props
+ * - Uses shadcn/ui Input component for consistent styling
  */
 export function InternationalPhoneField({
   value,
@@ -29,10 +30,9 @@ export function InternationalPhoneField({
   disabled = false,
   defaultCountry = "JP",
   countries,
-  labels,
   showFlags = false,
   placeholder = "例）09012345678",
-  className = "w-full h-12 px-3 border rounded-md",
+  className = "PhoneInput",
   id = "phone",
 }: InternationalPhoneFieldProps) {
   return (
@@ -42,13 +42,13 @@ export function InternationalPhoneField({
       onChange={onChange}
       defaultCountry={defaultCountry}
       countries={countries}
-      labels={labels}
       international
       withCountryCallingCode
       countryCallingCodeEditable={false}
       disabled={disabled}
       placeholder={placeholder}
       className={className}
+      inputComponent={Input}
       flagComponent={showFlags ? undefined : () => null}
     />
   );

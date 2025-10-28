@@ -13,12 +13,3 @@ export const isValidPhoneNumber = (
   }
   return isValidPhoneNumberLib(phoneNumber);
 };
-
-/**
- * Format phone number for display
- * @param phoneNumber - Phone number in E.164 format
- * @returns Formatted phone number
- */
-export const formatPhoneNumberForDisplay = (phoneNumber: string): string => {
-  return phoneNumber;
-};

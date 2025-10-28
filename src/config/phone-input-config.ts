@@ -1,4 +1,5 @@
 import { Country } from "react-phone-number-input";
+import en from "react-phone-number-input/locale/en.json";
 
 /**
  * Default country for phone input
@@ -9,42 +10,21 @@ export const DEFAULT_COUNTRY: Country = "JP";
  * Get allowed countries from environment variable
  * Returns undefined if not set (allows all countries)
  * Returns array of country codes if set
+ * Validates country codes against known ISO country codes
  */
 export const getAllowedCountries = (): Country[] | undefined => {
   const envCountries = process.env.NEXT_PUBLIC_PHONE_ALLOWED_COUNTRIES;
   if (!envCountries) {
     return undefined; // All countries allowed
   }
-  return envCountries.split(",").map((code) => code.trim() as Country);
-};
-
-/**
- * Country labels in Japanese
- */
-export const COUNTRY_LABELS: Record<string, string> = {
-  JP: "日本",
-  US: "アメリカ",
-  GB: "イギリス",
-  CN: "中国",
-  KR: "韓国",
-  TW: "台湾",
-  HK: "香港",
-  SG: "シンガポール",
-  AU: "オーストラリア",
-  CA: "カナダ",
-  DE: "ドイツ",
-  FR: "フランス",
-  IT: "イタリア",
-  ES: "スペイン",
-  NL: "オランダ",
-  BR: "ブラジル",
-  MX: "メキシコ",
-  IN: "インド",
-  TH: "タイ",
-  VN: "ベトナム",
-  PH: "フィリピン",
-  MY: "マレーシア",
-  ID: "インドネシア",
+  
+  const validCountries = Object.keys(en) as Country[];
+  
+  // Parse, normalize, and validate country codes from environment variable
+  return envCountries
+    .split(",")
+    .map((code) => code.trim().toUpperCase() as Country)
+    .filter((code) => validCountries.includes(code));
 };
 
 /**
