@@ -14,7 +14,6 @@ import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { RawURIComponent } from "@/utils/path";
 import { logger } from "@/lib/logging";
 import { LiffService } from "@/lib/auth/service/liff-service";
-import { urlToFile } from "@/lib/utils/image-converter";
 
 interface CodeVerificationResult {
   success: boolean;
@@ -104,24 +103,8 @@ export function useCodeVerification(
             const displayName = liffProfile.displayName || "ユーザー";
 
             try {
-              // LINE画像をダウンロードしてFileに変換
-              let profileImage: File | null = null;
-              if (liffProfile.pictureUrl) {
-                try {
-                  profileImage = await urlToFile(liffProfile.pictureUrl, "profile.jpg");
-                  if (profileImage) {
-                    logger.debug("[useCodeVerification] Successfully downloaded LINE profile image");
-                  }
-                } catch (imageError) {
-                  logger.warn("[useCodeVerification] Failed to download LINE profile image", {
-                    error: imageError instanceof Error ? imageError.message : String(imageError),
-                  });
-                  // 画像ダウンロード失敗は致命的ではないので続行
-                }
-              }
-
-              // userSignUpを実行
-              await createUser(displayName, GqlCurrentPrefecture.Unknown, phoneUid, profileImage);
+              // userSignUpを実行（画像は後でユーザーがプロフィール編集で設定可能）
+              await createUser(displayName, GqlCurrentPrefecture.Unknown, phoneUid, null);
 
               // ユーザー情報を再取得
               await updateAuthState();
