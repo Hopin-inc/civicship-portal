@@ -25,5 +25,6 @@
   "common.prefectures.tokushima": "Tokushima",
   "common.prefectures.ehime": "Ehime",
   "common.prefectures.kochi": "Kochi",
-  "common.prefectures.outsideShikoku": "Outside Shikoku"
+  "common.prefectures.outsideShikoku": "Outside Shikoku",
+  "common.prefectures.unknown": "Unknown"
 }

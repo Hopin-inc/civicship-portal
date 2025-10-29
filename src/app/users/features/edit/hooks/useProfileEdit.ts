@@ -6,13 +6,15 @@ import { toast } from "sonner";
 import { GqlCurrentPrefecture, useUpdateMyProfileMutation } from "@/types/graphql";
 import { GeneralUserProfile } from "@/app/users/features/shared/types";
 import { mapGqlUserToProfile } from "@/app/users/features/shared/mappers";
-import { prefectureLabels } from "@/shared/prefectures/constants";
+import { prefectureOptions as prefectureEnumValues } from "@/shared/prefectures/constants";
 import { logger } from "@/lib/logging";
 import { useUserProfileContext } from "@/app/users/features/shared/contexts/UserProfileContext";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
+import { getPrefectureKey } from "@/lib/i18n/prefectures";
 
 const useProfileEdit = () => {
   const t = useTranslations();
+  const locale = useLocale();
   const router = useRouter();
   const { gqlUser, userId } = useUserProfileContext();
 
@@ -91,11 +93,11 @@ const useProfileEdit = () => {
 
   const prefectureOptions = useMemo(
     () =>
-      Object.entries(prefectureLabels).map(([key, label]) => ({
-        value: key as GqlCurrentPrefecture,
-        label,
+      prefectureEnumValues.map((value) => ({
+        value,
+        label: t(getPrefectureKey(value)),
       })),
-    [],
+    [t, locale],
   );
 
   return {

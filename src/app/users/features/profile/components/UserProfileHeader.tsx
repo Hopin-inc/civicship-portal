@@ -9,13 +9,14 @@ import { currentCommunityConfig } from "@/lib/communities/metadata";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useTranslations } from "next-intl";
 import { getPrefectureKey } from "@/lib/i18n/prefectures";
+import { GqlCurrentPrefecture } from "@/types/graphql";
 
 interface UserProfileHeaderProps {
   id: string;
   name: string;
   imageUrl?: string;
   bio?: string;
-  currentPrefecture?: string;
+  currentPrefecture?: GqlCurrentPrefecture;
   isOwner: boolean;
   socialUrl: {
     x: string | null;

@@ -7,6 +7,8 @@ import { ja } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
 import SearchModal from "@/components/search/SearchModal";
 import { FormProvider, useForm } from "react-hook-form";
+import { useTranslations } from "next-intl";
+import { getPrefectureKey } from "@/lib/i18n/prefectures";
 
 interface SearchFormProps {
   location?: string;
@@ -19,19 +21,14 @@ interface SearchFormProps {
   points?: string;
 }
 
-const PREFECTURE_LABELS: Record<string, string> = {
-  KAGAWA: "香川県",
-  TOKUSHIMA: "徳島県",
-  KOUCHI: "高知県",
-  EHIME: "愛媛県",
-};
-const DEFAULT_LABEL = "四国";
-
 const SearchBox = ({ location, from, to, guests, q, type, ticket, points }: SearchFormProps) => {
+  const t = useTranslations();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const getLocationText = (location: string | undefined, isDefault: boolean = false): string => {
-    const label = location ? PREFECTURE_LABELS[location] || DEFAULT_LABEL : DEFAULT_LABEL;
+    const label = location && getPrefectureKey(location) 
+      ? t(getPrefectureKey(location))
+      : t("common.regions.shikoku");
     return isDefault ? label : `${label}の体験`;
   };
 

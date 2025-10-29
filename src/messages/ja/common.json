@@ -25,5 +25,6 @@
   "common.prefectures.tokushima": "徳島県",
   "common.prefectures.ehime": "愛媛県",
   "common.prefectures.kochi": "高知県",
-  "common.prefectures.outsideShikoku": "四国以外"
+  "common.prefectures.outsideShikoku": "四国以外",
+  "common.prefectures.unknown": "不明"
 }
