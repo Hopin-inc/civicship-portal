@@ -68,7 +68,7 @@ const UserInfoCard = ({
             </span>
           )}
         </div>
-        {showDid && <span className="text-label-xs text-caption py-2">{didValue?.length ? truncateText(didValue, 20, "middle") : "did取得中"}</span>}
+        {showDid && didValue && <span className="text-label-xs text-caption py-2">{truncateText(didValue, 20, "middle")}</span>}
         {comment && (
           <span className="text-label-xs text-caption bg-background-hover leading-relaxed block p-2 rounded-sm">
             {comment}
