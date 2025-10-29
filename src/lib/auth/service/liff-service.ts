@@ -79,16 +79,16 @@ export class LiffService {
 
         return true;
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const processedError = error instanceof Error ? error : new Error(String(error));
         const isEnvironmentConstraint =
-          errorMessage.includes("LIFF") ||
-          errorMessage.includes("LINE") ||
-          errorMessage.includes("Load failed");
+          processedError.message.includes("LIFF") ||
+          processedError.message.includes("LINE") ||
+          processedError.message.includes("Load failed");
 
         if (isEnvironmentConstraint) {
           logger.warn("LIFF environment initialization limitation", {
             authType: "liff",
-            error: errorMessage,
+            error: processedError.message,
             component: "LiffService",
             errorCategory: "environment_constraint",
             expected: true,
@@ -96,16 +96,12 @@ export class LiffService {
         } else {
           logger.info("LIFF initialization failed", {
             authType: "liff",
-            error: errorMessage,
+            error: processedError.message,
             component: "LiffService",
             errorCategory: "initialization_error",
           });
         }
-        if (error instanceof Error) {
-          this.state.error = error;
-        } else {
-          this.state.error = new Error(errorMessage);
-        }
+        this.state.error = processedError;
         return false;
       } finally {
         this.initializationPromise = null;
@@ -138,16 +134,16 @@ export class LiffService {
       await this.updateProfile();
       return true;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const processedError = error instanceof Error ? error : new Error(String(error));
       const isEnvironmentConstraint =
-        errorMessage.includes("LIFF") ||
-        errorMessage.includes("LINE") ||
-        errorMessage.includes("Load failed");
+        processedError.message.includes("LIFF") ||
+        processedError.message.includes("LINE") ||
+        processedError.message.includes("Load failed");
 
       if (isEnvironmentConstraint) {
         logger.warn("LIFF environment login limitation", {
           authType: "liff",
-          error: errorMessage,
+          error: processedError.message,
           component: "LiffService",
           errorCategory: "environment_constraint",
           expected: true,
@@ -155,16 +151,12 @@ export class LiffService {
       } else {
         logger.info("LIFF login process failed", {
           authType: "liff",
-          error: errorMessage,
+          error: processedError.message,
           component: "LiffService",
           errorCategory: "auth_temporary",
         });
       }
-      if (error instanceof Error) {
-        this.state.error = error;
-      } else {
-        this.state.error = new Error(errorMessage);
-      }
+      this.state.error = processedError;
       return false;
     }
   }
