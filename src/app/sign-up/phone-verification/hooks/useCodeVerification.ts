@@ -14,6 +14,7 @@ import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { RawURIComponent } from "@/utils/path";
 import { logger } from "@/lib/logging";
 import { LiffService } from "@/lib/auth/service/liff-service";
+import { currentCommunityConfig } from "@/lib/communities/metadata";
 
 interface CodeVerificationResult {
   success: boolean;
@@ -110,14 +111,15 @@ export function useCodeVerification(
               await updateAuthState();
               setAuthState({ authenticationState: "user_registered", isAuthInProgress: false });
 
+              const defaultPath = (currentCommunityConfig.rootPath || "/") as RawURIComponent;
               const homeRedirectPath = authRedirectService.getRedirectPath(
-                "/" as RawURIComponent,
+                defaultPath,
                 nextParam as RawURIComponent,
               );
 
               return {
                 success: true,
-                redirectPath: homeRedirectPath || "/",
+                redirectPath: homeRedirectPath || defaultPath,
                 message: "アカウントを作成しました",
               };
             } catch (createError) {
