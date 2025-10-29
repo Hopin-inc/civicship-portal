@@ -30,7 +30,7 @@ export function useCodeVerification(
   phoneAuth: { verifyPhoneCode: (verificationCode: string) => Promise<boolean> },
   nextParam: string,
   updateAuthState: () => Promise<any>,
-  createUser: (name: string, prefecture: GqlCurrentPrefecture, phoneUid: string) => Promise<any>,
+  createUser: (name: string, prefecture: GqlCurrentPrefecture, phoneUid: string, image?: File | null) => Promise<any>,
 ) {
   const [isVerifying, setIsVerifying] = useState(false);
 
@@ -104,8 +104,24 @@ export function useCodeVerification(
             const displayName = liffProfile.displayName || "ユーザー";
 
             try {
+              // LINE画像をダウンロードしてFileに変換
+              let profileImage: File | null = null;
+              if (liffProfile.pictureUrl) {
+                try {
+                  profileImage = await urlToFile(liffProfile.pictureUrl, "profile.jpg");
+                  if (profileImage) {
+                    logger.debug("[useCodeVerification] Successfully downloaded LINE profile image");
+                  }
+                } catch (imageError) {
+                  logger.warn("[useCodeVerification] Failed to download LINE profile image", {
+                    error: imageError instanceof Error ? imageError.message : String(imageError),
+                  });
+                  // 画像ダウンロード失敗は致命的ではないので続行
+                }
+              }
+
               // userSignUpを実行
-              await createUser(displayName, GqlCurrentPrefecture.Unknown, phoneUid);
+              await createUser(displayName, GqlCurrentPrefecture.Unknown, phoneUid, profileImage);
 
               // ユーザー情報を再取得
               await updateAuthState();

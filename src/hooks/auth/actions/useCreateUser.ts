@@ -8,7 +8,7 @@ export const useCreateUser = (refetchUser: () => Promise<GqlUser | null>) => {
   const firebaseUser = useAuthStore((s) => s.state.firebaseUser);
 
   return useCallback(
-    async (name: string, prefecture: GqlCurrentPrefecture, phoneUid: string) => {
+    async (name: string, prefecture: GqlCurrentPrefecture, phoneUid: string, image?: File | null) => {
       try {
         const { state, phoneAuth } = useAuthStore.getState();
         const { lineTokens } = state;
@@ -26,6 +26,7 @@ export const useCreateUser = (refetchUser: () => Promise<GqlUser | null>) => {
               phoneRefreshToken: phoneTokens.refreshToken ?? undefined,
               lineRefreshToken: lineTokens.refreshToken ?? undefined,
               lineTokenExpiresAt: lineTokens.expiresAt ?? undefined,
+              image: image ? { file: image } : undefined,
             },
           },
         });
