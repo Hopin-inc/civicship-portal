@@ -2,22 +2,16 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
+import {
+  Empty,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+  EmptyDescription,
+  EmptyContent,
+} from "@/components/ui/empty";
+import { Search } from "lucide-react";
 import { currentCommunityConfig, getCurrentRegionName } from "@/lib/communities/metadata";
-
-// const emptyImages = [
-//   {
-//     url: "/images/tickets/empty-1.jpg",
-//     alt: "体験の様子1",
-//   },
-//   {
-//     url: "/images/tickets/empty-2.jpg",
-//     alt: "体験の様子2",
-//   },
-//   {
-//     url: "/images/tickets/empty-3.jpg",
-//     alt: "体験の様子3",
-//   },
-// ];
 
 interface EmptyStateProps {
   title?: string;
@@ -30,7 +24,7 @@ interface EmptyStateProps {
 }
 
 export default function EmptyStateWithSearch({
-  // title = "チケットはありません",
+  title,
   description = (
     <>
       {getCurrentRegionName()}の素敵な人と関わって
@@ -39,43 +33,35 @@ export default function EmptyStateWithSearch({
     </>
   ),
   actionLabel = "関わりをみつける",
-  onAction = () => (window.location.href = "/"),
+  onAction = () => (window.location.href = currentCommunityConfig.rootPath ?? "/"),
   hideActionButton = false,
-  // icon,
-  // images = emptyImages,
+  icon,
 }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center text-center mt-8">
-      {/*{icon ? (*/}
-      {/*  <div className="mb-6">{icon}</div>*/}
-      {/*) : (*/}
-      {/*  <div className="w-[224px] h-[220px] mb-8">*/}
-      {/*    <AsymmetricImageGrid images={images} className="h-full" />*/}
-      {/*  </div>*/}
-      {/*)}*/}
-
-      {/*<h2 className="text-display-md mb-1">{title}</h2>*/}
-      <div className="text-muted-foreground mb-4">
-        {typeof description === "string" ? (
-          <p className="whitespace-pre-line text-body-md">{description}</p>
-        ) : (
-          description
-        )}
-      </div>
+    <Empty className="mt-8">
+      <EmptyHeader>
+        <EmptyMedia variant="gradient">
+          {icon || <Search className="h-8 w-8" />}
+        </EmptyMedia>
+        {title && <EmptyTitle>{title}</EmptyTitle>}
+        <EmptyDescription>
+          {typeof description === "string" ? description : description}
+        </EmptyDescription>
+      </EmptyHeader>
 
       {!hideActionButton && (
-        <>
+        <EmptyContent>
           {currentCommunityConfig.enableFeatures.includes("opportunities") ? (
             <Button variant="primary" size="lg" className="px-16" onClick={onAction}>
               {actionLabel}
             </Button>
           ) : (
-            <Button variant="tertiary" disabled size="lg" className="px-16" onClick={onAction}>
+            <Button variant="tertiary" disabled size="lg" className="px-16">
               🚧 開発中です
             </Button>
           )}
-        </>
+        </EmptyContent>
       )}
-    </div>
+    </Empty>
   );
 }
