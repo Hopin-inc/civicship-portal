@@ -4,10 +4,14 @@ import { GqlUser } from "@/types/graphql";
 import { formatDateTime } from "@/utils/date";
 import React from "react";
 import { truncateText } from "@/utils/stringUtils";
+import { useTranslations } from "next-intl";
 
 interface Props {
   otherUser: GqlUser | undefined | null;
   label?: string | { text: string; smallText: string };
+  otherName?: string;
+  actionType?: "donation" | "grant";
+  isReceive?: boolean;
   point?: bigint;
   sign?: string;
   pointColor?: string;
@@ -25,6 +29,9 @@ interface Props {
 const UserInfoCard = ({
   otherUser,
   label,
+  otherName,
+  actionType,
+  isReceive,
   point,
   sign,
   pointColor,
@@ -38,7 +45,10 @@ const UserInfoCard = ({
   children,
   comment,
 }: Props) => {
+  const t = useTranslations();
   const showDidLine = showDid && !!didValue;
+  
+  const useTranslatedLabel = actionType && otherName !== undefined && isReceive !== undefined;
   
   return (
     <Card className="px-4 py-4 bg-white" onClick={onClick}>
@@ -51,14 +61,16 @@ const UserInfoCard = ({
         <div className="flex items-start justify-between">
           <span className="flex items-center truncate whitespace-nowrap overflow-hidden">
           {showLabel
-            ? typeof label === "string"
-              ? label
-              : label && (
-                  <span className="flex items-center min-w-0">
-                    <span className="truncate text-label-sm font-bold">{label.text.replace(label.smallText, "")}</span>
-                    <span className="text-xs flex-shrink-0 text-label-xs font-bold">{label.smallText}</span>
-                  </span>
-                )
+            ? useTranslatedLabel
+              ? t(`wallets.action.${actionType}.${isReceive ? 'from' : 'to'}`, { name: otherName })
+              : typeof label === "string"
+                ? label
+                : label && (
+                    <span className="flex items-center min-w-0">
+                      <span className="truncate text-label-sm font-bold">{label.text.replace(label.smallText, "")}</span>
+                      <span className="text-xs flex-shrink-0 text-label-xs font-bold">{label.smallText}</span>
+                    </span>
+                  )
             : otherUser?.name
               ? `{{ ${otherUser.name} }}`
               : ""}

@@ -52,7 +52,9 @@ export function HistoryTab({ listType, searchQuery, onSelect }: HistoryTabProps)
         <UserInfoCard
           key={`${tx.otherUser?.id}-${index}`}
           otherUser={tx.otherUser}
-          label={tx.label}
+          otherName={tx.otherName}
+          actionType={tx.actionType}
+          isReceive={tx.isReceive}
           point={BigInt(tx.point)}
           sign={tx.sign}
           pointColor={tx.pointColor}

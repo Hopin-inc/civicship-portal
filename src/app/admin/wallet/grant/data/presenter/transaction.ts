@@ -80,10 +80,8 @@ function presentDonateTransaction({
     transaction,
     isReceive,
     otherUser,
-    label: {
-      text: `${otherName}${isReceive ? "から受取" : "に譲渡"}`,
-      smallText: isReceive ? "から受取" : "に譲渡",
-    },
+    otherName,
+    actionType: "donation",
     didIssuanceRequests,
   });
 }
@@ -111,10 +109,8 @@ function presentGrantTransaction({
     transaction,
     isReceive,
     otherUser,
-    label: {
-      text: `${otherName}${isReceive ? "から受取" : "に支給"}`,
-      smallText: isReceive ? "から受取" : "に支給",
-    },
+    otherName,
+    actionType: "grant",
     didIssuanceRequests,
   });
 }
@@ -123,13 +119,15 @@ function buildPresentedTransaction({
   transaction,
   isReceive,
   otherUser,
-  label,
+  otherName,
+  actionType,
   didIssuanceRequests,
 }: {
   transaction: GqlTransaction;
   isReceive: boolean;
   otherUser?: Maybe<GqlUser>;
-  label: { text: string; smallText: string };
+  otherName: string;
+  actionType: "donation" | "grant";
   didIssuanceRequests: GqlDidIssuanceRequest[];
 }) {
   const rawPoint = isReceive ? transaction.toPointChange : transaction.fromPointChange;
@@ -144,10 +142,11 @@ function buildPresentedTransaction({
   return {
     isReceive,
     otherUser,
+    otherName,
+    actionType,
     point,
     sign,
     pointColor,
-    label,
     didValue: truncateText(didValue, 20, "middle"),
     createdAt: transaction.createdAt,
     comment: transaction.comment,

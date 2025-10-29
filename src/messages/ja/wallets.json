@@ -40,5 +40,9 @@
   "wallets.shared.transfer.balance": "残高",
   "wallets.shared.transfer.commentLabel": "コメント",
   "wallets.shared.transfer.commentPlaceholder": "例）草刈り手伝ってくれてありがとう！",
-  "wallets.shared.transfer.commentError": "100文字以内で入力してください"
+  "wallets.shared.transfer.commentError": "100文字以内で入力してください",
+  "wallets.action.donation.to": "{name}に譲渡",
+  "wallets.action.donation.from": "{name}から受取",
+  "wallets.action.grant.to": "{name}に支給",
+  "wallets.action.grant.from": "{name}から受取"
 }

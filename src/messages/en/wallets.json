@@ -40,5 +40,9 @@
   "wallets.shared.transfer.balance": "Balance",
   "wallets.shared.transfer.commentLabel": "Comment",
   "wallets.shared.transfer.commentPlaceholder": "e.g., Thanks for helping with the weeding!",
-  "wallets.shared.transfer.commentError": "Please enter within 100 characters"
+  "wallets.shared.transfer.commentError": "Please enter within 100 characters",
+  "wallets.action.donation.to": "Transferred to {name}",
+  "wallets.action.donation.from": "Received from {name}",
+  "wallets.action.grant.to": "Granted to {name}",
+  "wallets.action.grant.from": "Received from {name}"
 }
