@@ -10,7 +10,7 @@
 
 **例:**
 ```
-auth.login.description
+auth.login.welcomeMessage
 auth.signup.title
 wallets.overview.headerTitle
 wallets.card.balanceLabel
@@ -112,7 +112,7 @@ src/messages/
 
 ```json
 {
-  "auth.login.description": "を利用するにはLINEでログインして下さい",
+  "auth.login.welcomeMessage": "を利用するにはLINEでログインして下さい",
   "auth.login.loginButton": "LINEでログイン",
   "auth.login.loggingIn": "ログイン中...",
   "auth.signup.nameLabel": "本名",
@@ -149,7 +149,7 @@ export function LoginView() {
   
   return (
     <div>
-      <p>{t('auth.login.description')}</p>
+      <p>{t('auth.login.welcomeMessage')}</p>
       <button>{t('auth.login.loginButton')}</button>
     </div>
   );
@@ -181,6 +181,37 @@ const message = isSuccess
   ? t('auth.login.successMessage')
   : t('auth.login.errorMessage');
 ```
+
+### リッチテキスト（HTML）の使用
+
+翻訳文字列にHTMLタグを含める場合は、`t.rich()`を使用します。これにより、安全にリッチテキストを変換できます。
+
+**翻訳ファイル (ja/auth.json):**
+```json
+{
+  "auth.login.welcomeMessage": "<b>{communityName}</b>を利用するにはLINEでログインして下さい"
+}
+```
+
+**コンポーネント内:**
+```tsx
+import { useTranslations } from 'next-intl';
+
+export function LoginView() {
+  const t = useTranslations();
+  
+  return (
+    <div>
+      {t.rich("auth.login.welcomeMessage", {
+        communityName: currentCommunityConfig.title,
+        b: (chunks) => <strong className="font-bold">{chunks}</strong>,
+      })}
+    </div>
+  );
+}
+```
+
+**注意:** 生のHTMLを直接注入するのではなく、`t.rich()`を使用して安全にリッチテキストを変換してください。
 
 ## チェックリスト
 

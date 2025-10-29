@@ -65,16 +65,20 @@ async function findUsedKeys(): Promise<Set<string>> {
   for (const file of files) {
     const content = fs.readFileSync(file, 'utf-8');
     
-    const singleQuoteMatches = content.matchAll(/t\(['"]([^'"]+)['"]\)/g);
-    const templateMatches = content.matchAll(/t\(`([^`]+)`\)/g);
+    const singleQuoteMatches = content.matchAll(/(?:^|[^A-Za-z0-9_])t(?:\s*\.\s*rich)?\s*\(\s*['"]([^'"]+)['"]\s*[,)]/g);
+    const templateMatches = content.matchAll(/(?:^|[^A-Za-z0-9_])t(?:\s*\.\s*rich)?\s*\(\s*`([^`]+)`\s*[,)]/g);
     
     for (const match of singleQuoteMatches) {
-      usedKeys.add(match[1]);
+      const key = match[1];
+      if (key.includes('.') && /^[A-Za-z][\w.-]*\.[\w.-]+$/.test(key)) {
+        usedKeys.add(key);
+      }
     }
     
     for (const match of templateMatches) {
-      if (!match[1].includes('${')) {
-        usedKeys.add(match[1]);
+      const key = match[1];
+      if (!key.includes('${') && key.includes('.') && /^[A-Za-z][\w.-]*\.[\w.-]+$/.test(key)) {
+        usedKeys.add(key);
       }
     }
   }
