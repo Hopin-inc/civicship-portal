@@ -9,6 +9,7 @@ import { applySsrAuthState } from "@/lib/auth/init/applySsrAuthState";
 import { useAuthActions } from "@/hooks/auth/actions";
 import { useAuthSideEffects } from "@/hooks/auth/sideEffects";
 import { useAuthValue } from "@/hooks/auth/init/useAuthValue";
+import { useAuthStore } from "@/lib/auth/core/auth-store";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -20,6 +21,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
 }) => {
   const { liffService, phoneAuthService, authStateManager } = useAuthDependencies();
   const hasInitialized = useRef(false);
+  const prehydratedRef = useRef(false);
+
+  if (!prehydratedRef.current && ssrCurrentUser && ssrLineAuthenticated) {
+    const store = useAuthStore.getState();
+    if (store.state.authenticationState === "loading") {
+      const targetState = ssrPhoneAuthenticated ? "user_registered" : "line_authenticated";
+      store.setState({
+        authenticationState: targetState,
+        currentUser: ssrCurrentUser,
+        isAuthenticating: false,
+        isAuthInProgress: false,
+      });
+      prehydratedRef.current = true;
+    }
+  }
 
   useEffect(() => {
     if (hasInitialized.current) return;
@@ -27,10 +43,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
 
     if (!authStateManager) return;
 
-    // ✅ SSR初期状態適用
     applySsrAuthState(ssrCurrentUser, ssrLineAuthenticated, ssrPhoneAuthenticated);
 
-    // 🚀 通常の初期化
     void initAuth({
       liffService,
       authStateManager,
