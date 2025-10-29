@@ -1,12 +1,15 @@
+"use client";
 import { Card, CardContent } from "@/components/ui/card";
 import { FileIcon } from "lucide-react";
 import Link from "next/link";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
+import { useTranslations } from "next-intl";
 
 export default function PromiseSection() {
+  const t = useTranslations();
   const defaultCommonDocuments = [
-    { id: "terms", title: "利用規約", path: "/terms", type: "internal" as const },
-    { id: "privacy", title: "プライバシーポリシー", path: "/privacy", type: "internal" as const },
+    { id: "terms", title: t("users.promise.termsOfService"), path: "/terms", type: "internal" as const },
+    { id: "privacy", title: t("users.promise.privacyPolicy"), path: "/privacy", type: "internal" as const },
   ];
 
   const commonDocuments = defaultCommonDocuments.map((doc) => {

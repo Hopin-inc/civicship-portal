@@ -1,16 +1,18 @@
 import EmptyStateWithSearch from "@/components/shared/EmptyStateWithSearch";
 import { getCurrentRegionName } from "@/lib/communities/metadata";
+import { useTranslations } from "next-intl";
 
 type PortfolioEmptyStateProps = {
   isOwner: boolean;
 };
 
 export const PortfolioEmptyState = ({ isOwner }: PortfolioEmptyStateProps) => {
+  const t = useTranslations();
   const emptyStateProps = {
     description: isOwner
-      ? `${getCurrentRegionName()}の素敵な人との\n関わりを探してみましょう`
-      : "体験に参加すると、タイムラインが作成されます",
-    actionLabel: isOwner ? "関わりを探す" : undefined,
+      ? t("users.portfolio.emptyStateOwner", { regionName: getCurrentRegionName() })
+      : t("users.portfolio.emptyStateNonOwner"),
+    actionLabel: isOwner ? t("users.portfolio.searchEngagements") : undefined,
     onAction: isOwner ? () => (window.location.href = "/") : undefined,
     hideActionButton: !isOwner,
   };

@@ -7,6 +7,7 @@ import { useReadMore } from "@/hooks/useReadMore";
 import { cn } from "@/lib/utils";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useTranslations } from "next-intl";
 
 interface UserProfileHeaderProps {
   id: string;
@@ -31,6 +32,7 @@ export function UserProfileHeader({
   isOwner,
   socialUrl,
 }: UserProfileHeaderProps) {
+  const t = useTranslations();
   const socialButtonClasses =
     "rounded-full border border-input w-10 h-10 flex items-center justify-center";
 
@@ -53,7 +55,7 @@ export function UserProfileHeader({
                   "ml-auto text-black",
                 )}
               >
-                設定
+                {t("users.profileHeader.settingsButton")}
               </Link>
             </div>
           )}
@@ -105,6 +107,7 @@ export function UserProfileHeader({
 }
 
 function BioSection({ bio }: { bio: string }) {
+  const t = useTranslations();
   const { textRef, expanded, showReadMore, toggleExpanded, getTextStyle } = useReadMore({
     text: bio,
     maxLines: 6,
@@ -124,7 +127,7 @@ function BioSection({ bio }: { bio: string }) {
           <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent"></div>
           <div className="relative flex justify-center pt-8">
             <Button variant="tertiary" size="sm" onClick={toggleExpanded} className="bg-white px-6">
-              <span className="text-label-sm font-bold">もっと見る</span>
+              <span className="text-label-sm font-bold">{t("users.profileHeader.readMore")}</span>
             </Button>
           </div>
         </div>

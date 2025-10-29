@@ -3,8 +3,10 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthProvider";
 import { LogOut, XCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export default function DangerSection() {
+  const t = useTranslations();
   const { logout } = useAuth();
   const [open, setOpen] = useState(false);
 
@@ -20,7 +22,7 @@ export default function DangerSection() {
               <span className="flex items-center gap-2">
                 <LogOut className="w-5 h-5" />
                 <span className="font-bold text-sm flex items-center gap-2">
-                  サインアウト
+                  {t("users.danger.signOut")}
                 </span>
               </span>
             </button>
@@ -34,13 +36,13 @@ export default function DangerSection() {
       {open && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 shadow-lg">
-            <p className="mb-4">本当にサインアウトしますか？</p>
+            <p className="mb-4">{t("users.danger.signOutConfirm")}</p>
             <div className="flex gap-4 justify-end">
               <button
                 className="px-4 py-2 rounded bg-gray-200"
                 onClick={() => setOpen(false)}
               >
-                キャンセル
+                {t("users.danger.cancel")}
               </button>
               <button
                 className="px-4 py-2 rounded bg-red-500 text-white"
@@ -49,7 +51,7 @@ export default function DangerSection() {
                   setOpen(false);
                 }}
               >
-                サインアウト
+                {t("users.danger.signOut")}
               </button>
             </div>
           </div>
