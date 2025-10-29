@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { Info, Search } from "lucide-react";
 import { getCurrentRegionName, currentCommunityConfig } from "@/lib/communities/metadata";
+import Link from "next/link";
 
 interface TicketContentProps {
   ticketClaimLinks: TicketClaimLink[];
@@ -67,13 +68,10 @@ const TicketContent: React.FC<TicketContentProps> = ({
           </EmptyHeader>
           {currentCommunityConfig.enableFeatures.includes("opportunities") && (
             <EmptyContent>
-              <Button
-                variant="primary"
-                size="lg"
-                className="px-16"
-                onClick={() => (window.location.href = currentCommunityConfig.rootPath ?? "/")}
-              >
-                関わりをみつける
+              <Button asChild variant="primary" size="lg" className="px-16">
+                <Link href={currentCommunityConfig.rootPath ?? "/"}>
+                  関わりをみつける
+                </Link>
               </Button>
             </EmptyContent>
           )}

@@ -8,6 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import { getCurrentRegionName, currentCommunityConfig } from "@/lib/communities/metadata";
+import Link from "next/link";
 
 type PortfolioEmptyStateProps = {
   isOwner: boolean;
@@ -28,13 +29,10 @@ export const PortfolioEmptyState = ({ isOwner }: PortfolioEmptyStateProps) => {
       </EmptyHeader>
       {isOwner && (
         <EmptyContent>
-          <Button
-            variant="primary"
-            size="lg"
-            className="px-16"
-            onClick={() => (window.location.href = currentCommunityConfig.rootPath ?? "/")}
-          >
-            関わりを探す
+          <Button asChild variant="primary" size="lg" className="px-16">
+            <Link href={currentCommunityConfig.rootPath ?? "/"}>
+              関わりを探す
+            </Link>
           </Button>
         </EmptyContent>
       )}
