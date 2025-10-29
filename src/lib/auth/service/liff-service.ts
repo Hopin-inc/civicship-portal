@@ -1,7 +1,7 @@
 "use client";
 
 import liff from "@line/liff";
-import { signInWithCustomToken, updateProfile } from "firebase/auth";
+import { signInWithCustomToken } from "firebase/auth";
 import { lineAuth } from "../core/firebase-config";
 import { TokenManager } from "../core/token-manager";
 import { logger } from "@/lib/logging";
@@ -224,7 +224,7 @@ export class LiffService {
           throw new Error(`LIFF authentication failed: ${response.status}`);
         }
 
-        const { customToken, profile } = await response.json();
+        const { customToken } = await response.json();
         const userCredential = await signInWithCustomToken(lineAuth, customToken);
 
         await Promise.race([
@@ -242,11 +242,6 @@ export class LiffService {
             }, 5000);
           }),
         ]);
-
-        await updateProfile(userCredential.user, {
-          displayName: profile.displayName,
-          photoURL: profile.pictureUrl,
-        });
 
         const idToken = await userCredential.user.getIdToken();
         const refreshToken = userCredential.user.refreshToken;

@@ -8,10 +8,13 @@ import {
   GqlIdentityCheckPhoneUserPayload,
   GqlMutationIdentityCheckPhoneUserArgs,
   GqlPhoneUserStatus,
+  GqlCurrentPrefecture,
 } from "@/types/graphql";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { RawURIComponent } from "@/utils/path";
 import { logger } from "@/lib/logging";
+import { LiffService } from "@/lib/auth/service/liff-service";
+import { urlToFile } from "@/lib/utils/image-converter";
 
 interface CodeVerificationResult {
   success: boolean;
@@ -27,6 +30,7 @@ export function useCodeVerification(
   phoneAuth: { verifyPhoneCode: (verificationCode: string) => Promise<boolean> },
   nextParam: string,
   updateAuthState: () => Promise<any>,
+  createUser: (name: string, prefecture: GqlCurrentPrefecture, phoneUid: string) => Promise<any>,
 ) {
   const [isVerifying, setIsVerifying] = useState(false);
 
@@ -94,12 +98,42 @@ export function useCodeVerification(
 
         switch (status) {
           case GqlPhoneUserStatus.NewUser:
-            setAuthState({ isAuthInProgress: false });
-            return {
-              success: true,
-              redirectPath: `/sign-up${nextParam}`,
-              message: "電話番号認証が完了しました",
-            };
+            // LINE認証のプロフィール情報を取得
+            const liffService = LiffService.getInstance();
+            const liffProfile = liffService.getState().profile;
+            const displayName = liffProfile.displayName || "ユーザー";
+
+            try {
+              // userSignUpを実行
+              await createUser(displayName, GqlCurrentPrefecture.Unknown, phoneUid);
+
+              // ユーザー情報を再取得
+              await updateAuthState();
+              setAuthState({ authenticationState: "user_registered", isAuthInProgress: false });
+
+              const homeRedirectPath = authRedirectService.getRedirectPath(
+                "/" as RawURIComponent,
+                nextParam as RawURIComponent,
+              );
+
+              return {
+                success: true,
+                redirectPath: homeRedirectPath || "/",
+                message: "アカウントを作成しました",
+              };
+            } catch (createError) {
+              logger.error("[useCodeVerification] Failed to create user", {
+                error: createError instanceof Error ? createError.message : String(createError),
+              });
+              setAuthState({ isAuthInProgress: false });
+              return {
+                success: false,
+                error: {
+                  message: "アカウント作成に失敗しました",
+                  type: "user-creation-failed",
+                },
+              };
+            }
 
           case GqlPhoneUserStatus.ExistingSameCommunity:
             await updateAuthState();
@@ -159,6 +193,7 @@ export function useCodeVerification(
       authRedirectService,
       nextParam,
       updateAuthState,
+      createUser,
       isVerifying,
     ],
   );

@@ -16,13 +16,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { GqlCurrentPrefecture } from "@/types/graphql";
 import { useAuth } from "@/contexts/AuthProvider";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { logger } from "@/lib/logging";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
+import { LiffService } from "@/lib/auth/service/liff-service";
 
 const FormSchema = z.object({
   name: z
@@ -41,13 +42,25 @@ export function SignUpForm() {
   const [isLoading, setIsLoading] = useState(false);
   const firebaseUser = useAuthStore((s) => s.state.firebaseUser);
 
+  // LINEプロフィールからデフォルト名を取得
+  const liffService = LiffService.getInstance();
+  const liffProfile = liffService.getState().profile;
+  const defaultName = liffProfile.displayName || undefined;
+
   const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      name: undefined,
+      name: defaultName,
       prefecture: GqlCurrentPrefecture.Unknown,
     },
   });
+
+  // LINEプロフィールが取得できたらフォームに反映
+  useEffect(() => {
+    if (defaultName && !form.getValues("name")) {
+      form.setValue("name", defaultName);
+    }
+  }, [defaultName, form]);
 
   const onSubmit = async (values: FormValues) => {
     setIsLoading(true);
