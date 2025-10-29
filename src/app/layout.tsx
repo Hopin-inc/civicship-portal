@@ -54,11 +54,6 @@ const RootLayout = async ({
         <NextIntlClientProvider 
           locale={locale} 
           messages={messages}
-          onError={(error) => {
-            if (process.env.NODE_ENV === 'development') {
-              console.error('[i18n Error]', error);
-            }
-          }}
         >
           <CookiesProvider>
             <ApolloProvider>

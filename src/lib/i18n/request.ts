@@ -1,6 +1,7 @@
 import { getRequestConfig } from 'next-intl/server';
 import { cookies } from 'next/headers';
 import { defaultLocale, locales, type Locale } from './config';
+import { nestMessages } from './nestMessages';
 
 /**
  * メッセージをマージ（メモ化付き）
@@ -14,17 +15,18 @@ async function loadMessages(locale: Locale, namespaces: string[]) {
     return messagesCache.get(cacheKey);
   }
 
-  const messages: Record<string, any> = {};
+  const flatMessages: Record<string, string> = {};
 
   for (const namespace of namespaces) {
     try {
       const namespaceMessages = (await import(`@/messages/${locale}/${namespace}.json`)).default;
-      Object.assign(messages, namespaceMessages);
+      Object.assign(flatMessages, namespaceMessages);
     } catch (error) {
       console.warn(`Failed to load ${locale}/${namespace}.json`);
     }
   }
 
+  const messages = nestMessages(flatMessages);
   messagesCache.set(cacheKey, messages);
   return messages;
 }
