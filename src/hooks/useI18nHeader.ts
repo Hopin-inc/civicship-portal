@@ -1,9 +1,10 @@
 import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { useHeaderConfig } from '@/contexts/HeaderContext';
+import { TranslationKey } from '@/types/i18n';
 
 interface I18nHeaderConfig {
-  titleKey: string;
+  titleKey: TranslationKey;
   showBackButton?: boolean;
   showLogo?: boolean;
   backTo?: string;
@@ -26,7 +27,7 @@ export function useI18nHeader(config: I18nHeaderConfig) {
   
   const headerConfig = useMemo(
     () => ({
-      title: t(config.titleKey as any),
+      title: t(config.titleKey),
       showBackButton: config.showBackButton ?? false,
       showLogo: config.showLogo ?? false,
       backTo: config.backTo,

@@ -26,8 +26,10 @@ export function LoginView({ isLoading, isAuthenticating, error, onLogin }: Props
       <div className="w-full max-w-mobile-l">
         <div className="space-y-3 mb-10">
           <div className="text-body-md mb-6">
-            <strong className="font-bold">{currentCommunityConfig.title}</strong>
-            {t("auth.login.description")}
+            {t.rich("auth.login.welcomeMessage", {
+              communityName: currentCommunityConfig.title,
+              b: (chunks) => <strong className="font-bold">{chunks}</strong>,
+            })}
           </div>
 
           <div className="space-y-3">
