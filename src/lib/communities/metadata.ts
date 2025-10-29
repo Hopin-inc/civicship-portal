@@ -309,6 +309,13 @@ export function getCurrentRegionName(): string {
   return "地域";
 }
 
+export function getCurrentRegionKey(): string {
+  if (COMMUNITY_ID === "neo88") return "common.regions.shikoku";
+  if (COMMUNITY_ID === "kibotcha") return "common.regions.higashimatsushima";
+  if (COMMUNITY_ID === "dais") return "common.regions.shikoku";
+  return "common.regions.default";
+}
+
 // 現在のコミュニティの設定
 export const currentCommunityConfig = COMMUNITY_BASE_CONFIG[COMMUNITY_ID];
 

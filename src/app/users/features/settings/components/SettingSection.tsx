@@ -1,11 +1,14 @@
+"use client";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Contact, Globe } from "lucide-react";
 import Link from "next/link";
 import { LocaleSwitcher } from "@/components/shared/LocaleSwitcher";
+import { useTranslations } from "next-intl";
 
 export default function SettingSection() {
+  const t = useTranslations();
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardContent className="p-0">
@@ -13,7 +16,7 @@ export default function SettingSection() {
         <div className="flex items-center justify-between py-4 px-4 border-b">
           <div className="flex items-center gap-2">
             <Contact className="w-5 h-5" />
-            <span className="font-bold text-sm">プロフィール</span>
+            <span className="font-bold text-sm">{t("users.settings.profileLabel")}</span>
           </div>
           <Link
             href="/users/me/edit"
@@ -22,7 +25,7 @@ export default function SettingSection() {
               "ml-auto text-black",
             )}
           >
-            編集
+            {t("users.settings.editButton")}
           </Link>
         </div>
 
@@ -30,7 +33,7 @@ export default function SettingSection() {
         <div className="flex items-center justify-between py-4 px-4">
           <div className="flex items-center gap-2">
             <Globe className="w-5 h-5" />
-            <span className="font-bold text-sm">表示言語</span>
+            <span className="font-bold text-sm">{t("users.settings.languageLabel")}</span>
           </div>
           <LocaleSwitcher />
         </div>

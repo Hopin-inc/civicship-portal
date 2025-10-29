@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useTranslations } from "next-intl";
+import { getPrefectureKey } from "@/lib/i18n/prefectures";
 
 interface UserProfileHeaderProps {
   id: string;
@@ -68,7 +69,7 @@ export function UserProfileHeader({
             {currentCommunityConfig.enableFeatures.includes("prefectures") && currentPrefecture && (
               <div className="flex items-center text-label-md text-caption mb-3">
                 <Home className="w-4 h-4 mr-1" />
-                <span>{currentPrefecture}</span>
+                <span>{getPrefectureKey(currentPrefecture) ? t(getPrefectureKey(currentPrefecture)) : currentPrefecture}</span>
               </div>
             )}
           </div>

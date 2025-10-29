@@ -17,5 +17,13 @@
   "common.viewMore": "もっと見る",
   "common.noResults": "結果がありません",
   "common.success": "成功しました",
-  "common.failed": "失敗しました"
+  "common.failed": "失敗しました",
+  "common.regions.shikoku": "四国",
+  "common.regions.higashimatsushima": "東松島",
+  "common.regions.default": "地域",
+  "common.prefectures.kagawa": "香川県",
+  "common.prefectures.tokushima": "徳島県",
+  "common.prefectures.ehime": "愛媛県",
+  "common.prefectures.kochi": "高知県",
+  "common.prefectures.outsideShikoku": "四国以外"
 }
