@@ -20,20 +20,20 @@ const WalletCard: React.FC<WalletCardProps> = ({
   onRefetch,
   showRefreshButton = true,
 }) => {
-  const t = useTranslations("WalletCard");
+  const t = useTranslations();
   
   return (
     <div className="bg-background rounded-[32px] px-12 py-8 shadow-[0_2px_20px_rgba(0,0,0,0.08)] mt-8 mb-8">
       <div className="flex flex-col items-center mb-12">
         <div className="text-sm text-muted-foreground mb-2">
-          {currentCommunityConfig.tokenName} {t("balanceLabel")}
+          {currentCommunityConfig.tokenName} {t("wallets.card.balanceLabel")}
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-baseline">
             <span className="text-[40px] font-bold leading-none tracking-tight">
               {isLoading ? "..." : currentPoint.toLocaleString()}
             </span>
-            <span className="text-base ml-0.5">{t("pointUnit")}</span>
+            <span className="text-base ml-0.5">{t("wallets.card.pointUnit")}</span>
           </div>
         </div>
       </div>
@@ -54,7 +54,7 @@ const WalletCard: React.FC<WalletCardProps> = ({
             className="flex items-center gap-1.5"
           >
             <RotateCcw className="w-4 h-4 text-muted-foreground" />
-            <span className="text-sm">{t("refreshButton")}</span>
+            <span className="text-sm">{t("wallets.card.refreshButton")}</span>
           </Button>
         )}
       </div>

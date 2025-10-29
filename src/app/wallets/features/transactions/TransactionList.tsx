@@ -9,7 +9,7 @@ import { useWalletContext } from "@/app/wallets/features/shared/contexts/WalletC
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 
 export function TransactionList() {
-  const t = useTranslations("TransactionList");
+  const t = useTranslations();
   const { transactions, hasNextPage, isLoadingTransactions, loadMore } = useWalletContext();
   const targetRef = useInfiniteScroll({
     hasMore: hasNextPage,
@@ -21,18 +21,18 @@ export function TransactionList() {
   return (
     <div className="pt-10">
       <div className="flex justify-between items-center">
-        <h2 className="text-display-sm">{t("title")}</h2>
+        <h2 className="text-display-sm">{t("transactions.list.title")}</h2>
         <Link
           href="/transactions"
           className="text-sm border-b-[1px] border-black cursor-pointer bg-transparent p-0"
         >
-          {t("communityHistoryLink")}
+          {t("transactions.list.communityHistoryLink")}
         </Link>
       </div>
       <div className="space-y-2 mt-2">
         {transactions.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center pt-6">
-            {t("emptyState")}
+            {t("transactions.list.emptyState")}
           </p>
         ) : (
           <>

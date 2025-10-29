@@ -41,10 +41,10 @@ export function CodeVerificationStep({
   recaptchaContainerRef,
   phoneAuth,
 }: CodeVerificationStepProps) {
-  const t = useTranslations("CodeVerificationStep");
+  const t = useTranslations();
   const headerConfig = useMemo(
     () => ({
-      title: t("headerTitle"),
+      title: t("phoneVerification.verification.headerTitle"),
       showBackButton: false,
       showLogo: false,
     }),
@@ -73,8 +73,8 @@ export function CodeVerificationStep({
       <div>
         <p className="text-sm text-muted-foreground">
           {phoneNumber
-            ? `${phoneNumber}${t("descriptionWithPhone")}`
-            : t("descriptionWithoutPhone")}
+            ? `${phoneNumber}${t("phoneVerification.verification.descriptionWithPhone")}`
+            : t("phoneVerification.verification.descriptionWithoutPhone")}
         </p>
       </div>
 
@@ -99,7 +99,7 @@ export function CodeVerificationStep({
               isReloading
             }
           >
-            {isVerifying ? t("verifying") : t("verifyButton")}
+            {isVerifying ? t("phoneVerification.verification.verifying") : t("phoneVerification.verification.verifyButton")}
           </Button>
           <Button
             type="button"
@@ -115,10 +115,10 @@ export function CodeVerificationStep({
             onClick={onResend}
           >
             {isResendDisabled
-              ? `${countdown}${t("resendCountdown")}`
+              ? `${countdown}${t("phoneVerification.verification.resendCountdown")}`
               : isPhoneSubmitting
-                ? t("resending")
-                : t("resendButton")}
+                ? t("phoneVerification.verification.resending")
+                : t("phoneVerification.verification.resendButton")}
           </Button>
           <div
             id="recaptcha-container"
@@ -139,7 +139,7 @@ export function CodeVerificationStep({
             }
             onClick={handleBackToPhone}
           >
-            {t("changePhoneButton")}
+            {t("phoneVerification.verification.changePhoneButton")}
           </Button>
         </div>
       </form>

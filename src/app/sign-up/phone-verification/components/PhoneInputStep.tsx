@@ -32,10 +32,10 @@ export function PhoneInputStep({
   isVerifying,
   recaptchaContainerRef,
 }: PhoneInputStepProps) {
-  const t = useTranslations("PhoneInputStep");
+  const t = useTranslations();
   const headerConfig = useMemo(
     () => ({
-      title: t("headerTitle"),
+      title: t("phoneVerification.input.headerTitle"),
       showBackButton: false,
       showLogo: false,
     }),
@@ -49,7 +49,7 @@ export function PhoneInputStep({
     <>
       <div>
         <p className="text-sm text-muted-foreground">
-          {t("description")}
+          {t("phoneVerification.input.description")}
         </p>
       </div>
 
@@ -60,7 +60,7 @@ export function PhoneInputStep({
           onChange={onPhoneNumberChange}
           defaultCountry={DEFAULT_COUNTRY}
           showFlags={SHOW_FLAGS}
-          placeholder={t("placeholder")}
+          placeholder={t("phoneVerification.input.placeholder")}
           disabled={isSubmitting || isVerifying || isReloading}
         />
         <div className="flex flex-col items-center gap-8 w-full mx-auto">
@@ -70,10 +70,10 @@ export function PhoneInputStep({
             disabled={isSubmitting || isVerifying || !isPhoneValid || isReloading || isRateLimited}
           >
             {isSubmitting || isVerifying
-              ? t("sending")
+              ? t("phoneVerification.input.sending")
               : isRateLimited
-                ? t("rateLimited")
-                : t("sendButton")}{" "}
+                ? t("phoneVerification.input.rateLimited")
+                : t("phoneVerification.input.sendButton")}{" "}
           </Button>
           <Button
             type="button"
@@ -88,7 +88,7 @@ export function PhoneInputStep({
               }, PHONE_VERIFICATION_CONSTANTS.RELOAD_INITIAL_DELAY_MS);
             }}
           >
-            {t("reloadButton")}
+            {t("phoneVerification.input.reloadButton")}
           </Button>
         </div>
       </form>

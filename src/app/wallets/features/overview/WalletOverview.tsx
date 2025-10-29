@@ -14,12 +14,12 @@ import { useWalletContext } from "@/app/wallets/features/shared/contexts/WalletC
 
 export function WalletOverview() {
   const router = useRouter();
-  const t = useTranslations("WalletOverview");
+  const t = useTranslations();
   const { currentPoint, isLoadingWallet, error, refresh } = useWalletContext();
 
   const headerConfig = useMemo(
     () => ({
-      title: t("headerTitle"),
+      title: t("wallets.overview.headerTitle"),
       showBackButton: true,
       showLogo: false,
       backTo: "/users/me",
@@ -32,7 +32,7 @@ export function WalletOverview() {
     router.push(`/wallets/donate?currentPoint=${currentPoint}&tab=history`);
 
   if (isLoadingWallet) return <LoadingIndicator />;
-  if (error) return <ErrorState title={t("errorTitle")} />;
+  if (error) return <ErrorState title={t("wallets.overview.errorTitle")} />;
 
   return (
     <div className="space-y-6">
@@ -42,9 +42,9 @@ export function WalletOverview() {
         onRefetch={async () => {
           try {
             await refresh();
-            toast.success(t("refreshSuccess"));
+            toast.success(t("wallets.overview.refreshSuccess"));
           } catch (err) {
-            toast.error(t("refreshError"));
+            toast.error(t("wallets.overview.refreshError"));
           }
         }}
       />
@@ -58,7 +58,7 @@ export function WalletOverview() {
           className="w-[104px] h-[48px] flex items-center gap-1.5"
         >
           <Gift className="w-4 h-4" />
-          <span className="text-base">{t("giveButton")}</span>
+          <span className="text-base">{t("wallets.overview.giveButton")}</span>
         </Button>
       </div>
     </div>

@@ -51,7 +51,15 @@ const RootLayout = async ({
     <html lang={locale}>
       <body className={font.className}>
         <ClientPolyfills />
-        <NextIntlClientProvider locale={locale} messages={messages}>
+        <NextIntlClientProvider 
+          locale={locale} 
+          messages={messages}
+          onError={(error) => {
+            if (process.env.NODE_ENV === 'development') {
+              console.error('[i18n Error]', error);
+            }
+          }}
+        >
           <CookiesProvider>
             <ApolloProvider>
               <AuthProvider

@@ -1,26 +1,21 @@
 {
-  "WalletOverview": {
-    "headerTitle": "Points Balance",
-    "giveButton": "Give",
-    "refreshSuccess": "Wallet information updated",
-    "refreshError": "Failed to reload",
-    "errorTitle": "Wallet"
-  },
-  "WalletCard": {
-    "balanceLabel": "Balance",
-    "pointUnit": "pt",
-    "refreshButton": "Reload"
-  },
-  "DonatePoints": {
-    "title": "Give Points",
-    "recipientLabel": "Recipient",
-    "amountLabel": "Amount",
-    "messageLabel": "Message",
-    "messagePlaceholder": "Enter a message (optional)",
-    "confirmButton": "Give",
-    "cancelButton": "Cancel",
-    "success": "Points sent successfully",
-    "error": "Failed to send points",
-    "insufficientBalance": "Insufficient balance"
-  }
+  "wallets.overview.headerTitle": "Points Balance",
+  "wallets.overview.giveButton": "Give",
+  "wallets.overview.refreshSuccess": "Wallet information updated",
+  "wallets.overview.refreshError": "Failed to reload",
+  "wallets.overview.errorTitle": "Wallet",
+  "wallets.card.balanceLabel": "Balance",
+  "wallets.card.balanceHeader": "{tokenName} Balance",
+  "wallets.card.pointUnit": "pt",
+  "wallets.card.refreshButton": "Reload",
+  "wallets.donate.title": "Give Points",
+  "wallets.donate.recipientLabel": "Recipient",
+  "wallets.donate.amountLabel": "Amount",
+  "wallets.donate.messageLabel": "Message",
+  "wallets.donate.messagePlaceholder": "Enter a message (optional)",
+  "wallets.donate.confirmButton": "Give",
+  "wallets.donate.cancelButton": "Cancel",
+  "wallets.donate.successMessage": "Points sent successfully",
+  "wallets.donate.errorMessage": "Failed to send points",
+  "wallets.donate.insufficientBalance": "Insufficient balance"
 }

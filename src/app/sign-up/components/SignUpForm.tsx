@@ -36,12 +36,12 @@ const createFormSchema = (t: (key: string) => string) => z.object({
 });
 
 export function SignUpForm() {
-  const t = useTranslations("SignUp");
+  const t = useTranslations();
   const { createUser, isAuthenticated, isPhoneVerified, phoneAuth, loading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const firebaseUser = useAuthStore((s) => s.state.firebaseUser);
 
-  const FormSchema = createFormSchema(t);
+  const FormSchema = createFormSchema((key: string) => t(`auth.signup.${key}`));
   type FormValues = z.infer<typeof FormSchema>;
 
   const form = useForm<FormValues>({
@@ -56,24 +56,24 @@ export function SignUpForm() {
     setIsLoading(true);
     try {
       if (!firebaseUser) {
-        toast.error(t("lineAuthRequired"));
+        toast.error(t("auth.signup.lineAuthRequired"));
         return null;
       }
 
       const phoneUid = phoneAuth.phoneUid;
       if (!phoneUid || !isPhoneVerified) {
-        toast.error(t("phoneAuthRequired"));
+        toast.error(t("auth.signup.phoneAuthRequired"));
         return null;
       }
 
       await createUser(values.name, values.prefecture, phoneUid);
-      toast.success(t("success"));
+      toast.success(t("auth.signup.successMessage"));
     } catch (error) {
       logger.error("Sign up error", {
         error: error instanceof Error ? error.message : String(error),
         component: "SignUpForm",
       });
-      toast.error(t("error"));
+      toast.error(t("auth.signup.errorMessage"));
     } finally {
       setIsLoading(false);
     }
@@ -90,7 +90,7 @@ export function SignUpForm() {
   return (
     <div className="w-full max-w-md mx-auto space-y-8">
       <div className="space-y-2">
-        <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
+        <h1 className="text-2xl font-bold tracking-tight">{t("auth.signup.title")}</h1>
       </div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -99,12 +99,12 @@ export function SignUpForm() {
             name="name"
             render={({ field }) => (
               <FormItem className="space-y-3">
-                <FormLabel className="text-base">{t("nameLabel")}</FormLabel>
+                <FormLabel className="text-base">{t("auth.signup.nameLabel")}</FormLabel>
                 <FormControl>
-                  <Input placeholder={t("namePlaceholder")} {...field} className="h-12" />
+                  <Input placeholder={t("auth.signup.namePlaceholder")} {...field} className="h-12" />
                 </FormControl>
                 <FormDescription className="text-xs text-muted-foreground">
-                  {t("nameDescription")}
+                  {t("auth.signup.nameDescription")}
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -117,7 +117,7 @@ export function SignUpForm() {
               name="prefecture"
               render={({ field }) => (
                 <FormItem className="space-y-3">
-                  <FormLabel className="text-base">{t("prefectureLabel")}</FormLabel>
+                  <FormLabel className="text-base">{t("auth.signup.prefectureLabel")}</FormLabel>
                   <FormControl>
                     <ToggleGroup
                       onValueChange={(val) => field.onChange(val as GqlCurrentPrefecture)}
@@ -126,22 +126,22 @@ export function SignUpForm() {
                       className="gap-2"
                     >
                       <ToggleGroupItem value={GqlCurrentPrefecture.Kagawa} className="flex-1">
-                        {t("prefectureKagawa")}
+                        {t("auth.signup.prefectureKagawa")}
                       </ToggleGroupItem>
                       <ToggleGroupItem value={GqlCurrentPrefecture.Tokushima} className="flex-1">
-                        {t("prefectureTokushima")}
+                        {t("auth.signup.prefectureTokushima")}
                       </ToggleGroupItem>
                       <ToggleGroupItem value={GqlCurrentPrefecture.Ehime} className="flex-1">
-                        {t("prefectureEhime")}
+                        {t("auth.signup.prefectureEhime")}
                       </ToggleGroupItem>
                       <ToggleGroupItem value={GqlCurrentPrefecture.Kochi} className="flex-1">
-                        {t("prefectureKochi")}
+                        {t("auth.signup.prefectureKochi")}
                       </ToggleGroupItem>
                       <ToggleGroupItem
                         value={GqlCurrentPrefecture.OutsideShikoku}
                         className="basis-full"
                       >
-                        {t("prefectureOutsideShikoku")}
+                        {t("auth.signup.prefectureOutsideShikoku")}
                       </ToggleGroupItem>
                     </ToggleGroup>
                   </FormControl>
@@ -156,7 +156,7 @@ export function SignUpForm() {
             className="w-full h-12 text-base"
             disabled={isLoading || !!form.formState.errors.name}
           >
-            {isLoading ? t("submitting") : t("submitButton")}
+            {isLoading ? t("auth.signup.submitting") : t("auth.signup.submitButton")}
           </Button>
         </form>
       </Form>

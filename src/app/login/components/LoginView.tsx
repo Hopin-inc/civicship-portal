@@ -17,7 +17,7 @@ type Props = {
 };
 
 export function LoginView({ isLoading, isAuthenticating, error, onLogin }: Props) {
-  const t = useTranslations("Login");
+  const t = useTranslations();
   const [agreedTerms, setAgreedTerms] = useState(false);
   const [agreedPrivacy, setAgreedPrivacy] = useState(false);
 
@@ -27,7 +27,7 @@ export function LoginView({ isLoading, isAuthenticating, error, onLogin }: Props
         <div className="space-y-3 mb-10">
           <div className="text-body-md mb-6">
             <strong className="font-bold">{currentCommunityConfig.title}</strong>
-            {t("description")}
+            {t("auth.login.description")}
           </div>
 
           <div className="space-y-3">
@@ -41,9 +41,9 @@ export function LoginView({ isLoading, isAuthenticating, error, onLogin }: Props
               />
               <Label htmlFor="agree-terms" className="text-label-md text-muted-foreground">
                 <Link href="/terms" className="underline">
-                  {t("termsLabel")}
+                  {t("auth.login.termsLabel")}
                 </Link>
-                <span className="text-label-sm">{t("termsAgree")}</span>
+                <span className="text-label-sm">{t("auth.login.termsAgree")}</span>
               </Label>
             </div>
 
@@ -57,9 +57,9 @@ export function LoginView({ isLoading, isAuthenticating, error, onLogin }: Props
               />
               <Label htmlFor="agree-privacy" className="text-label-md text-muted-foreground">
                 <Link href="/privacy" className="underline">
-                  {t("privacyLabel")}
+                  {t("auth.login.privacyLabel")}
                 </Link>
-                <span className="text-label-sm">{t("privacyAgree")}</span>
+                <span className="text-label-sm">{t("auth.login.privacyAgree")}</span>
               </Label>
             </div>
           </div>
@@ -73,7 +73,7 @@ export function LoginView({ isLoading, isAuthenticating, error, onLogin }: Props
           className="w-full bg-[#06C755] hover:bg-[#05B74B] text-white rounded-full h-14 flex items-center justify-center gap-2"
         >
           <Image src="/images/line-icon.png" alt="LINE" width={24} height={24} priority />
-          {isLoading || isAuthenticating ? t("loggingIn") : t("loginButton")}
+          {isLoading || isAuthenticating ? t("auth.login.loggingIn") : t("auth.login.loginButton")}
         </Button>
       </div>
     </div>

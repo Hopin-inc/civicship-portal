@@ -1,33 +1,25 @@
 {
-  "TransactionList": {
-    "title": "Transaction History",
-    "communityHistoryLink": "View Community History",
-    "emptyState": "No transactions yet",
-    "loadMore": "Load More",
-    "loading": "Loading..."
-  },
-  "TransactionItem": {
-    "received": "Received",
-    "sent": "Sent",
-    "pointUnit": "pt",
-    "dateFormat": "MM/DD/YYYY"
-  },
-  "TransactionDetail": {
-    "title": "Transaction Details",
-    "amount": "Amount",
-    "date": "Date",
-    "type": "Type",
-    "from": "From",
-    "to": "To",
-    "message": "Message",
-    "status": "Status"
-  },
-  "TransactionTypes": {
-    "POINT_ISSUED": "Points Issued",
-    "GRANT": "Grant",
-    "DONATION": "Donation",
-    "POINT_REWARD": "Point Reward",
-    "TICKET_PURCHASED": "Ticket Purchase",
-    "OPPORTUNITY_RESERVATION": "Reservation"
-  }
+  "transactions.list.title": "Transaction History",
+  "transactions.list.communityHistoryLink": "View Community History",
+  "transactions.list.emptyState": "No transactions yet",
+  "transactions.list.loadMore": "Load More",
+  "transactions.list.loading": "Loading...",
+  "transactions.item.received": "Received",
+  "transactions.item.sent": "Sent",
+  "transactions.item.pointUnit": "pt",
+  "transactions.item.dateFormat": "MM/DD/YYYY",
+  "transactions.detail.title": "Transaction Details",
+  "transactions.detail.amount": "Amount",
+  "transactions.detail.date": "Date",
+  "transactions.detail.type": "Type",
+  "transactions.detail.from": "From",
+  "transactions.detail.to": "To",
+  "transactions.detail.message": "Message",
+  "transactions.detail.status": "Status",
+  "transactions.types.POINT_ISSUED": "Points Issued",
+  "transactions.types.GRANT": "Grant",
+  "transactions.types.DONATION": "Donation",
+  "transactions.types.POINT_REWARD": "Point Reward",
+  "transactions.types.TICKET_PURCHASED": "Ticket Purchase",
+  "transactions.types.OPPORTUNITY_RESERVATION": "Reservation"
 }

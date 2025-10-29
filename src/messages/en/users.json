@@ -1,36 +1,28 @@
 {
-  "UserProfile": {
-    "title": "Profile",
-    "editButton": "Edit",
-    "saveButton": "Save",
-    "cancelButton": "Cancel",
-    "nameLabel": "Name",
-    "emailLabel": "Email",
-    "phoneLabel": "Phone Number",
-    "prefectureLabel": "Prefecture",
-    "bioLabel": "Bio",
-    "bioPlaceholder": "Enter your bio",
-    "updateSuccess": "Profile updated successfully",
-    "updateError": "Failed to update profile"
-  },
-  "UserProfileHeader": {
-    "memberSince": "Member Since",
-    "points": "Points",
-    "tickets": "Tickets"
-  },
-  "UserTicketsAndPoints": {
-    "ticketsLabel": "Available Tickets",
-    "ticketsUnit": "",
-    "pointsLabel": "Points Balance",
-    "pointsUnit": "pt"
-  },
-  "UserSettings": {
-    "title": "Settings",
-    "notificationsLabel": "Notifications",
-    "languageLabel": "Language",
-    "privacyLabel": "Privacy",
-    "logoutButton": "Logout",
-    "deleteAccountButton": "Delete Account",
-    "deleteAccountConfirm": "Are you sure you want to delete your account? This action cannot be undone."
-  }
+  "users.profile.title": "Profile",
+  "users.profile.editButton": "Edit",
+  "users.profile.saveButton": "Save",
+  "users.profile.cancelButton": "Cancel",
+  "users.profile.nameLabel": "Name",
+  "users.profile.emailLabel": "Email",
+  "users.profile.phoneLabel": "Phone Number",
+  "users.profile.prefectureLabel": "Prefecture",
+  "users.profile.bioLabel": "Bio",
+  "users.profile.bioPlaceholder": "Enter your bio",
+  "users.profile.updateSuccess": "Profile updated successfully",
+  "users.profile.updateError": "Failed to update profile",
+  "users.profileHeader.memberSince": "Member Since",
+  "users.profileHeader.points": "Points",
+  "users.profileHeader.tickets": "Tickets",
+  "users.ticketsAndPoints.ticketsLabel": "Available Tickets",
+  "users.ticketsAndPoints.ticketsUnit": "",
+  "users.ticketsAndPoints.pointsLabel": "Points Balance",
+  "users.ticketsAndPoints.pointsUnit": "pt",
+  "users.settings.title": "Settings",
+  "users.settings.notificationsLabel": "Notifications",
+  "users.settings.languageLabel": "Language",
+  "users.settings.privacyLabel": "Privacy",
+  "users.settings.logoutButton": "Logout",
+  "users.settings.deleteAccountButton": "Delete Account",
+  "users.settings.deleteAccountConfirm": "Are you sure you want to delete your account? This action cannot be undone."
 }

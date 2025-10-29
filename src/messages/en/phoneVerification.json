@@ -1,29 +1,23 @@
 {
-  "PhoneInputStep": {
-    "headerTitle": "Phone Verification",
-    "description": "Please enter your phone number for verification. A verification code will be sent via SMS.",
-    "placeholder": "e.g.) 09012345678",
-    "sendButton": "Send Verification Code",
-    "sending": "Sending...",
-    "rateLimited": "Rate Limited...",
-    "reloadButton": "Reload if not switching",
-    "invalidPhoneError": "Please enter a valid phone number"
-  },
-  "CodeVerificationStep": {
-    "headerTitle": "Code Verification",
-    "descriptionWithPhone": " Please enter the 6-digit verification code sent to",
-    "descriptionWithoutPhone": "Please enter the 6-digit verification code sent to your phone number.",
-    "verifyButton": "Verify",
-    "verifying": "Verifying...",
-    "resendButton": "Resend Code",
-    "resendCountdown": " seconds until you can resend",
-    "resending": "Sending...",
-    "changePhoneButton": "Change Phone Number",
-    "phoneNotSetError": "Phone number is not set"
-  },
-  "InternationalPhoneField": {
-    "placeholder": "e.g.) 09012345678",
-    "selectCountry": "Select a country",
-    "selectCountryAriaLabel": "Select country"
-  }
+  "phoneVerification.input.headerTitle": "Phone Verification",
+  "phoneVerification.input.description": "Please enter your phone number for verification. A verification code will be sent via SMS.",
+  "phoneVerification.input.placeholder": "e.g.) 09012345678",
+  "phoneVerification.input.sendButton": "Send Verification Code",
+  "phoneVerification.input.sending": "Sending...",
+  "phoneVerification.input.rateLimited": "Rate Limited...",
+  "phoneVerification.input.reloadButton": "Reload if not switching",
+  "phoneVerification.input.invalidPhoneError": "Please enter a valid phone number",
+  "phoneVerification.verification.headerTitle": "Code Verification",
+  "phoneVerification.verification.descriptionWithPhone": " Please enter the 6-digit verification code sent to",
+  "phoneVerification.verification.descriptionWithoutPhone": "Please enter the 6-digit verification code sent to your phone number.",
+  "phoneVerification.verification.verifyButton": "Verify",
+  "phoneVerification.verification.verifying": "Verifying...",
+  "phoneVerification.verification.resendButton": "Resend Code",
+  "phoneVerification.verification.resendCountdown": " seconds until you can resend",
+  "phoneVerification.verification.resending": "Sending...",
+  "phoneVerification.verification.changePhoneButton": "Change Phone Number",
+  "phoneVerification.verification.phoneNotSetError": "Phone number is not set",
+  "phoneVerification.field.placeholder": "e.g.) 09012345678",
+  "phoneVerification.field.selectCountry": "Select a country",
+  "phoneVerification.field.selectCountryAriaLabel": "Select country"
 }

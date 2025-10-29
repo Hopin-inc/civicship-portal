@@ -1,29 +1,23 @@
 {
-  "PhoneInputStep": {
-    "headerTitle": "電話番号認証",
-    "description": "電話番号認証のため、あなたの電話番号を入力してください。SMSで認証コードが送信されます。",
-    "placeholder": "例）09012345678",
-    "sendButton": "認証コードを送信",
-    "sending": "送信中...",
-    "rateLimited": "制限中...",
-    "reloadButton": "切り替わらない際は再読み込み",
-    "invalidPhoneError": "有効な電話番号を入力してください"
-  },
-  "CodeVerificationStep": {
-    "headerTitle": "認証コード検証",
-    "descriptionWithPhone": "に送信された6桁の認証コードを入力してください。",
-    "descriptionWithoutPhone": "電話番号に送信された6桁の認証コードを入力してください。",
-    "verifyButton": "認証する",
-    "verifying": "認証中...",
-    "resendButton": "認証コードを再送",
-    "resendCountdown": "秒後に再送できます",
-    "resending": "送信中...",
-    "changePhoneButton": "電話番号を変更する",
-    "phoneNotSetError": "電話番号が設定されていません"
-  },
-  "InternationalPhoneField": {
-    "placeholder": "例）09012345678",
-    "selectCountry": "国を選択",
-    "selectCountryAriaLabel": "国を選択"
-  }
+  "phoneVerification.input.headerTitle": "電話番号認証",
+  "phoneVerification.input.description": "電話番号認証のため、あなたの電話番号を入力してください。SMSで認証コードが送信されます。",
+  "phoneVerification.input.placeholder": "例）09012345678",
+  "phoneVerification.input.sendButton": "認証コードを送信",
+  "phoneVerification.input.sending": "送信中...",
+  "phoneVerification.input.rateLimited": "制限中...",
+  "phoneVerification.input.reloadButton": "切り替わらない際は再読み込み",
+  "phoneVerification.input.invalidPhoneError": "有効な電話番号を入力してください",
+  "phoneVerification.verification.headerTitle": "認証コード検証",
+  "phoneVerification.verification.descriptionWithPhone": "に送信された6桁の認証コードを入力してください。",
+  "phoneVerification.verification.descriptionWithoutPhone": "電話番号に送信された6桁の認証コードを入力してください。",
+  "phoneVerification.verification.verifyButton": "認証する",
+  "phoneVerification.verification.verifying": "認証中...",
+  "phoneVerification.verification.resendButton": "認証コードを再送",
+  "phoneVerification.verification.resendCountdown": "秒後に再送できます",
+  "phoneVerification.verification.resending": "送信中...",
+  "phoneVerification.verification.changePhoneButton": "電話番号を変更する",
+  "phoneVerification.verification.phoneNotSetError": "電話番号が設定されていません",
+  "phoneVerification.field.placeholder": "例）09012345678",
+  "phoneVerification.field.selectCountry": "国を選択",
+  "phoneVerification.field.selectCountryAriaLabel": "国を選択"
 }
