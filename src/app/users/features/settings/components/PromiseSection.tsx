@@ -45,17 +45,21 @@ export default function PromiseSection() {
 interface DocumentLinkProps {
   document: {
     title: string;
+    titleKey?: string;
     path: string;
     type: "internal" | "external";
   };
 }
 
 function DocumentLink({ document }: DocumentLinkProps) {
+  const t = useTranslations();
+  const displayTitle = document.titleKey ? t(document.titleKey) : document.title;
+  
   const content = (
     <div className="flex items-center justify-between py-4 px-4 border-b">
       <div className="flex items-center gap-2">
         <FileIcon className="w-5 h-5" />
-        <span className="font-bold text-sm">{document.title}</span>
+        <span className="font-bold text-sm">{displayTitle}</span>
       </div>
     </div>
   );

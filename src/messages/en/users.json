@@ -24,6 +24,7 @@
   "users.portfolio.emptyStateNonOwner": "Your timeline will be created when you participate in experiences",
   "users.portfolio.searchEngagements": "Find engagements",
   "users.ticketsAndPoints.ticketsLabel": "Available Tickets",
+  "users.ticketsAndPoints.ticketsCount": "{count, plural, =0 {0 tickets} one {# ticket} other {# tickets}}",
   "users.ticketsAndPoints.ticketsUnit": "",
   "users.ticketsAndPoints.pointsLabel": "Points Balance",
   "users.ticketsAndPoints.pointsUnit": "pt",
@@ -70,5 +71,10 @@
   "users.edit.phoneNumber": "Phone Number",
   "users.edit.phoneNumberNote": "Your phone number will be shared with guides as an emergency contact for reservations. It will not be publicly displayed.",
   "users.edit.saving": "Saving...",
-  "users.edit.save": "Save"
+  "users.edit.save": "Save",
+  "users.documents.bylaws": "Bylaws (PDF)",
+  "users.documents.operatingRegulations": "Operating Regulations (PDF)",
+  "users.documents.daoMeetingRules": "DAO Meeting Rules (PDF)",
+  "users.documents.tokenRegulations": "Token Regulations (PDF)",
+  "users.documents.whitepaper": "Whitepaper (PDF)"
 }
