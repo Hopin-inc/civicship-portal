@@ -6,14 +6,14 @@ import { useAuth } from "@/contexts/AuthProvider";
 import { AuthRedirectService } from "@/lib/auth/service/auth-redirect-service";
 import { decodeURIComponentWithType, EncodedURIComponent, RawURIComponent } from "@/utils/path";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
-import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { computeInitialGuardReadiness } from "@/components/auth/guards/initial-readiness";
 
 interface RouteGuardProps {
   children: React.ReactNode;
 }
 
 export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
-  const { loading } = useAuth();
+  const { loading, ssrSnapshot } = useAuth();
   const authState = useAuthStore((s) => s.state);
   const router = useRouter();
   const pathname = usePathname();
@@ -21,7 +21,9 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   const nextParam = searchParams.get("next") as EncodedURIComponent;
 
   const authRedirectService = React.useMemo(() => AuthRedirectService.getInstance(), []);
-  const [isReadyToRender, setIsReadyToRender] = useState(false);
+  const [isReadyToRender, setIsReadyToRender] = useState(() =>
+    computeInitialGuardReadiness(pathname, ssrSnapshot, searchParams),
+  );
   const redirectedRef = React.useRef<string | null>(null);
 
   useEffect(() => {
@@ -64,9 +66,8 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     }
   }, [pathname, authState, loading, router, authRedirectService, nextParam, searchParams]);
 
-  // --- 未確定中は描画しない（チラつき防止） ---
   if (!isReadyToRender) {
-    return <LoadingIndicator />; // or return null;
+    return null;
   }
 
   return <>{children}</>;

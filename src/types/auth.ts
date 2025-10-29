@@ -63,6 +63,13 @@ export type PhoneAuthState = {
   };
 };
 
+export interface SsrAuthSnapshot {
+  hasUser: boolean;
+  lineAuthenticated: boolean;
+  phoneAuthenticated: boolean;
+  userRegistered: boolean;
+}
+
 export interface AuthContextType {
   user: GqlCurrentUserPayload["user"] | null;
   firebaseUser: User | null;
@@ -94,6 +101,7 @@ export interface AuthContextType {
   updateAuthState: () => Promise<GqlUser | null>;
 
   loading: boolean;
+  ssrSnapshot: SsrAuthSnapshot;
 }
 
 export interface AuthProviderProps {
