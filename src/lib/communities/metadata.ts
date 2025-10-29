@@ -22,9 +22,6 @@ export interface CommunityDocument {
   /** 表示名 */
   title: string;
 
-  /** 翻訳キー（指定された場合はtitleより優先） */
-  titleKey?: string;
-
   /** ファイルパスまたはURL */
   path: string;
 
@@ -149,40 +146,35 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     documents: [
       {
         id: "bylaws",
-        title: "定款 (PDF)",
-        titleKey: "users.documents.bylaws",
+        title: "users.documents.bylaws",
         path: "/communities/kibotcha/bylaws.pdf",
         type: "external",
         order: 1,
       },
       {
         id: "operating-regulations",
-        title: "運営規程 (PDF)",
-        titleKey: "users.documents.operatingRegulations",
+        title: "users.documents.operatingRegulations",
         path: "/communities/kibotcha/operating-regulations.pdf",
         type: "external",
         order: 2,
       },
       {
         id: "dao-meeting-rules",
-        title: "DAO総会規程 (PDF)",
-        titleKey: "users.documents.daoMeetingRules",
+        title: "users.documents.daoMeetingRules",
         path: "/communities/kibotcha/dao-meeting-rules.pdf",
         type: "external",
         order: 3,
       },
       {
         id: "token-regulations",
-        title: "トークン規程 (PDF)",
-        titleKey: "users.documents.tokenRegulations",
+        title: "users.documents.tokenRegulations",
         path: "/communities/kibotcha/token-regulations.pdf",
         type: "external",
         order: 4,
       },
       {
         id: "whitepaper",
-        title: "ホワイトペーパー (PDF)",
-        titleKey: "users.documents.whitepaper",
+        title: "users.documents.whitepaper",
         path: "/communities/kibotcha/whitepaper.pdf",
         type: "external",
         order: 5,
@@ -239,49 +231,44 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     commonDocumentOverrides: {
       privacy: {
         id: "privacy",
-        title: "プライバシーポリシー (PDF)",
-        path: "/communities/izu/privacy-policy.pdf",
+        title: "users.promise.privacyPolicy",
+        path: "/communities/izu/ja/privacy-policy.pdf",
         type: "external",
       },
     },
     documents: [
       {
         id: "bylaws",
-        title: "定款 (PDF)",
-        titleKey: "users.documents.bylaws",
-        path: "/communities/izu/bylaws.pdf",
+        title: "users.documents.bylaws",
+        path: "/communities/izu/ja/bylaws.pdf",
         type: "external",
         order: 1,
       },
       {
         id: "operating-regulations",
-        title: "運営規程 (PDF)",
-        titleKey: "users.documents.operatingRegulations",
-        path: "/communities/izu/operating-regulations.pdf",
+        title: "users.documents.operatingRegulations",
+        path: "/communities/izu/ja/operating-regulations.pdf",
         type: "external",
         order: 2,
       },
       {
         id: "dao-meeting-rules",
-        title: "DAO総会規程 (PDF)",
-        titleKey: "users.documents.daoMeetingRules",
-        path: "/communities/izu/dao-meeting-rules.pdf",
+        title: "users.documents.daoMeetingRules",
+        path: "/communities/izu/ja/dao-meeting-rules.pdf",
         type: "external",
         order: 3,
       },
       {
         id: "token-regulations",
-        title: "トークン規程 (PDF)",
-        titleKey: "users.documents.tokenRegulations",
-        path: "/communities/izu/token-regulations.pdf",
+        title: "users.documents.tokenRegulations",
+        path: "/communities/izu/ja/token-regulations.pdf",
         type: "external",
         order: 4,
       },
       {
         id: "whitepaper",
-        title: "ホワイトペーパー (PDF)",
-        titleKey: "users.documents.whitepaper",
-        path: "/communities/izu/whitepaper.pdf",
+        title: "users.documents.whitepaper",
+        path: "/communities/izu/ja/whitepaper.pdf",
         type: "external",
         order: 5,
       },

@@ -3,13 +3,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { FileIcon } from "lucide-react";
 import Link from "next/link";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 
 export default function PromiseSection() {
-  const t = useTranslations();
   const defaultCommonDocuments = [
-    { id: "terms", title: t("users.promise.termsOfService"), path: "/terms", type: "internal" as const },
-    { id: "privacy", title: t("users.promise.privacyPolicy"), path: "/privacy", type: "internal" as const },
+    { id: "terms", title: "users.promise.termsOfService", path: "/terms", type: "internal" as const },
+    { id: "privacy", title: "users.promise.privacyPolicy", path: "/privacy", type: "internal" as const },
   ];
 
   const commonDocuments = defaultCommonDocuments.map((doc) => {
@@ -45,7 +44,6 @@ export default function PromiseSection() {
 interface DocumentLinkProps {
   document: {
     title: string;
-    titleKey?: string;
     path: string;
     type: "internal" | "external";
   };
@@ -53,7 +51,13 @@ interface DocumentLinkProps {
 
 function DocumentLink({ document }: DocumentLinkProps) {
   const t = useTranslations();
-  const displayTitle = document.titleKey ? t(document.titleKey) : document.title;
+  const locale = useLocale();
+  const displayTitle = t(document.title);
+  
+  const baseLocale = locale.split("-")[0] as "ja" | "en";
+  const href = document.type === "external" && document.path.match(/\/communities\/[^/]+\/(ja|en)\//)
+    ? document.path.replace(/(\/communities\/[^/]+)\/(ja|en)\//, `$1/${baseLocale}/`)
+    : document.path;
   
   const content = (
     <div className="flex items-center justify-between py-4 px-4 border-b">
@@ -65,11 +69,11 @@ function DocumentLink({ document }: DocumentLinkProps) {
   );
 
   if (document.type === "internal") {
-    return <Link href={document.path}>{content}</Link>;
+    return <Link href={href}>{content}</Link>;
   }
 
   return (
-    <a href={document.path} target="_blank" rel="noopener noreferrer">
+    <a href={href} target="_blank" rel="noopener noreferrer">
       {content}
     </a>
   );
