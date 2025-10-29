@@ -61,20 +61,22 @@ const TicketContent: React.FC<TicketContentProps> = ({
               <Search className="h-8 w-8" />
             </EmptyMedia>
             <EmptyDescription>
-              {getCurrentRegionName()}の素敵な人と関わって
-              <br />
-              チケットをもらおう
+              {`${getCurrentRegionName()}の素敵な人と関わって\nチケットをもらおう`}
             </EmptyDescription>
           </EmptyHeader>
-          {currentCommunityConfig.enableFeatures.includes("opportunities") && (
-            <EmptyContent>
+          <EmptyContent>
+            {currentCommunityConfig.enableFeatures.includes("opportunities") ? (
               <Button asChild variant="primary" size="lg" className="px-16">
                 <Link href={currentCommunityConfig.rootPath ?? "/"}>
                   関わりをみつける
                 </Link>
               </Button>
-            </EmptyContent>
-          )}
+            ) : (
+              <Button variant="tertiary" disabled size="lg" className="px-16">
+                🚧 開発中です
+              </Button>
+            )}
+          </EmptyContent>
         </Empty>
       )}
     </main>
