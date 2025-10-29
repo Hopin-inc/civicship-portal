@@ -36,13 +36,13 @@
   "transactions.name.onboarding": "Welcome Bonus",
   "transactions.name.move": "Point transfer",
   "transactions.action.donation.to": "Transferred to {name}",
-  "transactions.action.donation.from": "Transferred from {name}",
+  "transactions.action.donation.from": "{name} transferred",
   "transactions.action.grant.to": "Granted to {name}",
-  "transactions.action.grant.from": "Granted from {name}",
+  "transactions.action.grant.from": "{name} granted",
   "transactions.action.payment.to": "Paid to {name}",
-  "transactions.action.payment.from": "Paid from {name}",
+  "transactions.action.payment.from": "{name} paid",
   "transactions.action.return.to": "Returned to {name}",
-  "transactions.action.return.from": "Returned from {name}",
+  "transactions.action.return.from": "{name} returned",
   "transactions.action.refund.to": "Refunded to {name}",
-  "transactions.action.refund.from": "Refunded from {name}"
+  "transactions.action.refund.from": "{name} refunded"
 }
