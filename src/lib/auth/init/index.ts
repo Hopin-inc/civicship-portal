@@ -36,9 +36,9 @@ export async function initAuth(params: InitAuthParams) {
   if (state.isAuthInProgress) return;
 
   TokenManager.clearDeprecatedCookies();
-  setState({ isAuthInProgress: true, isAuthenticating: true });
-
+  
   const environment = detectEnvironment();
+  
   if (ssrCurrentUser && ssrLineAuthenticated) {
     return await initAuthFast({
       ssrCurrentUser,
@@ -49,6 +49,8 @@ export async function initAuth(params: InitAuthParams) {
       setState,
     });
   }
+  
+  setState({ isAuthInProgress: true, isAuthenticating: true });
   return await initAuthFull({
     liffService,
     authStateManager,
@@ -76,11 +78,9 @@ async function initAuthFast({
 }) {
   try {
     if (environment === AuthEnvironment.LIFF) {
-      try {
-        await liffService.initialize();
-      } catch (err) {
-        logger.warn("LIFF initialization skipped", { error: err });
-      }
+      liffService.initialize().catch(err => {
+        logger.warn("LIFF initialization failed in background", { error: err });
+      });
     }
 
     finalizeAuthState(
