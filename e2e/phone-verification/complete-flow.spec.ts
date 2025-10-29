@@ -72,7 +72,6 @@ test.describe('Phone Verification - Complete Flow with GraphQL', () => {
 
     const submitButton = page.getByRole('button', { name: /認証コードを送信/ });
     await expect(submitButton).toBeEnabled();
-    await expect(submitButton).toBeEnabled();
     await submitButton.click();
 
     // Wait for code verification screen
@@ -91,7 +90,6 @@ test.describe('Phone Verification - Complete Flow with GraphQL', () => {
 
     const submitButton = page.getByRole('button', { name: /認証コードを送信/ });
     await expect(submitButton).toBeEnabled();
-    await expect(submitButton).toBeEnabled();
     await submitButton.click();
 
     // Wait for code verification screen
@@ -107,7 +105,6 @@ test.describe('Phone Verification - Complete Flow with GraphQL', () => {
 
     const submitButton = page.getByRole('button', { name: /認証コードを送信/ });
     await expect(submitButton).toBeEnabled();
-    await expect(submitButton).toBeEnabled();
     await submitButton.click();
 
     // Verify phone number is displayed in code verification screen
@@ -122,7 +119,6 @@ test.describe('Phone Verification - Complete Flow with GraphQL', () => {
     await phoneInput.fill('9012345678');
 
     const submitButton = page.getByRole('button', { name: /認証コードを送信/ });
-    await expect(submitButton).toBeEnabled();
     await expect(submitButton).toBeEnabled();
     await submitButton.click();
 
@@ -148,7 +144,6 @@ test.describe('Phone Verification - Complete Flow with GraphQL', () => {
     await phoneInput.fill('9012345678');
 
     const submitButton = page.getByRole('button', { name: /認証コードを送信/ });
-    await expect(submitButton).toBeEnabled();
     await expect(submitButton).toBeEnabled();
     await submitButton.click();
 
@@ -180,7 +175,6 @@ test.describe('Phone Verification - Code Input UI', () => {
     await phoneInput.fill('9012345678');
 
     const submitButton = page.getByRole('button', { name: /認証コードを送信/ });
-    await expect(submitButton).toBeEnabled();
     await expect(submitButton).toBeEnabled();
     await submitButton.click();
 

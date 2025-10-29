@@ -14,7 +14,8 @@ describe("isValidPhoneNumber", () => {
     it.each([
       ["+81312345678", "Tokyo landline (03)"],
       ["+81612345678", "Osaka landline (06)"],
-    ])("should reject %s (%s)", (phoneNumber) => {
+    ])("should reject FIXED_LINE numbers: %s (%s)", (phoneNumber, description) => {
+      // These are pure landlines (FIXED_LINE type), not MOBILE or FIXED_LINE_OR_MOBILE
       expect(isValidPhoneNumber(phoneNumber)).toBe(false);
     });
 
@@ -65,7 +66,8 @@ describe("isValidPhoneNumber", () => {
     it.each([
       ["+442012345678", "London landline (020)"],
       ["+441612345678", "Manchester landline (0161)"],
-    ])("should reject %s (%s)", (phoneNumber) => {
+    ])("should reject FIXED_LINE numbers: %s (%s)", (phoneNumber, description) => {
+      // These are pure landlines (FIXED_LINE type), not MOBILE or FIXED_LINE_OR_MOBILE
       expect(isValidPhoneNumber(phoneNumber)).toBe(false);
     });
 
@@ -89,7 +91,8 @@ describe("isValidPhoneNumber", () => {
     it.each([
       ["+82212345678", "Seoul landline (02)"],
       ["+82512345678", "Busan landline (051)"],
-    ])("should reject %s (%s)", (phoneNumber) => {
+    ])("should reject FIXED_LINE numbers: %s (%s)", (phoneNumber, description) => {
+      // These are pure landlines (FIXED_LINE type), not MOBILE or FIXED_LINE_OR_MOBILE
       expect(isValidPhoneNumber(phoneNumber)).toBe(false);
     });
 
@@ -112,7 +115,8 @@ describe("isValidPhoneNumber", () => {
     it.each([
       ["+61212345678", "Sydney landline (02)"],
       ["+61312345678", "Melbourne landline (03)"],
-    ])("should reject %s (%s)", (phoneNumber) => {
+    ])("should reject FIXED_LINE numbers: %s (%s)", (phoneNumber, description) => {
+      // These are pure landlines (FIXED_LINE type), not MOBILE or FIXED_LINE_OR_MOBILE
       expect(isValidPhoneNumber(phoneNumber)).toBe(false);
     });
   });
@@ -129,7 +133,8 @@ describe("isValidPhoneNumber", () => {
     it.each([
       ["+493012345678", "Berlin landline (030)"],
       ["+498912345678", "Munich landline (089)"],
-    ])("should reject %s (%s)", (phoneNumber) => {
+    ])("should reject FIXED_LINE numbers: %s (%s)", (phoneNumber, description) => {
+      // These are pure landlines (FIXED_LINE type), not MOBILE or FIXED_LINE_OR_MOBILE
       expect(isValidPhoneNumber(phoneNumber)).toBe(false);
     });
   });
@@ -145,7 +150,8 @@ describe("isValidPhoneNumber", () => {
     it.each([
       ["+33112345678", "Paris landline (01)"],
       ["+33412345678", "Lyon landline (04)"],
-    ])("should reject %s (%s)", (phoneNumber) => {
+    ])("should reject FIXED_LINE numbers: %s (%s)", (phoneNumber, description) => {
+      // These are pure landlines (FIXED_LINE type), not MOBILE or FIXED_LINE_OR_MOBILE
       expect(isValidPhoneNumber(phoneNumber)).toBe(false);
     });
   });
