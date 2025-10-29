@@ -58,7 +58,7 @@ export function CodeVerificationStep({
     try {
       phoneAuth.clearRecaptcha?.();
     } catch (error) {
-      logger.error("reCAPTCHAクリアエラー:", { error });
+      logger.error("reCAPTCHA clear error:", { error });
     } finally {
       setIsReloading(true);
       onBackToPhone();

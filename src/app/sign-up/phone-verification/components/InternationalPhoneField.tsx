@@ -6,6 +6,7 @@ import metadata from "libphonenumber-js/metadata.max.json";
 import { OriginInput } from "./OriginInput";
 import { CountrySelect, FlagComponent } from "./PhoneCountrySelect";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 interface InternationalPhoneFieldProps {
   value: string | undefined;
@@ -45,10 +46,12 @@ export function InternationalPhoneField({
   defaultCountry = "JP",
   countries,
   showFlags = false,
-  placeholder = "例）09012345678",
+  placeholder,
   className = "flex flex-row items-stretch rounded-md shadow-xs",
   id = "phone",
 }: InternationalPhoneFieldProps) {
+  const t = useTranslations();
+  const defaultPlaceholder = t("phoneVerification.field.placeholder");
   return (
     <PhoneInput
       id={id}
@@ -60,7 +63,7 @@ export function InternationalPhoneField({
       withCountryCallingCode
       countryCallingCodeEditable={false}
       disabled={disabled}
-      placeholder={placeholder}
+      placeholder={placeholder || defaultPlaceholder}
       className={className}
       inputComponent={PhoneInputInner}
       countrySelectComponent={CountrySelect}
