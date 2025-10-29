@@ -23,5 +23,22 @@
   "wallets.donate.submitLabel": "Give",
   "wallets.donate.backLabel": "Choose a different recipient",
   "wallets.donate.selectRecipient": "Select Recipient",
-  "wallets.donate.errorMembers": "Could not fetch recipients"
+  "wallets.donate.errorMembers": "Could not fetch recipients",
+  "wallets.shared.tabs.history": "History",
+  "wallets.shared.tabs.member": "Members",
+  "wallets.shared.search.placeholder": "Enter name or DID",
+  "wallets.shared.member.errorLoad": "Failed to load members",
+  "wallets.shared.member.noMatch": "No matching members found",
+  "wallets.shared.history.errorLoad": "Failed to load history",
+  "wallets.shared.history.noGrant": "No grant history",
+  "wallets.shared.history.noDonation": "No donation history",
+  "wallets.shared.transfer.didPending": "DID issuance in progress",
+  "wallets.shared.transfer.errorExceedsBalance": "Exceeds available balance",
+  "wallets.shared.transfer.errorExceedsLimit": "Please specify 2 billion or less",
+  "wallets.shared.transfer.amountLabel": "Grant Points",
+  "wallets.shared.transfer.required": "Required",
+  "wallets.shared.transfer.balance": "Balance",
+  "wallets.shared.transfer.commentLabel": "Comment",
+  "wallets.shared.transfer.commentPlaceholder": "e.g., Thanks for helping with the weeding!",
+  "wallets.shared.transfer.commentError": "Please enter within 100 characters"
 }
