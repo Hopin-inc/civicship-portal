@@ -21,8 +21,8 @@ export default function SettingSection() {
           <Link
             href="/users/me/edit"
             className={cn(
-              buttonVariants({ variant: "secondary", size: "md" }),
-              "ml-auto text-black",
+              buttonVariants({ variant: "tertiary", size: "sm" }),
+              "ml-auto text-black w-24",
             )}
           >
             {t("users.settings.editButton")}
