@@ -186,9 +186,10 @@ export class LiffService {
         pictureUrl: profile.pictureUrl || null,
       };
     } catch (error) {
+      const processedError = error instanceof Error ? error : new Error(String(error));
       logger.info("Failed to get LIFF profile", {
         authType: "liff",
-        error: error instanceof Error ? error.message : String(error),
+        error: processedError.message,
         component: "LiffService",
       });
     }
@@ -279,9 +280,9 @@ export class LiffService {
 
         return true;
       } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
+        const processedError = error instanceof Error ? error : new Error(String(error));
 
-        if (message.includes("401") || message.includes("network") || message.includes("fetch")) {
+        if (processedError.message.includes("401") || processedError.message.includes("network") || processedError.message.includes("fetch")) {
           await new Promise((r) => setTimeout(r, attempt * 1000)); // 1s,2s,3s
           continue;
         }
