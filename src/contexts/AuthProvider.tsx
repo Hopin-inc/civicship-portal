@@ -41,6 +41,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
   }, [authStateManager, liffService, ssrCurrentUser, ssrLineAuthenticated, ssrPhoneAuthenticated]);
 
   const { refetch } = useCurrentUserServerQuery({
+    skip: Boolean(ssrCurrentUser),
     fetchPolicy: "network-only",
   });
 
