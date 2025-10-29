@@ -17,5 +17,11 @@
   "wallets.donate.cancelButton": "Cancel",
   "wallets.donate.successMessage": "Points sent successfully",
   "wallets.donate.errorMessage": "Failed to send points",
-  "wallets.donate.insufficientBalance": "Insufficient balance"
+  "wallets.donate.insufficientBalance": "Insufficient balance",
+  "wallets.donate.pageTitle": "Give Points",
+  "wallets.donate.recipientSuffix": "to",
+  "wallets.donate.submitLabel": "Give",
+  "wallets.donate.backLabel": "Choose a different recipient",
+  "wallets.donate.selectRecipient": "Select Recipient",
+  "wallets.donate.errorMembers": "Could not fetch recipients"
 }

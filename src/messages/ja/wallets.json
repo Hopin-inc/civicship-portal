@@ -17,5 +17,11 @@
   "wallets.donate.cancelButton": "キャンセル",
   "wallets.donate.successMessage": "ポイントを贈りました",
   "wallets.donate.errorMessage": "ポイントの送信に失敗しました",
-  "wallets.donate.insufficientBalance": "ポイントが不足しています"
+  "wallets.donate.insufficientBalance": "ポイントが不足しています",
+  "wallets.donate.pageTitle": "ポイントをあげる",
+  "wallets.donate.recipientSuffix": "にあげる",
+  "wallets.donate.submitLabel": "あげる",
+  "wallets.donate.backLabel": "あげる相手を選び直す",
+  "wallets.donate.selectRecipient": "送り先を選ぶ",
+  "wallets.donate.errorMembers": "送信先のメンバーを取得できませんでした"
 }

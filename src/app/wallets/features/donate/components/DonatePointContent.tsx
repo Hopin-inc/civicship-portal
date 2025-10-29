@@ -8,6 +8,7 @@ import { useDonateMembers } from "../hooks/useDonateMembers";
 import { Tabs } from "@/app/admin/wallet/grant/types/tabs";
 import { useEffect, useRef, useState } from "react";
 import { GqlUser } from "@/types/graphql";
+import { useTranslations } from "next-intl";
 
 export function DonatePointContent({
   currentUser,
@@ -16,6 +17,7 @@ export function DonatePointContent({
   currentUser?: GqlUser | null;
   currentPoint: bigint;
 }) {
+  const t = useTranslations();
   const [activeTab, setActiveTab] = useState<Tabs>(Tabs.History);
   const { members, loading, error, refetch, loadMoreRef, isLoadingMore } = useDonateMembers(
     currentUser?.id,
@@ -33,7 +35,7 @@ export function DonatePointContent({
 
   if (loading && !isLoadingMore) return <LoadingIndicator />;
   if (error)
-    return <ErrorState title="送信先のメンバーを取得できませんでした" refetchRef={refetchRef} />;
+    return <ErrorState title={t("wallets.donate.errorMembers")} refetchRef={refetchRef} />;
 
   return (
     <div className="max-w-xl mx-auto mt-6 space-y-4">
