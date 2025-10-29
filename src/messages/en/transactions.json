@@ -32,13 +32,6 @@
   "transactions.status.refund": "Refund recipient",
   "transactions.status.return": "Return recipient",
   "transactions.status.default": "Destination",
-  "transactions.action.donation": "{name} transferred",
-  "transactions.action.grant": "{name} granted",
-  "transactions.action.pay": "{name} paid",
-  "transactions.action.return": "{name} returned",
-  "transactions.action.onboarding": "{name}",
-  "transactions.action.refund": "{name} refunded",
-  "transactions.action.default": "{name}",
   "transactions.name.issued": "Issued",
   "transactions.name.onboarding": "Welcome Bonus",
   "transactions.name.move": "Point transfer",
@@ -50,6 +43,6 @@
   "transactions.action.payment.from": "Paid from {name}",
   "transactions.action.return.to": "Returned to {name}",
   "transactions.action.return.from": "Returned from {name}",
-  "transactions.action.refund.to": "Refunded from {name}",
+  "transactions.action.refund.to": "Refunded to {name}",
   "transactions.action.refund.from": "Refunded from {name}"
 }
