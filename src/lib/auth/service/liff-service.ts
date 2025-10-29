@@ -60,7 +60,7 @@ export class LiffService {
 
   public async initialize(): Promise<boolean> {
     if (this.state.isInitialized) {
-      return Promise.resolve(true);
+      return true;
     }
 
     if (this.initializationPromise) {
