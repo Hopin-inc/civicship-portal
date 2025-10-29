@@ -101,7 +101,11 @@ export class LiffService {
             errorCategory: "initialization_error",
           });
         }
-        this.state.error = error as Error;
+        if (error instanceof Error) {
+          this.state.error = error;
+        } else {
+          this.state.error = new Error(errorMessage);
+        }
         return false;
       } finally {
         this.initializationPromise = null;
@@ -156,7 +160,11 @@ export class LiffService {
           errorCategory: "auth_temporary",
         });
       }
-      this.state.error = error as Error;
+      if (error instanceof Error) {
+        this.state.error = error;
+      } else {
+        this.state.error = new Error(errorMessage);
+      }
       return false;
     }
   }
