@@ -37,9 +37,12 @@ const UserInfoCard = ({
   onClick,
   children,
   comment,
-}: Props) => (
+}: Props) => {
+  const showDidLine = showDid && !!didValue;
+  
+  return (
     <Card className="px-4 py-4 bg-white" onClick={onClick}>
-    <div className="flex items-start gap-3">
+    <div className={`flex ${showDidLine ? "items-start" : "items-center"} gap-3`}>
       <Avatar className="h-10 w-10">
         <AvatarImage src={otherUser?.image || ""} alt="user" />
         <AvatarFallback>U</AvatarFallback>
@@ -83,6 +86,7 @@ const UserInfoCard = ({
       </div>
     </div>
   </Card>
-);
+  );
+};
 
 export default UserInfoCard;
