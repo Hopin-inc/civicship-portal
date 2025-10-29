@@ -18,26 +18,29 @@ describe("PhoneInputStep", () => {
   it("should render phone input form", () => {
     render(<PhoneInputStep {...defaultProps} />);
 
-    expect(screen.getByText("電話番号を入力")).toBeInTheDocument();
-    expect(screen.getByLabelText("電話番号")).toBeInTheDocument();
+    // Now uses InternationalPhoneField instead of basic input
+    expect(screen.getByRole("textbox")).toBeInTheDocument();
+    expect(screen.getByLabelText("Select country")).toBeInTheDocument();
     expect(screen.getByPlaceholderText("例）09012345678")).toBeInTheDocument();
   });
 
   it("should display phone number value", () => {
-    render(<PhoneInputStep {...defaultProps} phoneNumber="09012345678" />);
+    render(<PhoneInputStep {...defaultProps} phoneNumber="+819012345678" />);
 
-    const input = screen.getByLabelText("電話番号") as HTMLInputElement;
-    expect(input.value).toBe("09012345678");
+    const input = screen.getByRole("textbox") as HTMLInputElement;
+    // InternationalPhoneField formats with country code
+    expect(input.value).toBe("+81 90 1234 5678");
   });
 
   it("should call onPhoneNumberChange when input changes", () => {
     const onPhoneNumberChange = vi.fn();
     render(<PhoneInputStep {...defaultProps} onPhoneNumberChange={onPhoneNumberChange} />);
 
-    const input = screen.getByLabelText("電話番号");
-    fireEvent.change(input, { target: { value: "09012345678" } });
+    const input = screen.getByRole("textbox");
+    fireEvent.change(input, { target: { value: "9012345678" } });
 
-    expect(onPhoneNumberChange).toHaveBeenCalledWith("09012345678");
+    // InternationalPhoneField handles the onChange and passes the international format
+    expect(onPhoneNumberChange).toHaveBeenCalledWith("+819012345678");
   });
 
   it("should call onSubmit when form is submitted", () => {

@@ -1,12 +1,18 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { PHONE_VERIFICATION_CONSTANTS } from "../utils/phoneVerificationConstants";
+import {
+  DEFAULT_COUNTRY,
+  PHONE_VERIFICATION_CONSTANTS,
+  SHOW_FLAGS,
+} from "../utils/phoneVerificationConstants";
+import { InternationalPhoneField } from "./InternationalPhoneField";
+import useHeaderConfig from "@/hooks/useHeaderConfig";
 
 interface PhoneInputStepProps {
-  phoneNumber: string;
-  onPhoneNumberChange: (value: string) => void;
+  phoneNumber: string | undefined;
+  onPhoneNumberChange: (value: string | undefined) => void;
   onSubmit: (e: React.FormEvent) => void;
   isSubmitting: boolean;
   isRateLimited: boolean;
@@ -25,32 +31,36 @@ export function PhoneInputStep({
   isVerifying,
   recaptchaContainerRef,
 }: PhoneInputStepProps) {
+  const headerConfig = useMemo(
+    () => ({
+      title: "電話番号認証",
+      showBackButton: false,
+      showLogo: false,
+    }),
+    [],
+  );
+  useHeaderConfig(headerConfig);
+
   const [isReloading, setIsReloading] = useState(false);
 
   return (
     <>
-      <div className="space-y-2">
-        <h1 className="text-2xl font-bold tracking-tight">電話番号を入力</h1>
+      <div>
         <p className="text-sm text-muted-foreground">
           電話番号認証のため、あなたの電話番号を入力してください。SMSで認証コードが送信されます。
         </p>
       </div>
 
       <form onSubmit={onSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <label htmlFor="phone" className="text-sm font-medium">
-            電話番号
-          </label>
-          <input
-            id="phone"
-            type="tel"
-            value={phoneNumber}
-            onChange={(e) => onPhoneNumberChange(e.target.value)}
-            placeholder="例）09012345678"
-            className="w-full h-12 px-3 border rounded-md"
-            required
-          />
-        </div>
+        <InternationalPhoneField
+          id="phone"
+          value={phoneNumber}
+          onChange={onPhoneNumberChange}
+          defaultCountry={DEFAULT_COUNTRY}
+          showFlags={SHOW_FLAGS}
+          placeholder="例）09012345678"
+          disabled={isSubmitting || isVerifying || isReloading}
+        />
         <div className="flex flex-col items-center gap-8 w-full mx-auto">
           <Button
             type="submit"
@@ -68,7 +78,7 @@ export function PhoneInputStep({
             className="px-4"
             size="sm"
             variant="text"
-            disabled={isReloading}
+            disabled={isSubmitting || isVerifying || isReloading}
             onClick={() => {
               setIsReloading(true);
               setTimeout(() => {
