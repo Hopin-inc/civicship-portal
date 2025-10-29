@@ -31,7 +31,7 @@ export function UserTicketsAndPoints({ ticketCount, pointCount }: UserTicketsAnd
           <div className={ticketClass}>
             <TicketIcon className="w-5 h-5 mb-0.5" />
             <p className="text-label-md">{t("users.ticketsAndPoints.ticketsLabel")}</p>
-            <p className="text-label-md font-bold">{ticketCount}{t("users.ticketsAndPoints.ticketsUnit")}</p>
+            <p className="text-label-md font-bold">{t("users.ticketsAndPoints.ticketsCount", { count: ticketCount })}</p>
             <ChevronRight className="w-4 h-4 ml-auto" />
           </div>
         </Link>

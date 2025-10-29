@@ -22,6 +22,9 @@ export interface CommunityDocument {
   /** 表示名 */
   title: string;
 
+  /** 翻訳キー（指定された場合はtitleより優先） */
+  titleKey?: string;
+
   /** ファイルパスまたはURL */
   path: string;
 
@@ -147,6 +150,7 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
       {
         id: "bylaws",
         title: "定款 (PDF)",
+        titleKey: "users.documents.bylaws",
         path: "/communities/kibotcha/bylaws.pdf",
         type: "external",
         order: 1,
@@ -154,6 +158,7 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
       {
         id: "operating-regulations",
         title: "運営規程 (PDF)",
+        titleKey: "users.documents.operatingRegulations",
         path: "/communities/kibotcha/operating-regulations.pdf",
         type: "external",
         order: 2,
@@ -161,6 +166,7 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
       {
         id: "dao-meeting-rules",
         title: "DAO総会規程 (PDF)",
+        titleKey: "users.documents.daoMeetingRules",
         path: "/communities/kibotcha/dao-meeting-rules.pdf",
         type: "external",
         order: 3,
@@ -168,6 +174,7 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
       {
         id: "token-regulations",
         title: "トークン規程 (PDF)",
+        titleKey: "users.documents.tokenRegulations",
         path: "/communities/kibotcha/token-regulations.pdf",
         type: "external",
         order: 4,
@@ -175,6 +182,7 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
       {
         id: "whitepaper",
         title: "ホワイトペーパー (PDF)",
+        titleKey: "users.documents.whitepaper",
         path: "/communities/kibotcha/whitepaper.pdf",
         type: "external",
         order: 5,
@@ -240,6 +248,7 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
       {
         id: "bylaws",
         title: "定款 (PDF)",
+        titleKey: "users.documents.bylaws",
         path: "/communities/izu/bylaws.pdf",
         type: "external",
         order: 1,
@@ -247,6 +256,7 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
       {
         id: "operating-regulations",
         title: "運営規程 (PDF)",
+        titleKey: "users.documents.operatingRegulations",
         path: "/communities/izu/operating-regulations.pdf",
         type: "external",
         order: 2,
@@ -254,6 +264,7 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
       {
         id: "dao-meeting-rules",
         title: "DAO総会規程 (PDF)",
+        titleKey: "users.documents.daoMeetingRules",
         path: "/communities/izu/dao-meeting-rules.pdf",
         type: "external",
         order: 3,
@@ -261,6 +272,7 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
       {
         id: "token-regulations",
         title: "トークン規程 (PDF)",
+        titleKey: "users.documents.tokenRegulations",
         path: "/communities/izu/token-regulations.pdf",
         type: "external",
         order: 4,
@@ -268,6 +280,7 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
       {
         id: "whitepaper",
         title: "ホワイトペーパー (PDF)",
+        titleKey: "users.documents.whitepaper",
         path: "/communities/izu/whitepaper.pdf",
         type: "external",
         order: 5,

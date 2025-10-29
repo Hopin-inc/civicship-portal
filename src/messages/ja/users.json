@@ -24,6 +24,7 @@
   "users.portfolio.emptyStateNonOwner": "体験に参加すると、タイムラインが作成されます",
   "users.portfolio.searchEngagements": "関わりを探す",
   "users.ticketsAndPoints.ticketsLabel": "利用できるチケット",
+  "users.ticketsAndPoints.ticketsCount": "{count}枚",
   "users.ticketsAndPoints.ticketsUnit": "枚",
   "users.ticketsAndPoints.pointsLabel": "保有ポイント",
   "users.ticketsAndPoints.pointsUnit": "pt",
@@ -70,5 +71,10 @@
   "users.edit.phoneNumber": "電話番号",
   "users.edit.phoneNumberNote": "電話番号は、予約時の緊急連絡先として案内人に共有されます。一般には公開されません。",
   "users.edit.saving": "保存中...",
-  "users.edit.save": "保存"
+  "users.edit.save": "保存",
+  "users.documents.bylaws": "定款 (PDF)",
+  "users.documents.operatingRegulations": "運営規程 (PDF)",
+  "users.documents.daoMeetingRules": "DAO総会規程 (PDF)",
+  "users.documents.tokenRegulations": "トークン規程 (PDF)",
+  "users.documents.whitepaper": "ホワイトペーパー (PDF)"
 }
