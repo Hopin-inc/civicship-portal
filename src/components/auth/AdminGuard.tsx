@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthProvider";
 import { toast } from "sonner";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { GqlMembership, GqlRole } from "@/types/graphql";
 import { AuthRedirectService } from "@/lib/auth/service/auth-redirect-service";
@@ -57,7 +58,7 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
   }, [currentUser, isAuthenticated, loading, router, authRedirectService]);
 
   if (loading) {
-    return null;
+    return <LoadingIndicator />;
   }
 
   if (!isAuthenticated || !currentUser) {

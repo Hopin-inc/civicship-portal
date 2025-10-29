@@ -1,7 +1,7 @@
 "use client";
 
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef } from "react";
-import { AuthContextType, AuthProviderProps, SsrAuthSnapshot } from "@/types/auth";
+import React, { createContext, useCallback, useContext, useEffect, useRef } from "react";
+import { AuthContextType, AuthProviderProps } from "@/types/auth";
 import { initAuth } from "@/lib/auth/init";
 import { useCurrentUserServerQuery } from "@/types/graphql";
 import { useAuthDependencies } from "@/hooks/auth/init/useAuthDependencies";
@@ -20,16 +20,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
 }) => {
   const { liffService, phoneAuthService, authStateManager } = useAuthDependencies();
   const hasInitialized = useRef(false);
-
-  const ssrSnapshot = useMemo<SsrAuthSnapshot>(
-    () => ({
-      hasUser: !!ssrCurrentUser,
-      lineAuthenticated: !!ssrLineAuthenticated,
-      phoneAuthenticated: !!ssrPhoneAuthenticated,
-      userRegistered: !!ssrCurrentUser && !!ssrPhoneAuthenticated,
-    }),
-    [ssrCurrentUser, ssrLineAuthenticated, ssrPhoneAuthenticated],
-  );
 
   useEffect(() => {
     if (hasInitialized.current) return;
@@ -77,9 +67,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
 
   const value = useAuthValue({ refetchUser, phoneAuthService, actions });
 
-  const contextValue = useMemo(() => ({ ...value, ssrSnapshot }), [value, ssrSnapshot]);
-
-  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = (): AuthContextType => {
