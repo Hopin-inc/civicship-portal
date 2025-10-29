@@ -35,30 +35,30 @@ const useStatusLabel = (reason: GqlTransactionReason) => {
   }
 }
 
-const useFormatTransactionDescription = (reason: GqlTransactionReason, from: string, to: string): { name: string; to: string; action: string } => {
+const useFormatTransactionDescription = (reason: GqlTransactionReason, from: string, to: string): { displayText: string; to: string } => {
   const t = useTranslations();
   switch (reason) {
     case GqlTransactionReason.Donation:
-      return { name: from, to: to, action: t("transactions.action.donation", { name: from }) };
+      return { displayText: t("transactions.action.donation.from", { name: from }), to: to };
     case GqlTransactionReason.Grant:
-      return { name: from, to: to, action: t("transactions.action.grant", { name: from }) };
+      return { displayText: t("transactions.action.grant.from", { name: from }), to: to };
     case GqlTransactionReason.PointIssued:
-      return { name: t("transactions.name.issued"), to: to, action: "" };
+      return { displayText: t("transactions.name.issued"), to: to };
     case GqlTransactionReason.PointReward:
-      return { name: from, to: to, action: t("transactions.action.pay", { name: from }) };
+      return { displayText: t("transactions.action.payment.from", { name: from }), to: to };
     case GqlTransactionReason.TicketPurchased:
-      return { name: from, to: to, action: t("transactions.action.pay", { name: from }) };
+      return { displayText: t("transactions.action.payment.from", { name: from }), to: to };
     case GqlTransactionReason.TicketRefunded:
-      return { name: from, to: to, action: t("transactions.action.return", { name: from }) };
+      return { displayText: t("transactions.action.return.from", { name: from }), to: to };
     case GqlTransactionReason.Onboarding:
-      return { name: t("transactions.name.onboarding"), to: to, action: "" };
+      return { displayText: t("transactions.name.onboarding"), to: to };
     case GqlTransactionReason.OpportunityReservationCreated:
-      return { name: from, to: to, action: t("transactions.action.pay", { name: from }) };
+      return { displayText: t("transactions.action.payment.from", { name: from }), to: to };
     case GqlTransactionReason.OpportunityReservationCanceled:
     case GqlTransactionReason.OpportunityReservationRejected:
-      return { name: from, to: to, action: t("transactions.action.refund", { name: from }) };
+      return { displayText: t("transactions.action.refund.from", { name: from }), to: to };
     default:
-      return { name: t("transactions.name.move"), to: to, action: "" };
+      return { displayText: t("transactions.name.move"), to: to };
   }
 };
 
@@ -84,8 +84,9 @@ export const TransactionCard = ({ transaction, image }: TransactionCardProps) =>
     const t = useTranslations();
     const locale = useLocale();
     const info = getTransactionInfo(transaction, t("transactions.did.pending"));
-    const { name, action } = useFormatTransactionDescription(info.reason, info.from, info.to);
+    const { displayText, to } = useFormatTransactionDescription(info.reason, info.from, info.to);
     const statusLabelElement = useStatusLabel(info.reason);
+    const hasDestination = to && info.reason !== GqlTransactionReason.PointIssued && info.reason !== GqlTransactionReason.Onboarding;
     
     const formatDateTime = (isoString: string | null | undefined): string => {
       if (!isoString) return t("transactions.date.unknown");
@@ -112,19 +113,17 @@ export const TransactionCard = ({ transaction, image }: TransactionCardProps) =>
             </Avatar>
             <div className="flex flex-col text-left min-w-0 flex-1">
               <div className="flex items-start justify-between">
-                <span className="flex items-center truncate whitespace-nowrap overflow-hidden">
-                  {name && <span className="text-label-sm font-bold">{name}</span>}
-                  {action && <span className="text-label-xs font-bold">{action}</span>}
+                <span className="flex items-center truncate whitespace-nowrap overflow-hidden text-label-sm font-bold">
+                  {displayText}
                 </span>
-                {/* 右: 金額 */}
                 <div className="text-label-sm font-bold shrink-0 ml-4 text-foreground">
                   {formatCurrency(info.amount)} pt
                 </div>
               </div>
-              {action && (
+              {hasDestination && (
                 <p className="flex items-center gap-2 my-2">
                     {statusLabelElement}
-                    <span className="text-label-xs font-medium text-caption">{info.to}</span>
+                    <span className="text-label-xs font-medium text-caption">{to}</span>
                 </p>
               )}
               {info.comment && (
