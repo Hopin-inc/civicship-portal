@@ -32,6 +32,7 @@ export function DonateForm({
       recipientLabel={t("wallets.donate.recipientSuffix")}
       submitLabel={t("wallets.donate.submitLabel")}
       backLabel={t("wallets.donate.backLabel")}
+      amountLabel={t("wallets.donate.amountLabel")}
       presetAmounts={[1000, 3000, 5000, 10000]}
     />
   );

@@ -24,6 +24,7 @@ interface Props {
   recipientLabel?: string;
   submitLabel?: string;
   backLabel?: string;
+  amountLabel?: string;
   presetAmounts?: number[]; // ← 追加
 }
 
@@ -39,6 +40,7 @@ function TransferInputStep({
   recipientLabel = "に支給",
   submitLabel = "支給する",
   backLabel = "支給先を選び直す",
+  amountLabel,
 }: Props) {
   const t = useTranslations();
   const headerConfig: HeaderConfig = useMemo(
@@ -104,7 +106,7 @@ function TransferInputStep({
           </Card>
           <section className="w-full">
             <div>
-              <Label className="text-label-md font-medium">{t("wallets.shared.transfer.amountLabel")}</Label>
+              <Label className="text-label-md font-medium">{amountLabel ?? t("wallets.shared.transfer.amountLabel")}</Label>
               <span className="text-label-xs rounded-full px-2 py-[2px] ml-2 bg-primary-foreground text-primary font-bold">
                 {t("wallets.shared.transfer.required")}
               </span>
