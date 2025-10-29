@@ -3,9 +3,17 @@
 import React from "react";
 import TicketList from "./TicketList";
 import { TicketClaimLink } from "@/app/tickets/data/type";
-import EmptyStateWithSearch from "@/components/shared/EmptyStateWithSearch";
+import {
+  Empty,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyDescription,
+  EmptyContent,
+} from "@/components/ui/empty";
+import { Button } from "@/components/ui/button";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { Info } from "lucide-react";
+import { Info, Search } from "lucide-react";
+import { getCurrentRegionName, currentCommunityConfig } from "@/lib/communities/metadata";
 
 interface TicketContentProps {
   ticketClaimLinks: TicketClaimLink[];
@@ -46,7 +54,30 @@ const TicketContent: React.FC<TicketContentProps> = ({
           )}
         </>
       ) : (
-        <EmptyStateWithSearch />
+        <Empty className="mt-8">
+          <EmptyHeader>
+            <EmptyMedia variant="gradient">
+              <Search className="h-8 w-8" />
+            </EmptyMedia>
+            <EmptyDescription>
+              {getCurrentRegionName()}の素敵な人と関わって
+              <br />
+              チケットをもらおう
+            </EmptyDescription>
+          </EmptyHeader>
+          {currentCommunityConfig.enableFeatures.includes("opportunities") && (
+            <EmptyContent>
+              <Button
+                variant="primary"
+                size="lg"
+                className="px-16"
+                onClick={() => (window.location.href = currentCommunityConfig.rootPath ?? "/")}
+              >
+                関わりをみつける
+              </Button>
+            </EmptyContent>
+          )}
+        </Empty>
       )}
     </main>
   );
