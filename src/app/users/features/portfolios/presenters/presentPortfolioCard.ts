@@ -4,22 +4,22 @@ import { PLACEHOLDER_IMAGE } from "@/utils";
 import { parsePortfolioDate, formatPortfolioDate } from "@/app/users/features/portfolios/lib";
 import { PortfolioCardViewModel } from "./viewModels";
 
-function getCategoryLabel(
+function getCategoryLabelKey(
   source: "OPPORTUNITY" | "ARTICLE",
   reservationStatus?: GqlReservationStatus | null,
 ): string | undefined {
   if (source === "OPPORTUNITY" && reservationStatus) {
     switch (reservationStatus) {
       case GqlReservationStatus.Applied:
-        return "予約承認待ち";
+        return "users.portfolio.status.applied";
       case GqlReservationStatus.Accepted:
-        return "予約確定";
+        return "users.portfolio.status.accepted";
       case GqlReservationStatus.Rejected:
-        return "要確認";
+        return "users.portfolio.status.rejected";
       case GqlReservationStatus.Canceled:
-        return "キャンセル済み";
+        return "users.portfolio.status.canceled";
       default:
-        return "要確認";
+        return "users.portfolio.status.unknown";
     }
   }
   return undefined;
@@ -74,18 +74,18 @@ export function presentPortfolioCard(
     portfolio?.reservationStatus === GqlReservationStatus.Accepted &&
     isPast;
 
-  let badge: { label: string; variantClasses: string } | null = null;
+  let badge: { labelKey: string; variantClasses: string } | null = null;
   if (!showShield) {
     if (isPassed) {
       badge = {
-        label: "証明済み",
+        labelKey: "users.portfolio.badge.certified",
         variantClasses: getStatusStylesForPassed(portfolio.evaluationStatus),
       };
     } else {
-      const label = getCategoryLabel(portfolio.source, portfolio.reservationStatus);
-      if (label) {
+      const labelKey = getCategoryLabelKey(portfolio.source, portfolio.reservationStatus);
+      if (labelKey) {
         badge = {
-          label,
+          labelKey,
           variantClasses: getStatusStyles(portfolio.reservationStatus),
         };
       }

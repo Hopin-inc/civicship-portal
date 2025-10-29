@@ -35,7 +35,7 @@
   "wallets.shared.transfer.didPending": "DID issuance in progress",
   "wallets.shared.transfer.errorExceedsBalance": "Exceeds available balance",
   "wallets.shared.transfer.errorExceedsLimit": "Please specify 2 billion or less",
-  "wallets.shared.transfer.amountLabel": "Grant Points",
+  "wallets.shared.transfer.amountLabel": "Amount",
   "wallets.shared.transfer.required": "Required",
   "wallets.shared.transfer.balance": "Balance",
   "wallets.shared.transfer.commentLabel": "Comment",
@@ -44,5 +44,10 @@
   "wallets.action.donation.to": "Donated to {name}",
   "wallets.action.donation.from": "{name} donated",
   "wallets.action.grant.to": "Granted to {name}",
-  "wallets.action.grant.from": "Received from {name}"
+  "wallets.action.grant.from": "Received from {name}",
+  "wallets.donate.toast.success": "Donated {amount} pt",
+  "wallets.donate.toast.errorWithCode": "Transfer failed: {code}",
+  "wallets.donate.toast.genericError": "Failed to send points",
+  "wallets.meta.title": "{communityName} - Wallet",
+  "wallets.meta.description": "Check your points balance and donate to others."
 }

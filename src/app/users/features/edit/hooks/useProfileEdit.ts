@@ -9,8 +9,10 @@ import { mapGqlUserToProfile } from "@/app/users/features/shared/mappers";
 import { prefectureLabels } from "@/shared/prefectures/constants";
 import { logger } from "@/lib/logging";
 import { useUserProfileContext } from "@/app/users/features/shared/contexts/UserProfileContext";
+import { useTranslations } from "next-intl";
 
 const useProfileEdit = () => {
+  const t = useTranslations();
   const router = useRouter();
   const { gqlUser, userId } = useUserProfileContext();
 
@@ -50,7 +52,7 @@ const useProfileEdit = () => {
   const handleSave = async (e: FormEvent) => {
     e.preventDefault();
     if (!profile.currentPrefecture) {
-      toast.error("居住地を選択してください");
+      toast.error(t("users.edit.toast.missingResidence"));
       return;
     }
 
@@ -75,7 +77,7 @@ const useProfileEdit = () => {
           },
         },
       });
-      toast.success("プロフィールを更新しました");
+      toast.success(t("users.edit.toast.updated"));
       router.push(`/users/me`);
     } catch (err) {
       logger.error("Failed to update profile", {
@@ -83,7 +85,7 @@ const useProfileEdit = () => {
         component: "useProfileEdit",
         userId,
       });
-      toast.error("プロフィールの更新に失敗しました");
+      toast.error(t("users.edit.toast.updateFailed"));
     }
   };
 

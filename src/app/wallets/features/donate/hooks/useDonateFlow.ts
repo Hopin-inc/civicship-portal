@@ -6,8 +6,10 @@ import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 import { useDonatePoint } from "@/app/wallets/features/donate/hooks";
 import { toast } from "sonner";
 import { GqlUser } from "@/types/graphql";
+import { useTranslations } from "next-intl";
 
 export function useDonateFlow(currentUser?: GqlUser | null, currentPoint?: bigint) {
+  const t = useTranslations();
   const router = useRouter();
   const track = useAnalytics();
   const { donate, isLoading } = useDonatePoint();
@@ -28,19 +30,19 @@ export function useDonateFlow(currentUser?: GqlUser | null, currentPoint?: bigin
         track({
           name: "donate_point",
           params: {
-            fromUser: { userId: currentUser.id, name: currentUser.name ?? "未設定" },
-            toUser: { userId: selectedUser.id, name: selectedUser.name ?? "未設定" },
+            fromUser: { userId: currentUser.id, name: currentUser.name ?? t("users.shared.unnamed") },
+            toUser: { userId: selectedUser.id, name: selectedUser.name ?? t("users.shared.unnamed") },
             amount,
           },
         });
 
-        toast.success(`${amount.toLocaleString()} pt をあげました`);
+        toast.success(t("wallets.donate.toast.success", { amount: amount.toLocaleString() }));
         router.push("/wallets/me?refresh=true");
       } else {
-        toast.error(`送信失敗: ${res.code}`);
+        toast.error(t("wallets.donate.toast.errorWithCode", { code: res.code }));
       }
     } catch {
-      toast.error("ポイントを送れませんでした");
+      toast.error(t("wallets.donate.toast.genericError"));
     }
   };
 
