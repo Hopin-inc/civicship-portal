@@ -19,14 +19,10 @@
     "tickets": "チケット"
   },
   "UserTicketsAndPoints": {
-    "pointsTitle": "ポイント",
-    "ticketsTitle": "チケット",
-    "currentPoints": "現在のポイント",
-    "accumulatedPoints": "累計ポイント",
-    "availableTickets": "利用可能なチケット",
-    "usedTickets": "使用済みチケット",
-    "viewWallet": "ウォレットを見る",
-    "viewTickets": "チケット一覧を見る"
+    "ticketsLabel": "利用できるチケット",
+    "ticketsUnit": "枚",
+    "pointsLabel": "保有ポイント",
+    "pointsUnit": "pt"
   },
   "UserSettings": {
     "title": "設定",

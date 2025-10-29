@@ -19,7 +19,7 @@ export function WalletOverview() {
 
   const headerConfig = useMemo(
     () => ({
-      title: t("title"),
+      title: t("headerTitle"),
       showBackButton: true,
       showLogo: false,
       backTo: "/users/me",

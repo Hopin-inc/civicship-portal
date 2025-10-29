@@ -126,22 +126,22 @@ export function SignUpForm() {
                       className="gap-2"
                     >
                       <ToggleGroupItem value={GqlCurrentPrefecture.Kagawa} className="flex-1">
-                        香川県
+                        {t("prefectureKagawa")}
                       </ToggleGroupItem>
                       <ToggleGroupItem value={GqlCurrentPrefecture.Tokushima} className="flex-1">
-                        徳島県
+                        {t("prefectureTokushima")}
                       </ToggleGroupItem>
                       <ToggleGroupItem value={GqlCurrentPrefecture.Ehime} className="flex-1">
-                        愛媛県
+                        {t("prefectureEhime")}
                       </ToggleGroupItem>
                       <ToggleGroupItem value={GqlCurrentPrefecture.Kochi} className="flex-1">
-                        高知県
+                        {t("prefectureKochi")}
                       </ToggleGroupItem>
                       <ToggleGroupItem
                         value={GqlCurrentPrefecture.OutsideShikoku}
                         className="basis-full"
                       >
-                        四国以外
+                        {t("prefectureOutsideShikoku")}
                       </ToggleGroupItem>
                     </ToggleGroup>
                   </FormControl>

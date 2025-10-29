@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
   DEFAULT_COUNTRY,
@@ -31,13 +32,14 @@ export function PhoneInputStep({
   isVerifying,
   recaptchaContainerRef,
 }: PhoneInputStepProps) {
+  const t = useTranslations("PhoneInputStep");
   const headerConfig = useMemo(
     () => ({
-      title: "電話番号認証",
+      title: t("headerTitle"),
       showBackButton: false,
       showLogo: false,
     }),
-    [],
+    [t],
   );
   useHeaderConfig(headerConfig);
 
@@ -47,7 +49,7 @@ export function PhoneInputStep({
     <>
       <div>
         <p className="text-sm text-muted-foreground">
-          電話番号認証のため、あなたの電話番号を入力してください。SMSで認証コードが送信されます。
+          {t("description")}
         </p>
       </div>
 
@@ -58,7 +60,7 @@ export function PhoneInputStep({
           onChange={onPhoneNumberChange}
           defaultCountry={DEFAULT_COUNTRY}
           showFlags={SHOW_FLAGS}
-          placeholder="例）09012345678"
+          placeholder={t("placeholder")}
           disabled={isSubmitting || isVerifying || isReloading}
         />
         <div className="flex flex-col items-center gap-8 w-full mx-auto">
@@ -68,10 +70,10 @@ export function PhoneInputStep({
             disabled={isSubmitting || isVerifying || !isPhoneValid || isReloading || isRateLimited}
           >
             {isSubmitting || isVerifying
-              ? "送信中..."
+              ? t("sending")
               : isRateLimited
-                ? "制限中..."
-                : "認証コードを送信"}{" "}
+                ? t("rateLimited")
+                : t("sendButton")}{" "}
           </Button>
           <Button
             type="button"
@@ -86,7 +88,7 @@ export function PhoneInputStep({
               }, PHONE_VERIFICATION_CONSTANTS.RELOAD_INITIAL_DELAY_MS);
             }}
           >
-            切り替わらない際は再読み込み
+            {t("reloadButton")}
           </Button>
         </div>
       </form>

@@ -1,8 +1,7 @@
 {
   "WalletOverview": {
-    "title": "保有ポイント",
+    "headerTitle": "保有ポイント",
     "giveButton": "あげる",
-    "refreshButton": "再読み込み",
     "refreshSuccess": "ウォレット情報を更新しました",
     "refreshError": "再読み込みに失敗しました",
     "errorTitle": "ウォレット"
@@ -10,8 +9,7 @@
   "WalletCard": {
     "balanceLabel": "残高",
     "pointUnit": "pt",
-    "currentPoints": "現在のポイント",
-    "accumulatedPoints": "累計ポイント"
+    "refreshButton": "再読み込み"
   },
   "DonatePoints": {
     "title": "ポイントを贈る",

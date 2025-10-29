@@ -19,14 +19,10 @@
     "tickets": "Tickets"
   },
   "UserTicketsAndPoints": {
-    "pointsTitle": "Points",
-    "ticketsTitle": "Tickets",
-    "currentPoints": "Current Points",
-    "accumulatedPoints": "Total Accumulated",
-    "availableTickets": "Available Tickets",
-    "usedTickets": "Used Tickets",
-    "viewWallet": "View Wallet",
-    "viewTickets": "View Tickets"
+    "ticketsLabel": "Available Tickets",
+    "ticketsUnit": "",
+    "pointsLabel": "Points Balance",
+    "pointsUnit": "pt"
   },
   "UserSettings": {
     "title": "Settings",

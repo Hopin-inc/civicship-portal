@@ -38,7 +38,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
       ? (savedLocale as Locale)
       : defaultLocale;
 
-  const namespaces = ['common', 'wallets', 'transactions', 'users', 'auth'];
+  const namespaces = ['common', 'wallets', 'transactions', 'users', 'auth', 'phoneVerification'];
   const messages = await loadMessages(locale, namespaces);
 
   return {

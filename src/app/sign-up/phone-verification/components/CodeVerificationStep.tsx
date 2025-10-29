@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Button } from "@/components/ui/button";
 import { logger } from "@/lib/logging";
@@ -40,13 +41,14 @@ export function CodeVerificationStep({
   recaptchaContainerRef,
   phoneAuth,
 }: CodeVerificationStepProps) {
+  const t = useTranslations("CodeVerificationStep");
   const headerConfig = useMemo(
     () => ({
-      title: "認証コード検証",
+      title: t("headerTitle"),
       showBackButton: false,
       showLogo: false,
     }),
-    [],
+    [t],
   );
   useHeaderConfig(headerConfig);
 
@@ -71,8 +73,8 @@ export function CodeVerificationStep({
       <div>
         <p className="text-sm text-muted-foreground">
           {phoneNumber
-            ? `${phoneNumber}に送信された6桁の認証コードを入力してください。`
-            : "電話番号に送信された6桁の認証コードを入力してください。"}
+            ? `${phoneNumber}${t("descriptionWithPhone")}`
+            : t("descriptionWithoutPhone")}
         </p>
       </div>
 
@@ -97,7 +99,7 @@ export function CodeVerificationStep({
               isReloading
             }
           >
-            {isVerifying ? "認証中..." : "認証する"}
+            {isVerifying ? t("verifying") : t("verifyButton")}
           </Button>
           <Button
             type="button"
@@ -113,10 +115,10 @@ export function CodeVerificationStep({
             onClick={onResend}
           >
             {isResendDisabled
-              ? `${countdown}秒後に再送できます`
+              ? `${countdown}${t("resendCountdown")}`
               : isPhoneSubmitting
-                ? "送信中..."
-                : "認証コードを再送"}
+                ? t("resending")
+                : t("resendButton")}
           </Button>
           <div
             id="recaptcha-container"
@@ -137,7 +139,7 @@ export function CodeVerificationStep({
             }
             onClick={handleBackToPhone}
           >
-            電話番号を変更する
+            {t("changePhoneButton")}
           </Button>
         </div>
       </form>

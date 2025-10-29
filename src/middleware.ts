@@ -80,8 +80,6 @@ export function middleware(request: NextRequest) {
 
   const res = NextResponse.next();
   res.headers.set("x-nonce", nonce);
-  
-  res.headers.set("x-pathname", pathname);
 
   const csp = [
     `default-src 'self'`,

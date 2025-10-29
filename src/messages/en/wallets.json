@@ -1,17 +1,15 @@
 {
   "WalletOverview": {
-    "title": "Your Points",
+    "headerTitle": "Points Balance",
     "giveButton": "Give",
-    "refreshButton": "Refresh",
     "refreshSuccess": "Wallet information updated",
-    "refreshError": "Failed to refresh",
+    "refreshError": "Failed to reload",
     "errorTitle": "Wallet"
   },
   "WalletCard": {
     "balanceLabel": "Balance",
     "pointUnit": "pt",
-    "currentPoints": "Current Points",
-    "accumulatedPoints": "Total Accumulated"
+    "refreshButton": "Reload"
   },
   "DonatePoints": {
     "title": "Give Points",

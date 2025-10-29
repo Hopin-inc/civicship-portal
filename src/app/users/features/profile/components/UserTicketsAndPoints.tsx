@@ -30,8 +30,8 @@ export function UserTicketsAndPoints({ ticketCount, pointCount }: UserTicketsAnd
         <Link href="/tickets">
           <div className={ticketClass}>
             <TicketIcon className="w-5 h-5 mb-0.5" />
-            <p className="text-label-md">{t("availableTickets")}</p>
-            <p className="text-label-md font-bold">{ticketCount}枚</p>
+            <p className="text-label-md">{t("ticketsLabel")}</p>
+            <p className="text-label-md font-bold">{ticketCount}{t("ticketsUnit")}</p>
             <ChevronRight className="w-4 h-4 ml-auto" />
           </div>
         </Link>
@@ -40,8 +40,8 @@ export function UserTicketsAndPoints({ ticketCount, pointCount }: UserTicketsAnd
         <Link href="/wallets/me">
           <div className={pointClass}>
             <Wallet className="w-5 h-5 mb-0.5" />
-            <p className="text-label-md">{t("currentPoints")}</p>
-            <p className="text-label-md font-bold">{pointCount.toLocaleString()}pt</p>
+            <p className="text-label-md">{t("pointsLabel")}</p>
+            <p className="text-label-md font-bold">{pointCount.toLocaleString()}{t("pointsUnit")}</p>
             <ChevronRight className="w-4 h-4 ml-auto" />
           </div>
         </Link>
