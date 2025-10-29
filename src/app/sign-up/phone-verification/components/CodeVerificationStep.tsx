@@ -128,13 +128,7 @@ export function CodeVerificationStep({
             className="px-4"
             size="sm"
             variant={"text"}
-            disabled={
-              isVerifying ||
-              isPhoneVerifying ||
-              isResendDisabled ||
-              isPhoneSubmitting ||
-              isReloading
-            }
+            disabled={isVerifying || isPhoneVerifying || isPhoneSubmitting || isReloading}
             onClick={handleBackToPhone}
           >
             電話番号を変更する
