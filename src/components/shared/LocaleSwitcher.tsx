@@ -4,7 +4,7 @@ import { useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
-import { locales, localeNames } from "@/lib/i18n/config";
+import { localeNames, locales } from "@/lib/i18n/config";
 
 export function LocaleSwitcher() {
   const locale = useLocale();
@@ -14,10 +14,10 @@ export function LocaleSwitcher() {
 
   const handleLocaleChange = (newLocale: string) => {
     if (newLocale === locale) return;
-    
+
     setChangingTo(newLocale);
     document.cookie = `language=${newLocale}; path=/; max-age=31536000`;
-    
+
     startTransition(() => {
       router.refresh();
       setChangingTo(null);
@@ -29,11 +29,11 @@ export function LocaleSwitcher() {
       {locales.map((loc) => {
         const isActive = locale === loc;
         const isChanging = changingTo === loc;
-        
+
         return (
           <Button
             key={loc}
-            variant={isActive ? "default" : "outline"}
+            variant={isActive ? "primary" : "tertiary"}
             size="sm"
             onClick={() => handleLocaleChange(loc)}
             disabled={isPending}
