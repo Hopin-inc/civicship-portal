@@ -78,8 +78,8 @@ async function initAuthFast({
 }) {
   try {
     if (environment === AuthEnvironment.LIFF) {
-      liffService.initialize().catch(err => {
-        logger.warn("LIFF initialization failed in background", { error: err });
+      liffService.initialize().then(success => {
+        if (!success) logger.warn("LIFF initialization failed in background");
       });
     }
 
