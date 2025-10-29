@@ -26,45 +26,82 @@ export const getNameFromWallet = (wallet: GqlWallet | null | undefined): string 
   }
 };
 
+interface TransactionDescriptionData {
+  actionType?: "donation" | "grant" | "payment" | "return" | "refund";
+  direction?: "to" | "from";
+  name: string;
+  isSpecialCase: boolean;
+}
+
 const formatTransactionDescription = (
   reason: GqlTransactionReason,
   fromUserName: string,
   toUserName: string,
   signedPoints: number,
-): string => {
+): TransactionDescriptionData => {
   const isOutgoing = signedPoints < 0;
 
   switch (reason) {
     case GqlTransactionReason.Donation:
-      return isOutgoing ? `${toUserName}さんに譲渡` : `${fromUserName}さんから譲渡`;
+      return {
+        actionType: "donation",
+        direction: isOutgoing ? "to" : "from",
+        name: isOutgoing ? toUserName : fromUserName,
+        isSpecialCase: false,
+      };
 
     case GqlTransactionReason.Grant:
-      return isOutgoing ? `${toUserName}さんに支給` : `${fromUserName}から支給`;
+      return {
+        actionType: "grant",
+        direction: isOutgoing ? "to" : "from",
+        name: isOutgoing ? toUserName : fromUserName,
+        isSpecialCase: false,
+      };
 
     case GqlTransactionReason.PointIssued:
-      return `発行`;
+      return {
+        name: "issued",
+        isSpecialCase: true,
+      };
 
     case GqlTransactionReason.PointReward:
-      return isOutgoing ? `${toUserName}さんに支払い` : `${fromUserName}さんから支払い`;
-
     case GqlTransactionReason.TicketPurchased:
-      return isOutgoing ? `${toUserName}さんに支払い` : `${fromUserName}さんから支払い`;
+    case GqlTransactionReason.OpportunityReservationCreated:
+      return {
+        actionType: "payment",
+        direction: isOutgoing ? "to" : "from",
+        name: isOutgoing ? toUserName : fromUserName,
+        isSpecialCase: !toUserName && !fromUserName,
+      };
 
     case GqlTransactionReason.TicketRefunded:
-      return isOutgoing ? `${toUserName}さんから返品` : `${fromUserName}さんに返品`;
+      return {
+        actionType: "return",
+        direction: isOutgoing ? "from" : "to",
+        name: isOutgoing ? toUserName : fromUserName,
+        isSpecialCase: false,
+      };
 
     case GqlTransactionReason.Onboarding:
-      return `初回ボーナス`;
-
-    case GqlTransactionReason.OpportunityReservationCreated:
-      return toUserName ? `${toUserName}さんに支払い` : "支払い";
+      return {
+        name: "onboarding",
+        isSpecialCase: true,
+      };
 
     case GqlTransactionReason.OpportunityReservationCanceled:
     case GqlTransactionReason.OpportunityReservationRejected:
-      return fromUserName ? `${fromUserName}さんから返金` : "返金";
+      return {
+        actionType: "refund",
+        direction: "from",
+        name: fromUserName,
+        isSpecialCase: !fromUserName,
+      };
 
     default:
-      return `ポイント移動`;
+      return {
+        name: "move",
+        isSpecialCase: true,
+      };
   }
 };
 
@@ -87,6 +124,8 @@ export const presenterTransaction = (
         ? getSquareLogoPath()
         : (counterparty?.user?.image ?? PLACEHOLDER_IMAGE);
 
+  const descriptionData = formatTransactionDescription(node.reason, from, to, signedPoint);
+
   return {
     id: node.id,
     reason: node.reason,
@@ -96,7 +135,10 @@ export const presenterTransaction = (
     comment: node.comment ?? "",
     transferPoints: signedPoint,
     transferredAt: node.createdAt ? new Date(node.createdAt).toISOString() : "",
-    description: formatTransactionDescription(node.reason, from, to, signedPoint),
+    description: descriptionData.isSpecialCase 
+      ? descriptionData.name 
+      : `${descriptionData.name}${descriptionData.direction === 'to' ? 'に' : 'から'}${descriptionData.actionType}`,
+    descriptionData,
     didValue:
       node.toWallet?.user?.didIssuanceRequests?.find(
         (req) => req?.status === GqlDidIssuanceStatus.Completed,

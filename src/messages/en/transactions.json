@@ -41,5 +41,15 @@
   "transactions.action.default": "{name}",
   "transactions.name.issued": "Issued",
   "transactions.name.onboarding": "Welcome Bonus",
-  "transactions.name.move": "Point transfer"
+  "transactions.name.move": "Point transfer",
+  "transactions.action.donation.to": "Transferred to {name}",
+  "transactions.action.donation.from": "Transferred from {name}",
+  "transactions.action.grant.to": "Granted to {name}",
+  "transactions.action.grant.from": "Granted from {name}",
+  "transactions.action.payment.to": "Paid to {name}",
+  "transactions.action.payment.from": "Paid from {name}",
+  "transactions.action.return.to": "Returned to {name}",
+  "transactions.action.return.from": "Returned from {name}",
+  "transactions.action.refund.to": "Refunded from {name}",
+  "transactions.action.refund.from": "Refunded from {name}"
 }

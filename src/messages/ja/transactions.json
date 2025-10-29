@@ -41,5 +41,15 @@
   "transactions.action.default": "{name}",
   "transactions.name.issued": "発行",
   "transactions.name.onboarding": "初回ボーナス",
-  "transactions.name.move": "ポイント移動"
+  "transactions.name.move": "ポイント移動",
+  "transactions.action.donation.to": "{name}さんに譲渡",
+  "transactions.action.donation.from": "{name}さんから譲渡",
+  "transactions.action.grant.to": "{name}さんに支給",
+  "transactions.action.grant.from": "{name}から支給",
+  "transactions.action.payment.to": "{name}さんに支払い",
+  "transactions.action.payment.from": "{name}さんから支払い",
+  "transactions.action.return.to": "{name}さんに返品",
+  "transactions.action.return.from": "{name}さんから返品",
+  "transactions.action.refund.to": "{name}さんから返金",
+  "transactions.action.refund.from": "{name}さんから返金"
 }

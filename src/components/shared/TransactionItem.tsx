@@ -7,56 +7,44 @@ import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { GqlTransactionReason } from "@/types/graphql";
 import { truncateText } from "@/utils/stringUtils";
+import { useTranslations, useLocale } from "next-intl";
 
 interface TransactionItemProps {
   transaction: AppTransaction;
-  image?: string; // ← 追加
+  image?: string;
 }
 
-const formatDateTime = (isoString: string | null | undefined): string => {
-  if (!isoString) return "日時不明";
-
-  const date = new Date(isoString);
-  if (isNaN(date.getTime())) return "日時不明";
-
-  return `${date.getFullYear()}年${String(date.getMonth() + 1).padStart(2, "0")}月${String(
-    date.getDate(),
-  ).padStart(2, "0")}日 ${String(date.getHours()).padStart(2, "0")}:${String(
-    date.getMinutes(),
-  ).padStart(2, "0")}`;
-};
-
-const formatTransactionDescription = (description: string): { name: string; action: string } => {
-  if (!description) return { name: "", action: "" };
-
-  const actions = [
-    "に支給",
-    "から支給",
-    "さんに譲渡",
-    "さんから譲渡",
-    "さんに支払い",
-    "さんから支払い",
-    "さんから返品",
-    "さんに返品",
-  ];
-
-  for (const action of actions) {
-    if (description.endsWith(action)) {
-      const name = description.replace(action, "");
-      return { name, action };
-    }
-  }
-
-  if (["発行", "初回ボーナス", "ポイント移動", "支払い", "返金"].includes(description)) {
-    return { name: description, action: "" };
-  }
-
-  return { name: description, action: "" };
-};
-
 const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, image }) => {
+  const t = useTranslations();
+  const locale = useLocale();
   const isPositive = transaction.transferPoints > 0;
-  const { name, action } = formatTransactionDescription(transaction.description);
+  
+  const formatDateTime = (isoString: string | null | undefined): string => {
+    if (!isoString) return t("transactions.date.unknown");
+
+    const date = new Date(isoString);
+    if (isNaN(date.getTime())) return t("transactions.date.unknown");
+
+    return new Intl.DateTimeFormat(locale, {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(date);
+  };
+
+  const getDisplayText = () => {
+    const descData = transaction.descriptionData;
+    
+    if (!descData || descData.isSpecialCase) {
+      return t(`transactions.name.${descData?.name || "move"}`);
+    }
+
+    const key = `transactions.action.${descData.actionType}.${descData.direction}`;
+    return t(key, { name: descData.name });
+  };
+
   return (
     <Card className="px-4 py-4 bg-white">
       <div className="flex items-start gap-3">
@@ -66,11 +54,9 @@ const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, image })
         </Avatar>
         <div className="flex flex-col text-left min-w-0 flex-1">
           <div className="flex items-start justify-between">
-            <span className="flex items-center truncate whitespace-nowrap overflow-hidden">
-              {name && <span className="text-label-sm font-bold">{name}</span>}
-              {action && <span className="text-label-xs font-bold">{action}</span>}
+            <span className="flex items-center truncate whitespace-nowrap overflow-hidden text-label-sm font-bold">
+              {getDisplayText()}
             </span>
-            {/* 右: 金額 */}
             <div
               className={`text-label-sm font-bold shrink-0 ml-4 ${isPositive ? "text-success" : "text-foreground"}`}
             >
