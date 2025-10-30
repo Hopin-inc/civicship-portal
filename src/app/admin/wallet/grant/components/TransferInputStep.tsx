@@ -62,7 +62,7 @@ function TransferInputStep({
 
   const finalRecipientKey = recipientKey ?? "adminWallet.grant.recipientRich";
   const recipientDisplay = t.rich(finalRecipientKey, {
-    b: (chunks) => <span className="text-label-sm font-bold">{chunks}</span>,
+    b: (chunks) => <strong className="text-label-sm font-bold">{chunks}</strong>,
     name: user.name ?? t("adminWallet.common.notSet"),
   });
 
