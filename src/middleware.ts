@@ -20,6 +20,7 @@ export function middleware(request: NextRequest) {
   const rootPath = currentCommunityConfig.rootPath || "/";
 
   if (pathname === "/_next/image") {
+    console.debug(`NextImage - URL: ${nextUrl.toString()}`);
     const rewritten = redirectToCloudFlareIfIpfs(nextUrl);
     if (rewritten) return rewritten;
     return NextResponse.next();
@@ -64,7 +65,6 @@ function redirectToCloudFlareIfIpfs(nextUrl: NextURL) {
   if (searchParams.get('__cf_gw') === '1') return null;
 
   const originalUrl = decodeURIComponent(rawOriginalUrl);
-  console.debug(`Original URL: ${originalUrl}`);
   if (/https?:\/\/ipfs\.io\/ipfs\//i.test(originalUrl)) {
     // ipfs.io を cloudflare-ipfs.com に置換
     let replaced = originalUrl.replace(
