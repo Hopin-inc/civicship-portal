@@ -33,6 +33,35 @@ interface TransactionDescriptionData {
   isSpecialCase: boolean;
 }
 
+type TransactionActionMapping = {
+  actionType?: "donation" | "grant" | "payment" | "return" | "refund";
+  specialName?: "issued" | "onboarding" | "move";
+};
+
+export const mapReasonToAction = (reason: GqlTransactionReason): TransactionActionMapping => {
+  switch (reason) {
+    case GqlTransactionReason.Donation:
+      return { actionType: "donation" };
+    case GqlTransactionReason.Grant:
+      return { actionType: "grant" };
+    case GqlTransactionReason.PointIssued:
+      return { specialName: "issued" };
+    case GqlTransactionReason.PointReward:
+    case GqlTransactionReason.TicketPurchased:
+    case GqlTransactionReason.OpportunityReservationCreated:
+      return { actionType: "payment" };
+    case GqlTransactionReason.TicketRefunded:
+      return { actionType: "return" };
+    case GqlTransactionReason.Onboarding:
+      return { specialName: "onboarding" };
+    case GqlTransactionReason.OpportunityReservationCanceled:
+    case GqlTransactionReason.OpportunityReservationRejected:
+      return { actionType: "refund" };
+    default:
+      return { specialName: "move" };
+  }
+};
+
 const formatTransactionDescription = (
   reason: GqlTransactionReason,
   fromUserName: string,
@@ -40,69 +69,40 @@ const formatTransactionDescription = (
   signedPoints: number,
 ): TransactionDescriptionData => {
   const isOutgoing = signedPoints < 0;
+  const mapping = mapReasonToAction(reason);
 
-  switch (reason) {
-    case GqlTransactionReason.Donation:
-      return {
-        actionType: "donation",
-        direction: isOutgoing ? "to" : "from",
-        name: isOutgoing ? toUserName : fromUserName,
-        isSpecialCase: false,
-      };
-
-    case GqlTransactionReason.Grant:
-      return {
-        actionType: "grant",
-        direction: isOutgoing ? "to" : "from",
-        name: isOutgoing ? toUserName : fromUserName,
-        isSpecialCase: false,
-      };
-
-    case GqlTransactionReason.PointIssued:
-      return {
-        name: "issued",
-        isSpecialCase: true,
-      };
-
-    case GqlTransactionReason.PointReward:
-    case GqlTransactionReason.TicketPurchased:
-    case GqlTransactionReason.OpportunityReservationCreated:
-      return {
-        actionType: "payment",
-        direction: isOutgoing ? "to" : "from",
-        name: isOutgoing ? toUserName : fromUserName,
-        isSpecialCase: !toUserName && !fromUserName,
-      };
-
-    case GqlTransactionReason.TicketRefunded:
-      return {
-        actionType: "return",
-        direction: isOutgoing ? "from" : "to",
-        name: isOutgoing ? toUserName : fromUserName,
-        isSpecialCase: false,
-      };
-
-    case GqlTransactionReason.Onboarding:
-      return {
-        name: "onboarding",
-        isSpecialCase: true,
-      };
-
-    case GqlTransactionReason.OpportunityReservationCanceled:
-    case GqlTransactionReason.OpportunityReservationRejected:
-      return {
-        actionType: "refund",
-        direction: "from",
-        name: fromUserName,
-        isSpecialCase: !fromUserName,
-      };
-
-    default:
-      return {
-        name: "move",
-        isSpecialCase: true,
-      };
+  if (mapping.specialName) {
+    return {
+      name: mapping.specialName,
+      isSpecialCase: true,
+    };
   }
+
+  if (mapping.actionType === "refund") {
+    return {
+      actionType: "refund",
+      direction: "from",
+      name: fromUserName,
+      isSpecialCase: !fromUserName,
+    };
+  }
+
+  if (mapping.actionType === "return") {
+    return {
+      actionType: "return",
+      direction: isOutgoing ? "from" : "to",
+      name: isOutgoing ? toUserName : fromUserName,
+      isSpecialCase: false,
+    };
+  }
+
+  const actionType = mapping.actionType!;
+  return {
+    actionType,
+    direction: isOutgoing ? "to" : "from",
+    name: isOutgoing ? toUserName : fromUserName,
+    isSpecialCase: !toUserName && !fromUserName,
+  };
 };
 
 export const presenterTransaction = (

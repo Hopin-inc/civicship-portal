@@ -17,6 +17,8 @@ export function getPrefectureKey(prefecture: GqlCurrentPrefecture | string | und
       return "common.prefectures.kochi";
     case GqlCurrentPrefecture.OutsideShikoku:
       return "common.prefectures.outsideShikoku";
+    case GqlCurrentPrefecture.Unknown:
+      return "common.prefectures.unknown";
     default:
       return "";
   }
@@ -39,6 +41,8 @@ export function getPrefectureName(prefecture: GqlCurrentPrefecture | string | un
       return "高知県";
     case GqlCurrentPrefecture.OutsideShikoku:
       return "四国以外";
+    case GqlCurrentPrefecture.Unknown:
+      return "不明";
     default:
       return "";
   }

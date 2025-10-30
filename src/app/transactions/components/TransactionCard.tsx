@@ -1,6 +1,6 @@
 "use client";
 
-import { formatCurrency, getNameFromWallet } from "@/utils/transaction";
+import { formatCurrency, getNameFromWallet, mapReasonToAction } from "@/utils/transaction";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { GqlTransaction, GqlTransactionReason } from "@/types/graphql";
@@ -38,29 +38,14 @@ const useStatusLabel = (reason: GqlTransactionReason) => {
 
 const useFormatTransactionDescription = (reason: GqlTransactionReason, from: string, to: string): { displayText: string; to: string } => {
   const t = useTranslations();
-  switch (reason) {
-    case GqlTransactionReason.Donation:
-      return { displayText: t("transactions.action.donation.from", { name: from }), to: to };
-    case GqlTransactionReason.Grant:
-      return { displayText: t("transactions.action.grant.from", { name: from }), to: to };
-    case GqlTransactionReason.PointIssued:
-      return { displayText: t("transactions.name.issued"), to: to };
-    case GqlTransactionReason.PointReward:
-      return { displayText: t("transactions.action.payment.from", { name: from }), to: to };
-    case GqlTransactionReason.TicketPurchased:
-      return { displayText: t("transactions.action.payment.from", { name: from }), to: to };
-    case GqlTransactionReason.TicketRefunded:
-      return { displayText: t("transactions.action.return.from", { name: from }), to: to };
-    case GqlTransactionReason.Onboarding:
-      return { displayText: t("transactions.name.onboarding"), to: to };
-    case GqlTransactionReason.OpportunityReservationCreated:
-      return { displayText: t("transactions.action.payment.from", { name: from }), to: to };
-    case GqlTransactionReason.OpportunityReservationCanceled:
-    case GqlTransactionReason.OpportunityReservationRejected:
-      return { displayText: t("transactions.action.refund.from", { name: from }), to: to };
-    default:
-      return { displayText: t("transactions.name.move"), to: to };
+  const mapping = mapReasonToAction(reason);
+
+  if (mapping.specialName) {
+    return { displayText: t(`transactions.name.${mapping.specialName}`), to: to };
   }
+
+  const actionType = mapping.actionType!;
+  return { displayText: t(`transactions.action.${actionType}.from`, { name: from }), to: to };
 };
 
 
