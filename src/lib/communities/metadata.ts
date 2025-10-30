@@ -10,7 +10,8 @@ export type FeaturesType =
   | "prefectures"
   | "credentials"
   | "justDaoIt"
-  | "quests";
+  | "quests"
+  | "languageSwitcher";
 
 /**
  * コミュニティの規約・文書の定義
@@ -140,7 +141,7 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     squareLogoPath: "/communities/kibotcha/logo-square.jpg",
     ogImagePath:
       "https://storage.googleapis.com/prod-civicship-storage-public/asset/kibotcha/ogp.jpg",
-    enableFeatures: ["points", "justDaoIt"],
+    enableFeatures: ["points", "justDaoIt", "languageSwitcher"],
     rootPath: "/users/me",
     adminRootPath: "/admin/wallet",
     documents: [
@@ -225,7 +226,7 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     logoPath: "/communities/izu/logo.jpg",
     squareLogoPath: "/communities/izu/logo-square.jpg",
     ogImagePath: "https://storage.googleapis.com/prod-civicship-storage-public/asset/izu/ogp.png",
-    enableFeatures: ["points", "justDaoIt"],
+    enableFeatures: ["points", "justDaoIt", "languageSwitcher"],
     rootPath: "/users/me",
     adminRootPath: "/admin/wallet",
     commonDocumentOverrides: {
