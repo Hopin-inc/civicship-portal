@@ -6,7 +6,7 @@
   "transactions.empty": "No transactions yet",
   "transactions.did.pending": "DID issuance in progress",
   "transactions.date.unknown": "Unknown date",
-  "transactions.name.issued": "Points credited",
+  "transactions.name.issued": "Points issued",
   "transactions.name.onboarding": "Welcome bonus",
   "transactions.name.move": "Point transfer",
   "transactions.status.donation": "Recipient",
