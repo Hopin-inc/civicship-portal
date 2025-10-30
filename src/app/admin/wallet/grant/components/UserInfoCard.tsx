@@ -1,11 +1,10 @@
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { GqlUser } from "@/types/graphql";
-import { formatDateTime } from "@/utils/date";
 import React from "react";
 import { truncateText } from "@/utils/stringUtils";
 import { useTranslations } from "next-intl";
-import { getWalletActionKey } from "@/utils/i18n";
+import { getWalletActionKey, useLocaleDateTimeFormat } from "@/utils/i18n";
 
 interface Props {
   otherUser: GqlUser | undefined | null;
@@ -49,6 +48,7 @@ const UserInfoCard = ({
   comment,
 }: Props) => {
   const t = useTranslations();
+  const formatDateTime = useLocaleDateTimeFormat();
   const showDidLine = showDid && (!!didValue || isDidPending);
   
   const displayDid = isDidPending
@@ -58,6 +58,12 @@ const UserInfoCard = ({
     : "";
   
   const useTranslatedLabel = actionType && otherName !== undefined && isReceive !== undefined;
+  
+  const formattedDate = createdAt
+    ? formatDateTime(
+        typeof createdAt === "string" ? createdAt : createdAt.toISOString()
+      )
+    : "";
   
   return (
     <Card className="px-4 py-4 bg-white" onClick={onClick}>
@@ -96,9 +102,9 @@ const UserInfoCard = ({
             {comment}
           </span>
         )}
-        {showDate && (
+        {showDate && formattedDate && (
         <span className="text-label-xs text-muted-foreground mt-2 block">
-          {formatDateTime(createdAt ?? null, "yyyy年MM月dd日 HH時mm分")}
+          {formattedDate}
         </span>
         )}
         {children}
