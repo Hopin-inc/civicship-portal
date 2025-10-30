@@ -64,6 +64,7 @@ function redirectToCloudFlareIfIpfs(nextUrl: NextURL) {
   if (searchParams.get('__cf_gw') === '1') return null;
 
   const originalUrl = decodeURIComponent(rawOriginalUrl);
+  console.debug(`Original URL: ${originalUrl}`);
   if (/https?:\/\/ipfs\.io\/ipfs\//i.test(originalUrl)) {
     // ipfs.io を cloudflare-ipfs.com に置換
     let replaced = originalUrl.replace(
