@@ -2,7 +2,6 @@
 
 import { useCallback, useState } from "react";
 import { useMutation } from "@apollo/client";
-import { AuthRedirectService } from "@/lib/auth/service/auth-redirect-service";
 import { IDENTITY_CHECK_PHONE_USER } from "@/graphql/account/identity/mutation";
 import {
   GqlIdentityCheckPhoneUserPayload,
@@ -39,8 +38,6 @@ export function useCodeVerification(
     { identityCheckPhoneUser: GqlIdentityCheckPhoneUserPayload },
     GqlMutationIdentityCheckPhoneUserArgs
   >(IDENTITY_CHECK_PHONE_USER);
-
-  const authRedirectService = AuthRedirectService.getInstance();
 
   const verify = useCallback(
     async (verificationCode: string): Promise<CodeVerificationResult> => {
@@ -98,11 +95,10 @@ export function useCodeVerification(
         }
 
         // 共通のリダイレクトパス計算
+        // nextParamから実際のnext値を取得（例: "?next=/opportunities" → "/opportunities"）
+        const next = nextParam ? new URLSearchParams(nextParam).get("next") : null;
         const defaultPath = (currentCommunityConfig.rootPath || "/") as RawURIComponent;
-        const redirectPath = authRedirectService.getRedirectPath(
-          defaultPath,
-          nextParam as RawURIComponent,
-        );
+        const redirectPath = (next || defaultPath) as RawURIComponent;
 
         switch (status) {
           case GqlPhoneUserStatus.NewUser:
@@ -125,7 +121,7 @@ export function useCodeVerification(
 
             return {
               success: true,
-              redirectPath: redirectPath || defaultPath,
+              redirectPath: redirectPath,
               message: "アカウントを作成しました",
             };
 
@@ -134,7 +130,7 @@ export function useCodeVerification(
             setAuthState({ authenticationState: "user_registered", isAuthInProgress: false });
             return {
               success: true,
-              redirectPath: redirectPath || defaultPath,
+              redirectPath: redirectPath,
               message: "ログインしました",
             };
 
@@ -143,7 +139,7 @@ export function useCodeVerification(
             setAuthState({ authenticationState: "user_registered", isAuthInProgress: false });
             return {
               success: true,
-              redirectPath: redirectPath || defaultPath,
+              redirectPath: redirectPath,
               message: "メンバーシップが追加されました",
             };
 
@@ -176,7 +172,6 @@ export function useCodeVerification(
     [
       phoneAuth,
       identityCheckPhoneUser,
-      authRedirectService,
       nextParam,
       updateAuthState,
       createUser,
