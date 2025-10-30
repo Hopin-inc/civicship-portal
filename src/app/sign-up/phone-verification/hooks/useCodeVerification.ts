@@ -114,9 +114,12 @@ export function useCodeVerification(
             });
 
             if (!signupResult.success) {
+              // 自動サインアップ失敗時は手動登録フォームにリダイレクト
+              // 電話番号認証自体は成功しているため、success: true
               return {
-                success: false,
-                error: signupResult.error,
+                success: true,
+                redirectPath: `/sign-up${nextParam}`,
+                message: "アカウントの自動作成に失敗しました。手動で情報を入力してください。",
               };
             }
 
