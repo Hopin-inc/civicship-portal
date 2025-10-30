@@ -135,9 +135,7 @@ export const presenterTransaction = (
     comment: node.comment ?? "",
     transferPoints: signedPoint,
     transferredAt: node.createdAt ? new Date(node.createdAt).toISOString() : "",
-    description: descriptionData.isSpecialCase 
-      ? descriptionData.name 
-      : `${descriptionData.name}${descriptionData.direction === 'to' ? 'に' : 'から'}${descriptionData.actionType}`,
+    description: "",
     descriptionData,
     didValue:
       node.toWallet?.user?.didIssuanceRequests?.find(

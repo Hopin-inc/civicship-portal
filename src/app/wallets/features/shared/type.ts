@@ -10,6 +10,11 @@ export interface TransactionDescriptionData {
 export type AppTransaction = {
   id: string;
   reason: GqlTransactionReason;
+  /**
+   * @deprecated Legacy field that previously contained hardcoded Japanese text.
+   * Use `descriptionData` instead to build internationalized transaction descriptions.
+   * This field is now always an empty string and will be removed in a future cleanup.
+   */
   description: string;
   descriptionData?: TransactionDescriptionData;
   comment: string;
