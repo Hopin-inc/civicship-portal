@@ -13,12 +13,13 @@
  * - Matches t('key') and t("key") with single/double quotes
  * - Matches t(`key`) with template literals (without interpolation)
  * - Matches t.rich('key') and t.rich("key") for rich text translations
+ * - Matches keys in mapping objects (e.g., WALLET_ACTION_KEY_MAP)
+ * - Matches keys in JSX props (e.g., recipientKey="translation.key")
  * - Filters keys to only include valid translation keys (containing dots)
  * 
  * Limitations:
  * - Cannot detect dynamically constructed keys (e.g., t(`prefix.${variable}`))
- * - Cannot detect keys returned from helper functions or mapping objects
- * - May report false positives for unused keys when keys are used via helpers
+ * - May report false positives for unused keys when keys are used via complex helpers
  * - Only scans TypeScript/TSX files in src/ directory
  * 
  * Usage:
@@ -70,6 +71,23 @@ function loadTranslationKeys(): TranslationKeys {
 }
 
 /**
+ * Check if a string is a valid translation key
+ */
+function isValidTranslationKey(key: string): boolean {
+  if (!key.includes('.')) return false;
+  
+  if (!/^[A-Za-z][\w.-]*\.[\w.-]+$/.test(key)) return false;
+  
+  const parts = key.split('.');
+  const lastPart = parts[parts.length - 1];
+  if (/^(md|json|js|ts|tsx|jsx|css|html|xml|txt|pdf|png|jpg|jpeg|gif|svg)$/i.test(lastPart)) {
+    return false;
+  }
+  
+  return true;
+}
+
+/**
  * Find all translation key usages in source code
  */
 async function findUsedKeys(): Promise<Set<string>> {
@@ -82,21 +100,40 @@ async function findUsedKeys(): Promise<Set<string>> {
   });
 
   for (const file of files) {
-    const content = fs.readFileSync(file, 'utf-8');
+    let content = fs.readFileSync(file, 'utf-8');
+    
+    content = content.replace(/\/\*[\s\S]*?\*\//g, ''); // Remove block comments
+    content = content.replace(/\/\/.*/g, ''); // Remove line comments
     
     const singleQuoteMatches = content.matchAll(/(?:^|[^A-Za-z0-9_])t(?:\s*\.\s*rich)?\s*\(\s*['"]([^'"]+)['"]\s*[,)]/g);
     const templateMatches = content.matchAll(/(?:^|[^A-Za-z0-9_])t(?:\s*\.\s*rich)?\s*\(\s*`([^`]+)`\s*[,)]/g);
     
     for (const match of singleQuoteMatches) {
       const key = match[1];
-      if (key.includes('.') && /^[A-Za-z][\w.-]*\.[\w.-]+$/.test(key)) {
+      if (isValidTranslationKey(key)) {
         usedKeys.add(key);
       }
     }
     
     for (const match of templateMatches) {
       const key = match[1];
-      if (!key.includes('${') && key.includes('.') && /^[A-Za-z][\w.-]*\.[\w.-]+$/.test(key)) {
+      if (!key.includes('${') && isValidTranslationKey(key)) {
+        usedKeys.add(key);
+      }
+    }
+
+    const mappingMatches = content.matchAll(/['"]([a-zA-Z][\w.-]*\.[\w.-]+)['"]\s*[,}]/g);
+    for (const match of mappingMatches) {
+      const key = match[1];
+      if (isValidTranslationKey(key)) {
+        usedKeys.add(key);
+      }
+    }
+
+    const jsxPropMatches = content.matchAll(/\w+Key=['"]([a-zA-Z][\w.-]*\.[\w.-]+)['"]/g);
+    for (const match of jsxPropMatches) {
+      const key = match[1];
+      if (isValidTranslationKey(key)) {
         usedKeys.add(key);
       }
     }
