@@ -73,7 +73,7 @@ export function CodeVerificationStep({
       <div>
         <p className="text-sm text-muted-foreground">
           {phoneNumber
-            ? `${phoneNumber}${t("phoneVerification.verification.descriptionWithPhone")}`
+            ? t("phoneVerification.verification.descriptionWithPhone", { phoneNumber })
             : t("phoneVerification.verification.descriptionWithoutPhone")}
         </p>
       </div>
@@ -115,7 +115,7 @@ export function CodeVerificationStep({
             onClick={onResend}
           >
             {isResendDisabled
-              ? `${countdown}${t("phoneVerification.verification.resendCountdown")}`
+              ? t("phoneVerification.verification.resendCountdown", { countdown })
               : isPhoneSubmitting
                 ? t("phoneVerification.verification.resending")
                 : t("phoneVerification.verification.resendButton")}
