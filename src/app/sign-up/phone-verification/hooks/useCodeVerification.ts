@@ -96,6 +96,13 @@ export function useCodeVerification(
           };
         }
 
+        // 共通のリダイレクトパス計算
+        const defaultPath = (currentCommunityConfig.rootPath || "/") as RawURIComponent;
+        const redirectPath = authRedirectService.getRedirectPath(
+          defaultPath,
+          nextParam as RawURIComponent,
+        );
+
         switch (status) {
           case GqlPhoneUserStatus.NewUser:
             const signupResult = await handleNewUserSignup({
@@ -112,43 +119,27 @@ export function useCodeVerification(
               };
             }
 
-            const defaultPath = (currentCommunityConfig.rootPath || "/") as RawURIComponent;
-            const newUserRedirectPath = authRedirectService.getRedirectPath(
-              defaultPath,
-              nextParam as RawURIComponent,
-            );
-
             return {
               success: true,
-              redirectPath: newUserRedirectPath || defaultPath,
+              redirectPath: redirectPath || defaultPath,
               message: "アカウントを作成しました",
             };
 
           case GqlPhoneUserStatus.ExistingSameCommunity:
             await updateAuthState();
             setAuthState({ authenticationState: "user_registered", isAuthInProgress: false });
-            const existingUserPath = (currentCommunityConfig.rootPath || "/") as RawURIComponent;
-            const homeRedirectPath = authRedirectService.getRedirectPath(
-              existingUserPath,
-              nextParam as RawURIComponent,
-            );
             return {
               success: true,
-              redirectPath: homeRedirectPath || existingUserPath,
+              redirectPath: redirectPath || defaultPath,
               message: "ログインしました",
             };
 
           case GqlPhoneUserStatus.ExistingDifferentCommunity:
             await updateAuthState();
             setAuthState({ authenticationState: "user_registered", isAuthInProgress: false });
-            const crossCommunityPath = (currentCommunityConfig.rootPath || "/") as RawURIComponent;
-            const crossCommunityRedirectPath = authRedirectService.getRedirectPath(
-              crossCommunityPath,
-              nextParam as RawURIComponent,
-            );
             return {
               success: true,
-              redirectPath: crossCommunityRedirectPath || crossCommunityPath,
+              redirectPath: redirectPath || defaultPath,
               message: "メンバーシップが追加されました",
             };
 
