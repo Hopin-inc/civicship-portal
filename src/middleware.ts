@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { FeaturesType, currentCommunityConfig } from "@/lib/communities/metadata";
+import { NextURL } from "next/dist/server/web/next-url";
 
 // Map features to their corresponding route paths
 const featureToRoutesMap: Partial<Record<FeaturesType, string[]>> = {
@@ -17,6 +18,10 @@ export function middleware(request: NextRequest) {
   const searchParams = nextUrl.searchParams;
   const enabledFeatures = currentCommunityConfig.enableFeatures || [];
   const rootPath = currentCommunityConfig.rootPath || "/";
+
+  if (pathname === "/_next/image") {
+    return redirectToCloudFlareIfIpfs(nextUrl);
+  }
 
   // liff.state がある場合はrootPathへのリダイレクトをスキップ（LIFFのルーティングバグ対策）
   // ルートページへのアクセスを処理（liff.stateがない場合、またはliff.stateが/の場合のみrootPathにリダイレクト）
@@ -46,6 +51,29 @@ export function middleware(request: NextRequest) {
 export const config = {
   matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };
+
+function redirectToCloudFlareIfIpfs(nextUrl: NextURL) {
+  const searchParams = nextUrl.searchParams;
+  const orig = searchParams.get("url");
+
+  if (orig && /https?:\/\/ipfs\.io\/ipfs\//i.test(orig)) {
+    // ipfs.io を cloudflare-ipfs.com に置換
+    let replaced = orig.replace(
+      /^https?:\/\/ipfs\.io\/ipfs\//i,
+      "https://cloudflare-ipfs.com/ipfs/",
+    );
+
+    // MIME 安定化のため filename ヒントを付与（拡張子不明対策）
+    if (!/[?&]filename=/.test(replaced)) {
+      replaced += (replaced.includes("?") ? "&" : "?") + "filename=image.png";
+    }
+
+    searchParams.set("url", replaced);
+    nextUrl.search = searchParams.toString();
+    // Rewrite で同じハンドラに渡し直す（ユーザーからはURL変わらない）
+    return NextResponse.rewrite(nextUrl);
+  }
+}
 
 function setCsp() {
   const isDev = process.env.NODE_ENV !== "production";
@@ -89,10 +117,7 @@ function setCsp() {
     "https://firebaseinstallations.googleapis.com",
   ].join(" ");
 
-  const frameSrc = [
-    `'self'`,
-    "https://www.google.com",
-  ].join(" ");
+  const frameSrc = [`'self'`, "https://www.google.com"].join(" ");
 
   const res = NextResponse.next();
   res.headers.set("x-nonce", nonce);
