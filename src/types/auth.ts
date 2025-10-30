@@ -90,7 +90,6 @@ export interface AuthContextType {
     name: string,
     prefecture: GqlCurrentPrefecture,
     phoneUid: string,
-    image?: File | null,
   ) => Promise<User | null>;
   updateAuthState: () => Promise<GqlUser | null>;
 

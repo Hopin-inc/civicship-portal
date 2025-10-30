@@ -63,7 +63,7 @@ export function SignUpForm() {
         return null;
       }
 
-      await createUser(values.name, values.prefecture, phoneUid, null);
+      await createUser(values.name, values.prefecture, phoneUid);
       toast.success("アカウントを作成しました");
     } catch (error) {
       logger.error("Sign up error", {
