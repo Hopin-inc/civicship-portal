@@ -171,7 +171,7 @@ export class PhoneAuthService {
         },
       };
     } catch (error) {
-      logger.error("verifyPhoneCode failed", {
+      logger.warn("verifyPhoneCode failed", {
         error: error instanceof Error ? error.message : String(error),
         component: "PhoneAuthService",
       });
