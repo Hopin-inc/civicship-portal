@@ -58,9 +58,9 @@ export function formatDateTime(
 ): string {
   const dtf = new Intl.DateTimeFormat(locale, {
     year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
     minute: "2-digit",
   });
   return dtf.format(date);
