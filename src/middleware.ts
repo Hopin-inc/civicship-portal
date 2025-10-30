@@ -51,13 +51,6 @@ export function middleware(request: NextRequest) {
   return setCsp();
 }
 
-export const config = {
-  matcher: [
-    "/_next/image",
-    "/((?!_next/static|favicon.ico).*)",
-  ],
-};
-
 function redirectToCloudFlareIfIpfs(nextUrl: NextURL) {
   const searchParams = nextUrl.searchParams;
   const rawOriginalUrl = searchParams.get("url");
