@@ -127,26 +127,28 @@ export function useCodeVerification(
           case GqlPhoneUserStatus.ExistingSameCommunity:
             await updateAuthState();
             setAuthState({ authenticationState: "user_registered", isAuthInProgress: false });
+            const existingUserPath = (currentCommunityConfig.rootPath || "/") as RawURIComponent;
             const homeRedirectPath = authRedirectService.getRedirectPath(
-              "/" as RawURIComponent,
+              existingUserPath,
               nextParam as RawURIComponent,
             );
             return {
               success: true,
-              redirectPath: homeRedirectPath || "/",
+              redirectPath: homeRedirectPath || existingUserPath,
               message: "ログインしました",
             };
 
           case GqlPhoneUserStatus.ExistingDifferentCommunity:
             await updateAuthState();
             setAuthState({ authenticationState: "user_registered", isAuthInProgress: false });
+            const crossCommunityPath = (currentCommunityConfig.rootPath || "/") as RawURIComponent;
             const crossCommunityRedirectPath = authRedirectService.getRedirectPath(
-              "/" as RawURIComponent,
+              crossCommunityPath,
               nextParam as RawURIComponent,
             );
             return {
               success: true,
-              redirectPath: crossCommunityRedirectPath || "/",
+              redirectPath: crossCommunityRedirectPath || crossCommunityPath,
               message: "メンバーシップが追加されました",
             };
 
