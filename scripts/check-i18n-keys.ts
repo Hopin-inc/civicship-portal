@@ -122,9 +122,16 @@ async function findUsedKeys(): Promise<Set<string>> {
       }
     }
 
-    const mappingMatches = content.matchAll(/['"]([a-zA-Z][\w.-]*\.[\w.-]+)['"]\s*[,}]/g);
+    const mappingMatches = content.matchAll(/['"]([a-zA-Z][\w.-]*\.[\w.-]+)['"]\s*[,};)]/g);
     for (const match of mappingMatches) {
       const key = match[1];
+      const fullMatch = match[0];
+      const beforeMatch = content.substring(Math.max(0, match.index - 50), match.index);
+      
+      if (/(?:get|getTranslations|fetch|request)\s*\(\s*$/.test(beforeMatch)) {
+        continue;
+      }
+      
       if (isValidTranslationKey(key)) {
         usedKeys.add(key);
       }
@@ -136,6 +143,12 @@ async function findUsedKeys(): Promise<Set<string>> {
       if (isValidTranslationKey(key)) {
         usedKeys.add(key);
       }
+    }
+
+    const getTranslationsMatches = content.matchAll(/getTranslations\s*\(\s*['"]([^'"]+)['"]\s*\)/g);
+    for (const match of getTranslationsMatches) {
+      const namespace = match[1];
+      usedKeys.add(`__NAMESPACE__${namespace}`);
     }
   }
 
@@ -160,10 +173,26 @@ function generateReport(translationKeys: TranslationKeys, usedKeys: Set<string>)
     translationKeys[locale].forEach(key => allDefinedKeys.add(key));
   }
 
+  const namespaces = new Set<string>();
+  for (const key of usedKeys) {
+    if (key.startsWith('__NAMESPACE__')) {
+      namespaces.add(key.replace('__NAMESPACE__', ''));
+    }
+  }
+
+  const expandedUsedKeys = new Set(usedKeys);
+  for (const namespace of namespaces) {
+    for (const key of allDefinedKeys) {
+      if (key.startsWith(namespace + '.')) {
+        expandedUsedKeys.add(key);
+      }
+    }
+  }
+
   for (const locale of locales) {
     report.unusedKeys[locale] = [];
     for (const key of translationKeys[locale]) {
-      if (!usedKeys.has(key)) {
+      if (!expandedUsedKeys.has(key)) {
         report.unusedKeys[locale].push(key);
       }
     }
@@ -172,6 +201,8 @@ function generateReport(translationKeys: TranslationKeys, usedKeys: Set<string>)
   for (const locale of locales) {
     report.missingKeys[locale] = [];
     for (const key of usedKeys) {
+      if (key.startsWith('__NAMESPACE__')) continue;
+      
       if (!translationKeys[locale].has(key)) {
         report.missingKeys[locale].push(key);
       }
