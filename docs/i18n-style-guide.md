@@ -297,9 +297,9 @@ function MyComponent() {
 ```tsx
 import { resolveLocalePath } from "@/utils/i18n";
 
-const href = document.path.includes("{locale}")
-  ? resolveLocalePath(document.path, locale)
-  : document.path;
+const href = doc.path.includes("{locale}")
+  ? resolveLocalePath(doc.path, locale)
+  : doc.path;
 ```
 
 ## チェックリスト

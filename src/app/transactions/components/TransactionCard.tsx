@@ -13,8 +13,7 @@ interface TransactionCardProps {
   image?: string;
 }
 
-const useStatusLabel = (reason: GqlTransactionReason) => {
-  const t = useTranslations();
+const getStatusLabel = (reason: GqlTransactionReason, t: ReturnType<typeof useTranslations>) => {
   switch (reason) {
     case GqlTransactionReason.Donation:
       return <span className="text-label-xs font-medium bg-green-100 text-green-700 py-1 px-2 rounded-full">{t("transactions.status.donation")}</span>;
@@ -34,10 +33,14 @@ const useStatusLabel = (reason: GqlTransactionReason) => {
     default:
       return <span className="text-label-xs font-medium bg-zinc-100 text-zinc-700 py-1 px-2 rounded-full">{t("transactions.status.default")}</span>;
   }
-}
+};
 
-const useFormatTransactionDescription = (reason: GqlTransactionReason, from: string, to: string): { displayText: string; to: string } => {
-  const t = useTranslations();
+const formatTransactionDescription = (
+  reason: GqlTransactionReason,
+  from: string,
+  to: string,
+  t: ReturnType<typeof useTranslations>
+): { displayText: string; to: string } => {
   const mapping = mapReasonToAction(reason);
 
   if (mapping.specialName) {
@@ -70,8 +73,8 @@ export const TransactionCard = ({ transaction, image }: TransactionCardProps) =>
     const t = useTranslations();
     const formatDateTime = useLocaleDateTimeFormat();
     const info = getTransactionInfo(transaction, t("transactions.did.pending"));
-    const { displayText, to } = useFormatTransactionDescription(info.reason, info.from, info.to);
-    const statusLabelElement = useStatusLabel(info.reason);
+    const { displayText, to } = formatTransactionDescription(info.reason, info.from, info.to, t);
+    const statusLabelElement = getStatusLabel(info.reason, t);
     const hasDestination = to && info.reason !== GqlTransactionReason.PointIssued && info.reason !== GqlTransactionReason.Onboarding;
     
     return (

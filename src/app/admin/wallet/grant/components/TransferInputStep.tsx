@@ -21,7 +21,6 @@ interface Props {
   onBack: () => void;
   onSubmit: (amount: number, comment?: string) => void;
   title?: string;
-  recipientLabel?: string;
   recipientKey?: string;
   submitLabel?: string;
   backLabel?: string;
@@ -38,7 +37,6 @@ function TransferInputStep({
   onBack,
   onSubmit,
   title,
-  recipientLabel,
   recipientKey,
   submitLabel,
   backLabel,
