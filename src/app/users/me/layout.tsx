@@ -6,40 +6,24 @@ import { mapGqlPortfolio, UserProfileProvider } from "@/app/users/features/share
 export { metadata };
 
 export default async function MyPageLayout({ children }: { children: React.ReactNode }) {
-  const result = await fetchPrivateUserServer();
+  const gqlUser = await fetchPrivateUserServer();
 
-  if (result.type === "success") {
-    const portfolios = (result.user.portfolios ?? []).map(mapGqlPortfolio);
+  if (gqlUser) {
+    const portfolios = (gqlUser.portfolios ?? []).map(mapGqlPortfolio);
 
     return (
       <UserProfileProvider
         value={{
-          userId: result.user.id,
+          userId: gqlUser.id,
           isOwner: true,
-          gqlUser: result.user,
+          gqlUser,
           portfolios,
         }}
       >
-        <ClientLayout ssrState="success" ssrUser={result.user}>
-          {children}
-        </ClientLayout>
+        <ClientLayout ssrUser={gqlUser}>{children}</ClientLayout>
       </UserProfileProvider>
     );
   }
 
-  if (result.type === "error") {
-    // SSR failed with server error - pass error state to client
-    return (
-      <ClientLayout ssrState="error" ssrUser={null} ssrError={result.error.message}>
-        {children}
-      </ClientLayout>
-    );
-  }
-
-  // Unauthenticated - let client retry
-  return (
-    <ClientLayout ssrState="unauthenticated" ssrUser={null}>
-      {children}
-    </ClientLayout>
-  );
+  return <ClientLayout ssrUser={null}>{children}</ClientLayout>;
 }

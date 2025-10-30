@@ -5,7 +5,7 @@ import { mapGqlPortfolio, UserProfileProvider } from "@/app/users/features/share
 import { GqlUser } from "@/types/graphql";
 import { GET_CURRENT_USER_PROFILE } from "@/graphql/account/user/client-query";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { notFound } from "next/navigation";
+import { ErrorState } from "@/components/shared";
 
 interface CurrentUserProfileQueryResult {
   currentUser?: {
@@ -16,50 +16,29 @@ interface CurrentUserProfileQueryResult {
 interface ClientLayoutProps {
   children: React.ReactNode;
   ssrUser: GqlUser | null;
-  ssrState: "success" | "unauthenticated" | "error";
-  ssrError?: string;
 }
 
-export function ClientLayout({ children, ssrUser, ssrState, ssrError }: ClientLayoutProps) {
-  const { data, loading, error } = useQuery<CurrentUserProfileQueryResult>(GET_CURRENT_USER_PROFILE, {
-    skip: ssrState === "success" || ssrState === "error",
+export function ClientLayout({ children, ssrUser }: ClientLayoutProps) {
+  const { data, loading } = useQuery<CurrentUserProfileQueryResult>(GET_CURRENT_USER_PROFILE, {
+    skip: !!ssrUser,
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
   });
 
   const csrUser = data?.currentUser?.user ?? null;
 
-  // SSR succeeded - just render
-  if (ssrState === "success" && ssrUser) {
+  if (ssrUser) {
     return <>{children}</>;
   }
 
-  // SSR failed with server error - show error message, don't retry
-  if (ssrState === "error") {
-    return (
-      <div style={{ padding: "2rem", textAlign: "center" }}>
-        <h2>サーバーエラーが発生しました</h2>
-        <p>一時的な問題が発生しています。しばらくしてから再度お試しください。</p>
-        {ssrError && (
-          <details style={{ marginTop: "1rem" }}>
-            <summary>エラー詳細</summary>
-            <pre style={{ textAlign: "left", background: "#f5f5f5", padding: "1rem" }}>
-              {ssrError}
-            </pre>
-          </details>
-        )}
-      </div>
-    );
-  }
-
-  // SSR returned unauthenticated - retry with CSR
   if (loading && !csrUser) {
     return <LoadingIndicator />;
   }
 
-  // CSR also failed to get user - show 404
+  // Show error state instead of notFound when user cannot be fetched
+  // This handles both auth failures and server errors more gracefully
   if (!csrUser) {
-    return notFound();
+    return <ErrorState title="ユーザー情報を読み込めませんでした" />;
   }
 
   const portfolios = (csrUser.portfolios ?? []).map(mapGqlPortfolio);
