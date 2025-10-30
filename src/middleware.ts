@@ -20,7 +20,9 @@ export function middleware(request: NextRequest) {
   const rootPath = currentCommunityConfig.rootPath || "/";
 
   if (pathname === "/_next/image") {
-    return redirectToCloudFlareIfIpfs(nextUrl);
+    const rewritten = redirectToCloudFlareIfIpfs(nextUrl);
+    if (rewritten) return rewritten;
+    return NextResponse.next();
   }
 
   // liff.state がある場合はrootPathへのリダイレクトをスキップ（LIFFのルーティングバグ対策）
@@ -49,7 +51,10 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: [
+    "/_next/image",
+    "/((?!_next/static|_next/image|favicon.ico).*)",
+  ],
 };
 
 function redirectToCloudFlareIfIpfs(nextUrl: NextURL) {
@@ -70,9 +75,9 @@ function redirectToCloudFlareIfIpfs(nextUrl: NextURL) {
       replaced += (replaced.includes("?") ? "&" : "?") + "filename=image.png";
     }
 
-    searchParams.set("url", replaced);
+    searchParams.set("url", encodeURIComponent(replaced));
     nextUrl.search = searchParams.toString();
-    // Rewrite で同じハンドラに渡し直す（ユーザーからはURL変わらない）
+
     return NextResponse.rewrite(nextUrl);
   }
 }
