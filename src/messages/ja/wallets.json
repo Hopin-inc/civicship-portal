@@ -20,6 +20,7 @@
   "wallets.donate.insufficientBalance": "ポイントが不足しています",
   "wallets.donate.pageTitle": "ポイントをあげる",
   "wallets.donate.recipientSuffix": "にあげる",
+  "wallets.donate.recipientRich": "<b>{name}</b>にあげる",
   "wallets.donate.submitLabel": "あげる",
   "wallets.donate.backLabel": "あげる相手を選び直す",
   "wallets.donate.selectRecipient": "送り先を選ぶ",

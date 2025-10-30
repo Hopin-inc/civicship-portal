@@ -20,6 +20,7 @@
   "wallets.donate.insufficientBalance": "Insufficient balance",
   "wallets.donate.pageTitle": "Donate Points",
   "wallets.donate.recipientSuffix": "to",
+  "wallets.donate.recipientRich": "to <b>{name}</b>",
   "wallets.donate.submitLabel": "Donate",
   "wallets.donate.backLabel": "Choose a different recipient",
   "wallets.donate.selectRecipient": "Select Recipient",

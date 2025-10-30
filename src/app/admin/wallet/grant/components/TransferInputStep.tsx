@@ -22,10 +22,11 @@ interface Props {
   onSubmit: (amount: number, comment?: string) => void;
   title?: string;
   recipientLabel?: string;
+  recipientKey?: string;
   submitLabel?: string;
   backLabel?: string;
   amountLabel?: string;
-  presetAmounts?: number[]; // ← 追加
+  presetAmounts?: number[];
 }
 
 const INT_LIMIT = 2000000000;
@@ -38,6 +39,7 @@ function TransferInputStep({
   onSubmit,
   title = "ポイントを支給する",
   recipientLabel = "に支給",
+  recipientKey,
   submitLabel = "支給する",
   backLabel = "支給先を選び直す",
   amountLabel,
@@ -53,6 +55,18 @@ function TransferInputStep({
   );
   useHeaderConfig(headerConfig);
   const didValue = user.didIssuanceRequests?.find(req => req?.status === GqlDidIssuanceStatus.Completed)?.didValue;
+
+  const recipientDisplay = recipientKey
+    ? t.rich(recipientKey, {
+        b: (chunks) => <span className="text-label-sm font-bold">{chunks}</span>,
+        name: user.name,
+      })
+    : (
+        <>
+          <span className="text-label-sm font-bold">{user.name}</span>
+          <span className="text-label-xs font-bold">{recipientLabel}</span>
+        </>
+      );
 
   const [amount, setAmount] = useState<number | null>(null);
   const [displayValue, setDisplayValue] = useState<string>("");
@@ -96,9 +110,8 @@ function TransferInputStep({
                 <AvatarFallback>{user.name?.[0] ?? "U"}</AvatarFallback>
               </Avatar>
               <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-1">
-                  <span className="text-label-sm font-bold">{user.name}</span>
-                  <span className="text-label-xs font-bold">{recipientLabel}</span>
+                <div className="flex items-center gap-1 text-label-xs font-bold">
+                  {recipientDisplay}
                 </div>
                 {didValue && <span className="text-label-xs text-caption mt-1">{truncateText(didValue, 20, "middle")}</span>}
               </div>

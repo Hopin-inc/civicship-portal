@@ -29,7 +29,7 @@ export function DonateForm({
       onSubmit={onSubmit}
       currentPoint={currentPoint}
       title={t("wallets.donate.pageTitle")}
-      recipientLabel={t("wallets.donate.recipientSuffix")}
+      recipientKey="wallets.donate.recipientRich"
       submitLabel={t("wallets.donate.submitLabel")}
       backLabel={t("wallets.donate.backLabel")}
       presetAmounts={[1000, 3000, 5000, 10000]}
