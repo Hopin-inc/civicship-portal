@@ -5,6 +5,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tabs as TabsEnum } from "../types/tabs";
 import { useRouter, useSearchParams } from "next/navigation";
 import clsx from "clsx";
+import { useTranslations } from "next-intl";
 
 interface TabManagerProps {
   activeTab: TabsEnum;
@@ -12,6 +13,7 @@ interface TabManagerProps {
 }
 
 export function TabManager({ activeTab, setActiveTab }: TabManagerProps) {
+  const t = useTranslations();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -42,7 +44,7 @@ export function TabManager({ activeTab, setActiveTab }: TabManagerProps) {
               : "bg-white text-black border border-gray-300"
           )}
         >
-          履歴
+          {t("wallets.shared.tabs.history")}
         </TabsTrigger>
         <TabsTrigger
           value={TabsEnum.Member}
@@ -53,9 +55,9 @@ export function TabManager({ activeTab, setActiveTab }: TabManagerProps) {
               : "bg-white text-black border border-gray-300"
           )}
         >
-          メンバー
+          {t("wallets.shared.tabs.member")}
         </TabsTrigger>
       </TabsList>
     </Tabs>
   );
-} 
+}   

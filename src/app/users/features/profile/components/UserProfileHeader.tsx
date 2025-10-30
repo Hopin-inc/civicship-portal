@@ -7,13 +7,16 @@ import { useReadMore } from "@/hooks/useReadMore";
 import { cn } from "@/lib/utils";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useTranslations } from "next-intl";
+import { getPrefectureKey } from "@/lib/i18n/prefectures";
+import { GqlCurrentPrefecture } from "@/types/graphql";
 
 interface UserProfileHeaderProps {
   id: string;
   name: string;
   imageUrl?: string;
   bio?: string;
-  currentPrefecture?: string;
+  currentPrefecture?: GqlCurrentPrefecture;
   isOwner: boolean;
   socialUrl: {
     x: string | null;
@@ -31,6 +34,7 @@ export function UserProfileHeader({
   isOwner,
   socialUrl,
 }: UserProfileHeaderProps) {
+  const t = useTranslations();
   const socialButtonClasses =
     "rounded-full border border-input w-10 h-10 flex items-center justify-center";
 
@@ -53,7 +57,7 @@ export function UserProfileHeader({
                   "ml-auto text-black",
                 )}
               >
-                設定
+                {t("users.profileHeader.settingsButton")}
               </Link>
             </div>
           )}
@@ -66,7 +70,7 @@ export function UserProfileHeader({
             {currentCommunityConfig.enableFeatures.includes("prefectures") && currentPrefecture && (
               <div className="flex items-center text-label-md text-caption mb-3">
                 <Home className="w-4 h-4 mr-1" />
-                <span>{currentPrefecture}</span>
+                <span>{getPrefectureKey(currentPrefecture) ? t(getPrefectureKey(currentPrefecture)) : currentPrefecture}</span>
               </div>
             )}
           </div>
@@ -105,6 +109,7 @@ export function UserProfileHeader({
 }
 
 function BioSection({ bio }: { bio: string }) {
+  const t = useTranslations();
   const { textRef, expanded, showReadMore, toggleExpanded, getTextStyle } = useReadMore({
     text: bio,
     maxLines: 6,
@@ -124,7 +129,7 @@ function BioSection({ bio }: { bio: string }) {
           <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent"></div>
           <div className="relative flex justify-center pt-8">
             <Button variant="tertiary" size="sm" onClick={toggleExpanded} className="bg-white px-6">
-              <span className="text-label-sm font-bold">もっと見る</span>
+              <span className="text-label-sm font-bold">{t("users.profileHeader.readMore")}</span>
             </Button>
           </div>
         </div>

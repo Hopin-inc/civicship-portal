@@ -5,6 +5,7 @@ import { UserPortfolioSection } from "@/app/users/features/portfolios";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 import { NftCard } from "@/components/domains/nfts/components";
 import { CardCarousel } from "@/components/shared/CardCarousel";
+import { useTranslations } from "next-intl";
 
 interface UserProfileViewProps {
   viewModel: UserProfileViewModel;
@@ -12,6 +13,7 @@ interface UserProfileViewProps {
 }
 
 export function UserProfileView({ viewModel, isOwner }: UserProfileViewProps) {
+  const t = useTranslations();
   const targetFeatures = ["opportunities", "credentials"] as const;
   const shouldShowOpportunities = targetFeatures.some((feature) =>
     currentCommunityConfig.enableFeatures.includes(feature),
@@ -40,7 +42,9 @@ export function UserProfileView({ viewModel, isOwner }: UserProfileViewProps) {
 
       {viewModel.nftInstances && viewModel.nftInstances.length > 0 && (
         <section className="py-6 mt-0">
-          <h2 className="text-display-sm font-semibold text-foreground pt-4 pb-1">証明書</h2>
+          <h2 className="text-display-sm font-semibold text-foreground pt-4 pb-1">
+            {t("users.profileView.certificatesTitle")}
+          </h2>
           <div className="mt-4">
             <CardCarousel>
               {viewModel.nftInstances.map((nft) => (

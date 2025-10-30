@@ -2,6 +2,7 @@
 
 import React, { useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import WalletCard from "@/components/shared/WalletCard";
 import { Button } from "@/components/ui/button";
@@ -13,16 +14,17 @@ import { useWalletContext } from "@/app/wallets/features/shared/contexts/WalletC
 
 export function WalletOverview() {
   const router = useRouter();
+  const t = useTranslations();
   const { currentPoint, isLoadingWallet, error, refresh } = useWalletContext();
 
   const headerConfig = useMemo(
     () => ({
-      title: "保有ポイント",
+      title: t("wallets.overview.headerTitle"),
       showBackButton: true,
       showLogo: false,
       backTo: "/users/me",
     }),
-    [],
+    [t],
   );
   useHeaderConfig(headerConfig);
 
@@ -30,7 +32,7 @@ export function WalletOverview() {
     router.push(`/wallets/donate?currentPoint=${currentPoint}&tab=history`);
 
   if (isLoadingWallet) return <LoadingIndicator />;
-  if (error) return <ErrorState title={"ウォレット"} />;
+  if (error) return <ErrorState title={t("wallets.overview.errorTitle")} />;
 
   return (
     <div className="space-y-6">
@@ -40,9 +42,9 @@ export function WalletOverview() {
         onRefetch={async () => {
           try {
             await refresh();
-            toast.success("ウォレット情報を更新しました");
+            toast.success(t("wallets.overview.refreshSuccess"));
           } catch (err) {
-            toast.error("再読み込みに失敗しました");
+            toast.error(t("wallets.overview.refreshError"));
           }
         }}
       />
@@ -53,10 +55,10 @@ export function WalletOverview() {
           variant="secondary"
           size="sm"
           disabled={currentPoint <= 0}
-          className="w-[104px] h-[48px] flex items-center gap-1.5"
+          className="h-12 px-4"
         >
-          <Gift className="w-4 h-4" />
-          <span className="text-base">あげる</span>
+          <Gift className="w-4 h-4 shrink-0" />
+          <span className="text-base whitespace-nowrap">{t("wallets.overview.giveButton")}</span>
         </Button>
       </div>
     </div>

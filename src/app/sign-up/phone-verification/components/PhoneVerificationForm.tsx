@@ -14,8 +14,10 @@ import { useCodeVerification } from "../hooks/useCodeVerification";
 import { PhoneInputStep } from "./PhoneInputStep";
 import { CodeVerificationStep } from "./CodeVerificationStep";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
+import { useTranslations } from "next-intl";
 
 export function PhoneVerificationForm() {
+  const t = useTranslations();
   const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next");
@@ -66,7 +68,7 @@ export function PhoneVerificationForm() {
     e.preventDefault();
 
     if (!isPhoneValid || !phoneNumber) {
-      toast.error("有効な電話番号を入力してください");
+      toast.error(t("phoneVerification.errors.invalidPhone"));
       return;
     }
 
@@ -81,7 +83,7 @@ export function PhoneVerificationForm() {
 
   const handleResendCode = async () => {
     if (!phoneNumber) {
-      toast.error("電話番号が設定されていません");
+      toast.error(t("phoneVerification.errors.phoneNotSet"));
       return;
     }
 

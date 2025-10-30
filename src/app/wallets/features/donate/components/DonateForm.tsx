@@ -3,6 +3,7 @@
 import React from "react";
 import { GqlUser } from "@/types/graphql";
 import TransferInputStep from "@/app/admin/wallet/grant/components/TransferInputStep";
+import { useTranslations } from "next-intl";
 
 interface Props {
   user: GqlUser;
@@ -19,6 +20,7 @@ export function DonateForm({
   onBack,
   onSubmit,
 }: Props) {
+  const t = useTranslations();
   return (
     <TransferInputStep
       user={user}
@@ -26,10 +28,10 @@ export function DonateForm({
       onBack={onBack}
       onSubmit={onSubmit}
       currentPoint={currentPoint}
-      title="ポイントをあげる"
-      recipientLabel="にあげる"
-      submitLabel="あげる"
-      backLabel="あげる相手を選び直す"
+      title={t("wallets.donate.pageTitle")}
+      recipientKey="wallets.donate.recipientRich"
+      submitLabel={t("wallets.donate.submitLabel")}
+      backLabel={t("wallets.donate.backLabel")}
       presetAmounts={[1000, 3000, 5000, 10000]}
     />
   );

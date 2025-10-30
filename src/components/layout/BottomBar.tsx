@@ -9,12 +9,14 @@ import { matchPaths } from "@/utils/path";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
 import { AuthEnvironment, detectEnvironment } from "@/lib/auth/core/environment-detector";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
+import { useTranslations } from "next-intl";
 
 interface HeaderProps {
   className?: string;
 }
 
 const BottomBar: React.FC<HeaderProps> = ({ className }) => {
+  const t = useTranslations();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const placeId = searchParams.get("placeId");
@@ -70,13 +72,13 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
               )}
             >
               <Search size={24} />
-              <span className="text-xs mt-1">見つける</span>
+              <span className="text-xs mt-1">{t("navigation.bottomBar.discover")}</span>
             </Link>
           )}
           {currentCommunityConfig.enableFeatures.includes("places") && (
             <Link href="/places" className={cn(getLinkStyle("/places", "/places/*"), "flex-grow")}>
               <Globe size={24} />
-              <span className="text-xs mt-1">拠点</span>
+              <span className="text-xs mt-1">{t("navigation.bottomBar.places")}</span>
             </Link>
           )}
           <Link
@@ -84,7 +86,7 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
             className={cn(getLinkStyle("/users/me", "/users/me/*"), "flex-grow")}
           >
             <User size={24} />
-            <span className="text-xs mt-1">マイページ</span>
+            <span className="text-xs mt-1">{t("navigation.bottomBar.myPage")}</span>
           </Link>
         </div>
       </div>

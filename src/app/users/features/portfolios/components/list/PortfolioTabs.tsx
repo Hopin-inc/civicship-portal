@@ -5,6 +5,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useRouter, useSearchParams } from "next/navigation";
 import clsx from "clsx";
 import { PortfolioTab } from "../../types";
+import { useTranslations } from "next-intl";
 
 interface PortfolioTabsProps {
   activeTab: PortfolioTab;
@@ -16,6 +17,7 @@ function isPortfolioTab(value: string | null): value is PortfolioTab {
 }
 
 export function PortfolioTabs({ activeTab, setActiveTab }: PortfolioTabsProps) {
+  const t = useTranslations();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -47,7 +49,7 @@ export function PortfolioTabs({ activeTab, setActiveTab }: PortfolioTabsProps) {
               : "bg-white text-black border-b-[1px]",
           )}
         >
-          今後の予定
+          {t("users.portfolio.tabs.future")}
         </TabsTrigger>
         <TabsTrigger
           value={PortfolioTab.Past}
@@ -58,7 +60,7 @@ export function PortfolioTabs({ activeTab, setActiveTab }: PortfolioTabsProps) {
               : "bg-white text-black border-b-[1px]",
           )}
         >
-          過去
+          {t("users.portfolio.tabs.past")}
         </TabsTrigger>
       </TabsList>
     </Tabs>

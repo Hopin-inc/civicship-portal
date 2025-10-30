@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Button } from "@/components/ui/button";
 import { logger } from "@/lib/logging";
@@ -40,13 +41,14 @@ export function CodeVerificationStep({
   recaptchaContainerRef,
   phoneAuth,
 }: CodeVerificationStepProps) {
+  const t = useTranslations();
   const headerConfig = useMemo(
     () => ({
-      title: "認証コード検証",
+      title: t("phoneVerification.verification.headerTitle"),
       showBackButton: false,
       showLogo: false,
     }),
-    [],
+    [t],
   );
   useHeaderConfig(headerConfig);
 
@@ -56,7 +58,7 @@ export function CodeVerificationStep({
     try {
       phoneAuth.clearRecaptcha?.();
     } catch (error) {
-      logger.error("reCAPTCHAクリアエラー:", { error });
+      logger.error("reCAPTCHA clear error:", { error });
     } finally {
       setIsReloading(true);
       onBackToPhone();
@@ -71,8 +73,8 @@ export function CodeVerificationStep({
       <div>
         <p className="text-sm text-muted-foreground">
           {phoneNumber
-            ? `${phoneNumber}に送信された6桁の認証コードを入力してください。`
-            : "電話番号に送信された6桁の認証コードを入力してください。"}
+            ? t("phoneVerification.verification.descriptionWithPhone", { phoneNumber })
+            : t("phoneVerification.verification.descriptionWithoutPhone")}
         </p>
       </div>
 
@@ -97,7 +99,7 @@ export function CodeVerificationStep({
               isReloading
             }
           >
-            {isVerifying ? "認証中..." : "認証する"}
+            {isVerifying ? t("phoneVerification.verification.verifying") : t("phoneVerification.verification.verifyButton")}
           </Button>
           <Button
             type="button"
@@ -113,10 +115,10 @@ export function CodeVerificationStep({
             onClick={onResend}
           >
             {isResendDisabled
-              ? `${countdown}秒後に再送できます`
+              ? t("phoneVerification.verification.resendCountdown", { countdown })
               : isPhoneSubmitting
-                ? "送信中..."
-                : "認証コードを再送"}
+                ? t("phoneVerification.verification.resending")
+                : t("phoneVerification.verification.resendButton")}
           </Button>
           <div
             id="recaptcha-container"
@@ -137,7 +139,7 @@ export function CodeVerificationStep({
             }
             onClick={handleBackToPhone}
           >
-            電話番号を変更する
+            {t("phoneVerification.verification.changePhoneButton")}
           </Button>
         </div>
       </form>

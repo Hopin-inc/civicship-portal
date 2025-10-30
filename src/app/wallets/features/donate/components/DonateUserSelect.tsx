@@ -5,6 +5,7 @@ import { GqlUser } from "@/types/graphql";
 import UserSelectStep from "@/app/admin/wallet/grant/components/UserSelectStep";
 import { Tabs } from "@/app/admin/wallet/grant/types/tabs";
 import { DonateMember } from "../types";
+import { useTranslations } from "next-intl";
 
 interface Props {
   members: DonateMember[];
@@ -23,9 +24,10 @@ export function DonateUserSelect({
   activeTab,
   setActiveTab,
 }: Props) {
+  const t = useTranslations();
   return (
     <UserSelectStep
-      title="送り先を選ぶ"
+      title={t("wallets.donate.selectRecipient")}
       members={members}
       onSelect={onSelect}
       loadMoreRef={loadMoreRef}

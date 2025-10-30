@@ -9,21 +9,23 @@ import { useTransactionMutations } from "@/app/admin/wallet/hooks/useTransaction
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
+import { useTranslations } from "next-intl";
 
 const PRESET_AMOUNTS = [1000000, 3000000, 5000000, 10000000, 30000000, 50000000];
 const INT_LIMIT = 2000000000;
 
 export default function IssuePointPage() {
+  const t = useTranslations();
   const communityId = COMMUNITY_ID;
   const router = useRouter();
 
   const headerConfig = useMemo(
     () => ({
-      title: "ポイント発行",
+      title: t("adminWallet.issue.title"),
       showLogo: false,
       showBackButton: true,
     }),
-    [],
+    [t],
   );
   useHeaderConfig(headerConfig);
 
@@ -62,11 +64,11 @@ export default function IssuePointPage() {
       return;
     }
     if (num < 0) {
-      toast.error("0以上を指定して下さい");
+      toast.error(t("adminWallet.issue.validation.min"));
       return;
     }
     if (num > INT_LIMIT) {
-      toast.error("20億以下を指定して下さい");
+      toast.error(t("adminWallet.issue.validation.max"));
       return;
     }
     setAmount(num);
@@ -91,7 +93,7 @@ export default function IssuePointPage() {
           name: "issue_point",
           params: { amount },
         });
-        toast.success("ポイントを発行しました");
+        toast.success(t("adminWallet.issue.success"));
         router.push("/admin/wallet?refresh=true");
       }
     } catch (err) {
@@ -141,7 +143,7 @@ export default function IssuePointPage() {
           onClick={handleIssuePoint}
           disabled={!amount || amount <= 0 || amount > INT_LIMIT}
         >
-          発行
+          {t("adminWallet.issue.submit")}
         </Button>
       </footer>
     </>

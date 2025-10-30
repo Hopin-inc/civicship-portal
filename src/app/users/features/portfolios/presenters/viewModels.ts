@@ -14,7 +14,7 @@ export type PortfolioCardViewModel = {
     image: string | null;
   }>;
   badge: {
-    label: string;
+    labelKey: string;
     variantClasses: string;
   } | null;
   showShield: boolean;

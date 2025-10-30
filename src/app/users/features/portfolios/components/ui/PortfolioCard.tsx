@@ -5,6 +5,7 @@ import { RefObject } from "react";
 import { ParticipantsList } from "@/components/shared/ParticipantsList";
 import { PortfolioCardViewModel } from "../../presenters/viewModels";
 import { PLACEHOLDER_IMAGE } from "@/utils";
+import { useTranslations } from "next-intl";
 
 type PortfolioCardProps = {
   viewModel: PortfolioCardViewModel;
@@ -13,6 +14,7 @@ type PortfolioCardProps = {
 };
 
 export const PortfolioCard = ({ viewModel, isLast, lastRef }: PortfolioCardProps) => {
+  const t = useTranslations();
   return (
     <Link href={viewModel.linkHref} className="block w-full">
       <div
@@ -43,7 +45,7 @@ export const PortfolioCard = ({ viewModel, isLast, lastRef }: PortfolioCardProps
             viewModel.badge && (
               <div className="absolute top-2 left-2 z-10">
                 <div className={`px-2 py-1 text-label-sm rounded-full font-bold ${viewModel.badge.variantClasses}`}>
-                  {viewModel.badge.label}
+                  {t(viewModel.badge.labelKey as any)}
                 </div>
               </div>
             )
@@ -64,7 +66,7 @@ export const PortfolioCard = ({ viewModel, isLast, lastRef }: PortfolioCardProps
               <span>
                 {viewModel.dateDisplay}
                 {viewModel.showScheduleBadge && (
-                  <span className="bg-ring pl-1.5 pr-2 py-0.5 rounded-lg ml-1">予定</span>
+                  <span className="bg-ring pl-1.5 pr-2 py-0.5 rounded-lg ml-1">{t("users.portfolio.badge.scheduled")}</span>
                 )}
               </span>
             </div>

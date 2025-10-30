@@ -10,6 +10,7 @@ import { GqlCurrentPrefecture } from "@/types/graphql";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useTranslations } from "next-intl";
 
 interface UserProfileEditProps {
   profileImage: string | null;
@@ -46,13 +47,14 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({
   handleImageSelect,
   handleSave,
 }) => {
+  const t = useTranslations();
   return (
     <form onSubmit={handleSave} className="space-y-8">
       <div>
         <Label className="mb-2 flex items-center gap-x-2">
-          プロフィール画像
+          {t("users.edit.profileImage")}
           <span className="text-primary text-label-xs font-bold bg-primary-foreground px-1 py-1 rounded-md">
-            必須
+            {t("users.edit.required")}
           </span>
         </Label>
         <div className="flex items-center gap-3">
@@ -72,7 +74,7 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({
             onClick={() => document.getElementById("profile-image-input")?.click()}
             className="h-10"
           >
-            画像を選択
+            {t("users.edit.selectImage")}
           </Button>
           <input
             id="profile-image-input"
@@ -87,28 +89,28 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({
       <div>
         {/* #NOTE: 運営メンバーが本名でないと、誰かが誰かを区別できなくなる可能性があるため本名としているが、NEO88における特殊対応 */}
         <Label className="mb-2 flex items-center gap-x-2">
-          本名
+          {t("users.edit.fullName")}
           <span className="text-primary text-label-xs font-bold bg-primary-foreground px-1 py-1 rounded-md">
-            必須
+            {t("users.edit.required")}
           </span>
         </Label>
         <Input
           value={displayName}
           onChange={(e) => setDisplayName(e.target.value)}
-          placeholder="山田太郎"
+          placeholder={t("users.edit.fullNamePlaceholder")}
           required
         />
         <span className="text-xs text-muted-foreground">
-          ※ どなたか分からなくなるため、必ず本名をご入力ください
+          {t("users.edit.fullNameNote")}
         </span>
       </div>
 
       {currentCommunityConfig.enableFeatures.includes("prefectures") && (
         <div>
           <Label className="mb-2 flex items-center gap-x-2">
-            住んでいるところ
+            {t("users.edit.location")}
             <span className="text-primary text-label-xs font-bold bg-primary-foreground px-1 py-1 rounded-md">
-              必須
+              {t("users.edit.required")}
             </span>
           </Label>
           <ToggleGroup
@@ -119,36 +121,36 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({
             className="gap-2"
           >
             <ToggleGroupItem value={GqlCurrentPrefecture.Kagawa} className="flex-1">
-              香川県
+              {t("common.prefectures.kagawa")}
             </ToggleGroupItem>
             <ToggleGroupItem value={GqlCurrentPrefecture.Tokushima} className="flex-1">
-              徳島県
+              {t("common.prefectures.tokushima")}
             </ToggleGroupItem>
             <ToggleGroupItem value={GqlCurrentPrefecture.Ehime} className="flex-1">
-              愛媛県
+              {t("common.prefectures.ehime")}
             </ToggleGroupItem>
             <ToggleGroupItem value={GqlCurrentPrefecture.Kochi} className="flex-1">
-              高知県
+              {t("common.prefectures.kochi")}
             </ToggleGroupItem>
             <ToggleGroupItem value={GqlCurrentPrefecture.OutsideShikoku} className="basis-full">
-              四国以外
+              {t("common.prefectures.outsideShikoku")}
             </ToggleGroupItem>
           </ToggleGroup>
         </div>
       )}
 
       <div>
-        <Label className="block mb-2">自己紹介</Label>
+        <Label className="block mb-2">{t("users.edit.bio")}</Label>
         <Textarea
           value={bio}
           onChange={(e) => setBio(e.target.value)}
-          placeholder="自己紹介を入力しましょう"
+          placeholder={t("users.edit.bioPlaceholder")}
           className="min-h-[120px]"
         />
       </div>
 
       <div>
-        <Label className="mb-2 block">SNSリンク</Label>
+        <Label className="mb-2 block">{t("users.edit.snsLinks")}</Label>
         <div className="space-y-3">
           <div className="relative">
             <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
@@ -190,17 +192,17 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({
 
       {phone && (
         <div>
-          <Label className="mb-2 block">電話番号</Label>
+          <Label className="mb-2 block">{t("users.edit.phoneNumber")}</Label>
           <span className="text-body-lg mb-2 block">{phone}</span>
           <p className="text-body-sm text-caption">
-            電話番号は、予約時の緊急連絡先として案内人に共有されます。一般には公開されません。
+            {t("users.edit.phoneNumberNote")}
           </p>
         </div>
       )}
 
       <div className="w-[345px] mx-auto">
         <Button type="submit" variant="primary" className="w-full h-[56px]" disabled={updating}>
-          {updating ? "保存中..." : "保存"}
+          {updating ? t("users.edit.saving") : t("users.edit.save")}
         </Button>
       </div>
     </form>

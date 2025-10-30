@@ -7,14 +7,17 @@ import {
 } from "@/components/ui/empty";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
-import { getCurrentRegionName, currentCommunityConfig } from "@/lib/communities/metadata";
+import { getCurrentRegionName, currentCommunityConfig, getCurrentRegionKey } from "@/lib/communities/metadata";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 type PortfolioEmptyStateProps = {
   isOwner: boolean;
 };
 
 export const PortfolioEmptyState = ({ isOwner }: PortfolioEmptyStateProps) => {
+  const t = useTranslations();
+  
   return (
     <Empty className="mt-8">
       <EmptyHeader>
@@ -23,15 +26,15 @@ export const PortfolioEmptyState = ({ isOwner }: PortfolioEmptyStateProps) => {
         </EmptyMedia>
         <EmptyDescription>
           {isOwner
-            ? `${getCurrentRegionName()}の素敵な人との\n関わりを探してみましょう`
-            : "体験に参加すると、タイムラインが作成されます"}
+            ? t("users.portfolio.emptyStateOwner", { regionName: t(getCurrentRegionKey()) })
+            : t("users.portfolio.emptyStateNonOwner")}
         </EmptyDescription>
       </EmptyHeader>
       {isOwner && (
         <EmptyContent>
           <Button asChild variant="primary" size="lg" className="px-16">
             <Link href={currentCommunityConfig.rootPath ?? "/"}>
-              関わりを探す
+              {t("users.portfolio.searchEngagements")}
             </Link>
           </Button>
         </EmptyContent>

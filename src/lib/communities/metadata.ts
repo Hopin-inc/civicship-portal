@@ -10,7 +10,8 @@ export type FeaturesType =
   | "prefectures"
   | "credentials"
   | "justDaoIt"
-  | "quests";
+  | "quests"
+  | "languageSwitcher";
 
 /**
  * コミュニティの規約・文書の定義
@@ -140,41 +141,41 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     squareLogoPath: "/communities/kibotcha/logo-square.jpg",
     ogImagePath:
       "https://storage.googleapis.com/prod-civicship-storage-public/asset/kibotcha/ogp.jpg",
-    enableFeatures: ["points", "justDaoIt"],
+    enableFeatures: ["points", "justDaoIt", "languageSwitcher"],
     rootPath: "/users/me",
     adminRootPath: "/admin/wallet",
     documents: [
       {
         id: "bylaws",
-        title: "定款 (PDF)",
+        title: "users.documents.bylaws",
         path: "/communities/kibotcha/bylaws.pdf",
         type: "external",
         order: 1,
       },
       {
         id: "operating-regulations",
-        title: "運営規程 (PDF)",
+        title: "users.documents.operatingRegulations",
         path: "/communities/kibotcha/operating-regulations.pdf",
         type: "external",
         order: 2,
       },
       {
         id: "dao-meeting-rules",
-        title: "DAO総会規程 (PDF)",
+        title: "users.documents.daoMeetingRules",
         path: "/communities/kibotcha/dao-meeting-rules.pdf",
         type: "external",
         order: 3,
       },
       {
         id: "token-regulations",
-        title: "トークン規程 (PDF)",
+        title: "users.documents.tokenRegulations",
         path: "/communities/kibotcha/token-regulations.pdf",
         type: "external",
         order: 4,
       },
       {
         id: "whitepaper",
-        title: "ホワイトペーパー (PDF)",
+        title: "users.documents.whitepaper",
         path: "/communities/kibotcha/whitepaper.pdf",
         type: "external",
         order: 5,
@@ -225,50 +226,50 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     logoPath: "/communities/izu/logo.jpg",
     squareLogoPath: "/communities/izu/logo-square.jpg",
     ogImagePath: "https://storage.googleapis.com/prod-civicship-storage-public/asset/izu/ogp.png",
-    enableFeatures: ["points", "justDaoIt"],
+    enableFeatures: ["points", "justDaoIt", "languageSwitcher"],
     rootPath: "/users/me",
     adminRootPath: "/admin/wallet",
     commonDocumentOverrides: {
       privacy: {
         id: "privacy",
-        title: "プライバシーポリシー (PDF)",
-        path: "/communities/izu/privacy-policy.pdf",
+        title: "users.promise.privacyPolicy",
+        path: "/communities/izu/{locale}/privacy-policy.pdf",
         type: "external",
       },
     },
     documents: [
       {
         id: "bylaws",
-        title: "定款 (PDF)",
-        path: "/communities/izu/bylaws.pdf",
+        title: "users.documents.bylaws",
+        path: "/communities/izu/{locale}/bylaws.pdf",
         type: "external",
         order: 1,
       },
       {
         id: "operating-regulations",
-        title: "運営規程 (PDF)",
-        path: "/communities/izu/operating-regulations.pdf",
+        title: "users.documents.operatingRegulations",
+        path: "/communities/izu/{locale}/operating-regulations.pdf",
         type: "external",
         order: 2,
       },
       {
         id: "dao-meeting-rules",
-        title: "DAO総会規程 (PDF)",
-        path: "/communities/izu/dao-meeting-rules.pdf",
+        title: "users.documents.daoMeetingRules",
+        path: "/communities/izu/{locale}/dao-meeting-rules.pdf",
         type: "external",
         order: 3,
       },
       {
         id: "token-regulations",
-        title: "トークン規程 (PDF)",
-        path: "/communities/izu/token-regulations.pdf",
+        title: "users.documents.tokenRegulations",
+        path: "/communities/izu/{locale}/token-regulations.pdf",
         type: "external",
         order: 4,
       },
       {
         id: "whitepaper",
-        title: "ホワイトペーパー (PDF)",
-        path: "/communities/izu/whitepaper.pdf",
+        title: "users.documents.whitepaper",
+        path: "/communities/izu/{locale}/whitepaper.pdf",
         type: "external",
         order: 5,
       },
@@ -307,6 +308,13 @@ export function getCurrentRegionName(): string {
   if (COMMUNITY_ID === "kibotcha") return "東松島";
   if (COMMUNITY_ID === "dais") return "四国";
   return "地域";
+}
+
+export function getCurrentRegionKey(): string {
+  if (COMMUNITY_ID === "neo88") return "common.regions.shikoku";
+  if (COMMUNITY_ID === "kibotcha") return "common.regions.higashimatsushima";
+  if (COMMUNITY_ID === "dais") return "common.regions.shikoku";
+  return "common.regions.default";
 }
 
 // 現在のコミュニティの設定

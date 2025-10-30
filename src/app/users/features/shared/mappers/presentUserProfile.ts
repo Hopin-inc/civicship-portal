@@ -2,7 +2,6 @@ import { GqlTicketStatus, GqlUser } from "@/types/graphql";
 import { UserProfileViewModel } from "@/app/users/features/profile/types";
 import { AppPortfolio } from "@/app/users/features/shared/types";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { prefectureLabels } from "@/shared/prefectures/constants";
 
 export function presentUserProfile(
   gqlUser: GqlUser | null,
@@ -37,9 +36,7 @@ export function presentUserProfile(
     name: gqlUser?.name ?? "",
     bio: gqlUser?.bio ?? undefined,
     imageUrl: gqlUser?.image ?? undefined,
-    currentPrefecture: gqlUser?.currentPrefecture
-      ? prefectureLabels[gqlUser?.currentPrefecture]
-      : undefined,
+    currentPrefecture: gqlUser?.currentPrefecture ?? undefined,
     socialUrl: {
       x: gqlUser?.urlX ?? null,
       instagram: gqlUser?.urlInstagram ?? null,

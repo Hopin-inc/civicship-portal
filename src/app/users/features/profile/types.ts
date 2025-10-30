@@ -1,5 +1,5 @@
 import { AppPortfolio } from "@/app/users/features/shared/types";
-import { GqlOpportunityCategory, GqlOpportunitySlot } from "@/types/graphql";
+import { GqlCurrentPrefecture, GqlOpportunityCategory, GqlOpportunitySlot } from "@/types/graphql";
 
 /**
  * ユーザープロフィール画面用のViewModel
@@ -17,7 +17,7 @@ export type UserProfileViewModel = {
   name: string;
   bio?: string;
   imageUrl?: string;
-  currentPrefecture?: string;
+  currentPrefecture?: GqlCurrentPrefecture;
 
   socialUrl: {
     x: string | null;

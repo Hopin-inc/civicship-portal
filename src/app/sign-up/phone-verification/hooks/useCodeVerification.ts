@@ -12,6 +12,7 @@ import {
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { RawURIComponent } from "@/utils/path";
 import { logger } from "@/lib/logging";
+import { useTranslations } from "next-intl";
 
 interface CodeVerificationResult {
   success: boolean;
@@ -28,6 +29,7 @@ export function useCodeVerification(
   nextParam: string,
   updateAuthState: () => Promise<any>,
 ) {
+  const t = useTranslations();
   const [isVerifying, setIsVerifying] = useState(false);
 
   const [identityCheckPhoneUser] = useMutation<
@@ -46,7 +48,7 @@ export function useCodeVerification(
         return {
           success: false,
           error: {
-            message: "認証処理中です。しばらくお待ちください。",
+            message: t("phoneVerification.verification.processing"),
             type: "already-verifying",
           },
         };
@@ -67,7 +69,7 @@ export function useCodeVerification(
           return {
             success: false,
             error: {
-              message: "認証コードが無効です",
+              message: t("phoneVerification.verification.invalidCode"),
               type: "invalid-code",
             },
           };
@@ -86,7 +88,7 @@ export function useCodeVerification(
           return {
             success: false,
             error: {
-              message: "認証ステータスの取得に失敗しました。再試行してください。",
+              message: t("phoneVerification.verification.statusFailed"),
               type: "status-fetch-failed",
             },
           };
@@ -98,7 +100,7 @@ export function useCodeVerification(
             return {
               success: true,
               redirectPath: `/sign-up${nextParam}`,
-              message: "電話番号認証が完了しました",
+              message: t("phoneVerification.verification.completed"),
             };
 
           case GqlPhoneUserStatus.ExistingSameCommunity:
@@ -111,7 +113,7 @@ export function useCodeVerification(
             return {
               success: true,
               redirectPath: homeRedirectPath || "/",
-              message: "ログインしました",
+              message: t("phoneVerification.login.success"),
             };
 
           case GqlPhoneUserStatus.ExistingDifferentCommunity:
@@ -124,7 +126,7 @@ export function useCodeVerification(
             return {
               success: true,
               redirectPath: crossCommunityRedirectPath || "/",
-              message: "メンバーシップが追加されました",
+              message: t("phoneVerification.membership.added"),
             };
 
           default:
@@ -132,7 +134,7 @@ export function useCodeVerification(
             return {
               success: false,
               error: {
-                message: "認証処理でエラーが発生しました",
+                message: t("phoneVerification.errors.generic"),
                 type: "unknown-status",
               },
             };
@@ -145,15 +147,16 @@ export function useCodeVerification(
         return {
           success: false,
           error: {
-            message: "電話番号からやり直して下さい",
+            message: t("phoneVerification.actions.restartFromPhone"),
             type: "verification-failed",
           },
         };
-      } finally {
+      }finally {
         setIsVerifying(false);
       }
     },
     [
+      t,
       phoneAuth,
       identityCheckPhoneUser,
       authRedirectService,

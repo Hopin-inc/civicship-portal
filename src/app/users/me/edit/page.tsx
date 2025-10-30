@@ -5,15 +5,17 @@ import { useProfileEdit, UserProfileEdit } from "@/app/users/features/edit";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
+import { useTranslations } from "next-intl";
 
 export default function ProfileEditPage() {
+  const t = useTranslations();
   const headerConfig = useMemo(
     () => ({
-      title: "プロフィール編集",
+      title: t("users.edit.pageTitle"),
       showLogo: false,
       showBackButton: true,
     }),
-    [],
+    [t],
   );
   useHeaderConfig(headerConfig);
 
@@ -40,7 +42,7 @@ export default function ProfileEditPage() {
   }
 
   if (error) {
-    return <ErrorState title="プロフィールを読み込めませんでした" />;
+    return <ErrorState title={t("users.edit.errorTitle")} />;
   }
 
   return (

@@ -12,6 +12,10 @@
     "lint:graphql": "eslint 'src/**/*.{ts,tsx}' --no-eslintrc --config .eslintrc.json",
     "format": "prettier --write --ignore-path .gitignore './**/*.{js,jsx,ts,tsx,json}'",
     "gql:generate": "export NODE_TLS_REJECT_UNAUTHORIZED=0 && graphql-codegen --config codegen.yaml",
+    "i18n:validate": "tsx scripts/validate-i18n-json.ts",
+    "i18n:check": "tsx scripts/check-i18n-keys.ts",
+    "i18n:generate": "tsx scripts/generate-i18n-types.ts",
+    "i18n:all": "pnpm i18n:validate && pnpm i18n:generate && pnpm i18n:check",
     "test": "vitest --project unit",
     "test:watch": "vitest --project unit --watch",
     "test:coverage": "vitest --project unit --coverage",
@@ -69,6 +73,7 @@
     "micromatch": "^4.0.8",
     "next": "15.5.2",
     "next-client-cookies": "^2.1.0",
+    "next-intl": "^4.4.0",
     "next-themes": "^0.3.0",
     "radix-ui": "^1.4.3",
     "react": "^18.3.1",
@@ -139,6 +144,7 @@
     "sass": "^1.89.0",
     "storybook": "^9.0.17",
     "tailwindcss": "^3.4.17",
+    "tsx": "^4.20.6",
     "typescript": "^5.8.3",
     "vitest": "^3.2.4"
   }
