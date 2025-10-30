@@ -213,6 +213,95 @@ export function LoginView() {
 
 **注意:** 生のHTMLを直接注入するのではなく、`t.rich()`を使用して安全にリッチテキストを変換してください。
 
+## ベストプラクティス
+
+### 動的な翻訳キーの構築を避ける
+
+テンプレートリテラルで動的に翻訳キーを構築すると、型安全性が失われ、実行時エラーのリスクが高まります。代わりに、型付きマッピングとヘルパー関数を使用してください。
+
+**悪い例 ❌**
+```tsx
+// 動的キー構築は型安全性がなく、実行時エラーの可能性がある
+t(`wallets.action.${actionType}.${isReceive ? 'from' : 'to'}`, { name })
+```
+
+**良い例 ✅**
+```tsx
+// src/utils/i18n.ts
+const WALLET_ACTION_KEY_MAP = {
+  donation: {
+    to: "wallets.action.donation.to",
+    from: "wallets.action.donation.from",
+  },
+  grant: {
+    to: "wallets.action.grant.to",
+    from: "wallets.action.grant.from",
+  },
+} as const;
+
+export function getWalletActionKey(
+  actionType: keyof typeof WALLET_ACTION_KEY_MAP,
+  isReceive: boolean
+): TranslationKey {
+  const direction = isReceive ? "from" : "to";
+  return WALLET_ACTION_KEY_MAP[actionType][direction] as TranslationKey;
+}
+
+// コンポーネント内
+import { getWalletActionKey } from "@/utils/i18n";
+t(getWalletActionKey(actionType, isReceive), { name })
+```
+
+**利点:**
+- コンパイル時の型チェック
+- 存在しないキーへの参照を防止
+- IDEの自動補完サポート
+- リファクタリングが容易
+
+**注意:** ヘルパー関数を使用すると、`pnpm i18n:check`スクリプトがキーを「未使用」として報告する場合がありますが、これは静的解析の制限によるものです。
+
+### 日付フォーマットの共通化
+
+日付フォーマットロジックは重複を避けるため、共有ユーティリティまたはカスタムフックを使用してください。
+
+**サーバーコンポーネント用:**
+```tsx
+import { formatDateTime } from "@/utils/i18n";
+
+const formattedDate = formatDateTime(isoString, locale);
+```
+
+**クライアントコンポーネント用:**
+```tsx
+import { useLocaleDateTimeFormat } from "@/utils/i18n";
+
+function MyComponent() {
+  const formatDateTime = useLocaleDateTimeFormat();
+  return <span>{formatDateTime(transaction.createdAt)}</span>;
+}
+```
+
+### ロケール固有のパスの管理
+
+ドキュメントパスなどのロケール固有のURLには、プレースホルダー `{locale}` を使用し、`resolveLocalePath` ヘルパーで解決してください。
+
+**設定ファイル:**
+```tsx
+{
+  path: "/communities/izu/{locale}/privacy-policy.pdf",
+  type: "external",
+}
+```
+
+**コンポーネント内:**
+```tsx
+import { resolveLocalePath } from "@/utils/i18n";
+
+const href = document.path.includes("{locale}")
+  ? resolveLocalePath(document.path, locale)
+  : document.path;
+```
+
 ## チェックリスト
 
 新しい翻訳を追加する際は、以下を確認してください：

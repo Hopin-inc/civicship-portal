@@ -7,7 +7,8 @@ import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { GqlTransactionReason } from "@/types/graphql";
 import { truncateText } from "@/utils/stringUtils";
-import { useTranslations, useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
+import { useLocaleDateTimeFormat } from "@/utils/i18n";
 
 interface TransactionItemProps {
   transaction: AppTransaction;
@@ -16,23 +17,8 @@ interface TransactionItemProps {
 
 const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, image }) => {
   const t = useTranslations();
-  const locale = useLocale();
+  const formatDateTime = useLocaleDateTimeFormat();
   const isPositive = transaction.transferPoints > 0;
-  
-  const formatDateTime = (isoString: string | null | undefined): string => {
-    if (!isoString) return t("transactions.date.unknown");
-
-    const date = new Date(isoString);
-    if (isNaN(date.getTime())) return t("transactions.date.unknown");
-
-    return new Intl.DateTimeFormat(locale, {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(date);
-  };
 
   const getDisplayText = () => {
     const descData = transaction.descriptionData;

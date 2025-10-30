@@ -5,7 +5,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { GqlTransaction, GqlTransactionReason } from "@/types/graphql";
 import { PLACEHOLDER_IMAGE } from "@/utils";
-import { useTranslations, useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
+import { useLocaleDateTimeFormat } from "@/utils/i18n";
 
 interface TransactionCardProps {
   transaction: GqlTransaction;
@@ -82,27 +83,11 @@ const getTransactionInfo = (transaction: GqlTransaction, didPendingText: string)
 
 export const TransactionCard = ({ transaction, image }: TransactionCardProps) => {
     const t = useTranslations();
-    const locale = useLocale();
+    const formatDateTime = useLocaleDateTimeFormat();
     const info = getTransactionInfo(transaction, t("transactions.did.pending"));
     const { displayText, to } = useFormatTransactionDescription(info.reason, info.from, info.to);
     const statusLabelElement = useStatusLabel(info.reason);
     const hasDestination = to && info.reason !== GqlTransactionReason.PointIssued && info.reason !== GqlTransactionReason.Onboarding;
-    
-    const formatDateTime = (isoString: string | null | undefined): string => {
-      if (!isoString) return t("transactions.date.unknown");
-      
-      const date = new Date(isoString);
-      if (isNaN(date.getTime())) return t("transactions.date.unknown");
-      
-      const dtf = new Intl.DateTimeFormat(locale, {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-      });
-      return dtf.format(date);
-    };
     
     return (
         <Card className="px-4 py-4 bg-white">

@@ -5,6 +5,7 @@ import { formatDateTime } from "@/utils/date";
 import React from "react";
 import { truncateText } from "@/utils/stringUtils";
 import { useTranslations } from "next-intl";
+import { getWalletActionKey } from "@/utils/i18n";
 
 interface Props {
   otherUser: GqlUser | undefined | null;
@@ -16,6 +17,7 @@ interface Props {
   sign?: string;
   pointColor?: string;
   didValue?: string;
+  isDidPending?: boolean;
   createdAt?: Date | null | undefined;
   showLabel?: boolean;
   showPoint?: boolean;
@@ -36,6 +38,7 @@ const UserInfoCard = ({
   sign,
   pointColor,
   didValue,
+  isDidPending,
   createdAt,
   showLabel = true,
   showPoint = true,
@@ -46,7 +49,13 @@ const UserInfoCard = ({
   comment,
 }: Props) => {
   const t = useTranslations();
-  const showDidLine = showDid && !!didValue;
+  const showDidLine = showDid && (!!didValue || isDidPending);
+  
+  const displayDid = isDidPending
+    ? t("wallets.shared.transfer.didPending")
+    : didValue
+    ? truncateText(didValue, 20, "middle")
+    : "";
   
   const useTranslatedLabel = actionType && otherName !== undefined && isReceive !== undefined;
   
@@ -62,7 +71,7 @@ const UserInfoCard = ({
           <span className="flex items-center truncate whitespace-nowrap overflow-hidden">
           {showLabel
             ? useTranslatedLabel
-              ? t(`wallets.action.${actionType}.${isReceive ? 'from' : 'to'}`, { name: otherName })
+              ? t(getWalletActionKey(actionType!, isReceive!), { name: otherName })
               : typeof label === "string"
                 ? label
                 : label && (
@@ -83,7 +92,7 @@ const UserInfoCard = ({
             </span>
           )}
         </div>
-        {showDid && didValue && <span className="text-label-xs text-caption py-2">{truncateText(didValue, 20, "middle")}</span>}
+        {showDidLine && <span className="text-label-xs text-caption py-2">{displayDid}</span>}
         {comment && (
           <span className="text-label-xs text-caption bg-background-hover leading-relaxed block p-2 rounded-sm">
             {comment}

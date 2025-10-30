@@ -6,7 +6,6 @@ import {
   GqlWalletType,
   Maybe,
 } from "@/types/graphql";
-import { truncateText } from "@/utils/stringUtils";
 
 export function presentTransaction({
   transaction,
@@ -139,6 +138,10 @@ function buildPresentedTransaction({
     (req) => req.status === GqlDidIssuanceStatus.Completed,
   )?.didValue;
 
+  const isDidPending = didIssuanceRequests.some(
+    (req) => req.status === GqlDidIssuanceStatus.Pending,
+  );
+
   return {
     isReceive,
     otherUser,
@@ -147,7 +150,8 @@ function buildPresentedTransaction({
     point,
     sign,
     pointColor,
-    didValue: truncateText(didValue, 20, "middle"),
+    didValue,
+    isDidPending,
     createdAt: transaction.createdAt,
     comment: transaction.comment,
   };

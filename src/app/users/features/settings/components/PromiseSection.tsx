@@ -4,6 +4,7 @@ import { FileIcon } from "lucide-react";
 import Link from "next/link";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 import { useTranslations, useLocale } from "next-intl";
+import { resolveLocalePath } from "@/utils/i18n";
 
 export default function PromiseSection() {
   const defaultCommonDocuments = [
@@ -54,9 +55,8 @@ function DocumentLink({ document }: DocumentLinkProps) {
   const locale = useLocale();
   const displayTitle = t(document.title);
   
-  const baseLocale = locale.split("-")[0] as "ja" | "en";
-  const href = document.type === "external" && document.path.match(/\/communities\/[^/]+\/(ja|en)\//)
-    ? document.path.replace(/(\/communities\/[^/]+)\/(ja|en)\//, `$1/${baseLocale}/`)
+  const href = document.path.includes("{locale}")
+    ? resolveLocalePath(document.path, locale)
     : document.path;
   
   const content = (

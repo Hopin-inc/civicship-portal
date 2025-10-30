@@ -3,8 +3,27 @@
 /**
  * Script to detect unused and missing translation keys
  * 
+ * This script analyzes translation key usage across the codebase and reports:
+ * - Used keys: Translation keys found in source code
+ * - Unused keys: Keys defined in message files but not used in code
+ * - Missing keys: Keys used in code but not defined in message files
+ * - Inconsistent keys: Keys that exist in one locale but not others
+ * 
+ * Detection patterns:
+ * - Matches t('key') and t("key") with single/double quotes
+ * - Matches t(`key`) with template literals (without interpolation)
+ * - Matches t.rich('key') and t.rich("key") for rich text translations
+ * - Filters keys to only include valid translation keys (containing dots)
+ * 
+ * Limitations:
+ * - Cannot detect dynamically constructed keys (e.g., t(`prefix.${variable}`))
+ * - Cannot detect keys returned from helper functions or mapping objects
+ * - May report false positives for unused keys when keys are used via helpers
+ * - Only scans TypeScript/TSX files in src/ directory
+ * 
  * Usage:
  *   pnpm tsx scripts/check-i18n-keys.ts
+ *   pnpm i18n:check
  */
 
 import fs from 'fs';
