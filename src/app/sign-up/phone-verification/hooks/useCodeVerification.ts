@@ -14,6 +14,7 @@ import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { RawURIComponent } from "@/utils/path";
 import { logger } from "@/lib/logging";
 import { handleNewUserSignup } from "./handleNewUserSignup";
+import { currentCommunityConfig } from "@/lib/communities/metadata";
 
 interface CodeVerificationResult {
   success: boolean;
@@ -97,13 +98,31 @@ export function useCodeVerification(
 
         switch (status) {
           case GqlPhoneUserStatus.NewUser:
-            return await handleNewUserSignup({
+            const signupResult = await handleNewUserSignup({
               createUser,
               updateAuthState,
               setAuthState,
               phoneUid,
-              nextParam,
             });
+
+            if (!signupResult.success) {
+              return {
+                success: false,
+                error: signupResult.error,
+              };
+            }
+
+            const defaultPath = (currentCommunityConfig.rootPath || "/") as RawURIComponent;
+            const newUserRedirectPath = authRedirectService.getRedirectPath(
+              defaultPath,
+              nextParam as RawURIComponent,
+            );
+
+            return {
+              success: true,
+              redirectPath: newUserRedirectPath || defaultPath,
+              message: "アカウントを作成しました",
+            };
 
           case GqlPhoneUserStatus.ExistingSameCommunity:
             await updateAuthState();
