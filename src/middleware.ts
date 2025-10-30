@@ -12,15 +12,15 @@ const featureToRoutesMap: Partial<Record<FeaturesType, string[]>> = {
 };
 
 export function middleware(request: NextRequest) {
-  const isDev = process.env.NODE_ENV !== "production";
-  const pathname = request.nextUrl.pathname;
+  const nextUrl = request.nextUrl;
+  const pathname = nextUrl.pathname;
+  const searchParams = nextUrl.searchParams;
   const enabledFeatures = currentCommunityConfig.enableFeatures || [];
   const rootPath = currentCommunityConfig.rootPath || "/";
 
   // liff.state がある場合はrootPathへのリダイレクトをスキップ（LIFFのルーティングバグ対策）
-  const hasLiffState = request.nextUrl.searchParams.get("liff.state");
-
   // ルートページへのアクセスを処理（liff.stateがない場合、またはliff.stateが/の場合のみrootPathにリダイレクト）
+  const hasLiffState = searchParams.get("liff.state");
   if (pathname === "/" && rootPath !== "/" && (!hasLiffState || hasLiffState === "/")) {
     return NextResponse.redirect(new URL(rootPath, request.url));
   }
@@ -40,6 +40,15 @@ export function middleware(request: NextRequest) {
     }
   }
 
+  return setCsp();
+}
+
+export const config = {
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+};
+
+function setCsp() {
+  const isDev = process.env.NODE_ENV !== "production";
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
 
   const scriptSrc = [
@@ -111,7 +120,3 @@ export function middleware(request: NextRequest) {
 
   return res;
 }
-
-export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
-};
