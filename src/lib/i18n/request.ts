@@ -1,7 +1,9 @@
 import { getRequestConfig } from 'next-intl/server';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { defaultLocale, locales, type Locale } from './config';
 import { nestMessages } from './nestMessages';
+import { detectPreferredLocale } from './languageDetection';
+import { currentCommunityConfig } from '@/lib/communities/metadata';
 
 /**
  * メッセージをマージ（メモ化付き）
@@ -35,10 +37,21 @@ export default getRequestConfig(async ({ requestLocale }) => {
   const cookieStore = await cookies();
   const savedLocale = cookieStore.get('language')?.value;
   
-  const locale: Locale = 
-    savedLocale && locales.includes(savedLocale as Locale)
-      ? (savedLocale as Locale)
-      : defaultLocale;
+  let locale: Locale;
+  
+  if (savedLocale && locales.includes(savedLocale as Locale)) {
+    locale = savedLocale as Locale;
+  } else {
+    const hasLanguageSwitcher = currentCommunityConfig.enableFeatures?.includes('languageSwitcher');
+    
+    if (hasLanguageSwitcher) {
+      const headersList = await headers();
+      const acceptLanguage = headersList.get('accept-language');
+      locale = detectPreferredLocale(acceptLanguage, locales, defaultLocale);
+    } else {
+      locale = defaultLocale;
+    }
+  }
 
   const namespaces = ['common', 'navigation', 'wallets', 'transactions', 'users', 'auth', 'phoneVerification'];
   const messages = await loadMessages(locale, namespaces);
