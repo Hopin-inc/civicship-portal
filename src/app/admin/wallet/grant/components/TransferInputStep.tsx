@@ -47,7 +47,6 @@ function TransferInputStep({
   const t = useTranslations();
   
   const finalTitle = title ?? t("adminWallet.grant.title");
-  const finalRecipientLabel = recipientLabel ?? t("adminWallet.grant.recipientLabel");
   const finalSubmitLabel = submitLabel ?? t("adminWallet.grant.submit");
   const finalBackLabel = backLabel ?? t("adminWallet.grant.back");
   const headerConfig: HeaderConfig = useMemo(
@@ -61,17 +60,11 @@ function TransferInputStep({
   useHeaderConfig(headerConfig);
   const didValue = user.didIssuanceRequests?.find(req => req?.status === GqlDidIssuanceStatus.Completed)?.didValue;
 
-  const recipientDisplay = recipientKey
-    ? t.rich(recipientKey, {
-        b: (chunks) => <span className="text-label-sm font-bold">{chunks}</span>,
-        name: user.name,
-      })
-    : (
-        <>
-          <span className="text-label-sm font-bold">{user.name}</span>
-          <span className="text-label-xs font-bold">{finalRecipientLabel}</span>
-        </>
-      );
+  const finalRecipientKey = recipientKey ?? "adminWallet.grant.recipientRich";
+  const recipientDisplay = t.rich(finalRecipientKey, {
+    b: (chunks) => <span className="text-label-sm font-bold">{chunks}</span>,
+    name: user.name ?? t("adminWallet.common.notSet"),
+  });
 
   const [amount, setAmount] = useState<number | null>(null);
   const [displayValue, setDisplayValue] = useState<string>("");

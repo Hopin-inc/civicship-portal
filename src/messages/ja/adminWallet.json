@@ -7,6 +7,7 @@
   "adminWallet.grant.selectRecipient": "支給相手を選ぶ",
   "adminWallet.grant.title": "ポイントを支給する",
   "adminWallet.grant.recipientLabel": "に支給",
+  "adminWallet.grant.recipientRich": "<b>{name}</b>に支給",
   "adminWallet.grant.submit": "支給する",
   "adminWallet.grant.back": "支給先を選び直す",
   "adminWallet.grant.success": "+{amount} pt を渡しました",
