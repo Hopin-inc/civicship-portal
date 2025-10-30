@@ -21,7 +21,6 @@ interface Props {
   onBack: () => void;
   onSubmit: (amount: number, comment?: string) => void;
   title?: string;
-  recipientLabel?: string;
   recipientKey?: string;
   submitLabel?: string;
   backLabel?: string;
@@ -38,7 +37,6 @@ function TransferInputStep({
   onBack,
   onSubmit,
   title,
-  recipientLabel,
   recipientKey,
   submitLabel,
   backLabel,
@@ -62,7 +60,7 @@ function TransferInputStep({
 
   const finalRecipientKey = recipientKey ?? "adminWallet.grant.recipientRich";
   const recipientDisplay = t.rich(finalRecipientKey, {
-    b: (chunks) => <span className="text-label-sm font-bold">{chunks}</span>,
+    b: (chunks) => <strong className="text-label-sm font-bold">{chunks}</strong>,
     name: user.name ?? t("adminWallet.common.notSet"),
   });
 

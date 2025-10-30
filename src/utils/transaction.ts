@@ -67,6 +67,8 @@ const formatTransactionDescription = (
   if (mapping.specialName) {
     return {
       name: mapping.specialName,
+      // isSpecialCase: true indicates system-level transactions that don't follow the typical "from/to" pattern
+      // (e.g., point issuance, onboarding bonus)
       isSpecialCase: true,
     };
   }

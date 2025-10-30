@@ -53,15 +53,9 @@ export function getTransactionActionKey(
 }
 
 export function formatDateTime(
-  isoString: string | null | undefined,
+  date: Date,
   locale: string,
-  unknownKey: string = "transactions.date.unknown"
 ): string {
-  if (!isoString) return unknownKey;
-
-  const date = new Date(isoString);
-  if (isNaN(date.getTime())) return unknownKey;
-
   const dtf = new Intl.DateTimeFormat(locale, {
     year: "numeric",
     month: "2-digit",
@@ -86,7 +80,7 @@ export function useLocaleDateTimeFormat(): (
       const date = new Date(isoString);
       if (isNaN(date.getTime())) return unknownText;
 
-      return formatDateTime(isoString, locale, unknownText);
+      return formatDateTime(date, locale);
     },
     [locale, t]
   );
