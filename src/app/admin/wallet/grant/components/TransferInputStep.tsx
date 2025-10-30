@@ -37,21 +37,26 @@ function TransferInputStep({
   isLoading,
   onBack,
   onSubmit,
-  title = "ポイントを支給する",
-  recipientLabel = "に支給",
+  title,
+  recipientLabel,
   recipientKey,
-  submitLabel = "支給する",
-  backLabel = "支給先を選び直す",
+  submitLabel,
+  backLabel,
   amountLabel,
 }: Props) {
   const t = useTranslations();
+  
+  const finalTitle = title ?? t("adminWallet.grant.title");
+  const finalRecipientLabel = recipientLabel ?? t("adminWallet.grant.recipientLabel");
+  const finalSubmitLabel = submitLabel ?? t("adminWallet.grant.submit");
+  const finalBackLabel = backLabel ?? t("adminWallet.grant.back");
   const headerConfig: HeaderConfig = useMemo(
     () => ({
-      title,
+      title: finalTitle,
       showLogo: true,
       showBackButton: false,
     }),
-    [title],
+    [finalTitle],
   );
   useHeaderConfig(headerConfig);
   const didValue = user.didIssuanceRequests?.find(req => req?.status === GqlDidIssuanceStatus.Completed)?.didValue;
@@ -64,7 +69,7 @@ function TransferInputStep({
     : (
         <>
           <span className="text-label-sm font-bold">{user.name}</span>
-          <span className="text-label-xs font-bold">{recipientLabel}</span>
+          <span className="text-label-xs font-bold">{finalRecipientLabel}</span>
         </>
       );
 
@@ -106,7 +111,7 @@ function TransferInputStep({
           <Card className="items-center gap-3 w-full border p-4">
             <div className="flex items-center gap-3 w-full">
               <Avatar className="w-10 h-10 rounded-full border object-cover">
-                <AvatarImage src={user.image || ""} alt={user.name ?? "要確認"} />
+                <AvatarImage src={user.image || ""} alt={user.name ?? t("adminWallet.common.toConfirm")} />
                 <AvatarFallback>{user.name?.[0] ?? "U"}</AvatarFallback>
               </Avatar>
               <div className="flex flex-col gap-1">
@@ -167,10 +172,10 @@ function TransferInputStep({
               }
               className="w-full"
             >
-              {submitLabel}
+              {finalSubmitLabel}
             </Button>
             <Button variant="text" size="sm" onClick={onBack} className="w-full">
-              {backLabel}
+              {finalBackLabel}
             </Button>
           </div>
         </div>
