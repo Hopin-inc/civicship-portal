@@ -29,7 +29,7 @@ const SearchBox = ({ location, from, to, guests, q, type, ticket, points }: Sear
     const label = location && getPrefectureKey(location) 
       ? t(getPrefectureKey(location))
       : t("common.regions.shikoku");
-    return isDefault ? label : `${label}の体験`;
+    return isDefault ? label : t("search.experienceIn", { location: label });
   };
 
   const getKeywordText = (keyword?: string, location?: string): string => {
@@ -37,16 +37,16 @@ const SearchBox = ({ location, from, to, guests, q, type, ticket, points }: Sear
       return keyword;
     }
     if (location) {
-      return getLocationText(location, false); // 例: "香川県の体験"
+      return getLocationText(location, false);
     }
-    return "すべての体験";
+    return t("search.allExperiences");
   };
 
   const formatDateRange = () => {
     const fromDate = from ? new Date(from) : null;
     const toDate = to ? new Date(to) : null;
 
-    if (!fromDate) return "日付未定";
+    if (!fromDate) return t("search.dateUndecided");
     if (!toDate) {
       return format(fromDate, "M/d", { locale: ja });
     }
@@ -54,7 +54,7 @@ const SearchBox = ({ location, from, to, guests, q, type, ticket, points }: Sear
   };
 
   const getGuestsText = () => {
-    if (!guests) return "人数未定";
+    if (!guests) return t("search.guestsUndecided");
     return `${guests}人`;
   };
 
@@ -101,7 +101,7 @@ const SearchBox = ({ location, from, to, guests, q, type, ticket, points }: Sear
         </div>
         {!location && !from && !to && !guests && !q && !points && !ticket ? (
           <div className="flex items-center justify-center w-full h-full">
-            <span className="text-body-sm text-caption font-medium">タップして検索する</span>
+            <span className="text-body-sm text-caption font-medium">{t("search.tapToSearch")}</span>
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center w-full h-full">

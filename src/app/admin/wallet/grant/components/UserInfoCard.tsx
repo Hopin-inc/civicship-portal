@@ -80,9 +80,7 @@ const UserInfoCard = ({
                       <span className="text-xs flex-shrink-0 text-label-xs font-bold">{label.smallText}</span>
                     </span>
                   )
-            : otherUser?.name
-              ? `{{ ${otherUser.name} }}`
-              : ""}
+            : otherUser?.name ?? ""}
           </span>
           {/* 右: 金額 */}
           {showPoint && point !== undefined && (

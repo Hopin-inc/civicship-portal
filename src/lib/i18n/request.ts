@@ -53,7 +53,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
     }
   }
 
-  const namespaces = ['common', 'navigation', 'wallets', 'transactions', 'users', 'auth', 'phoneVerification'];
+  const namespaces = ['common', 'navigation', 'wallets', 'transactions', 'users', 'auth', 'phoneVerification', 'search'];
   const messages = await loadMessages(locale, namespaces);
 
   return {

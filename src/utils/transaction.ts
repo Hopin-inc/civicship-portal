@@ -5,7 +5,7 @@ import {
   GqlWallet,
   GqlWalletType,
 } from "@/types/graphql";
-import { AppTransaction } from "@/app/wallets/features/shared/type";
+import type { AppTransaction, TransactionDescriptionData } from "@/app/wallets/features/shared/type";
 import { currentCommunityConfig, getSquareLogoPath } from "@/lib/communities/metadata";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
@@ -25,13 +25,6 @@ export const getNameFromWallet = (wallet: GqlWallet | null | undefined): string 
       return "";
   }
 };
-
-interface TransactionDescriptionData {
-  actionType?: "donation" | "grant" | "payment" | "return" | "refund";
-  direction?: "to" | "from";
-  name: string;
-  isSpecialCase: boolean;
-}
 
 type TransactionActionMapping = {
   actionType?: "donation" | "grant" | "payment" | "return" | "refund";
