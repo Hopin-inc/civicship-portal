@@ -15,6 +15,7 @@ import { RawURIComponent } from "@/utils/path";
 import { logger } from "@/lib/logging";
 import { handleNewUserSignup } from "./handleNewUserSignup";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
+import { User } from "firebase/auth";
 
 interface CodeVerificationResult {
   success: boolean;
@@ -29,8 +30,8 @@ interface CodeVerificationResult {
 export function useCodeVerification(
   phoneAuth: { verifyPhoneCode: (verificationCode: string) => Promise<boolean> },
   nextParam: string,
-  updateAuthState: () => Promise<any>,
-  createUser: (name: string, prefecture: GqlCurrentPrefecture, phoneUid: string) => Promise<any>,
+  updateAuthState: () => Promise<GqlUser | null>,
+  createUser: (name: string, prefecture: GqlCurrentPrefecture, phoneUid: string) => Promise<User | null>,
 ) {
   const [isVerifying, setIsVerifying] = useState(false);
 

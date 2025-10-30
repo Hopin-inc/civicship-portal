@@ -1,11 +1,13 @@
-import { GqlCurrentPrefecture } from "@/types/graphql";
+import { GqlCurrentPrefecture, GqlUser } from "@/types/graphql";
 import { LiffService } from "@/lib/auth/service/liff-service";
 import { logger } from "@/lib/logging";
+import { User } from "firebase/auth";
+import { AuthState } from "@/types/auth";
 
 interface NewUserSignupParams {
-  createUser: (name: string, prefecture: GqlCurrentPrefecture, phoneUid: string) => Promise<any>;
-  updateAuthState: () => Promise<any>;
-  setAuthState: (partial: any) => void;
+  createUser: (name: string, prefecture: GqlCurrentPrefecture, phoneUid: string) => Promise<User | null>;
+  updateAuthState: () => Promise<GqlUser | null>;
+  setAuthState: (partial: Partial<AuthState>) => void;
   phoneUid: string;
 }
 
