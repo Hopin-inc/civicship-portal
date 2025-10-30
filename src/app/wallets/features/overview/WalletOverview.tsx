@@ -55,10 +55,10 @@ export function WalletOverview() {
           variant="secondary"
           size="sm"
           disabled={currentPoint <= 0}
-          className="w-[104px] h-[48px] flex items-center gap-1.5"
+          className="h-12 px-4"
         >
-          <Gift className="w-4 h-4" />
-          <span className="text-base">{t("wallets.overview.giveButton")}</span>
+          <Gift className="w-4 h-4 shrink-0" />
+          <span className="text-base whitespace-nowrap">{t("wallets.overview.giveButton")}</span>
         </Button>
       </div>
     </div>

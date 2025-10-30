@@ -121,20 +121,20 @@ export default function WalletPage() {
           onClick={handleNavigateToIssue}
           variant="secondary"
           size="sm"
-          className="w-[104px] h-[48px] flex items-center gap-1.5"
+          className="h-12 px-4"
         >
-          <Coins className="w-4 h-4" />
-          <span className="text-base">発行</span>
+          <Coins className="w-4 h-4 shrink-0" />
+          <span className="text-base whitespace-nowrap">発行</span>
         </Button>
         <Button
           disabled={currentUserRole !== GqlRole.Owner || currentPoint <= 0}
           onClick={handleNavigateToGrant}
           variant="secondary"
           size="sm"
-          className="w-[104px] h-[48px] flex items-center gap-1.5"
+          className="h-12 px-4"
         >
-          <Gift className="w-4 h-4" />
-          <span className="text-base">支給</span>
+          <Gift className="w-4 h-4 shrink-0" />
+          <span className="text-base whitespace-nowrap">支給</span>
         </Button>
       </div>
 
