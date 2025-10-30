@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import { Home, RefreshCcw } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 interface ErrorStateProps {
   title?: string;
@@ -11,9 +12,12 @@ interface ErrorStateProps {
 }
 
 export const ErrorState: React.FC<ErrorStateProps> = ({
-  title = "ページを読み込めませんでした",
+  title,
   refetchRef,
 }) => {
+  const t = useTranslations();
+  const displayTitle = title ?? t("common.errorState.defaultTitle");
+
   const handleRetry = () => {
     if (refetchRef?.current) {
       refetchRef.current();
@@ -30,11 +34,9 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
   return (
     <div className="flex items-center justify-center p-12">
       <div className="w-full max-w-mobile-l space-y-6 text-center">
-        <h1 className="text-left text-display-md font-bold">{title}</h1>
+        <h1 className="text-left text-display-md font-bold">{displayTitle}</h1>
         <p className="text-left text-body-sm text-muted-foreground">
-          以下のボタンから再読み込みをお試しください。
-          再試行しても改善しない場合は、時間をおいて再度アクセスするか、
-          トップページにお戻りください。
+          {t("common.errorState.description")}
         </p>
 
         <div className="mt-6">
@@ -45,14 +47,14 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
               variant="primary"
             >
               <RefreshCcw className="h-4 w-4" />
-              再度読み込み
+              {t("common.errorState.retryButton")}
             </Button>
           )}
 
           <Link href="/" passHref>
             <Button className="w-full flex justify-center" size="sm" variant="text">
               <Home className="h-4 w-4" />
-              トップに戻る
+              {t("common.errorState.homeButton")}
             </Button>
           </Link>
         </div>
