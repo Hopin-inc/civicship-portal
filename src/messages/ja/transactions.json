@@ -16,7 +16,7 @@
   "transactions.status.return": "返品先",
   "transactions.status.default": "移動先",
   "transactions.action.donation.to": "{name}さんにあげた",
-  "transactions.action.donation.from": "{name}さんからもらった",
+  "transactions.action.donation.from": "{name}さんがあげた",
   "transactions.action.grant.to": "{name}さんに支給",
   "transactions.action.grant.from": "{name}から支給",
   "transactions.action.payment.to": "{name}さんに支払い",
