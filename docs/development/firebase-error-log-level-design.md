@@ -4,6 +4,32 @@
 
 SESSION_EXPIRED エラーを含む Firebase Authentication 関連のエラーログレベルを調査し、適切なログレベルへの変更を設計しました。
 
+## 🎯 このPRの実装範囲
+
+このPRでは、以下のFirebase認証エラーのログレベル改善を実装しています：
+
+### 実装済みエラーコード
+1. `auth/network-request-failed` - ネットワーク接続失敗 → **WARN**
+2. `auth/user-token-expired` / `auth/id-token-expired` - トークン有効期限切れ → **INFO**
+3. `auth/invalid-credential` / `auth/user-disabled` - 認証情報無効 → **WARN**
+4. `auth/requires-recent-login` - 再認証が必要 → **INFO**
+5. `auth/invalid-verification-code` - 無効な認証コード → **INFO**
+6. `auth/too-many-requests` - レート制限 → **WARN**
+7. **`auth/code-expired` - 認証コードの有効期限切れ → WARN** ← 今回の主目的
+8. LIFF authentication failed - LINE認証失敗 → **WARN**
+
+### 実装内容
+- `categorizeFirebaseError` 関数に `logLevel` と `errorCategory` フィールドを追加
+- `logFirebaseError` ヘルパー関数を新規実装
+- 電話認証関連の全ログ出力を `logFirebaseError` に統一
+
+### 将来の拡張計画
+以下のエラーコードは、Phase 2/3 で実装予定です（本PRには含まれません）：
+- `auth/invalid-phone-number` / `auth/missing-phone-number`
+- `auth/app-not-authorized` / `auth/app-not-verified`
+- `auth/quota-exceeded`
+- その他のFirebase認証エラー
+
 ### 対象エラー
 
 ユーザーから報告された Google Cloud Identity Toolkit のエラーログ:
@@ -217,6 +243,8 @@ logger.error("Failed to start phone verification", {
 
 現在の `categorizeFirebaseError` (src/lib/auth/core/firebase-config.ts) に以下を追加:
 
+> **注**: 以下のコードは最終的な目標状態を示しています。このPRでは「このPRの実装範囲」セクションに記載されたエラーコードのみを対応し、その他のエラーコード（`auth/invalid-phone-number`, `auth/app-not-authorized`, `auth/quota-exceeded`など）は将来のPhase 2/3で実装予定です。
+
 ```typescript
 export const categorizeFirebaseError = (
   error: any,
@@ -233,7 +261,7 @@ export const categorizeFirebaseError = (
     // SESSION_EXPIRED エラーを追加
     if (code === "auth/code-expired") {
       return {
-        type: "expired",
+        type: "verification",  // 注: 認証コード(verification code)の有効期限切れのため"verification"を使用。トークン有効期限切れ(auth/user-token-expired)とは区別
         message: "認証コードの有効期限が切れました。再度送信してください。",
         retryable: true,
         logLevel: "warn",  // 予期される動作
@@ -400,17 +428,17 @@ export const logFirebaseError = (
 ### 1. アラート精度の向上
 - **現状**: SESSION_EXPIRED のような予期されるエラーで誤アラート発生
 - **改善後**: 真のシステムエラーのみがERRORレベルでアラート
-- **削減見込み**: ERROR ログ 40-60% 削減
+- **削減見込み**: ERROR ログ 40-60% 削減見込み（実測データに基づく検証が必要）
 
 ### 2. 監視効率の向上
 - **現状**: エラーログのノイズが多く、重要なエラーが埋もれる
 - **改善後**: ログレベルでフィルタリング可能
-- **効果**: 重大なシステムエラーの検知時間短縮
+- **効果**: 重大なシステムエラーの検知時間短縮（見込み）
 
 ### 3. コスト削減
 - **現状**: 大量の ERROR ログによる Cloud Logging コスト増加
 - **改善後**: 適切なログレベル分類によるコスト最適化
-- **削減見込み**: ログコスト 20-30% 削減
+- **削減見込み**: ログコスト 20-30% 削減見込み（実測データに基づく検証が必要）
 
 ### 4. ログレベル標準化への準拠
 - `docs/development/logging-standards.md` の基準に完全準拠
