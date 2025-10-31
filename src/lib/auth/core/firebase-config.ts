@@ -54,7 +54,13 @@ export const getFirebaseAnalytics = async (): Promise<Analytics | undefined> => 
  */
 export const categorizeFirebaseError = (
   error: any,
-): { type: string; message: string; retryable: boolean } => {
+): {
+  type: string;
+  message: string;
+  retryable: boolean;
+  logLevel: 'error' | 'warn' | 'info';
+  errorCategory: string;
+} => {
   if (error?.code) {
     const code = error.code as string;
 
@@ -63,6 +69,8 @@ export const categorizeFirebaseError = (
         type: "network",
         message: "ネットワーク接続に問題が発生しました。インターネット接続を確認してください。",
         retryable: true,
+        logLevel: "warn",
+        errorCategory: "network",
       };
     }
 
@@ -71,6 +79,8 @@ export const categorizeFirebaseError = (
         type: "expired",
         message: "認証の有効期限が切れました。再認証が必要です。",
         retryable: false,
+        logLevel: "info",
+        errorCategory: "auth_temporary",
       };
     }
 
@@ -79,6 +89,8 @@ export const categorizeFirebaseError = (
         type: "auth",
         message: "認証情報が無効です。再ログインしてください。",
         retryable: false,
+        logLevel: "warn",
+        errorCategory: "auth_temporary",
       };
     }
 
@@ -87,6 +99,8 @@ export const categorizeFirebaseError = (
         type: "reauth",
         message: "セキュリティのため再認証が必要です。",
         retryable: false,
+        logLevel: "info",
+        errorCategory: "auth_temporary",
       };
     }
 
@@ -94,7 +108,9 @@ export const categorizeFirebaseError = (
       return {
         type: "verification",
         message: "認証コードが無効です。正しいコードを入力してください。",
-        retryable: false,
+        retryable: true,
+        logLevel: "info",
+        errorCategory: "user_input",
       };
     }
 
@@ -103,6 +119,8 @@ export const categorizeFirebaseError = (
         type: "rate-limit",
         message: "短時間に大量のリクエストが発生しました。しばらく待ってから再試行してください。",
         retryable: false,
+        logLevel: "warn",
+        errorCategory: "network",
       };
     }
 
@@ -110,7 +128,9 @@ export const categorizeFirebaseError = (
       return {
         type: "verification",
         message: "認証コードの有効期限が切れました。再度送信してください。",
-        retryable: false,
+        retryable: true,
+        logLevel: "warn",
+        errorCategory: "user_input",
       };
     }
   }
@@ -120,6 +140,8 @@ export const categorizeFirebaseError = (
       type: "api",
       message: "LINE認証サービスとの通信に失敗しました。",
       retryable: true,
+      logLevel: "warn",
+      errorCategory: "network",
     };
   }
 
@@ -127,5 +149,30 @@ export const categorizeFirebaseError = (
     type: "unknown",
     message: "認証中に予期せぬエラーが発生しました。",
     retryable: false,
+    logLevel: "error",
+    errorCategory: "system",
   };
+};
+
+/**
+ * Firebase エラーを適切なログレベルで記録する
+ * @param error Firebaseから返されたエラー
+ * @param context ログのコンテキスト（エラーメッセージ）
+ * @param additionalMetadata 追加のメタデータ
+ */
+export const logFirebaseError = (
+  error: any,
+  context: string,
+  additionalMetadata?: Record<string, any>,
+) => {
+  const categorized = categorizeFirebaseError(error);
+
+  logger[categorized.logLevel](context, {
+    error: error instanceof Error ? error.message : String(error),
+    errorCode: error?.code,
+    errorCategory: categorized.errorCategory,
+    retryable: categorized.retryable,
+    authType: "phone",
+    ...additionalMetadata,
+  });
 };

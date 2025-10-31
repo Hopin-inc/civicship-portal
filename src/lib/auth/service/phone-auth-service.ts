@@ -10,7 +10,7 @@ import { TokenManager } from "../core/token-manager";
 import { isRunningInLiff } from "../core/environment-detector";
 import { logger } from "@/lib/logging";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
-import { getPhoneAuth } from "@/lib/auth/core/firebase-config";
+import { getPhoneAuth, logFirebaseError } from "@/lib/auth/core/firebase-config";
 
 export class PhoneAuthService {
   private static instance: PhoneAuthService;
@@ -124,12 +124,14 @@ export class PhoneAuthService {
 
       return verificationId;
     } catch (error) {
-      logger.error("[PhoneAuthService] Phone verification start failed", {
-        error: error instanceof Error ? error.message : String(error),
-        errorCode: (error as any)?.code,
-        phoneMasked: phoneNumber.replace(/\d(?=\d{4})/g, '*'),
-        component: "PhoneAuthService",
-      });
+      logFirebaseError(
+        error,
+        "[PhoneAuthService] Phone verification start failed",
+        {
+          phoneMasked: phoneNumber.replace(/\d(?=\d{4})/g, '*'),
+          component: "PhoneAuthService",
+        }
+      );
       throw error;
     }
   }
