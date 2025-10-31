@@ -569,6 +569,12 @@ export type GqlImageInput = {
   file?: InputMaybe<Scalars["Upload"]["input"]>;
 };
 
+export const GqlLanguage = {
+  En: "EN",
+  Ja: "JA",
+} as const;
+
+export type GqlLanguage = (typeof GqlLanguage)[keyof typeof GqlLanguage];
 export const GqlLineRichMenuType = {
   Admin: "ADMIN",
   Public: "PUBLIC",
@@ -2556,6 +2562,7 @@ export type GqlUser = {
   participations?: Maybe<Array<GqlParticipation>>;
   phoneNumber?: Maybe<Scalars["String"]["output"]>;
   portfolios?: Maybe<Array<GqlPortfolio>>;
+  preferredLanguage: GqlLanguage;
   reservationStatusChangedByMe?: Maybe<Array<GqlReservationHistory>>;
   reservations?: Maybe<Array<GqlReservation>>;
   slug?: Maybe<Scalars["String"]["output"]>;
@@ -2613,6 +2620,7 @@ export type GqlUserSignUpInput = {
   phoneRefreshToken?: InputMaybe<Scalars["String"]["input"]>;
   phoneTokenExpiresAt?: InputMaybe<Scalars["String"]["input"]>;
   phoneUid?: InputMaybe<Scalars["String"]["input"]>;
+  preferredLanguage?: InputMaybe<GqlLanguage>;
   slug?: InputMaybe<Scalars["String"]["input"]>;
 };
 
@@ -3446,6 +3454,7 @@ export type GqlUpdateMyProfileMutation = {
       image?: string | null;
       bio?: string | null;
       currentPrefecture?: GqlCurrentPrefecture | null;
+      preferredLanguage: GqlLanguage;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
@@ -7567,6 +7576,7 @@ export const UpdateMyProfileDocument = gql`
           image
           bio
           currentPrefecture
+          preferredLanguage
           urlFacebook
           urlInstagram
           urlX
