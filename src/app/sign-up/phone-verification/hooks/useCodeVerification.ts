@@ -60,7 +60,7 @@ export function useCodeVerification(
       setIsVerifying(true);
 
       const setAuthState = authStoreState.setState;
-      setAuthState({ isAuthInProgress: true });
+      setAuthState({ isAuthInProgress: true, isAuthenticating: true });
 
       try {
         const success = await phoneAuth.verifyPhoneCode(verificationCode);
@@ -68,7 +68,7 @@ export function useCodeVerification(
 
         if (!success || !phoneUid) {
           logger.error("[useCodeVerification] Invalid code or missing phoneUid");
-          setAuthState({ isAuthInProgress: false });
+          setAuthState({ isAuthInProgress: false, isAuthenticating: false });
           return {
             success: false,
             error: {
@@ -87,7 +87,7 @@ export function useCodeVerification(
         });
         const status = data?.identityCheckPhoneUser?.status;
         if (!status) {
-          setAuthState({ isAuthInProgress: false });
+          setAuthState({ isAuthInProgress: false, isAuthenticating: false });
           return {
             success: false,
             error: {
@@ -134,7 +134,7 @@ export function useCodeVerification(
 
           case GqlPhoneUserStatus.ExistingSameCommunity:
             await updateAuthState();
-            setAuthState({ authenticationState: "user_registered", isAuthInProgress: false });
+            setAuthState({ authenticationState: "user_registered", isAuthInProgress: false, isAuthenticating: false });
 
             // 認証状態が user_registered に更新された後に authRedirectService を呼ぶ
             const existingUserRedirectPath = authRedirectService.getRedirectPath(
@@ -150,7 +150,7 @@ export function useCodeVerification(
 
           case GqlPhoneUserStatus.ExistingDifferentCommunity:
             await updateAuthState();
-            setAuthState({ authenticationState: "user_registered", isAuthInProgress: false });
+            setAuthState({ authenticationState: "user_registered", isAuthInProgress: false, isAuthenticating: false });
 
             // 認証状態が user_registered に更新された後に authRedirectService を呼ぶ
             const crossCommunityRedirectPath = authRedirectService.getRedirectPath(
@@ -165,7 +165,7 @@ export function useCodeVerification(
             };
 
           default:
-            setAuthState({ isAuthInProgress: false });
+            setAuthState({ isAuthInProgress: false, isAuthenticating: false });
             return {
               success: false,
               error: {
@@ -178,7 +178,7 @@ export function useCodeVerification(
         logger.error("[useCodeVerification] Verification failed", {
           error: error instanceof Error ? error.message : String(error),
         });
-        setAuthState({ isAuthInProgress: false });
+        setAuthState({ isAuthInProgress: false, isAuthenticating: false });
         return {
           success: false,
           error: {
