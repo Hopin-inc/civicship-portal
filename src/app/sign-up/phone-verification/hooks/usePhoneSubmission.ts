@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { categorizeFirebaseError } from "@/lib/auth/core/firebase-config";
+import { categorizeFirebaseError, logFirebaseError } from "@/lib/auth/core/firebase-config";
 import { isRunningInLiff } from "@/lib/auth/core/environment-detector";
 import { PHONE_VERIFICATION_CONSTANTS } from "../utils/phoneVerificationConstants";
 import { useRecaptchaManager } from "./useRecaptchaManager";
@@ -107,10 +107,13 @@ export function usePhoneSubmission(
         resendTimer.start();
         return { success: true };
       } catch (error) {
-        logger.error("Phone verification submission failed", {
-          errorCode: (error as any)?.code,
-          errorMessage: (error as any)?.message,
-        });
+        logFirebaseError(
+          error,
+          "Phone verification submission failed",
+          {
+            component: "usePhoneSubmission",
+          }
+        );
         return handleSubmissionError(error);
       } finally {
         setIsSubmitting(false);
@@ -197,10 +200,13 @@ export function usePhoneSubmission(
 
         return { success: true, message: t("phoneVerification.resend.success") };
       } catch (error) {
-        logger.error("Phone verification resend failed", {
-          errorCode: (error as any)?.code,
-          errorMessage: (error as any)?.message,
-        });
+        logFirebaseError(
+          error,
+          "Phone verification resend failed",
+          {
+            component: "usePhoneSubmission",
+          }
+        );
         return handleSubmissionError(error);
       } finally {
         setIsSubmitting(false);
