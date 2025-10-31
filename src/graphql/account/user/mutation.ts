@@ -10,6 +10,7 @@ export const UPDATE_MY_PROFILE = gql(`
           image
           bio
           currentPrefecture
+          preferredLanguage
           urlFacebook
           urlInstagram
           urlX
