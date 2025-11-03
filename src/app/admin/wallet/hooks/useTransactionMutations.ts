@@ -59,7 +59,8 @@ export const useTransactionMutations = () => {
       }
       logger.warn("Issue point mutation failed", {
         error: e instanceof Error ? e.message : String(e),
-        component: "useTransactionMutations"
+        component: "useTransactionMutations",
+        errorCategory: "system"
       });
       return { success: false, code: GqlErrorCode.Unknown };
     }
@@ -91,7 +92,8 @@ export const useTransactionMutations = () => {
       }
       logger.warn("Grant point mutation failed", {
         error: e instanceof Error ? e.message : String(e),
-        component: "useTransactionMutations"
+        component: "useTransactionMutations",
+        errorCategory: "system"
       });
       return { success: false, code: GqlErrorCode.Unknown };
     }
@@ -120,7 +122,8 @@ export const useTransactionMutations = () => {
       }
       logger.warn("Donate point mutation failed", {
         error: e instanceof Error ? e.message : String(e),
-        component: "useTransactionMutations"
+        component: "useTransactionMutations",
+        errorCategory: "system"
       });
       return { success: false, code: GqlErrorCode.Unknown };
     }

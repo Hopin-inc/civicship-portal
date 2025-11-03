@@ -46,7 +46,7 @@ export async function fetchCurrentUserClient(
 
     if (!response.ok) {
       const errorText = await response.text();
-      logger.warn("[fetchCurrentUserClient] HTTP error", {
+      logger.error("[fetchCurrentUserClient] HTTP error", {
         status: response.status,
         statusText: response.statusText,
         errorText,
@@ -57,7 +57,7 @@ export async function fetchCurrentUserClient(
     const result = await response.json();
 
     if (result.errors) {
-      logger.warn("[fetchCurrentUserClient] GraphQL errors", {
+      logger.error("[fetchCurrentUserClient] GraphQL errors", {
         errors: result.errors,
       });
       return null;
@@ -65,7 +65,7 @@ export async function fetchCurrentUserClient(
 
     return result.data?.currentUser?.user ?? null;
   } catch (error) {
-    logger.warn("[fetchCurrentUserClient] Request failed", { error });
+    logger.error("[fetchCurrentUserClient] Request failed", { error });
     return null;
   }
 }
