@@ -15,6 +15,8 @@ import ClientPolyfills from "@/components/polyfills/ClientPolyfills";
 import { getUserServer } from "@/lib/auth/init/getUserServer";
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
+import { performanceTracker } from "@/lib/logging/performance";
+import { getCorrelationId } from "@/lib/logging/request-context";
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -42,39 +44,60 @@ const RootLayout = async ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
-  const { user, lineAuthenticated, phoneAuthenticated } = await getUserServer();
-  
-  const locale = await getLocale();
-  const messages = await getMessages();
+  const correlationId = await getCorrelationId();
 
-  return (
-    <html lang={locale}>
-      <body className={font.className}>
-        <ClientPolyfills />
-        <NextIntlClientProvider 
-          locale={locale} 
-          messages={messages}
-        >
-          <CookiesProvider>
-            <ApolloProvider>
-              <AuthProvider
-                ssrCurrentUser={user}
-                ssrLineAuthenticated={lineAuthenticated}
-                ssrPhoneAuthenticated={phoneAuthenticated}
-              >
-                <HeaderProvider>
-                  <LoadingProvider>
-                    <AnalyticsProvider />
-                    <MainContent>{children}</MainContent>
-                    <Toaster richColors className="mx-8" />
-                  </LoadingProvider>
-                </HeaderProvider>
-              </AuthProvider>
-            </ApolloProvider>
-          </CookiesProvider>
-        </NextIntlClientProvider>
-      </body>
-    </html>
+  return performanceTracker.measure(
+    "RootLayout Render",
+    async () => {
+      const { user, lineAuthenticated, phoneAuthenticated } = await performanceTracker.measure(
+        "RootLayout:getUserServer",
+        () => getUserServer(),
+        { correlationId, source: "RootLayout" }
+      );
+
+      const locale = await performanceTracker.measure(
+        "RootLayout:getLocale",
+        () => getLocale(),
+        { correlationId }
+      );
+
+      const messages = await performanceTracker.measure(
+        "RootLayout:getMessages",
+        () => getMessages(),
+        { correlationId }
+      );
+
+      return (
+        <html lang={locale}>
+          <body className={font.className}>
+            <ClientPolyfills />
+            <NextIntlClientProvider 
+              locale={locale} 
+              messages={messages}
+            >
+              <CookiesProvider>
+                <ApolloProvider>
+                  <AuthProvider
+                    ssrCurrentUser={user}
+                    ssrLineAuthenticated={lineAuthenticated}
+                    ssrPhoneAuthenticated={phoneAuthenticated}
+                  >
+                    <HeaderProvider>
+                      <LoadingProvider>
+                        <AnalyticsProvider />
+                        <MainContent>{children}</MainContent>
+                        <Toaster richColors className="mx-8" />
+                      </LoadingProvider>
+                    </HeaderProvider>
+                  </AuthProvider>
+                </ApolloProvider>
+              </CookiesProvider>
+            </NextIntlClientProvider>
+          </body>
+        </html>
+      );
+    },
+    { correlationId, route: "RootLayout" }
   );
 };
 

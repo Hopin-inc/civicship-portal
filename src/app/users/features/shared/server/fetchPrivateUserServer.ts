@@ -9,17 +9,23 @@ import {
 import { cookies } from "next/headers";
 import { logger } from "@/lib/logging";
 import { performanceTracker } from "@/lib/logging/performance";
+import { getCorrelationId } from "@/lib/logging/request-context";
 import { FETCH_PROFILE_SERVER_QUERY } from "@/graphql/account/user/server";
 
 export async function fetchPrivateUserServer(): Promise<GqlUser | null> {
+  const correlationId = await getCorrelationId();
+
   return performanceTracker.measure(
     "fetchPrivateUserServer",
     async () => {
-      performanceTracker.start("get-session-cookie");
+      performanceTracker.start(`get-session-cookie:${correlationId}`);
       const cookieStore = await cookies();
       const session = cookieStore.get("session")?.value ?? null;
       const hasSession = !!session;
-      performanceTracker.end("get-session-cookie", { hasSession });
+      performanceTracker.end(`get-session-cookie:${correlationId}`, {
+        hasSession,
+        correlationId,
+      });
 
       if (!hasSession) {
         return null;
@@ -36,9 +42,14 @@ export async function fetchPrivateUserServer(): Promise<GqlUser | null> {
         logger.error("⚠️ Failed to fetch private user (SSR):", {
           message: (error as Error).message,
           stack: (error as Error).stack,
+          correlationId,
         });
         return null;
       }
+    },
+    {
+      correlationId,
+      source: "UsersMeLayout/fetchPrivateUserServer",
     }
   );
 }
