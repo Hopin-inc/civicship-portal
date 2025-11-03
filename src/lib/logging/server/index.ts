@@ -43,7 +43,6 @@ if (isLocal) {
       redirectToStdout: true,
     }),
   );
-  transports.push(new winston.transports.Console());
 }
 
 const winstonLogger = winston.createLogger({
