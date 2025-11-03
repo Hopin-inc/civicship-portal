@@ -17,7 +17,7 @@ export default async function WalletMeLayout({ children }: { children: React.Rea
   try {
     result = await getServerMyWalletWithTransactions(session, { first: 20 });
   } catch (error) {
-    logger.error("Failed to fetch wallet data with transactions (SSR):", {
+    logger.warn("Failed to fetch wallet data with transactions (SSR):", {
       error: error instanceof Error ? error.message : String(error),
     });
     throw error;

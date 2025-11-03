@@ -20,7 +20,7 @@ export async function fetchPublicUserServer(
 
     return res.user ?? null;
   } catch (error) {
-    logger.error("⚠️ Failed to fetch public user (SSR):", {
+    logger.warn("⚠️ Failed to fetch public user (SSR):", {
       userId,
       message: (error as Error).message,
       stack: (error as Error).stack,

@@ -43,7 +43,7 @@ export async function getUserServer(): Promise<{
       phoneAuthenticated: hasPhoneIdentity,
     };
   } catch (error) {
-    logger.error("⚠️ Failed to fetch currentUser:", {
+    logger.warn("⚠️ Failed to fetch currentUser:", {
       message: (error as Error).message,
       stack: (error as Error).stack,
     });

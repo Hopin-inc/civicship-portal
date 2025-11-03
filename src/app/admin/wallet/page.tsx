@@ -75,7 +75,7 @@ export default function WalletPage() {
           url.searchParams.delete("refresh");
           window.history.replaceState({}, "", url);
         } catch (err) {
-          logger.error("Refresh failed after redirect", {
+          logger.warn("Refresh failed after redirect", {
             error: err instanceof Error ? err.message : String(err),
             component: "WalletPage",
           });
@@ -91,7 +91,7 @@ export default function WalletPage() {
         await refetchWallet();
         refetchTransactions();
       } catch (err) {
-        logger.error("Refetch failed on window focus", {
+        logger.warn("Refetch failed on window focus", {
           error: err instanceof Error ? err.message : String(err),
           component: "WalletPage",
         });

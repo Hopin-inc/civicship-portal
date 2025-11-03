@@ -170,7 +170,7 @@ export const useSearchResults = (
         },
       });
     } catch (error) {
-      logger.error("Error fetching more search results", { error, searchParams });
+      logger.warn("Error fetching more search results", { error, searchParams });
       toast.error("追加データの取得に失敗しました");
     } finally {
       setIsLoadingMore(false);

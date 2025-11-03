@@ -44,7 +44,7 @@ export const useCreateUser = (refetchUser: () => Promise<GqlUser | null>) => {
         return null;
       } catch (error) {
         const msg = error instanceof Error ? error.message : String(error);
-        logger.error("User creation error", { error: msg });
+        logger.warn("User creation error", { error: msg });
         return null;
       }
     },

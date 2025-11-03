@@ -93,7 +93,7 @@ async function initAuthFast({
     if (ssrPhoneAuthenticated) TokenManager.savePhoneAuthFlag(true);
     await authStateManager.handleUserRegistrationStateChange(true, { ssrMode: true });
   } catch (e) {
-    logger.error("initAuthFast failed", { error: e });
+    logger.warn("initAuthFast failed", { error: e });
     finalizeAuthState("unauthenticated", undefined, setState, authStateManager);
   }
 }
@@ -142,7 +142,7 @@ async function initAuthFull({
 
     await evaluateUserRegistrationState(user, ssrPhoneAuthenticated, setState, authStateManager);
   } catch (error) {
-    logger.error("initAuthFull failed", { error });
+    logger.warn("initAuthFull failed", { error });
     finalizeAuthState("unauthenticated", undefined, setState, authStateManager);
   }
 }

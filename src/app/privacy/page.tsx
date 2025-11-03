@@ -319,7 +319,7 @@ export default function PrivacyPage() {
 
   useEffect(() => {
     convertMarkdownToHtml(policyMarkdown).then(setHtml).catch((error) => {
-      logger.error("Failed to convert markdown to HTML", {
+      logger.warn("Failed to convert markdown to HTML", {
         error: error instanceof Error ? error.message : String(error),
         component: "PrivacyPage"
       });
