@@ -40,6 +40,40 @@ function extractOperationInfo(query: string): {
   };
 }
 
+/**
+ * クエリの短いハッシュを生成（operationNameが取得できない場合のフォールバック）
+ */
+function generateQueryHash(query: string): string {
+  let hash = 0;
+  for (let i = 0; i < Math.min(query.length, 100); i++) {
+    const char = query.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return Math.abs(hash).toString(36).slice(0, 6);
+}
+
+/**
+ * ユニークなマーク名を生成
+ */
+function generateMarkName(
+  baseName: string,
+  correlationId: string | undefined,
+  operationName: string | null,
+  source: string | undefined,
+  query?: string
+): string {
+  if (!correlationId) {
+    return baseName;
+  }
+
+  const op = operationName || (query ? `hash_${generateQueryHash(query)}` : "unknown");
+  const src = source || "unknown";
+  const uniq = Math.random().toString(36).slice(2, 6);
+  
+  return `${baseName}:${correlationId}:${op}:${src}:${uniq}`;
+}
+
 export async function executeServerGraphQLQuery<
   TData = unknown,
   TVariables = Record<string, unknown>,
@@ -63,7 +97,15 @@ export async function executeServerGraphQLQuery<
         ...headers,
       };
 
-      const fetchMarkName = correlationId ? `fetch-graphql-api:${correlationId}` : "fetch-graphql-api";
+      const fetchMarkName = generateMarkName(
+        "fetch-graphql-api",
+        correlationId,
+        operationName,
+        opts?.source,
+        query
+      );
+      const fetchMarkId = operationName || generateQueryHash(query);
+      
       performanceTracker.start(fetchMarkName);
       const response = await fetch(process.env.NEXT_PUBLIC_API_ENDPOINT!, {
         method: "POST",
@@ -76,6 +118,7 @@ export async function executeServerGraphQLQuery<
       performanceTracker.end(fetchMarkName, {
         status: response.status,
         ok: response.ok,
+        markId: `fetch:${fetchMarkId}`,
         ...(correlationId && { correlationId }),
         ...(operationName && { operationName }),
         ...(operationType && { operationType }),
@@ -86,10 +129,19 @@ export async function executeServerGraphQLQuery<
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const parseMarkName = correlationId ? `parse-graphql-response:${correlationId}` : "parse-graphql-response";
+      const parseMarkName = generateMarkName(
+        "parse-graphql-response",
+        correlationId,
+        operationName,
+        opts?.source,
+        query
+      );
+      const parseMarkId = operationName || generateQueryHash(query);
+      
       performanceTracker.start(parseMarkName);
       const result: GraphQLResponse<TData> = await response.json();
       performanceTracker.end(parseMarkName, {
+        markId: `parse:${parseMarkId}`,
         ...(correlationId && { correlationId }),
         ...(operationName && { operationName }),
         ...(operationType && { operationType }),

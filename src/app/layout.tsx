@@ -17,6 +17,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
 import { performanceTracker } from "@/lib/logging/performance";
 import { getCorrelationId } from "@/lib/logging/request-context";
+import ClientPerformanceTracker from "@/components/performance/ClientPerformanceTracker";
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -71,6 +72,7 @@ const RootLayout = async ({
         <html lang={locale}>
           <body className={font.className}>
             <ClientPolyfills />
+            <ClientPerformanceTracker correlationId={correlationId} />
             <NextIntlClientProvider 
               locale={locale} 
               messages={messages}
