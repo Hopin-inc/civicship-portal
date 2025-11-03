@@ -28,7 +28,7 @@ interface PerformanceMeasurement {
  * ```
  */
 export class PerformanceTracker {
-  private static enabled = process.env.NEXT_PUBLIC_ENABLE_PERFORMANCE_TRACKING === "true";
+  private static enabled = true;
   private marks = new Map<string, number>();
 
   /**
@@ -79,7 +79,7 @@ export class PerformanceTracker {
   async measure<T>(
     operation: string,
     fn: () => Promise<T>,
-    metadata?: Record<string, any>
+    metadata?: Record<string, any>,
   ): Promise<T> {
     if (!PerformanceTracker.enabled) {
       return fn();
