@@ -71,6 +71,11 @@ const RootLayout = async ({
       return (
         <html lang={locale}>
           <body className={font.className}>
+            <script
+              dangerouslySetInnerHTML={{
+                __html: 'window.__ssrHtmlFlushed = performance.now();',
+              }}
+            />
             <ClientPolyfills />
             <ClientPerformanceTracker correlationId={correlationId} />
             <NextIntlClientProvider 
