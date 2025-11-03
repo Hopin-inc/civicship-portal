@@ -101,7 +101,7 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
           retryable: true,
         });
       } else {
-        logger.error("Network system error", {
+        logger.warn("Network system error", {
           error: errorMessage,
           component: "ApolloErrorLink",
           operation: operation.operationName,

@@ -17,7 +17,7 @@ export const parseDateTime = (dateTimeStr: string | null | undefined): Date | nu
     const isoDateTimePart = dateTimeStr.split(" ")[0];
     return new Date(isoDateTimePart);
   } catch (error) {
-    logger.error('Error parsing date', {
+    logger.warn('Error parsing date', {
       error: error instanceof Error ? error.message : String(error),
       dateTimeStr,
       component: 'DateUtils'

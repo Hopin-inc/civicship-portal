@@ -142,7 +142,7 @@ async function initAuthFull({
 
     await evaluateUserRegistrationState(user, ssrPhoneAuthenticated, setState, authStateManager);
   } catch (error) {
-    logger.error("initAuthFull failed", { error });
+    logger.warn("initAuthFull failed", { error });
     finalizeAuthState("unauthenticated", undefined, setState, authStateManager);
   }
 }

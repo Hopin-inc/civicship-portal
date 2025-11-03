@@ -69,7 +69,7 @@ export function SignUpForm() {
       await createUser(values.name, values.prefecture, phoneUid);
       toast.success(t("auth.signup.successMessage"));
     } catch (error) {
-      logger.error("Sign up error", {
+      logger.warn("Sign up error", {
         error: error instanceof Error ? error.message : String(error),
         component: "SignUpForm",
       });

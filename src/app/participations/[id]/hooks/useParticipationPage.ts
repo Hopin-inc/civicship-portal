@@ -44,7 +44,7 @@ const useParticipationPage = (id: string): UseParticipationPageResult => {
 
   useEffect(() => {
     if (error) {
-      logger.error("Participation query error", {
+      logger.warn("Participation query error", {
         error: error.message || String(error),
         participationId: id,
         component: "useParticipationPage",

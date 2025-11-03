@@ -82,7 +82,7 @@ const useProfileEdit = () => {
       toast.success(t("users.edit.toast.updated"));
       router.push(`/users/me`);
     } catch (err) {
-      logger.error("Failed to update profile", {
+      logger.warn("Failed to update profile", {
         error: err instanceof Error ? err.message : String(err),
         component: "useProfileEdit",
         userId,
