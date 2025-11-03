@@ -7,12 +7,14 @@ import {
 import { cookies } from "next/headers";
 import { logger } from "@/lib/logging";
 import { GET_CURRENT_USER_SERVER_QUERY } from "@/graphql/account/user/server";
+import { getCorrelationId } from "@/lib/logging/request-context";
 
 export async function getUserServer(): Promise<{
   user: GqlUser | null;
   lineAuthenticated: boolean;
   phoneAuthenticated: boolean;
 }> {
+  const correlationId = await getCorrelationId();
   const cookieStore = await cookies();
 
   const session = cookieStore.get("session")?.value ?? null;
@@ -32,7 +34,12 @@ export async function getUserServer(): Promise<{
     const res = await executeServerGraphQLQuery<
       GqlCurrentUserServerQuery,
       GqlCurrentUserServerQueryVariables
-    >(GET_CURRENT_USER_SERVER_QUERY, {}, { Authorization: `Bearer ${session}` });
+    >(
+      GET_CURRENT_USER_SERVER_QUERY,
+      {},
+      { Authorization: `Bearer ${session}` },
+      { correlationId, source: "RootLayout/getUserServer" }
+    );
 
     const user: GqlUser | null = res.currentUser?.user ?? null;
     const hasPhoneIdentity = !!user?.identities?.some((i) => i.platform?.toUpperCase() === "PHONE");
@@ -46,6 +53,7 @@ export async function getUserServer(): Promise<{
     logger.error("⚠️ Failed to fetch currentUser:", {
       message: (error as Error).message,
       stack: (error as Error).stack,
+      correlationId,
     });
     return {
       user: null,

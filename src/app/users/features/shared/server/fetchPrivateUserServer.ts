@@ -35,7 +35,12 @@ export async function fetchPrivateUserServer(): Promise<GqlUser | null> {
         const res = await executeServerGraphQLQuery<
           GqlCurrentUserServerQuery,
           GqlCurrentUserServerQueryVariables
-        >(FETCH_PROFILE_SERVER_QUERY, {}, { Authorization: `Bearer ${session}` });
+        >(
+          FETCH_PROFILE_SERVER_QUERY,
+          {},
+          { Authorization: `Bearer ${session}` },
+          { correlationId, source: "UsersMeLayout/fetchPrivateUserServer" }
+        );
 
         return res.currentUser?.user ?? null;
       } catch (error) {

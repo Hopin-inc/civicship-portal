@@ -4,7 +4,6 @@
 
 import { logger } from "@/lib/logging";
 import { performanceTracker } from "@/lib/logging/performance";
-import { getCorrelationId } from "@/lib/logging/request-context";
 
 export interface GraphQLResponse<T> {
   data: T;
@@ -44,8 +43,13 @@ function extractOperationInfo(query: string): {
 export async function executeServerGraphQLQuery<
   TData = unknown,
   TVariables = Record<string, unknown>,
->(query: string, variables: TVariables, headers: Record<string, string> = {}): Promise<TData> {
-  const correlationId = await getCorrelationId();
+>(
+  query: string,
+  variables: TVariables,
+  headers: Record<string, string> = {},
+  opts?: { correlationId?: string; source?: string }
+): Promise<TData> {
+  const correlationId = opts?.correlationId;
   const { operationName, operationType } = extractOperationInfo(query);
 
   return performanceTracker.measure(
@@ -59,7 +63,8 @@ export async function executeServerGraphQLQuery<
         ...headers,
       };
 
-      performanceTracker.start(`fetch-graphql-api:${correlationId}`);
+      const fetchMarkName = correlationId ? `fetch-graphql-api:${correlationId}` : "fetch-graphql-api";
+      performanceTracker.start(fetchMarkName);
       const response = await fetch(process.env.NEXT_PUBLIC_API_ENDPOINT!, {
         method: "POST",
         headers: requestHeaders,
@@ -68,33 +73,37 @@ export async function executeServerGraphQLQuery<
           variables,
         }),
       });
-      performanceTracker.end(`fetch-graphql-api:${correlationId}`, {
+      performanceTracker.end(fetchMarkName, {
         status: response.status,
         ok: response.ok,
-        correlationId,
-        operationName,
-        operationType,
+        ...(correlationId && { correlationId }),
+        ...(operationName && { operationName }),
+        ...(operationType && { operationType }),
+        ...(opts?.source && { source: opts.source }),
       });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      performanceTracker.start(`parse-graphql-response:${correlationId}`);
+      const parseMarkName = correlationId ? `parse-graphql-response:${correlationId}` : "parse-graphql-response";
+      performanceTracker.start(parseMarkName);
       const result: GraphQLResponse<TData> = await response.json();
-      performanceTracker.end(`parse-graphql-response:${correlationId}`, {
-        correlationId,
-        operationName,
-        operationType,
+      performanceTracker.end(parseMarkName, {
+        ...(correlationId && { correlationId }),
+        ...(operationName && { operationName }),
+        ...(operationType && { operationType }),
+        ...(opts?.source && { source: opts.source }),
       });
 
       if (result.errors) {
         logger.error("GraphQL errors", {
           errors: result.errors,
           component: "executeServerGraphQLQuery",
-          correlationId,
-          operationName,
-          operationType,
+          ...(correlationId && { correlationId }),
+          ...(operationName && { operationName }),
+          ...(operationType && { operationType }),
+          ...(opts?.source && { source: opts.source }),
         });
         throw new Error(`GraphQL errors: ${result.errors.map((e) => e.message).join(", ")}`);
       }
@@ -104,9 +113,10 @@ export async function executeServerGraphQLQuery<
     {
       queryLength: query.length,
       hasVariables: Object.keys(variables).length > 0,
-      correlationId,
-      operationName,
-      operationType,
+      ...(correlationId && { correlationId }),
+      ...(operationName && { operationName }),
+      ...(operationType && { operationType }),
+      ...(opts?.source && { source: opts.source }),
     }
   );
 }
