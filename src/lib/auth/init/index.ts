@@ -93,7 +93,7 @@ async function initAuthFast({
     if (ssrPhoneAuthenticated) TokenManager.savePhoneAuthFlag(true);
     await authStateManager.handleUserRegistrationStateChange(true, { ssrMode: true });
   } catch (e) {
-    logger.warn("initAuthFast failed", { error: e });
+    logger.error("initAuthFast failed", { error: e });
     finalizeAuthState("unauthenticated", undefined, setState, authStateManager);
   }
 }
