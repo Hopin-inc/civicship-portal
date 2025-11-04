@@ -1,5 +1,8 @@
 // next.config.mjs
 import bundleAnalyzer from "@next/bundle-analyzer";
+import createNextIntlPlugin from 'next-intl/plugin';
+
+const withNextIntl = createNextIntlPlugin('./src/lib/i18n/request.ts');
 
 /** @type {import("next").NextConfig} */
 const withBundleAnalyzer = bundleAnalyzer({
@@ -90,4 +93,4 @@ const nextConfig = {
   },
 };
 
-export default withBundleAnalyzer(nextConfig);
+export default withNextIntl(withBundleAnalyzer(nextConfig));

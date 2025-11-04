@@ -118,7 +118,7 @@ export default function CredentialRecipientSelector({
       toast.success("登録が完了しました");
     },
     onError: (error) => {
-      logger.error("登録に失敗しました", {
+      logger.warn("登録に失敗しました", {
         error: error.message,
       });
       toast.error("登録に失敗しました");

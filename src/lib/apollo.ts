@@ -5,6 +5,7 @@ import {
   NormalizedCacheObject,
 } from "@apollo/client/core";
 import { InMemoryCache } from "@apollo/client/cache";
+import { relayStylePagination } from "@apollo/client/utilities";
 import { onError } from "@apollo/client/link/error";
 import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
 
@@ -100,7 +101,7 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
           retryable: true,
         });
       } else {
-        logger.error("Network system error", {
+        logger.warn("Network system error", {
           error: errorMessage,
           component: "ApolloErrorLink",
           operation: operation.operationName,
@@ -126,7 +127,15 @@ const link = ApolloLink.from([requestLink, errorLink, httpLink]);
 const defaultOptions: ApolloClientOptions<NormalizedCacheObject> = {
   link,
   ssrMode: true,
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    typePolicies: {
+      Wallet: {
+        fields: {
+          transactionsConnection: relayStylePagination(),
+        },
+      },
+    },
+  }),
 };
 
 export const apolloClient = new ApolloClient(defaultOptions);

@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { PhoneAuthService } from "@/lib/auth/service/phone-auth-service";
 import { logger } from "@/lib/logging";
+import { logFirebaseError } from "@/lib/auth/core/firebase-config";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 
 export const useStartPhoneVerification = (phoneAuthService: PhoneAuthService) => {
@@ -24,11 +25,14 @@ export const useStartPhoneVerification = (phoneAuthService: PhoneAuthService) =>
         return verificationId;
       } catch (error) {
         setPhoneAuth({ error: error as Error });
-        logger.error("Failed to start phone verification", {
-          error: error instanceof Error ? error.message : String(error),
-          phoneNumber,
-          component: "AuthActions",
-        });
+        logFirebaseError(
+          error,
+          "Failed to start phone verification",
+          {
+            phoneNumber,
+            component: "AuthActions",
+          }
+        );
         return null;
       } finally {
         setPhoneAuth({ isVerifying: false });

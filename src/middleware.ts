@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { FeaturesType, currentCommunityConfig } from "@/lib/communities/metadata";
+import { detectPreferredLocale } from "@/lib/i18n/languageDetection";
+import { locales, defaultLocale } from "@/lib/i18n/config";
 
 // Map features to their corresponding route paths
 const featureToRoutesMap: Partial<Record<FeaturesType, string[]>> = {
@@ -142,9 +144,24 @@ function setCsp() {
   ].join("; ");
 
   res.headers.set("Content-Security-Policy", csp);
-
   res.headers.set("X-Content-Type-Options", "nosniff");
   res.headers.set("Referrer-Policy", "no-referrer");
+
+  const hasLanguageSwitcher = enabledFeatures.includes("languageSwitcher");
+  const languageCookie = request.cookies.get('language');
+  
+  if (hasLanguageSwitcher && !languageCookie) {
+    const detectedLanguage = detectPreferredLocale(
+      request.headers.get('accept-language'),
+      locales,
+      defaultLocale
+    );
+    res.cookies.set('language', detectedLanguage, {
+      path: '/',
+      maxAge: 60 * 60 * 24 * 365,
+      sameSite: 'lax',
+    });
+  }
 
   return res;
 }

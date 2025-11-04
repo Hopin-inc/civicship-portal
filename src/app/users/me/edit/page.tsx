@@ -1,20 +1,21 @@
 "use client";
 
 import React, { useMemo } from "react";
-import useProfileEdit from "@/app/users/me/edit/hooks/useProfileEdit";
-import UserProfileEdit from "@/app/users/components/UserProfileEdit";
+import { useProfileEdit, UserProfileEdit } from "@/app/users/features/edit";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { ErrorState } from '@/components/shared'
+import { ErrorState } from "@/components/shared";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
+import { useTranslations } from "next-intl";
 
 export default function ProfileEditPage() {
+  const t = useTranslations();
   const headerConfig = useMemo(
     () => ({
-      title: "プロフィール編集",
-      showBackButton: true,
+      title: t("users.edit.pageTitle"),
       showLogo: false,
+      showBackButton: true,
     }),
-    [],
+    [t],
   );
   useHeaderConfig(headerConfig);
 
@@ -41,7 +42,7 @@ export default function ProfileEditPage() {
   }
 
   if (error) {
-    return <ErrorState title="プロフィールを読み込めませんでした" />;
+    return <ErrorState title={t("users.edit.errorTitle")} />;
   }
 
   return (

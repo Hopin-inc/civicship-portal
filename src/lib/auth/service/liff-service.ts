@@ -24,7 +24,7 @@ export class LiffService {
   private static instance: LiffService;
   private liffId: string;
   private state: LiffState;
-  private initializing = false;
+  private initializationPromise: Promise<boolean> | null = null;
 
   private constructor(liffId: string) {
     this.liffId = liffId;
@@ -59,52 +59,34 @@ export class LiffService {
   }
 
   public async initialize(): Promise<boolean> {
-    try {
-      if (this.state.isInitialized) {
-        return true;
-      }
-      if (this.initializing) {
-        return true;
-      }
-      this.initializing = true;
-
-      await liff.init({ liffId: this.liffId });
-      this.state.isInitialized = true;
-      this.state.isLoggedIn = liff.isLoggedIn();
-
-      if (this.state.isLoggedIn) {
-        await this.updateProfile();
-      }
-
+    if (this.state.isInitialized) {
       return true;
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      const isEnvironmentConstraint =
-        errorMessage.includes("LIFF") ||
-        errorMessage.includes("LINE") ||
-        errorMessage.includes("Load failed");
-
-      if (isEnvironmentConstraint) {
-        logger.warn("LIFF environment initialization limitation", {
-          authType: "liff",
-          error: errorMessage,
-          component: "LiffService",
-          errorCategory: "environment_constraint",
-          expected: true,
-        });
-      } else {
-        logger.info("LIFF initialization failed", {
-          authType: "liff",
-          error: errorMessage,
-          component: "LiffService",
-          errorCategory: "initialization_error",
-        });
-      }
-      this.state.error = error as Error;
-      return false;
-    } finally {
-      this.initializing = false;
     }
+
+    if (this.initializationPromise) {
+      return this.initializationPromise;
+    }
+
+    this.initializationPromise = (async () => {
+      try {
+        await liff.init({ liffId: this.liffId });
+        this.state.isInitialized = true;
+        this.state.isLoggedIn = liff.isLoggedIn();
+
+        if (this.state.isLoggedIn) {
+          await this.updateProfile();
+        }
+
+        return true;
+      } catch (error) {
+        this._handleLiffError(error, "initialize");
+        return false;
+      } finally {
+        this.initializationPromise = null;
+      }
+    })();
+
+    return this.initializationPromise;
   }
 
   public async login(redirectPath?: RawURIComponent): Promise<boolean> {
@@ -130,29 +112,7 @@ export class LiffService {
       await this.updateProfile();
       return true;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      const isEnvironmentConstraint =
-        errorMessage.includes("LIFF") ||
-        errorMessage.includes("LINE") ||
-        errorMessage.includes("Load failed");
-
-      if (isEnvironmentConstraint) {
-        logger.warn("LIFF environment login limitation", {
-          authType: "liff",
-          error: errorMessage,
-          component: "LiffService",
-          errorCategory: "environment_constraint",
-          expected: true,
-        });
-      } else {
-        logger.info("LIFF login process failed", {
-          authType: "liff",
-          error: errorMessage,
-          component: "LiffService",
-          errorCategory: "auth_temporary",
-        });
-      }
-      this.state.error = error as Error;
+      this._handleLiffError(error, "login");
       return false;
     }
   }
@@ -169,6 +129,37 @@ export class LiffService {
     }
   }
 
+  private _handleLiffError(error: unknown, operation: "initialize" | "login"): void {
+    const processedError = error instanceof Error ? error : new Error(String(error));
+    const isEnvironmentConstraint =
+      processedError.message.includes("LIFF") ||
+      processedError.message.includes("LINE") ||
+      processedError.message.includes("Load failed");
+
+    const logContext = {
+      authType: "liff",
+      error: processedError.message,
+      component: "LiffService",
+    };
+
+    if (isEnvironmentConstraint) {
+      const warnMessage = `LIFF environment ${operation} limitation`;
+      logger.warn(warnMessage, {
+        ...logContext,
+        errorCategory: "environment_constraint",
+        expected: true,
+      });
+    } else {
+      const infoMessage = operation === "login" ? "LIFF login process failed" : "LIFF initialization failed";
+      const errorCategory = operation === "login" ? "auth_temporary" : "initialization_error";
+      logger.info(infoMessage, {
+        ...logContext,
+        errorCategory,
+      });
+    }
+    this.state.error = processedError;
+  }
+
   private async updateProfile(): Promise<void> {
     try {
       if (!this.state.isInitialized || !this.state.isLoggedIn) {
@@ -182,9 +173,10 @@ export class LiffService {
         pictureUrl: profile.pictureUrl || null,
       };
     } catch (error) {
+      const processedError = error instanceof Error ? error : new Error(String(error));
       logger.info("Failed to get LIFF profile", {
         authType: "liff",
-        error: error instanceof Error ? error.message : String(error),
+        error: processedError.message,
         component: "LiffService",
       });
     }
@@ -275,9 +267,9 @@ export class LiffService {
 
         return true;
       } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
+        const processedError = error instanceof Error ? error : new Error(String(error));
 
-        if (message.includes("401") || message.includes("network") || message.includes("fetch")) {
+        if (processedError.message.includes("401") || processedError.message.includes("network") || processedError.message.includes("fetch")) {
           await new Promise((r) => setTimeout(r, attempt * 1000)); // 1s,2s,3s
           continue;
         }

@@ -12,6 +12,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { truncateText } from "@/utils/stringUtils";
+import { useTranslations } from "next-intl";
 
 interface Props {
   user: GqlUser;
@@ -20,10 +21,11 @@ interface Props {
   onBack: () => void;
   onSubmit: (amount: number, comment?: string) => void;
   title?: string;
-  recipientLabel?: string;
+  recipientKey?: string;
   submitLabel?: string;
   backLabel?: string;
-  presetAmounts?: number[]; // ← 追加
+  amountLabel?: string;
+  presetAmounts?: number[];
 }
 
 const INT_LIMIT = 2000000000;
@@ -34,21 +36,33 @@ function TransferInputStep({
   isLoading,
   onBack,
   onSubmit,
-  title = "ポイントを支給する",
-  recipientLabel = "に支給",
-  submitLabel = "支給する",
-  backLabel = "支給先を選び直す",
+  title,
+  recipientKey,
+  submitLabel,
+  backLabel,
+  amountLabel,
 }: Props) {
+  const t = useTranslations();
+  
+  const finalTitle = title ?? t("adminWallet.grant.title");
+  const finalSubmitLabel = submitLabel ?? t("adminWallet.grant.submit");
+  const finalBackLabel = backLabel ?? t("adminWallet.grant.back");
   const headerConfig: HeaderConfig = useMemo(
     () => ({
-      title,
+      title: finalTitle,
       showLogo: true,
       showBackButton: false,
     }),
-    [title],
+    [finalTitle],
   );
   useHeaderConfig(headerConfig);
-  const didValue = user.didIssuanceRequests?.find(req => req?.status === GqlDidIssuanceStatus.Completed)?.didValue ?? "did発行中";
+  const didValue = user.didIssuanceRequests?.find(req => req?.status === GqlDidIssuanceStatus.Completed)?.didValue;
+
+  const finalRecipientKey = recipientKey ?? "adminWallet.grant.recipientRich";
+  const recipientDisplay = t.rich(finalRecipientKey, {
+    b: (chunks) => <strong className="text-label-sm font-bold">{chunks}</strong>,
+    name: user.name ?? t("adminWallet.common.notSet"),
+  });
 
   const [amount, setAmount] = useState<number | null>(null);
   const [displayValue, setDisplayValue] = useState<string>("");
@@ -69,11 +83,11 @@ function TransferInputStep({
     }
     
     if (num > currentPoint) {
-      toast.error("保有ポイントを超えています");
+      toast.error(t("wallets.shared.transfer.errorExceedsBalance"));
       return;
     }
     if (num > INT_LIMIT) {
-      toast.error("20億以下を指定して下さい");
+      toast.error(t("wallets.shared.transfer.errorExceedsLimit"));
       return;
     }
     
@@ -88,23 +102,22 @@ function TransferInputStep({
           <Card className="items-center gap-3 w-full border p-4">
             <div className="flex items-center gap-3 w-full">
               <Avatar className="w-10 h-10 rounded-full border object-cover">
-                <AvatarImage src={user.image || ""} alt={user.name ?? "要確認"} />
+                <AvatarImage src={user.image || ""} alt={user.name ?? t("adminWallet.common.toConfirm")} />
                 <AvatarFallback>{user.name?.[0] ?? "U"}</AvatarFallback>
               </Avatar>
               <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-1">
-                  <span className="text-label-sm font-bold">{user.name}</span>
-                  <span className="text-label-xs font-bold">{recipientLabel}</span>
+                <div className="flex items-center gap-1 text-label-xs font-bold">
+                  {recipientDisplay}
                 </div>
-                <span className="text-label-xs text-caption mt-1">{ didValue?.length ? truncateText(didValue, 20, "middle") : "did取得中"}</span>
+                {didValue && <span className="text-label-xs text-caption mt-1">{truncateText(didValue, 20, "middle")}</span>}
               </div>
             </div>
           </Card>
           <section className="w-full">
             <div>
-              <Label className="text-label-md font-medium">支給ポイント</Label>
+              <Label className="text-label-md font-medium">{amountLabel ?? t("wallets.shared.transfer.amountLabel")}</Label>
               <span className="text-label-xs rounded-full px-2 py-[2px] ml-2 bg-primary-foreground text-primary font-bold">
-                必須
+                {t("wallets.shared.transfer.required")}
               </span>
             </div>
             <Input
@@ -116,19 +129,19 @@ function TransferInputStep({
                 className="mt-3 focus:outline-none focus:ring-0 shadow-none"
             />
             <div className="text-sm text-muted-foreground text-left mt-3">
-              残高 {currentPoint.toLocaleString()} pt
+              {t("wallets.shared.transfer.balance")} {currentPoint.toLocaleString()} pt
             </div>
             <div className="mt-6">
-              <Label className="text-label-md font-medium">コメント</Label>
+              <Label className="text-label-md font-medium">{t("wallets.shared.transfer.commentLabel")}</Label>
               <div className="relative mt-3">
                 <Textarea
                   maxLength={100}
-                  placeholder="例）草刈り手伝ってくれてありがとう！"
+                  placeholder={t("wallets.shared.transfer.commentPlaceholder")}
                   value={comment}
                   onChange={(e) => {
                     const newValue = e.target.value;
                     if (newValue.length > 100) {
-                      toast.error("100文字以内で入力してください");
+                      toast.error(t("wallets.shared.transfer.commentError"));
                       return;
                     }
                     setComment(newValue);
@@ -150,10 +163,10 @@ function TransferInputStep({
               }
               className="w-full"
             >
-              {submitLabel}
+              {finalSubmitLabel}
             </Button>
             <Button variant="text" size="sm" onClick={onBack} className="w-full">
-              {backLabel}
+              {finalBackLabel}
             </Button>
           </div>
         </div>

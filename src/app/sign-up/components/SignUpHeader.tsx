@@ -6,11 +6,13 @@ import { ChevronLeft } from "lucide-react";
 import { lineAuth as auth } from "@/lib/auth/core/firebase-config";
 import { useCookies } from "next-client-cookies";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 /**
  * Header component for the sign-up page with cancel functionality
  */
 const SignUpHeader: React.FC = () => {
+  const t = useTranslations();
   const router = useRouter();
   const cookies = useCookies();
 
@@ -29,9 +31,9 @@ const SignUpHeader: React.FC = () => {
         className="absolute left-4 inline-flex items-center text-muted-foreground hover:text-foreground"
       >
         <ChevronLeft className="h-5 w-5 mr-1" />
-        戻る
+        {t("auth.signup.back")}
       </Link>
-      <h1 className="flex-1 text-center text-lg font-bold truncate">アカウント情報の登録</h1>
+      <h1 className="flex-1 text-center text-lg font-bold truncate">{t("auth.signup.headerTitle")}</h1>
     </header>
   );
 };

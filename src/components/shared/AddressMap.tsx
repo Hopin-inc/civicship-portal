@@ -101,7 +101,7 @@ const useAddressGeocoding = (
         // 住所からの取得に失敗した場合、フォールバックの座標を使用
         return setFallbackLocation(map, zoom);
       } catch (error) {
-        logger.error("Error geocoding address", {
+        logger.warn("Error geocoding address", {
           error: error instanceof Error ? error.message : String(error),
           address,
           placeId,

@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { buildSearchResultParams, formatDateRange } from "@/app/search/data/presenter";
 import SearchTabs, { SearchTabType } from "@/app/search/components/Tabs";
 import { SearchFilterType } from "@/app/search/hooks/useSearch";
-import { visiblePrefectureLabels } from "@/app/users/data/presenter";
+import { prefectureOptions } from "@/shared/prefectures/constants";
 import { useSearchForm } from "@/app/search/hooks/useSearchForm";
 import SearchForm from "@/app/search/components/SearchForm";
 import SearchFilters from "@/app/search/components/SearchFilters";
@@ -14,6 +14,8 @@ import SearchFilterSheets from "@/app/search/components/SearchFilterSheet";
 import { useFeatureCheck } from "@/hooks/useFeatureCheck";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
+import { useTranslations, useLocale } from "next-intl";
+import { getPrefectureKey } from "@/lib/i18n/prefectures";
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -22,9 +24,11 @@ interface SearchModalProps {
 }
 
 export default function SearchModal({ isOpen, onClose, type }: SearchModalProps) {
+  const t = useTranslations();
+  const locale = useLocale();
   const router = useRouter();
   const shouldShowQuests = useFeatureCheck("quests");
-  
+
   const defaultTab: SearchTabType = shouldShowQuests && type === "quest" ? "quest" : "activity";
   const [selectedTab, setSelectedTab] = useState<SearchTabType>(defaultTab);
   const [activeForm, setActiveForm] = useState<SearchFilterType>(null);
@@ -50,6 +54,23 @@ export default function SearchModal({ isOpen, onClose, type }: SearchModalProps)
     !values.useTicket &&
     !values.usePoints;
 
+  const prefectureLabels = useMemo(
+    () =>
+      Object.fromEntries(
+        prefectureOptions.map((value) => [value, t(getPrefectureKey(value))])
+      ),
+    [t, locale]
+  );
+
+  const prefectures = useMemo(
+    () =>
+      prefectureOptions.map((value) => ({
+        id: value,
+        name: t(getPrefectureKey(value)),
+      })),
+    [t, locale]
+  );
+
   const handleSearch = () => {
     const values = getValues();
     const type = selectedTab === "quest" ? "quest" : "activity";
@@ -62,11 +83,10 @@ export default function SearchModal({ isOpen, onClose, type }: SearchModalProps)
       values.usePoints,
       type,
     );
-    
+
     router.push(`/opportunities/search?${params.toString()}`);
     onClose();
   };
-
 
   const clearActiveFilter = () => {
     if (activeForm) {
@@ -92,16 +112,13 @@ export default function SearchModal({ isOpen, onClose, type }: SearchModalProps)
         <div className="flex-1 overflow-auto p-4 bg-white">
           <div className="space-y-4">
             {shouldShowQuests && (
-              <SearchTabs
-                selectedTab={selectedTab}
-                onTabChange={setSelectedTab}
-              />
+              <SearchTabs selectedTab={selectedTab} onTabChange={setSelectedTab} />
             )}
             <SearchForm onSearch={handleSearch} />
             <SearchFilters
               onFilterClick={setActiveForm}
               formatDateRange={formatDateRange}
-              prefectureLabels={visiblePrefectureLabels}
+              prefectureLabels={prefectureLabels}
               location={location}
               dateRange={dateRange}
               guests={guests}
@@ -123,13 +140,13 @@ export default function SearchModal({ isOpen, onClose, type }: SearchModalProps)
               setUsePoints={(val) => setValue("usePoints", val)}
               clearActiveFilter={clearActiveFilter}
               getSheetHeight={() => "60vh"}
-              prefectures={Object.entries(visiblePrefectureLabels).map(([id, name]) => ({ id, name }))}
+              prefectures={prefectures}
             />
             <div className="border-t">
-              <SearchFooter 
-                onClear={handleClear} 
-                onSearch={handleSearch} 
-                isNoCondition={isNoCondition} 
+              <SearchFooter
+                onClear={handleClear}
+                onSearch={handleSearch}
+                isNoCondition={isNoCondition}
               />
             </div>
           </div>

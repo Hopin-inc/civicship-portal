@@ -10,7 +10,7 @@ import { TokenManager } from "../core/token-manager";
 import { isRunningInLiff } from "../core/environment-detector";
 import { logger } from "@/lib/logging";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
-import { getPhoneAuth } from "@/lib/auth/core/firebase-config";
+import { getPhoneAuth, logFirebaseError } from "@/lib/auth/core/firebase-config";
 
 export class PhoneAuthService {
   private static instance: PhoneAuthService;
@@ -83,7 +83,9 @@ export class PhoneAuthService {
       await new Promise((resolve) => setTimeout(resolve, 500));
 
       const baseContainer = document.getElementById("recaptcha-container");
+      
       if (!baseContainer) {
+        logger.error("[PhoneAuthService] Base container not found");
         throw new Error("Base reCAPTCHA container element not found");
       }
 
@@ -93,19 +95,19 @@ export class PhoneAuthService {
 
       this.recaptchaContainerElement = newContainer;
 
+      const recaptchaSize = isRunningInLiff() ? "normal" : "invisible";
+
       this.recaptchaVerifier = new RecaptchaVerifier(getPhoneAuth(), this.recaptchaContainerId, {
-        size: isRunningInLiff() ? "normal" : "invisible",
+        size: recaptchaSize,
         callback: () => {
-          logger.debug("reCAPTCHA completed", {
-            authType: "phone",
-            component: "PhoneAuthService",
-            environment: isRunningInLiff() ? "liff" : "browser",
-          });
           if (isRunningInLiff()) {
             window.dispatchEvent(new CustomEvent("recaptcha-completed"));
           }
         },
-        "expired-callback": () => this.clearRecaptcha(),
+        "expired-callback": () => {
+          logger.info("[PhoneAuthService] reCAPTCHA expired");
+          this.clearRecaptcha();
+        },
       });
 
       await this.recaptchaVerifier.render();
@@ -116,13 +118,20 @@ export class PhoneAuthService {
         this.recaptchaVerifier,
       );
 
-      return confirmationResult.verificationId;
+      const verificationId = confirmationResult.verificationId;
+
+      useAuthStore.getState().setPhoneAuth({ verificationId });
+
+      return verificationId;
     } catch (error) {
-      logger.error("Phone verification start failed", {
-        error: error instanceof Error ? error.message : String(error),
-        phoneNumber,
-        component: "PhoneAuthService",
-      });
+      logFirebaseError(
+        error,
+        "[PhoneAuthService] Phone verification start failed",
+        {
+          phoneMasked: phoneNumber.replace(/\d(?=\d{4})/g, '*'),
+          component: "PhoneAuthService",
+        }
+      );
       throw error;
     }
   }
@@ -164,7 +173,7 @@ export class PhoneAuthService {
         },
       };
     } catch (error) {
-      logger.error("verifyPhoneCode failed", {
+      logger.warn("verifyPhoneCode failed", {
         error: error instanceof Error ? error.message : String(error),
         component: "PhoneAuthService",
       });

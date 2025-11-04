@@ -6,6 +6,7 @@ import UserInfoCard from "./UserInfoCard";
 import { useMemberWithDidSearch as useMemberSearchFromCredentials } from "@/app/admin/credentials/hooks/useMemberWithDidSearch";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { useTranslations } from "next-intl";
 
 interface MemberTabProps {
   members: { user: GqlUser; wallet: { currentPointView?: { currentPoint: bigint } } }[];
@@ -20,6 +21,7 @@ export function MemberTab({
   searchQuery,
   onSelect,
 }: MemberTabProps) {
+  const t = useTranslations();
   const communityId = COMMUNITY_ID;
   const {
     data: searchMembershipData,
@@ -35,7 +37,7 @@ export function MemberTab({
   if (error) {
     return (
       <div className="space-y-3 px-4">
-        <p className="text-sm text-center text-red-500 pt-4">メンバーの読み込みに失敗しました</p>
+        <p className="text-sm text-center text-red-500 pt-4">{t("wallets.shared.member.errorLoad")}</p>
       </div>
     );
   }
@@ -45,7 +47,7 @@ export function MemberTab({
     return (
       <div className="space-y-3 px-4">
         <p className="text-sm text-center text-muted-foreground pt-4">
-          一致するメンバーが見つかりません
+          {t("wallets.shared.member.noMatch")}
         </p>
       </div>
     );
@@ -62,7 +64,7 @@ export function MemberTab({
             point={m.wallet?.currentPointView?.currentPoint ?? BigInt(0)}
             showPoint={true}
             showDate={false}
-            didValue={m.didInfo?.didValue ?? "did取得中"}
+            didValue={m.didInfo?.didValue}
             onClick={() => onSelect(m)}
           />
         );

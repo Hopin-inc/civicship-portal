@@ -20,7 +20,7 @@ export const ACTIVITY_BOOKING_CONFIG: ActivityBookingConfig = {
 /**
  * Default advance booking days for activities without specific configuration
  */
-export const DEFAULT_ADVANCE_BOOKING_DAYS = 1;
+export const DEFAULT_ADVANCE_BOOKING_DAYS = 2;
 
 /**
  * Default cancellation deadline days before activity start
