@@ -70,14 +70,14 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  return setCsp();
+  return setCsp(request, enabledFeatures);
 }
 
 export const config = {
   matcher: ["/_next/image", "/((?!_next/static|favicon.ico).*)"],
 };
 
-function setCsp() {
+function setCsp(request: NextRequest, enabledFeatures: FeaturesType[]) {
   const isDev = process.env.NODE_ENV !== "production";
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
 
