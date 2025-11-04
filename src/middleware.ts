@@ -70,7 +70,6 @@ function redirectToCloudFlareIfIpfs(nextUrl: NextURL) {
       /^https?:\/\/ipfs\.io\/ipfs\//i,
       "https://cloudflare-ipfs.com/ipfs/",
     );
-    console.debug(`Redirected to CloudFlare: ${originalUrl} -> ${replaced}`)
 
     // MIME 安定化のため filename ヒントを付与（拡張子不明対策）
     if (!/[?&]filename=/.test(replaced)) {
