@@ -30,6 +30,11 @@ const nextConfig = {
       },
       {
         protocol: "https",
+        hostname: "cloudflare-ipfs.com",
+        pathname: "/ipfs/**",
+      },
+      {
+        protocol: "https",
         hostname: "ipfs.io",
         pathname: "/ipfs/**",
       },
