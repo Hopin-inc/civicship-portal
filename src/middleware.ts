@@ -54,13 +54,11 @@ export const config = {
 
 function redirectToCloudFlareIfIpfs(nextUrl: NextURL) {
   const searchParams = nextUrl.searchParams;
-  const rawOriginalUrl = searchParams.get("url");
-  if (!rawOriginalUrl) return;
+  const orig = searchParams.get("url");
 
-  const originalUrl = decodeURIComponent(rawOriginalUrl);
-  if (/https?:\/\/ipfs\.io\/ipfs\//i.test(originalUrl)) {
+  if (orig && /https?:\/\/ipfs\.io\/ipfs\//i.test(orig)) {
     // ipfs.io を cloudflare-ipfs.com に置換
-    let replaced = originalUrl.replace(
+    let replaced = orig.replace(
       /^https?:\/\/ipfs\.io\/ipfs\//i,
       "https://cloudflare-ipfs.com/ipfs/",
     );
