@@ -61,7 +61,6 @@ function redirectToCloudFlareIfIpfs(nextUrl: NextURL) {
   const searchParams = nextUrl.searchParams;
   const rawOriginalUrl = searchParams.get("url");
   if (!rawOriginalUrl) return;
-  if (searchParams.get('__cf_gw') === '1') return null;
 
   const originalUrl = decodeURIComponent(rawOriginalUrl);
   if (/https?:\/\/ipfs\.io\/ipfs\//i.test(originalUrl)) {
@@ -77,8 +76,6 @@ function redirectToCloudFlareIfIpfs(nextUrl: NextURL) {
     }
 
     searchParams.set("url", encodeURIComponent(replaced));
-    searchParams.set('__cf_gw', '1');
-
     nextUrl.search = searchParams.toString();
 
     return NextResponse.rewrite(nextUrl);
