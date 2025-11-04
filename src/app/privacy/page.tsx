@@ -1,10 +1,7 @@
-"use client";
-
-import { useEffect, useMemo, useState } from "react";
 import { convertMarkdownToHtml } from "@/utils/markdownUtils";
-import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { logger } from "@/lib/logging";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
+import { redirect } from "next/navigation";
+import PrivacyPageClient from "./PrivacyPageClient";
 
 const policyMarkdown = `
 共創DAO合同会社（以下「当社」といいます。）は、当社が提供するサービス、運営するイベント、関与するプロジェクトなどの当社の事業（以下「当事業等」といいます。）に関して、当社が取得した個人情報（以下、個人情報によって特定識別される当該本人を「ユーザー」といいます。）の取扱いについて、以下の通りプライバシーポリシー（以下「本ポリシー」といいます。）を定め、プライバシーの適切な保護の重要性と社会的責任を十分に認識し、個人情報の保護に関する法律（以下「個人情報保護法」といいます。）その他の関係法令を遵守いたします。なお、本プライバシーポリシーにおける「個人情報」は、個人情報保護法の定義に従います。
@@ -305,50 +302,14 @@ EEA居住者は該当監督機関へ、英国居住者はInformation Commissione
 グローバルプライバシーポリシー12.（連絡先）をご参照ください。
 `;
 
-export default function PrivacyPage() {
-  const headerConfig = useMemo(
-    () => ({
-      title: "プライバシーポリシー",
-      showBackButton: true,
-      showLogo: false,
-    }),
-    [],
-  );
-  useHeaderConfig(headerConfig);
-
-  const [html, setHtml] = useState("");
-
-  useEffect(() => {
-    const privacyOverride = currentCommunityConfig.commonDocumentOverrides?.privacy;
-    
-    if (privacyOverride && privacyOverride.type === "external") {
-      window.location.href = privacyOverride.path;
-      return;
-    }
-
-    convertMarkdownToHtml(policyMarkdown).then(setHtml).catch((error) => {
-      logger.warn("Failed to convert markdown to HTML", {
-        error: error instanceof Error ? error.message : String(error),
-        component: "PrivacyPage"
-      });
-    });
-  }, []);
-
-  if (!html) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">読み込み中...</div>
-      </div>
-    );
+export default async function PrivacyPage() {
+  const privacyOverride = currentCommunityConfig.commonDocumentOverrides?.privacy;
+  
+  if (privacyOverride && privacyOverride.type === "external") {
+    redirect(privacyOverride.path);
   }
 
-  return (
-    <div className="max-w-[720px] mx-auto px-4 py-8">
-      <div className="prose prose-slate max-w-none">
-        <div className="overflow-x-auto">
-          <div dangerouslySetInnerHTML={{ __html: html }} />
-        </div>
-      </div>
-    </div>
-  );
+  const html = await convertMarkdownToHtml(policyMarkdown);
+  
+  return <PrivacyPageClient html={html} />;
 }
