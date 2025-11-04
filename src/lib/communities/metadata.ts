@@ -144,6 +144,20 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     enableFeatures: ["points", "justDaoIt", "languageSwitcher"],
     rootPath: "/users/me",
     adminRootPath: "/admin/wallet",
+    commonDocumentOverrides: {
+      privacy: {
+        id: "privacy",
+        title: "users.promise.privacyPolicy",
+        path: "/communities/kibotcha/privacy-policy.pdf",
+        type: "external",
+      },
+      terms: {
+        id: "terms",
+        title: "users.promise.termsOfService",
+        path: "/communities/kibotcha/terms.pdf",
+        type: "external",
+      },
+    },
     documents: [
       {
         id: "bylaws",
