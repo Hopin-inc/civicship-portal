@@ -19,30 +19,28 @@ export function middleware(request: NextRequest) {
   const searchParams = nextUrl.searchParams;
 
   if (pathname === "/_next/image") {
-    const encodedUrl = searchParams.get("url");
-    if (encodedUrl) {
-      try {
-        const decodedUrl = decodeURIComponent(encodedUrl);
-        
-        if (/^https?:\/\/ipfs\.io\/ipfs\//i.test(decodedUrl)) {
-          let rewrittenUrl = decodedUrl.replace(
-            /^https?:\/\/ipfs\.io\/ipfs\//i,
-            'https://cloudflare-ipfs.com/ipfs/'
-          );
-          
-          if (!/[?&]filename=/.test(rewrittenUrl)) {
-            rewrittenUrl += (rewrittenUrl.includes('?') ? '&' : '?') + 'filename=image.png';
-          }
-          
-          searchParams.set('url', encodeURIComponent(rewrittenUrl));
-          nextUrl.search = searchParams.toString();
-          
-          return NextResponse.rewrite(nextUrl);
-        }
-      } catch (error) {
-        console.error('Error processing IPFS URL in middleware:', error);
-      }
+    const urlParam = searchParams.get("url");
+    if (!urlParam) {
+      return NextResponse.next();
     }
+
+    if (!/^https?:\/\/ipfs\.io\/ipfs\//i.test(urlParam)) {
+      return NextResponse.next();
+    }
+
+    let rewrittenUrl = urlParam.replace(
+      /^https?:\/\/ipfs\.io\/ipfs\//i,
+      'https://cloudflare-ipfs.com/ipfs/'
+    );
+    
+    if (!/[?&]filename=/.test(rewrittenUrl)) {
+      rewrittenUrl += (rewrittenUrl.includes('?') ? '&' : '?') + 'filename=image.png';
+    }
+    
+    searchParams.set('url', rewrittenUrl);
+    nextUrl.search = searchParams.toString();
+    
+    return NextResponse.rewrite(nextUrl);
   }
 
   const enabledFeatures = currentCommunityConfig.enableFeatures || [];
