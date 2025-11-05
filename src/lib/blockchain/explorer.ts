@@ -60,31 +60,27 @@ export function detectChainFromAddress(address?: string): Chain | null {
  * Extract tokenId from ERC-721 metadata
  */
 export function extractEthereumTokenId(metadata: unknown): string | undefined {
-  if (!metadata || typeof metadata !== 'object') {
+  if (typeof metadata !== 'object' || metadata === null) {
     return undefined;
   }
   
-  try {
-    const meta = metadata as Record<string, unknown>;
-    
-    if (meta.external_url && typeof meta.external_url === 'string') {
-      const match = meta.external_url.match(/\/tokens?\/[^/]+\/(\d+)$/i);
-      if (match && match[1]) {
-        return match[1];
-      }
+  const meta = metadata as Record<string, unknown>;
+  
+  if (meta.external_url && typeof meta.external_url === 'string') {
+    const match = meta.external_url.match(/\/tokens?\/[^/]+\/(\d+)$/i);
+    if (match && match[1]) {
+      return match[1];
     }
-    
-    if (meta.name && typeof meta.name === 'string') {
-      const match = meta.name.match(/#\s*(\d+)$/);
-      if (match && match[1]) {
-        return match[1];
-      }
-    }
-    
-    return undefined;
-  } catch {
-    return undefined;
   }
+  
+  if (meta.name && typeof meta.name === 'string') {
+    const match = meta.name.match(/#\s*(\d+)$/);
+    if (match && match[1]) {
+      return match[1];
+    }
+  }
+  
+  return undefined;
 }
 
 /**
@@ -94,33 +90,36 @@ export function getExplorerUrl(params: ExplorerUrlParams): string {
   const config = getBlockchainConfig();
   const { chain, contractOrPolicyAddress, tokenId, assetNameHex, metadata } = params;
   
-  if (chain === 'cardano') {
-    const baseUrl = config.cardano.explorerBaseUrl;
-    
-    if (assetNameHex) {
-      return `${baseUrl}/token/${contractOrPolicyAddress}.${assetNameHex}`;
+  switch (chain) {
+    case 'cardano': {
+      const baseUrl = config.cardano.explorerBaseUrl;
+      
+      if (assetNameHex) {
+        return `${baseUrl}/token/${contractOrPolicyAddress}.${assetNameHex}`;
+      }
+      
+      return `${baseUrl}/policy/${contractOrPolicyAddress}`;
     }
-    
-    return `${baseUrl}/policy/${contractOrPolicyAddress}`;
-  }
-  
-  if (chain === 'ethereum') {
-    const { explorerBaseUrl, contractPath, tokenPath } = config.ethereum;
-    
-    const extractedTokenId = tokenId || extractEthereumTokenId(metadata);
-    
-    if (extractedTokenId) {
-      const url = tokenPath
-        .replace('{address}', contractOrPolicyAddress)
-        .replace('{tokenId}', extractedTokenId);
+    case 'ethereum': {
+      const { explorerBaseUrl, contractPath, tokenPath } = config.ethereum;
+      
+      const extractedTokenId = tokenId || extractEthereumTokenId(metadata);
+      
+      if (extractedTokenId) {
+        const url = tokenPath
+          .replace('{address}', contractOrPolicyAddress)
+          .replace('{tokenId}', extractedTokenId);
+        return `${explorerBaseUrl}${url}`;
+      }
+      
+      const url = contractPath.replace('{address}', contractOrPolicyAddress);
       return `${explorerBaseUrl}${url}`;
     }
-    
-    const url = contractPath.replace('{address}', contractOrPolicyAddress);
-    return `${explorerBaseUrl}${url}`;
+    default: {
+      const _exhaustiveCheck: never = chain;
+      throw new Error(`Unsupported chain: ${_exhaustiveCheck}`);
+    }
   }
-  
-  throw new Error(`Unsupported chain: ${chain}`);
 }
 
 /**
@@ -130,15 +129,16 @@ export function getTransactionUrl(params: TransactionUrlParams): string {
   const config = getBlockchainConfig();
   const { chain, txHash } = params;
   
-  if (chain === 'cardano') {
-    return `${config.cardano.explorerBaseUrl}/transaction/${txHash}`;
+  switch (chain) {
+    case 'cardano':
+      return `${config.cardano.explorerBaseUrl}/transaction/${txHash}`;
+    case 'ethereum':
+      return `${config.ethereum.explorerBaseUrl}/tx/${txHash}`;
+    default: {
+      const _exhaustiveCheck: never = chain;
+      throw new Error(`Unsupported chain: ${_exhaustiveCheck}`);
+    }
   }
-  
-  if (chain === 'ethereum') {
-    return `${config.ethereum.explorerBaseUrl}/tx/${txHash}`;
-  }
-  
-  throw new Error(`Unsupported chain: ${chain}`);
 }
 
 /**
@@ -175,32 +175,28 @@ function isHexString(str: string): boolean {
  * first one will be extracted.
  */
 export function extractCardanoAssetNameHex(metadata: unknown): string | undefined {
-  if (!metadata || typeof metadata !== 'object') return undefined;
+  if (typeof metadata !== 'object' || metadata === null) return undefined;
   
-  try {
-    const meta = metadata as Record<string, unknown>;
-    const cip25 = meta['721'];
-    
-    if (!cip25 || typeof cip25 !== 'object') return undefined;
-    
-    const cip25Obj = cip25 as Record<string, unknown>;
-    
-    const policyId = Object.keys(cip25Obj).find(
-      key => key !== 'version' && typeof cip25Obj[key] === 'object' && cip25Obj[key] !== null
-    );
-    
-    if (!policyId) return undefined;
-    
-    const policyData = cip25Obj[policyId];
-    if (!policyData || typeof policyData !== 'object') return undefined;
-    
-    const assetNames = Object.keys(policyData as Record<string, unknown>);
-    if (assetNames.length === 0) return undefined;
-    
-    const assetName = assetNames[0];
-    
-    return isHexString(assetName) ? assetName : stringToHex(assetName);
-  } catch {
-    return undefined;
-  }
+  const meta = metadata as Record<string, unknown>;
+  const cip25 = meta['721'];
+  
+  if (typeof cip25 !== 'object' || cip25 === null) return undefined;
+  
+  const cip25Obj = cip25 as Record<string, unknown>;
+  
+  const policyId = Object.keys(cip25Obj).find(
+    key => key !== 'version' && typeof cip25Obj[key] === 'object' && cip25Obj[key] !== null
+  );
+  
+  if (!policyId) return undefined;
+  
+  const policyData = cip25Obj[policyId];
+  if (typeof policyData !== 'object' || policyData === null) return undefined;
+  
+  const assetNames = Object.keys(policyData);
+  if (assetNames.length === 0) return undefined;
+  
+  const assetName = assetNames[0];
+  
+  return isHexString(assetName) ? assetName : stringToHex(assetName);
 }

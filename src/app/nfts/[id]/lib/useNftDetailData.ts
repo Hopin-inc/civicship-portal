@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { GqlDidIssuanceStatus } from "@/types/graphql";
+import { GqlDidIssuanceStatus, GqlGetNftInstanceWithDidQuery, GqlDidIssuanceRequest } from "@/types/graphql";
 import {
   detectChain,
   detectChainFromAddress,
@@ -8,7 +8,7 @@ import {
   extractCardanoAssetNameHex,
 } from "@/lib/blockchain";
 
-export function useNftDetailData(nftInstance: any) {
+export function useNftDetailData(nftInstance: GqlGetNftInstanceWithDidQuery['nftInstance']) {
   const basic = useMemo(() => {
     if (!nftInstance) {
       return {
@@ -27,7 +27,7 @@ export function useNftDetailData(nftInstance: any) {
     const { address: contractAddress, type: tokenType } = nftInstance.nftToken ?? {};
     const { name: username } = nftInstance.nftWallet?.user ?? {};
     const didValue = nftInstance.nftWallet?.user?.didIssuanceRequests?.find(
-      (request: any) => request.status === GqlDidIssuanceStatus.Completed,
+      (request: GqlDidIssuanceRequest) => request.status === GqlDidIssuanceStatus.Completed,
     )?.didValue;
 
     return {
