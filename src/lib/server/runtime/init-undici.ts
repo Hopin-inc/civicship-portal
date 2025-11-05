@@ -23,6 +23,19 @@ export async function initUndiciAgent() {
     initialized = true;
     
     console.log('[undici] Global HTTP agent initialized with keep-alive');
+    
+    const apiEndpoint = process.env.NEXT_PUBLIC_API_ENDPOINT;
+    if (apiEndpoint) {
+      try {
+        await fetch(`${apiEndpoint}/health`, {
+          method: 'GET',
+          signal: AbortSignal.timeout(5000), // 5秒タイムアウト
+        });
+        console.log('[undici] Connection prewarmed to API');
+      } catch (error) {
+        console.warn('[undici] Prewarm failed (non-critical):', (error as Error).message);
+      }
+    }
   } catch (error) {
     console.error('[undici] Failed to initialize global agent:', error);
   }
