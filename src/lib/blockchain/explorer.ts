@@ -2,7 +2,7 @@
  * Blockchain explorer utilities for NFT verification
  */
 
-import { getBlockchainConfig } from './config';
+import { blockchainConfig } from './config';
 
 export type Chain = 'cardano' | 'ethereum';
 
@@ -87,7 +87,7 @@ export function extractEthereumTokenId(metadata: unknown): string | undefined {
  * Get blockchain explorer URL for NFT
  */
 export function getExplorerUrl(params: ExplorerUrlParams): string {
-  const config = getBlockchainConfig();
+  const config = blockchainConfig;
   const { chain, contractOrPolicyAddress, tokenId, assetNameHex, metadata } = params;
   
   switch (chain) {
@@ -126,7 +126,7 @@ export function getExplorerUrl(params: ExplorerUrlParams): string {
  * Get blockchain explorer URL for transaction
  */
 export function getTransactionUrl(params: TransactionUrlParams): string {
-  const config = getBlockchainConfig();
+  const config = blockchainConfig;
   const { chain, txHash } = params;
   
   switch (chain) {
