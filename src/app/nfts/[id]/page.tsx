@@ -92,20 +92,6 @@ export default function NftPage({ params }: { params: Promise<{ id: string }> })
       label: "規格",
       value: tokenType,
     }] : []),
-    ...(explorerUrl ? [{
-      label: "ブロックチェーンで確認",
-      value: (
-        <Button variant="text" size="sm" asChild>
-          <a
-            href={explorerUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Explorerで表示
-          </a>
-        </Button>
-      ),
-    }] : []),
   ];
 
   return (
@@ -130,6 +116,19 @@ export default function NftPage({ params }: { params: Promise<{ id: string }> })
             <InfoCard key={index} {...card} />
           ))}
         </div>
+        {explorerUrl && (
+          <div className="mt-4">
+            <Button variant="text" asChild>
+              <a
+                href={explorerUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                ブロックチェーンで確認
+              </a>
+            </Button>
+          </div>
+        )}
       </div>
     </>
   );

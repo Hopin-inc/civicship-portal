@@ -114,28 +114,28 @@ export function getChainDisplayName(chain: Chain): string {
  * Extract asset name hex from Cardano metadata
  * Looks for the asset name in the CIP-25 metadata structure
  */
-export function extractCardanoAssetNameHex(metadata: unknown): string | null {
-  if (!metadata || typeof metadata !== 'object') return null;
+export function extractCardanoAssetNameHex(metadata: unknown): string | undefined {
+  if (!metadata || typeof metadata !== 'object') return undefined;
   
   try {
     const meta = metadata as Record<string, unknown>;
     const cip25 = meta['721'];
     
-    if (!cip25 || typeof cip25 !== 'object') return null;
+    if (!cip25 || typeof cip25 !== 'object') return undefined;
     
     const cip25Obj = cip25 as Record<string, unknown>;
     
     const policyIds = Object.keys(cip25Obj);
-    if (policyIds.length === 0) return null;
+    if (policyIds.length === 0) return undefined;
     
     const policyData = cip25Obj[policyIds[0]];
-    if (!policyData || typeof policyData !== 'object') return null;
+    if (!policyData || typeof policyData !== 'object') return undefined;
     
     const assetNames = Object.keys(policyData as Record<string, unknown>);
-    if (assetNames.length === 0) return null;
+    if (assetNames.length === 0) return undefined;
     
     return assetNames[0];
   } catch {
-    return null;
+    return undefined;
   }
 }
