@@ -2,11 +2,8 @@
  * Blockchain network configuration
  */
 
-export type BlockchainNetwork = 'mainnet' | 'preprod';
-
 export interface BlockchainConfig {
   cardano: {
-    network: BlockchainNetwork;
     explorerBaseUrl: string;
   };
   ethereum: {
@@ -18,19 +15,13 @@ export interface BlockchainConfig {
 
 /**
  * Get blockchain configuration
- * Cardano: Uses mainnet by default
+ * Cardano: Uses Cardanoscan (mainnet)
  * Ethereum: All ERC-721 NFTs use Base Sepolia (Blockscout)
  */
 export function getBlockchainConfig(): BlockchainConfig {
-  const cardanoNetwork: BlockchainNetwork =
-    process.env.NEXT_PUBLIC_CARDANO_NETWORK === 'preprod' ? 'preprod' : 'mainnet';
-
   return {
     cardano: {
-      network: cardanoNetwork,
-      explorerBaseUrl: cardanoNetwork === 'mainnet'
-        ? 'https://cardanoscan.io'
-        : 'https://preprod.cardanoscan.io',
+      explorerBaseUrl: 'https://cardanoscan.io',
     },
     ethereum: {
       explorerBaseUrl: 'https://base-sepolia.blockscout.com',
