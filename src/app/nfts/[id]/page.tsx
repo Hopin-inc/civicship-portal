@@ -6,6 +6,13 @@ import { InfoCardProps } from "@/types";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import Image from "next/image";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import {
+  detectChain,
+  detectChainFromAddress,
+  getExplorerUrl,
+  getChainDisplayName,
+  extractCardanoAssetNameHex,
+} from "@/lib/blockchain";
 
 export default function NftPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -29,15 +36,26 @@ export default function NftPage({ params }: { params: Promise<{ id: string }> })
   }
 
   const nftInstance = nftInstanceWithDid.nftInstance;
-  const { instanceId, imageUrl, name: instanceName } = nftInstance;
+  const { instanceId, imageUrl, name: instanceName, json: instanceJson } = nftInstance;
 
-  const { address: contractAddress, type: tokenType } = nftInstance.nftToken ?? {};
+  const { address: contractAddress, type: tokenType, json: tokenJson } = nftInstance.nftToken ?? {};
 
   const { name: username } = nftInstance.nftWallet?.user ?? {};
 
   const didValue = nftInstance.nftWallet?.user?.didIssuanceRequests?.find(
     (request) => request.status === GqlDidIssuanceStatus.Completed,
   )?.didValue;
+
+  const chain = detectChain(tokenType) || detectChainFromAddress(contractAddress);
+  const chainDisplayName = chain ? getChainDisplayName(chain) : undefined;
+
+  const assetNameHex = chain === 'cardano' ? extractCardanoAssetNameHex(instanceJson) : undefined;
+
+  const explorerUrl = chain && contractAddress ? getExplorerUrl({
+    chain,
+    contractOrPolicyAddress: contractAddress,
+    assetNameHex,
+  }) : undefined;
 
   const infoCardsValueList: InfoCardProps[] = [
     {
@@ -65,14 +83,41 @@ export default function NftPage({ params }: { params: Promise<{ id: string }> })
       copyData: contractAddress,
       truncatePattern: "middle",
     },
-    // {
-    //   label: "チェーン",
-    //   value: "Ethereum",
-    // },
-    // {
-    //   label: "規格",
-    //   value: tokenType,
-    // },
+    ...(chainDisplayName ? [{
+      label: "チェーン",
+      value: chainDisplayName,
+    }] : []),
+    ...(tokenType ? [{
+      label: "規格",
+      value: tokenType,
+    }] : []),
+    ...(explorerUrl ? [{
+      label: "ブロックチェーンで確認",
+      value: (
+        <a
+          href={explorerUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-primary hover:underline flex items-center gap-1"
+        >
+          Explorerで表示
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+            />
+          </svg>
+        </a>
+      ),
+    }] : []),
   ];
 
   return (
