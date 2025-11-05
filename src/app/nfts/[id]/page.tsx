@@ -118,14 +118,10 @@ export default function NftPage({ params }: { params: Promise<{ id: string }> })
           ))}
         </div>
         {explorerUrl && (
-          <div className="mt-4">
+          <div className="mt-4 flex justify-center">
             <Button variant="text" asChild>
-              <a
-                href={explorerUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                ブロックチェーンで確認
+              <a href={explorerUrl} target="_blank" rel="noopener noreferrer">
+                証明を検証する
               </a>
             </Button>
           </div>
