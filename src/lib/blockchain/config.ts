@@ -10,18 +10,19 @@ export interface BlockchainConfig {
     explorerBaseUrl: string;
   };
   ethereum: {
-    network: BlockchainNetwork;
     explorerBaseUrl: string;
+    contractPath: string;
+    tokenPath: string;
   };
 }
 
 /**
- * Get blockchain configuration from environment variables
- * Defaults to mainnet for both chains
+ * Get blockchain configuration
+ * Cardano: Uses mainnet by default
+ * Ethereum: All ERC-721 NFTs use Base Sepolia (Blockscout)
  */
 export function getBlockchainConfig(): BlockchainConfig {
   const cardanoNetwork = (process.env.NEXT_PUBLIC_CARDANO_NETWORK || 'mainnet') as BlockchainNetwork;
-  const ethereumNetwork = (process.env.NEXT_PUBLIC_ETHEREUM_NETWORK || 'mainnet') as BlockchainNetwork;
 
   return {
     cardano: {
@@ -31,10 +32,9 @@ export function getBlockchainConfig(): BlockchainConfig {
         : 'https://preprod.cardanoscan.io',
     },
     ethereum: {
-      network: ethereumNetwork,
-      explorerBaseUrl: ethereumNetwork === 'mainnet'
-        ? 'https://etherscan.io'
-        : 'https://sepolia.etherscan.io',
+      explorerBaseUrl: 'https://base-sepolia.blockscout.com',
+      contractPath: '/token/{address}',
+      tokenPath: '/token/{address}/instance/{tokenId}',
     },
   };
 }

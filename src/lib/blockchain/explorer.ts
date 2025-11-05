@@ -11,6 +11,7 @@ export interface ExplorerUrlParams {
   contractOrPolicyAddress: string;
   tokenId?: string;
   assetNameHex?: string;
+  metadata?: unknown;
 }
 
 export interface TransactionUrlParams {
@@ -56,11 +57,42 @@ export function detectChainFromAddress(address?: string): Chain | null {
 }
 
 /**
+ * Extract tokenId from ERC-721 metadata
+ */
+export function extractEthereumTokenId(metadata: unknown, instanceId?: string): string | undefined {
+  if (!metadata || typeof metadata !== 'object') {
+    return instanceId;
+  }
+  
+  try {
+    const meta = metadata as Record<string, unknown>;
+    
+    if (meta.external_url && typeof meta.external_url === 'string') {
+      const match = meta.external_url.match(/\/tokens?\/[^/]+\/(\d+)$/i);
+      if (match && match[1]) {
+        return match[1];
+      }
+    }
+    
+    if (meta.name && typeof meta.name === 'string') {
+      const match = meta.name.match(/#\s*(\d+)$/);
+      if (match && match[1]) {
+        return match[1];
+      }
+    }
+    
+    return instanceId;
+  } catch {
+    return instanceId;
+  }
+}
+
+/**
  * Get blockchain explorer URL for NFT
  */
 export function getExplorerUrl(params: ExplorerUrlParams): string {
   const config = getBlockchainConfig();
-  const { chain, contractOrPolicyAddress, tokenId, assetNameHex } = params;
+  const { chain, contractOrPolicyAddress, tokenId, assetNameHex, metadata } = params;
   
   if (chain === 'cardano') {
     const baseUrl = config.cardano.explorerBaseUrl;
@@ -73,13 +105,19 @@ export function getExplorerUrl(params: ExplorerUrlParams): string {
   }
   
   if (chain === 'ethereum') {
-    const baseUrl = config.ethereum.explorerBaseUrl;
+    const { explorerBaseUrl, contractPath, tokenPath } = config.ethereum;
     
-    if (tokenId) {
-      return `${baseUrl}/nft/${contractOrPolicyAddress}/${tokenId}`;
+    const extractedTokenId = tokenId || extractEthereumTokenId(metadata, undefined);
+    
+    if (extractedTokenId) {
+      const url = tokenPath
+        .replace('{address}', contractOrPolicyAddress)
+        .replace('{tokenId}', extractedTokenId);
+      return `${explorerBaseUrl}${url}`;
     }
     
-    return `${baseUrl}/address/${contractOrPolicyAddress}`;
+    const url = contractPath.replace('{address}', contractOrPolicyAddress);
+    return `${explorerBaseUrl}${url}`;
   }
   
   throw new Error(`Unsupported chain: ${chain}`);
@@ -125,7 +163,7 @@ function stringToHex(str: string): string {
  * Check if a string is already in hex format
  */
 function isHexString(str: string): boolean {
-  return /^[0-9a-fA-F]+$/.test(str);
+  return /^[0-9a-fA-F]+$/.test(str) && str.length % 2 === 0;
 }
 
 /**

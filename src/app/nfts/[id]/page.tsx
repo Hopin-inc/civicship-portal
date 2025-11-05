@@ -56,6 +56,7 @@ export default function NftPage({ params }: { params: Promise<{ id: string }> })
     chain,
     contractOrPolicyAddress: contractAddress,
     assetNameHex,
+    metadata: instanceJson,
   }) : undefined;
 
   const infoCardsValueList: InfoCardProps[] = [
