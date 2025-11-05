@@ -2,7 +2,7 @@
  * Blockchain explorer utilities for NFT verification
  */
 
-import { blockchainConfig } from './config';
+import { blockchainConfig } from './blockchainConfig';
 
 export type Chain = 'cardano' | 'ethereum';
 

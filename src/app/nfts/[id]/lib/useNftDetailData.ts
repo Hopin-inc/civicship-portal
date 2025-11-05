@@ -6,7 +6,7 @@ import {
   getExplorerUrl,
   getChainDisplayName,
   extractCardanoAssetNameHex,
-} from "@/lib/blockchain";
+} from "./blockchainExplorer";
 
 export function useNftDetailData(nftInstance: GqlGetNftInstanceWithDidQuery['nftInstance']) {
   const basic = useMemo(() => {
