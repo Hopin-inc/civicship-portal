@@ -111,6 +111,24 @@ export function getChainDisplayName(chain: Chain): string {
 }
 
 /**
+ * Convert string to hex encoding
+ */
+function stringToHex(str: string): string {
+  const encoder = new TextEncoder();
+  const bytes = encoder.encode(str);
+  return Array.from(bytes)
+    .map(byte => byte.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+/**
+ * Check if a string is already in hex format
+ */
+function isHexString(str: string): boolean {
+  return /^[0-9a-fA-F]+$/.test(str);
+}
+
+/**
  * Extract asset name hex from Cardano metadata
  * Looks for the asset name in the CIP-25 metadata structure
  */
@@ -125,16 +143,21 @@ export function extractCardanoAssetNameHex(metadata: unknown): string | undefine
     
     const cip25Obj = cip25 as Record<string, unknown>;
     
-    const policyIds = Object.keys(cip25Obj);
-    if (policyIds.length === 0) return undefined;
+    const policyId = Object.keys(cip25Obj).find(
+      key => key !== 'version' && typeof cip25Obj[key] === 'object' && cip25Obj[key] !== null
+    );
     
-    const policyData = cip25Obj[policyIds[0]];
+    if (!policyId) return undefined;
+    
+    const policyData = cip25Obj[policyId];
     if (!policyData || typeof policyData !== 'object') return undefined;
     
     const assetNames = Object.keys(policyData as Record<string, unknown>);
     if (assetNames.length === 0) return undefined;
     
-    return assetNames[0];
+    const assetName = assetNames[0];
+    
+    return isHexString(assetName) ? assetName : stringToHex(assetName);
   } catch {
     return undefined;
   }
