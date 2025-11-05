@@ -8,7 +8,6 @@ import Image from "next/image";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { Button } from "@/components/ui/button";
 import { useNftDetailData } from "./lib/useNftDetailData";
-import { shortenMiddle } from "./lib/utils";
 
 export default function NftPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -48,17 +47,21 @@ export default function NftPage({ params }: { params: Promise<{ id: string }> })
     },
     {
       label: "証明書ID",
-      value: shortenMiddle(basic.instanceId),
+      value: basic.instanceId,
       showCopy: true,
       copyData: basic.instanceId,
-      showTruncate: false,
+      truncatePattern: "middle",
+      truncateHead: 6,
+      truncateTail: 4,
     },
     {
       label: "コントラクト\nアドレス",
-      value: shortenMiddle(basic.contractAddress),
+      value: basic.contractAddress,
       showCopy: true,
       copyData: basic.contractAddress,
-      showTruncate: false,
+      truncatePattern: "middle",
+      truncateHead: 6,
+      truncateTail: 4,
     },
     ...(blockchain.chainDisplayName ? [{
       label: "チェーン",
