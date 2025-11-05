@@ -2,7 +2,7 @@
  * Blockchain network configuration
  */
 
-export type BlockchainNetwork = 'mainnet' | 'testnet';
+export type BlockchainNetwork = 'mainnet' | 'preprod';
 
 export interface BlockchainConfig {
   cardano: {
@@ -22,7 +22,8 @@ export interface BlockchainConfig {
  * Ethereum: All ERC-721 NFTs use Base Sepolia (Blockscout)
  */
 export function getBlockchainConfig(): BlockchainConfig {
-  const cardanoNetwork = (process.env.NEXT_PUBLIC_CARDANO_NETWORK || 'mainnet') as BlockchainNetwork;
+  const cardanoNetwork: BlockchainNetwork =
+    process.env.NEXT_PUBLIC_CARDANO_NETWORK === 'preprod' ? 'preprod' : 'mainnet';
 
   return {
     cardano: {

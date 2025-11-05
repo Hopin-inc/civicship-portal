@@ -59,9 +59,9 @@ export function detectChainFromAddress(address?: string): Chain | null {
 /**
  * Extract tokenId from ERC-721 metadata
  */
-export function extractEthereumTokenId(metadata: unknown, instanceId?: string): string | undefined {
+export function extractEthereumTokenId(metadata: unknown): string | undefined {
   if (!metadata || typeof metadata !== 'object') {
-    return instanceId;
+    return undefined;
   }
   
   try {
@@ -81,9 +81,9 @@ export function extractEthereumTokenId(metadata: unknown, instanceId?: string): 
       }
     }
     
-    return instanceId;
+    return undefined;
   } catch {
-    return instanceId;
+    return undefined;
   }
 }
 
@@ -107,7 +107,7 @@ export function getExplorerUrl(params: ExplorerUrlParams): string {
   if (chain === 'ethereum') {
     const { explorerBaseUrl, contractPath, tokenPath } = config.ethereum;
     
-    const extractedTokenId = tokenId || extractEthereumTokenId(metadata, undefined);
+    const extractedTokenId = tokenId || extractEthereumTokenId(metadata);
     
     if (extractedTokenId) {
       const url = tokenPath
@@ -169,6 +169,10 @@ function isHexString(str: string): boolean {
 /**
  * Extract asset name hex from Cardano metadata
  * Looks for the asset name in the CIP-25 metadata structure
+ * 
+ * Note: This implementation assumes a single policy ID and single asset name
+ * within the CIP-25 metadata. If multiple policies or assets exist, only the
+ * first one will be extracted.
  */
 export function extractCardanoAssetNameHex(metadata: unknown): string | undefined {
   if (!metadata || typeof metadata !== 'object') return undefined;
