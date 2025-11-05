@@ -14,7 +14,7 @@ import AnalyticsProvider from "@/components/providers/AnalyticsProvider";
 import ClientPolyfills from "@/components/polyfills/ClientPolyfills";
 import { getUserServer } from "@/lib/auth/init/getUserServer";
 import { NextIntlClientProvider } from 'next-intl';
-import { getLocale, getMessages } from 'next-intl/server';
+import { getI18n } from '@/lib/i18n/getI18n';
 import { performanceTracker } from "@/lib/logging/performance";
 import { getCorrelationId } from "@/lib/logging/request-context";
 import ClientPerformanceTracker from "@/components/performance/ClientPerformanceTracker";
@@ -55,23 +55,21 @@ const RootLayout = async ({
   return performanceTracker.measure(
     "RootLayout Render",
     async () => {
-      const { user, lineAuthenticated, phoneAuthenticated } = await performanceTracker.measure(
-        "RootLayout:getUserServer",
-        () => getUserServer(),
-        { correlationId, source: "RootLayout" }
-      );
-
-      const locale = await performanceTracker.measure(
-        "RootLayout:getLocale",
-        () => getLocale(),
-        { correlationId }
-      );
-
-      const messages = await performanceTracker.measure(
-        "RootLayout:getMessages",
-        () => getMessages(),
-        { correlationId }
-      );
+      const [
+        { user, lineAuthenticated, phoneAuthenticated },
+        { locale, messages }
+      ] = await Promise.all([
+        performanceTracker.measure(
+          "RootLayout:getUserServer",
+          () => getUserServer(),
+          { correlationId, source: "RootLayout" }
+        ),
+        performanceTracker.measure(
+          "RootLayout:getI18n",
+          () => getI18n(),
+          { correlationId }
+        ),
+      ]);
 
       return (
         <html lang={locale}>
