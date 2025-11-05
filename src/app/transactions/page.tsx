@@ -1,6 +1,6 @@
 import { Header } from "@/app/transactions/components/Header";
-import { getServerCommunityTransactions } from "@/hooks/transactions/server";
-import { InfiniteTransactionList } from "./components/InfiniteTransactionList";
+import { getServerCommunityTransactions } from "@/hooks/transactions/server-community-transactions";
+import { ServerInfiniteTransactionList } from "./components/ServerInfiniteTransactionList";
 import { useTranslations } from "next-intl";
 import { getTranslations } from "next-intl/server";
 
@@ -18,7 +18,7 @@ export default async function TransactionsPage() {
                 {t("transactions.empty")}
             </p>
             ) : (
-            <InfiniteTransactionList initialTransactions={transactions} />
+            <ServerInfiniteTransactionList />
             )}
         </div>
         </>

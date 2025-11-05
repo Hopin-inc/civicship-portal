@@ -18,8 +18,13 @@ import { getLocale, getMessages } from 'next-intl/server';
 import { performanceTracker } from "@/lib/logging/performance";
 import { getCorrelationId } from "@/lib/logging/request-context";
 import ClientPerformanceTracker from "@/components/performance/ClientPerformanceTracker";
+import { initUndiciAgent } from "@/lib/server/runtime/init-undici";
 
 const font = Inter({ subsets: ["latin"] });
+
+if (typeof window === 'undefined') {
+  initUndiciAgent();
+}
 
 export async function generateMetadata(): Promise<Metadata> {
   const metadata = currentCommunityMetadata;
