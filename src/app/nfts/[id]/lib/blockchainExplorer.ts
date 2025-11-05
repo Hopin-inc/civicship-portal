@@ -27,11 +27,11 @@ export function detectChain(tokenType?: string): Chain | null {
   
   const normalizedType = tokenType.toUpperCase();
   
-  if (normalizedType.includes('CIP-25') || normalizedType.includes('CIP25')) {
+  if (/\bCIP-?25\b/.test(normalizedType)) {
     return 'cardano';
   }
   
-  if (normalizedType.includes('ERC-721') || normalizedType.includes('ERC721')) {
+  if (/\bERC-?721\b/.test(normalizedType)) {
     return 'ethereum';
   }
   
@@ -66,16 +66,16 @@ export function extractEthereumTokenId(metadata: unknown): string | undefined {
   
   const meta = metadata as Record<string, unknown>;
   
-  if (meta.external_url && typeof meta.external_url === 'string') {
+  if (typeof meta.external_url === 'string') {
     const match = meta.external_url.match(/\/tokens?\/[^/]+\/(\d+)$/i);
-    if (match && match[1]) {
+    if (match?.[1]) {
       return match[1];
     }
   }
   
-  if (meta.name && typeof meta.name === 'string') {
+  if (typeof meta.name === 'string') {
     const match = meta.name.match(/#\s*(\d+)$/);
-    if (match && match[1]) {
+    if (match?.[1]) {
       return match[1];
     }
   }
