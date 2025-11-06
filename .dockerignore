@@ -1,1 +1,17 @@
 node_modules
+.next
+.git
+.gitignore
+.turbo
+.vscode
+.idea
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.DS_Store
+*.pem
+coverage
+.env*.local
+README.md
