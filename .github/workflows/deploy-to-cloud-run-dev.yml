@@ -110,6 +110,7 @@ jobs:
           region: ${{ env.GCP_REGION }}
           flags: >
             --concurrency=80
+            --cpu=2
             --cpu-boost
             --min-instances=1
             --max-instances=10
