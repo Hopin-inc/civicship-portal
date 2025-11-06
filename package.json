@@ -60,7 +60,7 @@
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
     "embla-carousel-react": "^8.6.0",
-    "firebase": "^10.14.1",
+    "firebase": "^12.4.0",
     "framer-motion": "^12.12.1",
     "google-libphonenumber": "^3.2.40",
     "graphql": "^16.11.0",
