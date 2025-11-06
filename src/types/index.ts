@@ -33,4 +33,6 @@ export interface InfoCardProps {
   secondaryLabel?: string;
   showTruncate?: boolean;
   truncatePattern?: 'middle' | 'end';
+  truncateHead?: number;
+  truncateTail?: number;
 }
