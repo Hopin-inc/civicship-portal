@@ -1,13 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { categorizeFirebaseError } from "@/lib/auth/core/firebase-config";
+import { categorizeFirebaseError, logFirebaseError } from "@/lib/auth/core/firebase-config";
 import { isRunningInLiff } from "@/lib/auth/core/environment-detector";
 import { PHONE_VERIFICATION_CONSTANTS } from "../utils/phoneVerificationConstants";
 import { useRecaptchaManager } from "./useRecaptchaManager";
 import { useResendTimer } from "./useResendTimer";
 import { logger } from "@/lib/logging";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
+import { useTranslations } from "next-intl";
 
 interface PhoneSubmissionResult {
   success: boolean;
@@ -26,6 +27,7 @@ export function usePhoneSubmission(
   recaptchaManager: ReturnType<typeof useRecaptchaManager>,
   resendTimer: Pick<ReturnType<typeof useResendTimer>, "isDisabled" | "start">,
 ) {
+  const t = useTranslations();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRateLimited, setIsRateLimited] = useState(false);
 
@@ -63,7 +65,7 @@ export function usePhoneSubmission(
         return {
           success: false,
           error: {
-            message: "認証コード送信を準備中です",
+            message: t("phoneVerification.sending.prepare"),
             type: "not-ready",
           },
         };
@@ -74,8 +76,8 @@ export function usePhoneSubmission(
           success: false,
           error: {
             message: isRateLimited
-              ? "送信回数が上限に達しました。しばらく待ってから再試行してください。"
-              : "送信処理中です。しばらくお待ちください。",
+              ? t("phoneVerification.sending.rateLimited")
+              : t("phoneVerification.sending.processing"),
             type: isRateLimited ? "rate-limit" : "already-submitting",
           },
         };
@@ -96,7 +98,7 @@ export function usePhoneSubmission(
           return {
             success: false,
             error: {
-              message: "認証コードの送信に失敗しました。もう一度お試しください。",
+              message: t("phoneVerification.sending.failed"),
               type: "verification-id-missing",
             },
           };
@@ -105,16 +107,19 @@ export function usePhoneSubmission(
         resendTimer.start();
         return { success: true };
       } catch (error) {
-        logger.error("Phone verification submission failed", {
-          errorCode: (error as any)?.code,
-          errorMessage: (error as any)?.message,
-        });
+        logFirebaseError(
+          error,
+          "Phone verification submission failed",
+          {
+            component: "usePhoneSubmission",
+          }
+        );
         return handleSubmissionError(error);
       } finally {
         setIsSubmitting(false);
       }
     },
-    [phoneAuth, recaptchaManager, resendTimer, handleSubmissionError, isSubmitting, isRateLimited],
+    [t, phoneAuth, recaptchaManager, resendTimer, handleSubmissionError, isSubmitting, isRateLimited],
   );
 
   const resend = useCallback(
@@ -124,10 +129,10 @@ export function usePhoneSubmission(
           success: false,
           error: {
             message: isRateLimited
-              ? "送信回数が上限に達しました。しばらく待ってから再試行してください。"
+              ? t("phoneVerification.sending.rateLimited")
               : resendTimer.isDisabled
-                ? "再送信は60秒後に可能です。"
-                : "送信処理中です。しばらくお待ちください。",
+                ? t("phoneVerification.resend.cooldown", { seconds: 60 })
+                : t("phoneVerification.sending.processing"),
             type: isRateLimited
               ? "rate-limit"
               : resendTimer.isDisabled
@@ -141,7 +146,7 @@ export function usePhoneSubmission(
         return {
           success: false,
           error: {
-            message: "認証コード送信を準備中です",
+            message: t("phoneVerification.sending.prepare"),
             type: "not-ready",
           },
         };
@@ -151,7 +156,7 @@ export function usePhoneSubmission(
         return {
           success: false,
           error: {
-            message: "電話番号が設定されていません。電話番号入力画面に戻ってください。",
+            message: t("phoneVerification.errors.phoneNotSetRestart"),
             type: "invalid-phone",
           },
         };
@@ -181,7 +186,7 @@ export function usePhoneSubmission(
           return {
             success: false,
             error: {
-              message: "認証コードの再送信に失敗しました。もう一度お試しください。",
+              message: t("phoneVerification.resend.failed"),
               type: "verification-id-missing",
             },
           };
@@ -193,18 +198,21 @@ export function usePhoneSubmission(
           recaptchaManager.hide();
         }
 
-        return { success: true, message: "認証コードを再送信しました" };
+        return { success: true, message: t("phoneVerification.resend.success") };
       } catch (error) {
-        logger.error("Phone verification resend failed", {
-          errorCode: (error as any)?.code,
-          errorMessage: (error as any)?.message,
-        });
+        logFirebaseError(
+          error,
+          "Phone verification resend failed",
+          {
+            component: "usePhoneSubmission",
+          }
+        );
         return handleSubmissionError(error);
       } finally {
         setIsSubmitting(false);
       }
     },
-    [phoneAuth, recaptchaManager, resendTimer, handleSubmissionError, isSubmitting, isRateLimited],
+    [t, phoneAuth, recaptchaManager, resendTimer, handleSubmissionError, isSubmitting, isRateLimited],
   );
 
   return {

@@ -49,7 +49,7 @@ export function useWalletActions({
       setHasNextPage(result.transactions.pageInfo?.hasNextPage ?? false);
       setEndCursor(result.transactions.pageInfo?.endCursor ?? null);
     } catch (err) {
-      logger.error("Failed to refresh wallet", { error: String(err), component: "WalletProvider" });
+      logger.warn("Failed to refresh wallet", { error: String(err), component: "WalletProvider" });
       setError(err instanceof Error ? err : new Error(String(err)));
     } finally {
       setIsLoadingWallet(false);
@@ -84,7 +84,7 @@ export function useWalletActions({
       setHasNextPage(result.transactions.pageInfo?.hasNextPage ?? false);
       setEndCursor(result.transactions.pageInfo?.endCursor ?? null);
     } catch (err) {
-      logger.error("Failed to load more transactions", {
+      logger.warn("Failed to load more transactions", {
         error: String(err),
         component: "WalletProvider",
       });

@@ -6,8 +6,10 @@ import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
+import { useTranslations } from "next-intl";
 
 export default function OpenInBrowser() {
+  const t = useTranslations();
   const searchParams = useSearchParams();
   const nextParam = searchParams.get("next");
   const baseUrl = `${currentCommunityConfig.domain}/sign-up/phone-verification`;
@@ -23,9 +25,9 @@ export default function OpenInBrowser() {
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(COPY_URL);
-      toast.success("リンクをコピーしました");
+      toast.success(t("phoneVerification.lineBrowser.copySuccess"));
     } catch (err) {
-      toast.error("コピーに失敗しました");
+      toast.error(t("phoneVerification.lineBrowser.copyFailure"));
     }
   };
 
@@ -33,19 +35,19 @@ export default function OpenInBrowser() {
     <div className="flex items-center justify-center h-screen px-4">
       <div className="text-center space-y-6 max-w-mobile-l w-full">
         <h1 className="text-body-md font-bold">
-          電話番号認証は
+          {t("phoneVerification.lineBrowser.title")}
           <br />
-          LINEブラウザでご利用いただけません
+          {t("phoneVerification.lineBrowser.notAvailable")}
         </h1>
 
         <p className="text-sm text-muted-foreground">
-          正常にご利用いただくためには、SafariやChromeなどの通常のブラウザでこのページを開いてください。
+          {t("phoneVerification.lineBrowser.instructions")}
         </p>
 
         <div className="space-y-2">
           <Button onClick={handleCopy} variant="secondary" className="w-full flex justify-center">
             <LinkIcon className="mr-2 h-4 w-4" />
-            リンクをコピー
+            {t("phoneVerification.lineBrowser.copyLink")}
           </Button>
         </div>
       </div>

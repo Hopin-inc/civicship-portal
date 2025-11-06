@@ -1,3 +1,8 @@
+import { Country } from "react-phone-number-input";
+
+export const DEFAULT_COUNTRY: Country = "JP";
+export const SHOW_FLAGS = false;
+
 export const PHONE_VERIFICATION_CONSTANTS = {
   // 再送信ボタンが有効になるまでのカウントダウン秒数
   RESEND_COUNTDOWN_SECONDS: 60,

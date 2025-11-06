@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthProvider";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 import { useUserProfileContext } from "@/app/users/features/shared/contexts/UserProfileContext";
 import { GqlDidIssuanceStatus } from "@/types/graphql";
+import { useTranslations } from "next-intl";
 
 const truncateDid = (did: string | undefined | null, length: number = 20): string => {
   if (!did) return "";
@@ -17,6 +18,7 @@ const truncateDid = (did: string | undefined | null, length: number = 20): strin
 };
 
 export default function AccountSection() {
+  const t = useTranslations();
   const { isAuthenticated, isPhoneVerified, isAuthenticating } = useAuth();
   const { gqlUser } = useUserProfileContext();
 
@@ -32,7 +34,7 @@ export default function AccountSection() {
         <div className="flex items-center justify-between py-4 px-4 border-b">
           <div className="flex items-center gap-2">
             <FileKey className="w-5 h-5" />
-            <span className="font-bold text-sm flex items-center gap-2">共創ID</span>
+            <span className="font-bold text-sm flex items-center gap-2">{t("users.account.coCreationId")}</span>
           </div>
           <div className="flex items-center gap-2 text-gray-400">
             <span>
@@ -41,7 +43,7 @@ export default function AccountSection() {
               ) : (
                 <div className="flex items-center gap-1">
                   <Info className="w-4 h-4 text-[#EAB308]" />
-                  <span className="text-label-sm">did発行準備中</span>
+                  <span className="text-label-sm">{t("users.account.didPreparation")}</span>
                 </div>
               )}
             </span>
@@ -50,7 +52,7 @@ export default function AccountSection() {
                 className="w-4 h-4 cursor-pointer"
                 onClick={() => {
                   navigator.clipboard.writeText(didValue);
-                  toast.success("コピーしました");
+                  toast.success(t("users.account.copied"));
                 }}
               />
             )}
@@ -60,20 +62,20 @@ export default function AccountSection() {
         <div className="flex items-center justify-between py-4 px-4 border-b">
           <div className="flex items-center gap-2">
             <Image src="/images/line-icon.png" alt="LINE" width={20} height={20} />
-            <span className="font-bold text-sm">LINEアカウント</span>
+            <span className="font-bold text-sm">{t("users.account.lineAccount")}</span>
           </div>
           <span className="text-gray-400">
-            {isAuthenticated ? "連携済み" : isAuthenticating ? "読込中" : "未連携"}
+            {isAuthenticated ? t("users.account.connected") : isAuthenticating ? t("users.account.loading") : t("users.account.notConnected")}
           </span>
         </div>
         {/* 電話番号 */}
         <div className="flex items-center justify-between py-4 px-4 border-b">
           <div className="flex items-center gap-2">
             <PhoneIcon className="w-4 h-4" />
-            <span className="font-bold text-sm">電話番号</span>
+            <span className="font-bold text-sm">{t("users.account.phoneNumber")}</span>
           </div>
           <span className="text-gray-400">
-            {isPhoneVerified ? "連携済み" : isAuthenticating ? "読込中" : "未連携"}
+            {isPhoneVerified ? t("users.account.connected") : isAuthenticating ? t("users.account.loading") : t("users.account.notConnected")}
           </span>
         </div>
         {/* JUST DAO IT */}
@@ -103,7 +105,7 @@ export default function AccountSection() {
                 </span>
               </span>
             </div>
-            <span className="text-gray-400">{isNftWalletLinked ? "連携済み" : "未連携"}</span>
+            <span className="text-gray-400">{isNftWalletLinked ? t("users.account.connected") : t("users.account.notConnected")}</span>
           </div>
         )}
       </CardContent>

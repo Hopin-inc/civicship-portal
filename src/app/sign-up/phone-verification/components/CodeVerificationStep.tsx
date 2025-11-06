@@ -1,12 +1,15 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Button } from "@/components/ui/button";
 import { logger } from "@/lib/logging";
 import { PHONE_VERIFICATION_CONSTANTS } from "../utils/phoneVerificationConstants";
+import useHeaderConfig from "@/hooks/useHeaderConfig";
 
 interface CodeVerificationStepProps {
+  phoneNumber?: string;
   verificationCode: string;
   onCodeChange: (value: string) => void;
   onSubmit: (e: React.FormEvent) => void;
@@ -23,6 +26,7 @@ interface CodeVerificationStepProps {
 }
 
 export function CodeVerificationStep({
+  phoneNumber,
   verificationCode,
   onCodeChange,
   onSubmit,
@@ -37,13 +41,24 @@ export function CodeVerificationStep({
   recaptchaContainerRef,
   phoneAuth,
 }: CodeVerificationStepProps) {
+  const t = useTranslations();
+  const headerConfig = useMemo(
+    () => ({
+      title: t("phoneVerification.verification.headerTitle"),
+      showBackButton: false,
+      showLogo: false,
+    }),
+    [t],
+  );
+  useHeaderConfig(headerConfig);
+
   const [isReloading, setIsReloading] = useState(false);
 
   const handleBackToPhone = async () => {
     try {
-      await phoneAuth.clearRecaptcha?.();
+      phoneAuth.clearRecaptcha?.();
     } catch (error) {
-      logger.error("reCAPTCHAクリアエラー:", { error });
+      logger.warn("reCAPTCHA clear error:", { error });
     } finally {
       setIsReloading(true);
       onBackToPhone();
@@ -55,29 +70,25 @@ export function CodeVerificationStep({
 
   return (
     <>
-      <div className="space-y-2">
-        <h1 className="text-2xl font-bold tracking-tight">認証コードを入力</h1>
+      <div>
         <p className="text-sm text-muted-foreground">
-          電話番号に送信された6桁の認証コードを入力してください。
+          {phoneNumber
+            ? t("phoneVerification.verification.descriptionWithPhone", { phoneNumber })
+            : t("phoneVerification.verification.descriptionWithoutPhone")}
         </p>
       </div>
 
-      <form onSubmit={onSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <label htmlFor="code" className="text-sm font-medium">
-            認証コード
-          </label>
-          <div className="flex justify-center py-4">
-            <InputOTP maxLength={6} value={verificationCode} onChange={onCodeChange}>
-              <InputOTPGroup>
-                {Array.from({ length: 6 }).map((_, index) => (
-                  <InputOTPSlot key={index} index={index} />
-                ))}
-              </InputOTPGroup>
-            </InputOTP>
-          </div>
+      <form onSubmit={onSubmit} className="space-y-6">
+        <div className="flex justify-center py-4">
+          <InputOTP maxLength={6} value={verificationCode} onChange={onCodeChange}>
+            <InputOTPGroup>
+              {Array.from({ length: 6 }).map((_, index) => (
+                <InputOTPSlot key={index} index={index} />
+              ))}
+            </InputOTPGroup>
+          </InputOTP>
         </div>
-        <div className="flex flex-col items-center gap-8 w-full mx-auto">
+        <div className="flex flex-col items-center gap-4 w-full mx-auto">
           <Button
             type="submit"
             className="w-full h-12"
@@ -88,28 +99,47 @@ export function CodeVerificationStep({
               isReloading
             }
           >
-            {isVerifying ? "検証中..." : "コードを検証"}
+            {isVerifying ? t("phoneVerification.verification.verifying") : t("phoneVerification.verification.verifyButton")}
           </Button>
           <Button
             type="button"
-            variant="tertiary"
-            className="w-full h-12"
-            disabled={isResendDisabled || isPhoneSubmitting || isReloading}
+            variant="text"
+            className="w-full h-10"
+            disabled={
+              isVerifying ||
+              isPhoneVerifying ||
+              isResendDisabled ||
+              isPhoneSubmitting ||
+              isReloading
+            }
             onClick={onResend}
           >
             {isResendDisabled
-              ? `${countdown}秒後に再送信できます`
+              ? t("phoneVerification.verification.resendCountdown", { countdown })
               : isPhoneSubmitting
-                ? "送信中..."
-                : "コードを再送信"}
+                ? t("phoneVerification.verification.resending")
+                : t("phoneVerification.verification.resendButton")}
           </Button>
           <div
             id="recaptcha-container"
             ref={recaptchaContainerRef}
             style={{ display: showRecaptcha ? "block" : "none" }}
           ></div>
-          <Button type="button" variant={"text"} disabled={isReloading} onClick={handleBackToPhone}>
-            電話番号を再入力
+          <Button
+            type="button"
+            className="px-4"
+            size="sm"
+            variant={"text"}
+            disabled={
+              isVerifying ||
+              isPhoneVerifying ||
+              isResendDisabled ||
+              isPhoneSubmitting ||
+              isReloading
+            }
+            onClick={handleBackToPhone}
+          >
+            {t("phoneVerification.verification.changePhoneButton")}
           </Button>
         </div>
       </form>

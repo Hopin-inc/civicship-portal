@@ -17,8 +17,10 @@ import useCommunityTransactions from "@/app/admin/wallet/hooks/useCommunityTrans
 import { logger } from "@/lib/logging";
 import Link from "next/link";
 import { toPointNumber } from "@/utils/bigint";
+import { useTranslations } from "next-intl";
 
 export default function WalletPage() {
+  const t = useTranslations();
   const communityId = COMMUNITY_ID;
   const { user: currentUser } = useAuth();
   const currentUserRole = currentUser?.memberships?.find(
@@ -30,11 +32,11 @@ export default function WalletPage() {
 
   const headerConfig = useMemo(
     () => ({
-      title: "ウォレット",
+      title: t("adminWallet.title"),
       showLogo: false,
       showBackButton: true,
     }),
-    [],
+    [t],
   );
   useHeaderConfig(headerConfig);
 
@@ -73,7 +75,7 @@ export default function WalletPage() {
           url.searchParams.delete("refresh");
           window.history.replaceState({}, "", url);
         } catch (err) {
-          logger.error("Refresh failed after redirect", {
+          logger.warn("Refresh failed after redirect", {
             error: err instanceof Error ? err.message : String(err),
             component: "WalletPage",
           });
@@ -89,7 +91,7 @@ export default function WalletPage() {
         await refetchWallet();
         refetchTransactions();
       } catch (err) {
-        logger.error("Refetch failed on window focus", {
+        logger.warn("Refetch failed on window focus", {
           error: err instanceof Error ? err.message : String(err),
           component: "WalletPage",
         });
@@ -108,9 +110,9 @@ export default function WalletPage() {
           try {
             await refetchWallet();
             refetchTransactions();
-            toast.success("ウォレット情報を更新しました");
+            toast.success(t("adminWallet.toast.refreshSuccess"));
           } catch (err) {
-            toast.error("再読み込みに失敗しました");
+            toast.error(t("adminWallet.toast.refreshError"));
           }
         }}
       />
@@ -121,36 +123,36 @@ export default function WalletPage() {
           onClick={handleNavigateToIssue}
           variant="secondary"
           size="sm"
-          className="w-[104px] h-[48px] flex items-center gap-1.5"
+          className="h-12 px-4"
         >
-          <Coins className="w-4 h-4" />
-          <span className="text-base">発行</span>
+          <Coins className="w-4 h-4 shrink-0" />
+          <span className="text-base whitespace-nowrap">{t("adminWallet.buttons.issue")}</span>
         </Button>
         <Button
           disabled={currentUserRole !== GqlRole.Owner || currentPoint <= 0}
           onClick={handleNavigateToGrant}
           variant="secondary"
           size="sm"
-          className="w-[104px] h-[48px] flex items-center gap-1.5"
+          className="h-12 px-4"
         >
-          <Gift className="w-4 h-4" />
-          <span className="text-base">支給</span>
+          <Gift className="w-4 h-4 shrink-0" />
+          <span className="text-base whitespace-nowrap">{t("adminWallet.buttons.grant")}</span>
         </Button>
       </div>
 
       <div className="pt-10 flex justify-between items-center">
-        <h2 className="text-display-sm">これまでの交換</h2>
+        <h2 className="text-display-sm">{t("transactions.list.title")}</h2>
         <Link
             href="/transactions"
             className="text-sm border-b-[1px] border-black cursor-pointer bg-transparent p-0"
             >
-            コミュニティ履歴へ
+            {t("transactions.list.communityHistoryLink")}
         </Link>
       </div>
       <div className="space-y-2 mt-2">
         {connection.edges?.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center pt-6">
-            まだ交換したことがありません
+            {t("transactions.list.emptyState")}
           </p>
         ) : (
           connection.edges?.map((edge) => {

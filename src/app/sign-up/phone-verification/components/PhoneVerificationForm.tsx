@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthProvider";
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { VerificationStep } from "../types";
-import { validatePhoneNumber } from "../utils/validation";
+import { isValidPhoneNumber } from "../utils/validatePhoneNumber";
 import { useResendTimer } from "../hooks/useResendTimer";
 import { useRecaptchaManager } from "../hooks/useRecaptchaManager";
 import { usePhoneSubmission } from "../hooks/usePhoneSubmission";
@@ -14,16 +14,32 @@ import { useCodeVerification } from "../hooks/useCodeVerification";
 import { PhoneInputStep } from "./PhoneInputStep";
 import { CodeVerificationStep } from "./CodeVerificationStep";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
+import { useTranslations } from "next-intl";
 
 export function PhoneVerificationForm() {
+  const t = useTranslations();
   const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next");
   const nextParam = next ? `?next=${encodeURIComponent(next)}` : "";
   const { phoneAuth, isAuthenticated, loading, updateAuthState } = useAuth();
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState<string | undefined>(undefined);
   const [verificationCode, setVerificationCode] = useState("");
   const [step, setStep] = useState<VerificationStep>("phone");
+
+  useEffect(() => {
+    const scrollY = window.scrollY;
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = "100%";
+
+    return () => {
+      const y = document.body.style.top;
+      document.body.style.position = "";
+      document.body.style.top = "";
+      window.scrollTo(0, parseInt(y || "0") * -1);
+    };
+  }, []);
 
   const { isDisabled: isResendDisabled, countdown, start: startResendTimer } = useResendTimer();
   const recaptchaManager = useRecaptchaManager();
@@ -46,17 +62,17 @@ export function PhoneVerificationForm() {
     updateAuthState,
   );
 
-  const { isValid: isPhoneValid, formattedPhone } = validatePhoneNumber(phoneNumber);
+  const isPhoneValid = isValidPhoneNumber(phoneNumber);
 
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!isPhoneValid) {
-      toast.error("有効な電話番号を入力してください");
+    if (!isPhoneValid || !phoneNumber) {
+      toast.error(t("phoneVerification.errors.invalidPhone"));
       return;
     }
 
-    const result = await phoneSubmission.submit(formattedPhone);
+    const result = await phoneSubmission.submit(phoneNumber);
 
     if (result.success) {
       setStep("code");
@@ -66,7 +82,12 @@ export function PhoneVerificationForm() {
   };
 
   const handleResendCode = async () => {
-    const result = await phoneSubmission.resend(formattedPhone);
+    if (!phoneNumber) {
+      toast.error(t("phoneVerification.errors.phoneNotSet"));
+      return;
+    }
+
+    const result = await phoneSubmission.resend(phoneNumber);
 
     if (result.success) {
       if (result.message) {
@@ -99,7 +120,7 @@ export function PhoneVerificationForm() {
   };
 
   const handleBackToPhone = () => {
-    setPhoneNumber("");
+    setPhoneNumber(undefined);
     setVerificationCode("");
     setStep("phone");
 
@@ -134,6 +155,7 @@ export function PhoneVerificationForm() {
 
       {step === "code" && (
         <CodeVerificationStep
+          phoneNumber={phoneNumber}
           verificationCode={verificationCode}
           onCodeChange={handleOTPChange}
           onSubmit={handleCodeSubmit}

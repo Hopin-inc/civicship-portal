@@ -1,8 +1,11 @@
 import { Header } from "@/app/transactions/components/Header";
 import { getServerCommunityTransactions } from "@/hooks/transactions/server";
 import { InfiniteTransactionList } from "./components/InfiniteTransactionList";
+import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 
 export default async function TransactionsPage() {
+    const t = await getTranslations();
     const transactions = await getServerCommunityTransactions({
         first: 20,
     });
@@ -12,7 +15,7 @@ export default async function TransactionsPage() {
         <div className="mt-6 px-4">
             {transactions.edges?.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center pt-6">
-                まだ交換したことがありません
+                {t("transactions.empty")}
             </p>
             ) : (
             <InfiniteTransactionList initialTransactions={transactions} />

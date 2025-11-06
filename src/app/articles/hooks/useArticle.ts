@@ -33,7 +33,7 @@ export const useArticle = (id: string): UseArticleResult => {
 
   useEffect(() => {
     if (error) {
-      logger.error("Error fetching article data", {
+      logger.warn("Error fetching article data", {
         error: error.message,
         component: "useArticle",
         articleId: id

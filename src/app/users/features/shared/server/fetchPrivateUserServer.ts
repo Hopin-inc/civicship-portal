@@ -27,7 +27,7 @@ export async function fetchPrivateUserServer(): Promise<GqlUser | null> {
 
     return res.currentUser?.user ?? null;
   } catch (error) {
-    logger.error("⚠️ Failed to fetch private user (SSR):", {
+    logger.warn("⚠️ Failed to fetch private user (SSR):", {
       message: (error as Error).message,
       stack: (error as Error).stack,
     });

@@ -6,8 +6,10 @@ import { lineAuth as auth } from "@/lib/auth/core/firebase-config";
 import { useCookies } from "next-client-cookies";
 import { useRouter } from "next/navigation";
 import { MouseEventHandler } from "react";
+import { useTranslations } from "next-intl";
 
 const CancelButton: React.FC = () => {
+  const t = useTranslations();
   const router = useRouter();
   const cookies = useCookies();
 
@@ -21,7 +23,7 @@ const CancelButton: React.FC = () => {
   return (
     <Link href="/public" onClick={cancel} className="inline-flex ul-link">
       <ChevronLeft />
-      トップに戻る
+      {t("auth.signup.backToTop")}
     </Link>
   );
 };

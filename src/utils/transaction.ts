@@ -5,7 +5,7 @@ import {
   GqlWallet,
   GqlWalletType,
 } from "@/types/graphql";
-import { AppTransaction } from "@/app/wallets/features/shared/type";
+import type { AppTransaction, TransactionDescriptionData } from "@/app/wallets/features/shared/type";
 import { currentCommunityConfig, getSquareLogoPath } from "@/lib/communities/metadata";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
@@ -26,46 +26,78 @@ export const getNameFromWallet = (wallet: GqlWallet | null | undefined): string 
   }
 };
 
+type TransactionActionMapping = {
+  actionType?: "donation" | "grant" | "payment" | "return" | "refund";
+  specialName?: "issued" | "onboarding" | "move";
+};
+
+export const mapReasonToAction = (reason: GqlTransactionReason): TransactionActionMapping => {
+  switch (reason) {
+    case GqlTransactionReason.Donation:
+      return { actionType: "donation" };
+    case GqlTransactionReason.Grant:
+      return { actionType: "grant" };
+    case GqlTransactionReason.PointIssued:
+      return { specialName: "issued" };
+    case GqlTransactionReason.PointReward:
+    case GqlTransactionReason.TicketPurchased:
+    case GqlTransactionReason.OpportunityReservationCreated:
+      return { actionType: "payment" };
+    case GqlTransactionReason.TicketRefunded:
+      return { actionType: "return" };
+    case GqlTransactionReason.Onboarding:
+      return { specialName: "onboarding" };
+    case GqlTransactionReason.OpportunityReservationCanceled:
+    case GqlTransactionReason.OpportunityReservationRejected:
+      return { actionType: "refund" };
+    default:
+      return { specialName: "move" };
+  }
+};
+
 const formatTransactionDescription = (
   reason: GqlTransactionReason,
   fromUserName: string,
   toUserName: string,
   signedPoints: number,
-): string => {
+): TransactionDescriptionData => {
   const isOutgoing = signedPoints < 0;
+  const mapping = mapReasonToAction(reason);
 
-  switch (reason) {
-    case GqlTransactionReason.Donation:
-      return isOutgoing ? `${toUserName}さんに譲渡` : `${fromUserName}さんから譲渡`;
-
-    case GqlTransactionReason.Grant:
-      return isOutgoing ? `${toUserName}さんに支給` : `${fromUserName}から支給`;
-
-    case GqlTransactionReason.PointIssued:
-      return `発行`;
-
-    case GqlTransactionReason.PointReward:
-      return isOutgoing ? `${toUserName}さんに支払い` : `${fromUserName}さんから支払い`;
-
-    case GqlTransactionReason.TicketPurchased:
-      return isOutgoing ? `${toUserName}さんに支払い` : `${fromUserName}さんから支払い`;
-
-    case GqlTransactionReason.TicketRefunded:
-      return isOutgoing ? `${toUserName}さんから返品` : `${fromUserName}さんに返品`;
-
-    case GqlTransactionReason.Onboarding:
-      return `初回ボーナス`;
-
-    case GqlTransactionReason.OpportunityReservationCreated:
-      return toUserName ? `${toUserName}さんに支払い` : "支払い";
-
-    case GqlTransactionReason.OpportunityReservationCanceled:
-    case GqlTransactionReason.OpportunityReservationRejected:
-      return fromUserName ? `${fromUserName}さんから返金` : "返金";
-
-    default:
-      return `ポイント移動`;
+  if (mapping.specialName) {
+    return {
+      name: mapping.specialName,
+      // isSpecialCase: true indicates system-level transactions that don't follow the typical "from/to" pattern
+      // (e.g., point issuance, onboarding bonus)
+      isSpecialCase: true,
+    };
   }
+
+  if (mapping.actionType === "refund") {
+    return {
+      actionType: "refund",
+      direction: "from",
+      name: fromUserName,
+      isSpecialCase: !fromUserName,
+    };
+  }
+
+  if (mapping.actionType === "return") {
+    return {
+      actionType: "return",
+      direction: isOutgoing ? "from" : "to",
+      name: isOutgoing ? toUserName : fromUserName,
+      isSpecialCase: false,
+    };
+  }
+
+  const actionType = mapping.actionType!;
+  return {
+    actionType,
+    direction: isOutgoing ? "to" : "from",
+    name: isOutgoing ? toUserName : fromUserName,
+    isSpecialCase: !toUserName && !fromUserName,
+  };
 };
 
 export const presenterTransaction = (
@@ -87,6 +119,8 @@ export const presenterTransaction = (
         ? getSquareLogoPath()
         : (counterparty?.user?.image ?? PLACEHOLDER_IMAGE);
 
+  const descriptionData = formatTransactionDescription(node.reason, from, to, signedPoint);
+
   return {
     id: node.id,
     reason: node.reason,
@@ -96,7 +130,8 @@ export const presenterTransaction = (
     comment: node.comment ?? "",
     transferPoints: signedPoint,
     transferredAt: node.createdAt ? new Date(node.createdAt).toISOString() : "",
-    description: formatTransactionDescription(node.reason, from, to, signedPoint),
+    description: "",
+    descriptionData,
     didValue:
       node.toWallet?.user?.didIssuanceRequests?.find(
         (req) => req?.status === GqlDidIssuanceStatus.Completed,

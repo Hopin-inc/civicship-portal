@@ -13,6 +13,7 @@ import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 import { Tabs } from "./types/tabs";
 import { ErrorState } from "@/components/shared";
 import { useMemberWallets } from "@/hooks/members/useMemberWallets";
+import { useTranslations } from "next-intl";
 
 const DEFAULT_TAB: Tabs = Tabs.History;
 const isValidTab = (tab: string): tab is Tabs => {
@@ -20,6 +21,7 @@ const isValidTab = (tab: string): tab is Tabs => {
 };
 
 export default function GrantPointStepperPage() {
+  const t = useTranslations();
   const router = useRouter();
   const track = useAnalytics();
 
@@ -60,19 +62,19 @@ export default function GrantPointStepperPage() {
           params: {
             toUser: {
               userId: selectedUser.id,
-              name: selectedUser.name ?? "未設定",
+              name: selectedUser.name ?? t("adminWallet.common.notSet"),
             },
             amount,
           },
         });
 
-        toast.success(`+${amount.toLocaleString()} pt を渡しました`);
+        toast.success(t("adminWallet.grant.success", { amount: amount.toLocaleString() }));
         router.push("/admin/wallet?refresh=true");
       } else {
-        toast.error(`助成失敗: ${res.code}`);
+        toast.error(t("adminWallet.grant.errorWithCode", { code: res.code }));
       }
     } catch {
-      toast.error("助成に失敗しました");
+      toast.error(t("adminWallet.grant.errorGeneric"));
     } finally {
       setIsLoading(false);
     }
@@ -108,7 +110,7 @@ export default function GrantPointStepperPage() {
   }
 
   if (error) {
-    return <ErrorState title="メンバーを読み込めませんでした" refetchRef={refetchRef} />;
+    return <ErrorState title={t("adminWallet.grant.membersLoadError")} refetchRef={refetchRef} />;
   }
 
   return (
