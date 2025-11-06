@@ -13,13 +13,14 @@ import {
 import { localeNames, locales } from "@/lib/i18n/config";
 import { useMutation } from "@apollo/client";
 import { UPDATE_MY_PROFILE } from "@/graphql/account/user/mutation";
-import { useAuth } from "@/hooks/auth/useAuth";
+import { useAuth } from "@/contexts/AuthProvider";
+import { logger } from "@/lib/logging";
 
 export function LocaleSwitcher() {
   const locale = useLocale();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const { currentUser } = useAuth();
+  const { user: currentUser } = useAuth();
   const [updateMyProfile] = useMutation(UPDATE_MY_PROFILE);
 
   const handleLocaleChange = async (newLocale: string) => {
@@ -31,12 +32,16 @@ export function LocaleSwitcher() {
       try {
         await updateMyProfile({
           variables: {
-            input: { preferredLanguage: newLocale.toUpperCase() },
+            input: {
+              name: currentUser.name,
+              slug: currentUser.name,
+              preferredLanguage: newLocale.toUpperCase(),
+            },
             permission: { userId: currentUser.id },
           },
         });
       } catch (error) {
-        console.error("Failed to update language preference:", error);
+        logger.error("Failed to update language preference:");
       }
     }
 
