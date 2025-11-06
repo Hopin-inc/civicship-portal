@@ -1,14 +1,18 @@
 import { useMemo } from "react";
-import { GqlDidIssuanceStatus, GqlGetNftInstanceWithDidQuery, GqlDidIssuanceRequest } from "@/types/graphql";
+import {
+  GqlDidIssuanceRequest,
+  GqlDidIssuanceStatus,
+  GqlGetNftInstanceWithDidQuery,
+} from "@/types/graphql";
 import {
   detectChain,
   detectChainFromAddress,
-  getExplorerUrl,
-  getChainDisplayName,
   extractCardanoAssetNameHex,
+  getChainDisplayName,
+  getExplorerUrl,
 } from "./blockchainExplorer";
 
-export function useNftDetailData(nftInstance: GqlGetNftInstanceWithDidQuery['nftInstance']) {
+export function useNftDetailData(nftInstance: GqlGetNftInstanceWithDidQuery["nftInstance"]) {
   const basic = useMemo(() => {
     if (!nftInstance) {
       return {
@@ -45,13 +49,18 @@ export function useNftDetailData(nftInstance: GqlGetNftInstanceWithDidQuery['nft
   const blockchain = useMemo(() => {
     const chain = detectChain(basic.tokenType) || detectChainFromAddress(basic.contractAddress);
     const chainDisplayName = chain ? getChainDisplayName(chain) : undefined;
-    const assetNameHex = chain === 'cardano' ? extractCardanoAssetNameHex(basic.instanceJson) : undefined;
-    const explorerUrl = chain && basic.contractAddress ? getExplorerUrl({
-      chain,
-      contractOrPolicyAddress: basic.contractAddress,
-      assetNameHex,
-      metadata: basic.instanceJson,
-    }) : undefined;
+    const assetNameHex =
+      chain === "cardano" ? extractCardanoAssetNameHex(basic.instanceJson) : undefined;
+    const explorerUrl =
+      chain && basic.contractAddress
+        ? getExplorerUrl({
+            chain,
+            instanceId: basic.instanceId,
+            contractOrPolicyAddress: basic.contractAddress,
+            assetNameHex,
+            metadata: basic.instanceJson,
+          })
+        : undefined;
 
     return {
       chain,
@@ -59,7 +68,7 @@ export function useNftDetailData(nftInstance: GqlGetNftInstanceWithDidQuery['nft
       assetNameHex,
       explorerUrl,
     };
-  }, [basic.tokenType, basic.contractAddress, basic.instanceJson]);
+  }, [basic.tokenType, basic.instanceId, basic.contractAddress, basic.instanceJson]);
 
   return { basic, blockchain };
 }
