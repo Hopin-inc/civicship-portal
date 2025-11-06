@@ -108,3 +108,8 @@ jobs:
           service: ${{ env.APPLICATION_NAME }}-${{ matrix.community }}
           image: ${{ env.ARTIFACT_REGISTRY }}/${{ env.APPLICATION_NAME }}-${{ matrix.community }}:latest
           region: ${{ env.GCP_REGION }}
+          flags: >
+            --concurrency=80
+            --cpu-boost
+            --min-instances=1
+            --max-instances=10
