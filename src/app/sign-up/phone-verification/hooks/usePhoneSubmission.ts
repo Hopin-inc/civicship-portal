@@ -91,7 +91,7 @@ export function usePhoneSubmission(
         const storedId = useAuthStore.getState().phoneAuth.verificationId;
 
         if (!verificationId) {
-          logger.error("Phone verification ID mismatch", {
+          logger.warn("Phone verification ID mismatch", {
             verificationIdReturned: !!verificationId,
             verificationIdStored: !!storedId,
           });
@@ -179,7 +179,7 @@ export function usePhoneSubmission(
         const storedId = useAuthStore.getState().phoneAuth.verificationId;
 
         if (!verificationId || !storedId || storedId !== verificationId) {
-          logger.error("Phone verification ID mismatch on resend", {
+          logger.warn("Phone verification ID mismatch on resend", {
             verificationIdReturned: !!verificationId,
             verificationIdStored: !!storedId,
           });
