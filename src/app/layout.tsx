@@ -3,7 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { CookiesProvider } from "next-client-cookies/server";
 import ApolloProvider from "@/components/providers/ApolloProvider";
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "@/components/ui/toast";
 import LoadingProvider from "@/components/providers/LoadingProvider";
 import { AuthProvider } from "@/contexts/AuthProvider";
 import HeaderProvider from "@/components/providers/HeaderProvider";
@@ -63,7 +63,7 @@ const RootLayout = async ({
                   <LoadingProvider>
                     <AnalyticsProvider />
                     <MainContent>{children}</MainContent>
-                    <Toaster richColors className="mx-8" />
+                    <Toaster />
                   </LoadingProvider>
                 </HeaderProvider>
               </AuthProvider>
