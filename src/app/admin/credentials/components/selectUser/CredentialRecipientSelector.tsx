@@ -6,7 +6,7 @@ import {
   GqlUser,
   useParticipationBulkCreateMutation,
 } from "@/types/graphql";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import { useMembershipQueries } from "@/app/admin/members/hooks/useMembershipQueries";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { Button } from "@/components/ui/button";

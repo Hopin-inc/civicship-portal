@@ -7,7 +7,7 @@ import useParticipationPage from "@/app/participations/[id]/hooks/useParticipati
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import ParticipationStatusNotification from "@/app/participations/[id]/components/ParticipationStatusNotification";
 import ParticipationActions from "@/app/participations/[id]/components/ParticipationActions";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import { GqlReservationStatus } from "@/types/graphql";
 import { useParams } from "next/navigation";
 import { errorMessages } from "@/utils/errorMessage";

@@ -1,7 +1,7 @@
 "use client";
 import { useMemo, useRef, useEffect, useState } from "react";
 import { notFound, useRouter } from "next/navigation";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import { useAuth } from "@/contexts/AuthProvider";
 import { HeaderConfig } from "@/contexts/HeaderContext";
 import useHeaderConfig from "@/hooks/useHeaderConfig";

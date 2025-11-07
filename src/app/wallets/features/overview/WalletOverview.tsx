@@ -7,7 +7,7 @@ import useHeaderConfig from "@/hooks/useHeaderConfig";
 import WalletCard from "@/components/shared/WalletCard";
 import { Button } from "@/components/ui/button";
 import { Gift } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";
 import { useWalletContext } from "@/app/wallets/features/shared/contexts/WalletContext";

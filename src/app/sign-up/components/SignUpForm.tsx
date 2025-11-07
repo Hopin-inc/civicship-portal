@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { GqlCurrentPrefecture } from "@/types/graphql";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useState } from "react";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { logger } from "@/lib/logging";

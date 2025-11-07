@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useAuth } from "@/contexts/AuthProvider";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { GqlRole, GqlUser } from "@/types/graphql";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import {
   Dialog,
   DialogClose,

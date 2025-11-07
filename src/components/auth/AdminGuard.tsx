@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthProvider";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { GqlMembership, GqlRole } from "@/types/graphql";

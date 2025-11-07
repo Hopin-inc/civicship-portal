@@ -4,7 +4,7 @@ import { useCallback, useState } from "react";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { useGetMemberWalletsQuery, GqlGetMemberWalletsQuery } from "@/types/graphql";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 
 export interface UseMemberWalletsResult {
   data: GqlGetMemberWalletsQuery | undefined;
