@@ -20,6 +20,7 @@ export function Toaster() {
       pauseOnHover
       theme={resolvedTheme === "dark" ? "dark" : "light"}
       className="mx-8"
+      style={{ bottom: "24px" }}
     />
   );
 }
