@@ -9,7 +9,7 @@ import { formatDateTime } from "@/utils/date";
 import { Copy } from "lucide-react";
 import { use, useEffect, useMemo, useRef } from "react";
 import { CredentialRole, renderStatusCard, statusStyle } from "./data/presenter";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { InfoCard,ErrorState } from "@/components/shared";

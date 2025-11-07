@@ -9,7 +9,7 @@ import { useTicketClaim } from "@/app/tickets/receive/hooks/useTicketClaim";
 import TicketReceiveContent from "@/app/tickets/receive/components/TicketReceiveContent";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { ErrorState } from '@/components/shared'
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import { RawURIComponent } from "@/utils/path";
 
 export default function TicketReceivePage() {

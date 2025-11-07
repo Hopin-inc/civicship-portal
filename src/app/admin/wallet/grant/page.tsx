@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { GqlUser } from "@/types/graphql";
 import { useTransactionMutations } from "@/app/admin/wallet/hooks/useTransactionMutations";

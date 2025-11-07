@@ -12,7 +12,7 @@ import {
   useGetOpportunitiesQuery,
 } from "@/types/graphql";
 import { groupCardsByDate, SearchParams } from "@/app/search/data/presenter";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import { ActivityCard, QuestCard } from "@/components/domains/opportunities/types";
 import {
   presenterActivityCards,
