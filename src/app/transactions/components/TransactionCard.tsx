@@ -49,8 +49,8 @@ const formatTransactionDescription = (
 
   const actionType = mapping.actionType!;
   return { 
-    displayName: t(`transactions.action.${actionType}.from.name`, { name: from }), 
-    displayAction: t(`transactions.action.${actionType}.from.action`),
+    displayName: t(`transactions.parts.action.${actionType}.from.name`, { name: from }), 
+    displayAction: t(`transactions.parts.action.${actionType}.from.action`),
     to: to 
   };
 };
