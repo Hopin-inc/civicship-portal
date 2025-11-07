@@ -473,7 +473,16 @@ li {
   color: hsl(var(--foreground));
   border: 1px solid hsl(var(--border));
   border-left-width: 4px;
-  padding: 16px;
+  max-width: 425px;
+  padding: 12px;
+  font-size: 14px;
+}
+
+@media (min-width: 640px) {
+  .Toastify__toast {
+    padding: 16px;
+    font-size: 16px;
+  }
 }
 
 .Toastify__toast--success {
