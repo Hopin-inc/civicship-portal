@@ -40,15 +40,19 @@ const formatTransactionDescription = (
   from: string,
   to: string,
   t: ReturnType<typeof useTranslations>
-): { displayText: string; to: string } => {
+): { displayName: string | null; displayAction: string | null; to: string } => {
   const mapping = mapReasonToAction(reason);
 
   if (mapping.specialName) {
-    return { displayText: t(`transactions.name.${mapping.specialName}`), to: to };
+    return { displayName: null, displayAction: t(`transactions.name.${mapping.specialName}`), to: to };
   }
 
   const actionType = mapping.actionType!;
-  return { displayText: t(`transactions.action.${actionType}.from`, { name: from }), to: to };
+  return { 
+    displayName: t(`transactions.action.${actionType}.from.name`, { name: from }), 
+    displayAction: t(`transactions.action.${actionType}.from.action`),
+    to: to 
+  };
 };
 
 
@@ -73,7 +77,7 @@ export const TransactionCard = ({ transaction, image }: TransactionCardProps) =>
     const t = useTranslations();
     const formatDateTime = useLocaleDateTimeFormat();
     const info = getTransactionInfo(transaction, t("transactions.did.pending"));
-    const { displayText, to } = formatTransactionDescription(info.reason, info.from, info.to, t);
+    const { displayName, displayAction, to } = formatTransactionDescription(info.reason, info.from, info.to, t);
     const statusLabelElement = getStatusLabel(info.reason, t);
     const hasDestination = to && info.reason !== GqlTransactionReason.PointIssued && info.reason !== GqlTransactionReason.Onboarding;
     
@@ -86,11 +90,12 @@ export const TransactionCard = ({ transaction, image }: TransactionCardProps) =>
             </Avatar>
             <div className="flex flex-col text-left min-w-0 flex-1">
               <div className="flex items-start justify-between">
-                <span className="flex items-center truncate whitespace-nowrap overflow-hidden text-label-sm font-bold">
-                  {displayText}
+                <span className="flex items-center truncate whitespace-nowrap overflow-hidden">
+                  {displayName && <span className="text-label-sm font-bold">{displayName}</span>}
+                  {displayAction && <span className="text-label-xs font-bold">{displayAction}</span>}
                 </span>
                 <div className="text-label-sm font-bold shrink-0 ml-4 text-foreground">
-                  {formatCurrency(info.amount)} pt
+                  {formatCurrency(info.amount)}pt
                 </div>
               </div>
               {hasDestination && (
