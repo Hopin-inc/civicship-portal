@@ -467,47 +467,58 @@ li {
 /* React-Toastify Custom Styles */
 .Toastify__toast {
   font-family: inherit;
-  border-radius: 0.375rem;
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   background: hsl(var(--background));
   color: hsl(var(--foreground));
   border: 1px solid hsl(var(--border));
+  border-left-width: 4px;
+  padding: 16px;
 }
 
 .Toastify__toast--success {
-  background-color: hsl(var(--success));
-  color: hsl(var(--success-foreground));
-  border: none;
+  border-left-color: hsl(var(--success));
 }
 
 .Toastify__toast--error {
-  background-color: hsl(var(--destructive));
-  color: hsl(var(--destructive-foreground));
-  border: none;
+  border-left-color: hsl(var(--destructive));
 }
 
 .Toastify__toast--warning {
-  background-color: hsl(var(--warning));
-  color: hsl(var(--warning-foreground));
-  border: none;
+  border-left-color: hsl(var(--warning));
 }
 
 .Toastify__toast--info {
-  background-color: hsl(var(--primary));
-  color: hsl(var(--primary-foreground));
-  border: none;
+  border-left-color: hsl(var(--primary));
 }
 
-.Toastify__progress-bar {
-  background: currentColor;
-  opacity: 0.3;
+.Toastify__progress-bar--success {
+  background: hsl(var(--success));
+}
+
+.Toastify__progress-bar--error {
+  background: hsl(var(--destructive));
+}
+
+.Toastify__progress-bar--warning {
+  background: hsl(var(--warning));
+}
+
+.Toastify__progress-bar--info {
+  background: hsl(var(--primary));
 }
 
 .Toastify__close-button {
-  color: currentColor;
-  opacity: 0.7;
+  color: hsl(var(--foreground));
+  opacity: 0.5;
 }
 
 .Toastify__close-button:hover {
   opacity: 1;
+}
+
+.dark .Toastify__toast {
+  background: hsl(var(--card));
+  color: hsl(var(--card-foreground));
+  border-color: hsl(var(--border));
 }
