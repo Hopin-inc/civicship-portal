@@ -47,7 +47,7 @@ const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, image })
               className={`text-label-sm font-bold shrink-0 ml-4 ${isPositive ? "text-success" : "text-foreground"}`}
             >
               {isPositive ? "+" : ""}
-              {formatCurrency(transaction.transferPoints)} pt
+              {formatCurrency(transaction.transferPoints)}pt
             </div>
           </div>
           {transaction.reason !== GqlTransactionReason.PointIssued && transaction.didValue && (
