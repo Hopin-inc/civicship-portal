@@ -5,7 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useTheme } from "next-themes";
 
 export function Toaster() {
-  const { theme = "system" } = useTheme();
+  const { resolvedTheme } = useTheme();
 
   return (
     <ToastContainer
@@ -18,7 +18,7 @@ export function Toaster() {
       pauseOnFocusLoss
       draggable
       pauseOnHover
-      theme={theme === "dark" ? "dark" : "light"}
+      theme={resolvedTheme === 'dark' ? 'dark' : 'light'}
       className="mx-10"
     />
   );
