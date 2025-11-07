@@ -1,8 +1,9 @@
 import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { CookiesProvider } from "next-client-cookies/server";
 import ApolloProvider from "@/components/providers/ApolloProvider";
-import { Toaster } from "@/components/ui/toast";
+import { Toaster } from "@/components/ui/sonner";
 import LoadingProvider from "@/components/providers/LoadingProvider";
 import { AuthProvider } from "@/contexts/AuthProvider";
 import HeaderProvider from "@/components/providers/HeaderProvider";
@@ -14,7 +15,6 @@ import ClientPolyfills from "@/components/polyfills/ClientPolyfills";
 import { getUserServer } from "@/lib/auth/init/getUserServer";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
-import { Inter } from "next/dist/compiled/@next/font/dist/google";
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -63,7 +63,7 @@ const RootLayout = async ({
                   <LoadingProvider>
                     <AnalyticsProvider />
                     <MainContent>{children}</MainContent>
-                    <Toaster />
+                    <Toaster richColors className="mx-8" />
                   </LoadingProvider>
                 </HeaderProvider>
               </AuthProvider>
