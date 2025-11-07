@@ -7,7 +7,7 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";
 import dynamic from "next/dynamic";
 import { useParams } from "next/navigation";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { GqlClaimLinkStatus, useTicketClaimLinkQuery } from "@/types/graphql";

@@ -1,6 +1,6 @@
 import { Card, CardHeader } from "@/components/ui/card";
 import { Copy, Info, ExternalLink } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import { truncateText, shortenMiddle } from "@/utils/stringUtils";
 import { InfoCardProps } from "@/types";
 import Link from "next/link";

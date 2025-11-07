@@ -2,7 +2,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Copy, FileKey, Info, LinkIcon, PhoneIcon } from "lucide-react";
 import Image from "next/image";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import { useAuth } from "@/contexts/AuthProvider";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 import { useUserProfileContext } from "@/app/users/features/shared/contexts/UserProfileContext";

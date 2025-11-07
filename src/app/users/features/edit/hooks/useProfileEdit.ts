@@ -2,7 +2,7 @@
 
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import { GqlCurrentPrefecture, useUpdateMyProfileMutation } from "@/types/graphql";
 import { GeneralUserProfile } from "@/app/users/features/shared/types";
 import { mapGqlUserToProfile } from "@/app/users/features/shared/mappers";

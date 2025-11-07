@@ -4,7 +4,7 @@ import { useEffect, useMemo } from "react";
 import { useArticleQuery } from "./useArticleQuery";
 import { presenterArticleDetail, presenterArticleWithAuthor } from "@/app/articles/data/presenter";
 import type { TArticleDetail, TArticleWithAuthor } from "@/app/articles/data/type";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import { logger } from "@/lib/logging";
 
 interface UseArticleResult {

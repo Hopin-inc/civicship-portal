@@ -3,7 +3,7 @@ import {
   GqlParticipation,
   useEvaluationBulkCreateMutation,
 } from "@/types/graphql";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 
 type UseSaveAttendancesArgs = {
   onSuccess?: () => void;

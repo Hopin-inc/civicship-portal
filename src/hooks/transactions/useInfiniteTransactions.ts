@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { GqlTransaction, GqlTransactionsConnection } from "@/types/graphql";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 
 interface UseInfiniteTransactionsProps {
   initialTransactions: GqlTransactionsConnection;

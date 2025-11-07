@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { GqlDidIssuanceStatus, GqlUser } from "@/types/graphql";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { HeaderConfig } from "@/contexts/HeaderContext";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";

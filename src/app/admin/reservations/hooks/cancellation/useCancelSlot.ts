@@ -4,7 +4,7 @@ import {
   GqlReservation,
   useOpportunitySlotSetHostingStatusMutation,
 } from "@/types/graphql";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 

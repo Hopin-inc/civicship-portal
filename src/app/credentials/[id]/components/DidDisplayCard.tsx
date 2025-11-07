@@ -1,6 +1,6 @@
 import { Card, CardHeader } from "@/components/ui/card";
 import { Copy } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 
 interface DidDisplayCardProps {
   label: string;
