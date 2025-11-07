@@ -16,7 +16,7 @@ const MainContent: React.FC<MainContentProps> = ({ children }) => {
   const showHeader = !config?.hideHeader;
 
   return (
-    <div className="min-h-screen flex flex-col max-w-mobile-l mx-auto w-full">
+    <div className="app-content min-h-screen flex flex-col max-w-mobile-l mx-auto w-full">
       <Header />
       <main className={`w-full flex-grow ${showHeader ? "pt-16" : ""} pb-16 overflow-y-auto`}>
         <RouteGuard>{children}</RouteGuard>

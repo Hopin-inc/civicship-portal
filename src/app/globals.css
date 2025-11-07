@@ -439,11 +439,11 @@
   }
 }
 
-section {
+:where(.app-content) section {
   @apply mt-8
 }
 
-li {
+:where(.app-content) li {
   @apply list-disc ml-8;
 }
 
