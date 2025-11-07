@@ -24,12 +24,21 @@ const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, image })
     const descData = transaction.descriptionData;
     
     if (!descData || descData.isSpecialCase) {
-      return t(`transactions.name.${descData?.name || "move"}`);
+      return {
+        displayName: null,
+        displayAction: t(`transactions.name.${descData?.name || "move"}`)
+      };
     }
 
-    const key = `transactions.action.${descData.actionType}.${descData.direction}`;
-    return t(key, { name: descData.name });
+    const actionType = descData.actionType;
+    const direction = descData.direction;
+    return {
+      displayName: t(`transactions.parts.action.${actionType}.${direction}.name`, { name: descData.name }),
+      displayAction: t(`transactions.parts.action.${actionType}.${direction}.action`)
+    };
   };
+
+  const { displayName, displayAction } = getDisplayText();
 
   return (
     <Card className="px-4 py-4 bg-white">
@@ -40,8 +49,9 @@ const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, image })
         </Avatar>
         <div className="flex flex-col text-left min-w-0 flex-1">
           <div className="flex items-start justify-between">
-            <span className="flex items-center truncate whitespace-nowrap overflow-hidden text-label-sm font-bold">
-              {getDisplayText()}
+            <span className="flex items-center truncate whitespace-nowrap overflow-hidden">
+              {displayName && <span className="text-label-sm font-bold">{displayName}</span>}
+              {displayAction && <span className="text-label-xs font-bold">{displayAction}</span>}
             </span>
             <div
               className={`text-label-sm font-bold shrink-0 ml-4 ${isPositive ? "text-success" : "text-foreground"}`}
