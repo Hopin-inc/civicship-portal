@@ -59,6 +59,14 @@ const UserInfoCard = ({
   
   const useTranslatedLabel = actionType && otherName !== undefined && isReceive !== undefined;
   
+  const direction = isReceive ? "from" : "to";
+  const displayName = useTranslatedLabel 
+    ? t(`transactions.parts.action.${actionType}.${direction}.name`, { name: otherName })
+    : null;
+  const displayAction = useTranslatedLabel
+    ? t(`transactions.parts.action.${actionType}.${direction}.action`)
+    : null;
+  
   const formattedDate = createdAt
     ? formatDateTime(
         typeof createdAt === "string" ? createdAt : createdAt.toISOString()
@@ -77,7 +85,12 @@ const UserInfoCard = ({
           <span className="flex items-center truncate whitespace-nowrap overflow-hidden">
           {showLabel
             ? useTranslatedLabel
-              ? t(getWalletActionKey(actionType!, isReceive!), { name: otherName })
+              ? (
+                  <>
+                    <span className="text-label-sm font-bold">{displayName}</span>
+                    <span className="text-label-xs font-bold">{displayAction}</span>
+                  </>
+                )
               : typeof label === "string"
                 ? label
                 : label && (
