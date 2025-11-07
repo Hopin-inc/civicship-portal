@@ -18,8 +18,8 @@ export function Toaster() {
       pauseOnFocusLoss
       draggable
       pauseOnHover
-      theme={resolvedTheme === 'dark' ? 'dark' : 'light'}
-      className="mx-10"
+      theme={resolvedTheme === "dark" ? "dark" : "light"}
+      className="mx-8"
     />
   );
 }
