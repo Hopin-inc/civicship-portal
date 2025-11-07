@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next";
-// import { Inter } from "next/font/google";
 import "./globals.css";
 import { CookiesProvider } from "next-client-cookies/server";
 import ApolloProvider from "@/components/providers/ApolloProvider";
@@ -13,10 +12,11 @@ import { currentCommunityMetadata } from "@/lib/communities/metadata";
 import AnalyticsProvider from "@/components/providers/AnalyticsProvider";
 import ClientPolyfills from "@/components/polyfills/ClientPolyfills";
 import { getUserServer } from "@/lib/auth/init/getUserServer";
-import { NextIntlClientProvider } from 'next-intl';
-import { getLocale, getMessages } from 'next-intl/server';
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
+import { Inter } from "next/dist/compiled/@next/font/dist/google";
 
-// const font = Inter({ subsets: ["latin"] });
+const font = Inter({ subsets: ["latin"] });
 
 export async function generateMetadata(): Promise<Metadata> {
   const metadata = currentCommunityMetadata;
@@ -43,18 +43,15 @@ const RootLayout = async ({
   children: React.ReactNode;
 }>) => {
   const { user, lineAuthenticated, phoneAuthenticated } = await getUserServer();
-  
+
   const locale = await getLocale();
   const messages = await getMessages();
 
   return (
     <html lang={locale}>
-      <body style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
+      <body className={font.className}>
         <ClientPolyfills />
-        <NextIntlClientProvider 
-          locale={locale} 
-          messages={messages}
-        >
+        <NextIntlClientProvider locale={locale} messages={messages}>
           <CookiesProvider>
             <ApolloProvider>
               <AuthProvider
