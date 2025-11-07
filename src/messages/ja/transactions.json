@@ -6,7 +6,7 @@
   "transactions.empty": "まだ交換したことがありません",
   "transactions.did.pending": "did発行中",
   "transactions.date.unknown": "日時不明",
-  "transactions.name.issued": "ポイント付与",
+  "transactions.name.issued": "ポイント発行",
   "transactions.name.onboarding": "登録ボーナス",
   "transactions.name.move": "ポイント移動",
   "transactions.status.donation": "あげた相手",
