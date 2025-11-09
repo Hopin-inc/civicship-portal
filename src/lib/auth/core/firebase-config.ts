@@ -133,6 +133,16 @@ export const categorizeFirebaseError = (
         errorCategory: "user_input",
       };
     }
+
+    if (code === "auth/operation-not-allowed") {
+      return {
+        type: "config",
+        message: "この地域ではSMS送信が有効化されていません。",
+        retryable: false,
+        logLevel: "warn",
+        errorCategory: "environment_constraint",
+      };
+    }
   }
 
   if (error?.message?.includes("LIFF authentication failed")) {
