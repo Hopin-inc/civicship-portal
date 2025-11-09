@@ -3116,46 +3116,30 @@ export type GqlGetMembershipListQuery = {
       cursor: string;
       node?: {
         __typename?: "Membership";
-        headline?: string | null;
-        bio?: string | null;
         role: GqlRole;
         status: GqlMembershipStatus;
-        reason: GqlMembershipStatusReason;
         user?: {
           __typename?: "User";
           id: string;
           name: string;
           image?: string | null;
-          bio?: string | null;
-          currentPrefecture?: GqlCurrentPrefecture | null;
-          phoneNumber?: string | null;
-          urlFacebook?: string | null;
-          urlInstagram?: string | null;
-          urlX?: string | null;
           didIssuanceRequests?: Array<{
             __typename?: "DidIssuanceRequest";
-            id: string;
             status: GqlDidIssuanceStatus;
             didValue?: string | null;
-            requestedAt?: Date | null;
-            processedAt?: Date | null;
-            completedAt?: Date | null;
-            createdAt?: Date | null;
-            updatedAt?: Date | null;
           }> | null;
           wallets?: Array<{
             __typename?: "Wallet";
             id: string;
             type: GqlWalletType;
+            currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
             community?: {
               __typename?: "Community";
               id: string;
               name?: string | null;
               image?: string | null;
             } | null;
-            currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
           }> | null;
-          nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
         } | null;
         community?: {
           __typename?: "Community";
@@ -3885,29 +3869,17 @@ export type GqlGetMemberWalletsQuery = {
         __typename?: "Wallet";
         id: string;
         type: GqlWalletType;
+        currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
         user?: {
           __typename?: "User";
           id: string;
           name: string;
           image?: string | null;
-          bio?: string | null;
-          currentPrefecture?: GqlCurrentPrefecture | null;
-          phoneNumber?: string | null;
-          urlFacebook?: string | null;
-          urlInstagram?: string | null;
-          urlX?: string | null;
           didIssuanceRequests?: Array<{
             __typename?: "DidIssuanceRequest";
-            id: string;
             status: GqlDidIssuanceStatus;
             didValue?: string | null;
-            requestedAt?: Date | null;
-            processedAt?: Date | null;
-            completedAt?: Date | null;
-            createdAt?: Date | null;
-            updatedAt?: Date | null;
           }> | null;
-          nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
         } | null;
         community?: {
           __typename?: "Community";
@@ -3915,7 +3887,6 @@ export type GqlGetMemberWalletsQuery = {
           name?: string | null;
           image?: string | null;
         } | null;
-        currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
       } | null;
     } | null> | null;
   };
@@ -7100,31 +7071,38 @@ export const GetMembershipListDocument = gql`
       edges {
         cursor
         node {
-          ...MembershipFields
+          role
+          status
           user {
-            ...UserFields
+            id
+            name
+            image
             didIssuanceRequests @include(if: $withDidIssuanceRequests) {
-              ...DidIssuanceRequestFields
+              status
+              didValue
             }
             wallets @include(if: $withWallets) {
-              ...WalletFields
+              id
+              type
+              currentPointView {
+                currentPoint
+              }
               community {
-                ...CommunityFields
+                id
+                name
+                image
               }
             }
           }
           community {
-            ...CommunityFields
+            id
+            name
+            image
           }
         }
       }
     }
   }
-  ${MembershipFieldsFragmentDoc}
-  ${UserFieldsFragmentDoc}
-  ${DidIssuanceRequestFieldsFragmentDoc}
-  ${WalletFieldsFragmentDoc}
-  ${CommunityFieldsFragmentDoc}
 `;
 
 /**
@@ -8146,24 +8124,29 @@ export const GetMemberWalletsDocument = gql`
       edges {
         cursor
         node {
-          ...WalletFields
+          id
+          type
+          currentPointView {
+            currentPoint
+          }
           user {
-            ...UserFields
+            id
+            name
+            image
             didIssuanceRequests @include(if: $withDidIssuanceRequests) {
-              ...DidIssuanceRequestFields
+              status
+              didValue
             }
           }
           community {
-            ...CommunityFields
+            id
+            name
+            image
           }
         }
       }
     }
   }
-  ${WalletFieldsFragmentDoc}
-  ${UserFieldsFragmentDoc}
-  ${DidIssuanceRequestFieldsFragmentDoc}
-  ${CommunityFieldsFragmentDoc}
 `;
 
 /**

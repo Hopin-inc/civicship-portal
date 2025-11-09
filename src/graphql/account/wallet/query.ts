@@ -102,15 +102,24 @@ export const GET_MEMBER_WALLETS = gql`
       edges {
         cursor
         node {
-          ...WalletFields
+          id
+          type
+          currentPointView {
+            currentPoint
+          }
           user {
-            ...UserFields
+            id
+            name
+            image
             didIssuanceRequests @include(if: $withDidIssuanceRequests) {
-              ...DidIssuanceRequestFields
+              status
+              didValue
             }
           }
           community {
-            ...CommunityFields
+            id
+            name
+            image
           }
         }
       }
