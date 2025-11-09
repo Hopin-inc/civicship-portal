@@ -30,32 +30,13 @@ export const GET_TRANSACTIONS_SERVER_QUERY = `
           fromWallet {
             id
             type
-            currentPointView {
-              currentPoint
-            }
             user {
               id
               name
               image
-              bio
-              currentPrefecture
-              phoneNumber
-              nftWallet {
-                id
-                walletAddress
-              }
-              urlFacebook
-              urlInstagram
-              urlX
               didIssuanceRequests @include(if: $withDidIssuanceRequests) {
-                id
                 status
                 didValue
-                requestedAt
-                processedAt
-                completedAt
-                createdAt
-                updatedAt
               }
             }
             community {
@@ -67,32 +48,13 @@ export const GET_TRANSACTIONS_SERVER_QUERY = `
           toWallet {
             id
             type
-            currentPointView {
-              currentPoint
-            }
             user {
               id
               name
               image
-              bio
-              currentPrefecture
-              phoneNumber
-              nftWallet {
-                id
-                walletAddress
-              }
-              urlFacebook
-              urlInstagram
-              urlX
               didIssuanceRequests @include(if: $withDidIssuanceRequests) {
-                id
                 status
                 didValue
-                requestedAt
-                processedAt
-                completedAt
-                createdAt
-                updatedAt
               }
             }
             community {

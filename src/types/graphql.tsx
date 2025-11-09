@@ -6054,24 +6054,11 @@ export type GqlGetTransactionsQuery = {
             id: string;
             name: string;
             image?: string | null;
-            bio?: string | null;
-            currentPrefecture?: GqlCurrentPrefecture | null;
-            phoneNumber?: string | null;
-            urlFacebook?: string | null;
-            urlInstagram?: string | null;
-            urlX?: string | null;
             didIssuanceRequests?: Array<{
               __typename?: "DidIssuanceRequest";
-              id: string;
               status: GqlDidIssuanceStatus;
               didValue?: string | null;
-              requestedAt?: Date | null;
-              processedAt?: Date | null;
-              completedAt?: Date | null;
-              createdAt?: Date | null;
-              updatedAt?: Date | null;
             }> | null;
-            nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
           } | null;
           community?: {
             __typename?: "Community";
@@ -6079,7 +6066,6 @@ export type GqlGetTransactionsQuery = {
             name?: string | null;
             image?: string | null;
           } | null;
-          currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
         } | null;
         toWallet?: {
           __typename?: "Wallet";
@@ -6090,24 +6076,11 @@ export type GqlGetTransactionsQuery = {
             id: string;
             name: string;
             image?: string | null;
-            bio?: string | null;
-            currentPrefecture?: GqlCurrentPrefecture | null;
-            phoneNumber?: string | null;
-            urlFacebook?: string | null;
-            urlInstagram?: string | null;
-            urlX?: string | null;
             didIssuanceRequests?: Array<{
               __typename?: "DidIssuanceRequest";
-              id: string;
               status: GqlDidIssuanceStatus;
               didValue?: string | null;
-              requestedAt?: Date | null;
-              processedAt?: Date | null;
-              completedAt?: Date | null;
-              createdAt?: Date | null;
-              updatedAt?: Date | null;
             }> | null;
-            nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
           } | null;
           community?: {
             __typename?: "Community";
@@ -6115,7 +6088,6 @@ export type GqlGetTransactionsQuery = {
             name?: string | null;
             image?: string | null;
           } | null;
-          currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
         } | null;
       } | null;
     } | null> | null;
@@ -11421,27 +11393,39 @@ export const GetTransactionsDocument = gql`
         node {
           ...TransactionFields
           fromWallet {
-            ...WalletFields
+            id
+            type
             user {
+              id
+              name
+              image
               didIssuanceRequests @include(if: $withDidIssuanceRequests) {
-                ...DidIssuanceRequestFields
+                status
+                didValue
               }
-              ...UserFields
             }
             community {
-              ...CommunityFields
+              id
+              name
+              image
             }
           }
           toWallet {
-            ...WalletFields
+            id
+            type
             user {
+              id
+              name
+              image
               didIssuanceRequests @include(if: $withDidIssuanceRequests) {
-                ...DidIssuanceRequestFields
+                status
+                didValue
               }
-              ...UserFields
             }
             community {
-              ...CommunityFields
+              id
+              name
+              image
             }
           }
         }
@@ -11449,10 +11433,6 @@ export const GetTransactionsDocument = gql`
     }
   }
   ${TransactionFieldsFragmentDoc}
-  ${WalletFieldsFragmentDoc}
-  ${DidIssuanceRequestFieldsFragmentDoc}
-  ${UserFieldsFragmentDoc}
-  ${CommunityFieldsFragmentDoc}
 `;
 
 /**

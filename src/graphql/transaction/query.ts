@@ -21,27 +21,39 @@ export const GET_TRANSACTIONS = gql`
         node {
           ...TransactionFields
           fromWallet {
-            ...WalletFields
+            id
+            type
             user {
+              id
+              name
+              image
               didIssuanceRequests @include(if: $withDidIssuanceRequests) {
-                ...DidIssuanceRequestFields
+                status
+                didValue
               }
-              ...UserFields
             }
             community {
-              ...CommunityFields
+              id
+              name
+              image
             }
           }
           toWallet {
-            ...WalletFields
+            id
+            type
             user {
+              id
+              name
+              image
               didIssuanceRequests @include(if: $withDidIssuanceRequests) {
-                ...DidIssuanceRequestFields
+                status
+                didValue
               }
-              ...UserFields
             }
             community {
-              ...CommunityFields
+              id
+              name
+              image
             }
           }
         }
