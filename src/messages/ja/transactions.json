@@ -9,7 +9,7 @@
   "transactions.name.issued": "ポイント発行",
   "transactions.name.onboarding": "登録ボーナス",
   "transactions.name.move": "ポイント移動",
-  "transactions.status.donation": "あげた相手",
+  "transactions.status.donation": "譲渡先",
   "transactions.status.grant": "支給先",
   "transactions.status.pay": "支払い先",
   "transactions.status.refund": "払い戻し先",
@@ -44,5 +44,10 @@
   "transactions.parts.action.refund.to.name": "{name}",
   "transactions.parts.action.refund.to.action": "に返金",
   "transactions.parts.action.refund.from.name": "{name}",
-  "transactions.parts.action.refund.from.action": "が返金"
+  "transactions.parts.action.refund.from.action": "が返金",
+  "transactions.parts.action.donation.from.received.action": "からあげた",
+  "transactions.parts.action.grant.from.received.action": "から支給",
+  "transactions.parts.action.payment.from.received.action": "から支払い",
+  "transactions.parts.action.return.from.received.action": "から返品",
+  "transactions.parts.action.refund.from.received.action": "から返金"
 }
