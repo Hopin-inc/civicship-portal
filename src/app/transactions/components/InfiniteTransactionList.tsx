@@ -8,7 +8,7 @@ import { getFromWalletImage, getCounterpartyImage } from "@/app/admin/wallet/dat
 
 interface InfiniteTransactionListProps {
   initialTransactions: GqlTransactionsConnection;
-  fetchMore: (cursor: string, first: number) => Promise<GqlTransactionsConnection>;
+  apiEndpoint?: string;
   perspectiveWalletId?: string;
   showSignedAmount?: boolean;
   showDid?: boolean;
@@ -16,11 +16,30 @@ interface InfiniteTransactionListProps {
 
 export const InfiniteTransactionList = ({
   initialTransactions,
-  fetchMore,
+  apiEndpoint = "/api/transactions/community",
   perspectiveWalletId,
   showSignedAmount = false,
   showDid = false,
 }: InfiniteTransactionListProps) => {
+  const fetchMore = async (cursor: string, first: number): Promise<GqlTransactionsConnection> => {
+    const params = new URLSearchParams({
+      first: first.toString(),
+    });
+    if (cursor) {
+      params.append("cursor", cursor);
+    }
+    
+    const response = await fetch(`${apiEndpoint}?${params.toString()}`, {
+      cache: "no-store",
+    });
+    
+    if (!response.ok) {
+      throw new Error("Failed to fetch transactions");
+    }
+    
+    return response.json();
+  };
+
   const { transactions, hasNextPage, loading, loadMoreRef } = useInfiniteTransactions({
     initialTransactions,
     fetchMore,
