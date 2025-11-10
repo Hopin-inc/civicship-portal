@@ -9,6 +9,10 @@ export interface ServerCommunityPointFlowStatsParams {
   weeklyTo?: Date;
 }
 
+interface CommunityPointFlowStatsResponse {
+  community: Pick<GqlCommunity, "pointFlowStat" | "pointFlowStatsWeekly"> | null;
+}
+
 const fallbackStats = {
   pointFlowStat: null,
   pointFlowStatsWeekly: [],
@@ -23,17 +27,17 @@ export async function getServerCommunityPointFlowStats(
   const { weeklyLimit = 8, weeklyFrom, weeklyTo } = params;
 
   try {
-    const variables: GqlGetCommunityPointFlowStatsQueryVariables = {
+    const variables = {
       communityId: COMMUNITY_ID,
       weeklyLimit,
       weeklyFrom,
       weeklyTo,
     };
 
-    const data = await executeServerGraphQLQuery<
-      GqlGetCommunityPointFlowStatsQuery,
-      GqlGetCommunityPointFlowStatsQueryVariables
-    >(GET_COMMUNITY_POINT_FLOW_STATS_QUERY, variables);
+    const data = await executeServerGraphQLQuery<CommunityPointFlowStatsResponse>(
+      GET_COMMUNITY_POINT_FLOW_STATS_QUERY,
+      variables,
+    );
 
     return {
       pointFlowStat: data.community?.pointFlowStat ?? null,
