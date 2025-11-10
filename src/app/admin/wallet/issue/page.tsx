@@ -112,30 +112,38 @@ export default function IssuePointPage() {
     <>
       <main className="pb-24 min-h-screen flex items-center justify-center px-4">
         <div className="flex flex-col items-center space-y-6 max-w-xl w-full">
-          <Input
-            type="text"
-            placeholder="7,500,000"
-            value={displayValue}
-            onChange={handleInputChange}
-            inputMode="numeric"
-            className="text-5xl text-center py-6 h-20 border-0 border-b-2 border-input focus:outline-none focus:ring-0 shadow-none"
-          />
-
-          <div className="w-full">
-            <div className="flex gap-x-3 overflow-x-auto scrollbar-none pb-1">
-              {PRESET_AMOUNTS.map((value) => (
-                <Button
-                  key={value}
-                  variant={amount === value ? "primary" : "secondary"}
-                  size="sm"
-                  onClick={() => handlePresetClick(value)}
-                  className="min-w-[100px] flex-shrink-0"
-                >
-                  {formatAsManUnit(value)}
-                </Button>
-              ))}
+          <section className="w-full">
+            <div>
+              <Label className="text-label-md font-medium">{t("wallets.shared.transfer.amountLabel")}</Label>
+              <span className="text-label-xs rounded-full px-2 py-[2px] ml-2 bg-primary-foreground text-primary font-bold">
+                {t("wallets.shared.transfer.required")}
+              </span>
             </div>
-          </div>
+            <Input
+              type="text"
+              placeholder="1000pt"
+              value={displayValue}
+              onChange={handleInputChange}
+              inputMode="numeric"
+              className="mt-3 focus:outline-none focus:ring-0 shadow-none"
+            />
+
+            <div className="w-full mt-6">
+              <div className="flex gap-x-3 overflow-x-auto scrollbar-none pb-1">
+                {PRESET_AMOUNTS.map((value) => (
+                  <Button
+                    key={value}
+                    variant={amount === value ? "primary" : "secondary"}
+                    size="sm"
+                    onClick={() => handlePresetClick(value)}
+                    className="min-w-[100px] flex-shrink-0"
+                  >
+                    {formatAsManUnit(value)}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </section>
 
           <div className="w-full mt-6">
             <Label className="text-label-md font-medium">{t("wallets.shared.transfer.commentLabel")}</Label>
