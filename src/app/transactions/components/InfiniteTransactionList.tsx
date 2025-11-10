@@ -4,11 +4,13 @@ import { TransactionCard } from "./TransactionCard";
 import { GqlTransactionsConnection } from "@/types/graphql";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { useInfiniteTransactions } from "@/hooks/transactions/useInfiniteTransactions";
+import { getServerCommunityTransactionsWithCursor } from "@/hooks/transactions/server-community-transactions";
+import { getServerWalletTransactionsWithCursor } from "@/hooks/transactions/server-wallet-transactions";
 import { getFromWalletImage, getCounterpartyImage } from "@/app/admin/wallet/data/presenter";
 
 interface InfiniteTransactionListProps {
   initialTransactions: GqlTransactionsConnection;
-  apiEndpoint?: string;
+  walletId?: string;
   perspectiveWalletId?: string;
   showSignedAmount?: boolean;
   showDid?: boolean;
@@ -16,29 +18,14 @@ interface InfiniteTransactionListProps {
 
 export const InfiniteTransactionList = ({
   initialTransactions,
-  apiEndpoint = "/api/transactions/community",
+  walletId,
   perspectiveWalletId,
   showSignedAmount = false,
   showDid = false,
 }: InfiniteTransactionListProps) => {
-  const fetchMore = async (cursor: string, first: number): Promise<GqlTransactionsConnection> => {
-    const params = new URLSearchParams({
-      first: first.toString(),
-    });
-    if (cursor) {
-      params.append("cursor", cursor);
-    }
-    
-    const response = await fetch(`${apiEndpoint}?${params.toString()}`, {
-      cache: "no-store",
-    });
-    
-    if (!response.ok) {
-      throw new Error("Failed to fetch transactions");
-    }
-    
-    return response.json();
-  };
+  const fetchMore = walletId
+    ? (cursor?: string, first: number = 20) => getServerWalletTransactionsWithCursor(walletId, cursor, first)
+    : getServerCommunityTransactionsWithCursor;
 
   const { transactions, hasNextPage, loading, loadMoreRef } = useInfiniteTransactions({
     initialTransactions,

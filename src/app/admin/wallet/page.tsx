@@ -8,12 +8,10 @@ import useHeaderConfig from "@/hooks/useHeaderConfig";
 import WalletCard from "@/components/shared/WalletCard";
 import { GqlMembership, GqlRole, GqlWallet, useGetCommunityWalletQuery } from "@/types/graphql";
 import { Coins, Gift } from "lucide-react";
-import TransactionItem from "@/components/shared/TransactionItem";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
-import { presenterTransaction } from "@/utils/transaction";
-import { getToWalletImage } from "@/app/admin/wallet/data/presenter";
 import useCommunityTransactions from "@/app/admin/wallet/hooks/useCommunityTransactions";
+import { InfiniteTransactionList } from "@/app/transactions/components/InfiniteTransactionList";
 import { logger } from "@/lib/logging";
 import Link from "next/link";
 import { toPointNumber } from "@/utils/bigint";
@@ -155,18 +153,13 @@ export default function WalletPage() {
             {t("transactions.list.emptyState")}
           </p>
         ) : (
-          <div className="divide-y-8 divide-zinc-100">
-            {connection.edges?.map((edge) => {
-              const node = edge?.node;
-              if (!node) return null;
-              const transaction = presenterTransaction(node, walletId);
-              if (!transaction) return null;
-              const image = getToWalletImage(node);
-              return <TransactionItem key={transaction.id} transaction={transaction} image={image} />;
-            })}
-
-            <div ref={loadMoreRef} className="flex justify-center py-4" />
-          </div>
+          <InfiniteTransactionList
+            initialTransactions={connection}
+            walletId={walletId}
+            perspectiveWalletId={walletId}
+            showSignedAmount={true}
+            showDid={true}
+          />
         )}
       </div>
     </div>
