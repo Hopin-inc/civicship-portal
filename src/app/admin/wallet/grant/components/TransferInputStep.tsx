@@ -26,6 +26,8 @@ interface Props {
   backLabel?: string;
   amountLabel?: string;
   presetAmounts?: number[];
+  commentPlaceholder?: string;
+  commentHistoryKey?: string;
 }
 
 const INT_LIMIT = 2000000000;
@@ -41,6 +43,8 @@ function TransferInputStep({
   submitLabel,
   backLabel,
   amountLabel,
+  commentPlaceholder,
+  commentHistoryKey,
 }: Props) {
   const t = useTranslations();
   
@@ -67,6 +71,16 @@ function TransferInputStep({
   const [amount, setAmount] = useState<number | null>(null);
   const [displayValue, setDisplayValue] = useState<string>("");
   const [comment, setComment] = useState<string>("");
+  const [commentHistory, setCommentHistory] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (commentHistoryKey) {
+      try {
+        const raw = localStorage.getItem(commentHistoryKey);
+        setCommentHistory(raw ? JSON.parse(raw) : []);
+      } catch {}
+    }
+  }, [commentHistoryKey]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value;
@@ -136,7 +150,7 @@ function TransferInputStep({
               <div className="relative mt-3">
                 <Textarea
                   maxLength={100}
-                  placeholder={t("wallets.shared.transfer.commentPlaceholder")}
+                  placeholder={commentPlaceholder ?? t("wallets.shared.transfer.commentPlaceholder")}
                   value={comment}
                   onChange={(e) => {
                     const newValue = e.target.value;
@@ -152,6 +166,28 @@ function TransferInputStep({
                   {comment.length}/100
                 </div>
               </div>
+              {commentHistory.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {commentHistory.map((h, i) => (
+                    <Button
+                      key={i}
+                      type="button"
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => {
+                        if (h.length > 100) {
+                          toast.error(t("wallets.shared.transfer.commentError"));
+                          return;
+                        }
+                        setComment(h);
+                      }}
+                      className="text-xs"
+                    >
+                      {h}
+                    </Button>
+                  ))}
+                </div>
+              )}
             </div>
           </section>
           

@@ -5,6 +5,8 @@ import { GqlUser } from "@/types/graphql";
 import TransferInputStep from "@/app/admin/wallet/grant/components/TransferInputStep";
 import { useTranslations } from "next-intl";
 
+const COMMENT_HISTORY_KEY = "commentHistory.donate";
+
 interface Props {
   user: GqlUser;
   currentPoint: bigint;
@@ -33,6 +35,8 @@ export function DonateForm({
       submitLabel={t("wallets.donate.submitLabel")}
       backLabel={t("wallets.donate.backLabel")}
       presetAmounts={[1000, 3000, 5000, 10000]}
+      commentPlaceholder={t("wallets.shared.transfer.commentPlaceholderDonate")}
+      commentHistoryKey={COMMENT_HISTORY_KEY}
     />
   );
 }
