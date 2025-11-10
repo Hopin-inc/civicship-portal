@@ -232,11 +232,26 @@ export type GqlCommunity = {
   opportunities?: Maybe<Array<GqlOpportunity>>;
   participations?: Maybe<Array<GqlParticipation>>;
   places?: Maybe<Array<GqlPlace>>;
+  pointFlowStat?: Maybe<GqlCommunityPointFlowStat>;
+  pointFlowStatsMonthly?: Maybe<Array<GqlCommunityPointFlowStatMonthly>>;
+  pointFlowStatsWeekly?: Maybe<Array<GqlCommunityPointFlowStatWeekly>>;
   pointName?: Maybe<Scalars["String"]["output"]>;
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
   utilities?: Maybe<Array<GqlUtility>>;
   wallets?: Maybe<Array<GqlWallet>>;
   website?: Maybe<Scalars["String"]["output"]>;
+};
+
+export type GqlCommunityPointFlowStatsMonthlyArgs = {
+  from?: InputMaybe<Scalars["Datetime"]["input"]>;
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  to?: InputMaybe<Scalars["Datetime"]["input"]>;
+};
+
+export type GqlCommunityPointFlowStatsWeeklyArgs = {
+  from?: InputMaybe<Scalars["Datetime"]["input"]>;
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  to?: InputMaybe<Scalars["Datetime"]["input"]>;
 };
 
 export type GqlCommunityConfig = {
@@ -325,6 +340,35 @@ export type GqlCommunityLineRichMenuConfig = {
 export type GqlCommunityLineRichMenuConfigInput = {
   richMenuId: Scalars["String"]["input"];
   type: GqlLineRichMenuType;
+};
+
+export type GqlCommunityPointFlowStat = {
+  __typename?: "CommunityPointFlowStat";
+  communityId: Scalars["ID"]["output"];
+  grantedPoints: Scalars["Int"]["output"];
+  issuedPoints: Scalars["Int"]["output"];
+  transferredPoints: Scalars["Int"]["output"];
+  updatedAt: Scalars["Datetime"]["output"];
+};
+
+export type GqlCommunityPointFlowStatMonthly = {
+  __typename?: "CommunityPointFlowStatMonthly";
+  communityId: Scalars["ID"]["output"];
+  grantedPoints: Scalars["Int"]["output"];
+  issuedPoints: Scalars["Int"]["output"];
+  month: Scalars["Datetime"]["output"];
+  transferredPoints: Scalars["Int"]["output"];
+  updatedAt: Scalars["Datetime"]["output"];
+};
+
+export type GqlCommunityPointFlowStatWeekly = {
+  __typename?: "CommunityPointFlowStatWeekly";
+  communityId: Scalars["ID"]["output"];
+  grantedPoints: Scalars["Int"]["output"];
+  issuedPoints: Scalars["Int"]["output"];
+  transferredPoints: Scalars["Int"]["output"];
+  updatedAt: Scalars["Datetime"]["output"];
+  week: Scalars["Datetime"]["output"];
 };
 
 export type GqlCommunitySortInput = {
