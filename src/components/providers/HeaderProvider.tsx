@@ -16,6 +16,10 @@ export interface HeaderConfig {
     from?: string;
     to?: string;
     guests?: number;
+    q?: string;
+    type?: string;
+    ticket?: string;
+    points?: string;
   };
 }
 
@@ -68,7 +72,14 @@ const HeaderProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const pathname = usePathname();
 
   const updateConfig = useCallback((newConfig: Partial<HeaderConfig>) => {
-    setConfig((prevConfig: HeaderConfig) => ({ ...prevConfig, ...newConfig }));
+    setConfig((prevConfig: HeaderConfig) => ({
+      ...prevConfig,
+      ...newConfig,
+      searchParams: {
+        ...prevConfig.searchParams,
+        ...newConfig.searchParams,
+      },
+    }));
   }, []);
 
   const resetConfig = useCallback(() => {

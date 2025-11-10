@@ -1,24 +1,29 @@
 "use client";
-
-import React, { useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthProvider";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { currentCommunityConfig } from "@/lib/communities/metadata";
+import FeaturedSection from "@/components/domains/opportunities/components/FeaturedSection/FeaturedSection";
+import { OpportunityCarouselListSection } from "@/components/domains/opportunities/components/ListSection/OpportunityCarouselListSection";
+import OpportunitiesFeed from "@/app/opportunities/components/OpportunitiesFeed";
+import { useFetchFeedOpportunities } from "@/app/opportunities/hooks/useFetchFeedOpportunities";
+import { formatOpportunities } from "@/components/domains/opportunities/utils";
 
 export default function HomePage() {
-  const router = useRouter();
-  const { isAuthenticating, loading: authLoading } = useAuth();
+    const { isAuthenticating, loading: authLoading } = useAuth();
+    const { featuredCards, upcomingCards, loading } = useFetchFeedOpportunities();
+    if (isAuthenticating || authLoading) {
+      return <LoadingIndicator fullScreen={true} />;
+    }
+    const formattedOpportunities = upcomingCards.map(formatOpportunities);
 
-  useEffect(() => {
-    router.replace(currentCommunityConfig.rootPath ?? "/activities");
-  }, [router]);
-
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, []);
-
-  if (isAuthenticating || authLoading) {
-    return <LoadingIndicator fullScreen={true} />;
-  }
+    return (
+        <div className="min-h-screen">
+          <FeaturedSection opportunities={featuredCards} isInitialLoading={loading} />
+          <OpportunityCarouselListSection
+            title="もうすぐ開催予定"
+            opportunities={formattedOpportunities}
+            isInitialLoading={loading}
+          />
+          <OpportunitiesFeed />
+        </div>
+      );
 }

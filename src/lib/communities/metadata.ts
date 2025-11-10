@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { DEFAULT_ASSET_PATHS } from "./constants";
 
 export type FeaturesType =
   | "places"
@@ -8,7 +9,36 @@ export type FeaturesType =
   | "articles"
   | "prefectures"
   | "credentials"
-  | "justDaoIt";
+  | "justDaoIt"
+  | "quests"
+  | "languageSwitcher";
+
+/**
+ * コミュニティの規約・文書の定義
+ */
+export interface CommunityDocument {
+  /** 文書のID（一意識別子） */
+  id: string;
+
+  /** 表示名 */
+  title: string;
+
+  /** ファイルパスまたはURL */
+  path: string;
+
+  /**
+   * リンクタイプ
+   * - 'external': 外部リンク（PDF等、新しいタブで開く）
+   * - 'internal': 内部ページ（Next.js Link使用）
+   */
+  type: "external" | "internal";
+
+  /**
+   * 表示順序（小さい順に表示）
+   * 指定しない場合は定義順
+   */
+  order?: number;
+}
 
 // コミュニティごとのベース設定
 interface CommunityBaseConfig {
@@ -25,6 +55,13 @@ interface CommunityBaseConfig {
   enableFeatures: FeaturesType[];
   rootPath?: string;
   adminRootPath?: string;
+  /** コミュニティ固有の規約・文書リスト */
+  documents?: CommunityDocument[];
+  /** 共通文書（利用規約・プライバシーポリシー）のオーバーライド */
+  commonDocumentOverrides?: {
+    terms?: CommunityDocument;
+    privacy?: CommunityDocument;
+  };
 }
 
 // コミュニティごとのメタデータ型定義
@@ -72,9 +109,25 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     logoPath: "/communities/neo88/logo.jpg",
     squareLogoPath: "/communities/neo88/logo-square.jpg",
     ogImagePath: "https://storage.googleapis.com/prod-civicship-storage-public/asset/neo88/ogp.jpg",
-    enableFeatures: ["opportunities", "places", "points", "articles", "tickets", "prefectures"],
-    rootPath: "/activities",
+    enableFeatures: ["opportunities", "points", "articles", "tickets", "prefectures", "quests"],
+    rootPath: "/opportunities",
     adminRootPath: "/admin/reservations",
+  },
+  "himeji-ymca": {
+    id: "himeji-ymca",
+    tokenName: "姫路YMCA",
+    title: "姫路YMCA",
+    description: "",
+    shortDescription: "",
+    domain: "https://himeji-ymca.civicship.jp", // TODO: 環境によってドメインが変わるので、環境変数化する必要あり
+    faviconPrefix: "/communities/himeji-ymca",
+    logoPath: "/communities/himeji-ymca/logo.jpg",
+    squareLogoPath: "/communities/himeji-ymca/logo-square.jpg",
+    ogImagePath:
+      "https://storage.googleapis.com/prod-civicship-storage-public/asset/himeji-ymca/ogp.jpg",
+    enableFeatures: ["points", "opportunities", "quests"],
+    rootPath: "/users/me",
+    adminRootPath: "/admin/wallet",
   },
   kibotcha: {
     id: "kibotcha",
@@ -88,9 +141,60 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     squareLogoPath: "/communities/kibotcha/logo-square.jpg",
     ogImagePath:
       "https://storage.googleapis.com/prod-civicship-storage-public/asset/kibotcha/ogp.jpg",
-    enableFeatures: ["points", "justDaoIt"],
+    enableFeatures: ["points", "justDaoIt", "languageSwitcher"],
     rootPath: "/users/me",
     adminRootPath: "/admin/wallet",
+    commonDocumentOverrides: {
+      privacy: {
+        id: "privacy",
+        title: "users.promise.privacyPolicy",
+        path: "/communities/kibotcha/privacy-policy.pdf",
+        type: "external",
+      },
+      terms: {
+        id: "terms",
+        title: "users.promise.termsOfService",
+        path: "/communities/kibotcha/terms.pdf",
+        type: "external",
+      },
+    },
+    documents: [
+      {
+        id: "bylaws",
+        title: "users.documents.bylaws",
+        path: "/communities/kibotcha/bylaws.pdf",
+        type: "external",
+        order: 1,
+      },
+      {
+        id: "operating-regulations",
+        title: "users.documents.operatingRegulations",
+        path: "/communities/kibotcha/operating-regulations.pdf",
+        type: "external",
+        order: 2,
+      },
+      {
+        id: "dao-meeting-rules",
+        title: "users.documents.daoMeetingRules",
+        path: "/communities/kibotcha/dao-meeting-rules.pdf",
+        type: "external",
+        order: 3,
+      },
+      {
+        id: "token-regulations",
+        title: "users.documents.tokenRegulations",
+        path: "/communities/kibotcha/token-regulations.pdf",
+        type: "external",
+        order: 4,
+      },
+      {
+        id: "whitepaper",
+        title: "users.documents.whitepaper",
+        path: "/communities/kibotcha/whitepaper.pdf",
+        type: "external",
+        order: 5,
+      },
+    ],
   },
   dais: {
     id: "dais",
@@ -107,6 +211,84 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     rootPath: "/users/me",
     adminRootPath: "/admin/credentials",
   },
+  kotohira: {
+    id: "kotohira",
+    tokenName: "KOTOHIRA",
+    title: "琴平デジタル町民",
+    description:
+      "「観光地を訪れる」から「観光地と関わる」へ。あなたも琴平デジタル町民として、DAO型地域共創の一員になりませんか？",
+    shortDescription: "「観光地を訪れる」から「観光地と関わる」へ。",
+    domain: "https://kotohira.civicship.app", // TODO: 環境によってドメインが変わるので、環境変数化する必要あり
+    faviconPrefix: "/communities/kotohira",
+    logoPath: "/communities/kotohira/logo.jpg",
+    squareLogoPath: "/communities/kotohira/logo-square.jpg",
+    ogImagePath:
+      "https://storage.googleapis.com/prod-civicship-storage-public/asset/kotohira/ogp.jpg",
+    enableFeatures: ["opportunities", "points", "quests"],
+    rootPath: "/opportunities",
+    adminRootPath: "/admin/reservations",
+  },
+  izu: {
+    id: "izu",
+    tokenName: "IZU",
+    title: "IZUとDAO",
+    description:
+      "クエストを通じて街に関わり、体験やお手伝いでポイントが貯まる。旅先で出会う人や場所とつながり、伊豆のまちをもっと深く楽しめるデジタル住民アプリです。",
+    shortDescription: '観光を越えて、伊豆に "溶ける" デジタル住民アプリ',
+    domain: "https://izu.civicship.app", // TODO: 環境によってドメインが変わるので、環境変数化する必要あり
+    faviconPrefix: "/communities/izu",
+    logoPath: "/communities/izu/logo.jpg",
+    squareLogoPath: "/communities/izu/logo-square.jpg",
+    ogImagePath: "https://storage.googleapis.com/prod-civicship-storage-public/asset/izu/ogp.png",
+    enableFeatures: ["points", "justDaoIt", "languageSwitcher"],
+    rootPath: "/users/me",
+    adminRootPath: "/admin/wallet",
+    commonDocumentOverrides: {
+      privacy: {
+        id: "privacy",
+        title: "users.promise.privacyPolicy",
+        path: "/communities/izu/{locale}/privacy-policy.pdf",
+        type: "external",
+      },
+    },
+    documents: [
+      {
+        id: "bylaws",
+        title: "users.documents.bylaws",
+        path: "/communities/izu/{locale}/bylaws.pdf",
+        type: "external",
+        order: 1,
+      },
+      {
+        id: "operating-regulations",
+        title: "users.documents.operatingRegulations",
+        path: "/communities/izu/{locale}/operating-regulations.pdf",
+        type: "external",
+        order: 2,
+      },
+      {
+        id: "dao-meeting-rules",
+        title: "users.documents.daoMeetingRules",
+        path: "/communities/izu/{locale}/dao-meeting-rules.pdf",
+        type: "external",
+        order: 3,
+      },
+      {
+        id: "token-regulations",
+        title: "users.documents.tokenRegulations",
+        path: "/communities/izu/{locale}/token-regulations.pdf",
+        type: "external",
+        order: 4,
+      },
+      {
+        id: "whitepaper",
+        title: "users.documents.whitepaper",
+        path: "/communities/izu/{locale}/whitepaper.pdf",
+        type: "external",
+        order: 5,
+      },
+    ],
+  },
   default: {
     id: "default",
     tokenName: "NEO88",
@@ -120,8 +302,16 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     logoPath: "/communities/neo88/logo.jpg",
     squareLogoPath: "/communities/neo88/logo-square.jpg",
     ogImagePath: "https://storage.googleapis.com/prod-civicship-storage-public/asset/neo88/ogp.jpg",
-    enableFeatures: ["opportunities", "places", "points", "articles", "tickets", "prefectures"],
-    rootPath: "/activities",
+    enableFeatures: [
+      "opportunities",
+      "places",
+      "points",
+      "articles",
+      "tickets",
+      "prefectures",
+      "quests",
+    ],
+    rootPath: "/opportunities",
   },
 };
 
@@ -132,6 +322,13 @@ export function getCurrentRegionName(): string {
   if (COMMUNITY_ID === "kibotcha") return "東松島";
   if (COMMUNITY_ID === "dais") return "四国";
   return "地域";
+}
+
+export function getCurrentRegionKey(): string {
+  if (COMMUNITY_ID === "neo88") return "common.regions.shikoku";
+  if (COMMUNITY_ID === "kibotcha") return "common.regions.higashimatsushima";
+  if (COMMUNITY_ID === "dais") return "common.regions.shikoku";
+  return "common.regions.default";
 }
 
 // 現在のコミュニティの設定
@@ -149,12 +346,12 @@ export const DEFAULT_OPEN_GRAPH_IMAGE = [
 
 // ロゴのパスを取得
 export function getLogoPath(): string {
-  return currentCommunityConfig.logoPath;
+  return currentCommunityConfig.logoPath ?? DEFAULT_ASSET_PATHS.LOGO;
 }
 
 // 正方形ロゴのパスを取得
 export function getSquareLogoPath(): string {
-  return currentCommunityConfig.squareLogoPath;
+  return currentCommunityConfig.squareLogoPath ?? DEFAULT_ASSET_PATHS.SQUARE_LOGO;
 }
 
 // コミュニティのメタデータを生成
@@ -167,12 +364,16 @@ function generateCommunityMetadata(communityId: string): CommunityMetadata {
     icons: {
       icon: [
         {
-          url: `${baseConfig.faviconPrefix}/favicon.ico`,
+          url: baseConfig.faviconPrefix
+            ? `${baseConfig.faviconPrefix}/favicon.ico`
+            : DEFAULT_ASSET_PATHS.FAVICON,
         },
       ],
       apple: [
         {
-          url: `${baseConfig.faviconPrefix}/apple-touch-icon.png`,
+          url: baseConfig.faviconPrefix
+            ? `${baseConfig.faviconPrefix}/apple-touch-icon.png`
+            : DEFAULT_ASSET_PATHS.APPLE_TOUCH_ICON,
         },
       ],
     },
@@ -196,7 +397,7 @@ function generateCommunityMetadata(communityId: string): CommunityMetadata {
       canonical: baseConfig.domain,
     },
     logo: {
-      url: baseConfig.logoPath,
+      url: baseConfig.logoPath ?? DEFAULT_ASSET_PATHS.LOGO,
       alt: baseConfig.title,
     },
   };

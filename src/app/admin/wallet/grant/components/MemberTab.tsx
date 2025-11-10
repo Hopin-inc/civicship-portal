@@ -1,75 +1,53 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import { GqlUser } from "@/types/graphql";
 import UserInfoCard from "./UserInfoCard";
 import { useMemberWithDidSearch as useMemberSearchFromCredentials } from "@/app/admin/credentials/hooks/useMemberWithDidSearch";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { useTranslations } from "next-intl";
 
 interface MemberTabProps {
   members: { user: GqlUser; wallet: { currentPointView?: { currentPoint: bigint } } }[];
   searchQuery: string;
   onSelect: (user: GqlUser) => void;
-  onLoadMore?: () => void;
-  hasNextPage?: boolean;
+  loadMoreRef?: React.RefObject<HTMLDivElement>;
+  isLoadingMore?: boolean;
 }
 
 export function MemberTab({
   members,
   searchQuery,
   onSelect,
-  onLoadMore,
-  hasNextPage,
 }: MemberTabProps) {
+  const t = useTranslations();
   const communityId = COMMUNITY_ID;
   const {
     data: searchMembershipData,
-    loading,
     error,
-  } = useMemberSearchFromCredentials(communityId, members, { searchQuery });
-  const loadMoreRef = useRef<HTMLDivElement | null>(null);
-  useEffect(() => {
-    if (!hasNextPage || !onLoadMore) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const first = entries[0];
-        if (first.isIntersecting) {
-          onLoadMore();
-        }
-      },
-      { threshold: 1 },
-    );
-
-    const currentRef = loadMoreRef.current;
-    if (currentRef) observer.observe(currentRef);
-
-    return () => {
-      if (currentRef) observer.unobserve(currentRef);
-    };
-  }, [hasNextPage, onLoadMore]);
+    loadMoreRef: searchLoadMoreRef,
+    isLoadingMore: searchIsLoadingMore,
+  } = useMemberSearchFromCredentials(communityId, members, { 
+    searchQuery ,
+    pageSize: 20,
+    enablePagination: true,
+  });
 
   if (error) {
     return (
       <div className="space-y-3 px-4">
-        <p className="text-sm text-center text-red-500 pt-4">メンバーの読み込みに失敗しました</p>
+        <p className="text-sm text-center text-red-500 pt-4">{t("wallets.shared.member.errorLoad")}</p>
       </div>
     );
   }
 
-  if (loading) {
-    return (
-      <div className="space-y-3 px-4">
-        <p className="text-sm text-center text-muted-foreground pt-4">読み込み中...</p>
-      </div>
-    );
-  }
 
   if (searchMembershipData.length === 0) {
     return (
       <div className="space-y-3 px-4">
         <p className="text-sm text-center text-muted-foreground pt-4">
-          一致するメンバーが見つかりません
+          {t("wallets.shared.member.noMatch")}
         </p>
       </div>
     );
@@ -86,13 +64,20 @@ export function MemberTab({
             point={m.wallet?.currentPointView?.currentPoint ?? BigInt(0)}
             showPoint={true}
             showDate={false}
-            didValue={m.didInfo?.didValue ?? "did取得中"}
+            didValue={m.didInfo?.didValue}
             onClick={() => onSelect(m)}
           />
         );
       })}
 
-      {hasNextPage && <div ref={loadMoreRef} className="h-10" />}
+      {/* 無限スクロール用のローディング要素 - 常に表示 */}
+      <div ref={searchLoadMoreRef} className="flex justify-center py-8">
+        {searchIsLoadingMore && (
+          <div className="flex items-center space-x-2">
+            <LoadingIndicator fullScreen={false}/>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

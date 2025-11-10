@@ -3,37 +3,22 @@
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthProvider";
-import { useQuery } from "@apollo/client";
-import { GET_CURRENT_USER } from "@/graphql/account/identity/query";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { GqlRole } from "@/types/graphql";
-import { AuthRedirectService } from "@/lib/auth/auth-redirect-service";
+import { GqlMembership, GqlRole } from "@/types/graphql";
+import { AuthRedirectService } from "@/lib/auth/service/auth-redirect-service";
 import { logger } from "@/lib/logging";
 import { AdminRoleContext } from "@/app/admin/context/AdminRoleContext";
+import { AccessPolicy } from "@/lib/auth/core/access-policy";
 
-/**
- * 管理者ガードコンポーネントのプロパティ
- */
 interface AdminGuardProps {
   children: React.ReactNode;
 }
 
-/**
- * 管理者ガードコンポーネント
- * 管理者権限を持つユーザーのみアクセスを許可する
- */
 export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
-  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { isAuthenticated, loading, user: currentUser } = useAuth();
   const router = useRouter();
-
-  const { data: userData, loading: userLoading } = useQuery(GET_CURRENT_USER, {
-    skip: !isAuthenticated,
-  });
-
-  const loading = authLoading || userLoading;
-  const currentUser = userData?.currentUser?.user;
 
   const authRedirectService = React.useMemo(() => {
     return AuthRedirectService.getInstance();
@@ -54,22 +39,17 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
       return;
     }
 
-    const checkAdminAccess = async () => {
-      const { hasAccess, redirectPath } = await authRedirectService.checkAdminAccess(currentUser);
-
-      if (!hasAccess && redirectPath) {
-        if (redirectPath === "/") {
-          toast.warning("管理者権限がありません");
-        }
-        logger.debug("Admin access denied. Redirecting", {
-          component: "AdminGuard",
-          redirectPath,
-        });
+    const checkAdminAccess = () => {
+      const pathname = window.location.pathname;
+      const canAccess = AccessPolicy.canAccessRole(currentUser, pathname);
+      if (!canAccess) {
+        const redirectPath = AccessPolicy.getFallbackPath(currentUser);
+        toast.warning("管理者権限がありません");
         router.replace(redirectPath);
         return;
       }
 
-      logger.debug("User is authorized as community manager", {
+      logger.debug("✅ User is authorized as community manager", {
         component: "AdminGuard",
       });
     };
@@ -86,8 +66,8 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
     return null;
   }
 
-  const targetMembership = currentUser.memberships.find(
-    (m: any) => m.community?.id === COMMUNITY_ID,
+  const targetMembership = currentUser.memberships?.find(
+    (m: GqlMembership) => m.community?.id === COMMUNITY_ID,
   );
   if (!targetMembership) {
     logger.debug("No membership found for community", { component: "AdminGuard" });

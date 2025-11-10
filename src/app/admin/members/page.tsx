@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useAuth } from "@/contexts/AuthProvider";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { GqlRole, GqlUser } from "@/types/graphql";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import {
   Dialog,
   DialogClose,
@@ -20,7 +20,7 @@ import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useMembershipCommand } from "@/app/admin/members/hooks/useMembershipMutations";
 import { Button } from "@/components/ui/button";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import ErrorState from "@/components/shared/ErrorState";
+import { ErrorState } from "@/components/shared";
 import { useMemberWithDidSearch } from "../credentials/hooks/useMemberWithDidSearch";
 import SearchForm from "@/components/shared/SearchForm";
 
@@ -43,9 +43,25 @@ export default function MembersPage() {
   );
   useHeaderConfig(headerConfig);
 
-  const { membershipListData, error, refetch, loading, hasNextPage, isLoadingMore, loadMoreRef } =
-    useMembershipQueries(communityId);
   const { assignOwner, assignManager, assignMember } = useMembershipCommand();
+
+  // useMemberWithDidSearchのみを使用（検索機能と無限スクロール機能付き）
+  const {
+    data: searchMembershipData,
+    loading,
+    error,
+    hasNextPage,
+    isLoadingMore: searchIsLoadingMore,
+    loadMoreRef: searchLoadMoreRef,
+    refetch
+  } = useMemberWithDidSearch(communityId, [], {
+    searchQuery,
+    pageSize: 20, 
+    enablePagination: true,
+  });
+
+  // 役割情報を取得するためのフック（キャッシュから取得）
+  const { membershipListData } = useMembershipQueries(communityId);
 
   const members = useMemo(() => {
     return (
@@ -58,10 +74,6 @@ export default function MembersPage() {
         .filter((member): member is { user: GqlUser; role: GqlRole } => member !== null) ?? []
     );
   }, [membershipListData]);
-
-  const { data: searchMembershipData } = useMemberWithDidSearch(communityId, members, {
-    searchQuery,
-  });
 
   const [pendingRoleChange, setPendingRoleChange] = useState<{
     userId: string;
@@ -102,7 +114,7 @@ export default function MembersPage() {
     refetchRef.current = refetch;
   }, [refetch]);
 
-  if (loading) return <LoadingIndicator fullScreen />;
+  if (loading && !searchIsLoadingMore) return <LoadingIndicator fullScreen />;
   if (error) return <ErrorState title={"メンバーを読み込めませんでした"} refetchRef={refetchRef} />;
 
   return (
@@ -138,13 +150,11 @@ export default function MembersPage() {
           );
         })}
         {hasNextPage && (
-          <div ref={loadMoreRef} className="py-4 text-center mt-4">
-            {isLoadingMore ? (
+          <div ref={searchLoadMoreRef} className="py-4 text-center mt-4">
+            {searchIsLoadingMore && (
               <div className="py-2">
                 <LoadingIndicator fullScreen={false} />
               </div>
-            ) : (
-              <p className="text-muted-foreground text-sm">スクロールしてさらに読み込み...</p>
             )}
           </div>
         )}

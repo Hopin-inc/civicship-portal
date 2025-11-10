@@ -74,7 +74,7 @@ const ArticleBody = ({ markdown }: { markdown: string }) => {
   useEffect(() => {
     convertMarkdownToHtml(markdown)
       .then(setHtml)
-      .catch((error) => logger.error("Error converting markdown", {
+      .catch((error) => logger.warn("Error converting markdown", {
         error: error instanceof Error ? error.message : String(error),
         component: "ArticleBody"
       }));

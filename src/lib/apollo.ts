@@ -2,116 +2,51 @@ import {
   ApolloClient,
   ApolloClientOptions,
   ApolloLink,
-  InMemoryCache,
   NormalizedCacheObject,
-  Observable,
-} from "@apollo/client";
+} from "@apollo/client/core";
+import { InMemoryCache } from "@apollo/client/cache";
+import { relayStylePagination } from "@apollo/client/utilities";
 import { onError } from "@apollo/client/link/error";
-import { loadDevMessages, loadErrorMessages } from "@apollo/client/dev";
-import { __DEV__ } from "@apollo/client/utilities/globals";
 import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
-import { TokenManager } from "./auth/token-manager";
 
 import { logger } from "@/lib/logging";
-
-if (__DEV__) {
-  loadDevMessages();
-  loadErrorMessages();
-}
+import { useAuthStore } from "@/lib/auth/core/auth-store";
+import { setContext } from "@apollo/client/link/context";
 
 const httpLink = createUploadLink({
   uri: process.env.NEXT_PUBLIC_API_ENDPOINT,
-  credentials: "same-origin",
+  credentials: "include",
   headers: {
     "Apollo-Require-Preflight": "true",
   },
 });
 
-const requestLink = new ApolloLink((operation, forward) => {
-  // SSR 環境では document は存在しない
-  if (typeof document === "undefined") {
-    // SSRではトークン系は不要（または別途 next/headers などで付与）
-    operation.setContext(({ headers = {} }) => ({
-      headers: {
-        ...headers,
-        "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
-        "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID,
-      },
-    }));
-    return forward(operation);
+const requestLink = setContext(async (operation, prevContext) => {
+  let token: string | null = null;
+  let authMode: "session" | "id_token" = "session";
+
+  if (typeof window !== "undefined") {
+    const { firebaseUser } = useAuthStore.getState().state;
+    
+    if (firebaseUser) {
+      try {
+        token = await firebaseUser.getIdToken();
+        authMode = "id_token";
+      } catch (error) {
+        logger.warn("Failed to get ID token, falling back to session", { error });
+      }
+    }
   }
 
-  return new Observable((observer) => {
-    (async () => {
-      try {
-        const { lineAuth } = await import("./auth/firebase-config");
-        const phoneTokens = TokenManager.getPhoneTokens();
+  const headers = {
+    ...prevContext.headers,
+    Authorization: token ? `Bearer ${token}` : "",
+    "X-Auth-Mode": authMode,
+    "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
+    "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID,
+  };
 
-        let firebaseToken = null;
-        if (lineAuth.currentUser) {
-          try {
-            firebaseToken = await lineAuth.currentUser.getIdToken();
-          } catch (error) {
-            logger.info("Failed to get Firebase token", {
-              error: error instanceof Error ? error.message : String(error),
-              component: "ApolloRequestLink",
-              operation: operation.operationName,
-            });
-          }
-        }
-
-        const lineTokens = TokenManager.getLineTokens();
-        const accessToken = firebaseToken || lineTokens.accessToken;
-
-        operation.setContext(({ headers = {} }) => {
-          const baseHeaders = {
-            ...headers,
-            Authorization: accessToken ? `Bearer ${accessToken}` : "",
-            "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
-            "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID,
-          };
-
-          const tokenRequiredOperations = ["userSignUp", "linkPhoneAuth", "storePhoneAuthToken", "identityCheckPhoneUser"];
-
-          if (tokenRequiredOperations.includes(operation.operationName || "")) {
-            const requestHeaders = {
-              ...baseHeaders,
-              "X-Token-Expires-At": lineTokens.expiresAt ? lineTokens.expiresAt.toString() : "",
-              "X-Phone-Auth-Token": phoneTokens.accessToken || "",
-              "X-Phone-Token-Expires-At": phoneTokens.expiresAt
-                ? phoneTokens.expiresAt.toString()
-                : "",
-              "X-Phone-Uid": phoneTokens.phoneUid || "",
-              "X-Phone-Number": phoneTokens.phoneNumber || "",
-            };
-
-            return { headers: requestHeaders };
-          }
-          return { headers: baseHeaders };
-        });
-
-        forward(operation).subscribe(observer);
-      } catch (error) {
-        logger.error("Error in requestLink", {
-          error: error instanceof Error ? error.message : String(error),
-          component: "ApolloRequestLink",
-          operation: operation.operationName,
-        });
-        const lineTokens = TokenManager.getLineTokens();
-
-        operation.setContext(({ headers = {} }) => ({
-          headers: {
-            ...headers,
-            Authorization: lineTokens.accessToken ? `Bearer ${lineTokens.accessToken}` : "",
-            "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
-            "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID,
-          },
-        }));
-
-        forward(operation).subscribe(observer);
-      }
-    })();
-  });
+  return { headers };
 });
 
 const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) => {
@@ -152,10 +87,11 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
       });
     } else {
       const errorMessage = networkError.message || String(networkError);
-      const isTemporaryNetworkIssue = errorMessage.includes("Failed to fetch") || 
-                                     errorMessage.includes("Load failed") || 
-                                     errorMessage.includes("Network request failed");
-      
+      const isTemporaryNetworkIssue =
+        errorMessage.includes("Failed to fetch") ||
+        errorMessage.includes("Load failed") ||
+        errorMessage.includes("Network request failed");
+
       if (isTemporaryNetworkIssue) {
         logger.warn("Network connectivity issue", {
           error: errorMessage,
@@ -165,7 +101,7 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
           retryable: true,
         });
       } else {
-        logger.error("Network system error", {
+        logger.warn("Network system error", {
           error: errorMessage,
           component: "ApolloErrorLink",
           operation: operation.operationName,
@@ -192,7 +128,13 @@ const defaultOptions: ApolloClientOptions<NormalizedCacheObject> = {
   link,
   ssrMode: true,
   cache: new InMemoryCache({
-    resultCaching: false,
+    typePolicies: {
+      Wallet: {
+        fields: {
+          transactionsConnection: relayStylePagination(),
+        },
+      },
+    },
   }),
 };
 

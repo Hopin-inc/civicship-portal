@@ -1,29 +1,24 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import LoginModal from "@/app/login/components/LoginModal";
-import ReservationDetailsCard from "@/app/reservation/confirm/components/ReservationDetailsCard";
-import PaymentSection from "@/app/reservation/confirm/components/PaymentSection";
-import NotesSection from "@/app/reservation/confirm/components/NotesSection";
-import { useReservationConfirm } from "@/app/reservation/confirm/hooks/useReservationConfirm";
-import { useAuth } from "@/contexts/AuthProvider";
-import { useTicketCounter } from "@/app/reservation/confirm/hooks/useTicketCounter";
-import { useReservationParams } from "@/app/reservation/confirm/hooks/useReservationParams";
+import { useMemo, useRef, useEffect, useState } from "react";
 import { notFound, useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import { useAuth } from "@/contexts/AuthProvider";
 import { HeaderConfig } from "@/contexts/HeaderContext";
-import { useEffect, useMemo, useRef, useState } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { toast } from "sonner";
-import { useReservationUIState } from "@/app/reservation/confirm/hooks/useReservationUIState";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import ErrorState from "@/components/shared/ErrorState";
-import { ParticipationAge } from "./components/ParticipationAge";
+import { ErrorState } from "@/components/shared";
 import { errorMessages } from "@/utils/errorMessage";
-import { useReservationCommand } from "@/app/reservation/confirm/hooks/useReservationAction";
-import OpportunityCardHorizontal from "@/app/activities/components/Card/CardHorizontal";
-import { GqlOpportunityCategory } from "@/types/graphql";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { logger } from "@/lib/logging";
 import { RawURIComponent } from "@/utils/path";
+import { useReservationOpportunity } from "@/app/reservation/confirm/hooks/useReservationOpportunity";
+import { useReservationWallet } from "@/app/reservation/confirm/hooks/useReservationWallet";
+import { useReservationParams } from "@/app/reservation/confirm/hooks/useReservationParams";
+import { useReservationUIState } from "@/app/reservation/confirm/hooks/useReservationUIState";
+import { useReservationCommand } from "@/app/reservation/confirm/hooks/useReservationAction";
+import { useTicketCounter } from "@/app/reservation/confirm/hooks/useTicketCounter";
+import { calculateReservationDetails } from "@/app/reservation/confirm/utils/reservationCalculations";
+import { validateReservation } from "@/app/reservation/confirm/utils/reservationValidation";
+import ConfirmPageView from "@/app/reservation/confirm/components/ConfirmPageView";
 
 export default function ConfirmPage() {
   const headerConfig: HeaderConfig = useMemo(
@@ -35,58 +30,91 @@ export default function ConfirmPage() {
     [],
   );
   useHeaderConfig(headerConfig);
-  const { user } = useAuth();
-  const router = useRouter();
 
-  const {
-    opportunityId,
-    slotId,
-    participantCount: initialParticipantCount,
-    communityId,
-  } = useReservationParams();
+  const { user, isAuthenticated } = useAuth();
+  const router = useRouter();
+  const { opportunityId, slotId, participantCount: initialParticipantCount, communityId } = useReservationParams();
 
   const [participantCount, setParticipantCount] = useState<number>(initialParticipantCount);
+  const [selectedPointCount, setSelectedPointCount] = useState(0);
+  const [selectedTicketCount, setSelectedTicketCount] = useState(0);
+  const [selectedTickets, setSelectedTickets] = useState<{ [ticketId: string]: number }>({});
+
   const {
     opportunity,
     selectedSlot,
-    wallets,
     startDateTime,
     endDateTime,
-    availableTickets,
-    loading,
-    hasError,
-    triggerRefetch,
-  } = useReservationConfirm({ opportunityId, slotId, userId: user?.id });
+    loading: oppLoading,
+    error: oppError,
+    refetch: oppRefetch,
+  } = useReservationOpportunity({ opportunityId, slotId });
+
+  const {
+    wallet,
+    loading: walletLoading,
+    error: walletError,
+    refetch: walletRefetch,
+  } = useReservationWallet({ userId: user?.id, opportunity });
+
+  const loading = oppLoading || walletLoading;
+  const hasError = Boolean(oppError || walletError);
+  const triggerRefetch = () => {
+    oppRefetch();
+    walletRefetch();
+  };
 
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
     refetchRef.current = triggerRefetch;
   }, [triggerRefetch]);
 
-  const ticketCounter = useTicketCounter(availableTickets);
+  const ticketCounter = useTicketCounter(wallet?.tickets.length ?? 0);
   const ui = useReservationUIState();
   const { handleReservation, creatingReservation } = useReservationCommand();
 
+  const calculations = useMemo(
+    () => calculateReservationDetails(opportunity, wallet, participantCount),
+    [opportunity, wallet, participantCount]
+  );
+
+  const validation = useMemo(
+    () => validateReservation(
+      creatingReservation,
+      ui.useTickets,
+      ticketCounter.count,
+      calculations.maxTickets,
+      calculations.hasInsufficientPoints,
+    ),
+    [creatingReservation, ui.useTickets, ticketCounter.count, calculations.maxTickets, calculations.hasInsufficientPoints]
+  );
+
+  useEffect(() => {
+    if (calculations.isPointsOnly) {
+      ui.lockPointsToggle();
+    }
+  }, [calculations.isPointsOnly, ui]);
+
   if (loading) return <LoadingIndicator />;
-  if (hasError)
-    return <ErrorState title="予約情報を読み込めませんでした" refetchRef={ refetchRef } />;
+  if (hasError) return <ErrorState title="予約情報を読み込めませんでした" refetchRef={refetchRef} />;
   if (!opportunity) return notFound();
 
   const handleConfirm = async () => {
     const result = await handleReservation({
       opportunity,
       selectedSlot,
-      wallets,
+      wallet,
       user: user ?? null,
       ticketCounter,
       participantCount,
       useTickets: ui.useTickets,
       comment: ui.ageComment ?? undefined,
+      usePoints: ui.usePoints,
+      selectedPointCount,
+      selectedTicketCount,
+      selectedTickets,
+      userWallet: wallet?.currentPoint ?? null,
     });
-
-    if (creatingReservation) {
-      return <LoadingIndicator fullScreen />;
-    }
 
     if (!result.success) {
       if (!user) {
@@ -94,13 +122,14 @@ export default function ConfirmPage() {
       } else {
         const message = errorMessages[result.code] ?? "予期しないエラーが発生しました。";
         toast.error(message);
-        logger.error("Reservation failed", {
+        logger.warn("Reservation failed", {
           code: result.code,
           component: "ReservationConfirmPage",
         });
       }
       return;
     }
+
     toast.success("申し込みが完了しました。");
     const participationCount = result.reservation.participations?.length ?? 1;
     const query = new URLSearchParams({
@@ -109,71 +138,45 @@ export default function ConfirmPage() {
       reservation_id: result.reservation.id,
       guests: participationCount.toString(),
     });
-    router.push(`/reservation/complete?${ query.toString() }`);
+    router.push(`/reservation/complete?${query.toString()}`);
   };
+
+  if (creatingReservation) {
+    return <LoadingIndicator fullScreen />;
+  }
+
   return (
-    <>
-      <main className="min-h-screen">
-        <LoginModal
-          isOpen={ ui.isLoginModalOpen }
-          onClose={ () => ui.setIsLoginModalOpen(false) }
-          nextPath={ window.location.pathname + window.location.search as RawURIComponent }
-        />
-        <div className="px-6 py-4 mt-4">
-          <OpportunityCardHorizontal
-            opportunity={ {
-              id: opportunity.id,
-              title: opportunity.title,
-              feeRequired: opportunity.feeRequired,
-              category: GqlOpportunityCategory.Activity,
-              communityId: COMMUNITY_ID,
-              images: opportunity.images,
-              location: opportunity.place.name,
-              hasReservableTicket: false,
-            } }
-            withShadow={ false }
-          />
-        </div>
-        <div className="px-2">
-          <ReservationDetailsCard
-            startDateTime={ startDateTime }
-            endDateTime={ endDateTime }
-            participantCount={ participantCount }
-            location={ {
-              name: opportunity?.place?.name || "",
-              address: opportunity?.place?.address || "",
-            } }
-            onChange={ setParticipantCount }
-          />
-        </div>
-        {/*<div className="h-0.5 bg-border" />*/ }
-        <PaymentSection
-          ticketCount={ ticketCounter.count }
-          onIncrement={ ticketCounter.increment }
-          onDecrement={ ticketCounter.decrement }
-          maxTickets={ availableTickets }
-          pricePerPerson={ opportunity?.feeRequired ?? null }
-          participantCount={ participantCount }
-          useTickets={ ui.useTickets }
-          setUseTickets={ ui.setUseTickets }
-        />
-        <div className="mb-2" />
-        <ParticipationAge ageComment={ ui.ageComment } setAgeComment={ ui.setAgeComment } />
-        <div className="mb-4 mt-2" />
-        <NotesSection />
-        <footer className="max-w-mobile-l w-full h-20 flex items-center px-4 py-6 justify-between mx-auto">
-          <Button
-            size="lg"
-            className="mx-auto px-20"
-            onClick={ handleConfirm }
-            disabled={
-              creatingReservation || (ui.useTickets && ticketCounter.count > availableTickets)
-            }
-          >
-            { creatingReservation ? "申込処理中..." : "申し込みを確定" }
-          </Button>
-        </footer>
-      </main>
-    </>
+    <ConfirmPageView
+      user={user}
+      isAuthenticated={isAuthenticated}
+      isLoginModalOpen={ui.isLoginModalOpen}
+      onLoginModalClose={() => ui.setIsLoginModalOpen(false)}
+      nextPath={(window.location.pathname + window.location.search) as RawURIComponent}
+      opportunity={opportunity}
+      startDateTime={startDateTime}
+      endDateTime={endDateTime}
+      calculations={calculations}
+      participantCount={participantCount}
+      onParticipantCountChange={setParticipantCount}
+      selectedPointCount={selectedPointCount}
+      onPointCountChange={setSelectedPointCount}
+      selectedTicketCount={selectedTicketCount}
+      onTicketCountChange={setSelectedTicketCount}
+      selectedTickets={selectedTickets}
+      onSelectedTicketsChange={setSelectedTickets}
+      useTickets={ui.useTickets}
+      setUseTickets={ui.setUseTickets}
+      usePoints={ui.usePoints}
+      setUsePoints={ui.setUsePoints}
+      ageComment={ui.ageComment}
+      onAgeCommentChange={ui.setAgeComment}
+      availableTickets={wallet?.tickets ?? []}
+      userWallet={wallet?.currentPoint ?? null}
+      ticketCounter={ticketCounter}
+      onConfirm={handleConfirm}
+      validation={validation}
+      creatingReservation={creatingReservation}
+      communityId={communityId}
+    />
   );
 }

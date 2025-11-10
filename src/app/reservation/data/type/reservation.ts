@@ -1,6 +1,10 @@
-import { GqlReservationStatus, GqlOpportunityCategory } from "@/types/graphql";
+import { GqlOpportunityCategory, GqlReservationStatus } from "@/types/graphql";
 import { CommunityId } from "@/types";
-import { OpportunityPlace, OpportunityHost, OpportunityCard } from "@/app/activities/data/type";
+import {
+  OpportunityCard,
+  OpportunityHost,
+  OpportunityPlace,
+} from "@/components/domains/opportunities/types";
 import { TArticleWithAuthor } from "@/app/articles/data/type";
 
 // ---------------------------------------------

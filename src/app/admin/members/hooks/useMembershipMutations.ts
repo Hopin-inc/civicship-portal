@@ -54,7 +54,7 @@ export const useMembershipCommand = () => {
           const code = gqlError?.extensions?.code as GqlErrorCode | undefined;
           return { success: false, code: code ?? GqlErrorCode.Unknown };
         }
-        logger.error("Mutation failed", {
+        logger.warn("Mutation failed", {
           error: e instanceof Error ? e.message : String(e),
           component: "useMembershipMutations"
         });

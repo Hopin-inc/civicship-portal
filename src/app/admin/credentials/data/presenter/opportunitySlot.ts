@@ -1,7 +1,7 @@
 "use client";
 import { GqlOpportunitySlot, GqlOpportunitySlotEdge } from "@/types/graphql";
 import { ActivitySlot, ActivitySlotGroup } from "@/app/reservation/data/type/opportunitySlot";
-import { addDays, isAfter } from "date-fns";
+import { isDateReservable } from "@/app/reservation/data/presenter/opportunitySlot";
 
 export const presenterOpportunitySlots = (
   edges: (GqlOpportunitySlotEdge | null | undefined)[] | null | undefined,
@@ -28,8 +28,8 @@ export const presenterOpportunitySlot = (
   feeRequired: number | null,
 ): ActivitySlot => {
   const startsAtDate = new Date(slot.startsAt);
-  const threshold = addDays(new Date(), 7);
-  const isReservable = isAfter(startsAtDate, threshold);
+  const activityId = slot.opportunity?.id;
+  const isReservable = isDateReservable(startsAtDate, activityId);
 
   return {
     id: slot.id,
@@ -44,7 +44,7 @@ export const presenterOpportunitySlot = (
     startsAt: startsAtDate.toISOString(),
     endsAt: new Date(slot.endsAt).toISOString(),
 
-    isReservable, // ✅ 追加
+    isReservable,
   };
 };
 

@@ -15,9 +15,11 @@ const SearchForm: React.FC<SearchFormProps> = ({ name = "searchQuery", onSearch 
   const { control } = useFormContext();
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter" && onSearch) {
+    if (event.key === "Enter") {
       event.preventDefault();
-      onSearch();
+      if (onSearch) {
+        onSearch();
+      }
     }
   };
 

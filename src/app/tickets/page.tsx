@@ -5,7 +5,7 @@ import { useTicketClaimLinks } from "@/app/tickets/hooks/useTicketClaimLinks";
 import TicketContent from "@/app/tickets/components/TicketContent";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import ErrorState from "@/components/shared/ErrorState";
+import { ErrorState } from '@/components/shared'
 
 export default function TicketsPage() {
   const headerConfig = useMemo(

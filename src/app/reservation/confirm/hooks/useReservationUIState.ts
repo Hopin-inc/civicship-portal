@@ -1,9 +1,23 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 
 export const useReservationUIState = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [useTickets, setUseTickets] = useState(false);
-  const [ageComment, setAgeComment] = useState<string | null>(null); // ★追加
+  const [usePoints, setUsePoints] = useState(false);
+  const [ageComment, setAgeComment] = useState<string | null>(null);
+  const [organizerMessage, setOrganizerMessage] = useState<string | null>(null);
+  const [lockedByPointsOnly, setLockedByPointsOnly] = useState(false);
+
+  const setUsePointsWithLock = useCallback((value: boolean) => {
+    if (!lockedByPointsOnly) {
+      setUsePoints(value);
+    }
+  }, [lockedByPointsOnly]);
+
+  const lockPointsToggle = useCallback(() => {
+    setUsePoints(true);
+    setLockedByPointsOnly(true);
+  }, []);
 
   return {
     isLoginModalOpen,
@@ -11,6 +25,12 @@ export const useReservationUIState = () => {
     useTickets,
     setUseTickets,
     ageComment,
-    setAgeComment, // ★追加
+    setAgeComment,
+    organizerMessage,
+    setOrganizerMessage,
+    usePoints,
+    setUsePoints: setUsePointsWithLock,
+    lockedByPointsOnly,
+    lockPointsToggle,
   };
 };

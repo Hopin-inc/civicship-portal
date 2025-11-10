@@ -6,7 +6,7 @@ import { useEffect, useMemo, useRef } from "react";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { notFound, useParams } from "next/navigation";
-import ErrorState from "@/components/shared/ErrorState";
+import { ErrorState } from "@/components/shared";
 
 export default function ArticlePage() {
   const params = useParams();

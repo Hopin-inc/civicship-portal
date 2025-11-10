@@ -1,30 +1,31 @@
 "use client";
 import { GqlOpportunitySlot, GqlOpportunitySlotEdge } from "@/types/graphql";
-import { addDays, isAfter } from "date-fns";
+import { addDays, isAfter, endOfDay, subDays } from "date-fns";
 import { ActivitySlot, ActivitySlotGroup } from "../type/opportunitySlot";
-
-/**
- * 予約可能日数（現在時刻から何日後まで予約可能か）
- */
-export const RESERVATION_THRESHOLD_DAYS = 1;
-
-/**
- * 予約可能判定のための閾値（現在時刻から何日後まで予約可能か）を返す
- * @returns 予約可能判定のための閾値
- */
-export const getReservationThreshold = (): Date => {
-  return addDays(new Date(), RESERVATION_THRESHOLD_DAYS);
-};
+import { getAdvanceBookingDays, DEFAULT_ADVANCE_BOOKING_DAYS } from "@/config/activityBookingConfig";
 
 /**
  * 指定された日時が予約可能かどうかを判定する
+ * N日前の23:59まで予約を受け付ける（当日予約の場合は現在時刻以降）
  * @param date 判定対象の日時
+ * @param activityId アクティビティID（指定されない場合はデフォルト値を使用）
  * @returns 予約可能かどうか
  */
-export const isDateReservable = (date: Date | string): boolean => {
+export const isDateReservable = (date: Date | string, activityId?: string): boolean => {
   const targetDate = typeof date === "string" ? new Date(date) : date;
-  const threshold = getReservationThreshold();
-  return isAfter(targetDate, threshold);
+  const advanceBookingDays = getAdvanceBookingDays(activityId);
+  const now = new Date();
+
+  // 当日予約の場合は、閾値を現在時刻とする
+  if (advanceBookingDays === 0) {
+    return isAfter(targetDate, now);
+  }
+
+  // アクティビティの開催日時からN日前の日付を計算し、その日の終わりを締切とする
+  const deadlineDate = subDays(targetDate, advanceBookingDays);
+  const deadline = endOfDay(deadlineDate);
+
+  return !isAfter(now, deadline); // 現在時刻が締切を過ぎていなければ予約可能
 };
 
 export const presenterOpportunitySlots = (
@@ -39,7 +40,11 @@ export const presenterOpportunitySlots = (
 
       if (!node || !opportunity) return null;
 
-      return presenterOpportunitySlot(node, opportunity.feeRequired ?? null);
+      return presenterOpportunitySlot(
+        node,
+        opportunity.feeRequired ?? null,
+        opportunity.pointsRequired ?? null
+      );
     })
     .filter((slot): slot is ActivitySlot => slot !== null);
 };
@@ -47,14 +52,17 @@ export const presenterOpportunitySlots = (
 export const presenterOpportunitySlot = (
   slot: GqlOpportunitySlot,
   feeRequired: number | null,
+  pointsRequired: number | null,
 ): ActivitySlot => {
   const startsAtDate = new Date(slot.startsAt);
-  const isReservable = isDateReservable(startsAtDate);
+  const opportunityId = slot.opportunity?.id;
+  const isReservable = isDateReservable(startsAtDate, opportunityId);
 
   return {
     id: slot.id,
     hostingStatus: slot.hostingStatus,
     feeRequired,
+    pointsRequired,
     opportunityId: slot.opportunity?.id ?? "",
     capacity: slot.capacity ?? 0,
     remainingCapacity: slot.remainingCapacity ?? 0,
@@ -80,9 +88,10 @@ export const filterSlotGroupsBySelectedDate = (
 export const presenterActivitySlots = (
   slots: GqlOpportunitySlot[] | null | undefined,
   feeRequired: number,
+  pointsRequired: number | null,
 ): ActivitySlot[] => {
   if (!slots || slots.length === 0) return [];
-  return slots.map((slot) => presenterOpportunitySlot(slot, feeRequired));
+  return slots.map((slot) => presenterOpportunitySlot(slot, feeRequired, pointsRequired));
 };
 
 export const groupActivitySlotsByDate = (slots: ActivitySlot[]): ActivitySlotGroup[] => {

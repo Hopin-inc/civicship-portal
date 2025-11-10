@@ -2,22 +2,22 @@
 
 import { useEffect, useMemo, useRef } from "react";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import ErrorState from "@/components/shared/ErrorState";
+import { ErrorState } from "@/components/shared";
 import useParticipationPage from "@/app/participations/[id]/hooks/useParticipationPage";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import ParticipationStatusNotification from "@/app/participations/[id]/components/ParticipationStatusNotification";
 import ParticipationActions from "@/app/participations/[id]/components/ParticipationActions";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import { GqlReservationStatus } from "@/types/graphql";
 import { useParams } from "next/navigation";
 import { errorMessages } from "@/utils/errorMessage";
 import useCancelReservation from "@/app/participations/[id]/hooks/useCancelReservation";
-import OpportunityInfo from "@/app/reservation/confirm/components/OpportunityInfo";
-import { useOpportunityDetail } from "@/app/activities/[id]/hooks/useOpportunityDetail";
-import ReservationDetails from "@/app/reservation/complete/components/ReservationDetails";
+import OpportunityInfo from "./components/OpportunityInfo";
 import { useCompletePageViewModel } from "@/app/reservation/complete/hooks/useCompletePageViewModel";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 import { logger } from "@/lib/logging";
+import { useOpportunityDetails } from "@/hooks/opportunities/useOpportunityDetails";
+import { useAuth } from "@/contexts/AuthProvider";
 
 export type ParticipationUIStatus = "pending" | "confirmed" | "cancelled";
 
@@ -35,6 +35,7 @@ const mapReservationStatusToUIStatus = (status: GqlReservationStatus): Participa
 };
 
 export default function ParticipationPage() {
+  const { user } = useAuth();
   const headerConfig = useMemo(
     () => ({
       title: "予約の確認",
@@ -61,9 +62,7 @@ export default function ParticipationPage() {
   
   // #NOTE: コンポーネントに必要な情報を取得するために、useCompletePageViewModel と useOpportunityDetail を使用しているがリクエストが重複するので、まとめたい
   const { dateTimeInfo } = useCompletePageViewModel(id ?? "", participation?.reservation?.id ?? "");
-  const { opportunity: opportunityDetail, loading: opportunityLoading } = useOpportunityDetail(
-    opportunity?.id ?? "",
-  );
+  const { opportunity: opportunityDetail, loading: opportunityLoading } = useOpportunityDetails(opportunity?.id ?? "", user);
 
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
@@ -128,7 +127,7 @@ export default function ParticipationPage() {
   }, [currentStatus, dateTimeInfo]);
 
   if (loading || opportunityLoading) return <LoadingIndicator />;
-  if (hasError || !reservationId || !opportunity || !participation) {
+  if (hasError || !reservationId || !opportunity || !participation || !opportunityDetail) {
     return <ErrorState title="Could not load reservation page" refetchRef={refetchRef} />;
   }
 
@@ -144,25 +143,16 @@ export default function ParticipationPage() {
           />
         </div>
       )}
-      <OpportunityInfo opportunity={opportunityDetail} />
-      {dateTimeInfo && opportunityDetail && (
-        <div className="px-6 mb-10 mt-8">
-          <h2 className="text-label-md font-bold mb-4">予約詳細</h2>
-          <ReservationDetails
-            formattedDate={dateTimeInfo.formattedDate}
-            startTime={dateTimeInfo.startTime}
-            endTime={dateTimeInfo.endTime}
-            participantCount={dateTimeInfo.participantCount}
-            paidParticipantCount={dateTimeInfo.paidParticipantCount}
-            totalPrice={dateTimeInfo.totalPrice}
-            pricePerPerson={opportunityDetail.feeRequired ?? 0}
-            location={opportunityDetail.place}
-            phoneNumber={participation.emergencyContactPhone}
-            isReserved={true}
-            dateDiffLabel={dateTimeInfo.dateDiffLabel}
-          />
-        </div>
-      )}
+      <OpportunityInfo 
+        opportunity={opportunityDetail}
+        dateTimeInfo={dateTimeInfo}
+        participationCount={dateTimeInfo?.participantCount}
+        phoneNumber={participation.emergencyContactPhone}
+        comment={participation.reservation?.comment}
+        totalPrice={dateTimeInfo?.totalPrice}
+        ticketCount={dateTimeInfo?.ticketCount}
+        variant="participation"
+      />
       {/*<div className="px-6">*/}
       {/*  <h2 className="text-label-md font-bold mb-4">メッセージ</h2>*/}
       {/*  /!* #TODO: メッセージの表示を動的にする *!/*/}

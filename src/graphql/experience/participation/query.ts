@@ -9,8 +9,8 @@ import { USER_FRAGMENT } from "@/graphql/account/user/fragment";
 
 // ★ filter引数を追加
 export const GET_PARTICIPATIONS = gql`
-  query GetParticipations($filter: ParticipationFilterInput) {
-    participations(filter: $filter) {
+  query GetParticipations($filter: ParticipationFilterInput, $first: Int) {
+    participations(filter: $filter, first: $first) {
       edges {
         node {
           id

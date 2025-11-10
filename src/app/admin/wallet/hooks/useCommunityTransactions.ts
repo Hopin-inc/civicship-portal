@@ -32,6 +32,7 @@ const useCommunityTransactions = (): UseCommunityTransactionsResult => {
         ],
       },
       first: 100,
+      withDidIssuanceRequests: true,
     },
     fetchPolicy: "cache-and-network",
     nextFetchPolicy: "cache-first",

@@ -7,14 +7,16 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import { matchPaths } from "@/utils/path";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
-import { AuthEnvironment, detectEnvironment } from "@/lib/auth/environment-detector";
+import { AuthEnvironment, detectEnvironment } from "@/lib/auth/core/environment-detector";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
+import { useTranslations } from "next-intl";
 
 interface HeaderProps {
   className?: string;
 }
 
 const BottomBar: React.FC<HeaderProps> = ({ className }) => {
+  const t = useTranslations();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const placeId = searchParams.get("placeId");
@@ -32,11 +34,15 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
     pathname.startsWith("/admin") ||
     (pathname.startsWith("/reservation") && !pathname.includes("/complete")) ||
     pathname.startsWith("/activities/") ||
+    pathname.startsWith("/quests/") ||
     pathname.startsWith("/participations/") ||
     pathname.startsWith("/sign-up") ||
     pathname === "/users/me/edit" ||
     (pathname.startsWith("/places") && placeId) ||
-    pathname.startsWith("/search")
+    pathname.startsWith("/search") ||
+    pathname.startsWith("/wallets") ||
+    pathname.startsWith("/credentials") ||
+    pathname.startsWith("/transactions")
   ) {
     return null;
   }
@@ -50,7 +56,7 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
     <nav
       className={cn(
         className,
-        "fixed bottom-0 left-0 w-full bg-background border-t border-input z-50 transition-transform duration-300",
+        "fixed bottom-0 left-0 w-full bg-background border-t border-input z-40 transition-transform duration-300",
         !isLiff ? "py-4" : "pt-4 pb-10",
         !isVisible && "transform translate-y-full",
       )}
@@ -59,17 +65,20 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
         <div className="flex justify-around items-center">
           {currentCommunityConfig.enableFeatures.includes("opportunities") && (
             <Link
-              href="/activities"
-              className={cn(getLinkStyle("/activities", "/activities/*", "/search/*"), "flex-grow")}
+              href="/opportunities"
+              className={cn(
+                getLinkStyle("/opportunities", "/opportunities/*", "opportunities/search/*"),
+                "flex-grow",
+              )}
             >
               <Search size={24} />
-              <span className="text-xs mt-1">見つける</span>
+              <span className="text-xs mt-1">{t("navigation.bottomBar.discover")}</span>
             </Link>
           )}
           {currentCommunityConfig.enableFeatures.includes("places") && (
             <Link href="/places" className={cn(getLinkStyle("/places", "/places/*"), "flex-grow")}>
               <Globe size={24} />
-              <span className="text-xs mt-1">拠点</span>
+              <span className="text-xs mt-1">{t("navigation.bottomBar.places")}</span>
             </Link>
           )}
           <Link
@@ -77,7 +86,7 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
             className={cn(getLinkStyle("/users/me", "/users/me/*"), "flex-grow")}
           >
             <User size={24} />
-            <span className="text-xs mt-1">マイページ</span>
+            <span className="text-xs mt-1">{t("navigation.bottomBar.myPage")}</span>
           </Link>
         </div>
       </div>

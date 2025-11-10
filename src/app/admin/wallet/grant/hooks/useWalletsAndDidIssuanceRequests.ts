@@ -27,6 +27,7 @@ export function useWalletsAndDidIssuanceRequests({
   error: ApolloError | undefined;
   allTransactions: GqlTransaction[];
   presentedTransactions: PresentedTransaction[];
+  refetch: () => void;
 } {
   const walletTypeFilter: GqlTransactionFilterInput =
     listType === "grant"
@@ -70,7 +71,7 @@ export function useWalletsAndDidIssuanceRequests({
       }
     : undefined;
 
-  const { data, error, loading } = useGetTransactionsQuery({
+  const { data, error, loading, refetch } = useGetTransactionsQuery({
     variables: {
       filter: {
         communityId: COMMUNITY_ID,
@@ -109,6 +110,7 @@ export function useWalletsAndDidIssuanceRequests({
     error,
     allTransactions,
     presentedTransactions,
+    refetch,
   };
 }
 

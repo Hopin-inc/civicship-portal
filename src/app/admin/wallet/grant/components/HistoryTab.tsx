@@ -1,11 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { GqlUser } from "@/types/graphql";
 import UserInfoCard from "./UserInfoCard";
 import { useWalletsAndDidIssuanceRequests } from "../hooks/useWalletsAndDidIssuanceRequests";
 import { useAuth } from "@/contexts/AuthProvider";
 import Loading from "@/components/layout/Loading";
+import { useTranslations } from "next-intl";
 
 interface HistoryTabProps {
   listType: "donate" | "grant";
@@ -14,17 +15,21 @@ interface HistoryTabProps {
 }
 
 export function HistoryTab({ listType, searchQuery, onSelect }: HistoryTabProps) {
+  const t = useTranslations();
   const { user } = useAuth();
-  const { error, presentedTransactions, loading } = useWalletsAndDidIssuanceRequests({
+  const { error, presentedTransactions, loading, refetch } = useWalletsAndDidIssuanceRequests({
     currentUserId: user?.id,
     listType,
     keyword: searchQuery,
   });
+  useEffect(() => {
+    refetch();
+  }, []);
 
   if (error) {
     return (
       <div className="space-y-3 px-4">
-        <p className="text-sm text-center text-red-500 pt-4">履歴の読み込みに失敗しました</p>
+        <p className="text-sm text-center text-red-500 pt-4">{t("wallets.shared.history.errorLoad")}</p>
       </div>
     );
   }
@@ -33,7 +38,7 @@ export function HistoryTab({ listType, searchQuery, onSelect }: HistoryTabProps)
     return (
       <div className="space-y-3 px-4">
         <p className="text-sm text-center text-muted-foreground pt-4">
-          {listType === "grant" ? "支給履歴がありません" : "譲渡履歴がありません"}
+          {listType === "grant" ? t("wallets.shared.history.noGrant") : t("wallets.shared.history.noDonation")}
         </p>
       </div>
     );
@@ -47,15 +52,18 @@ export function HistoryTab({ listType, searchQuery, onSelect }: HistoryTabProps)
         <UserInfoCard
           key={`${tx.otherUser?.id}-${index}`}
           otherUser={tx.otherUser}
-          label={tx.label}
+          otherName={tx.otherName}
+          actionType={tx.actionType}
+          isReceive={tx.isReceive}
           point={BigInt(tx.point)}
           sign={tx.sign}
           pointColor={tx.pointColor}
-          didValue={tx.didValue ?? "did取得中"}
+          didValue={tx.didValue}
           createdAt={tx.createdAt}
           onClick={() => {
             if (tx.otherUser) onSelect(tx.otherUser);
           }}
+          comment={tx.comment ?? undefined}
         />
       ))}
     </div>

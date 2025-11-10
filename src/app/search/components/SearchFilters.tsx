@@ -17,6 +17,7 @@ interface SearchFiltersProps {
   dateRange: DateRange | undefined;
   guests: number;
   useTicket: boolean;
+  usePoints: boolean;
 }
 
 const SearchFilters: React.FC<SearchFiltersProps> = ({
@@ -27,6 +28,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
   dateRange,
   guests,
   useTicket,
+  usePoints,
 }) => {
   const { control } = useFormContext();
 
@@ -103,7 +105,9 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
                 verticalLayout={true}
                 className="rounded-b-xl"
               >
-                {useTicket && "チケットで支払える"}
+              {[useTicket && "チケット利用可", usePoints && "ポイント利用可"]
+                .filter(Boolean)
+                .join(",")}
               </FilterButton>
             </FormControl>
           </FormItem>

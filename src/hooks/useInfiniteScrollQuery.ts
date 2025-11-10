@@ -3,7 +3,7 @@
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import React, { useState } from "react";
 import { useQuery, DocumentNode, QueryHookOptions, ApolloError } from "@apollo/client";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 
 export interface UseInfiniteScrollQueryResult<TData, TEdge> {
   data: TData | undefined;

@@ -1,0 +1,15 @@
+{
+  "common.regions.shikoku": "Shikoku",
+  "common.regions.higashimatsushima": "Higashimatsushima",
+  "common.regions.default": "Region",
+  "common.prefectures.kagawa": "Kagawa",
+  "common.prefectures.tokushima": "Tokushima",
+  "common.prefectures.ehime": "Ehime",
+  "common.prefectures.kochi": "Kochi",
+  "common.prefectures.outsideShikoku": "Outside Shikoku",
+  "common.prefectures.unknown": "Unknown",
+  "common.errorState.defaultTitle": "Failed to load page",
+  "common.errorState.description": "Please try reloading using the button below. If the issue persists after retrying, please wait a moment and try again, or return to the top page.",
+  "common.errorState.retryButton": "Reload",
+  "common.errorState.homeButton": "Back to Home"
+}

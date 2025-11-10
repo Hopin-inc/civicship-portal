@@ -7,12 +7,14 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import { matchPaths } from "@/utils/path";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
+import { useTranslations } from "next-intl";
 
 interface AdminBottomBarProps {
   className?: string;
 }
 
 const AdminBottomBar: React.FC<AdminBottomBarProps> = ({ className }) => {
+  const t = useTranslations();
   const pathname = usePathname();
   const enabledFeatures = currentCommunityConfig.enableFeatures;
 
@@ -45,7 +47,7 @@ const AdminBottomBar: React.FC<AdminBottomBarProps> = ({ className }) => {
               )}
             >
               <Book size={24} />
-              <span className="text-xs mt-1">予約</span>
+              <span className="text-xs mt-1">{t("navigation.adminBottomBar.reservations")}</span>
             </Link>
           )}
           {enabledFeatures.includes("tickets") && (
@@ -54,7 +56,7 @@ const AdminBottomBar: React.FC<AdminBottomBarProps> = ({ className }) => {
               className={cn(getLinkStyle("/admin/tickets", "/admin/tickets/*"), "flex-grow")}
             >
               <Ticket size={24} />
-              <span className="text-xs mt-1">チケット</span>
+              <span className="text-xs mt-1">{t("navigation.adminBottomBar.tickets")}</span>
             </Link>
           )}
           {enabledFeatures.includes("credentials") && (
@@ -66,7 +68,7 @@ const AdminBottomBar: React.FC<AdminBottomBarProps> = ({ className }) => {
               )}
             >
               <ClipboardList size={24} />
-              <span className="text-xs mt-1">証明書</span>
+              <span className="text-xs mt-1">{t("navigation.adminBottomBar.credentials")}</span>
             </Link>
           )}
           <Link
@@ -74,7 +76,7 @@ const AdminBottomBar: React.FC<AdminBottomBarProps> = ({ className }) => {
             className={cn(getLinkStyle("/admin/setting", "/admin/setting/*"), "flex-grow")}
           >
             <Settings size={24} />
-            <span className="text-xs mt-1">設定</span>
+            <span className="text-xs mt-1">{t("navigation.adminBottomBar.settings")}</span>
           </Link>
         </div>
       </div>

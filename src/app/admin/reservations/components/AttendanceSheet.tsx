@@ -11,7 +11,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { GqlEvaluationStatus, GqlParticipation } from "@/types/graphql";
+import { GqlEvaluationStatus, GqlParticipation, GqlOpportunity, GqlOpportunityCategory } from "@/types/graphql";
 import { cn } from "@/lib/utils";
 
 interface AttendanceListProps {
@@ -25,6 +25,8 @@ interface AttendanceListProps {
   setIsConfirmDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
   handleSaveAllAttendance: () => void;
   allEvaluated: boolean;
+  opportunity?: GqlOpportunity | null;
+  isInsufficientBalance: boolean;
 }
 
 const AttendanceList: React.FC<AttendanceListProps> = ({
@@ -38,6 +40,8 @@ const AttendanceList: React.FC<AttendanceListProps> = ({
   setIsConfirmDialogOpen,
   handleSaveAllAttendance,
   allEvaluated,
+  opportunity,
+  isInsufficientBalance,
 }) => {
   return (
     <div>
@@ -88,7 +92,7 @@ const AttendanceList: React.FC<AttendanceListProps> = ({
             <SheetTrigger asChild>
               {participations.length > 0 && !isSaved && (
                 <div className="fixed bottom-0 left-0 right-0 max-w-mobile-l mx-auto p-4 bg-background border-t-2 border-b-card space-y-3 z-50">
-                  <Button className="w-full py-4" size="lg" disabled={isSaving || !allEvaluated}>
+                  <Button className="w-full py-4" size="lg" disabled={isSaving || !allEvaluated || isInsufficientBalance}>
                     {isSaving ? "保存中…" : "出欠を保存する"}
                   </Button>
                 </div>
@@ -99,7 +103,9 @@ const AttendanceList: React.FC<AttendanceListProps> = ({
               <SheetHeader className="pb-6">
                 <SheetTitle>出欠情報を保存しますか？</SheetTitle>
                 <SheetDescription>
-                  保存後は編集できなくなります。本当に保存してよろしいですか？
+                  {opportunity?.category === GqlOpportunityCategory.Quest
+                    ? `出席した参加者には証明書が発行され、1人につき${opportunity.pointsToEarn || 0}ptが譲渡されます。また、保存後は編集できなくなります。本当に保存してよろしいですか？`
+                    : "出席した参加者には証明書が発行され、保存後は編集できなくなります。本当に保存してよろしいですか？"}
                 </SheetDescription>
               </SheetHeader>
               <div className="space-y-3 mt-4">

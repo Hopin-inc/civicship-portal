@@ -1,17 +1,19 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { GqlUser, useGetMemberWalletsQuery } from "@/types/graphql";
+import { GqlUser } from "@/types/graphql";
 import { useTransactionMutations } from "@/app/admin/wallet/hooks/useTransactionMutations";
 import UserSelectStep from "./components/UserSelectStep";
 import { useRouter, useSearchParams } from "next/navigation";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import ErrorState from "@/components/shared/ErrorState";
 import TransferInputStep from "@/app/admin/wallet/grant/components/TransferInputStep";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 import { Tabs } from "./types/tabs";
+import { ErrorState } from "@/components/shared";
+import { useMemberWallets } from "@/hooks/members/useMemberWallets";
+import { useTranslations } from "next-intl";
 
 const DEFAULT_TAB: Tabs = Tabs.History;
 const isValidTab = (tab: string): tab is Tabs => {
@@ -19,6 +21,7 @@ const isValidTab = (tab: string): tab is Tabs => {
 };
 
 export default function GrantPointStepperPage() {
+  const t = useTranslations();
   const router = useRouter();
   const track = useAnalytics();
 
@@ -32,31 +35,7 @@ export default function GrantPointStepperPage() {
     return DEFAULT_TAB;
   });
 
-  const { data, loading, error, refetch, fetchMore } = useGetMemberWalletsQuery({
-    variables: {
-      filter: {
-        communityId: COMMUNITY_ID,
-      },
-      first: 100,
-      withDidIssuanceRequests: true,
-    },
-    fetchPolicy: "network-only",
-  });
-
-  const handleLoadMore = async () => {
-    const pageInfo = data?.wallets?.pageInfo;
-    const endCursor = pageInfo?.endCursor;
-
-    if (pageInfo?.hasNextPage && endCursor) {
-      await fetchMore({
-        variables: {
-          filter: { communityId: COMMUNITY_ID },
-          first: 500,
-          after: endCursor,
-        },
-      });
-    }
-  };
+  const { data, loading, error, refetch, loadMoreRef, isLoadingMore } = useMemberWallets();
 
   const { grantPoint } = useTransactionMutations();
 
@@ -68,12 +47,12 @@ export default function GrantPointStepperPage() {
   const [selectedUser, setSelectedUser] = useState<GqlUser | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleGrantPoint = async (amount: number) => {
+  const handleGrantPoint = async (amount: number, comment?: string) => {
     if (!selectedUser) return;
     setIsLoading(true);
     try {
       const res = await grantPoint({
-        input: { transferPoints: amount, toUserId: selectedUser.id },
+        input: { transferPoints: amount, toUserId: selectedUser.id,comment: comment },
         permission: { communityId: COMMUNITY_ID },
       });
 
@@ -83,19 +62,19 @@ export default function GrantPointStepperPage() {
           params: {
             toUser: {
               userId: selectedUser.id,
-              name: selectedUser.name ?? "未設定",
+              name: selectedUser.name ?? t("adminWallet.common.notSet"),
             },
             amount,
           },
         });
 
-        toast.success(`+${amount.toLocaleString()} pt を渡しました`);
+        toast.success(t("adminWallet.grant.success", { amount: amount.toLocaleString() }));
         router.push("/admin/wallet?refresh=true");
       } else {
-        toast.error(`助成失敗: ${res.code}`);
+        toast.error(t("adminWallet.grant.errorWithCode", { code: res.code }));
       }
     } catch {
-      toast.error("助成に失敗しました");
+      toast.error(t("adminWallet.grant.errorGeneric"));
     } finally {
       setIsLoading(false);
     }
@@ -131,7 +110,7 @@ export default function GrantPointStepperPage() {
   }
 
   if (error) {
-    return <ErrorState title="メンバーを読み込めませんでした" refetchRef={refetchRef} />;
+    return <ErrorState title={t("adminWallet.grant.membersLoadError")} refetchRef={refetchRef} />;
   }
 
   return (
@@ -140,8 +119,8 @@ export default function GrantPointStepperPage() {
         <UserSelectStep
           members={members}
           onSelect={setSelectedUser}
-          onLoadMore={handleLoadMore}
-          hasNextPage={data?.wallets?.pageInfo?.hasNextPage}
+          loadMoreRef={loadMoreRef}
+          isLoadingMore={isLoadingMore}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           listType="grant"
@@ -153,6 +132,8 @@ export default function GrantPointStepperPage() {
           isLoading={isLoading}
           onBack={() => setSelectedUser(null)}
           onSubmit={handleGrantPoint}
+          commentPlaceholder={t("wallets.shared.transfer.commentPlaceholderGrant")}
+          commentName="comment-grant"
         />
       )}
     </div>

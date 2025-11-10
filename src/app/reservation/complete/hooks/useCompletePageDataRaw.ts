@@ -1,5 +1,5 @@
 import { useReservationComplete } from "@/app/reservation/complete/hooks/useReservationComplete";
-import { useSameStateActivities } from "@/app/activities/[id]/hooks/useSameStateActivities";
+import { useSameStateOpportunities } from "@/hooks/opportunities/useSameStateOpportunities";
 
 export function useCompletePageDataRaw(opportunityId: string | null, reservationId: string | null) {
   const {
@@ -14,11 +14,11 @@ export function useCompletePageDataRaw(opportunityId: string | null, reservation
 
   const stateCode = gqlOpportunity?.place?.city?.state?.code ?? "";
   const {
-    sameStateActivities,
+    sameStateOpportunities,
     loading: sameStateLoading,
     error: sameStateError,
     refetch: sameStateRefetch,
-  } = useSameStateActivities(opportunityId ?? "", stateCode);
+  } = useSameStateOpportunities(opportunityId ?? "", stateCode);
 
   const loading = reservationLoading || sameStateLoading;
   const error = reservationError ?? sameStateError ?? null;
@@ -32,7 +32,7 @@ export function useCompletePageDataRaw(opportunityId: string | null, reservation
     gqlOpportunity,
     gqlOpportunitySlot,
     gqlArticle,
-    sameStateActivities,
+    sameStateOpportunities,
     loading,
     error,
     refetch,

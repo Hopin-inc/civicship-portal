@@ -9,6 +9,7 @@ import {
   useGetReservationsQuery,
 } from "@/types/graphql";
 import { useAuth } from "@/contexts/AuthProvider";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 export interface UseReservationsResult {
   reservations: GqlReservationsConnection;
@@ -35,6 +36,7 @@ const useReservations = (filter: GqlReservationFilterInput): UseReservationsResu
   const mergedFilter = React.useMemo(
     () => ({
       ...filter,
+      communityId: COMMUNITY_ID,
       opportunityOwnerId: user?.id ?? undefined,
     }),
     [filter, user?.id],

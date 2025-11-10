@@ -16,8 +16,9 @@ import {
 } from "@/app/participations/[id]/data/type";
 import { ReservationStatus } from "@/types/participationStatus";
 import { presenterPlace } from "@/app/places/data/presenter";
-import { presenterOpportunityHost } from "@/app/activities/data/presenter";
+import { presenterOpportunityHost } from "@/components/domains/opportunities/data/presenter";
 import { subDays } from "date-fns";
+import { DEFAULT_CANCELLATION_DEADLINE_DAYS } from "@/config/activityBookingConfig";
 
 export const presenterParticipation = (raw: GqlParticipation): ParticipationDetail => {
   // if (
@@ -194,5 +195,5 @@ export const getStatusInfo = (status: GqlReservationStatus): ReservationStatus |
 
 export const calculateCancellationDeadline = (startTime?: Date): Date | null => {
   if (!startTime) return null;
-  return subDays(startTime, 1); // ← 前日まで
+  return subDays(startTime, DEFAULT_CANCELLATION_DEADLINE_DAYS);
 };

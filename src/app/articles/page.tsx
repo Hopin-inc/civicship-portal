@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import ErrorState from "@/components/shared/ErrorState";
+import { ErrorState } from "@/components/shared";
 import ArticleList from "@/app/articles/components/ArticleList";
 import { useArticles } from "@/app/articles/hooks/useArticles";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";

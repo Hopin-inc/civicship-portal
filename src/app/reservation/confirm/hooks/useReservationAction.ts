@@ -3,29 +3,56 @@ import {
   GqlErrorCode,
   GqlReservation,
   GqlUser,
-  GqlWallet,
   useCreateReservationMutation,
 } from "@/types/graphql";
-import { getTicketIds } from "@/app/reservation/data/presenter/reservation";
-import { ActivityDetail } from "@/app/activities/data/type";
-import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
+import { ActivityDetail, QuestDetail } from "@/components/domains/opportunities/types";
+import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
 import { UseTicketCounterReturn } from "@/app/reservation/confirm/hooks/useTicketCounter";
+import { ReservationWallet } from "@/app/reservation/confirm/presenters/presentReservationConfirm";
 import { ApolloError } from "@apollo/client";
 import { logger } from "@/lib/logging";
+import { isPointsOnlyOpportunity } from "@/utils/opportunity/isPointsOnlyOpportunity";
+
+const getSelectedTicketIds = (
+  wallet: ReservationWallet | null,
+  selectedTickets: { [ticketId: string]: number } | undefined,
+): string[] => {
+  if (!selectedTickets || !wallet) return [];
+  
+  const ticketIds: string[] = [];
+  const allTickets = wallet.tickets;
+  
+  Object.entries(selectedTickets).forEach(([utilityId, count]) => {
+    const availableTickets = allTickets.filter(ticket => 
+      ticket.utility?.id === utilityId && ticket.status === "AVAILABLE"
+    );
+    
+    for (let i = 0; i < count && i < availableTickets.length; i++) {
+      ticketIds.push(availableTickets[i].id);
+    }
+  });
+  
+  return ticketIds;
+};
 
 type Result =
   | { success: true; reservation: GqlReservation }
   | { success: false; code: GqlErrorCode };
 
 interface ReservationParams {
-  opportunity: ActivityDetail | null;
-  selectedSlot: ActivitySlot | null;
-  wallets: GqlWallet[] | null;
+  opportunity: ActivityDetail | QuestDetail | null;
+  selectedSlot: ActivitySlot | QuestSlot | null;
+  wallet: ReservationWallet | null;
   user: Pick<GqlUser, "id"> | null;
   ticketCounter: UseTicketCounterReturn;
   participantCount: number;
   useTickets: boolean;
+  usePoints: boolean;
+  selectedPointCount: number;
+  selectedTicketCount: number;
+  selectedTickets?: { [ticketId: string]: number };
   comment?: string;
+  userWallet: number | null;
 }
 
 export const useReservationCommand = () => {
@@ -35,25 +62,39 @@ export const useReservationCommand = () => {
     async ({
       opportunity,
       selectedSlot,
-      wallets,
+      wallet,
       user,
       ticketCounter,
       useTickets,
       comment,
       participantCount,
+      usePoints,
+      selectedPointCount,
+      selectedTicketCount,
+      selectedTickets,
+      userWallet
     }: ReservationParams): Promise<Result> => {
       if (loading) return { success: false, code: GqlErrorCode.Unknown };
       if (!user) return { success: false, code: GqlErrorCode.Unauthenticated };
       if (!opportunity || !selectedSlot)
         return { success: false, code: GqlErrorCode.ValidationError };
 
-      const count = ticketCounter.count;
-      const ticketIds = useTickets ? getTicketIds(wallets, opportunity.targetUtilities, count) : [];
+      const feeRequired = 'feeRequired' in opportunity ? opportunity.feeRequired : null;
+      const pointsRequired = 'pointsRequired' in opportunity ? opportunity.pointsRequired : 0;
+      const isPointsOnly = isPointsOnlyOpportunity(feeRequired, pointsRequired);
+      
+      if (isPointsOnly) {
+        const totalPointsRequired = pointsRequired * participantCount;
+        if (typeof userWallet !== 'number' || userWallet < totalPointsRequired) {
+          return { success: false, code: GqlErrorCode.ValidationError };
+        }
+      }
 
+      const count = selectedTicketCount;
+      const ticketIds = useTickets ? getSelectedTicketIds(wallet, selectedTickets) : [];
       if (useTickets && ticketIds.length < count) {
         return { success: false, code: GqlErrorCode.TicketParticipantMismatch };
       }
-
       try {
         const res = await createReservation({
           variables: {
@@ -63,6 +104,7 @@ export const useReservationCommand = () => {
               paymentMethod: useTickets ? "TICKET" : "FEE",
               ticketIdsIfNeed: useTickets ? ticketIds : undefined,
               comment: comment ?? undefined,
+              participantCountWithPoint: isPointsOnly ? participantCount : (usePoints ? selectedPointCount : undefined),
             },
           },
         });
@@ -86,7 +128,7 @@ export const useReservationCommand = () => {
             code: code ?? GqlErrorCode.Unknown,
           };
         }
-        logger.error("Reservation mutation failed", {
+        logger.warn("Reservation mutation failed", {
           error: e instanceof Error ? e.message : String(e),
           component: "useReservationAction"
         });

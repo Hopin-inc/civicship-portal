@@ -62,7 +62,7 @@ export function OpportunityCard({
   opportunityId,
 }: OpportunityCardProps) {
   const { data } = useGetParticipationsQuery({
-    variables: { filter: { opportunityId } },
+    variables: { filter: { opportunityId }, first: 100 },
     skip: !opportunityId,
   });
   const { setParticipatedUsers } = useSelection();

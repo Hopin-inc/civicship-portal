@@ -23,14 +23,6 @@ export function presentTransaction({
     : presentDonateTransaction({ transaction, currentUserId, didIssuanceRequests });
 }
 
-const truncateDid = (did: string | undefined | null, length: number = 20): string => {
-  if (!did) return "";
-  if (did.length <= length) return did;
-  const start = did.substring(0, length);
-  const end = did.substring(did.length - 10);
-  return `${start}...${end}`;
-};
-
 const resolveDidIssuanceRequests = ({
   transaction,
   currentUserId,
@@ -87,10 +79,8 @@ function presentDonateTransaction({
     transaction,
     isReceive,
     otherUser,
-    label: {
-      text: `${otherName}${isReceive ? "から受取" : "に譲渡"}`,
-      smallText: isReceive ? "から受取" : "に譲渡",
-    },
+    otherName,
+    actionType: "donation",
     didIssuanceRequests,
   });
 }
@@ -118,10 +108,8 @@ function presentGrantTransaction({
     transaction,
     isReceive,
     otherUser,
-    label: {
-      text: `${otherName}${isReceive ? "から受取" : "に支給"}`,
-      smallText: isReceive ? "から受取" : "に支給",
-    },
+    otherName,
+    actionType: "grant",
     didIssuanceRequests,
   });
 }
@@ -130,13 +118,15 @@ function buildPresentedTransaction({
   transaction,
   isReceive,
   otherUser,
-  label,
+  otherName,
+  actionType,
   didIssuanceRequests,
 }: {
   transaction: GqlTransaction;
   isReceive: boolean;
   otherUser?: Maybe<GqlUser>;
-  label: { text: string; smallText: string };
+  otherName: string;
+  actionType: "donation" | "grant";
   didIssuanceRequests: GqlDidIssuanceRequest[];
 }) {
   const rawPoint = isReceive ? transaction.toPointChange : transaction.fromPointChange;
@@ -148,14 +138,21 @@ function buildPresentedTransaction({
     (req) => req.status === GqlDidIssuanceStatus.Completed,
   )?.didValue;
 
+  const isDidPending = didIssuanceRequests.some(
+    (req) => req.status === GqlDidIssuanceStatus.Pending,
+  );
+
   return {
     isReceive,
     otherUser,
+    otherName,
+    actionType,
     point,
     sign,
     pointColor,
-    label,
-    didValue: truncateDid(didValue, 20),
+    didValue,
+    isDidPending,
     createdAt: transaction.createdAt,
+    comment: transaction.comment,
   };
 }

@@ -1,4 +1,14 @@
+// next.config.mjs
+import bundleAnalyzer from "@next/bundle-analyzer";
+import createNextIntlPlugin from 'next-intl/plugin';
+
+const withNextIntl = createNextIntlPlugin('./src/lib/i18n/request.ts');
+
 /** @type {import("next").NextConfig} */
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
+});
+
 const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
@@ -16,18 +26,16 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "storage.googleapis.com",
-        pathname: "/prod-civicship-storage-public/**",
       },
       {
         protocol: "https",
-        hostname: "plus.unsplash.com",
+        hostname: "vyocmhwkrvspeitnllty.supabase.co",
       },
       {
         protocol: "https",
-        hostname: "images.unsplash.com",
+        hostname: "ipfs.io",
       },
     ],
-    domains: ["storage.googleapis.com", "plus.unsplash.com", "images.unsplash.com"],
   },
   experimental: {
     webpackBuildWorker: true,
@@ -58,11 +66,20 @@ const nextConfig = {
   async headers() {
     return [
       {
+        source: "/:path*",
+        headers: [
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=31536000; includeSubDomains; preload",
+          },
+        ],
+      },
+      {
         source: "/_next/image",
         headers: [
           {
             key: "Cache-Control",
-            value: "public, max-age=31536000, immutable", // cache for 1 year
+            value: "public, max-age=31536000, immutable",
           },
         ],
       },
@@ -70,4 +87,4 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+export default withNextIntl(withBundleAnalyzer(nextConfig));
