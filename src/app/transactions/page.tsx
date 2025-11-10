@@ -3,6 +3,7 @@ import { getServerCommunityTransactions } from "@/hooks/transactions/server";
 import { InfiniteTransactionList } from "./components/InfiniteTransactionList";
 import { useTranslations } from "next-intl";
 import { getTranslations } from "next-intl/server";
+import { getServerCommunityTransactionsWithCursor } from "@/hooks/transactions/server-community-transactions";
 
 export default async function TransactionsPage() {
     const t = await getTranslations();
@@ -18,7 +19,10 @@ export default async function TransactionsPage() {
                 {t("transactions.empty")}
             </p>
             ) : (
-            <InfiniteTransactionList initialTransactions={transactions} />
+            <InfiniteTransactionList 
+                initialTransactions={transactions}
+                fetchMore={getServerCommunityTransactionsWithCursor}
+            />
             )}
         </div>
         </>

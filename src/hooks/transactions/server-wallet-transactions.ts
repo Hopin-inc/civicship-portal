@@ -1,0 +1,71 @@
+import { executeServerGraphQLQuery } from "@/lib/graphql/server";
+import { GET_TRANSACTIONS_SERVER_QUERY } from "@/graphql/account/transaction/query";
+import { GqlTransactionsConnection, GqlGetTransactionsQuery, GqlGetTransactionsQueryVariables } from "@/types/graphql";
+
+export interface ServerWalletTransactionsParams {
+  walletId: string;
+  first?: number;
+  after?: string;
+  withDidIssuanceRequests?: boolean;
+}
+
+const fallbackConnection: GqlTransactionsConnection = {
+  edges: [],
+  pageInfo: {
+    hasNextPage: false,
+    hasPreviousPage: false,
+    startCursor: null,
+    endCursor: null,
+  },
+  totalCount: 0,
+};
+
+/**
+ * サーバーサイドでウォレットのトランザクションを取得する関数
+ */
+export async function getServerWalletTransactions(
+  params: ServerWalletTransactionsParams
+): Promise<GqlTransactionsConnection> {
+  const {
+    walletId,
+    first = 50,
+    after,
+    withDidIssuanceRequests = true,
+  } = params;
+
+  try {
+    const variables: GqlGetTransactionsQueryVariables = {
+      filter: {
+        walletId,
+      },
+      first,
+      cursor: after,
+      withDidIssuanceRequests,
+    };
+
+    const data = await executeServerGraphQLQuery<GqlGetTransactionsQuery, GqlGetTransactionsQueryVariables>(
+      GET_TRANSACTIONS_SERVER_QUERY,
+      variables
+    );
+
+    return data.transactions ?? fallbackConnection;
+  } catch (error) {
+    console.error("Failed to fetch wallet transactions:", error);
+    return fallbackConnection;
+  }
+}
+
+/**
+ * カーソルベースのページネーションでウォレットのトランザクションを取得する関数
+ */
+export async function getServerWalletTransactionsWithCursor(
+  walletId: string,
+  cursor?: string,
+  first: number = 20
+): Promise<GqlTransactionsConnection> {
+  return getServerWalletTransactions({
+    walletId,
+    first,
+    after: cursor,
+  });
+}

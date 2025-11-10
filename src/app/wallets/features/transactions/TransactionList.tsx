@@ -29,7 +29,7 @@ export function TransactionList() {
           {t("transactions.list.communityHistoryLink")}
         </Link>
       </div>
-      <div className="space-y-2 mt-2">
+      <div className="divide-y-8 divide-zinc-100 mt-2">
         {transactions.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center pt-6">
             {t("transactions.list.emptyState")}
@@ -40,8 +40,8 @@ export function TransactionList() {
               <TransactionItem key={transaction.id} transaction={transaction} image={transaction.image} />
             ))}
             {hasNextPage && (
-              <div ref={targetRef} className="h-10 flex items-center justify-center">
-                {isLoadingTransactions && <LoadingIndicator />}
+              <div ref={targetRef} className="flex justify-center py-4">
+                {isLoadingTransactions && <LoadingIndicator fullScreen={false} />}
               </div>
             )}
           </>
