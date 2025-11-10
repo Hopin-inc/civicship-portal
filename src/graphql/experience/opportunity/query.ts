@@ -1,12 +1,4 @@
 import { gql } from "@apollo/client";
-import { OPPORTUNITY_FRAGMENT } from "@/graphql/experience/opportunity/fragment";
-import { COMMUNITY_FRAGMENT } from "@/graphql/account/community/fragment";
-import { PLACE_FRAGMENT } from "@/graphql/location/place/fragment";
-import { SLOT_FRAGMENT } from "@/graphql/experience/opportunitySlot/fragment";
-import { RESERVATION_FRAGMENT } from "@/graphql/experience/reservation/fragment";
-import { PARTICIPATION_FRAGMENT } from "@/graphql/experience/participation/fragment";
-import { USER_FRAGMENT } from "@/graphql/account/user/fragment";
-import { ARTICLE_FRAGMENT } from "@/graphql/content/article/fragment";
 
 export const GET_OPPORTUNITIES = gql`
   query GetOpportunities(
