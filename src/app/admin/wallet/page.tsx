@@ -8,12 +8,10 @@ import useHeaderConfig from "@/hooks/useHeaderConfig";
 import WalletCard from "@/components/shared/WalletCard";
 import { GqlMembership, GqlRole, GqlWallet, useGetCommunityWalletQuery } from "@/types/graphql";
 import { Coins, Gift } from "lucide-react";
-import TransactionItem from "@/components/shared/TransactionItem";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
-import { presenterTransaction } from "@/utils/transaction";
-import { getToWalletImage } from "@/app/admin/wallet/data/presenter";
 import useCommunityTransactions from "@/app/admin/wallet/hooks/useCommunityTransactions";
+import { InfiniteTransactionList } from "@/app/transactions/components/InfiniteTransactionList";
 import { logger } from "@/lib/logging";
 import Link from "next/link";
 import { toPointNumber } from "@/utils/bigint";
@@ -149,23 +147,20 @@ export default function WalletPage() {
             {t("transactions.list.communityHistoryLink")}
         </Link>
       </div>
-      <div className="space-y-2 mt-2">
+      <div className="mt-2">
         {connection.edges?.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center pt-6">
             {t("transactions.list.emptyState")}
           </p>
         ) : (
-          connection.edges?.map((edge) => {
-            const node = edge?.node;
-            if (!node) return null;
-            const transaction = presenterTransaction(node, walletId);
-            if (!transaction) return null;
-            const image = getToWalletImage(node);
-            return <TransactionItem key={transaction.id} transaction={transaction} image={image} />;
-          })
+          <InfiniteTransactionList
+            initialTransactions={connection}
+            walletId={walletId}
+            perspectiveWalletId={walletId}
+            showSignedAmount={true}
+            showDid={true}
+          />
         )}
-
-        <div ref={loadMoreRef} className="h-10" />
       </div>
     </div>
   );

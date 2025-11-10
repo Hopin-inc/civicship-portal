@@ -13,4 +13,14 @@ export const getFromWalletImage = (node: GqlTransaction): string => {
     return node.fromWallet.community?.image || PLACEHOLDER_IMAGE;
   }
   return node.fromWallet?.user?.image || PLACEHOLDER_IMAGE;
-}
+};
+
+export const getCounterpartyImage = (node: GqlTransaction, perspectiveWalletId: string): string => {
+  const isOutgoing = node.fromWallet?.id === perspectiveWalletId;
+  const counterpartyWallet = isOutgoing ? node.toWallet : node.fromWallet;
+  
+  if (counterpartyWallet?.type === GqlWalletType.Community) {
+    return counterpartyWallet.community?.image || PLACEHOLDER_IMAGE;
+  }
+  return counterpartyWallet?.user?.image || PLACEHOLDER_IMAGE;
+};

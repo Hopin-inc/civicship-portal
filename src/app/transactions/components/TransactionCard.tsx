@@ -2,38 +2,19 @@
 
 import { formatCurrency, getNameFromWallet, mapReasonToAction } from "@/utils/transaction";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { GqlTransaction, GqlTransactionReason } from "@/types/graphql";
+import { GqlTransaction, GqlTransactionReason, GqlDidIssuanceStatus } from "@/types/graphql";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { useTranslations } from "next-intl";
 import { useLocaleDateTimeFormat } from "@/utils/i18n";
+import { truncateText } from "@/utils/stringUtils";
 
 interface TransactionCardProps {
   transaction: GqlTransaction;
   image?: string;
+  perspectiveWalletId?: string;
+  showSignedAmount?: boolean;
+  showDid?: boolean;
 }
-
-const getStatusLabelText = (
-  reason: GqlTransactionReason,
-  t: ReturnType<typeof useTranslations>,
-) => {
-  switch (reason) {
-    case GqlTransactionReason.Donation:
-      return t("transactions.status.donation");
-    case GqlTransactionReason.Grant:
-      return t("transactions.status.grant");
-    case GqlTransactionReason.PointReward:
-    case GqlTransactionReason.TicketPurchased:
-    case GqlTransactionReason.OpportunityReservationCreated:
-      return t("transactions.status.pay");
-    case GqlTransactionReason.TicketRefunded:
-      return t("transactions.status.return");
-    case GqlTransactionReason.OpportunityReservationCanceled:
-    case GqlTransactionReason.OpportunityReservationRejected:
-      return t("transactions.status.refund");
-    default:
-      return t("transactions.status.default");
-  }
-};
 
 const formatTransactionDescription = (
   reason: GqlTransactionReason,
@@ -60,39 +41,103 @@ const formatTransactionDescription = (
 };
 
 // シンプルなトランザクション情報を取得する関数
-const getTransactionInfo = (transaction: GqlTransaction, didPendingText: string) => {
+const getTransactionInfo = (
+  transaction: GqlTransaction,
+  didPendingText: string,
+  perspectiveWalletId?: string,
+) => {
   const from = getNameFromWallet(transaction.fromWallet);
   const to = getNameFromWallet(transaction.toWallet);
-  const amount = Math.abs(transaction.fromPointChange ?? 0);
+  const rawAmount = Math.abs(transaction.fromPointChange ?? 0);
+
+  let amount = rawAmount;
+  let isPositive = false;
+  if (perspectiveWalletId) {
+    const isOutgoing = transaction.fromWallet?.id === perspectiveWalletId;
+    amount = isOutgoing ? -rawAmount : rawAmount;
+    isPositive = amount > 0;
+  }
+
+  let didValue = didPendingText;
+  if (perspectiveWalletId) {
+    const counterpartyWallet =
+      transaction.fromWallet?.id === perspectiveWalletId
+        ? transaction.toWallet
+        : transaction.fromWallet;
+    didValue =
+      counterpartyWallet?.user?.didIssuanceRequests?.find(
+        (req) => req?.status === GqlDidIssuanceStatus.Completed,
+      )?.didValue ?? didPendingText;
+  } else {
+    didValue =
+      transaction.toWallet?.user?.didIssuanceRequests?.find(
+        (req) => req?.status === GqlDidIssuanceStatus.Completed,
+      )?.didValue ?? didPendingText;
+  }
 
   return {
     from,
     to,
     amount,
+    isPositive,
     reason: transaction.reason,
     comment: transaction.comment ?? "",
     transferredAt: transaction.createdAt ? new Date(transaction.createdAt).toISOString() : "",
-    didValue:
-      transaction.toWallet?.user?.didIssuanceRequests?.find((req) => req?.status === "COMPLETED")
-        ?.didValue ?? didPendingText,
+    didValue,
   };
 };
 
-export const TransactionCard = ({ transaction, image }: TransactionCardProps) => {
+const getStatusLabel = (reason: GqlTransactionReason, t: ReturnType<typeof useTranslations>) => {
+  switch (reason) {
+    case GqlTransactionReason.Donation:
+      return <span className="text-label-xs font-medium bg-green-100 text-green-700 py-1 px-2 rounded-full">{t("transactions.status.donation")}</span>;
+    case GqlTransactionReason.Grant:
+      return <span className="text-label-xs font-medium py-1 px-2 bg-blue-100 text-blue-700 rounded-full">{t("transactions.status.grant")}</span>;
+    case GqlTransactionReason.PointReward:
+      return <span className="text-label-xs font-medium bg-green-100 text-green-700 py-1 px-2 rounded-full">{t("transactions.status.pay")}</span>;
+    case GqlTransactionReason.TicketPurchased:
+      return <span className="text-label-xs font-medium bg-green-100 text-green-700 py-1 px-2 rounded-full">{t("transactions.status.pay")}</span>;
+    case GqlTransactionReason.TicketRefunded:
+      return <span className="text-label-xs font-medium bg-red-100 text-red-700 py-1 px-2 rounded-full">{t("transactions.status.return")}</span>;
+    case GqlTransactionReason.OpportunityReservationCreated:
+      return <span className="text-label-xs font-medium bg-green-100 text-green-700 py-1 px-2 rounded-full">{t("transactions.status.pay")}</span>;
+    case GqlTransactionReason.OpportunityReservationCanceled:
+    case GqlTransactionReason.OpportunityReservationRejected:
+      return <span className="text-label-xs font-medium bg-red-100 text-red-700 py-1 px-2 rounded-full">{t("transactions.status.refund")}</span>;
+    default:
+      return <span className="text-label-xs font-medium bg-zinc-100 text-zinc-700 py-1 px-2 rounded-full">{t("transactions.status.default")}</span>;
+  }
+};
+
+export const TransactionCard = ({
+  transaction,
+  image,
+  perspectiveWalletId,
+  showSignedAmount = false,
+  showDid = false,
+}: TransactionCardProps) => {
   const t = useTranslations();
   const formatDateTime = useLocaleDateTimeFormat();
-  const info = getTransactionInfo(transaction, t("transactions.did.pending"));
+  const info = getTransactionInfo(transaction, t("transactions.did.pending"), perspectiveWalletId);
   const { displayName, displayAction, to } = formatTransactionDescription(
     info.reason,
     info.from,
     info.to,
     t,
   );
-  const statusLabelElement = getStatusLabelText(info.reason, t);
+  const statusLabelElement = getStatusLabel(info.reason, t);
   const hasDestination =
     to &&
     info.reason !== GqlTransactionReason.PointIssued &&
     info.reason !== GqlTransactionReason.Onboarding;
+
+  const amountClassName = showSignedAmount && info.isPositive
+    ? "text-label-sm font-bold shrink-0 ml-2 text-success"
+    : "text-label-sm font-bold shrink-0 ml-2 text-foreground";
+
+  const formattedAmount = showSignedAmount && info.isPositive
+    ? `+${formatCurrency(info.amount)}pt`
+    : `${formatCurrency(info.amount)}pt`;
 
   return (
     <div className="flex items-start gap-3 py-6">
@@ -110,16 +155,22 @@ export const TransactionCard = ({ transaction, image }: TransactionCardProps) =>
             )}
           </span>
 
-          <div className="text-label-sm font-bold shrink-0 ml-2 text-foreground">
-            {formatCurrency(info.amount)}pt
+          <div className={amountClassName}>
+            {formattedAmount}
           </div>
         </div>
 
         {hasDestination && (
-          <p className="flex items-center gap-0.5 mt-1 text-label-xs text-muted-foreground">
-            <span className="truncate">{statusLabelElement}</span>
+          <p className="flex items-center gap-2">
+            {statusLabelElement}
             <span className="text-label-xs font-medium text-caption truncate">{to}</span>
           </p>
+        )}
+
+        {showDid && info.reason !== GqlTransactionReason.PointIssued && info.didValue && (
+          <span className="text-label-xs text-caption py-2">
+            {truncateText(info.didValue, 20, "middle")}
+          </span>
         )}
 
         {info.comment && (

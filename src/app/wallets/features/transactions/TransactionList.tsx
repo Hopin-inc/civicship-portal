@@ -2,21 +2,17 @@
 
 import React from "react";
 import { useTranslations } from "next-intl";
-import TransactionItem from "@/components/shared/TransactionItem";
-import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import Link from "next/link";
-import { useWalletContext } from "@/app/wallets/features/shared/contexts/WalletContext";
-import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import { InfiniteTransactionList } from "@/app/transactions/components/InfiniteTransactionList";
+import { GqlTransactionsConnection } from "@/types/graphql";
 
-export function TransactionList() {
+interface TransactionListProps {
+  walletId: string;
+  initialTransactions: GqlTransactionsConnection;
+}
+
+export function TransactionList({ walletId, initialTransactions }: TransactionListProps) {
   const t = useTranslations();
-  const { transactions, hasNextPage, isLoadingTransactions, loadMore } = useWalletContext();
-  const targetRef = useInfiniteScroll({
-    hasMore: hasNextPage,
-    isLoading: isLoadingTransactions,
-    onLoadMore: loadMore,
-    threshold: 0.1,
-  });
 
   return (
     <div className="pt-10">
@@ -29,22 +25,19 @@ export function TransactionList() {
           {t("transactions.list.communityHistoryLink")}
         </Link>
       </div>
-      <div className="space-y-2 mt-2">
-        {transactions.length === 0 ? (
+      <div className="mt-2">
+        {initialTransactions.edges?.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center pt-6">
             {t("transactions.list.emptyState")}
           </p>
         ) : (
-          <>
-            {transactions.map((transaction) => (
-              <TransactionItem key={transaction.id} transaction={transaction} image={transaction.image} />
-            ))}
-            {hasNextPage && (
-              <div ref={targetRef} className="h-10 flex items-center justify-center">
-                {isLoadingTransactions && <LoadingIndicator />}
-              </div>
-            )}
-          </>
+          <InfiniteTransactionList
+            initialTransactions={initialTransactions}
+            walletId={walletId}
+            perspectiveWalletId={walletId}
+            showSignedAmount={true}
+            showDid={true}
+          />
         )}
       </div>
     </div>
