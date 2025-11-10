@@ -73,7 +73,7 @@ export const TransactionCardBase = ({
         )}
 
         {comment && (
-          <p className="text-label-xs text-foreground leading-relaxed whitespace-pre-line break-words">
+          <p className="text-label-xs text-caption bg-background-hover leading-relaxed whitespace-pre-line break-words p-2 rounded-sm">
             {comment}
           </p>
         )}
