@@ -13,7 +13,7 @@ const UpdatePage = ({ entries = CHANGELOG_ENTRIES }: UpdatePageProps) => {
 
   const headerConfig = useMemo(
     () => ({
-      title: t("update.pageTitle"),
+      title: t("users.settings.updatePageTitle"),
       showLogo: false,
       showBackButton: true,
     }),

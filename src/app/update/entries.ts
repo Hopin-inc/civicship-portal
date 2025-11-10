@@ -4,8 +4,8 @@ import type { ChangelogEntry } from "./types";
 const CHANGELOG_ENTRIES_JA: ChangelogEntry[] = [
   {
     date: "2025-11-07",
-    title: "予約データの不整合を修正（ユーザー表示の改善）",
-    description: "バッチ処理で発生していた予約と参加情報の不整合を修正しました。カレンダーや参加表示の誤りが減り、表示の信頼性が向上します。ユーザー側での操作は不要です。",
+    title: "予約データの不整合を修正",
+    description: "バッチ処理で発生していた予約と参加情報の不整合を修正しました。カレンダーや参加表示の誤りが減り、ユーザー表示の信頼性が向上します。ユーザー側での操作は不要です。",
   },
   {
     date: "2025-11-07",
@@ -29,13 +29,13 @@ const CHANGELOG_ENTRIES_JA: ChangelogEntry[] = [
   },
   {
     date: "2025-11-05",
-    title: "NFT 画像表示の信頼性改善（画像配信方式の変更）",
-    description: "NFT 画像の取り扱いを改善し、Google Cloud Storage を利用する処理を導入しました。画像が表示されない事象が減り、コンテンツが安定して見られるようになります。",
+    title: "NFT 画像表示の信頼性を改善",
+    description: "NFT 画像の取り扱いを改善し、Google Cloud Storage を利用した画像配信方式を導入しました。画像が表示されない事象が減り、コンテンツが安定して見られるようになります。",
   },
   {
     date: "2025-11-03",
-    title: "DID/VC 同期の信頼性を向上（表示データの安定化）",
-    description: "DID / VC 同期処理のログと自動復旧を強化し、同期失敗による表示欠損を減らしました。ユーザーに見えるデータの欠落が起きにくくなります。",
+    title: "DID/VC 同期の信頼性を向上",
+    description: "DID / VC 同期処理のログと自動復旧を強化し、同期失敗による表示欠損を減らしました。表示データが安定し、ユーザーに見えるデータの欠落が起きにくくなります。",
   },
   {
     date: "2025-11-03",
@@ -44,8 +44,8 @@ const CHANGELOG_ENTRIES_JA: ChangelogEntry[] = [
   },
   {
     date: "2025-10-31",
-    title: "予約申込締切のデフォルトを延長（運用変更）",
-    description: "予約申込のデフォルト締切を開催日の 1 日前から 2 日前へ変更しました。予約可能期間が長くなります（影響範囲は予約機能）。",
+    title: "予約申込締切のデフォルトを延長",
+    description: "予約申込のデフォルト締切を開催日の 1 日前から 2 日前へ変更しました。予約可能期間が長くなります。この変更は予約機能全体に影響します。",
   },
   {
     date: "2025-10-31",
@@ -64,7 +64,7 @@ const CHANGELOG_ENTRIES_JA: ChangelogEntry[] = [
   },
   {
     date: "2025-10-30",
-    title: "多言語対応を実装（日本語・英語）",
+    title: "多言語対応を実装",
     description: "アプリケーション全体で日本語と英語の切り替えに対応しました。ユーザーの言語設定に応じて表示言語が自動的に切り替わります。",
   },
   {
@@ -89,13 +89,13 @@ const CHANGELOG_ENTRIES_JA: ChangelogEntry[] = [
   },
   {
     date: "2025-10-29",
-    title: "認証初期化の最適化（UI表示の高速化）",
-    description: "サーバーからデータがある場合の認証処理を最適化し、画面表示が速くなりました。",
+    title: "認証初期化の最適化",
+    description: "サーバーからデータがある場合の認証処理を最適化し、UI表示が高速化されました。画面表示が速くなります。",
   },
   {
     date: "2025-10-29",
     title: "国際電話番号認証に対応",
-    description: "日本以外の電話番号でも認証できるようになりました。国際電話番号形式（+81など）に対応しています。",
+    description: "日本以外の電話番号でも認証できるようになりました。+81などの国際電話番号形式に対応しています。",
   },
   {
     date: "2025-10-25",
@@ -200,7 +200,7 @@ const CHANGELOG_ENTRIES_JA: ChangelogEntry[] = [
   {
     date: "2025-07-31",
     title: "お手伝い・ポイント決済機能を追加",
-    description: "お手伝い（クエスト）機能とポイントでの決済機能を追加しました。ポイントを使って体験に参加できるようになります。",
+    description: "お手伝いのクエスト機能とポイントでの決済機能を追加しました。ポイントを使って体験に参加できるようになります。",
   },
   {
     date: "2025-07-29",
@@ -285,7 +285,7 @@ const CHANGELOG_ENTRIES_JA: ChangelogEntry[] = [
   {
     date: "2025-06-07",
     title: "体験一覧ページのパフォーマンスを最適化",
-    description: "体験一覧ページの読み込み時間を大幅に短縮しました（約5.9秒から3秒に改善）。ページがより速く表示されます。",
+    description: "体験一覧ページの読み込み時間を大幅に短縮しました。約5.9秒から3秒に改善され、ページがより速く表示されます。",
   },
   {
     date: "2025-06-06",
@@ -299,7 +299,7 @@ const CHANGELOG_ENTRIES_JA: ChangelogEntry[] = [
   },
   {
     date: "2025-06-03",
-    title: "レンダリングを最適化（遅延読み込みとキャッシュ）",
+    title: "レンダリングを最適化",
     description: "遅延読み込みとキャッシュを導入し、ページの表示速度を改善しました。スムーズに閲覧できるようになります。",
   },
   {
@@ -313,7 +313,7 @@ const CHANGELOG_ENTRIES_JA: ChangelogEntry[] = [
 const CHANGELOG_ENTRIES_EN: ChangelogEntry[] = [
   {
     date: "2025-11-07",
-    title: "Fixed reservation data inconsistencies (improved user display)",
+    title: "Fixed reservation data inconsistencies",
     description: "Fixed inconsistencies between reservation and participation data that occurred in batch processing. Calendar and participation displays are now more reliable. No user action required.",
   },
   {
@@ -338,12 +338,12 @@ const CHANGELOG_ENTRIES_EN: ChangelogEntry[] = [
   },
   {
     date: "2025-11-05",
-    title: "Improved NFT image display reliability (changed image delivery method)",
+    title: "Improved NFT image display reliability",
     description: "Improved NFT image handling by introducing Google Cloud Storage. Images are now more reliably displayed and content is more stable.",
   },
   {
     date: "2025-11-03",
-    title: "Improved DID/VC sync reliability (stabilized display data)",
+    title: "Improved DID/VC sync reliability",
     description: "Enhanced logging and automatic recovery for DID/VC sync processing, reducing display gaps from sync failures. Data visible to users is now more complete.",
   },
   {
@@ -353,8 +353,8 @@ const CHANGELOG_ENTRIES_EN: ChangelogEntry[] = [
   },
   {
     date: "2025-10-31",
-    title: "Extended default reservation deadline (operational change)",
-    description: "Changed the default reservation deadline from 1 day before to 2 days before the event date. Reservation period is now longer (affects reservation functionality).",
+    title: "Extended default reservation deadline",
+    description: "Changed the default reservation deadline from 1 day before to 2 days before the event date. Reservation period is now longer. This change affects reservation functionality.",
   },
   {
     date: "2025-10-31",
@@ -373,7 +373,7 @@ const CHANGELOG_ENTRIES_EN: ChangelogEntry[] = [
   },
   {
     date: "2025-10-30",
-    title: "Implemented multilingual support (Japanese/English)",
+    title: "Implemented multilingual support",
     description: "Added support for switching between Japanese and English throughout the application. Display language automatically switches based on user language settings.",
   },
   {
@@ -398,13 +398,13 @@ const CHANGELOG_ENTRIES_EN: ChangelogEntry[] = [
   },
   {
     date: "2025-10-29",
-    title: "Optimized authentication initialization (faster UI display)",
+    title: "Optimized authentication initialization",
     description: "Optimized authentication processing when server data is available, making screen displays faster.",
   },
   {
     date: "2025-10-29",
     title: "Added support for international phone number authentication",
-    description: "Authentication now works with phone numbers outside Japan. Supports international phone number format (e.g., +81).",
+    description: "Authentication now works with phone numbers outside Japan. Supports international phone number format such as +81.",
   },
   {
     date: "2025-10-25",
@@ -594,7 +594,7 @@ const CHANGELOG_ENTRIES_EN: ChangelogEntry[] = [
   {
     date: "2025-06-07",
     title: "Optimized activities page performance",
-    description: "Significantly reduced loading time for activities page (improved from about 5.9s to 3s). Page now displays faster.",
+    description: "Significantly reduced loading time for activities page from about 5.9s to 3s. Page now displays faster.",
   },
   {
     date: "2025-06-06",
@@ -608,7 +608,7 @@ const CHANGELOG_ENTRIES_EN: ChangelogEntry[] = [
   },
   {
     date: "2025-06-03",
-    title: "Optimized rendering (lazy loading and caching)",
+    title: "Optimized rendering",
     description: "Introduced lazy loading and caching to improve page display speed. Browsing is now smoother.",
   },
   {
