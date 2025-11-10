@@ -2,28 +2,38 @@
 
 import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import type { ChangelogEntry, UpdatePageProps } from "./types";
-import { CHANGELOG_ENTRIES } from "./entries";
+import { CHANGELOG_ENTRIES_JA, CHANGELOG_ENTRIES_EN } from "./entries";
 
 export type { ChangelogEntry, UpdatePageProps };
 
-const UpdatePage = ({ entries = CHANGELOG_ENTRIES }: UpdatePageProps) => {
+const UpdatePage = ({ entries }: UpdatePageProps) => {
   const t = useTranslations();
+  const locale = useLocale();
+
+  const localizedEntries = useMemo(
+    () => (locale.startsWith("ja") ? CHANGELOG_ENTRIES_JA : CHANGELOG_ENTRIES_EN),
+    [locale],
+  );
+
+  const activeEntries = entries ?? localizedEntries;
+
+  const title = t("users.settings.updatePageTitle");
 
   const headerConfig = useMemo(
     () => ({
-      title: t("users.settings.updatePageTitle"),
+      title,
       showLogo: false,
       showBackButton: true,
     }),
-    [t],
+    [title],
   );
   useHeaderConfig(headerConfig);
 
   const sortedEntries = useMemo(
-    () => [...entries].sort((a, b) => b.date.localeCompare(a.date)),
-    [entries],
+    () => [...activeEntries].sort((a, b) => b.date.localeCompare(a.date)),
+    [activeEntries],
   );
 
   return (
