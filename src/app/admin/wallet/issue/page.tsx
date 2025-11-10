@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +14,6 @@ import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 import { useTranslations } from "next-intl";
 
 const INT_LIMIT = 2000000000;
-const COMMENT_HISTORY_KEY = "commentHistory.issue";
 
 export default function IssuePointPage() {
   const t = useTranslations();
@@ -36,16 +35,8 @@ export default function IssuePointPage() {
   const [amount, setAmount] = useState<number | null>(null);
   const [displayValue, setDisplayValue] = useState<string>("");
   const [comment, setComment] = useState<string>("");
-  const [commentHistory, setCommentHistory] = useState<string[]>([]);
 
   const { issuePoint } = useTransactionMutations();
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(COMMENT_HISTORY_KEY);
-      setCommentHistory(raw ? JSON.parse(raw) : []);
-    } catch {}
-  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value;
@@ -78,14 +69,6 @@ export default function IssuePointPage() {
       });
 
       if (res.success) {
-        const val = comment.trim();
-        if (val) {
-          try {
-            const curr = JSON.parse(localStorage.getItem(COMMENT_HISTORY_KEY) ?? "[]") as string[];
-            const next = [val, ...curr.filter(v => v !== val)].slice(0, 5);
-            localStorage.setItem(COMMENT_HISTORY_KEY, JSON.stringify(next));
-          } catch {}
-        }
         track({
           name: "issue_point",
           params: { amount },
@@ -122,6 +105,8 @@ export default function IssuePointPage() {
               <Label className="text-label-md font-medium">{t("wallets.shared.transfer.commentLabel")}</Label>
               <div className="relative mt-3">
                 <Textarea
+                  name="comment-issue"
+                  autoComplete="on"
                   maxLength={100}
                   placeholder={t("wallets.shared.transfer.commentPlaceholderIssue")}
                   value={comment}
@@ -139,28 +124,6 @@ export default function IssuePointPage() {
                   {comment.length}/100
                 </div>
               </div>
-              {commentHistory.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {commentHistory.map((h, i) => (
-                    <Button
-                      key={i}
-                      type="button"
-                      size="sm"
-                      variant="secondary"
-                      onClick={() => {
-                        if (h.length > 100) {
-                          toast.error(t("wallets.shared.transfer.commentError"));
-                          return;
-                        }
-                        setComment(h);
-                      }}
-                      className="text-xs"
-                    >
-                      {h}
-                    </Button>
-                  ))}
-                </div>
-              )}
             </div>
           </section>
 

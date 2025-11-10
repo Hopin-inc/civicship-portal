@@ -8,8 +8,6 @@ import { toast } from "react-toastify";
 import { GqlUser } from "@/types/graphql";
 import { useTranslations } from "next-intl";
 
-const COMMENT_HISTORY_KEY = "commentHistory.donate";
-
 export function useDonateFlow(currentUser?: GqlUser | null, currentPoint?: bigint) {
   const t = useTranslations();
   const router = useRouter();
@@ -29,14 +27,6 @@ export function useDonateFlow(currentUser?: GqlUser | null, currentPoint?: bigin
       });
 
       if (res.success) {
-        const val = comment?.trim();
-        if (val) {
-          try {
-            const curr = JSON.parse(localStorage.getItem(COMMENT_HISTORY_KEY) ?? "[]") as string[];
-            const next = [val, ...curr.filter(v => v !== val)].slice(0, 5);
-            localStorage.setItem(COMMENT_HISTORY_KEY, JSON.stringify(next));
-          } catch {}
-        }
         track({
           name: "donate_point",
           params: {

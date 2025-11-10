@@ -16,7 +16,6 @@ import { useMemberWallets } from "@/hooks/members/useMemberWallets";
 import { useTranslations } from "next-intl";
 
 const DEFAULT_TAB: Tabs = Tabs.History;
-const COMMENT_HISTORY_KEY = "commentHistory.grant";
 const isValidTab = (tab: string): tab is Tabs => {
   return Object.values(Tabs).includes(tab as Tabs);
 };
@@ -58,14 +57,6 @@ export default function GrantPointStepperPage() {
       });
 
       if (res.success) {
-        const val = comment?.trim();
-        if (val) {
-          try {
-            const curr = JSON.parse(localStorage.getItem(COMMENT_HISTORY_KEY) ?? "[]") as string[];
-            const next = [val, ...curr.filter(v => v !== val)].slice(0, 5);
-            localStorage.setItem(COMMENT_HISTORY_KEY, JSON.stringify(next));
-          } catch {}
-        }
         track({
           name: "grant_point",
           params: {
@@ -142,7 +133,7 @@ export default function GrantPointStepperPage() {
           onBack={() => setSelectedUser(null)}
           onSubmit={handleGrantPoint}
           commentPlaceholder={t("wallets.shared.transfer.commentPlaceholderGrant")}
-          commentHistoryKey={COMMENT_HISTORY_KEY}
+          commentName="comment-grant"
         />
       )}
     </div>
