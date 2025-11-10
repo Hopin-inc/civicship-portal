@@ -43,7 +43,6 @@ const formatTransactionDescription = (
 // シンプルなトランザクション情報を取得する関数
 const getTransactionInfo = (
   transaction: GqlTransaction,
-  didPendingText: string,
   perspectiveWalletId?: string,
 ) => {
   const from = getNameFromWallet(transaction.fromWallet);
@@ -58,7 +57,7 @@ const getTransactionInfo = (
     isPositive = amount > 0;
   }
 
-  let didValue = didPendingText;
+  let didValue: string | null = null;
   if (perspectiveWalletId) {
     const counterpartyWallet =
       transaction.fromWallet?.id === perspectiveWalletId
@@ -67,12 +66,12 @@ const getTransactionInfo = (
     didValue =
       counterpartyWallet?.user?.didIssuanceRequests?.find(
         (req) => req?.status === GqlDidIssuanceStatus.Completed,
-      )?.didValue ?? didPendingText;
+      )?.didValue ?? null;
   } else {
     didValue =
       transaction.toWallet?.user?.didIssuanceRequests?.find(
         (req) => req?.status === GqlDidIssuanceStatus.Completed,
-      )?.didValue ?? didPendingText;
+      )?.didValue ?? null;
   }
 
   return {
@@ -118,7 +117,7 @@ export const TransactionCard = ({
 }: TransactionCardProps) => {
   const t = useTranslations();
   const formatDateTime = useLocaleDateTimeFormat();
-  const info = getTransactionInfo(transaction, t("transactions.did.pending"), perspectiveWalletId);
+  const info = getTransactionInfo(transaction, perspectiveWalletId);
   const { displayName, displayAction, to } = formatTransactionDescription(
     info.reason,
     info.from,
