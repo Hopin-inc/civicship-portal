@@ -4,6 +4,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "react-toastify";
 import { useTransactionMutations } from "@/app/admin/wallet/hooks/useTransactionMutations";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
@@ -40,6 +42,7 @@ export default function IssuePointPage() {
 
   const [amount, setAmount] = useState<number | null>(null);
   const [displayValue, setDisplayValue] = useState<string>("");
+  const [comment, setComment] = useState<string>("");
 
   const { issuePoint } = useTransactionMutations();
 
@@ -84,7 +87,7 @@ export default function IssuePointPage() {
     if (!amount || amount <= 0) return;
     try {
       const res = await issuePoint({
-        input: { transferPoints: amount },
+        input: { transferPoints: amount, comment: comment.trim() || undefined },
         permission: { communityId },
       });
 
@@ -131,6 +134,29 @@ export default function IssuePointPage() {
                   {formatAsManUnit(value)}
                 </Button>
               ))}
+            </div>
+          </div>
+
+          <div className="w-full mt-6">
+            <Label className="text-label-md font-medium">{t("wallets.shared.transfer.commentLabel")}</Label>
+            <div className="relative mt-3">
+              <Textarea
+                maxLength={100}
+                placeholder={t("wallets.shared.transfer.commentPlaceholder")}
+                value={comment}
+                onChange={(e) => {
+                  const newValue = e.target.value;
+                  if (newValue.length > 100) {
+                    toast.error(t("wallets.shared.transfer.commentError"));
+                    return;
+                  }
+                  setComment(newValue);
+                }}
+                className="focus:outline-none focus:ring-0 shadow-none min-h-[120px] pr-12"
+              />
+              <div className="absolute bottom-2 right-2 text-xs text-muted-foreground">
+                {comment.length}/100
+              </div>
             </div>
           </div>
         </div>
