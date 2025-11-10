@@ -34,10 +34,14 @@ export const formatTransactionDescription = (
     const direction = isOutgoing ? "to" : "from";
 
     if (locale === 'en') {
+      const baseKey = direction === 'from' 
+        ? `transactions.action.${actionType}.from.default`
+        : `transactions.action.${actionType}.${direction}`;
+      
       const combinedKey =
         !isOutgoing && useReceivedPhrasing
           ? `transactions.action.${actionType}.from.received`
-          : `transactions.action.${actionType}.${direction}`;
+          : baseKey;
 
       return {
         displayName: null,
@@ -63,7 +67,7 @@ export const formatTransactionDescription = (
   if (locale === 'en') {
     return {
       displayName: null,
-      displayAction: t(`transactions.action.${actionType}.from`, { name: from }),
+      displayAction: t(`transactions.action.${actionType}.from.default`, { name: from }),
       to: to,
     };
   }
