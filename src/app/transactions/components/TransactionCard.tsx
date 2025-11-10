@@ -95,14 +95,14 @@ export const TransactionCard = ({ transaction, image }: TransactionCardProps) =>
     info.reason !== GqlTransactionReason.Onboarding;
 
   return (
-    <div className="flex items-start gap-3 py-4">
+    <div className="flex items-start gap-3 py-6">
       <Avatar className="h-10 w-10 shrink-0">
         <AvatarImage src={image ?? PLACEHOLDER_IMAGE} alt="user" />
         <AvatarFallback>U</AvatarFallback>
       </Avatar>
 
       <div className="flex flex-col text-left min-w-0 flex-1 gap-1.5">
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center justify-between">
           <span className="flex items-center min-w-0 flex-1 overflow-hidden">
             {displayName && <span className="text-label-sm font-bold truncate">{displayName}</span>}
             {displayAction && (
@@ -116,7 +116,7 @@ export const TransactionCard = ({ transaction, image }: TransactionCardProps) =>
         </div>
 
         {hasDestination && (
-          <p className="flex items-center gap-1.5 mt-1 text-label-xs text-muted-foreground">
+          <p className="flex items-center gap-0.5 mt-1 text-label-xs text-muted-foreground">
             <span className="truncate">{statusLabelElement}</span>
             <span className="text-label-xs font-medium text-caption truncate">{to}</span>
           </p>

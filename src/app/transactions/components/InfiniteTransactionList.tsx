@@ -18,7 +18,7 @@ export const InfiniteTransactionList = ({ initialTransactions }: InfiniteTransac
   });
 
   return (
-    <div className="divide-y-4 divide-zinc-100">
+    <div className="divide-y-8 divide-zinc-100">
       {transactions.map((transaction) => {
         const image = getFromWalletImage(transaction);
         return <TransactionCard key={transaction.id} transaction={transaction} image={image} />;
