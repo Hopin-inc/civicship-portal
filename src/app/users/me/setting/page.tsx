@@ -35,7 +35,7 @@ export default function SettingPage() {
       <PromiseSection />
       <h2 className="text-sm mb-2 font-bold mt-6">{t("users.settings.dangerSectionTitle")}</h2>
       <DangerSection />
-      <h2 className="text-sm mb-2 font-bold mt-6">{t("users.settings.dangerSectionTitle")}</h2>
+      <h2 className="text-sm mb-2 font-bold mt-6">{t("users.settings.updateSectionTitle")}</h2>
       <UpdateSection />
     </div>
   );

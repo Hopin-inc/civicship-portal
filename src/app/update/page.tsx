@@ -1,6 +1,5 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
 import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useTranslations } from "next-intl";
@@ -14,7 +13,7 @@ const UpdatePage = ({ entries = CHANGELOG_ENTRIES }: UpdatePageProps) => {
 
   const headerConfig = useMemo(
     () => ({
-      title: t("users.settings.pageTitle"),
+      title: t("update.pageTitle"),
       showLogo: false,
       showBackButton: true,
     }),
@@ -31,18 +30,15 @@ const UpdatePage = ({ entries = CHANGELOG_ENTRIES }: UpdatePageProps) => {
     <section className="px-6 py-4 md:py-4">
       <div className="mx-auto max-w-2xl">
         <div className="space-y-6 md:space-y-10">
-          {sortedEntries.map((entry) => (
-            <article key={entry.version} className="space-y-4">
+          {sortedEntries.map((entry, index) => (
+            <article key={entry.date + index} className="space-y-4">
               {/* Header */}
               <div className="flex flex-wrap items-center gap-2">
-                <Badge variant="secondary" className="text-xs">
-                  {entry.version}
-                </Badge>
                 <span className="text-xs text-muted-foreground">{entry.date}</span>
               </div>
 
               {/* Title */}
-              <h2 className="text-title-md font-semibold md:text-md">{entry.title}</h2>
+              <h2 className="text-title-md font-semibold md:text-lg">{entry.title}</h2>
 
               {/* Description */}
               <p className="text-xs text-muted-foreground md:text-xs">{entry.description}</p>

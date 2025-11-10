@@ -1,5 +1,4 @@
 export type ChangelogEntry = {
-  version: string;
   date: string;
   title: string;
   description: string;
