@@ -81,62 +81,69 @@ export default function IssuePointPage() {
     }
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleIssuePoint();
+  };
+
   return (
     <>
       <main className="flex justify-center px-4 pt-2">
         <div className="flex flex-col items-center space-y-6 max-w-xl w-full">
-          <section className="w-full">
-            <div>
-              <Label className="text-label-md font-medium">{t("wallets.shared.transfer.amountLabel")}</Label>
-              <span className="text-label-xs rounded-full px-2 py-[2px] ml-2 bg-primary-foreground text-primary font-bold">
-                {t("wallets.shared.transfer.required")}
-              </span>
-            </div>
-            <Input
-              type="text"
-              placeholder="1000pt"
-              value={displayValue}
-              onChange={handleInputChange}
-              inputMode="numeric"
-              className="mt-3 focus:outline-none focus:ring-0 shadow-none"
-            />
+          <form autoComplete="on" onSubmit={handleSubmit} className="w-full">
+            <section className="w-full">
+              <div>
+                <Label className="text-label-md font-medium">{t("wallets.shared.transfer.amountLabel")}</Label>
+                <span className="text-label-xs rounded-full px-2 py-[2px] ml-2 bg-primary-foreground text-primary font-bold">
+                  {t("wallets.shared.transfer.required")}
+                </span>
+              </div>
+              <Input
+                type="text"
+                placeholder="1000pt"
+                value={displayValue}
+                onChange={handleInputChange}
+                inputMode="numeric"
+                className="mt-3 focus:outline-none focus:ring-0 shadow-none"
+              />
 
-            <div className="mt-6">
-              <Label className="text-label-md font-medium">{t("wallets.shared.transfer.commentLabel")}</Label>
-              <div className="relative mt-3">
-                <Textarea
-                  name="comment-issue"
-                  autoComplete="on"
-                  maxLength={100}
-                  placeholder={t("wallets.shared.transfer.commentPlaceholderIssue")}
-                  value={comment}
-                  onChange={(e) => {
-                    const newValue = e.target.value;
-                    if (newValue.length > 100) {
-                      toast.error(t("wallets.shared.transfer.commentError"));
-                      return;
-                    }
-                    setComment(newValue);
-                  }}
-                  className="focus:outline-none focus:ring-0 shadow-none min-h-[120px] pr-12"
-                />
-                <div className="absolute bottom-2 right-2 text-xs text-muted-foreground">
-                  {comment.length}/100
+              <div className="mt-6">
+                <Label className="text-label-md font-medium">{t("wallets.shared.transfer.commentLabel")}</Label>
+                <div className="relative mt-3">
+                  <Textarea
+                    name="comment-issue"
+                    autoComplete="on"
+                    maxLength={100}
+                    placeholder={t("wallets.shared.transfer.commentPlaceholderIssue")}
+                    value={comment}
+                    onChange={(e) => {
+                      const newValue = e.target.value;
+                      if (newValue.length > 100) {
+                        toast.error(t("wallets.shared.transfer.commentError"));
+                        return;
+                      }
+                      setComment(newValue);
+                    }}
+                    className="focus:outline-none focus:ring-0 shadow-none min-h-[120px] pr-12"
+                  />
+                  <div className="absolute bottom-2 right-2 text-xs text-muted-foreground">
+                    {comment.length}/100
+                  </div>
                 </div>
               </div>
-            </div>
-          </section>
+            </section>
 
-          <div className="flex flex-col gap-2 w-full mt-6">
-            <Button
-              size="lg"
-              className="w-full"
-              onClick={handleIssuePoint}
-              disabled={!amount || amount <= 0 || amount > INT_LIMIT}
-            >
-              {t("adminWallet.issue.submit")}
-            </Button>
-          </div>
+            <div className="flex flex-col gap-2 w-full mt-6">
+              <Button
+                type="submit"
+                size="lg"
+                className="w-full"
+                disabled={!amount || amount <= 0 || amount > INT_LIMIT}
+              >
+                {t("adminWallet.issue.submit")}
+              </Button>
+            </div>
+          </form>
         </div>
       </main>
     </>

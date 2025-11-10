@@ -99,6 +99,13 @@ function TransferInputStep({
     setDisplayValue(raw);
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (amount && amount > 0 && amount <= currentPoint) {
+      onSubmit(amount, comment.trim() || undefined);
+    }
+  };
+
   return (
     <>
       <main className="flex items-center justify-center px-4">
@@ -117,64 +124,66 @@ function TransferInputStep({
               </div>
             </div>
           </Card>
-          <section className="w-full">
-            <div>
-              <Label className="text-label-md font-medium">{amountLabel ?? t("wallets.shared.transfer.amountLabel")}</Label>
-              <span className="text-label-xs rounded-full px-2 py-[2px] ml-2 bg-primary-foreground text-primary font-bold">
-                {t("wallets.shared.transfer.required")}
-              </span>
-            </div>
-            <Input
-                type="text"
-                inputMode="numeric"
-                placeholder="1000pt"
-                value={displayValue}
-                onChange={handleInputChange}
-                className="mt-3 focus:outline-none focus:ring-0 shadow-none"
-            />
-            <div className="text-sm text-muted-foreground text-left mt-3">
-              {t("wallets.shared.transfer.balance")} {currentPoint.toLocaleString()} pt
-            </div>
-            <div className="mt-6">
-              <Label className="text-label-md font-medium">{t("wallets.shared.transfer.commentLabel")}</Label>
-              <div className="relative mt-3">
-                <Textarea
-                  name={commentName}
-                  autoComplete="on"
-                  maxLength={100}
-                  placeholder={commentPlaceholder ?? t("wallets.shared.transfer.commentPlaceholder")}
-                  value={comment}
-                  onChange={(e) => {
-                    const newValue = e.target.value;
-                    if (newValue.length > 100) {
-                      toast.error(t("wallets.shared.transfer.commentError"));
-                      return;
-                    }
-                    setComment(newValue);
-                  }}
-                  className="focus:outline-none focus:ring-0 shadow-none min-h-[120px] pr-12"
-                />
-                <div className="absolute bottom-2 right-2 text-xs text-muted-foreground">
-                  {comment.length}/100
+          <form autoComplete="on" onSubmit={handleSubmit} className="w-full">
+            <section className="w-full">
+              <div>
+                <Label className="text-label-md font-medium">{amountLabel ?? t("wallets.shared.transfer.amountLabel")}</Label>
+                <span className="text-label-xs rounded-full px-2 py-[2px] ml-2 bg-primary-foreground text-primary font-bold">
+                  {t("wallets.shared.transfer.required")}
+                </span>
+              </div>
+              <Input
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="1000pt"
+                  value={displayValue}
+                  onChange={handleInputChange}
+                  className="mt-3 focus:outline-none focus:ring-0 shadow-none"
+              />
+              <div className="text-sm text-muted-foreground text-left mt-3">
+                {t("wallets.shared.transfer.balance")} {currentPoint.toLocaleString()} pt
+              </div>
+              <div className="mt-6">
+                <Label className="text-label-md font-medium">{t("wallets.shared.transfer.commentLabel")}</Label>
+                <div className="relative mt-3">
+                  <Textarea
+                    name={commentName}
+                    autoComplete="on"
+                    maxLength={100}
+                    placeholder={commentPlaceholder ?? t("wallets.shared.transfer.commentPlaceholder")}
+                    value={comment}
+                    onChange={(e) => {
+                      const newValue = e.target.value;
+                      if (newValue.length > 100) {
+                        toast.error(t("wallets.shared.transfer.commentError"));
+                        return;
+                      }
+                      setComment(newValue);
+                    }}
+                    className="focus:outline-none focus:ring-0 shadow-none min-h-[120px] pr-12"
+                  />
+                  <div className="absolute bottom-2 right-2 text-xs text-muted-foreground">
+                    {comment.length}/100
+                  </div>
                 </div>
               </div>
+            </section>
+            
+            <div className="flex flex-col gap-2 w-full mt-6">
+              <Button
+                type="submit"
+                disabled={
+                  !amount || amount <= 0 || amount > currentPoint || isLoading || amount > INT_LIMIT
+                }
+                className="w-full"
+              >
+                {finalSubmitLabel}
+              </Button>
+              <Button type="button" variant="text" size="sm" onClick={onBack} className="w-full">
+                {finalBackLabel}
+              </Button>
             </div>
-          </section>
-          
-          <div className="flex flex-col gap-2 w-full mt-6">
-            <Button
-              onClick={() => amount && amount > 0 && amount <= currentPoint && onSubmit(amount, comment.trim() || undefined)}
-              disabled={
-                !amount || amount <= 0 || amount > currentPoint || isLoading || amount > INT_LIMIT
-              }
-              className="w-full"
-            >
-              {finalSubmitLabel}
-            </Button>
-            <Button variant="text" size="sm" onClick={onBack} className="w-full">
-              {finalBackLabel}
-            </Button>
-          </div>
+          </form>
         </div>
       </main>
     </>
