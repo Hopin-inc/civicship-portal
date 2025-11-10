@@ -2,7 +2,6 @@
 
 import { formatCurrency, getNameFromWallet, mapReasonToAction } from "@/utils/transaction";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card } from "@/components/ui/card";
 import { GqlTransaction, GqlTransactionReason } from "@/types/graphql";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { useTranslations } from "next-intl";
@@ -13,25 +12,26 @@ interface TransactionCardProps {
   image?: string;
 }
 
-const getStatusLabel = (reason: GqlTransactionReason, t: ReturnType<typeof useTranslations>) => {
+const getStatusLabelText = (
+  reason: GqlTransactionReason,
+  t: ReturnType<typeof useTranslations>,
+) => {
   switch (reason) {
     case GqlTransactionReason.Donation:
-      return <span className="text-label-xs font-medium bg-green-100 text-green-700 py-1 px-2 rounded-full">{t("transactions.status.donation")}</span>;
+      return t("transactions.status.donation");
     case GqlTransactionReason.Grant:
-      return <span className="text-label-xs font-medium  py-1 px-2 bg-blue-100 text-blue-700 rounded-full">{t("transactions.status.grant")}</span>;
+      return t("transactions.status.grant");
     case GqlTransactionReason.PointReward:
-      return <span className="text-label-xs font-medium bg-green-100 text-green-700 py-1 px-2 rounded-full">{t("transactions.status.pay")}</span>;
     case GqlTransactionReason.TicketPurchased:
-      return <span className="text-label-xs font-medium bg-green-100 text-green-700 py-1 px-2 rounded-full">{t("transactions.status.pay")}</span>;
-    case GqlTransactionReason.TicketRefunded:
-      return <span className="text-label-xs font-medium bg-red-100 text-red-700 py-1 px-2 rounded-full">{t("transactions.status.return")}</span>;
     case GqlTransactionReason.OpportunityReservationCreated:
-      return <span className="text-label-xs font-medium bg-green-100 text-green-700 py-1 px-2 rounded-full">{t("transactions.status.pay")}</span>;
+      return t("transactions.status.pay");
+    case GqlTransactionReason.TicketRefunded:
+      return t("transactions.status.return");
     case GqlTransactionReason.OpportunityReservationCanceled:
     case GqlTransactionReason.OpportunityReservationRejected:
-      return <span className="text-label-xs font-medium bg-red-100 text-red-700 py-1 px-2 rounded-full">{t("transactions.status.refund")}</span>;
+      return t("transactions.status.refund");
     default:
-      return <span className="text-label-xs font-medium bg-zinc-100 text-zinc-700 py-1 px-2 rounded-full">{t("transactions.status.default")}</span>;
+      return t("transactions.status.default");
   }
 };
 
@@ -39,29 +39,32 @@ const formatTransactionDescription = (
   reason: GqlTransactionReason,
   from: string,
   to: string,
-  t: ReturnType<typeof useTranslations>
+  t: ReturnType<typeof useTranslations>,
 ): { displayName: string | null; displayAction: string | null; to: string } => {
   const mapping = mapReasonToAction(reason);
 
   if (mapping.specialName) {
-    return { displayName: null, displayAction: t(`transactions.name.${mapping.specialName}`), to: to };
+    return {
+      displayName: null,
+      displayAction: t(`transactions.name.${mapping.specialName}`),
+      to: to,
+    };
   }
 
   const actionType = mapping.actionType!;
-  return { 
-    displayName: t(`transactions.parts.action.${actionType}.from.name`, { name: from }), 
+  return {
+    displayName: t(`transactions.parts.action.${actionType}.from.name`, { name: from }),
     displayAction: t(`transactions.parts.action.${actionType}.from.action`),
-    to: to 
+    to: to,
   };
 };
-
 
 // シンプルなトランザクション情報を取得する関数
 const getTransactionInfo = (transaction: GqlTransaction, didPendingText: string) => {
   const from = getNameFromWallet(transaction.fromWallet);
   const to = getNameFromWallet(transaction.toWallet);
   const amount = Math.abs(transaction.fromPointChange ?? 0);
-  
+
   return {
     from,
     to,
@@ -69,51 +72,66 @@ const getTransactionInfo = (transaction: GqlTransaction, didPendingText: string)
     reason: transaction.reason,
     comment: transaction.comment ?? "",
     transferredAt: transaction.createdAt ? new Date(transaction.createdAt).toISOString() : "",
-    didValue: transaction.toWallet?.user?.didIssuanceRequests?.find(req => req?.status === "COMPLETED")?.didValue ?? didPendingText,
+    didValue:
+      transaction.toWallet?.user?.didIssuanceRequests?.find((req) => req?.status === "COMPLETED")
+        ?.didValue ?? didPendingText,
   };
 };
 
 export const TransactionCard = ({ transaction, image }: TransactionCardProps) => {
-    const t = useTranslations();
-    const formatDateTime = useLocaleDateTimeFormat();
-    const info = getTransactionInfo(transaction, t("transactions.did.pending"));
-    const { displayName, displayAction, to } = formatTransactionDescription(info.reason, info.from, info.to, t);
-    const statusLabelElement = getStatusLabel(info.reason, t);
-    const hasDestination = to && info.reason !== GqlTransactionReason.PointIssued && info.reason !== GqlTransactionReason.Onboarding;
-    
-    return (
-        <Card className="px-4 py-4 bg-white">
-          <div className="flex items-start gap-3">
-            <Avatar className="h-10 w-10">
-              <AvatarImage src={image ?? PLACEHOLDER_IMAGE} alt="user" />
-              <AvatarFallback>U</AvatarFallback>
-            </Avatar>
-            <div className="flex flex-col text-left min-w-0 flex-1">
-              <div className="flex items-start justify-between">
-                <span className="flex items-center truncate whitespace-nowrap overflow-hidden">
-                  {displayName && <span className="text-label-sm font-bold">{displayName}</span>}
-                  {displayAction && <span className="text-label-xs font-bold">{displayAction}</span>}
-                </span>
-                <div className="text-label-sm font-bold shrink-0 ml-4 text-foreground">
-                  {formatCurrency(info.amount)}pt
-                </div>
-              </div>
-              {hasDestination && (
-                <p className="flex items-center gap-2 my-2">
-                    {statusLabelElement}
-                    <span className="text-label-xs font-medium text-caption">{to}</span>
-                </p>
-              )}
-              {info.comment && (
-                <span className="text-label-xs text-caption bg-background-hover leading-relaxed block p-2 rounded-sm">
-                  {info.comment}
-                </span>
-              )}
-              <span className="text-label-xs text-muted-foreground mt-2 block">
-                {formatDateTime(info.transferredAt)}
-              </span>
-            </div>
+  const t = useTranslations();
+  const formatDateTime = useLocaleDateTimeFormat();
+  const info = getTransactionInfo(transaction, t("transactions.did.pending"));
+  const { displayName, displayAction, to } = formatTransactionDescription(
+    info.reason,
+    info.from,
+    info.to,
+    t,
+  );
+  const statusLabelElement = getStatusLabelText(info.reason, t);
+  const hasDestination =
+    to &&
+    info.reason !== GqlTransactionReason.PointIssued &&
+    info.reason !== GqlTransactionReason.Onboarding;
+
+  return (
+    <div className="flex items-start gap-3 py-4">
+      <Avatar className="h-10 w-10 shrink-0">
+        <AvatarImage src={image ?? PLACEHOLDER_IMAGE} alt="user" />
+        <AvatarFallback>U</AvatarFallback>
+      </Avatar>
+
+      <div className="flex flex-col text-left min-w-0 flex-1 gap-1.5">
+        <div className="flex items-center justify-between gap-2">
+          <span className="flex items-center min-w-0 flex-1 overflow-hidden">
+            {displayName && <span className="text-label-sm font-bold truncate">{displayName}</span>}
+            {displayAction && (
+              <span className="text-label-xs font-bold ml-1 shrink-0">{displayAction}</span>
+            )}
+          </span>
+
+          <div className="text-label-sm font-bold shrink-0 ml-2 text-foreground">
+            {formatCurrency(info.amount)}pt
           </div>
-        </Card>
-      );
+        </div>
+
+        {hasDestination && (
+          <p className="flex items-center gap-1.5 mt-1 text-label-xs text-muted-foreground">
+            <span className="truncate">{statusLabelElement}</span>
+            <span className="text-label-xs font-medium text-caption truncate">{to}</span>
+          </p>
+        )}
+
+        {info.comment && (
+          <p className="text-label-xs text-foreground leading-relaxed mt-2 whitespace-pre-line break-words">
+            {info.comment}
+          </p>
+        )}
+
+        <span className="text-label-xs text-muted-foreground mt-1 block">
+          {formatDateTime(info.transferredAt)}
+        </span>
+      </div>
+    </div>
+  );
 };

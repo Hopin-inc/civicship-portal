@@ -5,7 +5,7 @@ import { GqlTransactionsConnection } from "@/types/graphql";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { useInfiniteTransactions } from "@/hooks/transactions/useInfiniteTransactions";
 import { getServerCommunityTransactionsWithCursor } from "@/hooks/transactions/server-community-transactions";
-import { getFromWalletImage, getToWalletImage } from "@/app/admin/wallet/data/presenter";
+import { getFromWalletImage } from "@/app/admin/wallet/data/presenter";
 
 interface InfiniteTransactionListProps {
   initialTransactions: GqlTransactionsConnection;
@@ -18,19 +18,15 @@ export const InfiniteTransactionList = ({ initialTransactions }: InfiniteTransac
   });
 
   return (
-    <div className="space-y-4">
+    <div className="divide-y-4 divide-zinc-100">
       {transactions.map((transaction) => {
         const image = getFromWalletImage(transaction);
-        return (
-          <TransactionCard key={transaction.id} transaction={transaction} image={image} />
-        );
+        return <TransactionCard key={transaction.id} transaction={transaction} image={image} />;
       })}
-      
+
       {hasNextPage && (
         <div ref={loadMoreRef} className="flex justify-center py-4">
-          {loading && (
-            <LoadingIndicator fullScreen={false} />
-          )}
+          {loading && <LoadingIndicator fullScreen={false} />}
         </div>
       )}
     </div>
