@@ -18,7 +18,7 @@ const fallbackMetadata: Metadata = {
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id } = params;
+  const { id } = await params;
   const user = await fetchPublicUserServer(id);
 
   if (!user) return fallbackMetadata;
@@ -51,7 +51,8 @@ export default async function Layout({
   children: React.ReactNode;
   params: { id: string };
 }) {
-  const gqlUser = await fetchPublicUserServer(params.id);
+  const { id } = await params;
+  const gqlUser = await fetchPublicUserServer(id);
 
   if (!gqlUser) {
     notFound();
