@@ -8,6 +8,7 @@ import {
 import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useTranslations } from "next-intl";
+import UpdateSection from "@/app/users/features/settings/components/UpdateSection";
 
 export default function SettingPage() {
   const t = useTranslations();
@@ -22,7 +23,7 @@ export default function SettingPage() {
   useHeaderConfig(headerConfig);
 
   return (
-    <div className="container mx-auto px-6 py-6 max-w-3xl">
+    <div className="container mx-auto px-6 pt-6">
       <h2 className="text-sm mb-2 font-bold">{t("users.settings.accountSectionTitle")}</h2>
       <AccountSection />
       <h2 className="text-sm mb-2 font-bold mt-6">{t("users.settings.settingsSectionTitle")}</h2>
@@ -34,6 +35,8 @@ export default function SettingPage() {
       <PromiseSection />
       <h2 className="text-sm mb-2 font-bold mt-6">{t("users.settings.dangerSectionTitle")}</h2>
       <DangerSection />
+      <h2 className="text-sm mb-2 font-bold mt-6">{t("users.settings.updateSectionTitle")}</h2>
+      <UpdateSection />
     </div>
   );
 }
