@@ -4,16 +4,13 @@ import { useInfiniteMembers } from "../hooks/useInfiniteMembers";
 import { groupMembersByJoinMonth } from "../presenters/presentMember";
 import { MemberListGroupedView } from "./MemberListGroupedView";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { GqlMembershipsConnection } from "@/types/graphql";
 
-interface MembersTabProps {
-  initialMembers: GqlMembershipsConnection;
-}
+export function MembersTab() {
+  const { members, hasNextPage, loading, loadMoreRef } = useInfiniteMembers();
 
-export function MembersTab({ initialMembers }: MembersTabProps) {
-  const { members, hasNextPage, loading, loadMoreRef } = useInfiniteMembers({
-    initialMembers,
-  });
+  if (loading && members.length === 0) {
+    return <LoadingIndicator fullScreen={false} />;
+  }
 
   const groupedMembers = groupMembersByJoinMonth(members);
 

@@ -4,17 +4,16 @@ import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TransactionsTab } from "./TransactionsTab";
 import { MembersTab } from "./MembersTab";
-import { GqlTransactionsConnection, GqlMembershipsConnection } from "@/types/graphql";
+import { GqlTransactionsConnection } from "@/types/graphql";
 import { useTranslations } from "next-intl";
 
 export type CommunityTabType = "transactions" | "members";
 
 interface CommunityTabsProps {
   initialTransactions: GqlTransactionsConnection;
-  initialMembers: GqlMembershipsConnection;
 }
 
-export function CommunityTabs({ initialTransactions, initialMembers }: CommunityTabsProps) {
+export function CommunityTabs({ initialTransactions }: CommunityTabsProps) {
   const t = useTranslations();
   const [activeTab, setActiveTab] = useState<CommunityTabType>("transactions");
 
@@ -38,7 +37,7 @@ export function CommunityTabs({ initialTransactions, initialMembers }: Community
       </TabsContent>
 
       <TabsContent value="members">
-        <MembersTab initialMembers={initialMembers} />
+        <MembersTab />
       </TabsContent>
     </Tabs>
   );
