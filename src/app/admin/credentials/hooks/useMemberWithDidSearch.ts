@@ -55,6 +55,17 @@ export function useMemberWithDidSearch(
 
   const handleFetchMore = async () => {
     if (!hasNextPage || !enablePagination) return;
+    
+    if (!endCursor || typeof endCursor !== "string") {
+      console.warn("Invalid endCursor:", endCursor);
+      return;
+    }
+    
+    const cursorParts = endCursor.split("_");
+    if (cursorParts.length !== 2) {
+      console.warn("Invalid endCursor format:", endCursor);
+      return;
+    }
 
     await fetchMore({
       variables: {
@@ -64,7 +75,7 @@ export function useMemberWithDidSearch(
         },
         withWallets: true,
         withDidIssuanceRequests: true,
-        cursor: { userId: endCursor?.split("_")[0], communityId: endCursor?.split("_")[1] },
+        cursor: { userId: cursorParts[0], communityId: cursorParts[1] },
         first: pageSize,
       },
       updateQuery: (prev, { fetchMoreResult }) => {

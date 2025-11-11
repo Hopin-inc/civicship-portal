@@ -1,4 +1,4 @@
-import { useRef, useEffect, useLayoutEffect } from 'react';
+import { useRef, useEffect, useLayoutEffect, useCallback } from 'react';
 
 interface UseInfiniteScrollProps {
   hasMore: boolean;
@@ -15,13 +15,12 @@ export const useInfiniteScroll = ({
     onLoadMore,
     threshold = 0.1,
   }: UseInfiniteScrollProps) => {
-  const observer = useRef<IntersectionObserver | null>(null);
-  const targetRef = useRef<HTMLDivElement | null>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
   
   const hasMoreRef = useRef(hasMore);
   const isLoadingRef = useRef(isLoading);
   const onLoadMoreRef = useRef(onLoadMore);
-  const pendingRef = useRef(false); // Prevent duplicate calls while loading
+  const pendingRef = useRef(false);
 
   useIsomorphicLayoutEffect(() => {
     hasMoreRef.current = hasMore;
@@ -30,10 +29,20 @@ export const useInfiniteScroll = ({
   });
 
   useEffect(() => {
-    const el = targetRef.current;
-    if (!el) return;
+    if (!isLoading) {
+      pendingRef.current = false;
+    }
+  }, [isLoading]);
 
-    observer.current = new IntersectionObserver(
+  const setTargetRef = useCallback((node: HTMLDivElement | null) => {
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+      observerRef.current = null;
+    }
+
+    if (!node) return;
+
+    const observer = new IntersectionObserver(
       ([entry]) => {
         if (
           entry.isIntersecting &&
@@ -48,19 +57,9 @@ export const useInfiniteScroll = ({
       { threshold }
     );
 
-    observer.current.observe(el);
+    observer.observe(node);
+    observerRef.current = observer;
+  }, [threshold]);
 
-    return () => {
-      observer.current?.unobserve(el);
-      observer.current?.disconnect();
-    };
-  }, [threshold]); // Only depend on threshold, not hasMore/isLoading/onLoadMore
-
-  useEffect(() => {
-    if (!isLoading) {
-      pendingRef.current = false;
-    }
-  }, [isLoading]);
-
-  return targetRef;
+  return setTargetRef;
 };
