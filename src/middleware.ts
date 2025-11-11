@@ -94,6 +94,9 @@ export function middleware(request: NextRequest) {
     `'self'`,
     "https://www.google.com",
     "https://www.gstatic.com",
+    ...(process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+      ? [`https://${process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN}`]
+      : []),
   ].join(" ");
 
   const res = NextResponse.next();
