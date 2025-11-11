@@ -7,7 +7,7 @@ import {
   GqlUser,
   useGetMembershipListQuery,
 } from "@/types/graphql";
-import { ApolloError } from "@apollo/client";
+import { ApolloError, NetworkStatus } from "@apollo/client";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
@@ -34,7 +34,7 @@ export function useMemberWithDidSearch(
   const enablePagination = options?.enablePagination ?? false;
   const pageSize = options?.pageSize ?? 20;
 
-  const { data, loading, fetchMore, refetch, error } = useGetMembershipListQuery({
+  const { data, loading, fetchMore, refetch, error, networkStatus } = useGetMembershipListQuery({
     variables: {
       filter: {
         ...(searchQuery && { keyword: searchQuery }),
@@ -44,12 +44,14 @@ export function useMemberWithDidSearch(
       withDidIssuanceRequests: true,
       first: enablePagination ? pageSize : undefined,
     },
-    fetchPolicy: "cache-first", // ← feed構成と統一
+    fetchPolicy: "cache-first",
+    notifyOnNetworkStatusChange: true,
   });
 
   const memberships = data?.memberships ?? fallbackConnection;
   const endCursor = memberships.pageInfo?.endCursor;
   const hasNextPage = memberships.pageInfo?.hasNextPage ?? false;
+  const isFetchingMore = networkStatus === NetworkStatus.fetchMore;
 
   const handleFetchMore = async () => {
     if (!hasNextPage || !enablePagination) return;
@@ -89,7 +91,7 @@ export function useMemberWithDidSearch(
 
   const loadMoreRef = useInfiniteScroll({
     hasMore: hasNextPage,
-    isLoading: loading,
+    isLoading: loading || isFetchingMore,
     onLoadMore: handleFetchMore,
   });
 
@@ -126,6 +128,7 @@ export function useMemberWithDidSearch(
     loading,
     error: error as ApolloError | undefined,
     hasNextPage,
+    isFetchingMore,
     loadMoreRef,
     refetch,
   };
