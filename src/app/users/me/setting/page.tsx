@@ -12,13 +12,16 @@ import UpdateSection from "@/app/users/features/settings/components/UpdateSectio
 
 export default function SettingPage() {
   const t = useTranslations();
+
+  const title = t("users.settings.pageTitle");
+
   const headerConfig = useMemo(
     () => ({
-      title: t("users.settings.pageTitle"),
+      title,
       showLogo: false,
       showBackButton: true,
     }),
-    [t],
+    [title],
   );
   useHeaderConfig(headerConfig);
 
