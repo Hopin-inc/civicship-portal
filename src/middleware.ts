@@ -46,17 +46,21 @@ export function middleware(request: NextRequest) {
 
   const scriptSrc = [
     `'self'`,
-    `'nonce-${nonce}'`, // ← インラインを許可する唯一の手段
+    `'nonce-${nonce}'`,
     "https://static.line-scdn.net",
     "https://www.google.com",
     "https://www.googletagmanager.com",
-    ...(isDev ? [`'unsafe-eval'`] : []), // ← 開発のみ許可（本番は絶対NG）
+    "https://apis.google.com",
+    "https://maps.googleapis.com",
+    "https://www.gstatic.com",
+    ...(isDev ? [`'unsafe-eval'`] : []),
   ].join(" ");
 
   const styleSrcElem = [
     `'self'`,
     `'nonce-${nonce}'`,
     "https://fonts.googleapis.com",
+    `'unsafe-inline'`,
   ].join(" ");
 
   const styleSrcAttr = [
@@ -83,12 +87,15 @@ export function middleware(request: NextRequest) {
     "https://firebase.googleapis.com",
     "https://firebaseinstallations.googleapis.com",
     "https://www.google-analytics.com",
+    "https://analytics.google.com",
+    "https://region1.google-analytics.com",
     "https://www.googletagmanager.com",
   ].join(" ");
 
   const frameSrc = [
     `'self'`,
     "https://www.google.com",
+    "https://www.gstatic.com",
   ].join(" ");
 
   const res = NextResponse.next();
