@@ -3,7 +3,6 @@
 import React from "react";
 import { GqlRole, GqlUser } from "@/types/graphql";
 import { MemberRow } from "./MemberRow";
-import LoadingIndicator from "@/components/shared/LoadingIndicator";
 
 interface Member extends GqlUser {
   role: GqlRole;
@@ -16,7 +15,7 @@ interface MembersListProps {
   currentUserRole?: GqlRole;
   hasNextPage: boolean;
   isFetchingMore: boolean;
-  loadMoreRef: React.RefObject<HTMLDivElement>;
+  loadMoreRef: React.Ref<HTMLDivElement>;
   onRoleChange: (userId: string, userName: string, newRole: GqlRole) => void;
 }
 
