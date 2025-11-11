@@ -1,6 +1,4 @@
 {
-  "community.title": "Community",
-  "community.description": "View community transaction history and members",
   "community.tabs.transactions": "Transactions",
   "community.tabs.members": "Members"
 }

@@ -4,7 +4,7 @@ export interface PresentedMember {
   image: string | null;
   headline: string;
   bio: string | null;
-  joinedAt: string;
+  joinedAt: Date;
   role: string;
 }
 

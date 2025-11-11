@@ -20,7 +20,7 @@ export function useCommunityMembers() {
     variables: {
       filter: {
         communityId: COMMUNITY_ID,
-        status: GqlMembershipStatus.Active,
+        status: GqlMembershipStatus.Joined,
       },
       first: 100,
       sort: {
