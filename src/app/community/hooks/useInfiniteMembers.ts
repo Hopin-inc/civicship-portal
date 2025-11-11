@@ -1,15 +1,19 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { GqlMembership, GqlMembershipsConnection } from "@/types/graphql";
-import { toast } from "react-toastify";
-import { getServerCommunityMembersWithCursor } from "./server-community-members";
+import { useRef, useEffect, useCallback } from "react";
+import { useQuery } from "@apollo/client";
+import { GET_COMMUNITY_MEMBERS } from "@/graphql/account/membership/community-members";
+import {
+  GqlGetCommunityMembersQuery,
+  GqlGetCommunityMembersQueryVariables,
+  GqlMembershipStatus,
+  GqlSortDirection,
+  GqlMembership,
+} from "@/types/graphql";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { presentMember } from "../presenters/presentMember";
 import { PresentedMember } from "../types/PresentedMember";
-
-interface UseInfiniteMembersProps {
-  initialMembers: GqlMembershipsConnection;
-}
+import { toast } from "react-toastify";
 
 interface UseInfiniteMembersReturn {
   members: PresentedMember[];
@@ -19,43 +23,67 @@ interface UseInfiniteMembersReturn {
   loadMore: () => Promise<void>;
 }
 
-export const useInfiniteMembers = ({
-  initialMembers,
-}: UseInfiniteMembersProps): UseInfiniteMembersReturn => {
-  const [members, setMembers] = useState<PresentedMember[]>(
-    (initialMembers.edges?.map(edge => edge?.node).filter(Boolean) as GqlMembership[])
-      .map(presentMember)
-  );
-  const [hasNextPage, setHasNextPage] = useState(initialMembers.pageInfo?.hasNextPage ?? false);
-  const [endCursor, setEndCursor] = useState(initialMembers.pageInfo?.endCursor ?? null);
-  const [loading, setLoading] = useState(false);
+export const useInfiniteMembers = (): UseInfiniteMembersReturn => {
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
-  const loadMore = async () => {
-    if (loading || !hasNextPage || !endCursor) return;
+  const { data, loading, fetchMore } = useQuery<
+    GqlGetCommunityMembersQuery,
+    GqlGetCommunityMembersQueryVariables
+  >(GET_COMMUNITY_MEMBERS, {
+    variables: {
+      filter: {
+        communityId: COMMUNITY_ID,
+        status: GqlMembershipStatus.Active,
+      },
+      first: 20,
+      sort: {
+        createdAt: GqlSortDirection.Desc,
+      },
+    },
+    notifyOnNetworkStatusChange: true,
+  });
 
-    setLoading(true);
-    
+  const members = (data?.memberships?.edges?.map(edge => edge?.node).filter(Boolean) as GqlMembership[])
+    ?.map(presentMember) ?? [];
+
+  const hasNextPage = data?.memberships?.pageInfo?.hasNextPage ?? false;
+  const lastEdge = data?.memberships?.edges?.[data.memberships.edges.length - 1];
+
+  const loadMore = useCallback(async () => {
+    if (loading || !hasNextPage || !lastEdge?.node?.user?.id) return;
+
     try {
-      const data = await getServerCommunityMembersWithCursor(endCursor, 20);
-      
-      const newMembers = (data.edges?.map(edge => edge?.node).filter(Boolean) as GqlMembership[])
-        .map(presentMember);
-      
-      setMembers(prev => {
-        const existingIds = new Set(prev.map(m => m.id));
-        const uniqueNewMembers = newMembers.filter(m => !existingIds.has(m.id));
-        return [...prev, ...uniqueNewMembers];
+      await fetchMore({
+        variables: {
+          cursor: {
+            communityId: COMMUNITY_ID,
+            userId: lastEdge.node.user.id,
+          },
+        },
+        updateQuery: (prev, { fetchMoreResult }) => {
+          if (!fetchMoreResult?.memberships?.edges) return prev;
+
+          const existingIds = new Set(
+            prev.memberships?.edges?.map(edge => edge?.node?.user?.id).filter(Boolean)
+          );
+
+          const newEdges = fetchMoreResult.memberships.edges.filter(
+            edge => edge?.node?.user?.id && !existingIds.has(edge.node.user.id)
+          );
+
+          return {
+            memberships: {
+              ...fetchMoreResult.memberships,
+              edges: [...(prev.memberships?.edges ?? []), ...newEdges],
+            },
+          };
+        },
       });
-      setHasNextPage(data.pageInfo?.hasNextPage ?? false);
-      setEndCursor(data.pageInfo?.endCursor ?? null);
     } catch (error) {
       console.error('Error loading more members:', error);
       toast.error('データの取得に失敗しました');
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [loading, hasNextPage, lastEdge, fetchMore]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -72,7 +100,7 @@ export const useInfiniteMembers = ({
     }
 
     return () => observer.disconnect();
-  }, [hasNextPage, loading, endCursor, loadMore]);
+  }, [hasNextPage, loading, loadMore]);
 
   return {
     members,
