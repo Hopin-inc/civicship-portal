@@ -1,10 +1,14 @@
 import { getServerCommunityTransactions } from "@/hooks/transactions/server";
+import { getServerCommunityMembers } from "./hooks/server-community-members";
 import { CommunityTabs } from "./components/CommunityTabs";
 import { getTranslations } from "next-intl/server";
 
 export default async function CommunityPage() {
   const t = await getTranslations();
   const transactions = await getServerCommunityTransactions({
+    first: 20,
+  });
+  const members = await getServerCommunityMembers({
     first: 20,
   });
 
@@ -22,7 +26,7 @@ export default async function CommunityPage() {
       </div>
 
       <div className="pb-8">
-        <CommunityTabs initialTransactions={transactions} />
+        <CommunityTabs initialTransactions={transactions} initialMembers={members} />
       </div>
     </div>
   );

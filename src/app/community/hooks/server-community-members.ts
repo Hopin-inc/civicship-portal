@@ -37,7 +37,7 @@ export async function getServerCommunityMembers(
         status: GqlMembershipStatus.Active,
       },
       first,
-      cursor: after ? { cursor: after } : undefined,
+      cursor: after,
       sort: {
         createdAt: GqlSortDirection.Desc,
       },
