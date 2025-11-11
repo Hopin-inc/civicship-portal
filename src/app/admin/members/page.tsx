@@ -58,7 +58,7 @@ export default function MembersPage() {
     refetchRef.current = refetch;
   }, [refetch]);
 
-  if (loading) return <LoadingIndicator fullScreen />;
+  if (loading && members.length === 0) return <LoadingIndicator fullScreen />;
   if (error) return <ErrorState title={"メンバーを読み込めませんでした"} refetchRef={refetchRef} />;
 
   return (
