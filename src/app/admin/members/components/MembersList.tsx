@@ -81,8 +81,8 @@ export function MembersList({
                     disabled={currentUserRole !== "OWNER"}
                   >
                     <option value="OWNER">管理者</option>
-                    <option value="MEMBER">運用担当者</option>
-                    <option value="MANAGER">参加者</option>
+                    <option value="MANAGER">運用担当者</option>
+                    <option value="MEMBER">参加者</option>
                   </select>
                 </TableCell>
               </TableRow>
