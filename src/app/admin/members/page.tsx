@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@/contexts/AuthProvider";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { GqlRole, GqlUser } from "@/types/graphql";
+import { GqlRole } from "@/types/graphql";
 import { toast } from "react-toastify";
 import {
   Dialog,
@@ -15,7 +15,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { MemberRow, roleLabels } from "@/app/admin/members/components/MemberRow";
-import { useMembershipQueries } from "@/app/admin/members/hooks/useMembershipQueries";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useMembershipCommand } from "@/app/admin/members/hooks/useMembershipMutations";
 import { Button } from "@/components/ui/button";
@@ -25,12 +24,12 @@ import { useMemberWithDidSearch } from "../credentials/hooks/useMemberWithDidSea
 import SearchForm from "@/components/shared/SearchForm";
 
 export default function MembersPage() {
-  const communityId = COMMUNITY_ID;
   const { user: currentUser } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [input, setInput] = useState("");
+
   const currentUserRole = currentUser?.memberships?.find(
-    (m) => m.community?.id === communityId,
+    (m) => m.community?.id === COMMUNITY_ID,
   )?.role;
 
   const headerConfig = useMemo(
@@ -45,35 +44,18 @@ export default function MembersPage() {
 
   const { assignOwner, assignManager, assignMember } = useMembershipCommand();
 
-  // useMemberWithDidSearchのみを使用（検索機能と無限スクロール機能付き）
   const {
-    data: searchMembershipData,
+    data: members,
     loading,
     error,
     hasNextPage,
-    isLoadingMore: searchIsLoadingMore,
-    loadMoreRef: searchLoadMoreRef,
-    refetch
-  } = useMemberWithDidSearch(communityId, [], {
+    loadMoreRef,
+    refetch,
+  } = useMemberWithDidSearch(COMMUNITY_ID, [], {
     searchQuery,
-    pageSize: 20, 
+    pageSize: 20,
     enablePagination: true,
   });
-
-  // 役割情報を取得するためのフック（キャッシュから取得）
-  const { membershipListData } = useMembershipQueries(communityId);
-
-  const members = useMemo(() => {
-    return (
-      membershipListData?.memberships?.edges
-        ?.map((edge) => {
-          const user = edge?.node?.user;
-          const role = edge?.node?.role;
-          return user && role ? { user, role } : null;
-        })
-        .filter((member): member is { user: GqlUser; role: GqlRole } => member !== null) ?? []
-    );
-  }, [membershipListData]);
 
   const [pendingRoleChange, setPendingRoleChange] = useState<{
     userId: string;
@@ -89,73 +71,71 @@ export default function MembersPage() {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleMutation = useCallback(
-    async (mutate: Function, userId: string) => {
-      setIsLoading(true);
-      try {
-        const result = await mutate({ communityId, userId });
-        if (!result.success) {
-          toast.error(`権限変更に失敗しました（${result.code ?? "UNKNOWN"}）`);
-          return;
-        }
-        toast.success("権限を更新しました");
-        window.location.reload();
-      } catch (err) {
-        toast.error(err instanceof Error ? err.message : "不明なエラーが発生しました");
-      } finally {
-        setIsLoading(false);
+  const handleMutation = useCallback(async (mutate: Function, userId: string) => {
+    setIsLoading(true);
+    try {
+      const result = await mutate({ COMMUNITY_ID, userId });
+      if (!result.success) {
+        toast.error(`権限変更に失敗しました（${result.code ?? "UNKNOWN"}）`);
+        return;
       }
-    },
-    [communityId],
-  );
+      toast.success("権限を更新しました");
+      window.location.reload();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "不明なエラーが発生しました");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
     refetchRef.current = refetch;
   }, [refetch]);
 
-  if (loading && !searchIsLoadingMore) return <LoadingIndicator fullScreen />;
+  if (loading) return <LoadingIndicator fullScreen />;
   if (error) return <ErrorState title={"メンバーを読み込めませんでした"} refetchRef={refetchRef} />;
 
   return (
     <div className="py-4">
-      <SearchForm value={input} onInputChange={setInput} onSearch={setSearchQuery} placeholder={"名前・DIDで検索"} />
+      <SearchForm
+        value={input}
+        onInputChange={setInput}
+        onSearch={setSearchQuery}
+        placeholder={"名前・DIDで検索"}
+      />
       <div className="flex flex-col gap-4 mt-4">
         <span className="text-muted-foreground text-label-xs ml-4">
           操作を行うには管理者権限が必要です
         </span>
 
-        {searchMembershipData?.length === 0 && (
+        {members.length === 0 && (
           <p className="text-sm text-muted-foreground">一致するメンバーが見つかりません</p>
         )}
 
-        {searchMembershipData?.map((user) => {
-          const membership = members.find((m: any) => m?.user.id === user.id);
-          if (!membership) return null;
+        {members.map((member) => (
+          <MemberRow
+            key={member.id}
+            user={member}
+            role={member.role}
+            currentUserRole={currentUserRole}
+            onRoleChange={(newRole) => {
+              if (currentUserRole !== GqlRole.Owner) {
+                toast.error("この操作を行う権限がありません");
+                return;
+              }
+              setPendingRoleChange({
+                userId: member.id,
+                userName: member.name ?? "要確認",
+                newRole,
+              });
+            }}
+          />
+        ))}
 
-          return (
-            <MemberRow
-              key={user.id}
-              user={user}
-              role={membership.role}
-              currentUserRole={currentUserRole}
-              onRoleChange={(newRole) => {
-                if (currentUserRole !== GqlRole.Owner) {
-                  toast.error("この操作を行う権限がありません");
-                  return;
-                }
-                setPendingRoleChange({ userId: user.id, userName: user.name ?? "要確認", newRole });
-              }}
-            />
-          );
-        })}
         {hasNextPage && (
-          <div ref={searchLoadMoreRef} className="py-4 text-center mt-4">
-            {searchIsLoadingMore && (
-              <div className="py-2">
-                <LoadingIndicator fullScreen={false} />
-              </div>
-            )}
+          <div ref={loadMoreRef} className="h-10 mt-4" aria-hidden="true">
+            {<LoadingIndicator fullScreen={false} />}
           </div>
         )}
       </div>
