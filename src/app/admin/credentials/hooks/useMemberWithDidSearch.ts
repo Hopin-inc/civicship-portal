@@ -3,155 +3,130 @@
 import {
   GqlDidIssuanceRequest,
   GqlDidIssuanceStatus,
+  GqlRole,
   GqlUser,
   useGetMembershipListQuery,
 } from "@/types/graphql";
 import { ApolloError } from "@apollo/client";
-import React, { useState } from "react";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
-export type MemberSearchFormValues = {
-  searchQuery: string;
+const fallbackConnection = {
+  edges: [],
+  pageInfo: {
+    hasNextPage: false,
+    hasPreviousPage: false,
+    startCursor: null,
+    endCursor: null,
+  },
 };
 
-export interface MemberSearchTarget {
-  user: GqlUser;
-  wallet?: {
-    currentPointView?: {
-      currentPoint: bigint;
-    };
-  };
-}
-
-//TODO: credentials配下ではなく、共通化する場所に移動する
-export const useMemberWithDidSearch = (
+export function useMemberWithDidSearch(
   communityId: string,
-  members: MemberSearchTarget[] = [],
+  members: { user: GqlUser; wallet?: { currentPointView?: { currentPoint: bigint } } }[] = [],
   options?: {
     searchQuery?: string;
     enablePagination?: boolean;
     pageSize?: number;
   },
-): {
-  data: (GqlUser & { didInfo?: GqlDidIssuanceRequest } & {
-    wallet?: {
-      currentPointView?: {
-        currentPoint: bigint;
-      };
-    };
-  })[];
-  loading: boolean;
-  error: ApolloError | undefined;
-  hasNextPage: boolean;
-  isLoadingMore: boolean;
-  handleFetchMore: () => Promise<void>;
-  loadMoreRef: React.RefObject<HTMLDivElement>;
-  refetch: () => void;
-} => {
+) {
   const searchQuery = options?.searchQuery ?? "";
   const enablePagination = options?.enablePagination ?? false;
   const pageSize = options?.pageSize ?? 20;
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-  const {
-    data: searchMembershipData,
-    loading,
-    error,
-    fetchMore: apolloFetchMore,
-    refetch,
-  } = useGetMembershipListQuery({
+  const { data, loading, fetchMore, refetch, error } = useGetMembershipListQuery({
     variables: {
       filter: {
-        ...(searchQuery && { keyword: searchQuery }), // 検索クエリがある場合のみkeywordを追加
+        ...(searchQuery && { keyword: searchQuery }),
         communityId,
       },
       withWallets: true,
       withDidIssuanceRequests: true,
       first: enablePagination ? pageSize : undefined,
     },
-    fetchPolicy: "network-only",
-    notifyOnNetworkStatusChange: true,
+    fetchPolicy: "cache-first", // ← feed構成と統一
   });
 
-  const users = searchMembershipData?.memberships?.edges
-    ?.map((edge) => edge?.node?.user)
-    .filter((user): user is GqlUser => !!user) ?? [];
-
-  const usersWithDid = users?.map((user) => {
-    const didInfo = user.didIssuanceRequests?.find(
-      (request) => request?.status === GqlDidIssuanceStatus.Completed,
-    );
-
-    const gqlWallet = user.wallets?.find((w) => w?.community?.id === communityId);
-    const fallbackWallet = members.find((m) => m.user.id === user.id)?.wallet;
-    const wallet = {
-      currentPointView: {
-        currentPoint:
-          fallbackWallet?.currentPointView?.currentPoint ??
-          BigInt(gqlWallet?.currentPointView?.currentPoint ?? 0),
-      },
-    };
-
-    return {
-      ...user,
-      didInfo,
-      wallet,
-    };
-  });
-
-  const pageInfo = searchMembershipData?.memberships?.pageInfo;
-  const hasNextPage = pageInfo?.hasNextPage ?? false;
-  
+  const memberships = data?.memberships ?? fallbackConnection;
+  const endCursor = memberships.pageInfo?.endCursor;
+  const hasNextPage = memberships.pageInfo?.hasNextPage ?? false;
 
   const handleFetchMore = async () => {
-    if (!hasNextPage || isLoadingMore || !enablePagination) return;
-    
-    const endCursor = pageInfo?.endCursor;
-    if (!endCursor || typeof endCursor !== "string") {
-      return;
-    }
-    
-    setIsLoadingMore(true);
-    try {
-      const [userId, communityId] = endCursor.split("_");
-      await apolloFetchMore({
-        variables: {
-          cursor: { userId, communityId },
+    if (!hasNextPage || !enablePagination) return;
+
+    await fetchMore({
+      variables: {
+        filter: {
+          ...(searchQuery && { keyword: searchQuery }),
+          communityId,
         },
-        updateQuery: (prev, { fetchMoreResult }) => {
-          if (!fetchMoreResult) return prev;
-          return {
-            ...prev,
-            memberships: {
-              ...prev.memberships,
-              edges: [
-                ...(prev.memberships.edges ?? []),
-                ...(fetchMoreResult.memberships.edges ?? []),
-              ],
-              pageInfo: fetchMoreResult.memberships.pageInfo,
-            },
-          };
-        },
-      });
-    } finally {
-      setIsLoadingMore(false);
-    }
+        withWallets: true,
+        withDidIssuanceRequests: true,
+        cursor: { userId: endCursor?.split("_")[0], communityId: endCursor?.split("_")[1] },
+        first: pageSize,
+      },
+      updateQuery: (prev, { fetchMoreResult }) => {
+        if (!fetchMoreResult?.memberships?.edges) return prev;
+
+        // ID重複防止
+        return {
+          ...prev,
+          memberships: {
+            ...prev.memberships,
+            edges: [
+              ...new Map(
+                [...(prev.memberships?.edges ?? []), ...fetchMoreResult.memberships.edges].map(
+                  (edge) => [edge?.node?.user?.id, edge],
+                ),
+              ).values(),
+            ],
+            pageInfo: fetchMoreResult.memberships.pageInfo,
+          },
+        };
+      },
+    });
   };
 
   const loadMoreRef = useInfiniteScroll({
     hasMore: hasNextPage,
-    isLoading: loading || isLoadingMore,
+    isLoading: loading,
     onLoadMore: handleFetchMore,
   });
 
+  const usersWithDid = memberships.edges
+    ?.map((edge) => {
+      const node = edge?.node;
+      if (!node?.user) return null;
+      const user = node.user;
+      const role = node.role!;
+      const didInfo = user.didIssuanceRequests?.find(
+        (req) => req?.status === GqlDidIssuanceStatus.Completed,
+      );
+
+      const gqlWallet = user.wallets?.find((w) => w?.community?.id === COMMUNITY_ID);
+      const fallbackWallet = members.find((m) => m.user.id === user.id)?.wallet;
+      const wallet = {
+        currentPointView: {
+          currentPoint:
+            fallbackWallet?.currentPointView?.currentPoint ??
+            BigInt(gqlWallet?.currentPointView?.currentPoint ?? 0),
+        },
+      };
+
+      return { ...user, didInfo, wallet, role };
+    })
+    .filter(Boolean) as (GqlUser & {
+    didInfo?: GqlDidIssuanceRequest;
+    wallet?: { currentPointView?: { currentPoint: bigint } };
+    role: GqlRole;
+  })[];
+
   return {
-    data: usersWithDid ?? [],
+    data: usersWithDid,
     loading,
-    error,
+    error: error as ApolloError | undefined,
     hasNextPage,
-    isLoadingMore,
-    handleFetchMore,
     loadMoreRef,
     refetch,
   };
-};
+}
