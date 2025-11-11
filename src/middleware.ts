@@ -53,11 +53,20 @@ export function middleware(request: NextRequest) {
     ...(isDev ? [`'unsafe-eval'`] : []), // ← 開発のみ許可（本番は絶対NG）
   ].join(" ");
 
+  const styleSrcElem = [
+    `'self'`,
+    `'nonce-${nonce}'`,
+    "https://fonts.googleapis.com",
+  ].join(" ");
+
+  const styleSrcAttr = [
+    `'unsafe-inline'`,
+  ].join(" ");
+
   const styleSrc = [
     `'self'`,
-    `'nonce-${nonce}'`, // CSS-in-JSが挿入する <style> を許可
+    `'nonce-${nonce}'`,
     "https://fonts.googleapis.com",
-    // 可能なら style も nonce 化。インライン style が残るなら開発中だけ 'unsafe-inline' を一時許可
     ...(isDev ? [`'unsafe-inline'`] : []),
   ].join(" ");
 
@@ -72,6 +81,8 @@ export function middleware(request: NextRequest) {
     "https://www.google.com",
     "https://maps.googleapis.com",
     "https://firebase.googleapis.com",
+    "https://firebaseinstallations.googleapis.com",
+    "https://www.google-analytics.com",
     "https://www.googletagmanager.com",
   ].join(" ");
 
@@ -89,14 +100,14 @@ export function middleware(request: NextRequest) {
     `object-src 'none'`,
     `script-src ${scriptSrc}`,
     `style-src ${styleSrc}`,
+    `style-src-elem ${styleSrcElem}`,
+    `style-src-attr ${styleSrcAttr}`,
     `img-src 'self' https: data: blob:`,
     `font-src 'self' https: data:`,
     `connect-src ${connectSrc}`,
     `frame-src ${frameSrc}`,
     `frame-ancestors 'none'`,
     `form-action 'self'`,
-
-    // `report-to default-endpoint`,  // ← レポート先を使うなら:
   ].join("; ");
 
   res.headers.set("Content-Security-Policy", csp);
