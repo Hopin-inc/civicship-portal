@@ -15,6 +15,17 @@ export const useInfiniteScroll = ({
   }: UseInfiniteScrollProps) => {
   const observer = useRef<IntersectionObserver | null>(null);
   const targetRef = useRef<HTMLDivElement | null>(null);
+  
+  const hasMoreRef = useRef(hasMore);
+  const isLoadingRef = useRef(isLoading);
+  const onLoadMoreRef = useRef(onLoadMore);
+  const pendingRef = useRef(false); // Prevent duplicate calls while loading
+
+  useEffect(() => {
+    hasMoreRef.current = hasMore;
+    isLoadingRef.current = isLoading;
+    onLoadMoreRef.current = onLoadMore;
+  });
 
   useEffect(() => {
     const el = targetRef.current;
@@ -22,8 +33,14 @@ export const useInfiniteScroll = ({
 
     observer.current = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && hasMore && !isLoading) {
-          onLoadMore();
+        if (
+          entry.isIntersecting &&
+          hasMoreRef.current &&
+          !isLoadingRef.current &&
+          !pendingRef.current
+        ) {
+          pendingRef.current = true;
+          onLoadMoreRef.current();
         }
       },
       { threshold }
@@ -35,7 +52,13 @@ export const useInfiniteScroll = ({
       observer.current?.unobserve(el);
       observer.current?.disconnect();
     };
-  }, [hasMore, isLoading, onLoadMore, threshold]);
+  }, [threshold]); // Only depend on threshold, not hasMore/isLoading/onLoadMore
+
+  useEffect(() => {
+    if (!isLoading) {
+      pendingRef.current = false;
+    }
+  }, [isLoading]);
 
   return targetRef;
 };
