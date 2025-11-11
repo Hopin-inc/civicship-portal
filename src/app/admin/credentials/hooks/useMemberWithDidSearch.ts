@@ -55,12 +55,12 @@ export function useMemberWithDidSearch(
 
   const handleFetchMore = async () => {
     if (!hasNextPage || !enablePagination) return;
-    
-    if (!endCursor || typeof endCursor !== "string") {
+
+    if (!endCursor) {
       console.warn("Invalid endCursor:", endCursor);
       return;
     }
-    
+
     const cursorParts = endCursor.split("_");
     if (cursorParts.length !== 2) {
       console.warn("Invalid endCursor format:", endCursor);
