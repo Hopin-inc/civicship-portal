@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TransactionsTab } from "./TransactionsTab";
 import { MembersTab } from "./MembersTab";
 import { GqlTransactionsConnection } from "@/types/graphql";
 import { useTranslations } from "next-intl";
+import useHeaderConfig from "@/hooks/useHeaderConfig";
 
 export type CommunityTabType = "transactions" | "members";
 
@@ -16,6 +17,16 @@ interface CommunityTabsProps {
 export function CommunityTabs({ initialTransactions }: CommunityTabsProps) {
   const t = useTranslations();
   const [activeTab, setActiveTab] = useState<CommunityTabType>("transactions");
+
+  const headerConfig = useMemo(
+    () => ({
+      title: "ホーム",
+      showBackButton: false,
+      showLogo: true,
+    }),
+    [],
+  );
+  useHeaderConfig(headerConfig);
 
   return (
     <Tabs

@@ -18,9 +18,7 @@ export function MemberListGroupedView({ groupedMembers }: MemberListGroupedViewP
     <div className="space-y-6">
       {groupedMembers.map((group) => (
         <div key={group.yearMonth} className="space-y-2">
-          <h3 className="text-sm font-bold text-gray-600 px-4">
-            {group.displayLabel}（{group.members.length}人）
-          </h3>
+          <h3 className="text-sm font-bold text-gray-600 px-4">{group.displayLabel}</h3>
           <div className="bg-white divide-y divide-gray-100">
             {group.members.map((member) => (
               <div key={member.id} className="px-4">

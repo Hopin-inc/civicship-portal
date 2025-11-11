@@ -12,7 +12,7 @@ export function MemberCard({ member }: MemberCardProps) {
     <div className="flex items-start gap-3 py-3">
       <Avatar className="w-12 h-12">
         <AvatarImage src={member.image ?? undefined} alt={member.name} />
-        <AvatarFallback className="bg-gray-200 text-gray-600 text-sm font-medium">
+        <AvatarFallback className="bg-card text-muted-foreground text-sm font-medium">
           {initial}
         </AvatarFallback>
       </Avatar>
