@@ -47,7 +47,7 @@ export function useMemberRoleManagement() {
 
     setIsLoading(true);
     try {
-      const result = await mutate({ COMMUNITY_ID, userId: pendingRoleChange.userId });
+      const result = await mutate({ communityId: COMMUNITY_ID, userId: pendingRoleChange.userId });
       if (!result.success) {
         toast.error(`権限変更に失敗しました（${result.code ?? "UNKNOWN"}）`);
         return;
