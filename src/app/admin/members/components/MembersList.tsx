@@ -13,7 +13,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface Member extends GqlUser {
-  image: string | null;
+  image?: string | null;
   role: GqlRole;
   wallet?: { currentPointView?: { currentPoint: bigint } };
 }
