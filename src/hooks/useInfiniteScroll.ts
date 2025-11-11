@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useLayoutEffect } from 'react';
 
 interface UseInfiniteScrollProps {
   hasMore: boolean;
@@ -6,6 +6,8 @@ interface UseInfiniteScrollProps {
   onLoadMore: () => void;
   threshold?: number;
 }
+
+const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
 export const useInfiniteScroll = ({
     hasMore,
@@ -21,7 +23,7 @@ export const useInfiniteScroll = ({
   const onLoadMoreRef = useRef(onLoadMore);
   const pendingRef = useRef(false); // Prevent duplicate calls while loading
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     hasMoreRef.current = hasMore;
     isLoadingRef.current = isLoading;
     onLoadMoreRef.current = onLoadMore;
