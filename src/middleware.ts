@@ -58,7 +58,6 @@ export function middleware(request: NextRequest) {
 
   const styleSrcElem = [
     `'self'`,
-    `'nonce-${nonce}'`,
     "https://fonts.googleapis.com",
     `'unsafe-inline'`,
   ].join(" ");
@@ -69,9 +68,8 @@ export function middleware(request: NextRequest) {
 
   const styleSrc = [
     `'self'`,
-    `'nonce-${nonce}'`,
     "https://fonts.googleapis.com",
-    ...(isDev ? [`'unsafe-inline'`] : []),
+    `'unsafe-inline'`,
   ].join(" ");
 
   const connectSrc = [
