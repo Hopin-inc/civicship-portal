@@ -21,13 +21,16 @@ export const useMembershipQueries = (communityId: string) => {
   });
 
   const connection = data?.memberships ?? { edges: [], pageInfo: {} };
-  const pageInfo = connection.pageInfo && "endCursor" in connection.pageInfo ? connection.pageInfo : { endCursor: undefined, hasNextPage: false };
+  const pageInfo =
+    connection.pageInfo && "endCursor" in connection.pageInfo
+      ? connection.pageInfo
+      : { endCursor: undefined, hasNextPage: false };
   const endCursor = pageInfo.endCursor;
   const hasNextPage = pageInfo.hasNextPage ?? false;
 
   const handleFetchMore = async () => {
     if (!hasNextPage || isLoadingMore || !endCursor) return;
-    if (typeof endCursor !== "string" || !endCursor.includes("_") || endCursor.split("_").length !== 2) {
+    if (!endCursor.includes("_") || endCursor.split("_").length !== 2) {
       console.warn("endCursor format is invalid:", endCursor);
       return;
     }
