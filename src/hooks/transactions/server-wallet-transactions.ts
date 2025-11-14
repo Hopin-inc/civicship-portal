@@ -1,6 +1,10 @@
 import { executeServerGraphQLQuery } from "@/lib/graphql/server";
 import { GET_TRANSACTIONS_SERVER_QUERY } from "@/graphql/account/transaction/query";
-import { GqlTransactionsConnection, GqlGetTransactionsQuery, GqlGetTransactionsQueryVariables } from "@/types/graphql";
+import {
+  GqlGetTransactionsQuery,
+  GqlGetTransactionsQueryVariables,
+  GqlTransactionsConnection,
+} from "@/types/graphql";
 
 export interface ServerWalletTransactionsParams {
   walletId: string;
@@ -24,29 +28,24 @@ const fallbackConnection: GqlTransactionsConnection = {
  * サーバーサイドでウォレットのトランザクションを取得する関数
  */
 export async function getServerWalletTransactions(
-  params: ServerWalletTransactionsParams
+  params: ServerWalletTransactionsParams,
 ): Promise<GqlTransactionsConnection> {
-  const {
-    walletId,
-    first = 50,
-    after,
-    withDidIssuanceRequests = true,
-  } = params;
+  const { walletId, first = 50, after, withDidIssuanceRequests = true } = params;
 
   try {
     const variables: GqlGetTransactionsQueryVariables = {
       filter: {
-        walletId,
+        or: [{ fromWalletId: walletId }, { toWalletId: walletId }],
       },
       first,
       cursor: after,
       withDidIssuanceRequests,
     };
 
-    const data = await executeServerGraphQLQuery<GqlGetTransactionsQuery, GqlGetTransactionsQueryVariables>(
-      GET_TRANSACTIONS_SERVER_QUERY,
-      variables
-    );
+    const data = await executeServerGraphQLQuery<
+      GqlGetTransactionsQuery,
+      GqlGetTransactionsQueryVariables
+    >(GET_TRANSACTIONS_SERVER_QUERY, variables);
 
     return data.transactions ?? fallbackConnection;
   } catch (error) {
@@ -61,7 +60,7 @@ export async function getServerWalletTransactions(
 export async function getServerWalletTransactionsWithCursor(
   walletId: string,
   cursor?: string,
-  first: number = 20
+  first: number = 20,
 ): Promise<GqlTransactionsConnection> {
   return getServerWalletTransactions({
     walletId,
