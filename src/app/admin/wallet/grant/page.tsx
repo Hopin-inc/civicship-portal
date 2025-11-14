@@ -16,7 +16,7 @@ export default async function GrantPage() {
     });
     connection = result.connection;
   } catch (error) {
-    console.error("SSR fetch for GrantPage failed:", error);
+    logger.error("SSR fetch for GrantPage failed:", { error });
   }
 
   return <GrantPageClient initialConnection={connection} />;
