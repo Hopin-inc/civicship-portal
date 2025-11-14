@@ -16,20 +16,15 @@ interface MemberTabProps {
   isLoadingMore?: boolean;
 }
 
-export function MemberTab({
-  members,
-  searchQuery,
-  onSelect,
-}: MemberTabProps) {
+export function MemberTab({ members, searchQuery, onSelect }: MemberTabProps) {
   const t = useTranslations();
-  const communityId = COMMUNITY_ID;
   const {
     data: searchMembershipData,
     error,
     loadMoreRef: searchLoadMoreRef,
     isLoadingMore: searchIsLoadingMore,
-  } = useMemberSearchFromCredentials(communityId, members, { 
-    searchQuery ,
+  } = useMemberSearchFromCredentials(COMMUNITY_ID, members, {
+    searchQuery,
     pageSize: 20,
     enablePagination: true,
   });
@@ -37,11 +32,12 @@ export function MemberTab({
   if (error) {
     return (
       <div className="space-y-3 px-4">
-        <p className="text-sm text-center text-red-500 pt-4">{t("wallets.shared.member.errorLoad")}</p>
+        <p className="text-sm text-center text-red-500 pt-4">
+          {t("wallets.shared.member.errorLoad")}
+        </p>
       </div>
     );
   }
-
 
   if (searchMembershipData.length === 0) {
     return (
@@ -74,7 +70,7 @@ export function MemberTab({
       <div ref={searchLoadMoreRef} className="flex justify-center py-8">
         {searchIsLoadingMore && (
           <div className="flex items-center space-x-2">
-            <LoadingIndicator fullScreen={false}/>
+            <LoadingIndicator fullScreen={false} />
           </div>
         )}
       </div>
