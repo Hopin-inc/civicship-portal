@@ -6,14 +6,11 @@ import {
   GqlMembershipsConnection,
   GqlRole,
   GqlUser,
-  useGetMembershipListQuery,
 } from "@/types/graphql";
-import { ApolloError, NetworkStatus } from "@apollo/client";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { useState, useEffect } from "react";
-import { fetchMoreMemberships } from "@/app/admin/members/actions";
+import { fetchMemberships, fetchMoreMemberships } from "@/app/admin/members/actions";
 
 const fallbackConnection = {
   edges: [],
@@ -42,46 +39,62 @@ export function useMemberWithDidSearch(
   const ssrFetched = options?.ssrFetched ?? false;
   const initialConnection = options?.initialConnection;
 
-  const firebaseUser = useAuthStore((s) => s.state.firebaseUser);
-  const authReady = !!firebaseUser;
-
   const [localConnection, setLocalConnection] = useState<GqlMembershipsConnection | null>(
     initialConnection ?? null
   );
-  const [isServerActionLoading, setIsServerActionLoading] = useState(false);
-
-  const shouldSkipCSR = (ssrFetched && !searchQuery) || !authReady;
-
-  const { data, loading, fetchMore, refetch, error, networkStatus } = useGetMembershipListQuery({
-    variables: {
-      filter: {
-        ...(searchQuery && { keyword: searchQuery }),
-        communityId,
-      },
-      withWallets: true,
-      withDidIssuanceRequests: true,
-      first: enablePagination ? pageSize : undefined,
-    },
-    skip: shouldSkipCSR,
-    fetchPolicy: shouldSkipCSR ? "cache-first" : "network-only",
-    notifyOnNetworkStatusChange: true,
-  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    if (ssrFetched && initialConnection && !searchQuery) {
-      setLocalConnection(initialConnection);
-    } else if (data?.memberships) {
-      setLocalConnection(data.memberships);
+    if (!searchQuery) {
+      if (ssrFetched && initialConnection) {
+        setLocalConnection(initialConnection);
+      }
+      return;
     }
-  }, [data, initialConnection, ssrFetched, searchQuery]);
+
+    let cancelled = false;
+    setIsLoading(true);
+    setError(null);
+
+    fetchMemberships({
+      filter: {
+        keyword: searchQuery,
+        communityId,
+      },
+      first: pageSize,
+      withWallets: true,
+      withDidIssuanceRequests: true,
+    })
+      .then((result) => {
+        if (cancelled) return;
+        if (result.ssrFetched && result.connection) {
+          setLocalConnection(result.connection);
+        } else {
+          setError(new Error("Failed to fetch search results"));
+        }
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setError(err);
+      })
+      .finally(() => {
+        if (cancelled) return;
+        setIsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [searchQuery, communityId, pageSize, ssrFetched, initialConnection]);
 
   const memberships = localConnection ?? fallbackConnection;
   const endCursor = memberships.pageInfo?.endCursor;
   const hasNextPage = memberships.pageInfo?.hasNextPage ?? false;
-  const isFetchingMore = isServerActionLoading || networkStatus === NetworkStatus.fetchMore;
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
 
   const handleFetchMore = async () => {
-    if (!hasNextPage || !enablePagination || isServerActionLoading) return;
+    if (!hasNextPage || !enablePagination || isFetchingMore) return;
 
     if (!endCursor) {
       console.warn("Invalid endCursor:", endCursor);
@@ -94,7 +107,7 @@ export function useMemberWithDidSearch(
       return;
     }
 
-    setIsServerActionLoading(true);
+    setIsFetchingMore(true);
     try {
       const result = await fetchMoreMemberships({
         cursor: { userId: cursorParts[0], communityId: cursorParts[1] },
@@ -129,80 +142,45 @@ export function useMemberWithDidSearch(
             pageInfo: result.connection?.pageInfo ?? prev.pageInfo,
           };
         });
-      } else if (authReady) {
-        await fetchMore({
-          variables: {
-            filter: {
-              ...(searchQuery && { keyword: searchQuery }),
-              communityId,
-            },
-            withWallets: true,
-            withDidIssuanceRequests: true,
-            cursor: { userId: cursorParts[0], communityId: cursorParts[1] },
-            first: pageSize,
-          },
-          updateQuery: (prev, { fetchMoreResult }) => {
-            if (!fetchMoreResult?.memberships?.edges) return prev;
-
-            return {
-              ...prev,
-              memberships: {
-                ...prev.memberships,
-                edges: [
-                  ...new Map(
-                    [...(prev.memberships?.edges ?? []), ...fetchMoreResult.memberships.edges].map(
-                      (edge) => [edge?.node?.user?.id, edge],
-                    ),
-                  ).values(),
-                ],
-                pageInfo: fetchMoreResult.memberships.pageInfo,
-              },
-            };
-          },
-        });
+      } else {
+        setError(new Error("Failed to fetch more results"));
       }
     } catch (err) {
       console.error("Server Action fetchMore failed:", err);
-      if (authReady) {
-        await fetchMore({
-          variables: {
-            filter: {
-              ...(searchQuery && { keyword: searchQuery }),
-              communityId,
-            },
-            withWallets: true,
-            withDidIssuanceRequests: true,
-            cursor: { userId: cursorParts[0], communityId: cursorParts[1] },
-            first: pageSize,
-          },
-          updateQuery: (prev, { fetchMoreResult }) => {
-            if (!fetchMoreResult?.memberships?.edges) return prev;
-
-            return {
-              ...prev,
-              memberships: {
-                ...prev.memberships,
-                edges: [
-                  ...new Map(
-                    [...(prev.memberships?.edges ?? []), ...fetchMoreResult.memberships.edges].map(
-                      (edge) => [edge?.node?.user?.id, edge],
-                    ),
-                  ).values(),
-                ],
-                pageInfo: fetchMoreResult.memberships.pageInfo,
-              },
-            };
-          },
-        });
-      }
+      setError(err as Error);
     } finally {
-      setIsServerActionLoading(false);
+      setIsFetchingMore(false);
+    }
+  };
+
+  const refetch = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await fetchMemberships({
+        filter: {
+          ...(searchQuery && { keyword: searchQuery }),
+          communityId,
+        },
+        first: pageSize,
+        withWallets: true,
+        withDidIssuanceRequests: true,
+      });
+      if (result.ssrFetched && result.connection) {
+        setLocalConnection(result.connection);
+      } else {
+        setError(new Error("Failed to refetch results"));
+      }
+    } catch (err) {
+      setError(err as Error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const loadMoreRef = useInfiniteScroll({
     hasMore: hasNextPage,
-    isLoading: loading || isFetchingMore,
+    isLoading: isLoading || isFetchingMore,
     onLoadMore: handleFetchMore,
   });
 
@@ -236,8 +214,8 @@ export function useMemberWithDidSearch(
 
   return {
     data: usersWithDid,
-    loading,
-    error: error as ApolloError | undefined,
+    loading: isLoading,
+    error: error,
     hasNextPage,
     isFetchingMore,
     loadMoreRef,

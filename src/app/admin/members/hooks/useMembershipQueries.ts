@@ -1,8 +1,7 @@
-import { GqlMembershipStatus, GqlMembershipsConnection, GqlSortDirection, useGetMembershipListQuery } from "@/types/graphql";
+import { GqlMembershipsConnection } from "@/types/graphql";
 import { useState, useEffect } from "react";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import { useAuthStore } from "@/lib/auth/core/auth-store";
-import { fetchMoreMemberships } from "../actions";
+import { fetchMemberships, fetchMoreMemberships } from "../actions";
 
 export const useMembershipQueries = (
   communityId: string,
@@ -12,37 +11,20 @@ export const useMembershipQueries = (
   }
 ) => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
   const ssrFetched = options?.ssrFetched ?? false;
   const initialConnection = options?.initialConnection;
-
-  const firebaseUser = useAuthStore((s) => s.state.firebaseUser);
-  const authReady = !!firebaseUser;
 
   const [localConnection, setLocalConnection] = useState<GqlMembershipsConnection | null>(
     initialConnection ?? null
   );
 
-  const { data, loading, error, refetch, fetchMore } = useGetMembershipListQuery({
-    variables: {
-      filter: {
-        communityId,
-      },
-      first: 20,
-      withWallets: true,
-      withDidIssuanceRequests: true,
-    },
-    skip: ssrFetched || !authReady,
-    fetchPolicy: ssrFetched ? "cache-first" : "network-only",
-    notifyOnNetworkStatusChange: true,
-  });
-
   useEffect(() => {
     if (ssrFetched && initialConnection) {
       setLocalConnection(initialConnection);
-    } else if (data?.memberships) {
-      setLocalConnection(data.memberships);
     }
-  }, [data, initialConnection, ssrFetched]);
+  }, [initialConnection, ssrFetched]);
 
   const connection = localConnection ?? { edges: [], pageInfo: {} };
   const pageInfo =
@@ -94,77 +76,50 @@ export const useMembershipQueries = (
             pageInfo: result.connection?.pageInfo ?? prev.pageInfo,
           };
         });
-      } else if (authReady) {
-        await fetchMore({
-          variables: {
-            cursor: { userId, communityId: communityIdFromCursor },
-            filter: {
-              communityId,
-            },
-            first: 20,
-            withWallets: true,
-            withDidIssuanceRequests: true,
-          },
-          updateQuery: (prev, { fetchMoreResult }) => {
-            if (!fetchMoreResult) return prev;
-            return {
-              ...prev,
-              memberships: {
-                ...prev.memberships,
-                edges: [
-                  ...(prev.memberships.edges ?? []),
-                  ...(fetchMoreResult.memberships.edges ?? []),
-                ],
-                pageInfo: fetchMoreResult.memberships.pageInfo,
-              },
-            };
-          },
-        });
+      } else {
+        setError(new Error("Failed to fetch more results"));
       }
     } catch (err) {
       console.error("Server Action fetchMore failed:", err);
-      if (authReady) {
-        const [userId, communityIdFromCursor] = endCursor.split("_");
-        await fetchMore({
-          variables: {
-            cursor: { userId, communityId: communityIdFromCursor },
-            filter: {
-              communityId,
-            },
-            first: 20,
-            withWallets: true,
-            withDidIssuanceRequests: true,
-          },
-          updateQuery: (prev, { fetchMoreResult }) => {
-            if (!fetchMoreResult) return prev;
-            return {
-              ...prev,
-              memberships: {
-                ...prev.memberships,
-                edges: [
-                  ...(prev.memberships.edges ?? []),
-                  ...(fetchMoreResult.memberships.edges ?? []),
-                ],
-                pageInfo: fetchMoreResult.memberships.pageInfo,
-              },
-            };
-          },
-        });
-      }
+      setError(err as Error);
     } finally {
       setIsLoadingMore(false);
     }
   };
 
+  const refetch = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await fetchMemberships({
+        filter: {
+          communityId,
+        },
+        first: 20,
+        withWallets: true,
+        withDidIssuanceRequests: true,
+      });
+      if (result.ssrFetched && result.connection) {
+        setLocalConnection(result.connection);
+      } else {
+        setError(new Error("Failed to refetch results"));
+      }
+    } catch (err) {
+      setError(err as Error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const loadMoreRef = useInfiniteScroll({
     hasMore: hasNextPage,
-    isLoading: loading || isLoadingMore,
+    isLoading: isLoading || isLoadingMore,
     onLoadMore: handleFetchMore,
   });
 
   return {
-    membershipListData: data,
-    loading,
+    membershipListData: localConnection,
+    loading: isLoading,
     error,
     refetch,
     hasNextPage,
