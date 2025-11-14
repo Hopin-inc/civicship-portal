@@ -2985,6 +2985,48 @@ export type GqlCurrentUserServerQuery = {
   } | null;
 };
 
+export type GqlGetCommunityMembersQueryVariables = Exact<{
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  cursor?: InputMaybe<GqlMembershipCursorInput>;
+  filter?: InputMaybe<GqlMembershipFilterInput>;
+  sort?: InputMaybe<GqlMembershipSortInput>;
+}>;
+
+export type GqlGetCommunityMembersQuery = {
+  __typename?: "Query";
+  memberships: {
+    __typename?: "MembershipsConnection";
+    totalCount: number;
+    pageInfo: {
+      __typename?: "PageInfo";
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+      startCursor?: string | null;
+      endCursor?: string | null;
+    };
+    edges?: Array<{
+      __typename?: "MembershipEdge";
+      cursor: string;
+      node?: {
+        __typename?: "Membership";
+        createdAt?: Date | null;
+        headline?: string | null;
+        bio?: string | null;
+        role: GqlRole;
+        status: GqlMembershipStatus;
+        user?: {
+          __typename?: "User";
+          id: string;
+          name: string;
+          image?: string | null;
+          bio?: string | null;
+        } | null;
+        community?: { __typename?: "Community"; id: string; name?: string | null } | null;
+      } | null;
+    } | null> | null;
+  };
+};
+
 export type GqlMembershipFieldsFragment = {
   __typename?: "Membership";
   headline?: string | null;
@@ -6684,6 +6726,114 @@ export type CurrentUserServerSuspenseQueryHookResult = ReturnType<
 export type CurrentUserServerQueryResult = Apollo.QueryResult<
   GqlCurrentUserServerQuery,
   GqlCurrentUserServerQueryVariables
+>;
+export const GetCommunityMembersDocument = gql`
+  query GetCommunityMembers(
+    $first: Int
+    $cursor: MembershipCursorInput
+    $filter: MembershipFilterInput
+    $sort: MembershipSortInput
+  ) {
+    memberships(first: $first, cursor: $cursor, filter: $filter, sort: $sort) {
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      totalCount
+      edges {
+        cursor
+        node {
+          createdAt
+          headline
+          bio
+          role
+          status
+          user {
+            id
+            name
+            image
+            bio
+          }
+          community {
+            id
+            name
+          }
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetCommunityMembersQuery__
+ *
+ * To run a query within a React component, call `useGetCommunityMembersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCommunityMembersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCommunityMembersQuery({
+ *   variables: {
+ *      first: // value for 'first'
+ *      cursor: // value for 'cursor'
+ *      filter: // value for 'filter'
+ *      sort: // value for 'sort'
+ *   },
+ * });
+ */
+export function useGetCommunityMembersQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GqlGetCommunityMembersQuery,
+    GqlGetCommunityMembersQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetCommunityMembersQuery, GqlGetCommunityMembersQueryVariables>(
+    GetCommunityMembersDocument,
+    options,
+  );
+}
+export function useGetCommunityMembersLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetCommunityMembersQuery,
+    GqlGetCommunityMembersQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetCommunityMembersQuery, GqlGetCommunityMembersQueryVariables>(
+    GetCommunityMembersDocument,
+    options,
+  );
+}
+export function useGetCommunityMembersSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetCommunityMembersQuery,
+        GqlGetCommunityMembersQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetCommunityMembersQuery, GqlGetCommunityMembersQueryVariables>(
+    GetCommunityMembersDocument,
+    options,
+  );
+}
+export type GetCommunityMembersQueryHookResult = ReturnType<typeof useGetCommunityMembersQuery>;
+export type GetCommunityMembersLazyQueryHookResult = ReturnType<
+  typeof useGetCommunityMembersLazyQuery
+>;
+export type GetCommunityMembersSuspenseQueryHookResult = ReturnType<
+  typeof useGetCommunityMembersSuspenseQuery
+>;
+export type GetCommunityMembersQueryResult = Apollo.QueryResult<
+  GqlGetCommunityMembersQuery,
+  GqlGetCommunityMembersQueryVariables
 >;
 export const AssignOwnerDocument = gql`
   mutation assignOwner(
