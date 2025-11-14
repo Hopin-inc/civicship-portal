@@ -2,7 +2,9 @@
 
 import { useForm } from "react-hook-form";
 import { useSearchParams } from "next/navigation";
-import { GqlDidIssuanceStatus, GqlUser, useGetDidIssuanceRequestsQuery, useGetMembershipListQuery } from "@/types/graphql";
+import { GqlDidIssuanceStatus, GqlUser, useGetDidIssuanceRequestsQuery } from "@/types/graphql";
+import { queryMemberships } from "@/app/admin/members/actions";
+import { useState, useEffect } from "react";
 
 export type MemberSearchFormValues = {
   searchQuery: string;
@@ -37,16 +39,38 @@ export const useMemberSearch = (
 
   const searchQuery = form.watch("searchQuery")?.toLowerCase() ?? "";
 
-  const { data: singleMembershipData } = useGetMembershipListQuery({
-    variables: {
+  const [singleMembershipData, setSingleMembershipData] = useState<any>(null);
+
+  useEffect(() => {
+    if (!searchQuery || !options?.communityId) {
+      setSingleMembershipData(null);
+      return;
+    }
+
+    let cancelled = false;
+
+    queryMemberships({
       filter: {
-        communityId: options?.communityId ?? "",
+        communityId: options.communityId,
       },
       first: 1,
       withDidIssuanceRequests: true,
-    },
-    skip: !searchQuery || !options?.communityId,
-  });
+    })
+      .then((result) => {
+        if (cancelled) return;
+        if (result.ssrFetched && result.connection) {
+          setSingleMembershipData({ memberships: result.connection });
+        }
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        console.error("Failed to fetch membership data:", err);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [searchQuery, options?.communityId]);
 
   const filteredMembers = members.filter(({ user }) =>
     user.name?.toLowerCase().includes(searchQuery)

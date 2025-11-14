@@ -46,6 +46,43 @@ export function useMemberWithDidSearch(
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
+    if (!ssrFetched && !initialConnection && !searchQuery && !localConnection) {
+      let cancelled = false;
+      setIsLoading(true);
+      setError(null);
+
+      queryMemberships({
+        filter: {
+          communityId,
+        },
+        first: pageSize,
+        withWallets: true,
+        withDidIssuanceRequests: true,
+      })
+        .then((result) => {
+          if (cancelled) return;
+          if (result.ssrFetched && result.connection) {
+            setLocalConnection(result.connection);
+          } else {
+            setError(new Error("Failed to fetch initial data"));
+          }
+        })
+        .catch((err) => {
+          if (cancelled) return;
+          setError(err);
+        })
+        .finally(() => {
+          if (cancelled) return;
+          setIsLoading(false);
+        });
+
+      return () => {
+        cancelled = true;
+      };
+    }
+  }, [ssrFetched, initialConnection, communityId, pageSize, searchQuery, localConnection]);
+
+  useEffect(() => {
     if (!searchQuery) {
       if (ssrFetched && initialConnection) {
         setLocalConnection(initialConnection);
