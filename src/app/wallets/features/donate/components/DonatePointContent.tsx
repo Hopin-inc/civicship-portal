@@ -9,6 +9,7 @@ import { GqlUser, GqlWalletsConnection } from "@/types/graphql";
 import { useTranslations } from "next-intl";
 import { useInfiniteMembers } from "@/hooks/members/useInfiniteMembers";
 import { getServerMemberWalletsWithCursor } from "@/hooks/members/server";
+import { DonateMember } from "../types";
 
 export function DonatePointContent({
   currentUser,
