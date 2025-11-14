@@ -7,7 +7,7 @@ export const Header = () => {
     const t = useTranslations();
     const headerConfig = useMemo(
         () => ({
-          title: t("transactions.header.title"),
+          title: t("navigation.bottomBar.timeline"),
           showBackButton: true,
           showLogo: false,
         }),
