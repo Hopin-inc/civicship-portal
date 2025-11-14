@@ -17,9 +17,7 @@ interface MembersPageClientProps {
   initialConnection: GqlMembershipsConnection | null;
 }
 
-export default function MembersPageClient({
-  initialConnection,
-}: MembersPageClientProps) {
+export default function MembersPageClient({ initialConnection }: MembersPageClientProps) {
   const { user: currentUser } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [input, setInput] = useState("");
@@ -33,6 +31,7 @@ export default function MembersPageClient({
       title: "権限管理",
       showLogo: false,
       showBackButton: true,
+      backTo: "/admin/setting",
     }),
     [],
   );
@@ -77,7 +76,7 @@ export default function MembersPageClient({
         onSearch={setSearchQuery}
         placeholder={"名前・DIDで検索"}
       />
-      
+
       <MembersList
         members={members}
         currentUserRole={currentUserRole}
