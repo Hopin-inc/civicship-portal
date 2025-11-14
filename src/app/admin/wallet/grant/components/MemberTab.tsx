@@ -64,7 +64,7 @@ export function MemberTab({
             point={m.wallet?.currentPointView?.currentPoint ?? BigInt(0)}
             showPoint={true}
             showDate={false}
-            didValue={m.didInfo?.didValue}
+            didValue={m.didInfo?.didValue ?? undefined}
             onClick={() => onSelect(m)}
           />
         );

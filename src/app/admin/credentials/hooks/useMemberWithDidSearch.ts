@@ -4,12 +4,14 @@ import {
   GqlDidIssuanceRequest,
   GqlDidIssuanceStatus,
   GqlMembershipsConnection,
+  GqlMembershipStatus,
+  GqlMembershipStatusReason,
   GqlRole,
   GqlUser,
 } from "@/types/graphql";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { queryMemberships } from "@/app/admin/members/actions";
 
 const fallbackConnection = {
@@ -39,6 +41,29 @@ export function useMemberWithDidSearch(
   const ssrFetched = options?.ssrFetched ?? false;
   const initialConnection = options?.initialConnection;
 
+  const membersFallbackConnection = useMemo<GqlMembershipsConnection>(() => {
+    const edges = members.map(m => ({
+      cursor: `${m.user.id}_${communityId}`,
+      node: {
+        user: m.user,
+        role: GqlRole.Member,
+        reason: GqlMembershipStatusReason.Assigned,
+        status: GqlMembershipStatus.Joined,
+      },
+    }));
+    
+    return {
+      edges,
+      pageInfo: {
+        hasNextPage: false,
+        hasPreviousPage: false,
+        startCursor: null,
+        endCursor: null,
+      },
+      totalCount: members.length,
+    };
+  }, [members, communityId]);
+
   const [localConnection, setLocalConnection] = useState<GqlMembershipsConnection | null>(
     initialConnection ?? null
   );
@@ -47,9 +72,7 @@ export function useMemberWithDidSearch(
 
   useEffect(() => {
     if (!searchQuery) {
-      if (ssrFetched && initialConnection) {
-        setLocalConnection(initialConnection);
-      }
+      setLocalConnection(initialConnection ?? membersFallbackConnection);
       return;
     }
 
@@ -86,7 +109,7 @@ export function useMemberWithDidSearch(
     return () => {
       cancelled = true;
     };
-  }, [searchQuery, communityId, pageSize, ssrFetched, initialConnection]);
+  }, [searchQuery, communityId, pageSize, initialConnection, membersFallbackConnection]);
 
   const memberships = localConnection ?? fallbackConnection;
   const endCursor = memberships.pageInfo?.endCursor;
@@ -189,7 +212,7 @@ export function useMemberWithDidSearch(
       const node = edge?.node;
       if (!node?.user) return null;
       const user = node.user;
-      const role = node.role!;
+      const role = node.role ?? GqlRole.Member; // Default to Member if not present
       const didInfo = user.didIssuanceRequests?.find(
         (req) => req?.status === GqlDidIssuanceStatus.Completed,
       );
