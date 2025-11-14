@@ -126,3 +126,49 @@ export const GET_MEMBER_WALLETS = gql`
     }
   }
 `;
+
+/**
+ * サーバーサイド用のGraphQLクエリ（文字列定数）
+ */
+export const GET_MEMBER_WALLETS_SERVER_QUERY = `
+  query GetMemberWallets(
+    $filter: WalletFilterInput
+    $first: Int
+    $cursor: String
+    $withDidIssuanceRequests: Boolean = false
+  ) {
+    wallets(filter: $filter, first: $first, cursor: $cursor) {
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      totalCount
+      edges {
+        cursor
+        node {
+          id
+          type
+          currentPointView {
+            currentPoint
+          }
+          user {
+            id
+            name
+            image
+            didIssuanceRequests @include(if: $withDidIssuanceRequests) {
+              status
+              didValue
+            }
+          }
+          community {
+            id
+            name
+            image
+          }
+        }
+      }
+    }
+  }
+`;
