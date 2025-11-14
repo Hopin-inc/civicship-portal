@@ -45,7 +45,7 @@ export function presentUserProfile(
     ticketsAvailable: isOwner
       ? (wallet?.tickets ?? []).filter((t) => t.status === GqlTicketStatus.Available).length
       : undefined,
-    points: isOwner ? (wallet?.currentPointView?.currentPoint ?? 0) : undefined,
+    points: wallet?.currentPointView?.currentPoint ?? undefined,
     portfolios: portfolios ?? [],
     selfOpportunities,
     currentlyHiringOpportunities,

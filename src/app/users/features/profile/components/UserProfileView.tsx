@@ -32,10 +32,11 @@ export function UserProfileView({ viewModel, isOwner }: UserProfileViewProps) {
           isOwner={isOwner}
         />
 
-        {isOwner && viewModel.ticketsAvailable !== undefined && viewModel.points !== undefined && (
+        {(viewModel.ticketsAvailable !== undefined || viewModel.points !== undefined) && (
           <UserTicketsAndPoints
             ticketCount={viewModel.ticketsAvailable}
             pointCount={viewModel.points}
+            canNavigate={isOwner}
           />
         )}
       </div>
