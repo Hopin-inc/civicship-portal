@@ -56,7 +56,7 @@ export default function GrantPageClient({ initialConnection }: GrantPageClientPr
     setIsLoading(true);
     try {
       const res = await grantPoint({
-        input: { transferPoints: amount, toUserId: selectedUser.id,comment: comment },
+        input: { transferPoints: amount, toUserId: selectedUser.id, comment },
         permission: { communityId: COMMUNITY_ID },
       });
 
