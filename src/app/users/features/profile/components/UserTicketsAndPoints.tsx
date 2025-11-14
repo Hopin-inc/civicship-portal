@@ -12,6 +12,19 @@ interface UserTicketsAndPointsProps {
   canNavigate?: boolean;
 }
 
+interface MaybeLinkProps {
+  canNavigate: boolean;
+  href: string;
+  children: React.ReactNode;
+}
+
+function MaybeLink({ canNavigate, href, children }: MaybeLinkProps) {
+  if (canNavigate) {
+    return <Link href={href}>{children}</Link>;
+  }
+  return <>{children}</>;
+}
+
 export function UserTicketsAndPoints({ ticketCount, pointCount, canNavigate = true }: UserTicketsAndPointsProps) {
   const t = useTranslations();
   
@@ -46,18 +59,14 @@ export function UserTicketsAndPoints({ ticketCount, pointCount, canNavigate = tr
   return (
     <div className="space-y-2 mt-2">
       {currentCommunityConfig.enableFeatures.includes("tickets") && ticketCount !== undefined && (
-        canNavigate ? (
-          <Link href="/tickets">{ticketContent}</Link>
-        ) : (
-          ticketContent
-        )
+        <MaybeLink canNavigate={canNavigate} href="/tickets">
+          {ticketContent}
+        </MaybeLink>
       )}
       {currentCommunityConfig.enableFeatures.includes("points") && pointCount !== undefined && (
-        canNavigate ? (
-          <Link href="/wallets/me">{pointContent}</Link>
-        ) : (
-          pointContent
-        )
+        <MaybeLink canNavigate={canNavigate} href="/wallets/me">
+          {pointContent}
+        </MaybeLink>
       )}
     </div>
   );
