@@ -38,13 +38,16 @@ const requestLink = setContext(async (operation, prevContext) => {
     }
   }
 
-  const headers = {
+  const headers: Record<string, string> = {
     ...prevContext.headers,
-    Authorization: token ? `Bearer ${token}` : "",
     "X-Auth-Mode": authMode,
-    "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
-    "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID,
+    "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID || "",
+    "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID || "",
   };
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
 
   return { headers };
 });
