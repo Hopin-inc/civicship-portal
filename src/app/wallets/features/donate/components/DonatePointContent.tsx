@@ -1,29 +1,35 @@
 "use client";
 
-import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";
 import { DonateForm, DonateUserSelect } from "@/app/wallets/features/donate/components";
 import { useDonateFlow } from "../hooks/useDonateFlow";
-import { useDonateMembers } from "../hooks/useDonateMembers";
 import { Tabs } from "@/app/admin/wallet/grant/types/tabs";
 import { useEffect, useRef, useState } from "react";
-import { GqlUser } from "@/types/graphql";
+import { GqlUser, GqlWalletsConnection } from "@/types/graphql";
 import { useTranslations } from "next-intl";
+import { useInfiniteMembers } from "@/hooks/members/useInfiniteMembers";
+import { getServerMemberWalletsWithCursor } from "@/hooks/members/server";
 
 export function DonatePointContent({
   currentUser,
-  currentPoint,
+  currentPointString,
+  initialMembers,
 }: {
   currentUser?: GqlUser | null;
-  currentPoint: bigint;
+  currentPointString: string;
+  initialMembers: GqlWalletsConnection;
 }) {
   const t = useTranslations();
   const [activeTab, setActiveTab] = useState<Tabs>(Tabs.History);
-  const { members, loading, error, refetch, loadMoreRef, isLoadingMore } = useDonateMembers(
-    currentUser?.id,
-  );
+  const currentPoint = BigInt(currentPointString);
 
-  const refetchRef = useRef<(() => void) | null>(null);
+  const { members, loading, refetch, loadMoreRef } = useInfiniteMembers({
+    initialMembers,
+    fetchMore: getServerMemberWalletsWithCursor,
+    currentUserId: currentUser?.id,
+  });
+
+  const refetchRef = useRef<(() => Promise<void>) | null>(null);
   useEffect(() => {
     refetchRef.current = refetch;
   }, [refetch]);
@@ -33,10 +39,6 @@ export function DonatePointContent({
     currentPoint,
   );
 
-  if (loading && !isLoadingMore) return <LoadingIndicator />;
-  if (error)
-    return <ErrorState title={t("wallets.donate.errorMembers")} refetchRef={refetchRef} />;
-
   return (
     <div className="max-w-xl mx-auto mt-6 space-y-4">
       {!selectedUser ? (
@@ -44,7 +46,7 @@ export function DonatePointContent({
           members={members}
           onSelect={setSelectedUser}
           loadMoreRef={loadMoreRef}
-          isLoadingMore={isLoadingMore}
+          isLoadingMore={loading}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
         />

@@ -1,13 +1,22 @@
-"use client";
-
-import { useAuth } from "@/contexts/AuthProvider";
-import { useSearchParams } from "next/navigation";
 import { DonatePointContent } from "@/app/wallets/features/donate/components/DonatePointContent";
+import { getServerMemberWallets } from "@/hooks/members/server";
+import { fetchPrivateUserServer } from "@/app/users/features/shared/server";
 
-export default function DonatePointPage() {
-  const { user } = useAuth();
-  const searchParams = useSearchParams();
-  const currentPoint = BigInt(searchParams.get("currentPoint") ?? "0");
+interface DonatePointPageProps {
+  searchParams: Promise<{ currentPoint?: string }>;
+}
 
-  return <DonatePointContent currentUser={user} currentPoint={currentPoint} />;
+export default async function DonatePointPage({ searchParams }: DonatePointPageProps) {
+  const params = await searchParams;
+  const currentPointString = params.currentPoint ?? "0";
+  const currentUser = await fetchPrivateUserServer();
+  const initialMembers = await getServerMemberWallets({ first: 20 });
+
+  return (
+    <DonatePointContent
+      currentUser={currentUser}
+      currentPointString={currentPointString}
+      initialMembers={initialMembers}
+    />
+  );
 }
