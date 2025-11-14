@@ -29,7 +29,6 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
   const hasOppOrQuest =
     currentCommunityConfig.enableFeatures.includes("opportunities") ||
     currentCommunityConfig.enableFeatures.includes("quests");
-  const showTimeline = !hasOppOrQuest;
 
   if (currentCommunityConfig.enableFeatures.length < 2) {
     return null;
@@ -69,18 +68,16 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
       <div className="max-w-screen-xl mx-auto px-4">
         <div className="flex justify-around items-center">
           {hasOppOrQuest ? (
-            currentCommunityConfig.enableFeatures.includes("opportunities") && (
-              <Link
-                href="/opportunities"
-                className={cn(
-                  getLinkStyle("/opportunities", "/opportunities/*", "opportunities/search/*"),
-                  "flex-grow",
-                )}
-              >
-                <Search size={24} />
-                <span className="text-xs mt-1">{t("navigation.bottomBar.discover")}</span>
-              </Link>
-            )
+            <Link
+              href="/opportunities"
+              className={cn(
+                getLinkStyle("/opportunities", "/opportunities/*", "opportunities/search/*"),
+                "flex-grow",
+              )}
+            >
+              <Search size={24} />
+              <span className="text-xs mt-1">{t("navigation.bottomBar.discover")}</span>
+            </Link>
           ) : (
             <Link
               href="/transactions"
