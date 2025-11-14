@@ -70,8 +70,45 @@ export function useMemberWithDidSearch(
 
   useEffect(() => {
     if (!searchQuery) {
-      setLocalConnection(initialConnection ?? membersFallbackConnection);
-      return;
+      if (initialConnection) {
+        setLocalConnection(initialConnection);
+        return;
+      }
+      
+      let cancelled = false;
+      setIsLoading(true);
+      setError(null);
+
+      queryMemberships({
+        filter: {
+          communityId,
+        },
+        first: pageSize,
+        withWallets: true,
+        withDidIssuanceRequests: true,
+      })
+        .then((result) => {
+          if (cancelled) return;
+          if (result.connection) {
+            setLocalConnection(result.connection);
+          } else {
+            setLocalConnection(membersFallbackConnection);
+            setError(new Error("Failed to fetch initial results"));
+          }
+        })
+        .catch((err) => {
+          if (cancelled) return;
+          setLocalConnection(membersFallbackConnection);
+          setError(err);
+        })
+        .finally(() => {
+          if (cancelled) return;
+          setIsLoading(false);
+        });
+
+      return () => {
+        cancelled = true;
+      };
     }
 
     let cancelled = false;
