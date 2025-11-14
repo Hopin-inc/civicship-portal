@@ -3,6 +3,7 @@
 import {
   GqlDidIssuanceRequest,
   GqlDidIssuanceStatus,
+  GqlMembershipsConnection,
   GqlRole,
   GqlUser,
   useGetMembershipListQuery,
@@ -10,6 +11,9 @@ import {
 import { ApolloError, NetworkStatus } from "@apollo/client";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useAuthStore } from "@/lib/auth/core/auth-store";
+import { useState, useEffect } from "react";
+import { fetchMoreMemberships } from "@/app/admin/members/actions";
 
 const fallbackConnection = {
   edges: [],
@@ -28,11 +32,25 @@ export function useMemberWithDidSearch(
     searchQuery?: string;
     enablePagination?: boolean;
     pageSize?: number;
+    initialConnection?: GqlMembershipsConnection | null;
+    ssrFetched?: boolean;
   },
 ) {
   const searchQuery = options?.searchQuery ?? "";
   const enablePagination = options?.enablePagination ?? false;
   const pageSize = options?.pageSize ?? 20;
+  const ssrFetched = options?.ssrFetched ?? false;
+  const initialConnection = options?.initialConnection;
+
+  const firebaseUser = useAuthStore((s) => s.state.firebaseUser);
+  const authReady = !!firebaseUser;
+
+  const [localConnection, setLocalConnection] = useState<GqlMembershipsConnection | null>(
+    initialConnection ?? null
+  );
+  const [isServerActionLoading, setIsServerActionLoading] = useState(false);
+
+  const shouldSkipCSR = (ssrFetched && !searchQuery) || !authReady;
 
   const { data, loading, fetchMore, refetch, error, networkStatus } = useGetMembershipListQuery({
     variables: {
@@ -44,17 +62,26 @@ export function useMemberWithDidSearch(
       withDidIssuanceRequests: true,
       first: enablePagination ? pageSize : undefined,
     },
-    fetchPolicy: "cache-first",
+    skip: shouldSkipCSR,
+    fetchPolicy: shouldSkipCSR ? "cache-first" : "network-only",
     notifyOnNetworkStatusChange: true,
   });
 
-  const memberships = data?.memberships ?? fallbackConnection;
+  useEffect(() => {
+    if (ssrFetched && initialConnection && !searchQuery) {
+      setLocalConnection(initialConnection);
+    } else if (data?.memberships) {
+      setLocalConnection(data.memberships);
+    }
+  }, [data, initialConnection, ssrFetched, searchQuery]);
+
+  const memberships = localConnection ?? fallbackConnection;
   const endCursor = memberships.pageInfo?.endCursor;
   const hasNextPage = memberships.pageInfo?.hasNextPage ?? false;
-  const isFetchingMore = networkStatus === NetworkStatus.fetchMore;
+  const isFetchingMore = isServerActionLoading || networkStatus === NetworkStatus.fetchMore;
 
   const handleFetchMore = async () => {
-    if (!hasNextPage || !enablePagination) return;
+    if (!hasNextPage || !enablePagination || isServerActionLoading) return;
 
     if (!endCursor) {
       console.warn("Invalid endCursor:", endCursor);
@@ -67,37 +94,110 @@ export function useMemberWithDidSearch(
       return;
     }
 
-    await fetchMore({
-      variables: {
+    setIsServerActionLoading(true);
+    try {
+      const result = await fetchMoreMemberships({
+        cursor: { userId: cursorParts[0], communityId: cursorParts[1] },
         filter: {
           ...(searchQuery && { keyword: searchQuery }),
           communityId,
         },
+        first: pageSize,
         withWallets: true,
         withDidIssuanceRequests: true,
-        cursor: { userId: cursorParts[0], communityId: cursorParts[1] },
-        first: pageSize,
-      },
-      updateQuery: (prev, { fetchMoreResult }) => {
-        if (!fetchMoreResult?.memberships?.edges) return prev;
+      });
 
-        // ID重複防止
-        return {
-          ...prev,
-          memberships: {
-            ...prev.memberships,
-            edges: [
-              ...new Map(
-                [...(prev.memberships?.edges ?? []), ...fetchMoreResult.memberships.edges].map(
-                  (edge) => [edge?.node?.user?.id, edge],
-                ),
-              ).values(),
-            ],
-            pageInfo: fetchMoreResult.memberships.pageInfo,
+      if (result.ssrFetched && result.connection) {
+        setLocalConnection((prev) => {
+          if (!prev) return result.connection;
+          
+          const existingEdges = prev.edges ?? [];
+          const newEdges = result.connection?.edges ?? [];
+          
+          const mergedEdges = [
+            ...new Map(
+              [...existingEdges, ...newEdges].map((edge) => [
+                edge?.node?.user?.id,
+                edge,
+              ])
+            ).values(),
+          ];
+
+          return {
+            ...prev,
+            edges: mergedEdges,
+            pageInfo: result.connection?.pageInfo ?? prev.pageInfo,
+          };
+        });
+      } else if (authReady) {
+        await fetchMore({
+          variables: {
+            filter: {
+              ...(searchQuery && { keyword: searchQuery }),
+              communityId,
+            },
+            withWallets: true,
+            withDidIssuanceRequests: true,
+            cursor: { userId: cursorParts[0], communityId: cursorParts[1] },
+            first: pageSize,
           },
-        };
-      },
-    });
+          updateQuery: (prev, { fetchMoreResult }) => {
+            if (!fetchMoreResult?.memberships?.edges) return prev;
+
+            return {
+              ...prev,
+              memberships: {
+                ...prev.memberships,
+                edges: [
+                  ...new Map(
+                    [...(prev.memberships?.edges ?? []), ...fetchMoreResult.memberships.edges].map(
+                      (edge) => [edge?.node?.user?.id, edge],
+                    ),
+                  ).values(),
+                ],
+                pageInfo: fetchMoreResult.memberships.pageInfo,
+              },
+            };
+          },
+        });
+      }
+    } catch (err) {
+      console.error("Server Action fetchMore failed:", err);
+      if (authReady) {
+        await fetchMore({
+          variables: {
+            filter: {
+              ...(searchQuery && { keyword: searchQuery }),
+              communityId,
+            },
+            withWallets: true,
+            withDidIssuanceRequests: true,
+            cursor: { userId: cursorParts[0], communityId: cursorParts[1] },
+            first: pageSize,
+          },
+          updateQuery: (prev, { fetchMoreResult }) => {
+            if (!fetchMoreResult?.memberships?.edges) return prev;
+
+            return {
+              ...prev,
+              memberships: {
+                ...prev.memberships,
+                edges: [
+                  ...new Map(
+                    [...(prev.memberships?.edges ?? []), ...fetchMoreResult.memberships.edges].map(
+                      (edge) => [edge?.node?.user?.id, edge],
+                    ),
+                  ).values(),
+                ],
+                pageInfo: fetchMoreResult.memberships.pageInfo,
+              },
+            };
+          },
+        });
+      }
+    } finally {
+      setIsServerActionLoading(false);
+    }
   };
 
   const loadMoreRef = useInfiniteScroll({

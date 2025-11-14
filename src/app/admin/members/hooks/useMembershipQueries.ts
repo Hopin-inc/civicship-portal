@@ -1,26 +1,50 @@
-import { GqlMembershipStatus, GqlSortDirection, useGetMembershipListQuery } from "@/types/graphql";
-import { useState } from "react";
+import { GqlMembershipStatus, GqlMembershipsConnection, GqlSortDirection, useGetMembershipListQuery } from "@/types/graphql";
+import { useState, useEffect } from "react";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import { useAuthStore } from "@/lib/auth/core/auth-store";
+import { fetchMoreMemberships } from "../actions";
 
-export const useMembershipQueries = (communityId: string) => {
+export const useMembershipQueries = (
+  communityId: string,
+  options?: {
+    initialConnection?: GqlMembershipsConnection | null;
+    ssrFetched?: boolean;
+  }
+) => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const ssrFetched = options?.ssrFetched ?? false;
+  const initialConnection = options?.initialConnection;
+
+  const firebaseUser = useAuthStore((s) => s.state.firebaseUser);
+  const authReady = !!firebaseUser;
+
+  const [localConnection, setLocalConnection] = useState<GqlMembershipsConnection | null>(
+    initialConnection ?? null
+  );
+
   const { data, loading, error, refetch, fetchMore } = useGetMembershipListQuery({
     variables: {
       filter: {
         communityId,
-        status: GqlMembershipStatus.Joined,
-      },
-      sort: {
-        createdAt: GqlSortDirection.Asc,
       },
       first: 20,
+      withWallets: true,
       withDidIssuanceRequests: true,
     },
-    fetchPolicy: "network-only",
+    skip: ssrFetched || !authReady,
+    fetchPolicy: ssrFetched ? "cache-first" : "network-only",
     notifyOnNetworkStatusChange: true,
   });
 
-  const connection = data?.memberships ?? { edges: [], pageInfo: {} };
+  useEffect(() => {
+    if (ssrFetched && initialConnection) {
+      setLocalConnection(initialConnection);
+    } else if (data?.memberships) {
+      setLocalConnection(data.memberships);
+    }
+  }, [data, initialConnection, ssrFetched]);
+
+  const connection = localConnection ?? { edges: [], pageInfo: {} };
   const pageInfo =
     connection.pageInfo && "endCursor" in connection.pageInfo
       ? connection.pageInfo
@@ -36,26 +60,97 @@ export const useMembershipQueries = (communityId: string) => {
     }
     setIsLoadingMore(true);
     try {
-      const [userId, communityId] = endCursor.split("_");
-      await fetchMore({
-        variables: {
-          cursor: { userId, communityId },
+      const [userId, communityIdFromCursor] = endCursor.split("_");
+      
+      const result = await fetchMoreMemberships({
+        cursor: { userId, communityId: communityIdFromCursor },
+        filter: {
+          communityId,
         },
-        updateQuery: (prev, { fetchMoreResult }) => {
-          if (!fetchMoreResult) return prev;
+        first: 20,
+        withWallets: true,
+        withDidIssuanceRequests: true,
+      });
+
+      if (result.ssrFetched && result.connection) {
+        setLocalConnection((prev) => {
+          if (!prev) return result.connection;
+          
+          const existingEdges = prev.edges ?? [];
+          const newEdges = result.connection?.edges ?? [];
+          
+          const mergedEdges = [
+            ...new Map(
+              [...existingEdges, ...newEdges].map((edge) => [
+                edge?.node?.user?.id,
+                edge,
+              ])
+            ).values(),
+          ];
+
           return {
             ...prev,
-            memberships: {
-              ...prev.memberships,
-              edges: [
-                ...(prev.memberships.edges ?? []),
-                ...(fetchMoreResult.memberships.edges ?? []),
-              ],
-              pageInfo: fetchMoreResult.memberships.pageInfo,
-            },
+            edges: mergedEdges,
+            pageInfo: result.connection?.pageInfo ?? prev.pageInfo,
           };
-        },
-      });
+        });
+      } else if (authReady) {
+        await fetchMore({
+          variables: {
+            cursor: { userId, communityId: communityIdFromCursor },
+            filter: {
+              communityId,
+            },
+            first: 20,
+            withWallets: true,
+            withDidIssuanceRequests: true,
+          },
+          updateQuery: (prev, { fetchMoreResult }) => {
+            if (!fetchMoreResult) return prev;
+            return {
+              ...prev,
+              memberships: {
+                ...prev.memberships,
+                edges: [
+                  ...(prev.memberships.edges ?? []),
+                  ...(fetchMoreResult.memberships.edges ?? []),
+                ],
+                pageInfo: fetchMoreResult.memberships.pageInfo,
+              },
+            };
+          },
+        });
+      }
+    } catch (err) {
+      console.error("Server Action fetchMore failed:", err);
+      if (authReady) {
+        const [userId, communityIdFromCursor] = endCursor.split("_");
+        await fetchMore({
+          variables: {
+            cursor: { userId, communityId: communityIdFromCursor },
+            filter: {
+              communityId,
+            },
+            first: 20,
+            withWallets: true,
+            withDidIssuanceRequests: true,
+          },
+          updateQuery: (prev, { fetchMoreResult }) => {
+            if (!fetchMoreResult) return prev;
+            return {
+              ...prev,
+              memberships: {
+                ...prev.memberships,
+                edges: [
+                  ...(prev.memberships.edges ?? []),
+                  ...(fetchMoreResult.memberships.edges ?? []),
+                ],
+                pageInfo: fetchMoreResult.memberships.pageInfo,
+              },
+            };
+          },
+        });
+      }
     } finally {
       setIsLoadingMore(false);
     }
