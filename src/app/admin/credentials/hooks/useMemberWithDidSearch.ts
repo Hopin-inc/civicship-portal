@@ -10,7 +10,7 @@ import {
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { useState, useEffect } from "react";
-import { fetchMemberships, fetchMoreMemberships } from "@/app/admin/members/actions";
+import { queryMemberships } from "@/app/admin/members/actions";
 
 const fallbackConnection = {
   edges: [],
@@ -57,7 +57,7 @@ export function useMemberWithDidSearch(
     setIsLoading(true);
     setError(null);
 
-    fetchMemberships({
+    queryMemberships({
       filter: {
         keyword: searchQuery,
         communityId,
@@ -109,7 +109,7 @@ export function useMemberWithDidSearch(
 
     setIsFetchingMore(true);
     try {
-      const result = await fetchMoreMemberships({
+      const result = await queryMemberships({
         cursor: { userId: cursorParts[0], communityId: cursorParts[1] },
         filter: {
           ...(searchQuery && { keyword: searchQuery }),
@@ -157,7 +157,7 @@ export function useMemberWithDidSearch(
     setIsLoading(true);
     setError(null);
     try {
-      const result = await fetchMemberships({
+      const result = await queryMemberships({
         filter: {
           ...(searchQuery && { keyword: searchQuery }),
           communityId,

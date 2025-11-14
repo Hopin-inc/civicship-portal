@@ -1,7 +1,7 @@
 import { GqlMembershipsConnection } from "@/types/graphql";
 import { useState, useEffect } from "react";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import { fetchMemberships, fetchMoreMemberships } from "../actions";
+import { queryMemberships } from "../actions";
 
 export const useMembershipQueries = (
   communityId: string,
@@ -44,7 +44,7 @@ export const useMembershipQueries = (
     try {
       const [userId, communityIdFromCursor] = endCursor.split("_");
       
-      const result = await fetchMoreMemberships({
+      const result = await queryMemberships({
         cursor: { userId, communityId: communityIdFromCursor },
         filter: {
           communityId,
@@ -91,7 +91,7 @@ export const useMembershipQueries = (
     setIsLoading(true);
     setError(null);
     try {
-      const result = await fetchMemberships({
+      const result = await queryMemberships({
         filter: {
           communityId,
         },

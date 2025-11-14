@@ -64,9 +64,6 @@ export async function getMembershipListServer(
       message: (error as Error).message,
       stack: (error as Error).stack,
     });
-    return {
-      connection: null,
-      ssrFetched: false,
-    };
+    throw error;
   }
 }
