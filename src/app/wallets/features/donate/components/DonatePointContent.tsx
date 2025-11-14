@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import { GqlUser, GqlWalletsConnection } from "@/types/graphql";
 import { useTranslations } from "next-intl";
 import { useInfiniteMembers } from "@/hooks/members/useInfiniteMembers";
-import { getServerMemberWalletsWithCursor } from "@/hooks/members/server";
+import { getServerMemberWalletsWithCursor } from "@/hooks/members/server-actions";
 import { DonateMember } from "../types";
 
 export function DonatePointContent({

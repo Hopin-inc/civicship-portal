@@ -1,5 +1,6 @@
-import "server-only";
+"use server";
 
+import { cookies } from "next/headers";
 import { executeServerGraphQLQuery } from "@/lib/graphql/server";
 import { GET_MEMBER_WALLETS_SERVER_QUERY } from "@/graphql/account/wallet/query";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
@@ -8,13 +9,6 @@ import {
   GqlGetMemberWalletsQueryVariables,
   GqlWalletsConnection,
 } from "@/types/graphql";
-import { cookies } from "next/headers";
-
-export interface ServerMemberWalletsParams {
-  first?: number;
-  after?: string;
-  withDidIssuanceRequests?: boolean;
-}
 
 const fallbackConnection: GqlWalletsConnection = {
   edges: [],
@@ -28,13 +22,12 @@ const fallbackConnection: GqlWalletsConnection = {
 };
 
 /**
- * サーバーサイドでメンバーウォレットを取得する関数
+ * Server Action: カーソルベースのページネーションでメンバーウォレットを取得
  */
-export async function getServerMemberWallets(
-  params: ServerMemberWalletsParams = {},
+export async function getServerMemberWalletsWithCursor(
+  cursor?: string,
+  first: number = 20,
 ): Promise<GqlWalletsConnection> {
-  const { first = 20, after, withDidIssuanceRequests = true } = params;
-
   try {
     const cookieStore = await cookies();
     const session = cookieStore.get("session")?.value ?? null;
@@ -45,8 +38,8 @@ export async function getServerMemberWallets(
         communityId: COMMUNITY_ID,
       },
       first,
-      cursor: after,
-      withDidIssuanceRequests,
+      cursor,
+      withDidIssuanceRequests: true,
     };
 
     const data = await executeServerGraphQLQuery<
@@ -56,7 +49,7 @@ export async function getServerMemberWallets(
 
     return data.wallets ?? fallbackConnection;
   } catch (error) {
-    console.error("Failed to fetch member wallets:", error);
+    console.error("Failed to fetch member wallets with cursor:", error);
     return fallbackConnection;
   }
 }
