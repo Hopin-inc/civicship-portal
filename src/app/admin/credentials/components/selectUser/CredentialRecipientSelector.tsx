@@ -2,12 +2,12 @@ import React, { useMemo, useState } from "react";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import {
   GqlDidIssuanceRequest,
+  GqlMembershipsConnection,
   GqlParticipationStatusReason,
   GqlUser,
   useParticipationBulkCreateMutation,
 } from "@/types/graphql";
 import { toast } from "react-toastify";
-import { useMembershipQueries } from "@/app/admin/members/hooks/useMembershipQueries";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { Button } from "@/components/ui/button";
 import { useSelection } from "../../context/SelectionContext";
@@ -90,22 +90,21 @@ const sortMembersByParticipation = (
   });
 };
 
+interface CredentialRecipientSelectorProps {
+  setStep: (step: number) => void;
+  initialConnection: GqlMembershipsConnection | null;
+}
+
 export default function CredentialRecipientSelector({
   setStep,
-}: {
-  setStep: (step: number) => void;
-}) {
+  initialConnection,
+}: CredentialRecipientSelectorProps) {
   const communityId = COMMUNITY_ID;
   const { selectedSlot, setSelectedSlot, participatedUsers } = useSelection();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const [input, setInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const {
-    membershipListData,
-    refetch,
-    loading: membershipLoading,
-  } = useMembershipQueries(communityId);
   const selectedUserIds = selectedSlot?.userIds ?? [];
 
   const { save } = useEvaluationBulkCreate({
@@ -144,15 +143,11 @@ export default function CredentialRecipientSelector({
     participatedUsers.find((u) => u.userId === userId && u.slotId === selectedSlot?.slotId)?.reason;
 
   const allMembers = useMemo(() => {
-    return (
-      membershipListData?.memberships?.edges
-        ?.map((edge) => {
-          const user = edge?.node?.user;
-          return user ? { user } : null;
-        })
-        .filter((member): member is { user: GqlUser } => member !== null) ?? []
+    if (!initialConnection?.edges) return [];
+    return initialConnection.edges.flatMap((edge) =>
+      edge?.node?.user ? [{ user: edge.node.user }] : []
     );
-  }, [membershipListData]);
+  }, [initialConnection]);
   const {
     data: searchMembershipData,
     loading,
@@ -161,10 +156,11 @@ export default function CredentialRecipientSelector({
     isLoadingMore,
     handleFetchMore,
     loadMoreRef,
-  } = useMemberWithDidSearch(communityId, allMembers, { 
+  } = useMemberWithDidSearch(communityId, allMembers, {
     searchQuery,
     enablePagination: true,
     pageSize: 20,
+    initialConnection,
   });
 
 

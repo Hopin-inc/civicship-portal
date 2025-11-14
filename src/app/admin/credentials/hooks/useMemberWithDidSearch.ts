@@ -3,13 +3,16 @@
 import {
   GqlDidIssuanceRequest,
   GqlDidIssuanceStatus,
+  GqlMembershipsConnection,
+  GqlMembershipStatus,
+  GqlMembershipStatusReason,
   GqlRole,
   GqlUser,
-  useGetMembershipListQuery,
 } from "@/types/graphql";
-import { ApolloError, NetworkStatus } from "@apollo/client";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useEffect, useMemo, useState } from "react";
+import { queryMemberships } from "@/app/admin/members/actions";
 
 const fallbackConnection = {
   edges: [],
@@ -28,33 +31,91 @@ export function useMemberWithDidSearch(
     searchQuery?: string;
     enablePagination?: boolean;
     pageSize?: number;
+    initialConnection?: GqlMembershipsConnection | null;
   },
 ) {
   const searchQuery = options?.searchQuery ?? "";
   const enablePagination = options?.enablePagination ?? false;
   const pageSize = options?.pageSize ?? 20;
+  const initialConnection = options?.initialConnection;
 
-  const { data, loading, fetchMore, refetch, error, networkStatus } = useGetMembershipListQuery({
-    variables: {
+  const membersFallbackConnection = useMemo<GqlMembershipsConnection>(() => {
+    const edges = members.map((m) => ({
+      cursor: `${m.user.id}_${communityId}`,
+      node: {
+        user: m.user,
+        role: GqlRole.Member,
+        reason: GqlMembershipStatusReason.AcceptedInvitation,
+        status: GqlMembershipStatus.Joined,
+      },
+    }));
+
+    return {
+      edges,
+      pageInfo: {
+        hasNextPage: false,
+        hasPreviousPage: false,
+        startCursor: null,
+        endCursor: null,
+      },
+      totalCount: members.length,
+    };
+  }, [members, communityId]);
+
+  const [localConnection, setLocalConnection] = useState<GqlMembershipsConnection | null>(
+    initialConnection ?? null,
+  );
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    if (!searchQuery) {
+      setLocalConnection(initialConnection ?? membersFallbackConnection);
+      return;
+    }
+
+    let cancelled = false;
+    setIsLoading(true);
+    setError(null);
+
+    queryMemberships({
       filter: {
-        ...(searchQuery && { keyword: searchQuery }),
+        keyword: searchQuery,
         communityId,
       },
+      first: pageSize,
       withWallets: true,
       withDidIssuanceRequests: true,
-      first: enablePagination ? pageSize : undefined,
-    },
-    fetchPolicy: "cache-first",
-    notifyOnNetworkStatusChange: true,
-  });
+    })
+      .then((result) => {
+        if (cancelled) return;
+        if (result.connection) {
+          setLocalConnection(result.connection);
+        } else {
+          setError(new Error("Failed to fetch search results"));
+        }
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setError(err);
+      })
+      .finally(() => {
+        if (cancelled) return;
+        setIsLoading(false);
+      });
 
-  const memberships = data?.memberships ?? fallbackConnection;
+    return () => {
+      cancelled = true;
+    };
+  }, [searchQuery, communityId, pageSize, initialConnection, membersFallbackConnection]);
+
+  const memberships = localConnection ?? fallbackConnection;
   const endCursor = memberships.pageInfo?.endCursor;
   const hasNextPage = memberships.pageInfo?.hasNextPage ?? false;
-  const isFetchingMore = networkStatus === NetworkStatus.fetchMore;
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
 
   const handleFetchMore = async () => {
-    if (!hasNextPage || !enablePagination) return;
+    if (!hasNextPage || !enablePagination || isFetchingMore) return;
 
     if (!endCursor) {
       console.warn("Invalid endCursor:", endCursor);
@@ -67,42 +128,80 @@ export function useMemberWithDidSearch(
       return;
     }
 
-    await fetchMore({
-      variables: {
+    setIsFetchingMore(true);
+    try {
+      const result = await queryMemberships({
+        cursor: { userId: cursorParts[0], communityId: cursorParts[1] },
         filter: {
           ...(searchQuery && { keyword: searchQuery }),
           communityId,
         },
+        first: pageSize,
         withWallets: true,
         withDidIssuanceRequests: true,
-        cursor: { userId: cursorParts[0], communityId: cursorParts[1] },
-        first: pageSize,
-      },
-      updateQuery: (prev, { fetchMoreResult }) => {
-        if (!fetchMoreResult?.memberships?.edges) return prev;
+      });
 
-        // ID重複防止
-        return {
-          ...prev,
-          memberships: {
-            ...prev.memberships,
-            edges: [
-              ...new Map(
-                [...(prev.memberships?.edges ?? []), ...fetchMoreResult.memberships.edges].map(
-                  (edge) => [edge?.node?.user?.id, edge],
-                ),
-              ).values(),
-            ],
-            pageInfo: fetchMoreResult.memberships.pageInfo,
-          },
-        };
-      },
-    });
+      if (result.connection) {
+        setLocalConnection((prev) => {
+          if (!prev) return result.connection;
+
+          const existingEdges = prev.edges ?? [];
+          const newEdges = result.connection?.edges ?? [];
+
+          const mergedEdges = [
+            ...new Map(
+              [...existingEdges, ...newEdges].map((edge) => [
+                edge?.cursor,
+                edge,
+              ]),
+            ).values(),
+          ];
+
+          return {
+            ...prev,
+            edges: mergedEdges,
+            pageInfo: result.connection?.pageInfo ?? prev.pageInfo,
+          };
+        });
+      } else {
+        setError(new Error("Failed to fetch more results"));
+      }
+    } catch (err) {
+      console.error("Server Action fetchMore failed:", err);
+      setError(err as Error);
+    } finally {
+      setIsFetchingMore(false);
+    }
+  };
+
+  const refetch = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await queryMemberships({
+        filter: {
+          ...(searchQuery && { keyword: searchQuery }),
+          communityId,
+        },
+        first: pageSize,
+        withWallets: true,
+        withDidIssuanceRequests: true,
+      });
+      if (result.connection) {
+        setLocalConnection(result.connection);
+      } else {
+        setError(new Error("Failed to refetch results"));
+      }
+    } catch (err) {
+      setError(err as Error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const loadMoreRef = useInfiniteScroll({
     hasMore: hasNextPage,
-    isLoading: loading || isFetchingMore,
+    isLoading: isLoading || isFetchingMore,
     onLoadMore: handleFetchMore,
   });
 
@@ -111,7 +210,7 @@ export function useMemberWithDidSearch(
       const node = edge?.node;
       if (!node?.user) return null;
       const user = node.user;
-      const role = node.role!;
+      const role = node.role ?? GqlRole.Member; // Default to Member if not present
       const didInfo = user.didIssuanceRequests?.find(
         (req) => req?.status === GqlDidIssuanceStatus.Completed,
       );
@@ -136,10 +235,12 @@ export function useMemberWithDidSearch(
 
   return {
     data: usersWithDid,
-    loading,
-    error: error as ApolloError | undefined,
+    loading: isLoading,
+    error: error,
     hasNextPage,
     isFetchingMore,
+    isLoadingMore: isFetchingMore, // Backward compatibility alias
+    handleFetchMore,
     loadMoreRef,
     refetch,
   };

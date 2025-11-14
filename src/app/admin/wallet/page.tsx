@@ -33,6 +33,7 @@ export default function WalletPage() {
       title: t("adminWallet.title"),
       showLogo: false,
       showBackButton: true,
+      backTo: "/admin/setting",
     }),
     [t],
   );
@@ -141,10 +142,10 @@ export default function WalletPage() {
       <div className="pt-10 flex justify-between items-center">
         <h2 className="text-display-sm">{t("transactions.list.title")}</h2>
         <Link
-            href="/transactions"
-            className="text-sm border-b-[1px] border-black cursor-pointer bg-transparent p-0"
-            >
-            {t("transactions.list.communityHistoryLink")}
+          href="/transactions"
+          className="text-sm border-b-[1px] border-black cursor-pointer bg-transparent p-0"
+        >
+          {t("transactions.list.communityHistoryLink")}
         </Link>
       </div>
       <div className="mt-2">
