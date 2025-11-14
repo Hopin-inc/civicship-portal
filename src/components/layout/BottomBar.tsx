@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Globe, Search, User } from "lucide-react";
+import { Globe, Home, Search, User } from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
 import React from "react";
 import { cn } from "@/lib/utils";
@@ -25,6 +25,11 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
   const isLiff = env === AuthEnvironment.LIFF;
 
   const { isVisible } = useScrollDirection({ threshold: 20 });
+
+  const hasOppOrQuest =
+    currentCommunityConfig.enableFeatures.includes("opportunities") ||
+    currentCommunityConfig.enableFeatures.includes("quests");
+  const showTimeline = !hasOppOrQuest;
 
   if (currentCommunityConfig.enableFeatures.length < 2) {
     return null;
@@ -63,16 +68,26 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
     >
       <div className="max-w-screen-xl mx-auto px-4">
         <div className="flex justify-around items-center">
-          {currentCommunityConfig.enableFeatures.includes("opportunities") && (
+          {hasOppOrQuest ? (
+            currentCommunityConfig.enableFeatures.includes("opportunities") && (
+              <Link
+                href="/opportunities"
+                className={cn(
+                  getLinkStyle("/opportunities", "/opportunities/*", "opportunities/search/*"),
+                  "flex-grow",
+                )}
+              >
+                <Search size={24} />
+                <span className="text-xs mt-1">{t("navigation.bottomBar.discover")}</span>
+              </Link>
+            )
+          ) : (
             <Link
-              href="/opportunities"
-              className={cn(
-                getLinkStyle("/opportunities", "/opportunities/*", "opportunities/search/*"),
-                "flex-grow",
-              )}
+              href="/transactions"
+              className={cn(getLinkStyle("/transactions", "/transactions/*"), "flex-grow")}
             >
-              <Search size={24} />
-              <span className="text-xs mt-1">{t("navigation.bottomBar.discover")}</span>
+              <Home size={24} />
+              <span className="text-xs mt-1">{t("navigation.bottomBar.timeline")}</span>
             </Link>
           )}
           {currentCommunityConfig.enableFeatures.includes("places") && (
