@@ -11,7 +11,7 @@ import {
 } from "@/types/graphql";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { queryMemberships } from "@/app/admin/members/actions";
 
 const fallbackConnection = {
@@ -67,9 +67,16 @@ export function useMemberWithDidSearch(
   );
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const initializedRef = useRef(false);
 
   useEffect(() => {
     if (!searchQuery) {
+      if (initializedRef.current) {
+        return;
+      }
+      
+      initializedRef.current = true;
+      
       if (initialConnection) {
         setLocalConnection(initialConnection);
         return;
@@ -110,6 +117,8 @@ export function useMemberWithDidSearch(
         cancelled = true;
       };
     }
+
+    initializedRef.current = false;
 
     let cancelled = false;
     setIsLoading(true);
