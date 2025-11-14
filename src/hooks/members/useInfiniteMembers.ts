@@ -3,23 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { GqlWalletsConnection } from "@/types/graphql";
 import { toast } from "react-toastify";
-
-interface DonateMember {
-  user: {
-    id: string;
-    name?: string | null;
-    image?: string | null;
-    didIssuanceRequests?: Array<{
-      status: string;
-      didValue?: string | null;
-    } | null> | null;
-  };
-  wallet: {
-    currentPointView: {
-      currentPoint: bigint;
-    };
-  };
-}
+import { DonateMember } from "@/app/wallets/features/donate/types";
 
 interface UseInfiniteMembersProps {
   initialMembers: GqlWalletsConnection;
