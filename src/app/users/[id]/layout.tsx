@@ -1,7 +1,7 @@
 import React from "react";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { fetchPublicUserServer } from "@/app/users/features/shared/server";
+import { fetchUserServer } from "@/app/users/features/shared/server";
 import { currentCommunityConfig, DEFAULT_OPEN_GRAPH_IMAGE } from "@/lib/communities/metadata";
 import { mapGqlPortfolio, UserProfileProvider } from "@/app/users/features/shared";
 
@@ -19,7 +19,7 @@ const fallbackMetadata: Metadata = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const user = await fetchPublicUserServer(id);
+  const user = await fetchUserServer(id);
 
   if (!user) return fallbackMetadata;
 
@@ -52,7 +52,7 @@ export default async function Layout({
   params: { id: string };
 }) {
   const { id } = await params;
-  const gqlUser = await fetchPublicUserServer(id);
+  const gqlUser = await fetchUserServer(id);
 
   if (!gqlUser) {
     notFound();

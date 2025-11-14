@@ -139,6 +139,16 @@ export const GET_PUBLIC_USER_SERVER_QUERY = `
         }
       }
 
+      wallets {
+        id
+        community {
+          id
+        }
+        currentPointView {
+          currentPoint
+        }
+      }
+
       opportunitiesCreatedByMe {
         id
         title
