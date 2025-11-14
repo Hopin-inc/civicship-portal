@@ -6,7 +6,7 @@ import { logger } from "@/lib/logging";
 import { GET_PUBLIC_USER_SERVER_QUERY } from "@/graphql/account/user/server";
 import { cookies } from "next/headers";
 
-export async function fetchPublicUserServer(
+export async function fetchUserServer(
   userId: string
 ): Promise<GqlUser | null> {
   try {
@@ -25,7 +25,7 @@ export async function fetchPublicUserServer(
 
     return res.user ?? null;
   } catch (error) {
-    logger.warn("⚠️ Failed to fetch public user (SSR):", {
+    logger.warn("⚠️ Failed to fetch user (SSR):", {
       userId,
       message: (error as Error).message,
       stack: (error as Error).stack,
