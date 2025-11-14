@@ -15,13 +15,15 @@ export function DonatePointContent({
   currentUser,
   currentPointString,
   initialMembers,
+  initialActiveTab = Tabs.Member,
 }: {
   currentUser?: GqlUser | null;
   currentPointString: string;
   initialMembers: GqlWalletsConnection;
+  initialActiveTab?: Tabs;
 }) {
   const t = useTranslations();
-  const [activeTab, setActiveTab] = useState<Tabs>(Tabs.History);
+  const [activeTab, setActiveTab] = useState<Tabs>(initialActiveTab);
   const currentPoint = BigInt(currentPointString);
 
   const { members, loading, refetch, loadMoreRef } = useInfiniteMembers({

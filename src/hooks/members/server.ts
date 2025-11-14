@@ -48,15 +48,6 @@ export async function getServerMemberWallets(
       withDidIssuanceRequests,
     };
 
-    console.log("[SSR] getServerMemberWallets called", {
-      COMMUNITY_ID,
-      first,
-      after,
-      withDidIssuanceRequests,
-      hasSession: !!session,
-      queryLength: GET_MEMBER_WALLETS_SERVER_QUERY.length,
-    });
-
     const data = session
       ? await executeServerGraphQLQuery<GqlGetMemberWalletsQuery, GqlGetMemberWalletsQueryVariables>(
           GET_MEMBER_WALLETS_SERVER_QUERY,
@@ -68,18 +59,9 @@ export async function getServerMemberWallets(
           variables
         );
 
-    console.log("[SSR] getServerMemberWallets result", {
-      totalCount: data.wallets?.totalCount,
-      edgesLength: data.wallets?.edges?.length,
-    });
-
     return data.wallets ?? fallbackConnection;
   } catch (error) {
-    console.error("[SSR] Failed to fetch member wallets:", error);
-    console.error("[SSR] Error details:", {
-      message: (error as Error).message,
-      stack: (error as Error).stack,
-    });
+    console.error("Failed to fetch member wallets:", error);
     return fallbackConnection;
   }
 }

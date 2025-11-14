@@ -41,14 +41,6 @@ export async function getServerMemberWalletsWithCursor(
       withDidIssuanceRequests: true,
     };
 
-    console.log("[Server Action] getServerMemberWalletsWithCursor called", {
-      COMMUNITY_ID,
-      first,
-      cursor,
-      hasSession: !!session,
-      queryLength: GET_MEMBER_WALLETS_SERVER_QUERY.length,
-    });
-
     const data = session
       ? await executeServerGraphQLQuery<GqlGetMemberWalletsQuery, GqlGetMemberWalletsQueryVariables>(
           GET_MEMBER_WALLETS_SERVER_QUERY,
@@ -60,18 +52,9 @@ export async function getServerMemberWalletsWithCursor(
           variables
         );
 
-    console.log("[Server Action] getServerMemberWalletsWithCursor result", {
-      totalCount: data.wallets?.totalCount,
-      edgesLength: data.wallets?.edges?.length,
-    });
-
     return data.wallets ?? fallbackConnection;
   } catch (error) {
-    console.error("[Server Action] Failed to fetch member wallets with cursor:", error);
-    console.error("[Server Action] Error details:", {
-      message: (error as Error).message,
-      stack: (error as Error).stack,
-    });
+    console.error("Failed to fetch member wallets with cursor:", error);
     return fallbackConnection;
   }
 }
