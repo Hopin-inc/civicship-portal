@@ -17,6 +17,8 @@ interface MembersPageClientProps {
   initialConnection: GqlMembershipsConnection | null;
 }
 
+const EMPTY_MEMBERS: [] = [];
+
 export default function MembersPageClient({ initialConnection }: MembersPageClientProps) {
   const { user: currentUser } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
@@ -45,7 +47,7 @@ export default function MembersPageClient({ initialConnection }: MembersPageClie
     isFetchingMore,
     loadMoreRef,
     refetch,
-  } = useMemberWithDidSearch(COMMUNITY_ID, [], {
+  } = useMemberWithDidSearch(COMMUNITY_ID, EMPTY_MEMBERS, {
     searchQuery,
     pageSize: 20,
     enablePagination: true,

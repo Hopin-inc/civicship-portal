@@ -11,7 +11,7 @@ import {
 } from "@/types/graphql";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { queryMemberships } from "@/app/admin/members/actions";
 
 const fallbackConnection = {
@@ -67,12 +67,58 @@ export function useMemberWithDidSearch(
   );
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const initializedRef = useRef(false);
 
   useEffect(() => {
     if (!searchQuery) {
-      setLocalConnection(initialConnection ?? membersFallbackConnection);
-      return;
+      if (initializedRef.current) {
+        return;
+      }
+      
+      initializedRef.current = true;
+      
+      if (initialConnection) {
+        setLocalConnection(initialConnection);
+        return;
+      }
+      
+      let cancelled = false;
+      setIsLoading(true);
+      setError(null);
+
+      queryMemberships({
+        filter: {
+          communityId,
+        },
+        first: pageSize,
+        withWallets: true,
+        withDidIssuanceRequests: true,
+      })
+        .then((result) => {
+          if (cancelled) return;
+          if (result.connection) {
+            setLocalConnection(result.connection);
+          } else {
+            setLocalConnection(membersFallbackConnection);
+            setError(new Error("Failed to fetch initial results"));
+          }
+        })
+        .catch((err) => {
+          if (cancelled) return;
+          setLocalConnection(membersFallbackConnection);
+          setError(err);
+        })
+        .finally(() => {
+          if (cancelled) return;
+          setIsLoading(false);
+        });
+
+      return () => {
+        cancelled = true;
+      };
     }
+
+    initializedRef.current = false;
 
     let cancelled = false;
     setIsLoading(true);

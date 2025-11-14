@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { GqlUser } from "@/types/graphql";
+import { GqlMembershipsConnection, GqlUser } from "@/types/graphql";
 import UserInfoCard from "./UserInfoCard";
 import { useMemberWithDidSearch as useMemberSearchFromCredentials } from "@/app/admin/credentials/hooks/useMemberWithDidSearch";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
@@ -14,9 +14,10 @@ interface MemberTabProps {
   onSelect: (user: GqlUser) => void;
   loadMoreRef?: React.RefObject<HTMLDivElement>;
   isLoadingMore?: boolean;
+  initialConnection?: GqlMembershipsConnection | null;
 }
 
-export function MemberTab({ members, searchQuery, onSelect }: MemberTabProps) {
+export function MemberTab({ members, searchQuery, onSelect, initialConnection }: MemberTabProps) {
   const t = useTranslations();
   const {
     data: searchMembershipData,
@@ -27,6 +28,7 @@ export function MemberTab({ members, searchQuery, onSelect }: MemberTabProps) {
     searchQuery,
     pageSize: 20,
     enablePagination: true,
+    initialConnection,
   });
 
   if (error) {
