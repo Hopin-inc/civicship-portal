@@ -145,7 +145,7 @@ export default function CredentialRecipientSelector({
 
   const allMembers = useMemo(() => {
     return (
-      membershipListData?.memberships?.edges
+      membershipListData?.edges
         ?.map((edge) => {
           const user = edge?.node?.user;
           return user ? { user } : null;

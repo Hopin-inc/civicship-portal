@@ -13,7 +13,7 @@ interface SearchResultListProps {
   hasNextPage?: boolean;
   isLoadingMore?: boolean;
   onLoadMore?: () => void;
-  loadMoreRef?: React.RefObject<HTMLDivElement>;
+  loadMoreRef?: (node: HTMLDivElement | null) => void;
 }
 
 const SearchResultList: React.FC<SearchResultListProps> = ({
@@ -82,4 +82,4 @@ const SearchResultList: React.FC<SearchResultListProps> = ({
   );
 };
 
-export default SearchResultList; 
+export default SearchResultList;  

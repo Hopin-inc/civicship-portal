@@ -218,6 +218,8 @@ export function useMemberWithDidSearch(
     error: error,
     hasNextPage,
     isFetchingMore,
+    isLoadingMore: isFetchingMore, // Backward compatibility alias
+    handleFetchMore,
     loadMoreRef,
     refetch,
   };
