@@ -7,13 +7,11 @@ export const useMembershipQueries = (
   communityId: string,
   options?: {
     initialConnection?: GqlMembershipsConnection | null;
-    ssrFetched?: boolean;
   }
 ) => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
-  const ssrFetched = options?.ssrFetched ?? false;
   const initialConnection = options?.initialConnection;
 
   const [localConnection, setLocalConnection] = useState<GqlMembershipsConnection | null>(
@@ -21,10 +19,10 @@ export const useMembershipQueries = (
   );
 
   useEffect(() => {
-    if (ssrFetched && initialConnection) {
+    if (initialConnection) {
       setLocalConnection(initialConnection);
     }
-  }, [initialConnection, ssrFetched]);
+  }, [initialConnection]);
 
   const connection = localConnection ?? { edges: [], pageInfo: {} };
   const pageInfo =
@@ -54,7 +52,7 @@ export const useMembershipQueries = (
         withDidIssuanceRequests: true,
       });
 
-      if (result.ssrFetched && result.connection) {
+      if (result.connection) {
         setLocalConnection((prev) => {
           if (!prev) return result.connection;
           
@@ -64,7 +62,7 @@ export const useMembershipQueries = (
           const mergedEdges = [
             ...new Map(
               [...existingEdges, ...newEdges].map((edge) => [
-                edge?.cursor ?? `${edge?.node?.user?.id}_${edge?.node?.community?.id}`,
+                edge?.cursor,
                 edge,
               ])
             ).values(),
@@ -99,7 +97,7 @@ export const useMembershipQueries = (
         withWallets: true,
         withDidIssuanceRequests: true,
       });
-      if (result.ssrFetched && result.connection) {
+      if (result.connection) {
         setLocalConnection(result.connection);
       } else {
         setError(new Error("Failed to refetch results"));

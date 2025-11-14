@@ -15,12 +15,10 @@ import { GqlMembershipsConnection } from "@/types/graphql";
 
 interface MembersPageClientProps {
   initialConnection: GqlMembershipsConnection | null;
-  ssrFetched: boolean;
 }
 
 export default function MembersPageClient({
   initialConnection,
-  ssrFetched,
 }: MembersPageClientProps) {
   const { user: currentUser } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
@@ -53,7 +51,6 @@ export default function MembersPageClient({
     pageSize: 20,
     enablePagination: true,
     initialConnection,
-    ssrFetched,
   });
 
   const {

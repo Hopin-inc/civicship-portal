@@ -25,7 +25,6 @@ export async function getMembershipListServer(
   variables: GetMembershipListServerVariables
 ): Promise<{
   connection: GqlMembershipsConnection | null;
-  ssrFetched: boolean;
 }> {
   const cookieStore = await cookies();
   const session = cookieStore.get("session")?.value ?? null;
@@ -34,7 +33,6 @@ export async function getMembershipListServer(
     logger.debug("No session cookie found for SSR membership fetch");
     return {
       connection: null,
-      ssrFetched: false,
     };
   }
 
@@ -44,20 +42,12 @@ export async function getMembershipListServer(
       GetMembershipListServerVariables
     >(
       GET_MEMBERSHIP_LIST_SERVER_QUERY,
-      {
-        first: variables.first,
-        cursor: variables.cursor,
-        filter: variables.filter,
-        sort: variables.sort,
-        withWallets: variables.withWallets ?? false,
-        withDidIssuanceRequests: variables.withDidIssuanceRequests ?? false,
-      },
+      variables,
       { Authorization: `Bearer ${session}` }
     );
 
     return {
       connection: res.memberships,
-      ssrFetched: true,
     };
   } catch (error) {
     logger.warn("⚠️ Failed to fetch membership list on server:", {

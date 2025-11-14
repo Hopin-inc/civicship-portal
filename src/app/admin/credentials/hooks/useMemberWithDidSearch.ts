@@ -32,13 +32,11 @@ export function useMemberWithDidSearch(
     enablePagination?: boolean;
     pageSize?: number;
     initialConnection?: GqlMembershipsConnection | null;
-    ssrFetched?: boolean;
   },
 ) {
   const searchQuery = options?.searchQuery ?? "";
   const enablePagination = options?.enablePagination ?? false;
   const pageSize = options?.pageSize ?? 20;
-  const ssrFetched = options?.ssrFetched ?? false;
   const initialConnection = options?.initialConnection;
 
   const membersFallbackConnection = useMemo<GqlMembershipsConnection>(() => {
@@ -91,7 +89,7 @@ export function useMemberWithDidSearch(
     })
       .then((result) => {
         if (cancelled) return;
-        if (result.ssrFetched && result.connection) {
+        if (result.connection) {
           setLocalConnection(result.connection);
         } else {
           setError(new Error("Failed to fetch search results"));
@@ -143,7 +141,7 @@ export function useMemberWithDidSearch(
         withDidIssuanceRequests: true,
       });
 
-      if (result.ssrFetched && result.connection) {
+      if (result.connection) {
         setLocalConnection((prev) => {
           if (!prev) return result.connection;
           
@@ -153,7 +151,7 @@ export function useMemberWithDidSearch(
           const mergedEdges = [
             ...new Map(
               [...existingEdges, ...newEdges].map((edge) => [
-                edge?.cursor ?? `${edge?.node?.user?.id}_${edge?.node?.community?.id}`,
+                edge?.cursor,
                 edge,
               ])
             ).values(),
@@ -189,7 +187,7 @@ export function useMemberWithDidSearch(
         withWallets: true,
         withDidIssuanceRequests: true,
       });
-      if (result.ssrFetched && result.connection) {
+      if (result.connection) {
         setLocalConnection(result.connection);
       } else {
         setError(new Error("Failed to refetch results"));
