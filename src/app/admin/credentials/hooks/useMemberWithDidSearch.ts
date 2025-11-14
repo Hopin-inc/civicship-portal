@@ -11,7 +11,7 @@ import {
 } from "@/types/graphql";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { useState, useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { queryMemberships } from "@/app/admin/members/actions";
 
 const fallbackConnection = {
@@ -40,16 +40,16 @@ export function useMemberWithDidSearch(
   const initialConnection = options?.initialConnection;
 
   const membersFallbackConnection = useMemo<GqlMembershipsConnection>(() => {
-    const edges = members.map(m => ({
+    const edges = members.map((m) => ({
       cursor: `${m.user.id}_${communityId}`,
       node: {
         user: m.user,
         role: GqlRole.Member,
-        reason: GqlMembershipStatusReason.Assigned,
+        reason: GqlMembershipStatusReason.AcceptedInvitation,
         status: GqlMembershipStatus.Joined,
       },
     }));
-    
+
     return {
       edges,
       pageInfo: {
@@ -63,7 +63,7 @@ export function useMemberWithDidSearch(
   }, [members, communityId]);
 
   const [localConnection, setLocalConnection] = useState<GqlMembershipsConnection | null>(
-    initialConnection ?? null
+    initialConnection ?? null,
   );
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -144,16 +144,16 @@ export function useMemberWithDidSearch(
       if (result.connection) {
         setLocalConnection((prev) => {
           if (!prev) return result.connection;
-          
+
           const existingEdges = prev.edges ?? [];
           const newEdges = result.connection?.edges ?? [];
-          
+
           const mergedEdges = [
             ...new Map(
               [...existingEdges, ...newEdges].map((edge) => [
                 edge?.cursor,
                 edge,
-              ])
+              ]),
             ).values(),
           ];
 
