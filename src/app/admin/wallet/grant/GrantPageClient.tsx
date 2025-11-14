@@ -106,7 +106,7 @@ export default function GrantPageClient({ initialConnection }: GrantPageClientPr
       ): member is {
         user: GqlUser;
         wallet: { currentPointView: { currentPoint: bigint } };
-      } => !!member && !!member.user,
+      } => !!member.user,
     );
 
   if (loading) {
