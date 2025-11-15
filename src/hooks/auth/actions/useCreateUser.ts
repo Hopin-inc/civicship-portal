@@ -1,7 +1,21 @@
 import { useCallback } from "react";
 import { logger } from "@/lib/logging";
-import { GqlCurrentPrefecture, GqlUser, useUserSignUpMutation } from "@/types/graphql";
+import { GqlCurrentPrefecture, GqlLanguage, GqlUser, useUserSignUpMutation } from "@/types/graphql";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
+
+const getLanguageCookie = (): string | null => {
+  if (typeof document === "undefined") return null;
+  const cookies = document.cookie.split("; ");
+  const cookie = cookies.find((c) => c.startsWith("language="));
+  const [_, ...cookieValues] = cookie?.split("=") ?? [];
+  return cookieValues?.length ? cookieValues.join("=") : null;
+};
+
+const mapLanguageToEnum = (language: string | null): GqlLanguage | undefined => {
+  if (language === "en") return GqlLanguage.En;
+  if (language === "ja") return GqlLanguage.Ja;
+  return undefined;
+};
 
 export const useCreateUser = (refetchUser: () => Promise<GqlUser | null>) => {
   const [userSignUp] = useUserSignUpMutation();
@@ -13,6 +27,9 @@ export const useCreateUser = (refetchUser: () => Promise<GqlUser | null>) => {
         const { state, phoneAuth } = useAuthStore.getState();
         const { lineTokens } = state;
         const { phoneTokens } = phoneAuth;
+
+        const languageCookie = getLanguageCookie();
+        const preferredLanguage = mapLanguageToEnum(languageCookie);
 
         const { data } = await userSignUp({
           variables: {
@@ -26,6 +43,7 @@ export const useCreateUser = (refetchUser: () => Promise<GqlUser | null>) => {
               phoneRefreshToken: phoneTokens.refreshToken ?? undefined,
               lineRefreshToken: lineTokens.refreshToken ?? undefined,
               lineTokenExpiresAt: lineTokens.expiresAt ?? undefined,
+              preferredLanguage,
             },
           },
         });
