@@ -77,7 +77,10 @@ export function PhoneVerificationForm() {
     if (result.success) {
       setStep("code");
     } else if (result.error) {
-      toast.error(result.error.message);
+      const errorMessage = result.error.messageKey 
+        ? t(result.error.messageKey) 
+        : result.error.message;
+      toast.error(errorMessage);
     }
   };
 
@@ -94,7 +97,10 @@ export function PhoneVerificationForm() {
         toast.success(result.message);
       }
     } else if (result.error) {
-      toast.error(result.error.message);
+      const errorMessage = result.error.messageKey 
+        ? t(result.error.messageKey) 
+        : result.error.message;
+      toast.error(errorMessage);
     }
   };
 

@@ -15,6 +15,7 @@ interface PhoneSubmissionResult {
   message?: string;
   error?: {
     message: string;
+    messageKey?: string;
     type: string;
   };
 }
@@ -54,6 +55,7 @@ export function usePhoneSubmission(
       success: false,
       error: {
         message: categorized.message,
+        messageKey: categorized.messageKey,
         type: categorized.type,
       },
     };
