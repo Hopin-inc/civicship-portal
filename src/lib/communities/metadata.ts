@@ -250,6 +250,12 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
         path: "/communities/izu/{locale}/privacy-policy.pdf",
         type: "external",
       },
+      terms: {
+        id: "terms",
+        title: "users.promise.termsOfService",
+        path: "/communities/izu/{locale}/terms.pdf",
+        type: "external",
+      },
     },
     documents: [
       {
