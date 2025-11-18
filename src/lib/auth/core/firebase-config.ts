@@ -47,6 +47,15 @@ export const getFirebaseAnalytics = async (): Promise<Analytics | undefined> => 
   return analyticsInstance;
 };
 
+const CODE_EXPIRED_ERROR = {
+  type: "verification",
+  message: "認証コードの有効期限が切れました。再度送信してください。",
+  messageKey: "auth.codeExpired",
+  retryable: true,
+  logLevel: "warn" as const,
+  errorCategory: "user_input",
+};
+
 /**
  * Firebase認証エラーを分類する
  * @param error Firebaseから返されたエラー
@@ -132,14 +141,7 @@ export const categorizeFirebaseError = (
     }
 
     if (code === "auth/code-expired") {
-      return {
-        type: "verification",
-        message: "認証コードの有効期限が切れました。再度送信してください。",
-        messageKey: "auth.codeExpired",
-        retryable: true,
-        logLevel: "warn",
-        errorCategory: "user_input",
-      };
+      return CODE_EXPIRED_ERROR;
     }
 
     if (code === "auth/operation-not-allowed") {
@@ -276,14 +278,7 @@ export const categorizeFirebaseError = (
   }
 
   if (error?.message?.includes("SESSION_EXPIRED")) {
-    return {
-      type: "verification",
-      message: "認証コードの有効期限が切れています。再度送信してください。",
-      messageKey: "auth.codeExpired",
-      retryable: true,
-      logLevel: "warn",
-      errorCategory: "user_input",
-    };
+    return CODE_EXPIRED_ERROR;
   }
 
   if (error?.message?.includes("LIFF authentication failed")) {
