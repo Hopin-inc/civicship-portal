@@ -84,10 +84,12 @@ export default function IssuePointPage() {
   return (
     <>
       <main className="flex items-center justify-center px-4">
-        <div className="flex flex-col items-center space-y-6 max-w-xl w-full mt-6">
+        <div className="flex flex-col items-center space-y-6 max-w-xl w-full">
           <section className="w-full">
             <div>
-              <Label className="text-label-md font-medium">{t("wallets.shared.transfer.amountLabel")}</Label>
+              <Label className="text-label-md font-medium">
+                {t("wallets.shared.transfer.amountLabel")}
+              </Label>
               <span className="text-label-xs rounded-full px-2 py-[2px] ml-2 bg-primary-foreground text-primary font-bold">
                 {t("wallets.shared.transfer.required")}
               </span>
@@ -102,7 +104,9 @@ export default function IssuePointPage() {
             />
 
             <div className="mt-6">
-              <Label className="text-label-md font-medium">{t("wallets.shared.transfer.commentLabel")}</Label>
+              <Label className="text-label-md font-medium">
+                {t("wallets.shared.transfer.commentLabel")}
+              </Label>
               <div className="relative mt-3">
                 <Textarea
                   maxLength={100}
