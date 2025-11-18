@@ -6,29 +6,83 @@ SESSION_EXPIRED エラーを含む Firebase Authentication 関連のエラーロ
 
 ## 🎯 このPRの実装範囲
 
-このPRでは、以下のFirebase認証エラーのログレベル改善を実装しています：
+このPRでは、Firebase認証エラーの包括的なログレベル改善とi18n対応を実装しています。
 
-### 実装済みエラーコード
+### 実装済みエラーコード（全20種類）
+
+#### 既存エラーコード（8種類 - messageKey追加）
 1. `auth/network-request-failed` - ネットワーク接続失敗 → **WARN**
 2. `auth/user-token-expired` / `auth/id-token-expired` - トークン有効期限切れ → **INFO**
 3. `auth/invalid-credential` / `auth/user-disabled` - 認証情報無効 → **WARN**
 4. `auth/requires-recent-login` - 再認証が必要 → **INFO**
 5. `auth/invalid-verification-code` - 無効な認証コード → **INFO**
 6. `auth/too-many-requests` - レート制限 → **WARN**
-7. **`auth/code-expired` - 認証コードの有効期限切れ → WARN** ← 今回の主目的
-8. LIFF authentication failed - LINE認証失敗 → **WARN**
+7. `auth/code-expired` - 認証コードの有効期限切れ → **WARN**
+8. `auth/operation-not-allowed` - SMS送信が有効化されていない → **ERROR** (WARN から変更)
+
+#### 新規追加エラーコード（12種類）
+
+**ERROR レベル（7種類）**:
+9. `auth/quota-exceeded` - APIクォータ超過
+10. `auth/app-not-authorized` - アプリケーション未承認
+11. `auth/app-not-verified` - アプリケーション未検証
+12. `auth/missing-verification-code` - 認証コード未入力（システムエラー）
+13. `auth/internal-error` - Firebase内部エラー
+14. `auth/missing-verification-id` - 認証ID欠落
+15. `auth/invalid-app-credential` / `auth/missing-app-credential` - アプリ認証情報無効
+
+**WARN レベル（2種類）**:
+16. `auth/too-many-attempts-try-later` - 認証試行回数超過
+17. `auth/captcha-check-failed` - CAPTCHA検証失敗
+
+**INFO レベル（2種類）**:
+18. `auth/invalid-phone-number` - 電話番号形式エラー
+19. `auth/missing-phone-number` - 電話番号未入力
+
+#### メッセージベースエラー（1種類）
+20. `SESSION_EXPIRED` (Cloud Identity Toolkit) - セッション有効期限切れ → **WARN**
 
 ### 実装内容
-- `categorizeFirebaseError` 関数に `logLevel` と `errorCategory` フィールドを追加
-- `logFirebaseError` ヘルパー関数を新規実装
-- 電話認証関連の全ログ出力を `logFirebaseError` に統一
+1. **`categorizeFirebaseError` 関数の拡張**
+   - `messageKey` フィールドを追加（i18n対応）
+   - 12個の新規エラーコードを追加
+   - `auth/operation-not-allowed` を WARN → ERROR に変更（errorCategory も environment_constraint → config に変更）
+   - `SESSION_EXPIRED` のメッセージベース判定を追加（error.code チェックの後に配置）
+   - `auth/captcha-check-failed` の errorCategory を environment_constraint に変更
 
-### 将来の拡張計画
-以下のエラーコードは、Phase 2/3 で実装予定です（本PRには含まれません）：
-- `auth/invalid-phone-number` / `auth/missing-phone-number`
-- `auth/app-not-authorized` / `auth/app-not-verified`
-- `auth/quota-exceeded`
-- その他のFirebase認証エラー
+2. **i18n対応**
+   - `src/messages/ja/auth.json` に20個の翻訳キーを追加
+   - `src/messages/en/auth.json` に20個の翻訳キーを追加
+   - UIコンポーネントで `t(categorized.messageKey)` を使用可能
+
+3. **ログ出力の統一**
+   - `logFirebaseError` ヘルパー関数は既に実装済み（変更不要）
+   - 電話認証関連の全ログ出力は既に `logFirebaseError` を使用中
+
+### retryable フラグの定義
+
+`retryable` フラグは、ユーザーが入力を修正したり、待機時間を置いた後に再試行可能かどうかを示します：
+
+- **`retryable: true`**: ユーザーが入力を修正する、または待機することで解決可能
+  - 例: `auth/invalid-phone-number`, `auth/invalid-verification-code`, `auth/code-expired`, `auth/captcha-check-failed`
+  
+- **`retryable: false`**: システムまたは設定の問題で、ユーザーの再試行では解決不可能
+  - 例: `auth/quota-exceeded`, `auth/app-not-authorized`, `auth/operation-not-allowed`, `auth/too-many-attempts-try-later`
+
+### エラー判定の優先順位
+
+`categorizeFirebaseError` 関数は以下の優先順位でエラーを判定します：
+
+1. **`error.code` による判定**（最優先）
+   - Firebase SDK が提供する標準エラーコード
+   - 20種類のエラーコードを網羅
+
+2. **`error.message` による判定**
+   - `SESSION_EXPIRED`: Cloud Identity Toolkit 固有のエラー
+   - `LIFF authentication failed`: LINE認証エラー
+
+3. **未知のエラー**（フォールバック）
+   - `type: "unknown"`, `logLevel: "error"`, `errorCategory: "system"`
 
 ### 対象エラー
 
