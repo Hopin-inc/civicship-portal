@@ -45,6 +45,14 @@ export function PhoneVerificationForm() {
     };
   }, []);
 
+  const updateAuthState = React.useCallback(async () => {
+    const refetchUser = useAuthStore.getState().actions?.refetchUser;
+    if (refetchUser) {
+      return await refetchUser();
+    }
+    return null;
+  }, []);
+
   const { isDisabled: isResendDisabled, countdown, start: startResendTimer } = useResendTimer();
   const recaptchaManager = useRecaptchaManager();
   const phoneSubmission = usePhoneSubmission(
@@ -63,7 +71,7 @@ export function PhoneVerificationForm() {
       verifyPhoneCode: phoneAuthMethods.verifyPhoneCode,
     },
     nextParam,
-    undefined,
+    updateAuthState,
   );
 
   const isPhoneValid = isValidPhoneNumber(phoneNumber);

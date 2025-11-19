@@ -8,6 +8,7 @@ import { GqlUser, CurrentUserServerDocument } from "@/types/graphql";
 import { TokenManager } from "@/lib/auth/core/token-manager";
 import { logger } from "@/lib/logging";
 import { useApolloClient } from "@apollo/client";
+import { useAuthSideEffects } from "@/hooks/auth/sideEffects";
 
 interface AuthStateProviderProps {
   children: React.ReactNode;
@@ -22,7 +23,7 @@ export const AuthStateProvider: React.FC<AuthStateProviderProps> = ({
   ssrLineAuthenticated,
   ssrPhoneAuthenticated,
 }) => {
-  const { liffService, phoneAuthService } = useAuthDependencies();
+  const { liffService, phoneAuthService, authStateManager } = useAuthDependencies();
   const apolloClient = useApolloClient();
   const hasInitialized = useRef(false);
 
@@ -74,6 +75,13 @@ export const AuthStateProvider: React.FC<AuthStateProviderProps> = ({
       },
     });
   }, [liffService, phoneAuthService, apolloClient, ssrCurrentUser, ssrLineAuthenticated, ssrPhoneAuthenticated]);
+
+  const refetchUser = useAuthStore((s) => s.actions?.refetchUser);
+  useAuthSideEffects({
+    authStateManager,
+    liffService,
+    refetchUser: refetchUser ?? (async () => null),
+  });
 
   return <>{children}</>;
 };
