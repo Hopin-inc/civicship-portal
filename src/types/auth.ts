@@ -12,6 +12,10 @@ export type AuthStore = {
   setPhoneAuth: (partial: Partial<PhoneAuthState>) => void;
   setLiffAuth: (partial: Partial<LiffState>) => void;
   reset: () => void;
+  actions?: {
+    logout: () => Promise<void>;
+    refetchUser: () => Promise<GqlUser | null>;
+  };
 };
 
 export type AuthState = {
