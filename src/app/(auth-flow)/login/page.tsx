@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { useAuthCompat as useAuth } from "@/hooks/auth/useAuthCompat";
+import { useAuthInteraction } from "@/contexts/AuthInteractionProvider";
 import { decodeURIComponentWithType, EncodedURIComponent } from "@/utils/path";
 import { getLiffLoginErrorMessage } from "@/app/(auth-flow)/login/utils/getLiffLoginErrorMessage";
 import { toast } from "react-toastify";
@@ -16,7 +16,7 @@ export default function LoginPage() {
     (searchParams.get("next") ?? "/") as EncodedURIComponent | null,
   );
 
-  const { loginWithLiff } = useAuth();
+  const { loginWithLiff } = useAuthInteraction();
   const { authenticationState, isAuthenticating } = useAuthStore((s) => s.state);
 
   const [isLoading, setIsLoading] = useState(false);

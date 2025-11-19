@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useAuthCompat as useAuth } from "@/hooks/auth/useAuthCompat";
+import { useAuthInteraction } from "@/contexts/AuthInteractionProvider";
 import { toast } from "react-toastify";
 import { useRouter, useSearchParams } from "next/navigation";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
@@ -22,7 +22,11 @@ export function PhoneVerificationForm() {
   const searchParams = useSearchParams();
   const next = searchParams.get("next");
   const nextParam = next ? `?next=${encodeURIComponent(next)}` : "";
-  const { phoneAuth, isAuthenticated, loading, updateAuthState } = useAuth();
+  const { phoneAuth: phoneAuthMethods } = useAuthInteraction();
+  const { authenticationState } = useAuthStore((s) => s.state);
+  const phoneAuthState = useAuthStore((s) => s.phoneAuth);
+  const isAuthenticated = authenticationState === "user_registered";
+  const loading = authenticationState === "loading";
   const [phoneNumber, setPhoneNumber] = useState<string | undefined>(undefined);
   const [verificationCode, setVerificationCode] = useState("");
   const [step, setStep] = useState<VerificationStep>("phone");
@@ -45,8 +49,8 @@ export function PhoneVerificationForm() {
   const recaptchaManager = useRecaptchaManager();
   const phoneSubmission = usePhoneSubmission(
     {
-      startPhoneVerification: phoneAuth.startPhoneVerification,
-      clearRecaptcha: phoneAuth.clearRecaptcha,
+      startPhoneVerification: phoneAuthMethods.startPhoneVerification,
+      clearRecaptcha: phoneAuthMethods.clearRecaptcha,
     },
     recaptchaManager,
     {
@@ -56,10 +60,10 @@ export function PhoneVerificationForm() {
   );
   const codeVerification = useCodeVerification(
     {
-      verifyPhoneCode: phoneAuth.verifyPhoneCode,
+      verifyPhoneCode: phoneAuthMethods.verifyPhoneCode,
     },
     nextParam,
-    updateAuthState,
+    undefined,
   );
 
   const isPhoneValid = isValidPhoneNumber(phoneNumber);
@@ -154,7 +158,7 @@ export function PhoneVerificationForm() {
           isSubmitting={phoneSubmission.isSubmitting}
           isRateLimited={phoneSubmission.isRateLimited}
           isPhoneValid={isPhoneValid}
-          isVerifying={phoneAuth.isVerifying}
+          isVerifying={phoneAuthState.isVerifying}
           recaptchaContainerRef={recaptchaManager.containerRef}
         />
       )}
@@ -168,13 +172,13 @@ export function PhoneVerificationForm() {
           onResend={handleResendCode}
           onBackToPhone={handleBackToPhone}
           isVerifying={codeVerification.isVerifying}
-          isPhoneVerifying={phoneAuth.isVerifying}
+          isPhoneVerifying={phoneAuthState.isVerifying}
           isResendDisabled={isResendDisabled}
           countdown={countdown}
           isPhoneSubmitting={phoneSubmission.isSubmitting}
           showRecaptcha={recaptchaManager.showRecaptcha}
           recaptchaContainerRef={recaptchaManager.containerRef}
-          phoneAuth={{ clearRecaptcha: phoneAuth.clearRecaptcha }}
+          phoneAuth={{ clearRecaptcha: phoneAuthMethods.clearRecaptcha }}
         />
       )}
     </div>

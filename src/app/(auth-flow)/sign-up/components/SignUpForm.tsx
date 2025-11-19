@@ -16,7 +16,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { GqlCurrentPrefecture } from "@/types/graphql";
-import { useAuthCompat as useAuth } from "@/hooks/auth/useAuthCompat";
+import { useAuthInteraction } from "@/contexts/AuthInteractionProvider";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
@@ -37,9 +37,14 @@ const createFormSchema = (t: (key: string) => string) => z.object({
 
 export function SignUpForm() {
   const t = useTranslations();
-  const { createUser, isAuthenticated, isPhoneVerified, phoneAuth, loading } = useAuth();
+  const { createUser } = useAuthInteraction();
   const [isLoading, setIsLoading] = useState(false);
   const firebaseUser = useAuthStore((s) => s.state.firebaseUser);
+  const { authenticationState, currentUser } = useAuthStore((s) => s.state);
+  const phoneAuth = useAuthStore((s) => s.phoneAuth);
+  const isAuthenticated = authenticationState === "user_registered";
+  const isPhoneVerified = phoneAuth.isVerified;
+  const loading = authenticationState === "loading";
 
   const FormSchema = createFormSchema((key: string) => t(`auth.signup.${key}`));
   type FormValues = z.infer<typeof FormSchema>;
