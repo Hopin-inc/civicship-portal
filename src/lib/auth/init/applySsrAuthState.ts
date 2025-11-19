@@ -7,10 +7,11 @@ export function applySsrAuthState(
   ssrLineAuthenticated?: boolean,
   ssrPhoneAuthenticated?: boolean,
 ) {
-  if (!ssrLineAuthenticated && !ssrPhoneAuthenticated && !ssrCurrentUser) return;
-
   let initialState: AuthenticationState = "loading";
-  if (ssrCurrentUser && ssrLineAuthenticated && ssrPhoneAuthenticated) {
+  
+  if (!ssrLineAuthenticated && !ssrPhoneAuthenticated && !ssrCurrentUser) {
+    initialState = "unauthenticated";
+  } else if (ssrCurrentUser && ssrLineAuthenticated && ssrPhoneAuthenticated) {
     initialState = "user_registered";
   } else if (ssrCurrentUser && ssrLineAuthenticated) {
     initialState = "line_authenticated";
