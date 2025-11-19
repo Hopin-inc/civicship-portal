@@ -48,8 +48,8 @@ export const useAuthCompat = (): UseAuthCompatReturn => {
   const isAuthenticated = authenticationState === "user_registered";
   const loading = authenticationState === "loading";
 
-  const logout = actions!.logout;
-  const refetchUser = actions!.refetchUser;
+  const logout = actions?.logout ?? (async () => {});
+  const refetchUser = actions?.refetchUser ?? (async () => null);
 
   return {
     user,

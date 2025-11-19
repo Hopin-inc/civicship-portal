@@ -15,8 +15,12 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
   title,
   refetchRef,
 }) => {
-  const t = useTranslations();
-  const displayTitle = title ?? t("common.errorState.defaultTitle");
+  let t: ReturnType<typeof useTranslations> | null = null;
+  try {
+    t = useTranslations();
+  } catch (e) {
+  }
+  const displayTitle = title ?? (t ? t("common.errorState.defaultTitle") : "エラーが発生しました");
 
   const handleRetry = () => {
     if (refetchRef?.current) {
@@ -36,7 +40,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
       <div className="w-full max-w-mobile-l space-y-6 text-center">
         <h1 className="text-left text-display-md font-bold">{displayTitle}</h1>
         <p className="text-left text-body-sm text-muted-foreground">
-          {t("common.errorState.description")}
+          {t ? t("common.errorState.description") : "問題が発生しました。もう一度お試しください。"}
         </p>
 
         <div className="mt-6">
@@ -47,14 +51,14 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
               variant="primary"
             >
               <RefreshCcw className="h-4 w-4" />
-              {t("common.errorState.retryButton")}
+              {t ? t("common.errorState.retryButton") : "再試行"}
             </Button>
           )}
 
           <Link href="/" passHref>
             <Button className="w-full flex justify-center" size="sm" variant="text">
               <Home className="h-4 w-4" />
-              {t("common.errorState.homeButton")}
+              {t ? t("common.errorState.homeButton") : "ホームへ"}
             </Button>
           </Link>
         </div>
