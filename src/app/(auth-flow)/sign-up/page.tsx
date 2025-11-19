@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthProvider";
-import { SignUpForm } from "@/app/sign-up/components/SignUpForm";
+import { SignUpForm } from "@/app/(auth-flow)/sign-up/components/SignUpForm";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 
 export default function RegisterAccount() {

@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthProvider";
-import LoginModal from "@/app/login/components/LoginModal";
+import LoginModal from "@/app/(auth-flow)/login/components/LoginModal";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { useTicketClaim } from "@/app/tickets/receive/hooks/useTicketClaim";
 import TicketReceiveContent from "@/app/tickets/receive/components/TicketReceiveContent";

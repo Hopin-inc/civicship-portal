@@ -4,10 +4,10 @@ import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthProvider";
 import { decodeURIComponentWithType, EncodedURIComponent } from "@/utils/path";
-import { getLiffLoginErrorMessage } from "@/app/login/utils/getLiffLoginErrorMessage";
+import { getLiffLoginErrorMessage } from "@/app/(auth-flow)/login/utils/getLiffLoginErrorMessage";
 import { toast } from "react-toastify";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { LoginView } from "@/app/login/components/LoginView";
+import { LoginView } from "@/app/(auth-flow)/login/components/LoginView";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 
 export default function LoginPage() {

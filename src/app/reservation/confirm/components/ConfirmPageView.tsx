@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import LoginModal from "@/app/login/components/LoginModal";
+import LoginModal from "@/app/(auth-flow)/login/components/LoginModal";
 import { ReservationConfirmationCard } from "@/app/reservation/confirm/components/ReservationConfirmationCard";
 import { NoticeCard } from "@/components/shared/NoticeCard";
 import { GqlCurrentUserPayload } from "@/types/graphql";
