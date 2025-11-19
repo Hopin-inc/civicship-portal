@@ -4,11 +4,10 @@ import React, { useEffect, useRef } from "react";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { applySsrAuthState } from "@/lib/auth/init/applySsrAuthState";
 import { useAuthDependencies } from "@/hooks/auth/init/useAuthDependencies";
-import { GqlUser } from "@/types/graphql";
+import { GqlUser, CurrentUserServerDocument } from "@/types/graphql";
 import { TokenManager } from "@/lib/auth/core/token-manager";
 import { logger } from "@/lib/logging";
 import { useApolloClient } from "@apollo/client";
-import { CurrentUserServerDocument } from "@/types/graphql";
 
 interface AuthStateProviderProps {
   children: React.ReactNode;

@@ -16,10 +16,9 @@
  */
 
 import { useAuthStore } from "@/lib/auth/core/auth-store";
-import { GqlUser } from "@/types/graphql";
+import { GqlUser, GqlCurrentPrefecture } from "@/types/graphql";
 import { User as FirebaseUser } from "firebase/auth";
 import { RawURIComponent } from "@/utils/path";
-import { GqlCurrentPrefecture } from "@/types/graphql";
 
 export interface UseAuthCompatReturn {
   user: GqlUser | null;

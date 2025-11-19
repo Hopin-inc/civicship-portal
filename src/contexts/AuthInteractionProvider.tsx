@@ -3,8 +3,7 @@
 import React, { createContext, useContext } from "react";
 import { useAuthDependencies } from "@/hooks/auth/init/useAuthDependencies";
 import { useAuthActions } from "@/hooks/auth/actions";
-import { useCurrentUserServerQuery } from "@/types/graphql";
-import { GqlCurrentPrefecture } from "@/types/graphql";
+import { useCurrentUserServerQuery, GqlCurrentPrefecture } from "@/types/graphql";
 import { RawURIComponent } from "@/utils/path";
 import { User } from "firebase/auth";
 
