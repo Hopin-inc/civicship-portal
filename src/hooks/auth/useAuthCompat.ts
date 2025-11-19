@@ -48,14 +48,8 @@ export const useAuthCompat = (): UseAuthCompatReturn => {
   const isAuthenticated = authenticationState === "user_registered";
   const loading = authenticationState === "loading";
 
-  const logout = actions?.logout ?? (async () => {
-    console.warn("logout action not available - AuthStateProvider may not be initialized");
-  });
-
-  const refetchUser = actions?.refetchUser ?? (async () => {
-    console.warn("refetchUser action not available - AuthStateProvider may not be initialized");
-    return null;
-  });
+  const logout = actions!.logout;
+  const refetchUser = actions!.refetchUser;
 
   return {
     user,

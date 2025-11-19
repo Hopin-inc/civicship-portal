@@ -5,7 +5,6 @@ import { CookiesProvider } from "next-client-cookies/server";
 import ApolloProvider from "@/components/providers/ApolloProvider";
 import { Toaster } from "@/components/ui/toast";
 import LoadingProvider from "@/components/providers/LoadingProvider";
-import { AuthProvider } from "@/contexts/AuthProvider";
 import { AuthStateProvider } from "@/contexts/AuthStateProvider";
 import HeaderProvider from "@/components/providers/HeaderProvider";
 import MainContent from "@/components/layout/MainContent";
@@ -60,19 +59,13 @@ const RootLayout = async ({
                 ssrLineAuthenticated={lineAuthenticated}
                 ssrPhoneAuthenticated={phoneAuthenticated}
               >
-                <AuthProvider
-                  ssrCurrentUser={user}
-                  ssrLineAuthenticated={lineAuthenticated}
-                  ssrPhoneAuthenticated={phoneAuthenticated}
-                >
-                  <HeaderProvider>
-                    <LoadingProvider>
-                      <AnalyticsProvider />
-                      <MainContent>{children}</MainContent>
-                      <Toaster />
-                    </LoadingProvider>
-                  </HeaderProvider>
-                </AuthProvider>
+                <HeaderProvider>
+                  <LoadingProvider>
+                    <AnalyticsProvider />
+                    <MainContent>{children}</MainContent>
+                    <Toaster />
+                  </LoadingProvider>
+                </HeaderProvider>
               </AuthStateProvider>
             </ApolloProvider>
           </CookiesProvider>
