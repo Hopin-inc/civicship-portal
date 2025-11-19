@@ -6,6 +6,7 @@ import { useAuthActions } from "@/hooks/auth/actions";
 import { useCurrentUserServerQuery, GqlCurrentPrefecture } from "@/types/graphql";
 import { RawURIComponent } from "@/utils/path";
 import { User } from "firebase/auth";
+import { useAuthStore } from "@/lib/auth/core/auth-store";
 
 interface AuthInteractionContextType {
   loginWithLiff: (redirectPath?: RawURIComponent) => Promise<boolean>;
@@ -31,6 +32,7 @@ export const AuthInteractionProvider: React.FC<{ children: React.ReactNode }> = 
   children,
 }) => {
   const { liffService, phoneAuthService, authStateManager } = useAuthDependencies();
+  const phoneAuthState = useAuthStore((s) => s.phoneAuth);
 
   const { refetch } = useCurrentUserServerQuery({
     fetchPolicy: "network-only",
@@ -54,11 +56,11 @@ export const AuthInteractionProvider: React.FC<{ children: React.ReactNode }> = 
       startPhoneVerification,
       verifyPhoneCode,
       clearRecaptcha: phoneAuthService?.clearRecaptcha,
-      isVerifying: phoneAuthService?.isVerifying ?? false,
-      phoneUid: phoneAuthService?.phoneUid ?? null,
-      phoneNumber: phoneAuthService?.phoneNumber ?? null,
+      isVerifying: phoneAuthState.isVerifying,
+      phoneUid: phoneAuthState.phoneUid,
+      phoneNumber: phoneAuthState.phoneNumber,
     }),
-    [startPhoneVerification, verifyPhoneCode, phoneAuthService],
+    [startPhoneVerification, verifyPhoneCode, phoneAuthService, phoneAuthState],
   );
 
   const value = React.useMemo(
