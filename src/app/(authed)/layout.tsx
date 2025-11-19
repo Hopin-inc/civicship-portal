@@ -5,7 +5,7 @@ import { headers } from "next/headers";
 
 export default async function AuthedLayout({ children }: { children: ReactNode }) {
   const { user, lineAuthenticated, phoneAuthenticated } = await getUserServer();
-  const reqHeaders = headers();
+  const reqHeaders = await headers();
 
   const pathname = reqHeaders.get("x-pathname") || "/";
   const search = reqHeaders.get("x-search") || "";
