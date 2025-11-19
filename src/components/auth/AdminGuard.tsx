@@ -2,12 +2,11 @@
 
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { toast } from "react-toastify";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { GqlMembership, GqlRole } from "@/types/graphql";
-import { AuthRedirectService } from "@/lib/auth/service/auth-redirect-service";
 import { logger } from "@/lib/logging";
 import { AdminRoleContext } from "@/app/admin/context/AdminRoleContext";
 import { AccessPolicy } from "@/lib/auth/core/access-policy";
@@ -17,12 +16,12 @@ interface AdminGuardProps {
 }
 
 export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
-  const { isAuthenticated, loading, user: currentUser } = useAuth();
+  const currentUser = useAuthStore((s) => s.state.currentUser);
+  const authenticationState = useAuthStore((s) => s.state.authenticationState);
   const router = useRouter();
 
-  const authRedirectService = React.useMemo(() => {
-    return AuthRedirectService.getInstance();
-  }, []);
+  const isAuthenticated = authenticationState === "user_registered";
+  const loading = authenticationState === "loading";
 
   useEffect(() => {
     if (loading) {
@@ -55,7 +54,7 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
     };
 
     checkAdminAccess();
-  }, [currentUser, isAuthenticated, loading, router, authRedirectService]);
+  }, [currentUser, isAuthenticated, loading, router]);
 
   if (loading) {
     return <LoadingIndicator />;

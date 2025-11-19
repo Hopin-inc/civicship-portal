@@ -6,6 +6,7 @@ import ApolloProvider from "@/components/providers/ApolloProvider";
 import { Toaster } from "@/components/ui/toast";
 import LoadingProvider from "@/components/providers/LoadingProvider";
 import { AuthProvider } from "@/contexts/AuthProvider";
+import { AuthStateProvider } from "@/contexts/AuthStateProvider";
 import HeaderProvider from "@/components/providers/HeaderProvider";
 import MainContent from "@/components/layout/MainContent";
 import React from "react";
@@ -54,19 +55,25 @@ const RootLayout = async ({
         <NextIntlClientProvider locale={locale} messages={messages}>
           <CookiesProvider>
             <ApolloProvider>
-              <AuthProvider
+              <AuthStateProvider
                 ssrCurrentUser={user}
                 ssrLineAuthenticated={lineAuthenticated}
                 ssrPhoneAuthenticated={phoneAuthenticated}
               >
-                <HeaderProvider>
-                  <LoadingProvider>
-                    <AnalyticsProvider />
-                    <MainContent>{children}</MainContent>
-                    <Toaster />
-                  </LoadingProvider>
-                </HeaderProvider>
-              </AuthProvider>
+                <AuthProvider
+                  ssrCurrentUser={user}
+                  ssrLineAuthenticated={lineAuthenticated}
+                  ssrPhoneAuthenticated={phoneAuthenticated}
+                >
+                  <HeaderProvider>
+                    <LoadingProvider>
+                      <AnalyticsProvider />
+                      <MainContent>{children}</MainContent>
+                      <Toaster />
+                    </LoadingProvider>
+                  </HeaderProvider>
+                </AuthProvider>
+              </AuthStateProvider>
             </ApolloProvider>
           </CookiesProvider>
         </NextIntlClientProvider>
