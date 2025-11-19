@@ -8,7 +8,7 @@ import {
   useGetUtilitiesQuery,
 } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthCompat as useAuth } from "@/hooks/auth/useAuthCompat";
 import { TicketIssueCard } from "@/app/(authed)/admin/tickets/components/IssuerCard";
 import CreateUtilitySheet from "@/app/(authed)/admin/tickets/utilities/components/CreateUtilitySheet";
 import CreateTicketSheet from "@/app/(authed)/admin/tickets/components/CreateTicketSheet";

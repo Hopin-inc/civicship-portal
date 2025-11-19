@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthCompat as useAuth } from "@/hooks/auth/useAuthCompat";
 import { toast } from "react-toastify";
 import { useRouter, useSearchParams } from "next/navigation";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";

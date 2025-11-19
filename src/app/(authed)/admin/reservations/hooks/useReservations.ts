@@ -8,7 +8,7 @@ import {
   GqlSortDirection,
   useGetReservationsQuery,
 } from "@/types/graphql";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthCompat as useAuth } from "@/hooks/auth/useAuthCompat";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 export interface UseReservationsResult {

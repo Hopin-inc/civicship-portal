@@ -3,7 +3,7 @@
 import { useCallback, useState } from "react";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthCompat as useAuth } from "@/hooks/auth/useAuthCompat";
 import Image from "next/image";
 import Link from "next/link";
 import { Checkbox } from "@/components/ui/checkbox";

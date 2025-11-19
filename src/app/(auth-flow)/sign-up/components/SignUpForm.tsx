@@ -16,7 +16,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { GqlCurrentPrefecture } from "@/types/graphql";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthCompat as useAuth } from "@/hooks/auth/useAuthCompat";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";

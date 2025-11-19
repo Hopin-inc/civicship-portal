@@ -1,7 +1,7 @@
 "use client";
 
 import { logEvent, setUserId, setUserProperties } from "firebase/analytics";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthCompat as useAuth } from "@/hooks/auth/useAuthCompat";
 import { useEffect, useMemo } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { logger } from "@/lib/logging";

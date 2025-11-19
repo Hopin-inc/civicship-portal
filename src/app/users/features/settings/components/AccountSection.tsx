@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Copy, FileKey, Info, LinkIcon, PhoneIcon } from "lucide-react";
 import Image from "next/image";
 import { toast } from "react-toastify";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthCompat as useAuth } from "@/hooks/auth/useAuthCompat";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 import { useUserProfileContext } from "@/app/users/features/shared/contexts/UserProfileContext";
 import { GqlDidIssuanceStatus } from "@/types/graphql";

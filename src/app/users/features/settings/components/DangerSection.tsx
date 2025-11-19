@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthCompat as useAuth } from "@/hooks/auth/useAuthCompat";
 import { LogOut, XCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
 

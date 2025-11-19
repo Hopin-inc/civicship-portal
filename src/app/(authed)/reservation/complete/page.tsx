@@ -11,7 +11,7 @@ import { ErrorState } from "@/components/shared";
 import OpportunityInfo from "@/app/(authed)/reservation/complete/components/OpportunityInfo";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 import { useOpportunityDetails } from "@/hooks/opportunities/useOpportunityDetails";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthCompat as useAuth } from "@/hooks/auth/useAuthCompat";
 import { SimilarOpportunities } from "@/app/(public)/opportunities/[id]/components/SimilarOpportunitiesList";
 
 export default function CompletePage() {

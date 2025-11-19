@@ -5,7 +5,7 @@ import { ActivitySlot, QuestSlot } from "@/app/(authed)/reservation/data/type/op
 import { ErrorState } from "@/components/shared";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import NavigationButtons from "@/components/shared/NavigationButtons";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthCompat as useAuth } from "@/hooks/auth/useAuthCompat";
 import { useOpportunityDetails } from "@/hooks/opportunities/useOpportunityDetails";
 import { notFound, useParams, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef } from "react";

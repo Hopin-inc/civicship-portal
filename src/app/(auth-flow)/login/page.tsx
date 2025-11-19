@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthCompat as useAuth } from "@/hooks/auth/useAuthCompat";
 import { decodeURIComponentWithType, EncodedURIComponent } from "@/utils/path";
 import { getLiffLoginErrorMessage } from "@/app/(auth-flow)/login/utils/getLiffLoginErrorMessage";
 import { toast } from "react-toastify";

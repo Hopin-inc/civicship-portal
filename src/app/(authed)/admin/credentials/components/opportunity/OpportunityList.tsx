@@ -1,4 +1,4 @@
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthCompat as useAuth } from "@/hooks/auth/useAuthCompat";
 import { GqlSortDirection, useGetOpportunitiesQuery } from "@/types/graphql";
 import { OpportunityCard } from "./OpportunityCard";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";

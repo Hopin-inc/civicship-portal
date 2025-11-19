@@ -17,7 +17,7 @@ import { useCompletePageViewModel } from "@/app/(authed)/reservation/complete/ho
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 import { logger } from "@/lib/logging";
 import { useOpportunityDetails } from "@/hooks/opportunities/useOpportunityDetails";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthCompat as useAuth } from "@/hooks/auth/useAuthCompat";
 
 export type ParticipationUIStatus = "pending" | "confirmed" | "cancelled";
 

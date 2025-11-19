@@ -9,7 +9,7 @@ import {
   useGetUtilitiesQuery,
 } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthCompat as useAuth } from "@/hooks/auth/useAuthCompat";
 import CreateUtilitySheet from "./components/CreateUtilitySheet";
 import OpportunityListSheet from "./components/OpportunityListSheet";
 import { Coins, MessageSquareText, Tickets } from "lucide-react";

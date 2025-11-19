@@ -9,7 +9,7 @@ import {
   GqlTicketClaimLinksQuery,
   useTicketClaimLinksQuery,
 } from "@/types/graphql";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthCompat as useAuth } from "@/hooks/auth/useAuthCompat";
 
 export interface UseTicketClaimLinksResult {
   ticketClaimLinks: TicketClaimLink[];

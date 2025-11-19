@@ -7,7 +7,7 @@ import {
   GqlTicketIssuerEdge,
   useGetTicketIssuersQuery,
 } from "@/types/graphql";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthCompat as useAuth } from "@/hooks/auth/useAuthCompat";
 import { ApolloError } from "@apollo/client";
 
 export interface UseTicketIssuersResult {

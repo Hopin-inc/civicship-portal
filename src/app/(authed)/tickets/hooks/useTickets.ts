@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthCompat as useAuth } from "@/hooks/auth/useAuthCompat";
 import { transformTickets } from "@/app/(authed)/tickets/data/presenter";
 import { TTicket } from "@/app/(authed)/tickets/data/type";
 import { GqlTicketStatus, useGetTicketsQuery } from "@/types/graphql";

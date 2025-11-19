@@ -2,7 +2,7 @@
 import { useMemo, useRef, useEffect, useState } from "react";
 import { notFound, useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthCompat as useAuth } from "@/hooks/auth/useAuthCompat";
 import { HeaderConfig } from "@/contexts/HeaderContext";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";

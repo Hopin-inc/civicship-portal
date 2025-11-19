@@ -1,5 +1,5 @@
 "use client";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuthCompat as useAuth } from "@/hooks/auth/useAuthCompat";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import FeaturedSection from "@/components/domains/opportunities/components/FeaturedSection/FeaturedSection";
 import { OpportunityCarouselListSection } from "@/components/domains/opportunities/components/ListSection/OpportunityCarouselListSection";
