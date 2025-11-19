@@ -10,7 +10,7 @@ import { GqlMembership, GqlRole, GqlWallet, useGetCommunityWalletQuery } from "@
 import { Coins, Gift } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
-import useCommunityTransactions from "@/app/admin/wallet/hooks/useCommunityTransactions";
+import useCommunityTransactions from "@/app/(authed)/admin/wallet/hooks/useCommunityTransactions";
 import { InfiniteTransactionList } from "@/shared/transactions/components/InfiniteTransactionList";
 import { logger } from "@/lib/logging";
 import Link from "next/link";

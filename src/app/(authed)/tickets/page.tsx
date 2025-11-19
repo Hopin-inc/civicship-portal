@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef } from "react";
-import { useTicketClaimLinks } from "@/app/tickets/hooks/useTicketClaimLinks";
-import TicketContent from "@/app/tickets/components/TicketContent";
+import { useTicketClaimLinks } from "@/app/(authed)/tickets/hooks/useTicketClaimLinks";
+import TicketContent from "@/app/(authed)/tickets/components/TicketContent";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { ErrorState } from '@/components/shared'

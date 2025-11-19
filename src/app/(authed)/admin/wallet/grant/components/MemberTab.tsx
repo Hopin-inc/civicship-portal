@@ -3,7 +3,7 @@
 import React from "react";
 import { GqlMembershipsConnection, GqlUser } from "@/types/graphql";
 import UserInfoCard from "./UserInfoCard";
-import { useMemberWithDidSearch as useMemberSearchFromCredentials } from "@/app/admin/credentials/hooks/useMemberWithDidSearch";
+import { useMemberWithDidSearch as useMemberSearchFromCredentials } from "@/app/(authed)/admin/credentials/hooks/useMemberWithDidSearch";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { useTranslations } from "next-intl";

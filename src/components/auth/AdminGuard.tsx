@@ -8,7 +8,7 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { GqlMembership, GqlRole } from "@/types/graphql";
 import { logger } from "@/lib/logging";
-import { AdminRoleContext } from "@/app/admin/context/AdminRoleContext";
+import { AdminRoleContext } from "@/app/(authed)/admin/context/AdminRoleContext";
 import { AccessPolicy } from "@/lib/auth/core/access-policy";
 
 interface AdminGuardProps {

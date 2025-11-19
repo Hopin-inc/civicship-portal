@@ -12,7 +12,7 @@ import {
   ActivityField,
   QuestField,
   ReservationDetail,
-} from "@/app/reservation/data/type/reservation";
+} from "@/app/(authed)/reservation/data/type/reservation";
 import { TArticleWithAuthor } from "@/app/articles/data/type";
 import { presenterPlace } from "@/app/places/data/presenter";
 import { presenterOpportunityHost } from "@/components/domains/opportunities/data/presenter";

@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { toPointNumber } from "@/utils/bigint";
 import { logger } from "@/lib/logging";
 import { presenterTransaction } from "@/utils/transaction";
-import { AppTransaction } from "@/app/wallets/features/shared/type";
+import { AppTransaction } from "@/app/(authed)/wallets/features/shared/type";
 
 interface WalletActionDeps {
   walletId: string;

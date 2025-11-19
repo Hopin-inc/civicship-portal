@@ -1,6 +1,6 @@
 "use client";
 
-import { Ticket, TicketClaimLink } from "@/app/tickets/data/type";
+import { Ticket, TicketClaimLink } from "@/app/(authed)/tickets/data/type";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { getCommunityIdFromEnv } from "@/lib/communities/metadata";
 import { GqlWallet } from "@/types/graphql";

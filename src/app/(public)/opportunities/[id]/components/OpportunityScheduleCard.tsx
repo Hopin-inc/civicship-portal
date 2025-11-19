@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
-import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
+import { ActivitySlot, QuestSlot } from "@/app/(authed)/reservation/data/type/opportunitySlot";
 import { getCrossDayLabel } from "@/utils/date";
 
 interface OpportunityScheduleCardProps {

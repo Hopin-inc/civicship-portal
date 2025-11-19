@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import GuestSelectionForm from "@/app/reservation/select-date/components/GuestSelectionForm";
-import SelectionSheet from "@/app/reservation/select-date/components/SelectionSheet";
+import GuestSelectionForm from "@/app/(authed)/reservation/select-date/components/GuestSelectionForm";
+import SelectionSheet from "@/app/(authed)/reservation/select-date/components/SelectionSheet";
 
 interface GuestCounterSelectorProps {
   value: number;

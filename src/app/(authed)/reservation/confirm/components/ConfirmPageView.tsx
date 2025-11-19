@@ -2,16 +2,16 @@
 
 import { Button } from "@/components/ui/button";
 import LoginModal from "@/app/(auth-flow)/login/components/LoginModal";
-import { ReservationConfirmationCard } from "@/app/reservation/confirm/components/ReservationConfirmationCard";
+import { ReservationConfirmationCard } from "@/app/(authed)/reservation/confirm/components/ReservationConfirmationCard";
 import { NoticeCard } from "@/components/shared/NoticeCard";
 import { GqlCurrentUserPayload } from "@/types/graphql";
 import { RawURIComponent } from "@/utils/path";
-import PaymentSection from "@/app/reservation/confirm/components/payment/PaymentSection";
-import { CommentTextarea } from "@/app/reservation/confirm/components/CommentTextarea";
-import { ExpectedPoints } from "@/app/reservation/confirm/components/payment/ExpectedPoints";
-import { PaymentSummary } from "@/app/reservation/confirm/components/payment/PaymentSummary";
+import PaymentSection from "@/app/(authed)/reservation/confirm/components/payment/PaymentSection";
+import { CommentTextarea } from "@/app/(authed)/reservation/confirm/components/CommentTextarea";
+import { ExpectedPoints } from "@/app/(authed)/reservation/confirm/components/payment/ExpectedPoints";
+import { PaymentSummary } from "@/app/(authed)/reservation/confirm/components/payment/PaymentSummary";
 import { ActivityDetail, QuestDetail, isActivityCategory, isQuestCategory } from "@/components/domains/opportunities/types";
-import { AvailableTicket } from "@/app/reservation/confirm/presenters/presentReservationConfirm";
+import { AvailableTicket } from "@/app/(authed)/reservation/confirm/presenters/presentReservationConfirm";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 export interface ConfirmPageViewProps {

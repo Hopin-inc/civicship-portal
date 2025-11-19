@@ -5,8 +5,8 @@ import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthProvider";
 import LoginModal from "@/app/(auth-flow)/login/components/LoginModal";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { useTicketClaim } from "@/app/tickets/receive/hooks/useTicketClaim";
-import TicketReceiveContent from "@/app/tickets/receive/components/TicketReceiveContent";
+import { useTicketClaim } from "@/app/(authed)/tickets/receive/hooks/useTicketClaim";
+import TicketReceiveContent from "@/app/(authed)/tickets/receive/components/TicketReceiveContent";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { ErrorState } from '@/components/shared'
 import { toast } from "react-toastify";

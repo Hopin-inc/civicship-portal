@@ -1,7 +1,7 @@
 import React, { memo, useCallback, useEffect, useState } from "react";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { AvailableTicket } from "@/app/reservation/confirm/presenters/presentReservationConfirm";
+import { AvailableTicket } from "@/app/(authed)/reservation/confirm/presenters/presentReservationConfirm";
 
 interface TicketsToggleProps {
   useTickets: boolean;

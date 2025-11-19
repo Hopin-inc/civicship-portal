@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { Ticket as TicketIcon } from "lucide-react";
-import { TicketClaimLink } from "@/app/tickets/data/type";
+import { TicketClaimLink } from "@/app/(authed)/tickets/data/type";
 import React from "react";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import Link from "next/link";

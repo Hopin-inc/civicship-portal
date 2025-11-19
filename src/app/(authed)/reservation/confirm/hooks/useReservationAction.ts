@@ -6,9 +6,9 @@ import {
   useCreateReservationMutation,
 } from "@/types/graphql";
 import { ActivityDetail, QuestDetail } from "@/components/domains/opportunities/types";
-import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
-import { UseTicketCounterReturn } from "@/app/reservation/confirm/hooks/useTicketCounter";
-import { ReservationWallet } from "@/app/reservation/confirm/presenters/presentReservationConfirm";
+import { ActivitySlot, QuestSlot } from "@/app/(authed)/reservation/data/type/opportunitySlot";
+import { UseTicketCounterReturn } from "@/app/(authed)/reservation/confirm/hooks/useTicketCounter";
+import { ReservationWallet } from "@/app/(authed)/reservation/confirm/presenters/presentReservationConfirm";
 import { ApolloError } from "@apollo/client";
 import { logger } from "@/lib/logging";
 import { isPointsOnlyOpportunity } from "@/utils/opportunity/isPointsOnlyOpportunity";

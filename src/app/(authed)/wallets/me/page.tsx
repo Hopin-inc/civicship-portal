@@ -1,6 +1,6 @@
-import { WalletOverview } from "@/app/wallets/features/overview/WalletOverview";
-import { TransactionList } from "@/app/wallets/features/transactions/TransactionList";
-import { getServerMyWalletWithTransactions } from "@/app/wallets/features/shared/server/getServerMyWalletWithTransactions";
+import { WalletOverview } from "@/app/(authed)/wallets/features/overview/WalletOverview";
+import { TransactionList } from "@/app/(authed)/wallets/features/transactions/TransactionList";
+import { getServerMyWalletWithTransactions } from "@/app/(authed)/wallets/features/shared/server/getServerMyWalletWithTransactions";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 

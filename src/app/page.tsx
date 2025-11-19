@@ -3,8 +3,8 @@ import { useAuth } from "@/contexts/AuthProvider";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import FeaturedSection from "@/components/domains/opportunities/components/FeaturedSection/FeaturedSection";
 import { OpportunityCarouselListSection } from "@/components/domains/opportunities/components/ListSection/OpportunityCarouselListSection";
-import OpportunitiesFeed from "@/app/opportunities/components/OpportunitiesFeed";
-import { useFetchFeedOpportunities } from "@/app/opportunities/hooks/useFetchFeedOpportunities";
+import OpportunitiesFeed from "@/app/(public)/opportunities/components/OpportunitiesFeed";
+import { useFetchFeedOpportunities } from "@/app/(public)/opportunities/hooks/useFetchFeedOpportunities";
 import { formatOpportunities } from "@/components/domains/opportunities/utils";
 
 export default function HomePage() {

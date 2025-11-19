@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/contexts/AuthProvider";
 import { useSearchParams } from "next/navigation";
-import { DonatePointContent } from "@/app/wallets/features/donate/components/DonatePointContent";
+import { DonatePointContent } from "@/app/(authed)/wallets/features/donate/components/DonatePointContent";
 
 export default function DonatePointPage() {
   const { user } = useAuth();

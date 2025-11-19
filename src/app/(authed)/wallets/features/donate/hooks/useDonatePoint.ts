@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useTransactionMutations } from "@/app/admin/wallet/hooks/useTransactionMutations";
+import { useTransactionMutations } from "@/app/(authed)/admin/wallet/hooks/useTransactionMutations";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 interface DonatePointInput {

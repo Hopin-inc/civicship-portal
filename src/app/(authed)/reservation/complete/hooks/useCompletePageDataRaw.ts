@@ -1,4 +1,4 @@
-import { useReservationComplete } from "@/app/reservation/complete/hooks/useReservationComplete";
+import { useReservationComplete } from "@/app/(authed)/reservation/complete/hooks/useReservationComplete";
 import { useSameStateOpportunities } from "@/hooks/opportunities/useSameStateOpportunities";
 
 export function useCompletePageDataRaw(opportunityId: string | null, reservationId: string | null) {

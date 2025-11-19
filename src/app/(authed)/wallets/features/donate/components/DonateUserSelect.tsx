@@ -2,8 +2,8 @@
 
 import React from "react";
 import { GqlUser } from "@/types/graphql";
-import UserSelectStep from "@/app/admin/wallet/grant/components/UserSelectStep";
-import { Tabs } from "@/app/admin/wallet/grant/types/tabs";
+import UserSelectStep from "@/app/(authed)/admin/wallet/grant/components/UserSelectStep";
+import { Tabs } from "@/app/(authed)/admin/wallet/grant/types/tabs";
 import { DonateMember } from "../types";
 import { useTranslations } from "next-intl";
 

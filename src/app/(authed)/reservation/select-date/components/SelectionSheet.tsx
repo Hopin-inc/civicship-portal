@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 import { Minus, Plus } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { ActivitySlotGroup } from "@/app/reservation/data/type/opportunitySlot";
+import { ActivitySlotGroup } from "@/app/(authed)/reservation/data/type/opportunitySlot";
 
 interface SelectionSheetProps {
   isOpen: boolean;

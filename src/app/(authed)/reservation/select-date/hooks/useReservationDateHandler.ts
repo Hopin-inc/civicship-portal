@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
-import { buildReservationParams } from "@/app/reservation/data/presenter/opportunitySlot";
+import { ActivitySlot } from "@/app/(authed)/reservation/data/type/opportunitySlot";
+import { buildReservationParams } from "@/app/(authed)/reservation/data/presenter/opportunitySlot";
 
 export const useReservationDateHandler = ({
   opportunityId,

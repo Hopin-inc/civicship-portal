@@ -1,7 +1,7 @@
 import { GqlOpportunityCategory, GqlOpportunitySlot } from "@/types/graphql";
 import { CommunityId } from "@/types";
 import { TArticleCard } from "@/app/articles/data/type";
-import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
+import { ActivitySlot, QuestSlot } from "@/app/(authed)/reservation/data/type/opportunitySlot";
 import { ReactElement } from "react";
 
 // ---------------------------------------------

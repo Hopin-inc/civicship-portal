@@ -19,8 +19,8 @@ import {
   presenterOpportunityHost,
 } from "@/components/domains/opportunities/data/presenter";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
-import { isDateReservable } from "@/app/reservation/data/presenter/opportunitySlot";
+import { QuestSlot } from "@/app/(authed)/reservation/data/type/opportunitySlot";
+import { isDateReservable } from "@/app/(authed)/reservation/data/presenter/opportunitySlot";
 
 /**
  * 利用可能なチケット情報

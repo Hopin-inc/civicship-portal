@@ -10,15 +10,15 @@ import { ErrorState } from "@/components/shared";
 import { errorMessages } from "@/utils/errorMessage";
 import { logger } from "@/lib/logging";
 import { RawURIComponent } from "@/utils/path";
-import { useReservationOpportunity } from "@/app/reservation/confirm/hooks/useReservationOpportunity";
-import { useReservationWallet } from "@/app/reservation/confirm/hooks/useReservationWallet";
-import { useReservationParams } from "@/app/reservation/confirm/hooks/useReservationParams";
-import { useReservationUIState } from "@/app/reservation/confirm/hooks/useReservationUIState";
-import { useReservationCommand } from "@/app/reservation/confirm/hooks/useReservationAction";
-import { useTicketCounter } from "@/app/reservation/confirm/hooks/useTicketCounter";
-import { calculateReservationDetails } from "@/app/reservation/confirm/utils/reservationCalculations";
-import { validateReservation } from "@/app/reservation/confirm/utils/reservationValidation";
-import ConfirmPageView from "@/app/reservation/confirm/components/ConfirmPageView";
+import { useReservationOpportunity } from "@/app/(authed)/reservation/confirm/hooks/useReservationOpportunity";
+import { useReservationWallet } from "@/app/(authed)/reservation/confirm/hooks/useReservationWallet";
+import { useReservationParams } from "@/app/(authed)/reservation/confirm/hooks/useReservationParams";
+import { useReservationUIState } from "@/app/(authed)/reservation/confirm/hooks/useReservationUIState";
+import { useReservationCommand } from "@/app/(authed)/reservation/confirm/hooks/useReservationAction";
+import { useTicketCounter } from "@/app/(authed)/reservation/confirm/hooks/useTicketCounter";
+import { calculateReservationDetails } from "@/app/(authed)/reservation/confirm/utils/reservationCalculations";
+import { validateReservation } from "@/app/(authed)/reservation/confirm/utils/reservationValidation";
+import ConfirmPageView from "@/app/(authed)/reservation/confirm/components/ConfirmPageView";
 
 export default function ConfirmPage() {
   const headerConfig: HeaderConfig = useMemo(

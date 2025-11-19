@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "react-toastify";
-import { useTransactionMutations } from "@/app/admin/wallet/hooks/useTransactionMutations";
+import { useTransactionMutations } from "@/app/(authed)/admin/wallet/hooks/useTransactionMutations";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";

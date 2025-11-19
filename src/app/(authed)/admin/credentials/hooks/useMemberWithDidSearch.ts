@@ -12,7 +12,7 @@ import {
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { queryMemberships } from "@/app/admin/members/actions";
+import { queryMemberships } from "@/app/(authed)/admin/members/actions";
 
 const fallbackConnection = {
   edges: [],

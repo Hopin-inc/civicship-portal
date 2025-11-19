@@ -2,7 +2,7 @@
 
 import React from "react";
 import { GqlUser } from "@/types/graphql";
-import TransferInputStep from "@/app/admin/wallet/grant/components/TransferInputStep";
+import TransferInputStep from "@/app/(authed)/admin/wallet/grant/components/TransferInputStep";
 import { useTranslations } from "next-intl";
 
 interface Props {

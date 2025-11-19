@@ -6,7 +6,7 @@ import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { ClipboardList, Ticket, Users, Wallet } from "lucide-react";
 import { currentCommunityConfig, FeaturesType } from "@/lib/communities/metadata";
-import { useAdminRole } from "@/app/admin/context/AdminRoleContext";
+import { useAdminRole } from "@/app/(authed)/admin/context/AdminRoleContext";
 import { GqlRole } from "@/types/graphql";
 
 const adminSettings = [

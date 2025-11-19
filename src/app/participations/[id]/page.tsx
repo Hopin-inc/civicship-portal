@@ -13,7 +13,7 @@ import { useParams } from "next/navigation";
 import { errorMessages } from "@/utils/errorMessage";
 import useCancelReservation from "@/app/participations/[id]/hooks/useCancelReservation";
 import OpportunityInfo from "./components/OpportunityInfo";
-import { useCompletePageViewModel } from "@/app/reservation/complete/hooks/useCompletePageViewModel";
+import { useCompletePageViewModel } from "@/app/(authed)/reservation/complete/hooks/useCompletePageViewModel";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 import { logger } from "@/lib/logging";
 import { useOpportunityDetails } from "@/hooks/opportunities/useOpportunityDetails";

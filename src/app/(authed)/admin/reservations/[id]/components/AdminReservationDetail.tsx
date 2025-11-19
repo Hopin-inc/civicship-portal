@@ -10,7 +10,7 @@ import { GqlOpportunityCategory, GqlReservation, Maybe } from "@/types/graphql";
 import { ActivityCard } from "@/components/domains/opportunities/types";
 import OpportunityHorizontalCard from "@/components/domains/opportunities/components/OpportunityHorizontalCard";
 import { formatOpportunities } from "@/components/domains/opportunities/utils";
-import { PriceInfo } from "@/app/admin/reservations/types";
+import { PriceInfo } from "@/app/(authed)/admin/reservations/types";
 
 interface ReservationDetailsProps {
   reservation: GqlReservation;

@@ -2,10 +2,10 @@
 
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";
-import { DonateForm, DonateUserSelect } from "@/app/wallets/features/donate/components";
+import { DonateForm, DonateUserSelect } from "@/app/(authed)/wallets/features/donate/components";
 import { useDonateFlow } from "../hooks/useDonateFlow";
 import { useDonateMembers } from "../hooks/useDonateMembers";
-import { Tabs } from "@/app/admin/wallet/grant/types/tabs";
+import { Tabs } from "@/app/(authed)/admin/wallet/grant/types/tabs";
 import { useEffect, useRef, useState } from "react";
 import { GqlUser } from "@/types/graphql";
 import { useTranslations } from "next-intl";

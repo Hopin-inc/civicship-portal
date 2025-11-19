@@ -1,18 +1,18 @@
 "use client";
 
-import CompletionHeader from "@/app/reservation/complete/components/CompletionHeader";
+import CompletionHeader from "@/app/(authed)/reservation/complete/components/CompletionHeader";
 import React, { useEffect, useMemo, useRef } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useSearchParams } from "next/navigation";
 import { HeaderConfig } from "@/contexts/HeaderContext";
-import { useCompletePageViewModel } from "@/app/reservation/complete/hooks/useCompletePageViewModel";
+import { useCompletePageViewModel } from "@/app/(authed)/reservation/complete/hooks/useCompletePageViewModel";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";
-import OpportunityInfo from "@/app/reservation/complete/components/OpportunityInfo";
+import OpportunityInfo from "@/app/(authed)/reservation/complete/components/OpportunityInfo";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 import { useOpportunityDetails } from "@/hooks/opportunities/useOpportunityDetails";
 import { useAuth } from "@/contexts/AuthProvider";
-import { SimilarOpportunities } from "@/app/opportunities/[id]/components/SimilarOpportunitiesList";
+import { SimilarOpportunities } from "@/app/(public)/opportunities/[id]/components/SimilarOpportunitiesList";
 
 export default function CompletePage() {
   const { user } = useAuth();
