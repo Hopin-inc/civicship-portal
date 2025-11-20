@@ -17,14 +17,17 @@ export default async function AuthFlowLayout({ children }: { children: ReactNode
   const pathname = reqHeaders.get("x-pathname") || "/";
   const search = reqHeaders.get("x-search") || "";
   const searchParams = new URLSearchParams(search);
-  const next = searchParams.get("next");
+  const next = searchParams.get("next") || searchParams.get("liff.state");
   
   const isLiffCallback = 
     searchParams.has("code") && 
-    searchParams.has("state") && 
+    (searchParams.has("state") || searchParams.has("liff.state")) && 
     searchParams.has("liffClientId");
   
+  console.log('[AUTH_FLOW_SSR]', { pathname, search, next, isLiffCallback, user: !!user, line: lineAuthenticated, phone: phoneAuthenticated });
+  
   if (isLiffCallback) {
+    console.log('[AUTH_FLOW_SSR] LIFF callback detected, skipping SSR redirect');
     return <AuthFlowClientWrapper>{children}</AuthFlowClientWrapper>;
   }
   

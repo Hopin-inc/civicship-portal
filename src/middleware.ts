@@ -21,6 +21,20 @@ export function middleware(request: NextRequest) {
 
   // liff.state がある場合はrootPathへのリダイレクトをスキップ（LIFFのルーティングバグ対策）
   const hasLiffState = request.nextUrl.searchParams.get("liff.state");
+  
+  const searchParams = request.nextUrl.searchParams;
+  const isLiffCallback = 
+    pathname === "/" &&
+    searchParams.has("code") && 
+    (searchParams.has("state") || searchParams.has("liff.state")) && 
+    searchParams.has("liffClientId");
+  
+  if (isLiffCallback) {
+    console.log('[MW_LIFF_CB_ROOT] Redirecting LIFF callback from / to /login', request.nextUrl.search);
+    const loginUrl = new URL("/login", request.url);
+    loginUrl.search = request.nextUrl.search;
+    return NextResponse.redirect(loginUrl);
+  }
 
   // ルートページへのアクセスを処理（liff.stateがない場合、またはliff.stateが/の場合のみrootPathにリダイレクト）
   if (pathname === "/" && rootPath !== "/" && (!hasLiffState || hasLiffState === "/")) {

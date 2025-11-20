@@ -32,8 +32,12 @@ export const useLineAuthProcessing = ({
       processedRef.current = true;
       setState({ isAuthenticating: true });
 
+      console.log('[LIFF_HOOK] start', typeof window !== 'undefined' ? window.location.href : 'SSR');
+      console.log('[LIFF_HOOK] shouldProcessRedirect:', shouldProcessRedirect);
+
       try {
         const initialized = await liffService.initialize();
+        console.log('[LIFF_HOOK] initialized:', initialized);
 
         if (!initialized) {
           logger.info("LIFF init failed", {
@@ -44,6 +48,7 @@ export const useLineAuthProcessing = ({
         }
 
         const { isLoggedIn } = liffService.getState();
+        console.log('[LIFF_HOOK] isLoggedIn:', isLoggedIn);
         if (!isLoggedIn) return;
 
         if (lineAuth.currentUser) {
@@ -53,6 +58,7 @@ export const useLineAuthProcessing = ({
           });
         } else {
           const success = await liffService.signInWithLiffToken();
+          console.log('[LIFF_HOOK] signInWithLiffToken:', success);
           if (!success) {
             logger.info("signInWithLiffToken failed", {
               authType: "liff",
@@ -63,6 +69,7 @@ export const useLineAuthProcessing = ({
         }
 
         const user = await refetchUser();
+        console.log('[LIFF_HOOK] refetchUser:', { hasUser: !!user });
         if (!user) {
           TokenManager.saveLineAuthFlag(true);
           setState({
@@ -89,6 +96,7 @@ export const useLineAuthProcessing = ({
           });
           authStateManager.updateState("user_registered", "useLineAuthProcessing (phone verified)");
           await authStateManager.handleUserRegistrationStateChange(true);
+          console.log('[LIFF_HOOK] auth state: user_registered');
         } else {
           setState({
             currentUser: user,
@@ -97,7 +105,9 @@ export const useLineAuthProcessing = ({
           });
           authStateManager.updateState("line_authenticated", "useLineAuthProcessing");
           await authStateManager.handleUserRegistrationStateChange(false);
+          console.log('[LIFF_HOOK] auth state: line_authenticated');
         }
+        console.log('[LIFF_HOOK] no client redirect (diagnostic)');
       } catch (err) {
         logger.info("Error during LINE auth", {
           authType: "liff",
