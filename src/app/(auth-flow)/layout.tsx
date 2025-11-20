@@ -24,7 +24,10 @@ export default async function AuthFlowLayout({ children }: { children: ReactNode
     (searchParams.has("state") || searchParams.has("liff.state")) && 
     searchParams.has("liffClientId");
   
+  console.log('[AUTH_FLOW_SSR]', { pathname, search, next, isLiffCallback, user: !!user, line: lineAuthenticated, phone: phoneAuthenticated });
+  
   if (isLiffCallback) {
+    console.log('[AUTH_FLOW_SSR] LIFF callback detected, skipping SSR redirect');
     return <AuthFlowClientWrapper>{children}</AuthFlowClientWrapper>;
   }
   

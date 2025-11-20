@@ -15,7 +15,6 @@ import ClientPolyfills from "@/components/polyfills/ClientPolyfills";
 import { getUserServer } from "@/lib/auth/init/getUserServer";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
-import { RootAuthEffects } from "@/components/auth/RootAuthEffects";
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -60,7 +59,6 @@ const RootLayout = async ({
                 ssrLineAuthenticated={lineAuthenticated}
                 ssrPhoneAuthenticated={phoneAuthenticated}
               >
-                <RootAuthEffects />
                 <HeaderProvider>
                   <LoadingProvider>
                     <AnalyticsProvider />
