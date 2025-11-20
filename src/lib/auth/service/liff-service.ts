@@ -105,7 +105,6 @@ export class LiffService {
               : window.location.origin
             : undefined;
 
-        console.log('[LIFF_LOGIN]', 'redirectPath:', redirectPath, '| redirectUri:', redirectUri);
         liff.login({ redirectUri });
         return false; // リダイレクトするのでここには到達しない
       }

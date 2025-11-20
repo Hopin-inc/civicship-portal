@@ -13,15 +13,11 @@ export default async function AuthedLayout({ children }: { children: ReactNode }
   const currentUrl = search ? `${pathname}${search}` : pathname;
   const nextParam = `?next=${encodeURIComponent(currentUrl)}`;
 
-  console.log('[AUTHED]', 'pathname:', pathname, '| search:', search, '| currentUrl:', currentUrl, '| user:', !!user, '| line:', lineAuthenticated, '| phone:', phoneAuthenticated);
-
   if (!lineAuthenticated || !user) {
-    console.log('[AUTHED] → /login' + nextParam);
     redirect(`/login${nextParam}`);
   }
 
   if (!phoneAuthenticated) {
-    console.log('[AUTHED] → /sign-up/phone-verification' + nextParam);
     redirect(`/sign-up/phone-verification${nextParam}`);
   }
 
