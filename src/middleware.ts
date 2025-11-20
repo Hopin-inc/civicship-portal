@@ -101,6 +101,11 @@ export function middleware(request: NextRequest) {
 
   const res = NextResponse.next();
   res.headers.set("x-nonce", nonce);
+  
+  res.headers.set("x-pathname", pathname);
+  res.headers.set("x-search", request.nextUrl.search);
+  
+  console.log('[MW]', request.nextUrl.href, '| pathname:', pathname, '| search:', request.nextUrl.search);
 
   const csp = [
     `default-src 'self'`,
