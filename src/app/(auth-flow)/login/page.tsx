@@ -17,7 +17,7 @@ export default function LoginPage() {
   );
 
   const { loginWithLiff } = useAuthInteraction();
-  const { authenticationState, isAuthenticating } = useAuthStore((s) => s.state);
+  const { isAuthenticating } = useAuthStore((s) => s.state);
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,7 +46,7 @@ export default function LoginPage() {
     }
   };
 
-  if (isAuthenticating || authenticationState !== "unauthenticated") {
+  if (isAuthenticating) {
     return <LoadingIndicator />;
   }
 
