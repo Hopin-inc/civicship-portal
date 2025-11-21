@@ -18,13 +18,14 @@ export async function getUserServer(): Promise<{
   const session = cookieStore.get("session")?.value ?? null;
   const hasSession = !!session;
 
-  const phoneAuthenticated = cookieStore.get("phone_authenticated")?.value === "true";
+  const lineAuthCookie = cookieStore.get("line_authenticated")?.value === "true";
+  const phoneAuthCookie = cookieStore.get("phone_authenticated")?.value === "true";
 
   if (!hasSession) {
     return {
       user: null,
-      lineAuthenticated: false,
-      phoneAuthenticated: false,
+      lineAuthenticated: lineAuthCookie,
+      phoneAuthenticated: lineAuthCookie && phoneAuthCookie,
     };
   }
 
