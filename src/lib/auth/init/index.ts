@@ -36,9 +36,9 @@ export async function initAuth(params: InitAuthParams) {
   if (state.isAuthInProgress) return;
 
   TokenManager.clearDeprecatedCookies();
-  
+
   const environment = detectEnvironment();
-  
+
   if (ssrCurrentUser && ssrLineAuthenticated) {
     return await initAuthFast({
       ssrCurrentUser,
@@ -49,7 +49,7 @@ export async function initAuth(params: InitAuthParams) {
       setState,
     });
   }
-  
+
   setState({ isAuthInProgress: true, isAuthenticating: true });
   return await initAuthFull({
     liffService,
@@ -77,11 +77,11 @@ async function initAuthFast({
   setState: ReturnType<typeof useAuthStore.getState>["setState"];
 }) {
   try {
-    if (environment === AuthEnvironment.LIFF) {
-      liffService.initialize().then(success => {
-        if (!success) logger.warn("LIFF initialization failed in background");
-      });
-    }
+    // if (environment === AuthEnvironment.LIFF) {
+    //   liffService.initialize().then(success => {
+    //     if (!success) logger.warn("LIFF initialization failed in background");
+    //   });
+    // }
 
     finalizeAuthState(
       ssrPhoneAuthenticated ? "user_registered" : "line_authenticated",
