@@ -22,7 +22,6 @@ export function useAuthSideEffects({
 
   const { shouldProcessRedirect } = useLineAuthRedirectDetection({
     liffService,
-    hasFullAuth,
   });
 
   useLineAuthProcessing({

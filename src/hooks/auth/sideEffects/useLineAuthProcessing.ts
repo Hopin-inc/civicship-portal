@@ -28,14 +28,16 @@ export const useLineAuthProcessing = ({
   const setState = useAuthStore((s) => s.setState);
 
   useEffect(() => {
-    // 🚫 SSRで full-auth の場合は何もしない
-    if (hasFullAuth) return;
-
     if (!shouldProcessRedirect || processedRef.current || !authStateManager) return;
 
     const handleLineAuthRedirect = async () => {
       processedRef.current = true;
-      setState({ isAuthenticating: true });
+
+      // 🔹 SSRフル認証なら「でかいスピナー」は出さない
+      const needAuthFlow = !hasFullAuth;
+      if (needAuthFlow) {
+        setState({ isAuthenticating: true });
+      }
 
       try {
         const initialized = await liffService.initialize();
@@ -50,6 +52,15 @@ export const useLineAuthProcessing = ({
 
         const { isLoggedIn } = liffService.getState();
         if (!isLoggedIn) return;
+
+        // SSR で user/line/phone そろってるなら、ここで終了してOK
+        if (hasFullAuth) {
+          logger.info("LIFF initialized with full auth; skipping token exchange & user fetch", {
+            authType: "liff",
+            component: "useLineAuthProcessing",
+          });
+          return;
+        }
 
         if (lineAuth.currentUser) {
           logger.info("Firebase already authenticated, skipping signInWithLiffToken", {

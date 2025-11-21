@@ -77,11 +77,11 @@ async function initAuthFast({
   setState: ReturnType<typeof useAuthStore.getState>["setState"];
 }) {
   try {
-    // if (environment === AuthEnvironment.LIFF) {
-    //   liffService.initialize().then(success => {
-    //     if (!success) logger.warn("LIFF initialization failed in background");
-    //   });
-    // }
+    if (environment === AuthEnvironment.LIFF) {
+      liffService.initialize().then((success) => {
+        if (!success) logger.warn("LIFF initialization failed in background");
+      });
+    }
 
     finalizeAuthState(
       ssrPhoneAuthenticated ? "user_registered" : "line_authenticated",
