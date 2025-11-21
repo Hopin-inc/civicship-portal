@@ -2,9 +2,11 @@ import { useCallback } from "react";
 import { logger } from "@/lib/logging";
 import { GqlCurrentPrefecture, useUserSignUpMutation } from "@/types/graphql";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
+import { useAuth } from "@/contexts/AuthProvider";
 
 export const useCreateUser = () => {
   const [userSignUp] = useUserSignUpMutation();
+  const { updateAuthState } = useAuth();
   const firebaseUser = useAuthStore((s) => s.state.firebaseUser);
 
   return useCallback(
@@ -30,14 +32,16 @@ export const useCreateUser = () => {
           },
         });
 
-        const user = data?.userSignUp?.user;
-        if (user) {
-          useAuthStore.getState().setState({
-            firebaseUser,
-            authenticationState: "user_registered",
-            currentUser: user,
-          });
-          return firebaseUser;
+        if (data?.userSignUp?.user) {
+          const user = await updateAuthState();
+          if (user) {
+            useAuthStore.getState().setState({
+              firebaseUser,
+              authenticationState: "user_registered",
+              currentUser: user,
+            });
+            return firebaseUser;
+          }
         }
         return null;
       } catch (error) {
@@ -46,6 +50,6 @@ export const useCreateUser = () => {
         return null;
       }
     },
-    [firebaseUser, userSignUp],
+    [firebaseUser, userSignUp, updateAuthState],
   );
 };
