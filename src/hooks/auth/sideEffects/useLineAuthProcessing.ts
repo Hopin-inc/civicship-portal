@@ -32,9 +32,18 @@ export const useLineAuthProcessing = ({
 
     const handleLineAuthRedirect = async () => {
       processedRef.current = true;
-      setState({ isAuthenticating: true });
 
       try {
+        // SSR で user/line/phone そろってるなら、ここで終了してOK
+        if (hasFullAuth) {
+          logger.info("LIFF initialized with full auth; skipping token exchange & user fetch", {
+            authType: "liff",
+            component: "useLineAuthProcessing",
+          });
+          return;
+        }
+
+        setState({ isAuthenticating: true });
         const initialized = await liffService.initialize();
 
         if (!initialized) {
@@ -47,15 +56,6 @@ export const useLineAuthProcessing = ({
 
         const { isLoggedIn } = liffService.getState();
         if (!isLoggedIn) return;
-
-        // SSR で user/line/phone そろってるなら、ここで終了してOK
-        if (hasFullAuth) {
-          logger.info("LIFF initialized with full auth; skipping token exchange & user fetch", {
-            authType: "liff",
-            component: "useLineAuthProcessing",
-          });
-          return;
-        }
 
         if (lineAuth.currentUser) {
           logger.info("Firebase already authenticated, skipping signInWithLiffToken", {
