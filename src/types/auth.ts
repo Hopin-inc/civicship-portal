@@ -75,15 +75,6 @@ export interface AuthContextType {
 
   logout: () => Promise<void>;
 
-  phoneAuth: {
-    startPhoneVerification: (phoneNumber: string) => Promise<string | null>;
-    verifyPhoneCode: (verificationCode: string) => Promise<boolean>;
-    clearRecaptcha?: () => void;
-    isVerifying: boolean;
-    phoneUid: string | null;
-    phoneNumber: string | null;
-  };
-
   updateAuthState: () => Promise<GqlUser | null>;
 
   loading: boolean;

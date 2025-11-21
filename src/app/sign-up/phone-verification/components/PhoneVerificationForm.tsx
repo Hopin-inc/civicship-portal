@@ -15,6 +15,9 @@ import { PhoneInputStep } from "./PhoneInputStep";
 import { CodeVerificationStep } from "./CodeVerificationStep";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { useTranslations } from "next-intl";
+import { useStartPhoneVerification } from "@/hooks/auth/actions/useStartPhoneVerification";
+import { useVerifyPhoneCode } from "@/hooks/auth/actions/useVerifyPhoneCode";
+import { useAuthDependencies } from "@/hooks/auth/init/useAuthDependencies";
 
 export function PhoneVerificationForm() {
   const t = useTranslations();
@@ -22,10 +25,16 @@ export function PhoneVerificationForm() {
   const searchParams = useSearchParams();
   const next = searchParams.get("next");
   const nextParam = next ? `?next=${encodeURIComponent(next)}` : "";
-  const { phoneAuth, isAuthenticated, loading, updateAuthState } = useAuth();
+  const { isAuthenticated, loading, updateAuthState } = useAuth();
   const [phoneNumber, setPhoneNumber] = useState<string | undefined>(undefined);
   const [verificationCode, setVerificationCode] = useState("");
   const [step, setStep] = useState<VerificationStep>("phone");
+
+  const { phoneAuthService, authStateManager } = useAuthDependencies();
+  const { phoneAuth } = useAuthStore.getState();
+  const startPhoneVerification = useStartPhoneVerification(phoneAuthService);
+  const verifyPhoneCode = useVerifyPhoneCode(phoneAuthService, authStateManager);
+  const clearRecaptcha = phoneAuthService.clearRecaptcha;
 
   useEffect(() => {
     const scrollY = window.scrollY;
@@ -45,8 +54,8 @@ export function PhoneVerificationForm() {
   const recaptchaManager = useRecaptchaManager();
   const phoneSubmission = usePhoneSubmission(
     {
-      startPhoneVerification: phoneAuth.startPhoneVerification,
-      clearRecaptcha: phoneAuth.clearRecaptcha,
+      startPhoneVerification,
+      clearRecaptcha,
     },
     recaptchaManager,
     {
@@ -56,7 +65,7 @@ export function PhoneVerificationForm() {
   );
   const codeVerification = useCodeVerification(
     {
-      verifyPhoneCode: phoneAuth.verifyPhoneCode,
+      verifyPhoneCode,
     },
     nextParam,
     updateAuthState,
@@ -77,8 +86,8 @@ export function PhoneVerificationForm() {
     if (result.success) {
       setStep("code");
     } else if (result.error) {
-      const errorMessage = result.error.messageKey 
-        ? t(result.error.messageKey) 
+      const errorMessage = result.error.messageKey
+        ? t(result.error.messageKey)
         : result.error.message;
       toast.error(errorMessage);
     }
@@ -97,8 +106,8 @@ export function PhoneVerificationForm() {
         toast.success(result.message);
       }
     } else if (result.error) {
-      const errorMessage = result.error.messageKey 
-        ? t(result.error.messageKey) 
+      const errorMessage = result.error.messageKey
+        ? t(result.error.messageKey)
         : result.error.message;
       toast.error(errorMessage);
     }
@@ -174,7 +183,7 @@ export function PhoneVerificationForm() {
           isPhoneSubmitting={phoneSubmission.isSubmitting}
           showRecaptcha={recaptchaManager.showRecaptcha}
           recaptchaContainerRef={recaptchaManager.containerRef}
-          phoneAuth={{ clearRecaptcha: phoneAuth.clearRecaptcha }}
+          phoneAuth={{ clearRecaptcha: clearRecaptcha }}
         />
       )}
     </div>
