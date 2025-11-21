@@ -8,12 +8,17 @@ import { logger } from "@/lib/logging";
 
 interface UseAuthStateChangeListenerProps {
   authStateManager: AuthStateManager | null;
+  hasFullAuth: boolean;
 }
 
 export const useAuthStateChangeListener = ({
   authStateManager,
+  hasFullAuth,
 }: UseAuthStateChangeListenerProps) => {
   useEffect(() => {
+    // 🚫 SSRで full-auth の場合は何もしない
+    if (hasFullAuth) return;
+
     if (!authStateManager) return;
 
     const handleStateChange = (newState: AuthState["authenticationState"]) => {
@@ -31,5 +36,5 @@ export const useAuthStateChangeListener = ({
 
     authStateManager.addStateChangeListener(handleStateChange);
     return () => authStateManager.removeStateChangeListener(handleStateChange);
-  }, [authStateManager]);
+  }, [authStateManager, hasFullAuth]);
 };

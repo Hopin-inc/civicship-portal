@@ -6,6 +6,7 @@ import { useAuthStore } from "@/lib/auth/core/auth-store";
 
 interface UseLineAuthRedirectDetectionProps {
   liffService: LiffService;
+  hasFullAuth: boolean;
 }
 
 /**
@@ -14,6 +15,7 @@ interface UseLineAuthRedirectDetectionProps {
  */
 export const useLineAuthRedirectDetection = ({
   liffService,
+  hasFullAuth,
 }: UseLineAuthRedirectDetectionProps) => {
   const [shouldProcessRedirect, setShouldProcessRedirect] = useState(false);
   const authenticationState = useAuthStore((s) => s.state.authenticationState);
@@ -25,6 +27,9 @@ export const useLineAuthRedirectDetection = ({
   const prevLiffStateRef = useRef<{ isInitialized: boolean; isLoggedIn: boolean } | null>(null);
 
   useEffect(() => {
+    // 🚫 SSRで full-auth の場合は何もしない
+    if (hasFullAuth) return;
+
     const authState = { authenticationState, isAuthenticating };
     const liffState = liffService.getState();
 
@@ -57,7 +62,7 @@ export const useLineAuthRedirectDetection = ({
     }
 
     setShouldProcessRedirect(true);
-  }, [authenticationState, isAuthenticating, liffService]);
+  }, [authenticationState, hasFullAuth, isAuthenticating, liffService]);
 
   return { shouldProcessRedirect };
 };

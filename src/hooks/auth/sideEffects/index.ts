@@ -10,14 +10,26 @@ export function useAuthSideEffects({
   authStateManager,
   liffService,
   refetchUser,
+  hasFullAuth,
 }: {
   authStateManager: AuthStateManager | null;
   liffService: LiffService;
   refetchUser: () => Promise<GqlUser | null>;
+  hasFullAuth: boolean;
 }) {
-  useFirebaseAuthState({ authStateManager });
-  useAuthStateChangeListener({ authStateManager });
+  useFirebaseAuthState({ authStateManager, hasFullAuth });
+  useAuthStateChangeListener({ authStateManager, hasFullAuth });
 
-  const { shouldProcessRedirect } = useLineAuthRedirectDetection({ liffService });
-  useLineAuthProcessing({ shouldProcessRedirect, liffService, refetchUser, authStateManager });
+  const { shouldProcessRedirect } = useLineAuthRedirectDetection({
+    liffService,
+    hasFullAuth,
+  });
+
+  useLineAuthProcessing({
+    shouldProcessRedirect,
+    liffService,
+    refetchUser,
+    authStateManager,
+    hasFullAuth,
+  });
 }

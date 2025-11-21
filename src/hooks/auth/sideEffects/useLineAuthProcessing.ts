@@ -14,6 +14,7 @@ interface UseLineAuthProcessingProps {
   liffService: LiffService;
   refetchUser: () => Promise<GqlUser | null>;
   authStateManager: AuthStateManager | null;
+  hasFullAuth: boolean;
 }
 
 export const useLineAuthProcessing = ({
@@ -21,11 +22,15 @@ export const useLineAuthProcessing = ({
   liffService,
   refetchUser,
   authStateManager,
+  hasFullAuth,
 }: UseLineAuthProcessingProps) => {
   const processedRef = useRef(false);
   const setState = useAuthStore((s) => s.setState);
 
   useEffect(() => {
+    // 🚫 SSRで full-auth の場合は何もしない
+    if (hasFullAuth) return;
+
     if (!shouldProcessRedirect || processedRef.current || !authStateManager) return;
 
     const handleLineAuthRedirect = async () => {
@@ -114,5 +119,5 @@ export const useLineAuthProcessing = ({
     };
 
     handleLineAuthRedirect();
-  }, [shouldProcessRedirect, refetchUser, setState, liffService, authStateManager]);
+  }, [shouldProcessRedirect, refetchUser, setState, liffService, authStateManager, hasFullAuth]);
 };

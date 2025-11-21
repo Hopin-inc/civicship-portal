@@ -20,6 +20,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
 }) => {
   const { liffService, phoneAuthService, authStateManager } = useAuthDependencies();
   const hasInitialized = useRef(false);
+  const hasFullAuth = Boolean(ssrCurrentUser && ssrLineAuthenticated && ssrPhoneAuthenticated);
 
   useEffect(() => {
     if (hasInitialized.current) return;
@@ -50,7 +51,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     return data?.currentUser?.user ?? null;
   }, [refetch]);
 
-  useAuthSideEffects({ authStateManager, liffService, refetchUser });
+  useAuthSideEffects({ authStateManager, liffService, refetchUser, hasFullAuth });
 
   const { logout, createUser, loginWithLiff, startPhoneVerification, verifyPhoneCode } =
     useAuthActions({
