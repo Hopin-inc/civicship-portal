@@ -32,12 +32,7 @@ export const useLineAuthProcessing = ({
 
     const handleLineAuthRedirect = async () => {
       processedRef.current = true;
-
-      // 🔹 SSRフル認証なら「でかいスピナー」は出さない
-      const needAuthFlow = !hasFullAuth;
-      if (needAuthFlow) {
-        setState({ isAuthenticating: true });
-      }
+      setState({ isAuthenticating: true });
 
       try {
         const initialized = await liffService.initialize();
