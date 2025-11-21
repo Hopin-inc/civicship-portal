@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getUserServer } from "@/lib/auth/init/getUserServer";
 import { headers } from "next/headers";
 import { AuthFlowClientWrapper } from "./AuthFlowClientWrapper";
+import { detectLiffCallback } from "@/lib/auth/utils/detectLiffCallback";
 
 function getSafeNext(next: string | null): string {
   if (!next?.startsWith("/")) return "/";
@@ -19,12 +20,7 @@ export default async function AuthFlowLayout({ children }: { children: ReactNode
   const searchParams = new URLSearchParams(search);
   const next = searchParams.get("next") || searchParams.get("liff.state");
   
-  const isLiffCallback = 
-    searchParams.has("code") && 
-    (searchParams.has("state") || searchParams.has("liff.state")) && 
-    searchParams.has("liffClientId");
-  
-  if (isLiffCallback) {
+  if (detectLiffCallback(search)) {
     return <AuthFlowClientWrapper>{children}</AuthFlowClientWrapper>;
   }
   

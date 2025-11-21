@@ -38,9 +38,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, nextPath }) =>
     setError(null);
 
     try {
-      await loginWithLiff(
-        `/login?next=${encodeURIComponentWithType(nextPath as RawURIComponent)}` as RawURIComponent,
-      );
+      await loginWithLiff(nextPath ?? ("/" as RawURIComponent));
       setIsLoading(false);
       onClose();
     } catch (err) {

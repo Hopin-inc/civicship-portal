@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useAuthInteraction } from "@/contexts/AuthInteractionProvider";
-import { decodeURIComponentWithType, EncodedURIComponent } from "@/utils/path";
+import { decodeURIComponentWithType, EncodedURIComponent, RawURIComponent } from "@/utils/path";
 import { getLiffLoginErrorMessage } from "@/app/(auth-flow)/login/utils/getLiffLoginErrorMessage";
 import { toast } from "react-toastify";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
@@ -32,7 +32,7 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      await loginWithLiff(nextPath ?? undefined);
+      await loginWithLiff(nextPath ?? ("/" as RawURIComponent));
     } catch (err) {
       const { title, description } = getLiffLoginErrorMessage(error);
       toast.error(

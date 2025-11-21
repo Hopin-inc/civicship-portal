@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { redirect } from "next/navigation";
 import { getUserServer } from "@/lib/auth/init/getUserServer";
 import { headers } from "next/headers";
+import { detectLiffCallback } from "@/lib/auth/utils/detectLiffCallback";
 
 export default async function AuthedLayout({ children }: { children: ReactNode }) {
   const { user, lineAuthenticated, phoneAuthenticated } = await getUserServer();
@@ -9,6 +10,10 @@ export default async function AuthedLayout({ children }: { children: ReactNode }
 
   const pathname = reqHeaders.get("x-pathname") || "/";
   const search = reqHeaders.get("x-search") || "";
+
+  if (detectLiffCallback(search)) {
+    return <>{children}</>;
+  }
 
   const currentUrl = search ? `${pathname}${search}` : pathname;
   const nextParam = `?next=${encodeURIComponent(currentUrl)}`;
