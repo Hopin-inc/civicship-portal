@@ -183,7 +183,7 @@ export function PhoneVerificationForm() {
           isPhoneSubmitting={phoneSubmission.isSubmitting}
           showRecaptcha={recaptchaManager.showRecaptcha}
           recaptchaContainerRef={recaptchaManager.containerRef}
-          phoneAuth={{ clearRecaptcha: clearRecaptcha }}
+          phoneAuth={{ clearRecaptcha }}
         />
       )}
     </div>
