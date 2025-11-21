@@ -1,13 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 export function useRecaptchaManager() {
   const [isReady, setIsReady] = useState(false);
   const [showRecaptcha, setShowRecaptcha] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (containerRef.current) {
       setIsReady(true);
     }
