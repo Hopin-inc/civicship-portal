@@ -25,7 +25,9 @@ export function PhoneVerificationForm() {
   const { phoneAuth: phoneAuthMethods } = useAuthInteraction();
   const { authenticationState } = useAuthStore((s) => s.state);
   const phoneAuthState = useAuthStore((s) => s.phoneAuth);
-  const isAuthenticated = authenticationState === "user_registered";
+  const isAuthenticated = ["line_authenticated", "phone_authenticated", "user_registered"].includes(
+    authenticationState,
+  );
   const loading = authenticationState === "loading";
   const [phoneNumber, setPhoneNumber] = useState<string | undefined>(undefined);
   const [verificationCode, setVerificationCode] = useState("");
