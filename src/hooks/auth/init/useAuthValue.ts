@@ -8,9 +8,7 @@ type UseAuthValueArgs = {
   refetchUser: () => Promise<GqlUser | null>;
   phoneAuthService: PhoneAuthService;
   actions: {
-    loginWithLiff: AuthContextType["loginWithLiff"];
     logout: AuthContextType["logout"];
-    createUser: AuthContextType["createUser"];
     verifyPhoneCode: AuthContextType["phoneAuth"]["verifyPhoneCode"];
     startPhoneVerification: AuthContextType["phoneAuth"]["startPhoneVerification"];
   };
@@ -41,7 +39,6 @@ export const useAuthValue = ({
       authenticationState,
       isAuthenticating,
       environment,
-      loginWithLiff: actions.loginWithLiff,
       logout: actions.logout,
       phoneAuth: {
         startPhoneVerification: actions.startPhoneVerification,
@@ -51,7 +48,6 @@ export const useAuthValue = ({
         phoneUid: phoneAuth.phoneUid,
         phoneNumber: phoneAuth.phoneNumber,
       },
-      createUser: actions.createUser,
       updateAuthState: refetchUser,
       loading: authenticationState === "loading" || isAuthenticating,
     }),
@@ -61,11 +57,9 @@ export const useAuthValue = ({
       authenticationState,
       isAuthenticating,
       environment,
-      actions.loginWithLiff,
       actions.logout,
       actions.startPhoneVerification,
       actions.verifyPhoneCode,
-      actions.createUser,
       phoneAuth.isVerifying,
       phoneAuth.phoneUid,
       phoneAuth.phoneNumber,

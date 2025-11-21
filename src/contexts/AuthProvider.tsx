@@ -53,17 +53,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
 
   useAuthSideEffects({ authStateManager, liffService, refetchUser, hasFullAuth });
 
-  const { logout, createUser, loginWithLiff, startPhoneVerification, verifyPhoneCode } =
-    useAuthActions({
-      authStateManager,
-      liffService,
-      phoneAuthService,
-      refetchUser,
-    });
+  const { logout, verifyPhoneCode, startPhoneVerification } = useAuthActions({
+    authStateManager,
+    liffService,
+    phoneAuthService,
+  });
 
   const actions = React.useMemo(
-    () => ({ logout, createUser, loginWithLiff, verifyPhoneCode, startPhoneVerification }),
-    [logout, createUser, loginWithLiff, verifyPhoneCode, startPhoneVerification],
+    () => ({ logout, startPhoneVerification, verifyPhoneCode }),
+    [logout, startPhoneVerification, verifyPhoneCode],
   );
 
   const value = useAuthValue({ refetchUser, phoneAuthService, actions });

@@ -2,13 +2,14 @@
 
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { useAuth } from "@/contexts/AuthProvider";
 import { decodeURIComponentWithType, EncodedURIComponent } from "@/utils/path";
 import { getLiffLoginErrorMessage } from "@/app/login/utils/getLiffLoginErrorMessage";
 import { toast } from "react-toastify";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { LoginView } from "@/app/login/components/LoginView";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
+import { useLogin } from "@/hooks/auth/actions/useLogin";
+import { useAuthDependencies } from "@/hooks/auth/init/useAuthDependencies";
 
 export default function LoginPage() {
   const searchParams = useSearchParams();
@@ -16,7 +17,9 @@ export default function LoginPage() {
     (searchParams.get("next") ?? "/") as EncodedURIComponent | null,
   );
 
-  const { loginWithLiff } = useAuth();
+  const { liffService, authStateManager } = useAuthDependencies();
+  const loginWithLiff = useLogin(liffService, authStateManager);
+
   const { authenticationState, isAuthenticating } = useAuthStore((s) => s.state);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -39,7 +42,7 @@ export default function LoginPage() {
         <div>
           <div className="font-bold">{title}</div>
           {description && <div className="text-sm mt-1">{description}</div>}
-        </div>
+        </div>,
       );
     } finally {
       setIsLoading(false);

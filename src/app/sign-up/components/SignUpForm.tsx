@@ -24,20 +24,24 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { logger } from "@/lib/logging";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
+import { useCreateUser } from "@/hooks/auth/actions/useCreateUser";
 
-const createFormSchema = (t: (key: string) => string) => z.object({
-  name: z
-    .string({ required_error: t("nameRequired") })
-    .trim()
-    .nonempty(t("nameRequired")),
-  prefecture: z.nativeEnum(GqlCurrentPrefecture, {
-    required_error: t("prefectureRequired"),
-  }),
-});
+const createFormSchema = (t: (key: string) => string) =>
+  z.object({
+    name: z
+      .string({ required_error: t("nameRequired") })
+      .trim()
+      .nonempty(t("nameRequired")),
+    prefecture: z.nativeEnum(GqlCurrentPrefecture, {
+      required_error: t("prefectureRequired"),
+    }),
+  });
 
 export function SignUpForm() {
   const t = useTranslations();
-  const { createUser, isAuthenticated, isPhoneVerified, phoneAuth, loading } = useAuth();
+  const { isAuthenticated, isPhoneVerified, phoneAuth, loading } = useAuth();
+  const createUser = useCreateUser();
+
   const [isLoading, setIsLoading] = useState(false);
   const firebaseUser = useAuthStore((s) => s.state.firebaseUser);
 
@@ -101,7 +105,11 @@ export function SignUpForm() {
               <FormItem className="space-y-3">
                 <FormLabel className="text-base">{t("auth.signup.nameLabel")}</FormLabel>
                 <FormControl>
-                  <Input placeholder={t("auth.signup.namePlaceholder")} {...field} className="h-12" />
+                  <Input
+                    placeholder={t("auth.signup.namePlaceholder")}
+                    {...field}
+                    className="h-12"
+                  />
                 </FormControl>
                 <FormDescription className="text-xs text-muted-foreground">
                   {t("auth.signup.nameDescription")}
