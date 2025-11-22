@@ -7,6 +7,7 @@ import { AuthRedirectService } from "@/lib/auth/service/auth-redirect-service";
 import { decodeURIComponentWithType, EncodedURIComponent, RawURIComponent } from "@/utils/path";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { logger } from "@/lib/logging";
 
 interface RouteGuardProps {
   children: React.ReactNode;
@@ -53,6 +54,16 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       decodeURIComponentWithType(nextParam),
       currentUser,
     );
+
+    logger.info("[LIFF-DEBUG] RouteGuard redirect check", {
+      pathname,
+      pathWithParams,
+      authenticationState: authState.authenticationState,
+      currentUser: !!currentUser,
+      currentUserId: currentUser?.id,
+      redirectPath,
+      willRedirect: !!(redirectPath && redirectPath !== pathWithParams),
+    });
 
     if (redirectPath && redirectPath !== pathWithParams) {
       if (redirectedRef.current !== redirectPath) {

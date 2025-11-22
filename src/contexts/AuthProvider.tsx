@@ -9,6 +9,7 @@ import { applySsrAuthState } from "@/lib/auth/init/applySsrAuthState";
 import { useAuthActions } from "@/hooks/auth/actions";
 import { useAuthSideEffects } from "@/hooks/auth/sideEffects";
 import { useAuthValue } from "@/hooks/auth/init/useAuthValue";
+import { logger } from "@/lib/logging";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -27,6 +28,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     hasInitialized.current = true;
 
     if (!authStateManager) return;
+
+    logger.info("[LIFF-DEBUG] AuthProvider initialization", {
+      hasFullAuth,
+      ssrCurrentUser: !!ssrCurrentUser,
+      ssrCurrentUserId: ssrCurrentUser?.id,
+      ssrLineAuthenticated,
+      ssrPhoneAuthenticated,
+      environment: typeof window !== "undefined" ? liffService.getState() : "SSR",
+    });
 
     // ✅ SSR初期状態適用
     applySsrAuthState(ssrCurrentUser, ssrLineAuthenticated, ssrPhoneAuthenticated);

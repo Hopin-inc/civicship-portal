@@ -1,6 +1,7 @@
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { AuthenticationState } from "@/types/auth";
 import { GqlUser } from "@/types/graphql";
+import { logger } from "@/lib/logging";
 
 export function applySsrAuthState(
   ssrCurrentUser?: GqlUser | null,
@@ -15,6 +16,14 @@ export function applySsrAuthState(
   } else if (ssrCurrentUser && ssrLineAuthenticated) {
     initialState = "line_authenticated";
   }
+
+  logger.info("[LIFF-DEBUG] applySsrAuthState", {
+    initialState,
+    ssrCurrentUser: !!ssrCurrentUser,
+    ssrCurrentUserId: ssrCurrentUser?.id,
+    ssrLineAuthenticated,
+    ssrPhoneAuthenticated,
+  });
 
   useAuthStore.getState().setState({
     authenticationState: initialState,

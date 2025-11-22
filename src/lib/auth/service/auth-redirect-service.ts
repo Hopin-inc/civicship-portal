@@ -3,6 +3,7 @@ import { GqlUser } from "@/types/graphql";
 import { encodeURIComponentWithType, matchPaths, RawURIComponent } from "@/utils/path";
 import { AccessPolicy } from "@/lib/auth/core/access-policy";
 import { AuthenticationState } from "@/types/auth";
+import { logger } from "@/lib/logging";
 
 export class AuthRedirectService {
   private static instance: AuthRedirectService;
@@ -28,7 +29,17 @@ export class AuthRedirectService {
     const basePath = pathname.split("?")[0];
     const nextParam = next ? this.generateNextParam(next) : this.generateNextParam(pathname);
 
+    logger.info("[LIFF-DEBUG] AuthRedirectService.getRedirectPath", {
+      pathname,
+      basePath,
+      authState,
+      currentUser: !!currentUser,
+      currentUserId: currentUser?.id,
+      next,
+    });
+
     if (authState === "loading" || authState === "authenticating") {
+      logger.info("[LIFF-DEBUG] AuthRedirectService: skipping (loading/authenticating)");
       return null;
     }
 
@@ -40,19 +51,29 @@ export class AuthRedirectService {
       nextParam,
     );
     if (redirectFromLogin) {
+      logger.info("[LIFF-DEBUG] AuthRedirectService: redirect from handleAuthEntryFlow", {
+        redirectPath: redirectFromLogin,
+      });
       return redirectFromLogin;
     }
 
     const redirectFromUserPath = this.handleUserPath(basePath, authState, currentUser, nextParam);
     if (redirectFromUserPath) {
+      logger.info("[LIFF-DEBUG] AuthRedirectService: redirect from handleUserPath", {
+        redirectPath: redirectFromUserPath,
+      });
       return redirectFromUserPath;
     }
 
     const redirectByRole = this.handleRoleRestriction(currentUser, basePath);
     if (redirectByRole) {
+      logger.info("[LIFF-DEBUG] AuthRedirectService: redirect from handleRoleRestriction", {
+        redirectPath: redirectByRole,
+      });
       return redirectByRole;
     }
 
+    logger.info("[LIFF-DEBUG] AuthRedirectService: no redirect needed");
     return null;
   }
 

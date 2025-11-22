@@ -39,6 +39,15 @@ export async function initAuth(params: InitAuthParams) {
 
   const environment = detectEnvironment();
 
+  logger.info("[LIFF-DEBUG] initAuth", {
+    environment,
+    ssrCurrentUser: !!ssrCurrentUser,
+    ssrCurrentUserId: ssrCurrentUser?.id,
+    ssrLineAuthenticated,
+    ssrPhoneAuthenticated,
+    willUseInitAuthFast: !!(ssrCurrentUser && ssrLineAuthenticated),
+  });
+
   if (ssrCurrentUser && ssrLineAuthenticated) {
     return await initAuthFast({
       ssrCurrentUser,
