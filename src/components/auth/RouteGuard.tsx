@@ -15,6 +15,7 @@ interface RouteGuardProps {
 export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   const { loading } = useAuth();
   const authState = useAuthStore((s) => s.state);
+  const currentUser = useAuthStore((s) => s.state.currentUser);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -50,6 +51,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     const redirectPath = authRedirectService.getRedirectPath(
       pathWithParams as RawURIComponent,
       decodeURIComponentWithType(nextParam),
+      currentUser,
     );
 
     if (redirectPath && redirectPath !== pathWithParams) {
@@ -62,7 +64,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       redirectedRef.current = null;
       setIsReadyToRender(true);
     }
-  }, [pathname, authState, loading, router, authRedirectService, nextParam, searchParams]);
+  }, [pathname, authState, currentUser, loading, router, authRedirectService, nextParam, searchParams]);
 
   // --- 未確定中は描画しない（チラつき防止） ---
   if (!isReadyToRender) {
