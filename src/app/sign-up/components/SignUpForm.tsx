@@ -39,11 +39,12 @@ const createFormSchema = (t: (key: string) => string) =>
 
 export function SignUpForm() {
   const t = useTranslations();
-  const { isAuthenticated, isPhoneVerified, phoneAuth, loading } = useAuth();
+  const { isAuthenticated, isPhoneVerified, loading } = useAuth();
   const createUser = useCreateUser();
 
   const [isLoading, setIsLoading] = useState(false);
   const firebaseUser = useAuthStore((s) => s.state.firebaseUser);
+  const phoneAuth = useAuthStore((s) => s.phoneAuth);
 
   const FormSchema = createFormSchema((key: string) => t(`auth.signup.${key}`));
   type FormValues = z.infer<typeof FormSchema>;
