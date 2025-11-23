@@ -116,6 +116,12 @@ export class AuthRedirectService {
         return null;
 
       case "user_registered":
+        // 特別扱い: メンバーシップ作成のために /sign-up/phone-verification にいるケースを許可
+        if (basePath === "/sign-up/phone-verification") {
+          // このページに留まらせる（リダイレクトしない）
+          return null;
+        }
+
         // 登録済みユーザーが sign-up 系や login に来たらトップ or nextへ
         if (next?.startsWith("/") && !next.startsWith("/login") && !next.startsWith("/sign-up")) {
           return next as RawURIComponent;
