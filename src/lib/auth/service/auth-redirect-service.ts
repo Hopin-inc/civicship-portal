@@ -162,10 +162,47 @@ export class AuthRedirectService {
     currentUser: GqlUser | null | undefined,
     basePath: string,
   ): RawURIComponent | null {
-    if (!currentUser) return null;
-    if (!AccessPolicy.canAccessRole(currentUser, basePath)) {
-      return AccessPolicy.getFallbackPath(currentUser) as RawURIComponent;
+    logger.info("[LIFF-DEBUG] handleRoleRestriction: start", {
+      basePath,
+      userId: currentUser?.id,
+      hasMemberships: !!currentUser?.memberships?.length,
+      membershipsCount: currentUser?.memberships?.length ?? 0,
+      membershipIds: currentUser?.memberships?.map(m => m.community?.id) ?? [],
+      component: "AuthRedirectService",
+    });
+
+    if (!currentUser) {
+      logger.info("[LIFF-DEBUG] handleRoleRestriction: no currentUser", {
+        component: "AuthRedirectService",
+      });
+      return null;
     }
+
+    const canAccess = AccessPolicy.canAccessRole(currentUser, basePath);
+    logger.info("[LIFF-DEBUG] handleRoleRestriction: canAccessRole result", {
+      basePath,
+      userId: currentUser.id,
+      canAccess,
+      component: "AuthRedirectService",
+    });
+
+    if (!canAccess) {
+      const fallbackPath = AccessPolicy.getFallbackPath(currentUser);
+      logger.info("[LIFF-DEBUG] handleRoleRestriction: redirecting to fallback", {
+        basePath,
+        userId: currentUser.id,
+        fallbackPath,
+        reason: "canAccessRole returned false",
+        component: "AuthRedirectService",
+      });
+      return fallbackPath as RawURIComponent;
+    }
+
+    logger.info("[LIFF-DEBUG] handleRoleRestriction: access allowed", {
+      basePath,
+      userId: currentUser.id,
+      component: "AuthRedirectService",
+    });
     return null;
   }
 }

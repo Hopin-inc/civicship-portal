@@ -1,6 +1,7 @@
 import { GqlRole, GqlUser } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { matchPaths } from "@/utils/path";
+import { logger } from "@/lib/logging";
 
 const OWNER_ONLY_PATHS = ["/admin/wallet", "/admin/members"];
 const MANAGER_PATHS = ["/admin", "/admin/*"];
@@ -28,20 +29,78 @@ export class AccessPolicy {
   }
 
   public static canAccessRole(user: GqlUser | null | undefined, pathname: string): boolean {
-    if (!user) return false;
+    logger.info("[LIFF-DEBUG] AccessPolicy.canAccessRole: start", {
+      pathname,
+      userId: user?.id,
+      hasMemberships: !!user?.memberships?.length,
+      membershipsCount: user?.memberships?.length ?? 0,
+      currentCommunityId: COMMUNITY_ID,
+      component: "AccessPolicy",
+    });
+
+    if (!user) {
+      logger.info("[LIFF-DEBUG] AccessPolicy.canAccessRole: no user", {
+        pathname,
+        result: false,
+        component: "AccessPolicy",
+      });
+      return false;
+    }
 
     const membership = this.getMembership(user);
-    if (!membership) return false;
+    logger.info("[LIFF-DEBUG] AccessPolicy.canAccessRole: membership check", {
+      pathname,
+      userId: user.id,
+      hasMembership: !!membership,
+      membershipCommunityId: membership?.community?.id,
+      membershipRole: membership?.role,
+      currentCommunityId: COMMUNITY_ID,
+      allMembershipIds: user.memberships?.map(m => m.community?.id) ?? [],
+      component: "AccessPolicy",
+    });
+
+    if (!membership) {
+      logger.info("[LIFF-DEBUG] AccessPolicy.canAccessRole: no membership for current community", {
+        pathname,
+        userId: user.id,
+        currentCommunityId: COMMUNITY_ID,
+        result: false,
+        component: "AccessPolicy",
+      });
+      return false;
+    }
 
     if (this.isOwnerOnlyPath(pathname)) {
-      return this.hasOwnerPrivileges(membership.role);
+      const hasOwner = this.hasOwnerPrivileges(membership.role);
+      logger.info("[LIFF-DEBUG] AccessPolicy.canAccessRole: owner-only path", {
+        pathname,
+        userId: user.id,
+        role: membership.role,
+        result: hasOwner,
+        component: "AccessPolicy",
+      });
+      return hasOwner;
     }
 
     if (this.isAdminPath(pathname)) {
-      return this.hasManagerPrivileges(membership.role);
+      const hasManager = this.hasManagerPrivileges(membership.role);
+      logger.info("[LIFF-DEBUG] AccessPolicy.canAccessRole: admin path", {
+        pathname,
+        userId: user.id,
+        role: membership.role,
+        result: hasManager,
+        component: "AccessPolicy",
+      });
+      return hasManager;
     }
 
     // 一般ページは誰でもアクセス可能
+    logger.info("[LIFF-DEBUG] AccessPolicy.canAccessRole: general path allowed", {
+      pathname,
+      userId: user.id,
+      result: true,
+      component: "AccessPolicy",
+    });
     return true;
   }
 
