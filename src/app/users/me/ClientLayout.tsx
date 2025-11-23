@@ -6,7 +6,7 @@ import { GqlUser } from "@/types/graphql";
 import { GET_CURRENT_USER_PROFILE } from "@/graphql/account/user/client-query";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { notFound } from "next/navigation";
-import { logger } from "@/lib/logger";
+import { logger } from "@/lib/logging";
 
 interface CurrentUserProfileQueryResult {
   currentUser?: {

@@ -2,7 +2,7 @@ import { metadata } from "./metadata";
 import { ClientLayout } from "./ClientLayout";
 import { fetchPrivateUserServer } from "@/app/users/features/shared/server";
 import { mapGqlPortfolio, UserProfileProvider } from "@/app/users/features/shared";
-import { logger } from "@/lib/logger";
+import { logger } from "@/lib/logging";
 
 export { metadata };
 
