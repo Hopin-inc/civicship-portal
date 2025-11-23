@@ -4,6 +4,7 @@ import { encodeURIComponentWithType, matchPaths, RawURIComponent } from "@/utils
 import { AccessPolicy } from "@/lib/auth/core/access-policy";
 import { AuthenticationState } from "@/types/auth";
 import { logger } from "@/lib/logging";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 export class AuthRedirectService {
   private static instance: AuthRedirectService;
@@ -187,12 +188,33 @@ export class AuthRedirectService {
     });
 
     if (!canAccess) {
+      // Check if user has membership in current community
+      const membership = currentUser.memberships?.find(
+        (m) => m.community?.id === COMMUNITY_ID
+      );
+
+      if (!membership) {
+        // User is authenticated but not a member of this community
+        // Send them to phone verification flow to create membership
+        const targetPath = `/sign-up/phone-verification?next=${encodeURIComponent(basePath)}` as RawURIComponent;
+        logger.info("[LIFF-DEBUG] handleRoleRestriction: non-member redirect", {
+          basePath,
+          userId: currentUser.id,
+          currentCommunityId: COMMUNITY_ID,
+          targetPath,
+          reason: "no membership in current community",
+          component: "AuthRedirectService",
+        });
+        return targetPath;
+      }
+
+      // User has membership but insufficient role (e.g., trying to access /admin)
       const fallbackPath = AccessPolicy.getFallbackPath(currentUser);
       logger.info("[LIFF-DEBUG] handleRoleRestriction: redirecting to fallback", {
         basePath,
         userId: currentUser.id,
         fallbackPath,
-        reason: "canAccessRole returned false",
+        reason: "has membership but insufficient role",
         component: "AuthRedirectService",
       });
       return fallbackPath as RawURIComponent;
