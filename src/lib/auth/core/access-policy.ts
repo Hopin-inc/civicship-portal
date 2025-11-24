@@ -109,7 +109,7 @@ export class AccessPolicy {
     const membership = this.getMembership(user);
     
     if (!membership) {
-      logger.warn("[CRITICAL] user_registered but no membership", {
+      logger.warn("[LIFF-DEBUG] user_registered but no membership", {
         userId: user.id,
         communityId: COMMUNITY_ID,
         membershipIds: user.memberships?.map(m => m.community?.id) ?? [],
