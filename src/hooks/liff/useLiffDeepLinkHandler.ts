@@ -42,14 +42,14 @@ export const useLiffDeepLinkHandler = () => {
 
     // Security check: only allow internal paths
     if (!liffState.startsWith("/") || liffState.startsWith("//")) {
-      logger.warn("[LIFF-DEBUG] Invalid liff.state parameter", {
+      logger.warn("[AUTH-LIFF] Invalid liff.state parameter", {
         liffState,
         component: "useLiffDeepLinkHandler",
       });
       return;
     }
 
-    logger.info("[LIFF-DEBUG] Processing LIFF deep link", {
+    logger.info("[AUTH-LIFF] Processing LIFF deep link", {
       liffState,
       component: "useLiffDeepLinkHandler",
     });

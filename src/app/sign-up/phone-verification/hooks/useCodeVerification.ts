@@ -114,7 +114,7 @@ export function useCodeVerification(
             
             // Defensive: handle case where updateAuthState returns null
             if (!updatedUser) {
-              logger.warn("[LIFF-DEBUG] useCodeVerification: updateAuthState returned null (ExistingSameCommunity)", {
+              logger.warn("[AUTH] useCodeVerification: updateAuthState returned null (ExistingSameCommunity)", {
                 status: GqlPhoneUserStatus.ExistingSameCommunity,
                 component: "useCodeVerification",
               });
@@ -145,7 +145,7 @@ export function useCodeVerification(
             
             // Defensive: handle case where updateAuthState returns null
             if (!updatedUserCross) {
-              logger.warn("[LIFF-DEBUG] useCodeVerification: updateAuthState returned null (ExistingDifferentCommunity)", {
+              logger.warn("[AUTH] useCodeVerification: updateAuthState returned null (ExistingDifferentCommunity)", {
                 status: GqlPhoneUserStatus.ExistingDifferentCommunity,
                 component: "useCodeVerification",
               });

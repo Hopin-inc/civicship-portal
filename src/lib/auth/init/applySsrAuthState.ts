@@ -17,7 +17,7 @@ export function applySsrAuthState(
     initialState = "line_authenticated";
   }
 
-  logger.info("[LIFF-DEBUG] applySsrAuthState", {
+  logger.info("[AUTH] applySsrAuthState", {
     initialState,
     ssrCurrentUser: !!ssrCurrentUser,
     ssrCurrentUserId: ssrCurrentUser?.id,

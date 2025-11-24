@@ -9,7 +9,7 @@ export { metadata };
 export default async function MyPageLayout({ children }: { children: React.ReactNode }) {
   const gqlUser = await fetchPrivateUserServer();
 
-  logger.info("[LIFF-DEBUG] /users/me layout fetchPrivateUserServer result", {
+  logger.info("[AUTH] /users/me layout fetchPrivateUserServer result", {
     hasUser: !!gqlUser,
     userId: gqlUser?.id,
     component: "MyPageLayout",
@@ -32,7 +32,7 @@ export default async function MyPageLayout({ children }: { children: React.React
     );
   }
 
-  logger.info("[LIFF-DEBUG] /users/me layout: no SSR user, using ClientLayout with null", {
+  logger.info("[AUTH] /users/me layout: no SSR user, using ClientLayout with null", {
     component: "MyPageLayout",
   });
 

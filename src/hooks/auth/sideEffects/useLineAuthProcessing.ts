@@ -100,7 +100,7 @@ export const useLineAuthProcessing = ({
           
           // Only set user_registered if BOTH phone identity AND membership exist
           if (hasMembership) {
-            logger.info("[LIFF-DEBUG] useLineAuthProcessing: setting user_registered", {
+            logger.info("[AUTH] useLineAuthProcessing: setting user_registered", {
               userId: user.id,
               hasPhoneIdentity,
               hasMembership,
@@ -114,7 +114,7 @@ export const useLineAuthProcessing = ({
             authStateManager.updateState("user_registered", "useLineAuthProcessing (phone + membership)");
             await authStateManager.handleUserRegistrationStateChange(true);
           } else {
-            logger.info("[LIFF-DEBUG] useLineAuthProcessing: setting phone_authenticated", {
+            logger.info("[AUTH] useLineAuthProcessing: setting phone_authenticated", {
               userId: user.id,
               hasPhoneIdentity,
               hasMembership,

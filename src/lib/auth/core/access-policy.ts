@@ -29,7 +29,7 @@ export class AccessPolicy {
   }
 
   public static canAccessRole(user: GqlUser | null | undefined, pathname: string): boolean {
-    logger.info("[LIFF-DEBUG] AccessPolicy.canAccessRole: start", {
+    logger.info("[AUTH] AccessPolicy.canAccessRole: start", {
       pathname,
       userId: user?.id,
       hasMemberships: !!user?.memberships?.length,
@@ -39,7 +39,7 @@ export class AccessPolicy {
     });
 
     if (!user) {
-      logger.info("[LIFF-DEBUG] AccessPolicy.canAccessRole: no user", {
+      logger.info("[AUTH] AccessPolicy.canAccessRole: no user", {
         pathname,
         result: false,
         component: "AccessPolicy",
@@ -48,7 +48,7 @@ export class AccessPolicy {
     }
 
     const membership = this.getMembership(user);
-    logger.info("[LIFF-DEBUG] AccessPolicy.canAccessRole: membership check", {
+    logger.info("[AUTH] AccessPolicy.canAccessRole: membership check", {
       pathname,
       userId: user.id,
       hasMembership: !!membership,
@@ -60,7 +60,7 @@ export class AccessPolicy {
     });
 
     if (!membership) {
-      logger.info("[LIFF-DEBUG] AccessPolicy.canAccessRole: no membership for current community", {
+      logger.info("[AUTH] AccessPolicy.canAccessRole: no membership for current community", {
         pathname,
         userId: user.id,
         currentCommunityId: COMMUNITY_ID,
@@ -72,7 +72,7 @@ export class AccessPolicy {
 
     if (this.isOwnerOnlyPath(pathname)) {
       const hasOwner = this.hasOwnerPrivileges(membership.role);
-      logger.info("[LIFF-DEBUG] AccessPolicy.canAccessRole: owner-only path", {
+      logger.info("[AUTH] AccessPolicy.canAccessRole: owner-only path", {
         pathname,
         userId: user.id,
         role: membership.role,
@@ -84,7 +84,7 @@ export class AccessPolicy {
 
     if (this.isAdminPath(pathname)) {
       const hasManager = this.hasManagerPrivileges(membership.role);
-      logger.info("[LIFF-DEBUG] AccessPolicy.canAccessRole: admin path", {
+      logger.info("[AUTH] AccessPolicy.canAccessRole: admin path", {
         pathname,
         userId: user.id,
         role: membership.role,
@@ -95,7 +95,7 @@ export class AccessPolicy {
     }
 
     // 一般ページは誰でもアクセス可能
-    logger.info("[LIFF-DEBUG] AccessPolicy.canAccessRole: general path allowed", {
+    logger.info("[AUTH] AccessPolicy.canAccessRole: general path allowed", {
       pathname,
       userId: user.id,
       result: true,
@@ -109,7 +109,7 @@ export class AccessPolicy {
     const membership = this.getMembership(user);
     
     if (!membership) {
-      logger.warn("[LIFF-DEBUG] user_registered but no membership", {
+      logger.warn("[AUTH] user_registered but no membership", {
         userId: user.id,
         communityId: COMMUNITY_ID,
         membershipIds: user.memberships?.map(m => m.community?.id) ?? [],
