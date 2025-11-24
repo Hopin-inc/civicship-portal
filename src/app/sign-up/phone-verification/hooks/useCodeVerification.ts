@@ -110,11 +110,12 @@ export function useCodeVerification(
             };
 
           case GqlPhoneUserStatus.ExistingSameCommunity:
-            await updateAuthState();
+            const updatedUser = await updateAuthState();
             setAuthState({ authenticationState: "user_registered", isAuthInProgress: false });
             const homeRedirectPath = authRedirectService.getRedirectPath(
               "/" as RawURIComponent,
               nextParam as RawURIComponent,
+              updatedUser,
             );
             return {
               success: true,
@@ -123,11 +124,12 @@ export function useCodeVerification(
             };
 
           case GqlPhoneUserStatus.ExistingDifferentCommunity:
-            await updateAuthState();
+            const updatedUserCross = await updateAuthState();
             setAuthState({ authenticationState: "user_registered", isAuthInProgress: false });
             const crossCommunityRedirectPath = authRedirectService.getRedirectPath(
               "/" as RawURIComponent,
               nextParam as RawURIComponent,
+              updatedUserCross,
             );
             return {
               success: true,
