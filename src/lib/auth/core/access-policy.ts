@@ -1,6 +1,7 @@
 import { GqlRole, GqlUser } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { matchPaths } from "@/utils/path";
+import { logger } from "@/lib/logging";
 
 const OWNER_ONLY_PATHS = ["/admin/wallet", "/admin/members"];
 const MANAGER_PATHS = ["/admin", "/admin/*"];
@@ -48,6 +49,17 @@ export class AccessPolicy {
   public static getFallbackPath(user: GqlUser | null | undefined): string {
     if (!user) return "/login";
     const membership = this.getMembership(user);
-    return membership ? "/" : "/";
+
+    if (!membership) {
+      logger.warn("[LIFF-DEBUG] user_registered but no membership", {
+        userId: user.id,
+        communityId: COMMUNITY_ID,
+        membershipIds: user.memberships?.map(m => m.community?.id) ?? [],
+        component: "AccessPolicy",
+      });
+      return "/sign-up/phone-verification";
+    }
+
+    return "/";
   }
 }
