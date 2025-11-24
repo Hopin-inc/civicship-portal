@@ -3,7 +3,6 @@ import type { NextRequest } from "next/server";
 import { FeaturesType, currentCommunityConfig } from "@/lib/communities/metadata";
 import { detectPreferredLocale } from "@/lib/i18n/languageDetection";
 import { locales, defaultLocale } from "@/lib/i18n/config";
-import { logger } from "@/lib/logging";
 
 // Map features to their corresponding route paths
 const featureToRoutesMap: Partial<Record<FeaturesType, string[]>> = {
@@ -25,7 +24,7 @@ export function middleware(request: NextRequest) {
 
   // ルートページへのアクセスを処理（liff.stateがない場合、またはliff.stateが/の場合のみrootPathにリダイレクト）
   if (pathname === "/" && rootPath !== "/" && (!hasLiffState || hasLiffState === "/")) {
-    logger.info("[AUTH] Middleware: redirecting from / to rootPath", {
+    console.log("[AUTH] Middleware: redirecting from / to rootPath", {
       rootPath,
       hasLiffState,
       communityId: currentCommunityConfig.id,
