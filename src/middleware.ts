@@ -24,11 +24,6 @@ export function middleware(request: NextRequest) {
 
   // ルートページへのアクセスを処理（liff.stateがない場合、またはliff.stateが/の場合のみrootPathにリダイレクト）
   if (pathname === "/" && rootPath !== "/" && (!hasLiffState || hasLiffState === "/")) {
-    console.log("[AUTH] Middleware: redirecting from / to rootPath", {
-      rootPath,
-      hasLiffState,
-      communityId: currentCommunityConfig.id,
-    });
     return NextResponse.redirect(new URL(rootPath, request.url));
   }
 
