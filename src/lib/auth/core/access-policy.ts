@@ -107,6 +107,17 @@ export class AccessPolicy {
   public static getFallbackPath(user: GqlUser | null | undefined): string {
     if (!user) return "/login";
     const membership = this.getMembership(user);
-    return membership ? "/" : "/";
+    
+    if (!membership) {
+      logger.warn("[CRITICAL] user_registered but no membership", {
+        userId: user.id,
+        communityId: COMMUNITY_ID,
+        membershipIds: user.memberships?.map(m => m.community?.id) ?? [],
+        component: "AccessPolicy",
+      });
+      return "/sign-up/phone-verification";
+    }
+    
+    return "/";
   }
 }
