@@ -170,6 +170,17 @@ export class AuthRedirectService {
     currentUser: GqlUser | null | undefined,
     basePath: string,
   ): RawURIComponent | null {
+    // Early escape: /sign-up/phone-verification is for creating membership, skip membership check
+    if (basePath === "/sign-up/phone-verification") {
+      logger.info("[LIFF-DEBUG] handleRoleRestriction: skipping membership check for phone-verification page", {
+        basePath,
+        userId: currentUser?.id,
+        reason: "phone-verification page is for creating membership",
+        component: "AuthRedirectService",
+      });
+      return null;
+    }
+
     logger.info("[LIFF-DEBUG] handleRoleRestriction: start", {
       basePath,
       userId: currentUser?.id,
