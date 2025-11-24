@@ -4,8 +4,6 @@ import { encodeURIComponentWithType, matchPaths, RawURIComponent } from "@/utils
 import { AccessPolicy } from "@/lib/auth/core/access-policy";
 import { AuthenticationState } from "@/types/auth";
 import { logger } from "@/lib/logging";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { isRunningInLiff } from "../core/environment-detector";
 
 export class AuthRedirectService {
   private static instance: AuthRedirectService;
@@ -117,12 +115,6 @@ export class AuthRedirectService {
         return null;
 
       case "user_registered":
-        // 特別扱い: メンバーシップ作成フローのために特定のページを許可
-        if (basePath === "/sign-up/phone-verification" || (basePath === "/login" && next)) {
-          // next がある場合のみ（メンバーシップ作成フロー）
-          return null; // このページに留まらせる（リダイレクトしない）
-        }
-
         // 登録済みユーザーが sign-up 系や login に来たらトップ or nextへ
         if (next?.startsWith("/") && !next.startsWith("/login") && !next.startsWith("/sign-up")) {
           return next as RawURIComponent;
@@ -170,17 +162,6 @@ export class AuthRedirectService {
     currentUser: GqlUser | null | undefined,
     basePath: string,
   ): RawURIComponent | null {
-    // Auth entry paths are controlled by handleAuthEntryFlow; do not apply role restriction here.
-    if (this.isAuthEntryPath(basePath)) {
-      logger.info("[LIFF-DEBUG] handleRoleRestriction: skip for auth entry path", {
-        basePath,
-        userId: currentUser?.id,
-        reason: "auth entry pages are controlled by handleAuthEntryFlow",
-        component: "AuthRedirectService",
-      });
-      return null;
-    }
-
     logger.info("[LIFF-DEBUG] handleRoleRestriction: start", {
       basePath,
       userId: currentUser?.id,
@@ -206,38 +187,12 @@ export class AuthRedirectService {
     });
 
     if (!canAccess) {
-      // Check if user has membership in current community
-      const membership = currentUser.memberships?.find(
-        (m) => m.community?.id === COMMUNITY_ID
-      );
-
-      if (!membership) {
-        // User is authenticated but not a member of this community
-        // Environment detection: LIFF → phone-verification, non-LIFF → login
-        const isLiff = isRunningInLiff();
-        const targetPath = isLiff
-          ? `/sign-up/phone-verification?next=${encodeURIComponent(basePath)}`
-          : `/login?next=${encodeURIComponent(basePath)}`;
-        
-        logger.info("[LIFF-DEBUG] handleRoleRestriction: non-member redirect", {
-          basePath,
-          userId: currentUser.id,
-          currentCommunityId: COMMUNITY_ID,
-          targetPath,
-          environment: isLiff ? "liff" : "non-liff",
-          reason: "no membership in current community",
-          component: "AuthRedirectService",
-        });
-        return targetPath as RawURIComponent;
-      }
-
-      // User has membership but insufficient role (e.g., trying to access /admin)
       const fallbackPath = AccessPolicy.getFallbackPath(currentUser);
-      logger.info("[LIFF-DEBUG] handleRoleRestriction: redirecting to fallback", {
+      logger.info("[LIFF-DEBUG] handleRoleRestriction: redirecting to fallback (master logic)", {
         basePath,
         userId: currentUser.id,
         fallbackPath,
-        reason: "has membership but insufficient role",
+        reason: "canAccessRole returned false",
         component: "AuthRedirectService",
       });
       return fallbackPath as RawURIComponent;
