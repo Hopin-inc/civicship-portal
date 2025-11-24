@@ -58,6 +58,24 @@ export function useCodeVerification(
       setIsVerifying(true);
 
       const setAuthState = authStoreState.setState;
+      
+      // Helper function to handle updateAuthState returning null
+      const handleUpdateAuthStateNull = (
+        status: GqlPhoneUserStatus,
+      ): CodeVerificationResult => {
+        logger.warn("[AUTH] useCodeVerification: updateAuthState returned null", {
+          status,
+          component: "useCodeVerification",
+        });
+        setAuthState({ isAuthInProgress: false });
+        return {
+          success: false,
+          error: {
+            message: t("phoneVerification.errors.generic"),
+            type: "auth-state-update-failed",
+          },
+        };
+      };
       setAuthState({ isAuthInProgress: true });
 
       try {
@@ -114,18 +132,7 @@ export function useCodeVerification(
             
             // Defensive: handle case where updateAuthState returns null
             if (!updatedUser) {
-              logger.warn("[AUTH] useCodeVerification: updateAuthState returned null (ExistingSameCommunity)", {
-                status: GqlPhoneUserStatus.ExistingSameCommunity,
-                component: "useCodeVerification",
-              });
-              setAuthState({ isAuthInProgress: false });
-              return {
-                success: false,
-                error: {
-                  message: t("phoneVerification.errors.generic"),
-                  type: "auth-state-update-failed",
-                },
-              };
+              return handleUpdateAuthStateNull(GqlPhoneUserStatus.ExistingSameCommunity);
             }
             
             setAuthState({ authenticationState: "user_registered", isAuthInProgress: false });
@@ -145,18 +152,7 @@ export function useCodeVerification(
             
             // Defensive: handle case where updateAuthState returns null
             if (!updatedUserCross) {
-              logger.warn("[AUTH] useCodeVerification: updateAuthState returned null (ExistingDifferentCommunity)", {
-                status: GqlPhoneUserStatus.ExistingDifferentCommunity,
-                component: "useCodeVerification",
-              });
-              setAuthState({ isAuthInProgress: false });
-              return {
-                success: false,
-                error: {
-                  message: t("phoneVerification.errors.generic"),
-                  type: "auth-state-update-failed",
-                },
-              };
+              return handleUpdateAuthStateNull(GqlPhoneUserStatus.ExistingDifferentCommunity);
             }
             
             setAuthState({ authenticationState: "user_registered", isAuthInProgress: false });
