@@ -5,6 +5,7 @@ import { AccessPolicy } from "@/lib/auth/core/access-policy";
 import { AuthenticationState } from "@/types/auth";
 import { logger } from "@/lib/logging";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { isRunningInLiff } from "../core/environment-detector";
 
 export class AuthRedirectService {
   private static instance: AuthRedirectService;
@@ -116,10 +117,10 @@ export class AuthRedirectService {
         return null;
 
       case "user_registered":
-        // 特別扱い: メンバーシップ作成のために /sign-up/phone-verification にいるケースを許可
-        if (basePath === "/sign-up/phone-verification") {
-          // このページに留まらせる（リダイレクトしない）
-          return null;
+        // 特別扱い: メンバーシップ作成フローのために特定のページを許可
+        if (basePath === "/sign-up/phone-verification" || (basePath === "/login" && next)) {
+          // next がある場合のみ（メンバーシップ作成フロー）
+          return null; // このページに留まらせる（リダイレクトしない）
         }
 
         // 登録済みユーザーが sign-up 系や login に来たらトップ or nextへ
@@ -201,17 +202,22 @@ export class AuthRedirectService {
 
       if (!membership) {
         // User is authenticated but not a member of this community
-        // Send them to phone verification flow to create membership
-        const targetPath = `/sign-up/phone-verification?next=${encodeURIComponent(basePath)}` as RawURIComponent;
+        // Environment detection: LIFF → phone-verification, non-LIFF → login
+        const isLiff = isRunningInLiff();
+        const targetPath = isLiff
+          ? `/sign-up/phone-verification?next=${encodeURIComponent(basePath)}`
+          : `/login?next=${encodeURIComponent(basePath)}`;
+        
         logger.info("[LIFF-DEBUG] handleRoleRestriction: non-member redirect", {
           basePath,
           userId: currentUser.id,
           currentCommunityId: COMMUNITY_ID,
           targetPath,
+          environment: isLiff ? "liff" : "non-liff",
           reason: "no membership in current community",
           component: "AuthRedirectService",
         });
-        return targetPath;
+        return targetPath as RawURIComponent;
       }
 
       // User has membership but insufficient role (e.g., trying to access /admin)
