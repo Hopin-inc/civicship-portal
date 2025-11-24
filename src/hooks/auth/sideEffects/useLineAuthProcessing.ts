@@ -8,6 +8,7 @@ import { GqlUser } from "@/types/graphql";
 import { AuthStateManager } from "@/lib/auth/core/auth-state-manager";
 import { TokenManager } from "@/lib/auth/core/token-manager";
 import { lineAuth } from "@/lib/auth/core/firebase-config";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 interface UseLineAuthProcessingProps {
   shouldProcessRedirect: boolean;
@@ -92,15 +93,40 @@ export const useLineAuthProcessing = ({
         const hasPhoneIdentity = !!user.identities?.some(
           (i) => i.platform?.toUpperCase() === "PHONE",
         );
+        const hasMembership = !!user.memberships?.some((m) => m.community?.id === COMMUNITY_ID);
+
         if (hasPhoneIdentity || TokenManager.phoneVerified()) {
           TokenManager.savePhoneAuthFlag(true);
-          setState({
-            currentUser: user,
-            authenticationState: "user_registered",
-            isAuthenticating: false,
-          });
-          authStateManager.updateState("user_registered", "useLineAuthProcessing (phone verified)");
-          await authStateManager.handleUserRegistrationStateChange(true);
+          
+          // Only set user_registered if BOTH phone identity AND membership exist
+          if (hasMembership) {
+            logger.info("[LIFF-DEBUG] useLineAuthProcessing: setting user_registered", {
+              userId: user.id,
+              hasPhoneIdentity,
+              hasMembership,
+              authState: "user_registered",
+            });
+            setState({
+              currentUser: user,
+              authenticationState: "user_registered",
+              isAuthenticating: false,
+            });
+            authStateManager.updateState("user_registered", "useLineAuthProcessing (phone + membership)");
+            await authStateManager.handleUserRegistrationStateChange(true);
+          } else {
+            logger.info("[LIFF-DEBUG] useLineAuthProcessing: setting phone_authenticated", {
+              userId: user.id,
+              hasPhoneIdentity,
+              hasMembership,
+              authState: "phone_authenticated",
+            });
+            setState({
+              currentUser: user,
+              authenticationState: "phone_authenticated",
+              isAuthenticating: false,
+            });
+            authStateManager.updateState("phone_authenticated", "useLineAuthProcessing (phone only, no membership)");
+          }
         } else {
           setState({
             currentUser: user,

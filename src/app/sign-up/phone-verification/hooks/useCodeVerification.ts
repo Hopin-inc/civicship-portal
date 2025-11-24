@@ -111,6 +111,23 @@ export function useCodeVerification(
 
           case GqlPhoneUserStatus.ExistingSameCommunity:
             const updatedUser = await updateAuthState();
+            
+            // Defensive: handle case where updateAuthState returns null
+            if (!updatedUser) {
+              logger.warn("[LIFF-DEBUG] useCodeVerification: updateAuthState returned null (ExistingSameCommunity)", {
+                status: GqlPhoneUserStatus.ExistingSameCommunity,
+                component: "useCodeVerification",
+              });
+              setAuthState({ isAuthInProgress: false });
+              return {
+                success: false,
+                error: {
+                  message: t("phoneVerification.errors.generic"),
+                  type: "auth-state-update-failed",
+                },
+              };
+            }
+            
             setAuthState({ authenticationState: "user_registered", isAuthInProgress: false });
             const homeRedirectPath = authRedirectService.getRedirectPath(
               "/" as RawURIComponent,
@@ -125,6 +142,23 @@ export function useCodeVerification(
 
           case GqlPhoneUserStatus.ExistingDifferentCommunity:
             const updatedUserCross = await updateAuthState();
+            
+            // Defensive: handle case where updateAuthState returns null
+            if (!updatedUserCross) {
+              logger.warn("[LIFF-DEBUG] useCodeVerification: updateAuthState returned null (ExistingDifferentCommunity)", {
+                status: GqlPhoneUserStatus.ExistingDifferentCommunity,
+                component: "useCodeVerification",
+              });
+              setAuthState({ isAuthInProgress: false });
+              return {
+                success: false,
+                error: {
+                  message: t("phoneVerification.errors.generic"),
+                  type: "auth-state-update-failed",
+                },
+              };
+            }
+            
             setAuthState({ authenticationState: "user_registered", isAuthInProgress: false });
             const crossCommunityRedirectPath = authRedirectService.getRedirectPath(
               "/" as RawURIComponent,
