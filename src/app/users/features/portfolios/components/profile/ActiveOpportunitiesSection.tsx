@@ -1,4 +1,4 @@
-import OpportunityVerticalCard from "@/components/domains/opportunities/components/OpportunityVerticalCard";
+import OpportunityHorizontalCard from "@/components/domains/opportunities/components/OpportunityHorizontalCard";
 import { useTranslations } from "next-intl";
 
 type ActiveOpportunitiesSectionProps = {
@@ -22,14 +22,10 @@ export const ActiveOpportunitiesSection = ({ opportunities }: ActiveOpportunitie
           {opportunities.length}
         </span>
       </div>
-      <div className="relative">
-        <div className="overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide">
-          <div className="flex gap-4">
-            {opportunities.map((opportunity) => (
-              <OpportunityVerticalCard key={opportunity.id} {...opportunity} />
-            ))}
-          </div>
-        </div>
+      <div className="flex flex-col gap-4 mt-4">
+        {opportunities.map((opportunity) => (
+          <OpportunityHorizontalCard key={opportunity.id} {...opportunity} />
+        ))}
       </div>
     </div>
   );

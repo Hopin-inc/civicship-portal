@@ -7,6 +7,10 @@ import { PLACEHOLDER_IMAGE } from "@/utils";
 import { JapaneseYenIcon, MapPin } from "lucide-react";
 import React from "react";
 
+/**
+ * @deprecated This card is designed for gallery/exhibition-style layouts.
+ * Use OpportunityHorizontalCard for vertical scroll lists instead.
+ */
 interface OpportunityVerticalCardProps {
   title: string;
   image?: string;

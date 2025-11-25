@@ -13,6 +13,10 @@ type Props = {
   onApiChange?: (api: any) => void;
 };
 
+/**
+ * @deprecated This component uses Embla carousel for horizontal image sliding.
+ * Use OpportunityImageSSR for static hero images instead.
+ */
 export default function OpportunityImageSlider({
   images,
   title,
