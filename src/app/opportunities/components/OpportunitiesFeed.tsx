@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
-import OpportunitiesGridListSection from "@/components/domains/opportunities/components/ListSection/OpportunitiesGridListSection";
 import { mapOpportunityCards } from "@/components/domains/opportunities/data/presenter";
 import { ErrorState } from "@/components/shared";
 import EmptyState from "@/components/shared/EmptyState";
@@ -10,8 +9,9 @@ import { Coins } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useFeatureCheck } from "@/hooks/useFeatureCheck";
-import { formatOpportunities } from "@/components/domains/opportunities/utils";
 import { useFetchFeedOpportunities } from "../hooks/useFetchFeedOpportunities";
+import { groupCardsByDate } from "@/app/search/data/presenter";
+import DateGroupedOpportunities from "@/app/search/result/components/DateGroupedOpportunities";
 
 export default function OpportunitiesFeed() {
   const { opportunities, loading, error, loadMoreRef, refetch } = useFetchFeedOpportunities();
@@ -22,13 +22,9 @@ export default function OpportunitiesFeed() {
   }, [refetch]);
 
   const allCards = mapOpportunityCards(opportunities.edges ?? []);
-  const firstFour = allCards.slice(0, 4);
-  const afterFour = allCards.slice(4);
+  const groupedOpportunities = useMemo(() => groupCardsByDate(allCards), [allCards]);
   const isEmpty = !loading && opportunities?.edges?.length === 0;
   const shouldShowQuests = useFeatureCheck("quests");
-
-  const firstFourFormatOpportunities = firstFour.map(formatOpportunities);
-  const afterFourFormatOpportunities = afterFour.map(formatOpportunities);
 
   const headerConfig = useMemo(
     () => ({
@@ -49,14 +45,9 @@ export default function OpportunitiesFeed() {
 
   return (
     <div className="min-h-screen">
-      <OpportunitiesGridListSection
-        opportunities={firstFourFormatOpportunities}
-        isInitialLoading={false}
-        isSectionLoading={loading}
-        opportunityTitle="すべての体験"
-      />
+      <DateGroupedOpportunities groupedOpportunities={groupedOpportunities} />
       {shouldShowQuests && (
-      <div className="px-6">
+      <div className="px-6 mt-6">
         <button
           className="w-full flex bg-blue-50 rounded-lg p-4 appearance-none border-none focus:outline-none"
           style={{ boxSizing: 'border-box' }}
@@ -77,13 +68,11 @@ export default function OpportunitiesFeed() {
           </button>
         </div>
       )}
-      <OpportunitiesGridListSection
-        opportunities={afterFourFormatOpportunities}
-        isInitialLoading={false}
-        isSectionLoading={loading}
-        isTitle={false}
-        opportunityTitle="すべての体験"
-      />
+      {loading && (
+        <div className="py-6 flex items-center justify-center">
+          <div className="animate-spin h-6 w-6 border-b-2 border-foreground rounded-full"></div>
+        </div>
+      )}
       <div ref={loadMoreRef} className="h-10" aria-hidden="true" />
     </div>
   );
