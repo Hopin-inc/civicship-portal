@@ -4,9 +4,9 @@ import {
   GqlMembershipSortInput,
   GqlMembershipsConnection,
 } from "@/types/graphql";
-import { cookies } from "next/headers";
 import { logger } from "@/lib/logging";
 import { GET_MEMBERSHIP_LIST_SERVER_QUERY } from "@/graphql/account/membership/server";
+import { hasServerSession, getServerCookieHeader } from "@/lib/auth/server/session";
 
 interface GetMembershipListServerVariables {
   first?: number;
@@ -26,10 +26,10 @@ export async function getMembershipListServer(
 ): Promise<{
   connection: GqlMembershipsConnection | null;
 }> {
-  const cookieStore = await cookies();
-  const session = cookieStore.get("session")?.value ?? null;
+  const hasSession = await hasServerSession();
+  const cookieHeader = await getServerCookieHeader();
 
-  if (!session) {
+  if (!hasSession) {
     logger.debug("No session cookie found for SSR membership fetch");
     return {
       connection: null,
@@ -43,7 +43,7 @@ export async function getMembershipListServer(
     >(
       GET_MEMBERSHIP_LIST_SERVER_QUERY,
       variables,
-      { Authorization: `Bearer ${session}` }
+      cookieHeader ? { cookie: cookieHeader } : {}
     );
 
     return {

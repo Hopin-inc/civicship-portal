@@ -52,7 +52,7 @@ export function SignUpForm() {
   const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      name: undefined,
+      name: "",
       prefecture: GqlCurrentPrefecture.Unknown,
     },
   });

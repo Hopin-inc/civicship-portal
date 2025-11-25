@@ -1,10 +1,7 @@
-import { metadata } from "./metadata";
 import { ClientLayout } from "./ClientLayout";
 import { fetchPrivateUserServer } from "@/app/users/features/shared/server";
 import { mapGqlPortfolio, UserProfileProvider } from "@/app/users/features/shared";
 import { logger } from "@/lib/logging";
-
-export { metadata };
 
 export default async function MyPageLayout({ children }: { children: React.ReactNode }) {
   const gqlUser = await fetchPrivateUserServer();

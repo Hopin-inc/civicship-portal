@@ -22,25 +22,28 @@ const httpLink = createUploadLink({
 });
 
 const requestLink = setContext(async (operation, prevContext) => {
+  const isBrowser = typeof window !== "undefined";
   let token: string | null = null;
-  let authMode: "session" | "id_token" = "session";
+  // Browser uses id_token mode only (session mode is SSR-only via executeServerGraphQLQuery)
+  // Server keeps session mode for any server-side Apollo usage
+  let authMode: "session" | "id_token" = isBrowser ? "id_token" : "session";
 
-  if (typeof window !== "undefined") {
+  if (isBrowser) {
     const { firebaseUser } = useAuthStore.getState().state;
-    
+
     if (firebaseUser) {
       try {
         token = await firebaseUser.getIdToken();
-        authMode = "id_token";
       } catch (error) {
-        logger.warn("Failed to get ID token, falling back to session", { error });
+        logger.warn("Failed to get ID token", { error });
       }
     }
   }
 
   const headers = {
     ...prevContext.headers,
-    Authorization: token ? `Bearer ${token}` : "",
+    // Only send Authorization header when we have a token
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
     "X-Auth-Mode": authMode,
     "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
     "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID,

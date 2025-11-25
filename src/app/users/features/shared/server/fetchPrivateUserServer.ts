@@ -1,19 +1,18 @@
 import "server-only";
 
 import { executeServerGraphQLQuery } from "@/lib/graphql/server";
-import {
-  GqlCurrentUserServerQuery,
-  GqlCurrentUserServerQueryVariables,
-  GqlUser,
-} from "@/types/graphql";
-import { cookies } from "next/headers";
+import { GqlCurrentUserServerQueryVariables, GqlUser } from "@/types/graphql";
 import { logger } from "@/lib/logging";
 import { FETCH_PROFILE_SERVER_QUERY } from "@/graphql/account/user/server";
+import { hasServerSession, getServerCookieHeader } from "@/lib/auth/server/session";
+
+type FetchProfileServerResult = {
+  currentUser?: { user?: GqlUser | null } | null;
+};
 
 export async function fetchPrivateUserServer(): Promise<GqlUser | null> {
-  const cookieStore = await cookies();
-  const session = cookieStore.get("session")?.value ?? null;
-  const hasSession = !!session;
+  const hasSession = await hasServerSession();
+  const cookieHeader = await getServerCookieHeader();
 
   logger.info("[AUTH] fetchPrivateUserServer: checking session", {
     hasSession,
@@ -29,15 +28,28 @@ export async function fetchPrivateUserServer(): Promise<GqlUser | null> {
 
   try {
     const res = await executeServerGraphQLQuery<
-      GqlCurrentUserServerQuery,
+      FetchProfileServerResult,
       GqlCurrentUserServerQueryVariables
-    >(FETCH_PROFILE_SERVER_QUERY, {}, { Authorization: `Bearer ${session}` });
+    >(FETCH_PROFILE_SERVER_QUERY, {}, cookieHeader ? { cookie: cookieHeader } : {});
 
     const user = res.currentUser?.user ?? null;
 
     logger.info("[AUTH] fetchPrivateUserServer: query succeeded", {
       hasUser: !!user,
       userId: user?.id,
+      component: "fetchPrivateUserServer",
+    });
+
+    logger.info("[AUTH] fetchPrivateUserServer: wallet data snapshot", {
+      hasUser: !!user,
+      walletsCount: user?.wallets?.length ?? 0,
+      walletSummary: (user?.wallets ?? []).map((w) => ({
+        id: w.id,
+        type: w.type,
+        communityId: w.community?.id,
+        hasCurrentPointView: w.currentPointView != null,
+        currentPoint: w.currentPointView?.currentPoint ?? "__MISSING__",
+      })),
       component: "fetchPrivateUserServer",
     });
 
