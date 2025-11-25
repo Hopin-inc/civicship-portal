@@ -12,6 +12,7 @@ import {
   usePointIssueMutation,
 } from "@/types/graphql";
 import { logger } from "@/lib/logging";
+import { useAuthStore } from "@/lib/auth/core/auth-store";
 
 interface IssuePointInput {
   communityId: string;
@@ -32,12 +33,30 @@ export const useTransactionMutations = () => {
   const [grantPointMutation, { loading: loadingGrant }] = usePointGrantMutation();
   const [donatePointMutation, { loading: loadingDonate }] = usePointDonateMutation();
 
+  // firebaseUserが初期化されているかチェック
+  // CSRからのミューテーションはfirebaseUserのidTokenが必要
+  const checkFirebaseAuth = (): { success: false; code: GqlErrorCode } | null => {
+    const { firebaseUser } = useAuthStore.getState().state;
+    if (!firebaseUser) {
+      logger.warn("Transaction mutation blocked: firebaseUser not initialized", {
+        component: "useTransactionMutations",
+        errorCategory: "auth",
+      });
+      return { success: false, code: GqlErrorCode.Unauthenticated };
+    }
+    return null;
+  };
+
   // -----------------------
   // 明示的に定義: ポイント発行
   // -----------------------
   const issuePoint = async (
     variables: GqlMutationTransactionIssueCommunityPointArgs,
   ): Promise<Result<GqlPointIssueMutation>> => {
+    // firebaseUser認証チェック
+    const authError = checkFirebaseAuth();
+    if (authError) return authError;
+
     // 入力バリデーション
     if (!variables.input?.transferPoints) {
       return { success: false, code: GqlErrorCode.ValidationError };
@@ -72,6 +91,10 @@ export const useTransactionMutations = () => {
   const grantPoint = async (
     variables: GqlMutationTransactionGrantCommunityPointArgs,
   ): Promise<Result<GqlPointGrantMutation>> => {
+    // firebaseUser認証チェック
+    const authError = checkFirebaseAuth();
+    if (authError) return authError;
+
     if (!variables.input?.toUserId || !variables.input?.transferPoints) {
       return { success: false, code: GqlErrorCode.ValidationError };
     }
@@ -102,6 +125,10 @@ export const useTransactionMutations = () => {
   const donatePoint = async (
     variables: GqlMutationTransactionDonateSelfPointArgs,
   ): Promise<Result<GqlPointDonateMutation>> => {
+    // firebaseUser認証チェック
+    const authError = checkFirebaseAuth();
+    if (authError) return authError;
+
     if (!variables.input?.toUserId || !variables.input?.transferPoints) {
       return { success: false, code: GqlErrorCode.ValidationError };
     }
