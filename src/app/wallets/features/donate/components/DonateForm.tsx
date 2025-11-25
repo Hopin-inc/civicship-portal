@@ -9,6 +9,7 @@ interface Props {
   user: GqlUser;
   currentPoint: bigint;
   isLoading: boolean;
+  isAuthReady?: boolean;
   onBack: () => void;
   onSubmit: (amount: number, comment?: string) => void;
 }
@@ -17,6 +18,7 @@ export function DonateForm({
   user,
   currentPoint,
   isLoading,
+  isAuthReady,
   onBack,
   onSubmit,
 }: Props) {
@@ -25,6 +27,7 @@ export function DonateForm({
     <TransferInputStep
       user={user}
       isLoading={isLoading}
+      isAuthReady={isAuthReady}
       onBack={onBack}
       onSubmit={onSubmit}
       currentPoint={currentPoint}

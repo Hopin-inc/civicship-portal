@@ -14,6 +14,7 @@ import { Tabs } from "./types/tabs";
 import { ErrorState } from "@/components/shared";
 import { useMemberWallets } from "@/hooks/members/useMemberWallets";
 import { useTranslations } from "next-intl";
+import { errorMessages } from "@/utils/errorMessage";
 
 const DEFAULT_TAB: Tabs = Tabs.History;
 const isValidTab = (tab: string): tab is Tabs => {
@@ -41,7 +42,7 @@ export default function GrantPageClient({ initialConnection }: GrantPageClientPr
 
   const { data, loading, error, refetch, loadMoreRef, isLoadingMore } = useMemberWallets();
 
-  const { grantPoint } = useTransactionMutations();
+  const { grantPoint, isAuthReady } = useTransactionMutations();
 
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
@@ -75,7 +76,8 @@ export default function GrantPageClient({ initialConnection }: GrantPageClientPr
         toast.success(t("adminWallet.grant.success", { amount: amount.toLocaleString() }));
         router.push("/admin/wallet?refresh=true");
       } else {
-        toast.error(t("adminWallet.grant.errorWithCode", { code: res.code }));
+        const errorMessage = errorMessages[res.code] ?? t("adminWallet.grant.errorGeneric");
+        toast.error(errorMessage);
       }
     } catch {
       toast.error(t("adminWallet.grant.errorGeneric"));
@@ -135,6 +137,7 @@ export default function GrantPageClient({ initialConnection }: GrantPageClientPr
           user={selectedUser}
           currentPoint={currentPoint}
           isLoading={isLoading}
+          isAuthReady={isAuthReady}
           onBack={() => setSelectedUser(null)}
           onSubmit={handleGrantPoint}
         />
