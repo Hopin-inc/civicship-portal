@@ -14,9 +14,10 @@ export async function getUserServer(): Promise<{
   phoneAuthenticated: boolean;
 }> {
   const cookieStore = await cookies();
+  const cookieHeader = cookieStore.toString();
 
-  const session = cookieStore.get("session")?.value ?? null;
-  const hasSession = !!session;
+  // Check for session cookie (support both "session" and "__session" names)
+  const hasSession = cookieStore.has("session") || cookieStore.has("__session");
 
   const phoneAuthenticated = cookieStore.get("phone_authenticated")?.value === "true";
 
@@ -32,7 +33,7 @@ export async function getUserServer(): Promise<{
     const res = await executeServerGraphQLQuery<
       GqlCurrentUserServerQuery,
       GqlCurrentUserServerQueryVariables
-    >(GET_CURRENT_USER_SERVER_QUERY, {}, { Authorization: `Bearer ${session}` });
+    >(GET_CURRENT_USER_SERVER_QUERY, {}, cookieHeader ? { cookie: cookieHeader } : {});
 
     const user: GqlUser | null = res.currentUser?.user ?? null;
     const hasPhoneIdentity = !!user?.identities?.some((i) => i.platform?.toUpperCase() === "PHONE");

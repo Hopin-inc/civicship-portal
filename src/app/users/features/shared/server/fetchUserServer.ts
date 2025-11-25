@@ -11,8 +11,8 @@ export async function fetchUserServer(
 ): Promise<GqlUser | null> {
   try {
     const cookieStore = await cookies();
-    const session = cookieStore.get("session")?.value ?? null;
-    const headers = session ? { Authorization: `Bearer ${session}` } : {};
+    const cookieHeader = cookieStore.toString();
+    const headers = cookieHeader ? { cookie: cookieHeader } : {};
 
     const res = await executeServerGraphQLQuery<
       { user: GqlUser | null },

@@ -1,18 +1,10 @@
 import { WalletOverview } from "@/app/wallets/features/overview/WalletOverview";
 import { TransactionList } from "@/app/wallets/features/transactions/TransactionList";
 import { getServerMyWalletWithTransactions } from "@/app/wallets/features/shared/server/getServerMyWalletWithTransactions";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 export default async function WalletMePage() {
-  const cookieStore = await cookies();
-  const session = cookieStore.get("session")?.value;
-
-  if (!session) {
-    redirect("/login");
-  }
-
-  const { wallet, transactions } = await getServerMyWalletWithTransactions(session, { first: 20 });
+  const { wallet, transactions } = await getServerMyWalletWithTransactions({ first: 20 });
 
   if (!wallet) {
     redirect("/login");
