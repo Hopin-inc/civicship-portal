@@ -12,6 +12,7 @@ import {
   usePointIssueMutation,
 } from "@/types/graphql";
 import { logger } from "@/lib/logging";
+import { useAuthStore } from "@/lib/auth/core/auth-store";
 
 interface IssuePointInput {
   communityId: string;
@@ -26,7 +27,25 @@ interface GrantPointInput {
 
 type Result<T> = { success: true; data: T } | { success: false; code: GqlErrorCode };
 
+// firebaseUserが初期化されているかチェック
+// CSRからのミューテーションはfirebaseUserのidTokenが必要
+const checkFirebaseAuth = (): { success: false; code: GqlErrorCode } | null => {
+  const { firebaseUser } = useAuthStore.getState().state;
+  if (!firebaseUser) {
+    logger.warn("Transaction mutation blocked: firebaseUser not initialized", {
+      component: "useTransactionMutations",
+      errorCategory: "auth",
+    });
+    return { success: false, code: GqlErrorCode.Unauthenticated };
+  }
+  return null;
+};
+
 export const useTransactionMutations = () => {
+  // firebaseUserの状態をsubscribeして、UIが反応的に更新されるようにする
+  const firebaseUser = useAuthStore((s) => s.state.firebaseUser);
+  const isAuthReady = !!firebaseUser;
+
   // Apollo Hooks
   const [issuePointMutation, { loading: loadingIssue }] = usePointIssueMutation();
   const [grantPointMutation, { loading: loadingGrant }] = usePointGrantMutation();
@@ -38,6 +57,10 @@ export const useTransactionMutations = () => {
   const issuePoint = async (
     variables: GqlMutationTransactionIssueCommunityPointArgs,
   ): Promise<Result<GqlPointIssueMutation>> => {
+    // firebaseUser認証チェック
+    const authError = checkFirebaseAuth();
+    if (authError) return authError;
+
     // 入力バリデーション
     if (!variables.input?.transferPoints) {
       return { success: false, code: GqlErrorCode.ValidationError };
@@ -72,6 +95,10 @@ export const useTransactionMutations = () => {
   const grantPoint = async (
     variables: GqlMutationTransactionGrantCommunityPointArgs,
   ): Promise<Result<GqlPointGrantMutation>> => {
+    // firebaseUser認証チェック
+    const authError = checkFirebaseAuth();
+    if (authError) return authError;
+
     if (!variables.input?.toUserId || !variables.input?.transferPoints) {
       return { success: false, code: GqlErrorCode.ValidationError };
     }
@@ -102,6 +129,10 @@ export const useTransactionMutations = () => {
   const donatePoint = async (
     variables: GqlMutationTransactionDonateSelfPointArgs,
   ): Promise<Result<GqlPointDonateMutation>> => {
+    // firebaseUser認証チェック
+    const authError = checkFirebaseAuth();
+    if (authError) return authError;
+
     if (!variables.input?.toUserId || !variables.input?.transferPoints) {
       return { success: false, code: GqlErrorCode.ValidationError };
     }
@@ -134,5 +165,6 @@ export const useTransactionMutations = () => {
     grantPoint,
     donatePoint,
     isLoading: loadingIssue || loadingGrant || loadingDonate,
+    isAuthReady,
   };
 };

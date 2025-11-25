@@ -18,6 +18,7 @@ interface Props {
   user: GqlUser;
   currentPoint: bigint;
   isLoading: boolean;
+  isAuthReady?: boolean;
   onBack: () => void;
   onSubmit: (amount: number, comment?: string) => void;
   title?: string;
@@ -34,6 +35,7 @@ function TransferInputStep({
   user,
   currentPoint,
   isLoading,
+  isAuthReady = true,
   onBack,
   onSubmit,
   title,
@@ -159,7 +161,7 @@ function TransferInputStep({
             <Button
               onClick={() => amount && amount > 0 && amount <= currentPoint && onSubmit(amount, comment.trim() || undefined)}
               disabled={
-                !amount || amount <= 0 || amount > currentPoint || isLoading || amount > INT_LIMIT
+                !amount || amount <= 0 || amount > currentPoint || isLoading || amount > INT_LIMIT || !isAuthReady
               }
               className="w-full"
             >
