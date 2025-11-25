@@ -1,14 +1,14 @@
 import "server-only";
 
 import { executeServerGraphQLQuery } from "@/lib/graphql/server";
-import {
-  GqlCurrentUserServerQuery,
-  GqlCurrentUserServerQueryVariables,
-  GqlUser,
-} from "@/types/graphql";
+import { GqlCurrentUserServerQueryVariables, GqlUser } from "@/types/graphql";
 import { cookies } from "next/headers";
 import { logger } from "@/lib/logging";
 import { FETCH_PROFILE_SERVER_QUERY } from "@/graphql/account/user/server";
+
+type FetchProfileServerResult = {
+  currentUser?: { user?: GqlUser | null } | null;
+};
 
 export async function fetchPrivateUserServer(): Promise<GqlUser | null> {
   const cookieStore = await cookies();
@@ -29,7 +29,7 @@ export async function fetchPrivateUserServer(): Promise<GqlUser | null> {
 
   try {
     const res = await executeServerGraphQLQuery<
-      GqlCurrentUserServerQuery,
+      FetchProfileServerResult,
       GqlCurrentUserServerQueryVariables
     >(FETCH_PROFILE_SERVER_QUERY, {}, { Authorization: `Bearer ${session}` });
 
