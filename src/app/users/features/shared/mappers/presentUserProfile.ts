@@ -16,7 +16,8 @@ export function presentUserProfile(
     walletsCount: gqlUser?.wallets?.length ?? 0,
     walletCommunities: (gqlUser?.wallets ?? []).map((w) => w.community?.id),
     selectedWalletId: wallet?.id,
-    selectedWalletPoint: wallet?.currentPointView?.currentPoint,
+    hasCurrentPointView: wallet?.currentPointView != null,
+    selectedWalletPoint: wallet?.currentPointView?.currentPoint ?? "__MISSING__",
     component: "presentUserProfile",
   });
 
@@ -55,7 +56,9 @@ export function presentUserProfile(
     ticketsAvailable: isOwner
       ? (wallet?.tickets ?? []).filter((t) => t.status === GqlTicketStatus.Available).length
       : undefined,
-    points: wallet?.currentPointView?.currentPoint ?? undefined,
+    points: wallet?.currentPointView?.currentPoint != null
+      ? Number(wallet.currentPointView.currentPoint)
+      : 0,
     portfolios: portfolios ?? [],
     selfOpportunities,
     currentlyHiringOpportunities,
