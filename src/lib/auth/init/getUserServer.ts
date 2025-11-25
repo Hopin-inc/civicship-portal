@@ -7,6 +7,7 @@ import {
 import { cookies } from "next/headers";
 import { logger } from "@/lib/logging";
 import { GET_CURRENT_USER_SERVER_QUERY } from "@/graphql/account/user/server";
+import { hasServerSession, getServerCookieHeader } from "@/lib/auth/server/session";
 
 export async function getUserServer(): Promise<{
   user: GqlUser | null;
@@ -14,10 +15,8 @@ export async function getUserServer(): Promise<{
   phoneAuthenticated: boolean;
 }> {
   const cookieStore = await cookies();
-  const cookieHeader = cookieStore.toString();
-
-  // Check for session cookie (support both "session" and "__session" names)
-  const hasSession = cookieStore.has("session") || cookieStore.has("__session");
+  const hasSession = await hasServerSession();
+  const cookieHeader = await getServerCookieHeader();
 
   const phoneAuthenticated = cookieStore.get("phone_authenticated")?.value === "true";
 

@@ -108,4 +108,4 @@ export const useMemberWallets = (): UseMemberWalletsResult => {
     hasNextPage,
     isLoadingMore,
   };
-};    
+};  

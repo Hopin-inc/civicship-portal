@@ -2,20 +2,17 @@ import "server-only";
 
 import { executeServerGraphQLQuery } from "@/lib/graphql/server";
 import { GqlCurrentUserServerQueryVariables, GqlUser } from "@/types/graphql";
-import { cookies } from "next/headers";
 import { logger } from "@/lib/logging";
 import { FETCH_PROFILE_SERVER_QUERY } from "@/graphql/account/user/server";
+import { hasServerSession, getServerCookieHeader } from "@/lib/auth/server/session";
 
 type FetchProfileServerResult = {
   currentUser?: { user?: GqlUser | null } | null;
 };
 
 export async function fetchPrivateUserServer(): Promise<GqlUser | null> {
-  const cookieStore = await cookies();
-  const cookieHeader = cookieStore.toString();
-
-  // Check for session cookie (support both "session" and "__session" names)
-  const hasSession = cookieStore.has("session") || cookieStore.has("__session");
+  const hasSession = await hasServerSession();
+  const cookieHeader = await getServerCookieHeader();
 
   logger.info("[AUTH] fetchPrivateUserServer: checking session", {
     hasSession,
@@ -55,14 +52,6 @@ export async function fetchPrivateUserServer(): Promise<GqlUser | null> {
       })),
       component: "fetchPrivateUserServer",
     });
-
-    // Log raw wallet structure for debugging
-    if (user?.wallets && user.wallets.length > 0) {
-      logger.info("[AUTH] fetchPrivateUserServer: raw wallet structure", {
-        firstWallet: JSON.stringify(user.wallets[0], null, 2),
-        component: "fetchPrivateUserServer",
-      });
-    }
 
     return user;
   } catch (error) {
