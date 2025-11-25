@@ -27,25 +27,25 @@ interface GrantPointInput {
 
 type Result<T> = { success: true; data: T } | { success: false; code: GqlErrorCode };
 
+// firebaseUserが初期化されているかチェック
+// CSRからのミューテーションはfirebaseUserのidTokenが必要
+const checkFirebaseAuth = (): { success: false; code: GqlErrorCode } | null => {
+  const { firebaseUser } = useAuthStore.getState().state;
+  if (!firebaseUser) {
+    logger.warn("Transaction mutation blocked: firebaseUser not initialized", {
+      component: "useTransactionMutations",
+      errorCategory: "auth",
+    });
+    return { success: false, code: GqlErrorCode.Unauthenticated };
+  }
+  return null;
+};
+
 export const useTransactionMutations = () => {
   // Apollo Hooks
   const [issuePointMutation, { loading: loadingIssue }] = usePointIssueMutation();
   const [grantPointMutation, { loading: loadingGrant }] = usePointGrantMutation();
   const [donatePointMutation, { loading: loadingDonate }] = usePointDonateMutation();
-
-  // firebaseUserが初期化されているかチェック
-  // CSRからのミューテーションはfirebaseUserのidTokenが必要
-  const checkFirebaseAuth = (): { success: false; code: GqlErrorCode } | null => {
-    const { firebaseUser } = useAuthStore.getState().state;
-    if (!firebaseUser) {
-      logger.warn("Transaction mutation blocked: firebaseUser not initialized", {
-        component: "useTransactionMutations",
-        errorCategory: "auth",
-      });
-      return { success: false, code: GqlErrorCode.Unauthenticated };
-    }
-    return null;
-  };
 
   // -----------------------
   // 明示的に定義: ポイント発行
