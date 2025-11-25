@@ -48,10 +48,19 @@ export async function fetchPrivateUserServer(): Promise<GqlUser | null> {
         id: w.id,
         type: w.type,
         communityId: w.community?.id,
-        currentPoint: w.currentPointView?.currentPoint,
+        hasCurrentPointView: w.currentPointView != null,
+        currentPoint: w.currentPointView?.currentPoint ?? "__MISSING__",
       })),
       component: "fetchPrivateUserServer",
     });
+
+    // Log raw wallet structure for debugging
+    if (user?.wallets && user.wallets.length > 0) {
+      logger.info("[AUTH] fetchPrivateUserServer: raw wallet structure", {
+        firstWallet: JSON.stringify(user.wallets[0], null, 2),
+        component: "fetchPrivateUserServer",
+      });
+    }
 
     return user;
   } catch (error) {
