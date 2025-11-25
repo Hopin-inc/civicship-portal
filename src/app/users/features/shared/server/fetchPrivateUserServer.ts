@@ -12,8 +12,10 @@ type FetchProfileServerResult = {
 
 export async function fetchPrivateUserServer(): Promise<GqlUser | null> {
   const cookieStore = await cookies();
-  const session = cookieStore.get("session")?.value ?? null;
-  const hasSession = !!session;
+  const cookieHeader = cookieStore.toString();
+
+  // Check for session cookie (support both "session" and "__session" names)
+  const hasSession = cookieHeader.includes("session=") || cookieHeader.includes("__session=");
 
   logger.info("[AUTH] fetchPrivateUserServer: checking session", {
     hasSession,
@@ -31,7 +33,7 @@ export async function fetchPrivateUserServer(): Promise<GqlUser | null> {
     const res = await executeServerGraphQLQuery<
       FetchProfileServerResult,
       GqlCurrentUserServerQueryVariables
-    >(FETCH_PROFILE_SERVER_QUERY, {}, { Authorization: `Bearer ${session}` });
+    >(FETCH_PROFILE_SERVER_QUERY, {}, cookieHeader ? { cookie: cookieHeader } : {});
 
     const user = res.currentUser?.user ?? null;
 

@@ -27,9 +27,10 @@ export async function getMembershipListServer(
   connection: GqlMembershipsConnection | null;
 }> {
   const cookieStore = await cookies();
-  const session = cookieStore.get("session")?.value ?? null;
+  const cookieHeader = cookieStore.toString();
 
-  if (!session) {
+  // Check for session cookie (support both "session" and "__session" names)
+  if (!cookieHeader.includes("session=") && !cookieHeader.includes("__session=")) {
     logger.debug("No session cookie found for SSR membership fetch");
     return {
       connection: null,
@@ -43,7 +44,7 @@ export async function getMembershipListServer(
     >(
       GET_MEMBERSHIP_LIST_SERVER_QUERY,
       variables,
-      { Authorization: `Bearer ${session}` }
+      cookieHeader ? { cookie: cookieHeader } : {}
     );
 
     return {

@@ -1,21 +1,13 @@
-import { cookies } from "next/headers";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { WalletProvider } from "@/app/wallets/features/shared/contexts/WalletProvider";
 import { getServerMyWalletWithTransactions } from "@/app/wallets/features/shared/server/getServerMyWalletWithTransactions";
 import { toPointNumber } from "@/utils/bigint";
 import { logger } from "@/lib/logging";
 
 export default async function WalletMeLayout({ children }: { children: React.ReactNode }) {
-  const cookieStore = await cookies();
-  const session = cookieStore.get("session")?.value;
-
-  if (!session) {
-    redirect("/login");
-  }
-
   let result;
   try {
-    result = await getServerMyWalletWithTransactions(session, { first: 20 });
+    result = await getServerMyWalletWithTransactions({ first: 20 });
   } catch (error) {
     logger.error("Failed to fetch wallet data with transactions (SSR):", {
       error: error instanceof Error ? error.message : String(error),

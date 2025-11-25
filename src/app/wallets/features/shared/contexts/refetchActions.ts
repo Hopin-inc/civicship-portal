@@ -1,6 +1,5 @@
 "use server";
 
-import { cookies } from "next/headers";
 import { getServerMyWalletWithTransactions } from "@/app/wallets/features/shared/server/getServerMyWalletWithTransactions";
 
 /**
@@ -12,14 +11,11 @@ import { getServerMyWalletWithTransactions } from "@/app/wallets/features/shared
  * @returns wallet情報とtransactionsを含むオブジェクト
  */
 export async function fetchMyWalletWithTransactionsAction(cursor?: string, first: number = 20) {
-  const cookieStore = await cookies();
-  const session = cookieStore.get("session")?.value;
+  const result = await getServerMyWalletWithTransactions({ first, after: cursor });
 
-  if (!session) {
-    throw new Error("No session found");
+  if (!result.wallet) {
+    throw new Error("No wallet found - session may be invalid");
   }
-
-  const result = await getServerMyWalletWithTransactions(session, { first, after: cursor });
 
   return {
     wallet: result.wallet ? {

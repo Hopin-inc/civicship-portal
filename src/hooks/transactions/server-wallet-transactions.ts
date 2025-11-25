@@ -5,6 +5,7 @@ import {
   GqlGetTransactionsQueryVariables,
   GqlTransactionsConnection,
 } from "@/types/graphql";
+import { cookies } from "next/headers";
 
 export interface ServerWalletTransactionsParams {
   walletId: string;
@@ -30,6 +31,9 @@ const fallbackConnection: GqlTransactionsConnection = {
 export async function getServerWalletTransactions(
   params: ServerWalletTransactionsParams,
 ): Promise<GqlTransactionsConnection> {
+  const cookieStore = await cookies();
+  const cookieHeader = cookieStore.toString();
+
   const { walletId, first = 50, after, withDidIssuanceRequests = true } = params;
 
   try {
@@ -45,7 +49,7 @@ export async function getServerWalletTransactions(
     const data = await executeServerGraphQLQuery<
       GqlGetTransactionsQuery,
       GqlGetTransactionsQueryVariables
-    >(GET_TRANSACTIONS_SERVER_QUERY, variables);
+    >(GET_TRANSACTIONS_SERVER_QUERY, variables, cookieHeader ? { cookie: cookieHeader } : {});
 
     return data.transactions ?? fallbackConnection;
   } catch (error) {
