@@ -3,8 +3,7 @@
 import React from "react";
 import { FormattedOpportunityCard } from "@/components/domains/opportunities/types";
 import OpportunitiesListSectionSkeleton from "@/components/domains/opportunities/components/ListSection/OpportunityListSectionSkeleton";
-import OpportunityVerticalCard from "@/components/domains/opportunities/components/OpportunityVerticalCard";
-import { CardGrid } from "@/components/shared/CardGrid";
+import OpportunityHorizontalCard from "@/components/domains/opportunities/components/OpportunityHorizontalCard";
 
 interface OpportunitiesGridListSectionProps {
   opportunities: FormattedOpportunityCard[];
@@ -49,17 +48,16 @@ const OpportunitiesGridListSection: React.FC<OpportunitiesGridListSectionProps> 
   }
 
   return (
-    <section className="mt-6 px-6">
+    <section className="mt-6 px-4">
       {getTitle()}
-      <CardGrid>
+      <div className="flex flex-col gap-4 mt-4">
         {opportunities.map((opportunity) => (
-          <OpportunityVerticalCard 
+          <OpportunityHorizontalCard 
             key={opportunity.id}
             {...opportunity}
           />
         ))}
-      </CardGrid>
-      <div className="h-10" aria-hidden="true"></div>
+      </div>
       {isSectionLoading && (
         <div className="py-6 flex items-center justify-center">
           <div className="animate-spin h-6 w-6 border-b-2 border-foreground rounded-full"></div>
