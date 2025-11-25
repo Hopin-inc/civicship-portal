@@ -1,29 +1,19 @@
 "use client";
-import { useAuth } from "@/contexts/AuthProvider";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import FeaturedSection from "@/components/domains/opportunities/components/FeaturedSection/FeaturedSection";
-import { OpportunityCarouselListSection } from "@/components/domains/opportunities/components/ListSection/OpportunityCarouselListSection";
-import OpportunitiesFeed from "@/app/opportunities/components/OpportunitiesFeed";
-import { useFetchFeedOpportunities } from "@/app/opportunities/hooks/useFetchFeedOpportunities";
-import { formatOpportunities } from "@/components/domains/opportunities/utils";
 
+/**
+ * Root page component.
+ *
+ * This page is primarily used as a transient entry point for LIFF deep-links.
+ * When LIFF launches with `/?liff.state=/target/path`, this page renders briefly
+ * before the LiffDeepLinkHandler navigates to the target path.
+ *
+ * For normal browser access, middleware redirects `/` to the community's rootPath
+ * (e.g., `/opportunities` or `/users/me`), so this page is not typically visible.
+ *
+ * Note: If a community with `rootPath: "/"` is added in the future, this page
+ * should be updated to display appropriate content instead of just a loading indicator.
+ */
 export default function HomePage() {
-    const { isAuthenticating, loading: authLoading } = useAuth();
-    const { featuredCards, upcomingCards, loading } = useFetchFeedOpportunities();
-    if (isAuthenticating || authLoading) {
-      return <LoadingIndicator fullScreen={true} />;
-    }
-    const formattedOpportunities = upcomingCards.map(formatOpportunities);
-
-    return (
-        <div className="min-h-screen">
-          <FeaturedSection opportunities={featuredCards} isInitialLoading={loading} />
-          <OpportunityCarouselListSection
-            title="もうすぐ開催予定"
-            opportunities={formattedOpportunities}
-            isInitialLoading={loading}
-          />
-          <OpportunitiesFeed />
-        </div>
-      );
+  return <LoadingIndicator fullScreen={true} />;
 }

@@ -58,6 +58,24 @@ export function useCodeVerification(
       setIsVerifying(true);
 
       const setAuthState = authStoreState.setState;
+      
+      // Helper function to handle updateAuthState returning null
+      const handleUpdateAuthStateNull = (
+        status: GqlPhoneUserStatus,
+      ): CodeVerificationResult => {
+        logger.warn("[AUTH] useCodeVerification: updateAuthState returned null", {
+          status,
+          component: "useCodeVerification",
+        });
+        setAuthState({ isAuthInProgress: false });
+        return {
+          success: false,
+          error: {
+            message: t("phoneVerification.errors.generic"),
+            type: "auth-state-update-failed",
+          },
+        };
+      };
       setAuthState({ isAuthInProgress: true });
 
       try {
@@ -110,11 +128,18 @@ export function useCodeVerification(
             };
 
           case GqlPhoneUserStatus.ExistingSameCommunity:
-            await updateAuthState();
+            const updatedUser = await updateAuthState();
+            
+            // Defensive: handle case where updateAuthState returns null
+            if (!updatedUser) {
+              return handleUpdateAuthStateNull(GqlPhoneUserStatus.ExistingSameCommunity);
+            }
+            
             setAuthState({ authenticationState: "user_registered", isAuthInProgress: false });
             const homeRedirectPath = authRedirectService.getRedirectPath(
               "/" as RawURIComponent,
               nextParam as RawURIComponent,
+              updatedUser,
             );
             return {
               success: true,
@@ -123,11 +148,18 @@ export function useCodeVerification(
             };
 
           case GqlPhoneUserStatus.ExistingDifferentCommunity:
-            await updateAuthState();
+            const updatedUserCross = await updateAuthState();
+            
+            // Defensive: handle case where updateAuthState returns null
+            if (!updatedUserCross) {
+              return handleUpdateAuthStateNull(GqlPhoneUserStatus.ExistingDifferentCommunity);
+            }
+            
             setAuthState({ authenticationState: "user_registered", isAuthInProgress: false });
             const crossCommunityRedirectPath = authRedirectService.getRedirectPath(
               "/" as RawURIComponent,
               nextParam as RawURIComponent,
+              updatedUserCross,
             );
             return {
               success: true,

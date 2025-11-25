@@ -36,9 +36,18 @@ export async function initAuth(params: InitAuthParams) {
   if (state.isAuthInProgress) return;
 
   TokenManager.clearDeprecatedCookies();
-  
+
   const environment = detectEnvironment();
-  
+
+  logger.info("[AUTH] initAuth", {
+    environment,
+    ssrCurrentUser: !!ssrCurrentUser,
+    ssrCurrentUserId: ssrCurrentUser?.id,
+    ssrLineAuthenticated,
+    ssrPhoneAuthenticated,
+    willUseInitAuthFast: !!(ssrCurrentUser && ssrLineAuthenticated),
+  });
+
   if (ssrCurrentUser && ssrLineAuthenticated) {
     return await initAuthFast({
       ssrCurrentUser,
@@ -49,7 +58,7 @@ export async function initAuth(params: InitAuthParams) {
       setState,
     });
   }
-  
+
   setState({ isAuthInProgress: true, isAuthenticating: true });
   return await initAuthFull({
     liffService,
@@ -77,12 +86,6 @@ async function initAuthFast({
   setState: ReturnType<typeof useAuthStore.getState>["setState"];
 }) {
   try {
-    if (environment === AuthEnvironment.LIFF) {
-      liffService.initialize().then(success => {
-        if (!success) logger.warn("LIFF initialization failed in background");
-      });
-    }
-
     finalizeAuthState(
       ssrPhoneAuthenticated ? "user_registered" : "line_authenticated",
       ssrCurrentUser,
@@ -91,7 +94,10 @@ async function initAuthFast({
     );
     TokenManager.saveLineAuthFlag(true);
     if (ssrPhoneAuthenticated) TokenManager.savePhoneAuthFlag(true);
-    await authStateManager.handleUserRegistrationStateChange(true, { ssrMode: true });
+    await authStateManager.handleUserRegistrationStateChange(
+      !!ssrPhoneAuthenticated,
+      { ssrMode: true }
+    );
   } catch (e) {
     logger.error("initAuthFast failed", { error: e });
     finalizeAuthState("unauthenticated", undefined, setState, authStateManager);

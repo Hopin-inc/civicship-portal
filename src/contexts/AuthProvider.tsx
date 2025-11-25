@@ -9,6 +9,7 @@ import { applySsrAuthState } from "@/lib/auth/init/applySsrAuthState";
 import { useAuthActions } from "@/hooks/auth/actions";
 import { useAuthSideEffects } from "@/hooks/auth/sideEffects";
 import { useAuthValue } from "@/hooks/auth/init/useAuthValue";
+import { logger } from "@/lib/logging";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -20,12 +21,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
 }) => {
   const { liffService, phoneAuthService, authStateManager } = useAuthDependencies();
   const hasInitialized = useRef(false);
+  const hasFullAuth = Boolean(ssrCurrentUser && ssrLineAuthenticated && ssrPhoneAuthenticated);
 
   useEffect(() => {
     if (hasInitialized.current) return;
     hasInitialized.current = true;
 
     if (!authStateManager) return;
+
+    logger.info("[AUTH] AuthProvider initialization", {
+      hasFullAuth,
+      ssrCurrentUser: !!ssrCurrentUser,
+      ssrCurrentUserId: ssrCurrentUser?.id,
+      ssrLineAuthenticated,
+      ssrPhoneAuthenticated,
+      environment: typeof window !== "undefined" ? liffService.getState() : "SSR",
+    });
 
     // ✅ SSR初期状態適用
     applySsrAuthState(ssrCurrentUser, ssrLineAuthenticated, ssrPhoneAuthenticated);
@@ -50,22 +61,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     return data?.currentUser?.user ?? null;
   }, [refetch]);
 
-  useAuthSideEffects({ authStateManager, liffService, refetchUser });
+  useAuthSideEffects({ authStateManager, liffService, refetchUser, hasFullAuth });
 
-  const { logout, createUser, loginWithLiff, startPhoneVerification, verifyPhoneCode } =
-    useAuthActions({
-      authStateManager,
-      liffService,
-      phoneAuthService,
-      refetchUser,
-    });
+  const { logout } = useAuthActions({
+    liffService,
+    phoneAuthService,
+  });
+  const actions = React.useMemo(() => ({ logout }), [logout]);
 
-  const actions = React.useMemo(
-    () => ({ logout, createUser, loginWithLiff, verifyPhoneCode, startPhoneVerification }),
-    [logout, createUser, loginWithLiff, verifyPhoneCode, startPhoneVerification],
-  );
-
-  const value = useAuthValue({ refetchUser, phoneAuthService, actions });
+  const value = useAuthValue({ refetchUser, actions });
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
