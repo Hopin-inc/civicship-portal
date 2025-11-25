@@ -2,6 +2,7 @@ import { GqlTicketStatus, GqlUser } from "@/types/graphql";
 import { UserProfileViewModel } from "@/app/users/features/profile/types";
 import { AppPortfolio } from "@/app/users/features/shared/types";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { logger } from "@/lib/logging";
 
 export function presentUserProfile(
   gqlUser: GqlUser | null,
@@ -9,6 +10,15 @@ export function presentUserProfile(
   portfolios?: AppPortfolio[],
 ): UserProfileViewModel {
   const wallet = gqlUser?.wallets?.find((w) => w.community?.id === COMMUNITY_ID);
+
+  logger.info("[AUTH] presentUserProfile: wallet selection", {
+    communityId: COMMUNITY_ID,
+    walletsCount: gqlUser?.wallets?.length ?? 0,
+    walletCommunities: (gqlUser?.wallets ?? []).map((w) => w.community?.id),
+    selectedWalletId: wallet?.id,
+    selectedWalletPoint: wallet?.currentPointView?.currentPoint,
+    component: "presentUserProfile",
+  });
 
   const selfOpportunities = (gqlUser?.opportunitiesCreatedByMe ?? []).map((opp) => ({
     id: opp.id,

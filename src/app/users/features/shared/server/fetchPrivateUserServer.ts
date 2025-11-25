@@ -41,6 +41,18 @@ export async function fetchPrivateUserServer(): Promise<GqlUser | null> {
       component: "fetchPrivateUserServer",
     });
 
+    logger.info("[AUTH] fetchPrivateUserServer: wallet data snapshot", {
+      hasUser: !!user,
+      walletsCount: user?.wallets?.length ?? 0,
+      walletSummary: (user?.wallets ?? []).map((w) => ({
+        id: w.id,
+        type: w.type,
+        communityId: w.community?.id,
+        currentPoint: w.currentPointView?.currentPoint,
+      })),
+      component: "fetchPrivateUserServer",
+    });
+
     return user;
   } catch (error) {
     logger.warn("[AUTH] fetchPrivateUserServer: query failed", {
