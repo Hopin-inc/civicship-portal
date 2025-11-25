@@ -39,7 +39,7 @@ export async function getServerMyWalletWithTransactions(
   const cookieHeader = cookieStore.toString();
 
   // Check for session cookie (support both "session" and "__session" names)
-  if (!cookieHeader.includes("session=") && !cookieHeader.includes("__session=")) {
+  if (!cookieStore.has("session") && !cookieStore.has("__session")) {
     return {
       wallet: null,
       transactions: fallbackConnection,

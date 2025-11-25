@@ -17,7 +17,7 @@ export async function getUserServer(): Promise<{
   const cookieHeader = cookieStore.toString();
 
   // Check for session cookie (support both "session" and "__session" names)
-  const hasSession = cookieHeader.includes("session=") || cookieHeader.includes("__session=");
+  const hasSession = cookieStore.has("session") || cookieStore.has("__session");
 
   const phoneAuthenticated = cookieStore.get("phone_authenticated")?.value === "true";
 

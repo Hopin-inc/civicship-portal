@@ -30,7 +30,7 @@ export async function getMembershipListServer(
   const cookieHeader = cookieStore.toString();
 
   // Check for session cookie (support both "session" and "__session" names)
-  if (!cookieHeader.includes("session=") && !cookieHeader.includes("__session=")) {
+  if (!cookieStore.has("session") && !cookieStore.has("__session")) {
     logger.debug("No session cookie found for SSR membership fetch");
     return {
       connection: null,
