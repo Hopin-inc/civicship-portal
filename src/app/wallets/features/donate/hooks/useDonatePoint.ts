@@ -13,7 +13,7 @@ interface DonatePointInput {
 
 export function useDonatePoint() {
   const [isLoading, setIsLoading] = useState(false);
-  const { donatePoint } = useTransactionMutations();
+  const { donatePoint, isAuthReady } = useTransactionMutations();
 
   const donate = async ({ toUserId, amount, comment, fromUserId }: DonatePointInput) => {
     setIsLoading(true);
@@ -35,5 +35,6 @@ export function useDonatePoint() {
   return {
     donate,
     isLoading,
+    isAuthReady,
   };
 }

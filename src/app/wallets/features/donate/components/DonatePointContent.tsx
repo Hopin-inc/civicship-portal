@@ -28,7 +28,7 @@ export function DonatePointContent({
     refetchRef.current = refetch;
   }, [refetch]);
 
-  const { selectedUser, setSelectedUser, handleDonate, isLoading } = useDonateFlow(
+  const { selectedUser, setSelectedUser, handleDonate, isLoading, isAuthReady } = useDonateFlow(
     currentUser,
     currentPoint,
   );
@@ -52,6 +52,7 @@ export function DonatePointContent({
         <DonateForm
           user={selectedUser}
           isLoading={isLoading}
+          isAuthReady={isAuthReady}
           onBack={() => setSelectedUser(null)}
           onSubmit={handleDonate}
           currentPoint={currentPoint}

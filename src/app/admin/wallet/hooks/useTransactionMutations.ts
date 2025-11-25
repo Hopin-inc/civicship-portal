@@ -42,6 +42,10 @@ const checkFirebaseAuth = (): { success: false; code: GqlErrorCode } | null => {
 };
 
 export const useTransactionMutations = () => {
+  // firebaseUserの状態をsubscribeして、UIが反応的に更新されるようにする
+  const firebaseUser = useAuthStore((s) => s.state.firebaseUser);
+  const isAuthReady = !!firebaseUser;
+
   // Apollo Hooks
   const [issuePointMutation, { loading: loadingIssue }] = usePointIssueMutation();
   const [grantPointMutation, { loading: loadingGrant }] = usePointGrantMutation();
@@ -161,5 +165,6 @@ export const useTransactionMutations = () => {
     grantPoint,
     donatePoint,
     isLoading: loadingIssue || loadingGrant || loadingDonate,
+    isAuthReady,
   };
 };
