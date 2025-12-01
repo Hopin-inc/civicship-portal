@@ -53,12 +53,28 @@ export class LiffService {
       if (!liffId) {
         throw new Error("LIFF ID is required for the first initialization");
       }
+
+      logger.info("[LiffService] Initializing new instance", {
+        component: "LiffService",
+        liffId,
+      });
+
       LiffService.instance = new LiffService(liffId);
+    } else {
+      logger.info("[LiffService] Reusing existing instance", {
+        component: "LiffService",
+        liffId: LiffService.instance.liffId,
+      });
     }
     return LiffService.instance;
   }
 
   public async initialize(): Promise<boolean> {
+    logger.info("[LiffService] initialize() called", {
+      component: "LiffService",
+      liffId: this.liffId,
+    });
+
     if (this.state.isInitialized) {
       return true;
     }
@@ -150,7 +166,8 @@ export class LiffService {
         expected: true,
       });
     } else {
-      const infoMessage = operation === "login" ? "LIFF login process failed" : "LIFF initialization failed";
+      const infoMessage =
+        operation === "login" ? "LIFF login process failed" : "LIFF initialization failed";
       const errorCategory = operation === "login" ? "auth_temporary" : "initialization_error";
       logger.info(infoMessage, {
         ...logContext,
@@ -269,7 +286,11 @@ export class LiffService {
       } catch (error) {
         const processedError = error instanceof Error ? error : new Error(String(error));
 
-        if (processedError.message.includes("401") || processedError.message.includes("network") || processedError.message.includes("fetch")) {
+        if (
+          processedError.message.includes("401") ||
+          processedError.message.includes("network") ||
+          processedError.message.includes("fetch")
+        ) {
           await new Promise((r) => setTimeout(r, attempt * 1000)); // 1s,2s,3s
           continue;
         }
