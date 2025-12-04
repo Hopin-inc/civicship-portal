@@ -154,6 +154,19 @@ export const GET_PUBLIC_USER_SERVER_QUERY = `
         title
         images
       }
+
+      nftInstances {
+        totalCount
+        edges {
+          node {
+            id
+            instanceId
+            name
+            imageUrl
+            createdAt
+          }
+        }
+      }
     }
   }
 `;

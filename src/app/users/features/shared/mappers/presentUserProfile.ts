@@ -34,13 +34,11 @@ export function presentUserProfile(
     images: opp.images ?? undefined,
   }));
 
-  const nftInstances = isOwner
-    ? (gqlUser?.nftInstances?.edges ?? []).map((edge) => ({
-        id: edge.node.id,
-        name: edge.node.name ?? "",
-        imageUrl: edge.node.imageUrl ?? undefined,
-      }))
-    : undefined;
+  const nftInstances = (gqlUser?.nftInstances?.edges ?? []).map((edge) => ({
+    id: edge.node.id,
+    name: edge.node.name ?? "",
+    imageUrl: edge.node.imageUrl ?? undefined,
+  }));
 
   return {
     id: gqlUser?.id ?? "",
