@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
-import { mapOpportunityCards } from "@/components/domains/opportunities/data/presenter";
 import { ErrorState } from "@/components/shared";
 import EmptyState from "@/components/shared/EmptyState";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
@@ -9,21 +8,21 @@ import { Coins } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useFeatureCheck } from "@/hooks/useFeatureCheck";
-import { useFetchFeedOpportunities } from "../hooks/useFetchFeedOpportunities";
+import { useFetchFeedOpportunitySlots } from "../hooks/useFetchFeedOpportunitySlots";
 import { groupCardsByDate } from "@/app/search/data/presenter";
 import DateGroupedOpportunities from "@/app/search/result/components/DateGroupedOpportunities";
 
 export default function OpportunitiesFeed() {
-  const { opportunities, loading, error, loadMoreRef, refetch } = useFetchFeedOpportunities();
+  const { featuredCards, upcomingCards, loading, error, loadMoreRef, refetch } = useFetchFeedOpportunitySlots();
   const router = useRouter();
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
     refetchRef.current = refetch;
   }, [refetch]);
 
-  const allCards = mapOpportunityCards(opportunities.edges ?? []);
+  const allCards = useMemo(() => [...featuredCards, ...upcomingCards], [featuredCards, upcomingCards]);
   const groupedOpportunities = useMemo(() => groupCardsByDate(allCards), [allCards]);
-  const isEmpty = !loading && opportunities?.edges?.length === 0;
+  const isEmpty = !loading && allCards.length === 0;
   const shouldShowQuests = useFeatureCheck("quests");
 
   const headerConfig = useMemo(

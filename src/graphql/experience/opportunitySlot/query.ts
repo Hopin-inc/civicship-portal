@@ -57,6 +57,51 @@ export const GET_OPPORTUNITY_SLOT = gql`
   }
 `;
 
+export const GET_FEED_OPPORTUNITY_SLOTS = gql`
+  query GetFeedOpportunitySlots(
+    $filter: OpportunitySlotFilterInput
+    $sort: OpportunitySlotSortInput
+    $cursor: String
+    $first: Int
+  ) {
+    opportunitySlots(filter: $filter, sort: $sort, cursor: $cursor, first: $first) {
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
+      }
+      totalCount
+      edges {
+        cursor
+        node {
+          id
+          hostingStatus
+          startsAt
+          endsAt
+          opportunity {
+            id
+            title
+            category
+            images
+            isReservableWithTicket
+            feeRequired
+            pointsToEarn
+            pointsRequired
+            place {
+              id
+              name
+            }
+            community {
+              id
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const GET_OPPORTUNITY_SLOT_WITH_PARTICIPATIONS = gql`
   query GetOpportunitySlotWithParticipations($id: ID!) {
     opportunitySlot(id: $id) {
