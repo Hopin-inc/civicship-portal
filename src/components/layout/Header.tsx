@@ -90,7 +90,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
       {config.title && !config.showSearchForm && (
         <div
           className={cn(
-            config.showLogo
+            config.showLogo || shouldShowBackButton
               ? "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
               : "",
           )}
@@ -98,7 +98,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
           <h1
             className={cn(
               "text-title-sm truncate max-w-[80vw]",
-              config.showLogo ? "text-center" : "text-left",
+              config.showLogo || shouldShowBackButton ? "text-center" : "text-left",
             )}
           >
             {config.title}
