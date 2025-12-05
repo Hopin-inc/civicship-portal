@@ -88,8 +88,21 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
         </div>
       )}
       {config.title && !config.showSearchForm && (
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-          <h1 className="text-title-md truncate max-w-[80vw] text-center">{config.title}</h1>
+        <div
+          className={cn(
+            config.showLogo
+              ? "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+              : "",
+          )}
+        >
+          <h1
+            className={cn(
+              "text-title-sm truncate max-w-[80vw]",
+              config.showLogo ? "text-center" : "text-left",
+            )}
+          >
+            {config.title}
+          </h1>
         </div>
       )}
       {config.action && (
