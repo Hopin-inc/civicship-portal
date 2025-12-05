@@ -1,16 +1,13 @@
 import { ActivityCard, QuestCard } from "@/components/domains/opportunities/types";
-import FeaturedSectionSkeleton from "@/components/domains/opportunities/components/FeaturedSection/FeaturedSectionSkeleton";
 import OpportunityImageSSR from "@/components/domains/opportunities/components/FeaturedSection/ImageSSR";
 import OpportunityHorizontalCard from "@/components/domains/opportunities/components/OpportunityHorizontalCard";
 import { formatOpportunities } from "@/components/domains/opportunities/utils";
 
 interface Props {
   opportunities: (ActivityCard | QuestCard)[];
-  isInitialLoading?: boolean;
 }
 
-export default function FeaturedSection({ opportunities, isInitialLoading = false }: Props) {
-  if (isInitialLoading) return <FeaturedSectionSkeleton />;
+export default function FeaturedSection({ opportunities }: Props) {
   if (opportunities.length === 0) return null;
 
   const firstImage = opportunities[0]?.images?.[1] ?? "";

@@ -15,7 +15,7 @@ export default function OpportunitiesPage() {
 
     return (
         <div className="min-h-screen">
-          <FeaturedSection opportunities={featuredCards} isInitialLoading={loading} />
+          <FeaturedSection opportunities={featuredCards} />
           <OpportunitiesFeed 
             featuredCards={featuredCards}
             upcomingCards={upcomingCards}
