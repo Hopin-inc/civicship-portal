@@ -72,8 +72,8 @@ const AdminBottomBar: React.FC<AdminBottomBarProps> = ({ className }) => {
             </Link>
           )}
           <Link
-            href="/admin/setting"
-            className={cn(getLinkStyle("/admin/setting", "/admin/setting/*"), "flex-grow")}
+            href="/admin"
+            className={cn(getLinkStyle("/admin", "/admin/*"), "flex-grow")}
           >
             <Settings size={24} />
             <span className="text-xs mt-1">{t("navigation.adminBottomBar.settings")}</span>
