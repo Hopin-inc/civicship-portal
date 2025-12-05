@@ -8,9 +8,9 @@ import { GqlMembership, GqlRole } from "@/types/graphql";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useMemo } from "react";
 import Link from "next/link";
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
+import { ArrowLeftRight } from "lucide-react";
 
 export default function MyProfilePage() {
   const { gqlUser, isOwner, portfolios } = useUserProfileContext();
@@ -30,11 +30,11 @@ export default function MyProfilePage() {
   const headerConfig = useMemo(
     () => ({
       action: hasAdminRole ? (
-        <Link
-          href="/admin"
-          className={cn(buttonVariants({ variant: "text", size: "sm" }), "text-black")}
-        >
-          {t("users.profileHeader.adminButton")}
+        <Link href="/admin">
+          <Button variant="outline" size="sm">
+            {t("users.profileHeader.adminButton")}
+            <ArrowLeftRight className="w-4 h-4 ml-1" />
+          </Button>
         </Link>
       ) : undefined,
     }),

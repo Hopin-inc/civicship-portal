@@ -6,5 +6,6 @@
   "navigation.adminBottomBar.reservations": "Reservations",
   "navigation.adminBottomBar.tickets": "Tickets",
   "navigation.adminBottomBar.credentials": "Credentials",
-  "navigation.adminBottomBar.settings": "Settings"
+  "navigation.adminBottomBar.settings": "Settings",
+  "navigation.adminHeader.toUserScreen": "User Screen"
 }
