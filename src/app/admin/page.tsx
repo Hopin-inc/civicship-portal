@@ -4,10 +4,13 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { ClipboardList, Ticket, Users, Wallet } from "lucide-react";
+import { ClipboardList, Ticket, Users, Wallet, ArrowLeftRight } from "lucide-react";
 import { currentCommunityConfig, FeaturesType } from "@/lib/communities/metadata";
 import { useAdminRole } from "@/app/admin/context/AdminRoleContext";
 import { GqlRole } from "@/types/graphql";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 const adminSettings = [
   {
@@ -41,13 +44,23 @@ const operatorSettings = [
 export default function AdminPage() {
   const router = useRouter();
   const role = useAdminRole();
+  const t = useTranslations();
 
   const headerConfig = useMemo(
     () => ({
       title: "管理画面",
-      showBackButton: true,
+      showBackButton: false,
+      showLogo: false,
+      action: (
+        <Link href="/users/me">
+          <Button variant="outline" size="sm">
+            {t("navigation.adminHeader.toUserScreen")}
+            <ArrowLeftRight className="w-4 h-4 ml-1" />
+          </Button>
+        </Link>
+      ),
     }),
-    [],
+    [t],
   );
   useHeaderConfig(headerConfig);
 
