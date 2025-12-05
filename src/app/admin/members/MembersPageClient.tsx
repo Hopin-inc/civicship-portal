@@ -33,7 +33,7 @@ export default function MembersPageClient({ initialConnection }: MembersPageClie
       title: "権限管理",
       showLogo: false,
       showBackButton: true,
-      backTo: "/admin/setting",
+      backTo: "/admin",
     }),
     [],
   );

@@ -1,5 +1,6 @@
 {
   "users.profileHeader.settingsButton": "Settings",
+  "users.profileHeader.adminButton": "Admin",
   "users.profileHeader.readMore": "Read more",
   "users.profileView.certificatesTitle": "Certificates",
   "users.portfolio.sectionTitle": "Past Engagements",
