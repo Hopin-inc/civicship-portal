@@ -92,6 +92,11 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
           <h1 className="text-title-md truncate max-w-[80vw] text-center">{config.title}</h1>
         </div>
       )}
+      {config.action && (
+        <div className="ml-auto">
+          {config.action}
+        </div>
+      )}
     </header>
   );
 };

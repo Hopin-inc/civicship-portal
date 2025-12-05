@@ -33,7 +33,7 @@ export default function WalletPage() {
       title: t("adminWallet.title"),
       showLogo: false,
       showBackButton: true,
-      backTo: "/admin/setting",
+      backTo: "/admin",
     }),
     [t],
   );
