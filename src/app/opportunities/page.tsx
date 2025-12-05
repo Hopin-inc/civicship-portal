@@ -3,11 +3,12 @@ import { useAuth } from "@/contexts/AuthProvider";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import FeaturedSection from "@/components/domains/opportunities/components/FeaturedSection/FeaturedSection";
 import OpportunitiesFeed from "@/app/opportunities/components/OpportunitiesFeed";
-import { useFetchFeedOpportunities } from "@/app/opportunities/hooks/useFetchFeedOpportunities";
+import { useFetchFeedOpportunitySlots } from "@/app/opportunities/hooks/useFetchFeedOpportunitySlots";
 
 export default function OpportunitiesPage() {
     const { isAuthenticating, loading: authLoading } = useAuth();
-    const { featuredCards, loading } = useFetchFeedOpportunities();
+    const { featuredCards, upcomingCards, loading, error, loadMoreRef, refetch } = useFetchFeedOpportunitySlots();
+    
     if (isAuthenticating || authLoading) {
       return <LoadingIndicator fullScreen={true} />;
     }
@@ -15,7 +16,14 @@ export default function OpportunitiesPage() {
     return (
         <div className="min-h-screen">
           <FeaturedSection opportunities={featuredCards} isInitialLoading={loading} />
-          <OpportunitiesFeed />
+          <OpportunitiesFeed 
+            featuredCards={featuredCards}
+            upcomingCards={upcomingCards}
+            loading={loading}
+            error={error}
+            loadMoreRef={loadMoreRef}
+            refetch={refetch}
+          />
         </div>
       );
 }

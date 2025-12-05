@@ -8,12 +8,28 @@ import { Coins } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useFeatureCheck } from "@/hooks/useFeatureCheck";
-import { useFetchFeedOpportunitySlots } from "../hooks/useFetchFeedOpportunitySlots";
 import { groupCardsByDate } from "@/app/search/data/presenter";
 import DateGroupedOpportunities from "@/app/search/result/components/DateGroupedOpportunities";
+import { ActivityCard, QuestCard } from "@/components/domains/opportunities/types";
+import { ApolloError } from "@apollo/client";
 
-export default function OpportunitiesFeed() {
-  const { featuredCards, upcomingCards, loading, error, loadMoreRef, refetch } = useFetchFeedOpportunitySlots();
+interface OpportunitiesFeedProps {
+  featuredCards: (ActivityCard | QuestCard)[];
+  upcomingCards: (ActivityCard | QuestCard)[];
+  loading: boolean;
+  error: ApolloError | undefined;
+  loadMoreRef: (node: HTMLDivElement | null) => void;
+  refetch: () => void;
+}
+
+export default function OpportunitiesFeed({
+  featuredCards,
+  upcomingCards,
+  loading,
+  error,
+  loadMoreRef,
+  refetch,
+}: OpportunitiesFeedProps) {
   const router = useRouter();
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
