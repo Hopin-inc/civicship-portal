@@ -100,3 +100,19 @@ export const GET_MEMBER_WALLETS = gql`
     }
   }
 `;
+
+export const GET_MY_WALLET = gql`
+  query GetMyWallet {
+    myWallet {
+      id
+      type
+      currentPointView {
+        currentPoint
+      }
+      community {
+        id
+        name
+      }
+    }
+  }
+`;
