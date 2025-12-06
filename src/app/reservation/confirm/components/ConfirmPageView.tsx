@@ -28,7 +28,6 @@ export interface ConfirmPageViewProps {
     pointsRequired: number;
     isActivity: boolean;
     isQuest: boolean;
-    maxTickets: number;
     isPointsOnly: boolean;
     totalPointsRequired: number;
     hasInsufficientPoints: boolean;
@@ -37,17 +36,10 @@ export interface ConfirmPageViewProps {
   onParticipantCountChange: (count: number) => void;
   selectedPointCount: number;
   onPointCountChange: (count: number) => void;
-  selectedTicketCount: number;
-  onTicketCountChange: (count: number) => void;
-  selectedTickets: Record<string, number>;
-  onSelectedTicketsChange: (tickets: Record<string, number>) => void;
-  useTickets: boolean;
-  setUseTickets: (use: boolean) => void;
   usePoints: boolean;
   setUsePoints: (use: boolean) => void;
   ageComment: string | null;
   onAgeCommentChange: (comment: string | null) => void;
-  availableTickets: AvailableTicket[];
   userWallet: number | null;
   ticketCounter: {
     count: number;
@@ -78,17 +70,10 @@ export default function ConfirmPageView(props: ConfirmPageViewProps) {
     onParticipantCountChange,
     selectedPointCount,
     onPointCountChange,
-    selectedTicketCount,
-    onTicketCountChange,
-    selectedTickets,
-    onSelectedTicketsChange,
-    useTickets,
-    setUseTickets,
     usePoints,
     setUsePoints,
     ageComment,
     onAgeCommentChange,
-    availableTickets,
     userWallet,
     ticketCounter,
     onConfirm,
@@ -102,7 +87,6 @@ export default function ConfirmPageView(props: ConfirmPageViewProps) {
     pointsRequired,
     isActivity,
     isQuest,
-    maxTickets,
     isPointsOnly,
     hasInsufficientPoints,
   } = calculations;
@@ -138,7 +122,7 @@ export default function ConfirmPageView(props: ConfirmPageViewProps) {
             communityId: COMMUNITY_ID,
             images: opportunity.images,
             location: opportunity.place?.name ?? "",
-            hasReservableTicket: maxTickets > 0,
+            hasReservableTicket: false,
             pointsRequired,
             slots: [],
           }}
@@ -153,24 +137,18 @@ export default function ConfirmPageView(props: ConfirmPageViewProps) {
 
       {!isPointsOnly && <div className="mx-6 border-b border-gray-200 my-6" />}
 
-      {isActivity && (pointsRequired > 0 || maxTickets > 0) && !isPointsOnly && (
+      {isActivity && pointsRequired > 0 && !isPointsOnly && (
         <PaymentSection
           ticketCount={ticketCounter.count}
           onIncrement={ticketCounter.increment}
           onDecrement={ticketCounter.decrement}
-          maxTickets={maxTickets}
-          availableTickets={availableTickets}
           pricePerPerson={feeRequired}
           participantCount={participantCount}
-          useTickets={useTickets}
-          setUseTickets={setUseTickets}
           userWallet={userWallet}
           usePoints={usePoints}
           setUsePoints={setUsePoints}
           pointsRequired={pointsRequired}
           onPointCountChange={onPointCountChange}
-          onTicketCountChange={onTicketCountChange}
-          onSelectedTicketsChange={onSelectedTicketsChange}
         />
       )}
 

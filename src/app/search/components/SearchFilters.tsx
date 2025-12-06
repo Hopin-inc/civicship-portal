@@ -90,29 +90,27 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
           </FormItem>
         )}
       />
-      <FormField
-        control={control}
-        name="useTicket"
-        render={() => (
-          <FormItem>
-            <FormControl>
-              <FilterButton
-                icon={<Tags className="h-4 w-4" />}
-                label="その他の条件"
-                value=""
-                active={useTicket}
-                onClick={() => onFilterClick("other")}
-                verticalLayout={true}
-                className="rounded-b-xl"
-              >
-              {[useTicket && "チケット利用可", usePoints && "ポイント利用可"]
-                .filter(Boolean)
-                .join(",")}
-              </FilterButton>
-            </FormControl>
-          </FormItem>
-        )}
-      />
+      {usePoints && (
+        <FormField
+          control={control}
+          name="usePoints"
+          render={() => (
+            <FormItem>
+              <FormControl>
+                <FilterButton
+                  icon={<Tags className="h-4 w-4" />}
+                  label="ポイント利用可"
+                  value=""
+                  active={usePoints}
+                  onClick={() => onFilterClick("points")}
+                  verticalLayout={true}
+                  className="rounded-b-xl"
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+      )}
 
     </div>
   );

@@ -1,12 +1,12 @@
 "use client";
 
 import { useMemo } from "react";
-import { GqlTicket, GqlWalletType, useGetWalletsWithTicketQuery } from "@/types/graphql";
+import { GqlWalletType, useGetWalletsQuery } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { toNumberSafe } from "@/utils/bigint";
 
 export function useWalletData(userId?: string) {
-  const { data, loading, error, refetch } = useGetWalletsWithTicketQuery({
+  const { data, loading, error, refetch } = useGetWalletsQuery({
     variables: {
       filter: {
         userId: userId,
@@ -29,7 +29,8 @@ export function useWalletData(userId?: string) {
     return toNumberSafe(memberWallet?.currentPointView?.currentPoint, 0);
   }, [wallets]);
 
-  const tickets: GqlTicket[] = useMemo(() => wallets?.[0]?.tickets ?? [], [wallets]);
+  // ticketsは常に空配列を返す
+  const tickets = [];
 
   return {
     wallets,
