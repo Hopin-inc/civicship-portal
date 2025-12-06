@@ -382,6 +382,10 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
 - チケットフィルター条件部分（`isTicketsEnabled &&`）
 - チケット表示ラベル（`"チケット利用可"`）
 
+**Props設計の注記:**
+※ `useTicket` props は現時点では削除していない（呼び出し元への影響最小化）。
+呼び出し元で未使用であれば props 自体を削除することも可能だが、バンドルサイズやコンポーネント責務の観点から将来的な整理タスクとして残す余地がある。
+
 **検証:**
 - チケットフィルターが表示されない
 - ポイントフィルターは正常に動作
@@ -492,10 +496,18 @@ export function useWalletData(userId?: string) {
 npm run codegen
 ```
 
+**Step 5: 不要な型・importsのチェック**
+`npm run codegen` 後、TypeScript の unused imports チェック（ESLint等）でチケット関連型・hooksが他ファイルに残存していないことを確認する。
+
+**注記:**
+- `GqlTicket` 型は残る（他の箇所で import されている可能性）
+- 実際には今後使用しないため、unused import として検出される場合は削除する
+
 **検証:**
 - `npm run codegen` がエラーなく完了
 - TypeScript型エラーがない
 - 予約画面が正常に動作（チケット欄は非表示）
+- チケット関連の unused imports がない
 
 ---
 
