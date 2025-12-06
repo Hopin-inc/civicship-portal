@@ -1,26 +1,22 @@
 "use client";
 
 import { useMemo } from "react";
-import { GqlWalletType, useGetMemberWalletsQuery } from "@/types/graphql";
+import { useGetUserFlexibleQuery } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { toNumberSafe } from "@/utils/bigint";
 
 export function useWalletData(userId?: string) {
-  const { data, loading, error, refetch } = useGetMemberWalletsQuery({
+  const { data, loading, error, refetch } = useGetUserFlexibleQuery({
     variables: {
-      filter: {
-        userId: userId,
-        type: GqlWalletType.Member,
-        communityId: COMMUNITY_ID,
-      },
-      first: 1,
+      id: userId ?? "",
+      withWallets: true,
     },
     skip: !userId,
     fetchPolicy: "cache-and-network",
   });
 
   const wallets = useMemo(
-    () => data?.wallets?.edges?.flatMap((edge) => (edge?.node ? [edge.node] : [])) ?? null,
+    () => data?.user?.wallets?.filter(w => w?.community?.id === COMMUNITY_ID) ?? null,
     [data],
   );
 
