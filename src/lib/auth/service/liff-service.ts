@@ -53,12 +53,28 @@ export class LiffService {
       if (!liffId) {
         throw new Error("LIFF ID is required for the first initialization");
       }
+
+      logger.info("[LiffService] Initializing new instance", {
+        component: "LiffService",
+        liffId,
+      });
+
       LiffService.instance = new LiffService(liffId);
+    } else {
+      logger.info("[LiffService] Reusing existing instance", {
+        component: "LiffService",
+        liffId: LiffService.instance.liffId,
+      });
     }
     return LiffService.instance;
   }
 
   public async initialize(): Promise<boolean> {
+    logger.info("[LiffService] initialize() called", {
+      component: "LiffService",
+      liffId: this.liffId,
+    });
+
     if (this.state.isInitialized) {
       return true;
     }
@@ -150,7 +166,8 @@ export class LiffService {
         expected: true,
       });
     } else {
-      const infoMessage = operation === "login" ? "LIFF login process failed" : "LIFF initialization failed";
+      const infoMessage =
+        operation === "login" ? "LIFF login process failed" : "LIFF initialization failed";
       const errorCategory = operation === "login" ? "auth_temporary" : "initialization_error";
       logger.info(infoMessage, {
         ...logContext,
@@ -182,6 +199,39 @@ export class LiffService {
     }
   }
 
+  /**
+   * Mini App用: profileスコープの権限を確保する
+   * チャネル同意の簡略化により、デフォルトではopenidのみ。
+   * バックエンドでgetProfileを呼ぶ前に、この権限を取得する必要がある。
+   * @see https://developers.line.biz/ja/news/2025/10/31/channel-consent-simplification/
+   */
+  private async ensureProfilePermission(): Promise<void> {
+    if (typeof window === "undefined") return;
+    if (!liff.isInClient()) return;
+    if (!liff.isApiAvailable("permission")) return;
+
+    try {
+      const permissionStatus = await liff.permission.query("profile");
+
+      logger.info("LIFF profile permission status", {
+        authType: "liff",
+        component: "LiffService",
+        state: permissionStatus.state,
+      });
+
+      if (permissionStatus.state === "prompt") {
+        await liff.permission.requestAll();
+      }
+    } catch (error) {
+      const processedError = error instanceof Error ? error : new Error(String(error));
+      logger.info("LIFF profile permission check failed", {
+        authType: "liff",
+        component: "LiffService",
+        error: processedError.message,
+      });
+    }
+  }
+
   public getAccessToken(): string | null {
     if (!this.state.isInitialized || !this.state.isLoggedIn) {
       return null;
@@ -192,6 +242,9 @@ export class LiffService {
   public async signInWithLiffToken(): Promise<boolean> {
     const accessToken = this.getAccessToken();
     if (!accessToken) return false;
+
+    // Mini App用: バックエンドにトークンを送る前にprofile権限を確保
+    await this.ensureProfilePermission();
 
     const communityId = process.env.NEXT_PUBLIC_COMMUNITY_ID;
     const endpoint = `${process.env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT}/line/liff-login`;
@@ -269,7 +322,11 @@ export class LiffService {
       } catch (error) {
         const processedError = error instanceof Error ? error : new Error(String(error));
 
-        if (processedError.message.includes("401") || processedError.message.includes("network") || processedError.message.includes("fetch")) {
+        if (
+          processedError.message.includes("401") ||
+          processedError.message.includes("network") ||
+          processedError.message.includes("fetch")
+        ) {
           await new Promise((r) => setTimeout(r, attempt * 1000)); // 1s,2s,3s
           continue;
         }

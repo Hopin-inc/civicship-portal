@@ -4,6 +4,7 @@ import { encodeURIComponentWithType, matchPaths, RawURIComponent } from "@/utils
 import { AccessPolicy } from "@/lib/auth/core/access-policy";
 import { AuthenticationState } from "@/types/auth";
 import { logger } from "@/lib/logging";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 export class AuthRedirectService {
   private static instance: AuthRedirectService;
@@ -47,6 +48,7 @@ export class AuthRedirectService {
       pathname,
       basePath,
       authState,
+      currentUser,
       next,
       nextParam,
     );
@@ -90,6 +92,7 @@ export class AuthRedirectService {
     pathname: string,
     basePath: string,
     authState: AuthenticationState,
+    currentUser: GqlUser | null | undefined,
     next?: string | null,
     nextParam?: string,
   ): RawURIComponent | null {
@@ -114,12 +117,29 @@ export class AuthRedirectService {
         }
         return null;
 
-      case "user_registered":
+      case "user_registered": {
+        const hasMembershipInCurrentCommunity = !!currentUser?.memberships?.some(
+          (m) => m.community?.id === COMMUNITY_ID
+        );
+
+        // 特殊ケース: 登録済みだが、現在のコミュニティにメンバーシップがない
+        // phone-verificationに居る場合はリダイレクトしない（無限ループ防止）
+        if (!hasMembershipInCurrentCommunity && basePath === "/sign-up/phone-verification") {
+          logger.info("[AUTH] handleAuthEntryFlow: user_registered but no membership in current community, staying on phone-verification", {
+            userId: currentUser?.id,
+            communityId: COMMUNITY_ID,
+            membershipIds: currentUser?.memberships?.map((m) => m.community?.id) ?? [],
+            component: "AuthRedirectService",
+          });
+          return null;
+        }
+
         // 登録済みユーザーが sign-up 系や login に来たらトップ or nextへ
         if (next?.startsWith("/") && !next.startsWith("/login") && !next.startsWith("/sign-up")) {
           return next as RawURIComponent;
         }
         return "/" as RawURIComponent;
+      }
 
       default:
         return null;
