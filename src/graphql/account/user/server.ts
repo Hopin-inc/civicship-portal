@@ -4,6 +4,7 @@ export const GET_CURRENT_USER_SERVER_QUERY = `
       user {
         id
         name
+        preferredLanguage
         identities {
           uid
           platform

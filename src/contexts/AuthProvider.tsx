@@ -9,6 +9,7 @@ import { applySsrAuthState } from "@/lib/auth/init/applySsrAuthState";
 import { useAuthActions } from "@/hooks/auth/actions";
 import { useAuthSideEffects } from "@/hooks/auth/sideEffects";
 import { useAuthValue } from "@/hooks/auth/init/useAuthValue";
+import { useLanguageSync } from "@/hooks/useLanguageSync";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -65,9 +66,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     [logout, createUser, loginWithLiff, verifyPhoneCode, startPhoneVerification],
   );
 
-  const value = useAuthValue({ refetchUser, phoneAuthService, actions });
+    const value = useAuthValue({ refetchUser, phoneAuthService, actions });
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+    // Sync browser language preference to server on first visit
+    useLanguageSync();
+
+    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = (): AuthContextType => {
