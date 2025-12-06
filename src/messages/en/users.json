@@ -31,6 +31,8 @@
   "users.account.connected": "Connected",
   "users.account.loading": "Loading",
   "users.account.notConnected": "Not connected",
+  "users.account.didFailed": "Issuance failed",
+  "users.account.reverifyPhone": "Reverify",
   "users.promise.termsOfService": "Terms of Service",
   "users.promise.privacyPolicy": "Privacy Policy",
   "users.danger.signOut": "Sign Out",

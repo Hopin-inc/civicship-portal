@@ -31,6 +31,8 @@
   "users.account.connected": "連携済み",
   "users.account.loading": "読込中",
   "users.account.notConnected": "未連携",
+  "users.account.didFailed": "発行失敗",
+  "users.account.reverifyPhone": "再認証",
   "users.promise.termsOfService": "利用規約",
   "users.promise.privacyPolicy": "プライバシーポリシー",
   "users.danger.signOut": "サインアウト",
