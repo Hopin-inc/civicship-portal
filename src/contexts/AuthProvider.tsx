@@ -66,12 +66,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     [logout, createUser, loginWithLiff, verifyPhoneCode, startPhoneVerification],
   );
 
-    const value = useAuthValue({ refetchUser, phoneAuthService, actions });
+  const value = useAuthValue({ refetchUser, phoneAuthService, actions });
 
-    // Sync browser language preference to server on first visit
-    useLanguageSync();
+  // Sync browser language preference to server on first visit
+  useLanguageSync({ user: value.user, loading: value.loading });
 
-    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = (): AuthContextType => {
