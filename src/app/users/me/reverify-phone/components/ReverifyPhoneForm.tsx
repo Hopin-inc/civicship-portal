@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useAuth } from "@/contexts/AuthProvider";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
@@ -32,7 +32,10 @@ export function ReverifyPhoneForm() {
   const [isVerifying, setIsVerifying] = useState(false);
 
   const { phoneAuthService, authStateManager } = useAuthDependencies();
-  const { phoneAuth } = useAuthStore.getState();
+  const { phoneAuth, setPhoneAuth } = useAuthStore((s) => ({
+    phoneAuth: s.phoneAuth,
+    setPhoneAuth: s.setPhoneAuth,
+  }));
   const startPhoneVerification = useStartPhoneVerification(phoneAuthService);
   const verifyPhoneCode = useVerifyPhoneCode(phoneAuthService, authStateManager);
   const clearRecaptcha = phoneAuthService.clearRecaptcha;
@@ -47,20 +50,6 @@ export function ReverifyPhoneForm() {
     [t],
   );
   useHeaderConfig(headerConfig);
-
-  useEffect(() => {
-    const scrollY = window.scrollY;
-    document.body.style.position = "fixed";
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.width = "100%";
-
-    return () => {
-      const y = document.body.style.top;
-      document.body.style.position = "";
-      document.body.style.top = "";
-      window.scrollTo(0, parseInt(y || "0") * -1);
-    };
-  }, []);
 
   const { isDisabled: isResendDisabled, countdown, start: startResendTimer } = useResendTimer();
   const recaptchaManager = useRecaptchaManager();
@@ -159,8 +148,6 @@ export function ReverifyPhoneForm() {
     setPhoneNumber(undefined);
     setVerificationCode("");
     setStep("phone");
-
-    const { setPhoneAuth } = useAuthStore.getState();
     setPhoneAuth({ verificationId: null });
   };
 

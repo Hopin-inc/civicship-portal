@@ -32,6 +32,7 @@ export default function AccountSection() {
   const didValue = completedRequest?.didValue;
 
   // Find the latest DID issuance request to check for failed state
+  // NOTE: Assumes didIssuanceRequests is sorted by createdAt in descending order
   const latestRequest = gqlUser?.didIssuanceRequests?.[0];
   const isTargetForReverify =
     !didValue &&
