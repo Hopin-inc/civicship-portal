@@ -11,7 +11,6 @@ export interface ReservationCalculations {
   pointsRequired: number;
   isActivity: boolean;
   isQuest: boolean;
-  maxTickets: number;
   isPointsOnly: boolean;
   totalPointsRequired: number;
   hasInsufficientPoints: boolean;
@@ -36,7 +35,6 @@ export function calculateReservationDetails(
       pointsRequired: 0,
       isActivity: false,
       isQuest: false,
-      maxTickets: 0,
       isPointsOnly: false,
       totalPointsRequired: 0,
       hasInsufficientPoints: false,
@@ -47,7 +45,6 @@ export function calculateReservationDetails(
   const pointsRequired = "pointsRequired" in opportunity ? opportunity.pointsRequired : 0;
   const isActivity = opportunity.category === GqlOpportunityCategory.Activity;
   const isQuest = opportunity.category === GqlOpportunityCategory.Quest;
-  const maxTickets = wallet?.tickets.reduce((sum, ticket) => sum + ticket.count, 0) ?? 0;
   const isPointsOnly = isPointsOnlyOpportunity(feeRequired, pointsRequired);
   const totalPointsRequired = pointsRequired * participantCount;
   const userPoint = wallet?.currentPoint ?? null;
@@ -58,7 +55,6 @@ export function calculateReservationDetails(
     pointsRequired,
     isActivity,
     isQuest,
-    maxTickets,
     isPointsOnly,
     totalPointsRequired,
     hasInsufficientPoints,
@@ -67,21 +63,19 @@ export function calculateReservationDetails(
 
 /**
  * 支払い金額を計算
- * 
+ *
  * @param feeRequired - 1人あたりの料金
  * @param participantCount - 参加者数
  * @param paidWithPoints - ポイントで支払う人数
- * @param paidWithTickets - チケットで支払う人数
  * @returns 合計支払い金額
  */
 export function calculateTotalPrice(
   feeRequired: number | null,
   participantCount: number,
   paidWithPoints: number,
-  paidWithTickets: number,
 ): number {
   if (feeRequired === null || feeRequired === 0) return 0;
-  const paidParticipants = participantCount - paidWithPoints - paidWithTickets;
+  const paidParticipants = participantCount - paidWithPoints;
   return feeRequired * Math.max(0, paidParticipants);
 }
 

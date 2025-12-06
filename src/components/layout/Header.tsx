@@ -81,7 +81,6 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
             guests={config.searchParams?.guests?.toString()}
             q={config.searchParams?.q}
             type={config.searchParams?.type}
-            ticket={config.searchParams?.ticket}
             points={config.searchParams?.points}
             redirectTo={config.searchParams?.redirectTo}
           />

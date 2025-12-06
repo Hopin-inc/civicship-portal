@@ -13,27 +13,7 @@ import { ApolloError } from "@apollo/client";
 import { logger } from "@/lib/logging";
 import { isPointsOnlyOpportunity } from "@/utils/opportunity/isPointsOnlyOpportunity";
 
-const getSelectedTicketIds = (
-  wallet: ReservationWallet | null,
-  selectedTickets: { [ticketId: string]: number } | undefined,
-): string[] => {
-  if (!selectedTickets || !wallet) return [];
-  
-  const ticketIds: string[] = [];
-  const allTickets = wallet.tickets;
-  
-  Object.entries(selectedTickets).forEach(([utilityId, count]) => {
-    const availableTickets = allTickets.filter(ticket => 
-      ticket.utility?.id === utilityId && ticket.status === "AVAILABLE"
-    );
-    
-    for (let i = 0; i < count && i < availableTickets.length; i++) {
-      ticketIds.push(availableTickets[i].id);
-    }
-  });
-  
-  return ticketIds;
-};
+// チケット機能停止: getSelectedTicketIds は削除
 
 type Result =
   | { success: true; reservation: GqlReservation }
@@ -46,11 +26,8 @@ interface ReservationParams {
   user: Pick<GqlUser, "id"> | null;
   ticketCounter: UseTicketCounterReturn;
   participantCount: number;
-  useTickets: boolean;
   usePoints: boolean;
   selectedPointCount: number;
-  selectedTicketCount: number;
-  selectedTickets?: { [ticketId: string]: number };
   comment?: string;
   userWallet: number | null;
 }
@@ -65,13 +42,10 @@ export const useReservationCommand = () => {
       wallet,
       user,
       ticketCounter,
-      useTickets,
       comment,
       participantCount,
       usePoints,
       selectedPointCount,
-      selectedTicketCount,
-      selectedTickets,
       userWallet
     }: ReservationParams): Promise<Result> => {
       if (loading) return { success: false, code: GqlErrorCode.Unknown };
@@ -82,7 +56,7 @@ export const useReservationCommand = () => {
       const feeRequired = 'feeRequired' in opportunity ? opportunity.feeRequired : null;
       const pointsRequired = 'pointsRequired' in opportunity ? opportunity.pointsRequired : 0;
       const isPointsOnly = isPointsOnlyOpportunity(feeRequired, pointsRequired);
-      
+
       if (isPointsOnly) {
         const totalPointsRequired = pointsRequired * participantCount;
         if (typeof userWallet !== 'number' || userWallet < totalPointsRequired) {
@@ -90,19 +64,13 @@ export const useReservationCommand = () => {
         }
       }
 
-      const count = selectedTicketCount;
-      const ticketIds = useTickets ? getSelectedTicketIds(wallet, selectedTickets) : [];
-      if (useTickets && ticketIds.length < count) {
-        return { success: false, code: GqlErrorCode.TicketParticipantMismatch };
-      }
       try {
         const res = await createReservation({
           variables: {
             input: {
               opportunitySlotId: selectedSlot.id,
               totalParticipantCount: participantCount,
-              paymentMethod: useTickets ? "TICKET" : "FEE",
-              ticketIdsIfNeed: useTickets ? ticketIds : undefined,
+              paymentMethod: "FEE",
               comment: comment ?? undefined,
               participantCountWithPoint: isPointsOnly ? participantCount : (usePoints ? selectedPointCount : undefined),
             },

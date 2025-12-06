@@ -17,11 +17,10 @@ interface SearchFormProps {
   guests?: string;
   q?: string;
   type?: string;
-  ticket?: string;
   points?: string;
 }
 
-const SearchBox = ({ location, from, to, guests, q, type, ticket, points }: SearchFormProps) => {
+const SearchBox = ({ location, from, to, guests, q, type, points }: SearchFormProps) => {
   const t = useTranslations();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -62,7 +61,7 @@ const SearchBox = ({ location, from, to, guests, q, type, ticket, points }: Sear
     setIsModalOpen(true);
   };
   
-  const badgeCount = [ticket, points].filter(Boolean).length;
+  const badgeCount = [points].filter(Boolean).length;
 
   const methods = useForm({
     defaultValues: {
@@ -85,7 +84,6 @@ const SearchBox = ({ location, from, to, guests, q, type, ticket, points }: Sear
         const parsed = parseInt(guests, 10);
         return Number.isNaN(parsed) ? 0 : parsed;
       })(),
-      useTicket: ticket === "true",
     },
   });
 
@@ -99,7 +97,7 @@ const SearchBox = ({ location, from, to, guests, q, type, ticket, points }: Sear
         <div className="absolute left-4 top-1/2 -translate-y-1/2">
           <Search className="h-6 w-6 text-muted-foreground" />
         </div>
-        {!location && !from && !to && !guests && !q && !points && !ticket ? (
+        {!location && !from && !to && !guests && !q && !points ? (
           <div className="flex items-center justify-center w-full h-full">
             <span className="text-body-sm text-caption font-medium">{t("search.tapToSearch")}</span>
           </div>

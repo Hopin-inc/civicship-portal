@@ -176,9 +176,9 @@ export function presentReservationWallet(
   const memberWallet = wallets[0];
 
   const currentPoint = toNumberSafe(memberWallet?.currentPointView?.currentPoint, 0);
-  const rawTickets = memberWallet?.tickets ?? [];
-  const allTickets: GqlTicket[] = Array.isArray(rawTickets) ? rawTickets : [];
-  const tickets = presentAvailableTickets(allTickets, opportunity);
+
+  // チケット機能停止: ticketsは常に空配列
+  const tickets: AvailableTicket[] = [];
 
   return {
     currentPoint,
@@ -187,55 +187,12 @@ export function presentReservationWallet(
 }
 
 /**
- * GraphQLチケットを利用可能チケット形式に変換
- *
- * @param tickets - GraphQLチケット配列
- * @param opportunity - 機会情報（対象ユーティリティでフィルタ）
- * @returns 利用可能チケット配列
+ * チケット機能停止により常に空配列を返す
+ * @deprecated チケット機能は停止されました
  */
 function presentAvailableTickets(
   tickets: GqlTicket[],
   opportunity: ActivityDetail | QuestDetail | null,
 ): AvailableTicket[] {
-  const ticketGroups = new Map<string, GqlTicket[]>();
-  tickets.forEach((ticket) => {
-    const utilityId = ticket.utility?.id || "unknown";
-    if (!ticketGroups.has(utilityId)) {
-      ticketGroups.set(utilityId, []);
-    }
-    ticketGroups.get(utilityId)!.push(ticket);
-  });
-
-  const groupedTickets = Array.from(ticketGroups.entries()).map(([utilityId, ticketList]) => {
-    const firstTicket = ticketList[0];
-    const availableTickets = ticketList.filter(
-      (ticket) => ticket.status === GqlTicketStatus.Available,
-    );
-
-    return {
-      id: utilityId,
-      utility: firstTicket.utility
-        ? {
-            id: firstTicket.utility.id,
-            name: firstTicket.utility.name ?? null,
-            owner: firstTicket.utility.owner ?? null,
-          }
-        : null,
-      status: availableTickets.length > 0 ? GqlTicketStatus.Available : firstTicket.status,
-      count: availableTickets.length,
-    };
-  });
-
-  if (!opportunity?.targetUtilities.length) {
-    return groupedTickets;
-  }
-
-  const requiredUtilityIds = new Set(opportunity.targetUtilities.map((u) => u.id));
-
-  return groupedTickets.filter((t) => {
-    const utilityId = t?.utility?.id;
-    const hasRequiredUtility = utilityId && requiredUtilityIds.has(utilityId);
-    const isAvailable = t.status === GqlTicketStatus.Available;
-    return hasRequiredUtility && isAvailable;
-  });
+  return [];
 }

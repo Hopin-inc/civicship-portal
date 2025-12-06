@@ -23,7 +23,6 @@ interface OpportunityInfoProps {
   phoneNumber?: string | null | undefined;
   comment?: string | null | undefined;
   totalPrice?: number;
-  ticketCount?: number;
   variant?: "complete" | "participation";
 }
 
@@ -34,7 +33,6 @@ const OpportunityInfo: React.FC<OpportunityInfoProps> = ({
   phoneNumber,
   comment,
   totalPrice,
-  ticketCount,
   variant = "complete",
 }) => {
   const isComplete = variant === "complete";
@@ -119,7 +117,6 @@ const OpportunityInfo: React.FC<OpportunityInfoProps> = ({
         pointsRequired: opportunity?.pointsRequired,
         participantCountWithPoint: dateTimeInfo?.participantCountWithPoint,
         participantCount: participationCount,
-        ticketCount,
       })}
       {phoneNumber && (
         <dl

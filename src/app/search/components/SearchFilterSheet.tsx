@@ -20,8 +20,6 @@ interface FilterSheetsProps {
   setDateRange: (range: DateRange | undefined) => void;
   guests: number;
   setGuests: (guests: number) => void;
-  useTicket: boolean;
-  setUseTicket: (useTicket: boolean) => void;
   usePoints: boolean;
   setUsePoints: (usePoints: boolean) => void;
   clearActiveFilter: () => void;
@@ -38,8 +36,6 @@ const SearchFilterSheets: React.FC<FilterSheetsProps> = ({
   setDateRange,
   guests,
   setGuests,
-  useTicket,
-  setUseTicket,
   usePoints,
   setUsePoints,
   clearActiveFilter,
@@ -148,20 +144,6 @@ const SearchFilterSheets: React.FC<FilterSheetsProps> = ({
       </SheetHeader>
       <div className="space-y-4">
         <p className="text-label-md font-bold">決済手段</p>
-        <div className="rounded-xl border px-4 py-3">
-          <div className="flex items-start gap-x-2">
-            <Checkbox id="use-ticket" checked={useTicket} onCheckedChange={setUseTicket} />
-            <div>
-              <Label htmlFor="use-ticket" className="text-label-md font-bold">
-                チケット利用可
-              </Label>
-              <p className="text-muted-foreground text-sm mt-1 leading-tight">
-                主催者からもらったチケットを使って、<br />
-                無料で参加することができます。
-              </p>
-            </div>
-          </div>
-        </div>
         <div className="rounded-xl border px-4 py-3">
           <div className="flex items-start gap-x-2">
             <Checkbox id="use-points" checked={usePoints} onCheckedChange={setUsePoints} />

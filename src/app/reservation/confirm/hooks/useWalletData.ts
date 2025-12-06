@@ -30,7 +30,7 @@ export function useWalletData(userId?: string) {
   }, [wallets]);
 
   // ticketsは常に空配列を返す
-  const tickets = [];
+  const tickets: never[] = [];
 
   return {
     wallets,

@@ -53,13 +53,12 @@ export function calculateRequiredPoints(
 export function calculateTotalFee(
   feePerPerson: number | null,
   participantCount: number,
-  ticketCount: number = 0,
   pointCount: number = 0
 ): number {
   if (feePerPerson === null) {
     return 0;
   }
-  
-  const normalParticipantCount = participantCount - ticketCount - pointCount;
+
+  const normalParticipantCount = participantCount - pointCount;
   return feePerPerson * Math.max(0, normalParticipantCount);
 }

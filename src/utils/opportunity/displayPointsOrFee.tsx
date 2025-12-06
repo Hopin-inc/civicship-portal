@@ -9,7 +9,6 @@ interface GetPointOrFeeParams {
   pointsRequired?: number;
   participantCountWithPoint?: number;
   participantCount?: number;
-  ticketCount?: number;
 }
 
 export const getPointOrFee = ({
@@ -18,12 +17,11 @@ export const getPointOrFee = ({
   pointsRequired,
   participantCountWithPoint,
   participantCount,
-  ticketCount,
 }: GetPointOrFeeParams) => {
   if (opportunity?.category === GqlOpportunityCategory.Activity) {
     const feeRequired = isActivityCategory(opportunity) ? opportunity.feeRequired : 0;
     const isPointsOnly = isPointsOnlyOpportunity(feeRequired, pointsRequired);
-    const normalParticipantCount = (participantCount ?? 0) - (ticketCount ?? 0) - (participantCountWithPoint ?? 0);
+    const normalParticipantCount = (participantCount ?? 0) - (participantCountWithPoint ?? 0);
     
     if (isPointsOnly) {
       return (
@@ -83,15 +81,6 @@ export const getPointOrFee = ({
                   <span>{participantCountWithPoint}名</span>
                   <span className="mx-2">=</span>
                   <span className="font-bold">{pointsRequired * participantCountWithPoint}pt</span>
-                </div>
-              </div>
-            ) : null}
-
-            {ticketCount && ticketCount > 0 ? (
-              <div className="flex justify-between text-body-xs text-muted-foreground">
-                <span>チケット利用</span>
-                <div>
-                  <span>{ticketCount}名分</span>
                 </div>
               </div>
             ) : null}

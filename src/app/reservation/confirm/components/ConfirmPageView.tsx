@@ -181,8 +181,6 @@ export default function ConfirmPageView(props: ConfirmPageViewProps) {
           <PaymentSummary
             pricePerPerson={isActivityCategory(opportunity) ? feeRequired : null}
             participantCount={participantCount}
-            useTickets={useTickets}
-            ticketCount={selectedTicketCount}
             usePoints={usePoints}
             pointCount={selectedPointCount}
             pointsRequired={pointsRequired}

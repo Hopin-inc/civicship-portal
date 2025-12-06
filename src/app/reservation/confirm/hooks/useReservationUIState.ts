@@ -2,7 +2,6 @@ import { useState, useCallback } from "react";
 
 export const useReservationUIState = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [useTickets, setUseTickets] = useState(false);
   const [usePoints, setUsePoints] = useState(false);
   const [ageComment, setAgeComment] = useState<string | null>(null);
   const [organizerMessage, setOrganizerMessage] = useState<string | null>(null);
@@ -22,8 +21,6 @@ export const useReservationUIState = () => {
   return {
     isLoginModalOpen,
     setIsLoginModalOpen,
-    useTickets,
-    setUseTickets,
     ageComment,
     setAgeComment,
     organizerMessage,

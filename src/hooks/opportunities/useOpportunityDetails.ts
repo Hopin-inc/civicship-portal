@@ -1,6 +1,5 @@
 import { GqlUser, Maybe } from "@/types/graphql";
 import { useSameStateOpportunities } from "./useSameStateOpportunities";
-import { useAvailableTickets } from "@/app/tickets/hooks/useAvailableTickets";
 import { useFilterFutureSlots } from "./useFilterFutureSlots";
 import { useSortedSlotsByStartsAt } from "./useSortedSlotsByStartsAt";
 import { useOpportunityDetail } from "./useOpportunityDetail";
@@ -16,14 +15,14 @@ export const useOpportunityDetails = (id: string | undefined, user: Maybe<GqlUse
     refetch: refetchSameState,
   } = useSameStateOpportunities(id ?? "", stateCode ?? "");
 
-  const availableTickets = useAvailableTickets(opportunity, user?.id);
+  // チケット機能停止: availableTicketsは常に空配列
   const futureSlots = useFilterFutureSlots(opportunity?.slots);
   const sortedSlots = useSortedSlotsByStartsAt(futureSlots);
 
   return {
     opportunity,
     sameStateOpportunities,
-    availableTickets,
+    availableTickets: [],
     sortedSlots,
     loading: loading || loadingSameState,
     error: error || errorSameState,

@@ -16,7 +16,6 @@ interface SearchFiltersProps {
   location: string;
   dateRange: DateRange | undefined;
   guests: number;
-  useTicket: boolean;
   usePoints: boolean;
 }
 
@@ -27,7 +26,6 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
   location,
   dateRange,
   guests,
-  useTicket,
   usePoints,
 }) => {
   const { control } = useFormContext();

@@ -37,8 +37,6 @@ export default function ConfirmPage() {
 
   const [participantCount, setParticipantCount] = useState<number>(initialParticipantCount);
   const [selectedPointCount, setSelectedPointCount] = useState(0);
-  const [selectedTicketCount, setSelectedTicketCount] = useState(0);
-  const [selectedTickets, setSelectedTickets] = useState<{ [ticketId: string]: number }>({});
 
   const {
     opportunity,
@@ -69,7 +67,7 @@ export default function ConfirmPage() {
     refetchRef.current = triggerRefetch;
   }, [triggerRefetch]);
 
-  const ticketCounter = useTicketCounter(wallet?.tickets.length ?? 0);
+  const ticketCounter = useTicketCounter(0); // チケット機能停止: 常に0
   const ui = useReservationUIState();
   const { handleReservation, creatingReservation } = useReservationCommand();
 
@@ -81,12 +79,9 @@ export default function ConfirmPage() {
   const validation = useMemo(
     () => validateReservation(
       creatingReservation,
-      ui.useTickets,
-      ticketCounter.count,
-      calculations.maxTickets,
       calculations.hasInsufficientPoints,
     ),
-    [creatingReservation, ui.useTickets, ticketCounter.count, calculations.maxTickets, calculations.hasInsufficientPoints]
+    [creatingReservation, calculations.hasInsufficientPoints]
   );
 
   useEffect(() => {
@@ -107,12 +102,9 @@ export default function ConfirmPage() {
       user: user ?? null,
       ticketCounter,
       participantCount,
-      useTickets: ui.useTickets,
       comment: ui.ageComment ?? undefined,
       usePoints: ui.usePoints,
       selectedPointCount,
-      selectedTicketCount,
-      selectedTickets,
       userWallet: wallet?.currentPoint ?? null,
     });
 
@@ -160,17 +152,10 @@ export default function ConfirmPage() {
       onParticipantCountChange={setParticipantCount}
       selectedPointCount={selectedPointCount}
       onPointCountChange={setSelectedPointCount}
-      selectedTicketCount={selectedTicketCount}
-      onTicketCountChange={setSelectedTicketCount}
-      selectedTickets={selectedTickets}
-      onSelectedTicketsChange={setSelectedTickets}
-      useTickets={ui.useTickets}
-      setUseTickets={ui.setUseTickets}
       usePoints={ui.usePoints}
       setUsePoints={ui.setUsePoints}
       ageComment={ui.ageComment}
       onAgeCommentChange={ui.setAgeComment}
-      availableTickets={wallet?.tickets ?? []}
       userWallet={wallet?.currentPoint ?? null}
       ticketCounter={ticketCounter}
       onConfirm={handleConfirm}

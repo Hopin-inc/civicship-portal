@@ -3,8 +3,6 @@ import React, { memo } from "react";
 interface PaymentSummaryProps {
   pricePerPerson: number | null;
   participantCount: number;
-  useTickets: boolean;
-  ticketCount: number;
   usePoints: boolean;
   pointCount: number;
   pointsRequired: number | null;
@@ -12,10 +10,10 @@ interface PaymentSummaryProps {
 }
 
 export const PaymentSummary: React.FC<PaymentSummaryProps> = memo(
-  ({ pricePerPerson, participantCount, useTickets, ticketCount, usePoints, pointCount, pointsRequired, isPointsOnly }) => {
-    const totalAmount = pricePerPerson != null ? pricePerPerson * (participantCount - ticketCount - pointCount) : null;
+  ({ pricePerPerson, participantCount, usePoints, pointCount, pointsRequired, isPointsOnly }) => {
+    const totalAmount = pricePerPerson != null ? pricePerPerson * (participantCount - pointCount) : null;
     const summaryAmount = totalAmount != null ? totalAmount : null;
-    const hasPaymentMethod = usePoints && pointCount > 0 || useTickets && ticketCount > 0;
+    const hasPaymentMethod = usePoints && pointCount > 0;
     const totalPointsRequired = (pointsRequired ?? 0) * participantCount;
     
     return (
@@ -60,7 +58,7 @@ export const PaymentSummary: React.FC<PaymentSummaryProps> = memo(
                       <>
                         <span>{pricePerPerson.toLocaleString()}円</span>
                         <span className="mx-2">×</span>
-                        <span>{participantCount - ticketCount - pointCount}名</span>
+                        <span>{participantCount - pointCount}名</span>
                         <span className="mx-2">=</span>
                         <span className="font-bold">{totalAmount?.toLocaleString()}円</span>
                       </>
@@ -81,14 +79,6 @@ export const PaymentSummary: React.FC<PaymentSummaryProps> = memo(
                       <span className="mx-2">=</span>
                       <span className="font-bold">{((pointsRequired ?? 0) * pointCount).toLocaleString()}pt</span>
                     </div>
-                  </div>
-                ) : null }
-
-                {/* チケット利用 */}
-                {useTickets && ticketCount > 0 ? (
-                  <div className="flex justify-between text-body-sm text-muted-foreground">
-                    <span>チケット利用</span>
-                    <span>{ticketCount}名分</span>
                   </div>
                 ) : null }
               </>

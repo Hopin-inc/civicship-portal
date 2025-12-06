@@ -72,7 +72,7 @@ export default function OpportunityDetailPage() {
       </div>
       <main className="min-h-screen">
         <div className="max-w-7xl mx-auto px-4">
-            <OpportunityDetailsHeader opportunity={opportunity} availableTickets={availableTickets.length} />
+            <OpportunityDetailsHeader opportunity={opportunity} />
             <OpportunityDetailsContent 
                 opportunity={opportunity} 
                 availableDates={sortedSlots}
