@@ -72,10 +72,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
 
   const value = useAuthValue({ refetchUser, actions });
 
-    // Sync browser language preference to server on first visit
-    useLanguageSync();
+  // Sync browser language preference to server on first visit
+  useLanguageSync({ user: value.user, loading: value.loading });
 
-    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = (): AuthContextType => {

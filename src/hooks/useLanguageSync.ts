@@ -1,9 +1,8 @@
 import { useEffect, useRef } from "react";
 import { useMutation } from "@apollo/client";
-import { useAuth } from "@/contexts/AuthProvider";
 import { useFeatureCheck } from "@/hooks/useFeatureCheck";
 import { UPDATE_MY_PROFILE } from "@/graphql/account/user/mutation";
-import { GqlLanguage } from "@/types/graphql";
+import { GqlLanguage, GqlUser } from "@/types/graphql";
 import { logger } from "@/lib/logging";
 
 const getLanguageCookie = (): string | null => {
@@ -20,13 +19,20 @@ const mapCookieToEnum = (cookie: string | null): GqlLanguage | null => {
   return null;
 };
 
+interface UseLanguageSyncOptions {
+  user: GqlUser | null;
+  loading: boolean;
+}
+
 /**
  * Hook to sync browser language preference to server on first visit.
  * Only runs once per user per browser (tracked via localStorage).
  * Only active when languageSwitcher feature is enabled.
+ *
+ * Note: This hook accepts user and loading as parameters instead of using useAuth()
+ * because it's called inside AuthProvider before the context is available.
  */
-export const useLanguageSync = () => {
-  const { user, loading } = useAuth();
+export const useLanguageSync = ({ user, loading }: UseLanguageSyncOptions) => {
   const isLanguageSwitcherEnabled = useFeatureCheck("languageSwitcher");
   const [updateMyProfile] = useMutation(UPDATE_MY_PROFILE);
   const hasSyncedRef = useRef(false);
