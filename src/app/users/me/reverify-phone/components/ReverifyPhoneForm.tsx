@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthProvider";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
@@ -18,7 +18,6 @@ import { useVerifyPhoneCode } from "@/hooks/auth/actions/useVerifyPhoneCode";
 import { useAuthDependencies } from "@/hooks/auth/init/useAuthDependencies";
 import { useStorePhoneAuthToken } from "@/hooks/auth/actions/useStorePhoneAuthToken";
 import { logger } from "@/lib/logging";
-import useHeaderConfig from "@/hooks/useHeaderConfig";
 
 type VerificationStep = "phone" | "code";
 
@@ -40,16 +39,6 @@ export function ReverifyPhoneForm() {
   const verifyPhoneCode = useVerifyPhoneCode(phoneAuthService, authStateManager);
   const clearRecaptcha = phoneAuthService.clearRecaptcha;
   const { storeTokens, loading: isStoringTokens } = useStorePhoneAuthToken();
-
-  const headerConfig = useMemo(
-    () => ({
-      title: t("phoneVerification.input.headerTitle"),
-      showBackButton: true,
-      showLogo: false,
-    }),
-    [t],
-  );
-  useHeaderConfig(headerConfig);
 
   const { isDisabled: isResendDisabled, countdown, start: startResendTimer } = useResendTimer();
   const recaptchaManager = useRecaptchaManager();
