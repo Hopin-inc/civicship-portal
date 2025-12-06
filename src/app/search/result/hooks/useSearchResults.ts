@@ -12,7 +12,7 @@ import {
   useGetOpportunitiesQuery,
 } from "@/types/graphql";
 import { groupCardsByDate, SearchParams } from "@/app/search/data/presenter";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import { ActivityCard, QuestCard } from "@/components/domains/opportunities/types";
 import {
   presenterActivityCards,
@@ -170,7 +170,7 @@ export const useSearchResults = (
         },
       });
     } catch (error) {
-      logger.error("Error fetching more search results", { error, searchParams });
+      logger.warn("Error fetching more search results", { error, searchParams });
       toast.error("追加データの取得に失敗しました");
     } finally {
       setIsLoadingMore(false);

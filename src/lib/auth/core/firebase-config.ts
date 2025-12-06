@@ -47,6 +47,15 @@ export const getFirebaseAnalytics = async (): Promise<Analytics | undefined> => 
   return analyticsInstance;
 };
 
+const CODE_EXPIRED_ERROR = {
+  type: "verification",
+  message: "認証コードの有効期限が切れました。再度送信してください。",
+  messageKey: "auth.codeExpired",
+  retryable: true,
+  logLevel: "warn" as const,
+  errorCategory: "user_input",
+};
+
 /**
  * Firebase認証エラーを分類する
  * @param error Firebaseから返されたエラー
@@ -54,7 +63,14 @@ export const getFirebaseAnalytics = async (): Promise<Analytics | undefined> => 
  */
 export const categorizeFirebaseError = (
   error: any,
-): { type: string; message: string; retryable: boolean } => {
+): {
+  type: string;
+  message: string;
+  messageKey: string;
+  retryable: boolean;
+  logLevel: 'error' | 'warn' | 'info';
+  errorCategory: string;
+} => {
   if (error?.code) {
     const code = error.code as string;
 
@@ -62,7 +78,10 @@ export const categorizeFirebaseError = (
       return {
         type: "network",
         message: "ネットワーク接続に問題が発生しました。インターネット接続を確認してください。",
+        messageKey: "auth.networkRequestFailed",
         retryable: true,
+        logLevel: "warn",
+        errorCategory: "network",
       };
     }
 
@@ -70,7 +89,10 @@ export const categorizeFirebaseError = (
       return {
         type: "expired",
         message: "認証の有効期限が切れました。再認証が必要です。",
+        messageKey: "auth.tokenExpired",
         retryable: false,
+        logLevel: "info",
+        errorCategory: "auth_temporary",
       };
     }
 
@@ -78,7 +100,10 @@ export const categorizeFirebaseError = (
       return {
         type: "auth",
         message: "認証情報が無効です。再ログインしてください。",
+        messageKey: "auth.invalidCredential",
         retryable: false,
+        logLevel: "warn",
+        errorCategory: "auth_temporary",
       };
     }
 
@@ -86,7 +111,10 @@ export const categorizeFirebaseError = (
       return {
         type: "reauth",
         message: "セキュリティのため再認証が必要です。",
+        messageKey: "auth.requiresRecentLogin",
         retryable: false,
+        logLevel: "info",
+        errorCategory: "auth_temporary",
       };
     }
 
@@ -94,7 +122,10 @@ export const categorizeFirebaseError = (
       return {
         type: "verification",
         message: "認証コードが無効です。正しいコードを入力してください。",
-        retryable: false,
+        messageKey: "auth.invalidVerificationCode",
+        retryable: true,
+        logLevel: "info",
+        errorCategory: "user_input",
       };
     }
 
@@ -102,30 +133,194 @@ export const categorizeFirebaseError = (
       return {
         type: "rate-limit",
         message: "短時間に大量のリクエストが発生しました。しばらく待ってから再試行してください。",
+        messageKey: "auth.tooManyRequests",
         retryable: false,
+        logLevel: "warn",
+        errorCategory: "network",
       };
     }
 
     if (code === "auth/code-expired") {
+      return CODE_EXPIRED_ERROR;
+    }
+
+    if (code === "auth/operation-not-allowed") {
       return {
-        type: "verification",
-        message: "認証コードの有効期限が切れました。再度送信してください。",
+        type: "config",
+        message: "この地域ではSMS送信が有効化されていません。",
+        messageKey: "auth.operationNotAllowed",
         retryable: false,
+        logLevel: "error",
+        errorCategory: "config",
       };
     }
+
+    if (code === "auth/quota-exceeded") {
+      return {
+        type: "quota",
+        message: "APIクォータを超過しました。",
+        messageKey: "auth.quotaExceeded",
+        retryable: false,
+        logLevel: "error",
+        errorCategory: "system",
+      };
+    }
+
+    if (code === "auth/app-not-authorized") {
+      return {
+        type: "config",
+        message: "アプリケーションが承認されていません。",
+        messageKey: "auth.appNotAuthorized",
+        retryable: false,
+        logLevel: "error",
+        errorCategory: "config",
+      };
+    }
+
+    if (code === "auth/app-not-verified") {
+      return {
+        type: "config",
+        message: "アプリケーションが検証されていません。",
+        messageKey: "auth.appNotVerified",
+        retryable: false,
+        logLevel: "error",
+        errorCategory: "config",
+      };
+    }
+
+    if (code === "auth/missing-verification-code") {
+      return {
+        type: "validation",
+        message: "認証コードが入力されていません。",
+        messageKey: "auth.missingVerificationCode",
+        retryable: false,
+        logLevel: "error",
+        errorCategory: "system",
+      };
+    }
+
+    if (code === "auth/internal-error") {
+      return {
+        type: "system",
+        message: "Firebase内部エラーが発生しました。",
+        messageKey: "auth.internalError",
+        retryable: false,
+        logLevel: "error",
+        errorCategory: "system",
+      };
+    }
+
+    if (code === "auth/missing-verification-id") {
+      return {
+        type: "system",
+        message: "認証IDが見つかりません。",
+        messageKey: "auth.missingVerificationId",
+        retryable: false,
+        logLevel: "error",
+        errorCategory: "state_management",
+      };
+    }
+
+    if (code === "auth/invalid-app-credential" || code === "auth/missing-app-credential") {
+      return {
+        type: "config",
+        message: "アプリケーション認証情報が無効または欠落しています。",
+        messageKey: "auth.invalidAppCredential",
+        retryable: false,
+        logLevel: "error",
+        errorCategory: "config",
+      };
+    }
+
+    if (code === "auth/too-many-attempts-try-later") {
+      return {
+        type: "rate-limit",
+        message: "短時間に多数の認証試行があり一時的にブロックされています。",
+        messageKey: "auth.tooManyAttempts",
+        retryable: false,
+        logLevel: "warn",
+        errorCategory: "network",
+      };
+    }
+
+    if (code === "auth/captcha-check-failed") {
+      return {
+        type: "verification",
+        message: "本人確認（CAPTCHA）に失敗しました。再度お試しください。",
+        messageKey: "auth.captchaFailed",
+        retryable: true,
+        logLevel: "warn",
+        errorCategory: "environment_constraint",
+      };
+    }
+
+    if (code === "auth/invalid-phone-number") {
+      return {
+        type: "validation",
+        message: "電話番号の形式が正しくありません。",
+        messageKey: "auth.invalidPhoneNumber",
+        retryable: true,
+        logLevel: "info",
+        errorCategory: "user_input",
+      };
+    }
+
+    if (code === "auth/missing-phone-number") {
+      return {
+        type: "validation",
+        message: "電話番号が入力されていません。",
+        messageKey: "auth.missingPhoneNumber",
+        retryable: true,
+        logLevel: "info",
+        errorCategory: "user_input",
+      };
+    }
+  }
+
+  if (error?.message?.includes("SESSION_EXPIRED")) {
+    return CODE_EXPIRED_ERROR;
   }
 
   if (error?.message?.includes("LIFF authentication failed")) {
     return {
       type: "api",
       message: "LINE認証サービスとの通信に失敗しました。",
+      messageKey: "auth.liffAuthFailed",
       retryable: true,
+      logLevel: "warn",
+      errorCategory: "network",
     };
   }
 
   return {
     type: "unknown",
     message: "認証中に予期せぬエラーが発生しました。",
+    messageKey: "auth.unknownError",
     retryable: false,
+    logLevel: "error",
+    errorCategory: "system",
   };
+};
+
+/**
+ * Firebase エラーを適切なログレベルで記録する
+ * @param error Firebaseから返されたエラー
+ * @param context ログのコンテキスト（エラーメッセージ）
+ * @param additionalMetadata 追加のメタデータ
+ */
+export const logFirebaseError = (
+  error: any,
+  context: string,
+  additionalMetadata?: Record<string, any>,
+) => {
+  const categorized = categorizeFirebaseError(error);
+
+  logger[categorized.logLevel](context, {
+    error: error instanceof Error ? error.message : String(error),
+    errorCode: error?.code,
+    errorCategory: categorized.errorCategory,
+    retryable: categorized.retryable,
+    authType: "phone",
+    ...additionalMetadata,
+  });
 };

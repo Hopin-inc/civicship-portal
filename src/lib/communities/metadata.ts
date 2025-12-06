@@ -144,6 +144,20 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     enableFeatures: ["points", "justDaoIt", "languageSwitcher"],
     rootPath: "/users/me",
     adminRootPath: "/admin/wallet",
+    commonDocumentOverrides: {
+      privacy: {
+        id: "privacy",
+        title: "users.promise.privacyPolicy",
+        path: "/communities/kibotcha/privacy-policy.pdf",
+        type: "external",
+      },
+      terms: {
+        id: "terms",
+        title: "users.promise.termsOfService",
+        path: "/communities/kibotcha/terms.pdf",
+        type: "external",
+      },
+    },
     documents: [
       {
         id: "bylaws",
@@ -234,6 +248,12 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
         id: "privacy",
         title: "users.promise.privacyPolicy",
         path: "/communities/izu/{locale}/privacy-policy.pdf",
+        type: "external",
+      },
+      terms: {
+        id: "terms",
+        title: "users.promise.termsOfService",
+        path: "/communities/izu/{locale}/terms.pdf",
         type: "external",
       },
     },

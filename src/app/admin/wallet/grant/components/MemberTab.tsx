@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { GqlUser } from "@/types/graphql";
+import { GqlMembershipsConnection, GqlUser } from "@/types/graphql";
 import UserInfoCard from "./UserInfoCard";
 import { useMemberWithDidSearch as useMemberSearchFromCredentials } from "@/app/admin/credentials/hooks/useMemberWithDidSearch";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
@@ -14,34 +14,32 @@ interface MemberTabProps {
   onSelect: (user: GqlUser) => void;
   loadMoreRef?: React.RefObject<HTMLDivElement>;
   isLoadingMore?: boolean;
+  initialConnection?: GqlMembershipsConnection | null;
 }
 
-export function MemberTab({
-  members,
-  searchQuery,
-  onSelect,
-}: MemberTabProps) {
+export function MemberTab({ members, searchQuery, onSelect, initialConnection }: MemberTabProps) {
   const t = useTranslations();
-  const communityId = COMMUNITY_ID;
   const {
     data: searchMembershipData,
     error,
     loadMoreRef: searchLoadMoreRef,
     isLoadingMore: searchIsLoadingMore,
-  } = useMemberSearchFromCredentials(communityId, members, { 
-    searchQuery ,
+  } = useMemberSearchFromCredentials(COMMUNITY_ID, members, {
+    searchQuery,
     pageSize: 20,
     enablePagination: true,
+    initialConnection,
   });
 
   if (error) {
     return (
       <div className="space-y-3 px-4">
-        <p className="text-sm text-center text-red-500 pt-4">{t("wallets.shared.member.errorLoad")}</p>
+        <p className="text-sm text-center text-red-500 pt-4">
+          {t("wallets.shared.member.errorLoad")}
+        </p>
       </div>
     );
   }
-
 
   if (searchMembershipData.length === 0) {
     return (
@@ -64,7 +62,7 @@ export function MemberTab({
             point={m.wallet?.currentPointView?.currentPoint ?? BigInt(0)}
             showPoint={true}
             showDate={false}
-            didValue={m.didInfo?.didValue}
+            didValue={m.didInfo?.didValue ?? undefined}
             onClick={() => onSelect(m)}
           />
         );
@@ -74,7 +72,7 @@ export function MemberTab({
       <div ref={searchLoadMoreRef} className="flex justify-center py-8">
         {searchIsLoadingMore && (
           <div className="flex items-center space-x-2">
-            <LoadingIndicator fullScreen={false}/>
+            <LoadingIndicator fullScreen={false} />
           </div>
         )}
       </div>

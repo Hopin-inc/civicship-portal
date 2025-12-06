@@ -1,7 +1,7 @@
 import { useTicketClaimQuery } from "@/app/tickets/receive/hooks/useTicketClaimQuery";
 import { useEffect, useState } from "react";
 import { GqlClaimLinkStatus } from "@/types/graphql";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 
 export const useTicketClaimController = (ticketClaimLinkId: string) => {
   const { view, claim, claimTicket } = useTicketClaimQuery(ticketClaimLinkId);

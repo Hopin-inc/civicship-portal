@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { GqlUser } from "@/types/graphql";
+import { GqlMembershipsConnection, GqlUser } from "@/types/graphql";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { Tabs as TabsEnum } from "../types/tabs";
 import { TabManager } from "./TabManager";
@@ -19,6 +19,7 @@ interface Props {
   activeTab: TabsEnum;
   setActiveTab: React.Dispatch<React.SetStateAction<TabsEnum>>;
   listType: "donate" | "grant";
+  initialConnection?: GqlMembershipsConnection | null;
 }
 
 function UserSelectStep({
@@ -30,6 +31,7 @@ function UserSelectStep({
   activeTab,
   setActiveTab,
   listType,
+  initialConnection,
 }: Props) {
   const t = useTranslations();
   const [searchQuery, setSearchQuery] = useState("");
@@ -61,6 +63,7 @@ function UserSelectStep({
           onSelect={onSelect}
           loadMoreRef={loadMoreRef}
           isLoadingMore={isLoadingMore}
+          initialConnection={initialConnection}
         />
       )}
     </>

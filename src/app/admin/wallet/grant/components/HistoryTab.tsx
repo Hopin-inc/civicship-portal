@@ -29,16 +29,20 @@ export function HistoryTab({ listType, searchQuery, onSelect }: HistoryTabProps)
   if (error) {
     return (
       <div className="space-y-3 px-4">
-        <p className="text-sm text-center text-red-500 pt-4">{t("wallets.shared.history.errorLoad")}</p>
+        <p className="text-sm text-center text-red-500 pt-4">
+          {t("wallets.shared.history.errorLoad")}
+        </p>
       </div>
     );
   }
 
-  if (presentedTransactions.length === 0) {
+  if (!loading && presentedTransactions.length === 0) {
     return (
       <div className="space-y-3 px-4">
         <p className="text-sm text-center text-muted-foreground pt-4">
-          {listType === "grant" ? t("wallets.shared.history.noGrant") : t("wallets.shared.history.noDonation")}
+          {listType === "grant"
+            ? t("wallets.shared.history.noGrant")
+            : t("wallets.shared.history.noDonation")}
         </p>
       </div>
     );
@@ -58,7 +62,7 @@ export function HistoryTab({ listType, searchQuery, onSelect }: HistoryTabProps)
           point={BigInt(tx.point)}
           sign={tx.sign}
           pointColor={tx.pointColor}
-          didValue={tx.didValue}
+          didValue={tx.didValue ?? undefined}
           createdAt={tx.createdAt}
           onClick={() => {
             if (tx.otherUser) onSelect(tx.otherUser);

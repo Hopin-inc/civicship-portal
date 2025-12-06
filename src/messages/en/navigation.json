@@ -2,8 +2,10 @@
   "navigation.bottomBar.discover": "Discover",
   "navigation.bottomBar.places": "Places",
   "navigation.bottomBar.myPage": "My Page",
+  "navigation.bottomBar.timeline": "Timeline",
   "navigation.adminBottomBar.reservations": "Reservations",
   "navigation.adminBottomBar.tickets": "Tickets",
   "navigation.adminBottomBar.credentials": "Credentials",
-  "navigation.adminBottomBar.settings": "Settings"
+  "navigation.adminBottomBar.settings": "Settings",
+  "navigation.adminHeader.toUserScreen": "User Screen"
 }

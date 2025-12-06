@@ -8,12 +8,10 @@ import useHeaderConfig from "@/hooks/useHeaderConfig";
 import WalletCard from "@/components/shared/WalletCard";
 import { GqlMembership, GqlRole, GqlWallet, useGetCommunityWalletQuery } from "@/types/graphql";
 import { Coins, Gift } from "lucide-react";
-import TransactionItem from "@/components/shared/TransactionItem";
 import { useRouter, useSearchParams } from "next/navigation";
-import { toast } from "sonner";
-import { presenterTransaction } from "@/utils/transaction";
-import { getToWalletImage } from "@/app/admin/wallet/data/presenter";
+import { toast } from "react-toastify";
 import useCommunityTransactions from "@/app/admin/wallet/hooks/useCommunityTransactions";
+import { InfiniteTransactionList } from "@/shared/transactions/components/InfiniteTransactionList";
 import { logger } from "@/lib/logging";
 import Link from "next/link";
 import { toPointNumber } from "@/utils/bigint";
@@ -35,6 +33,7 @@ export default function WalletPage() {
       title: t("adminWallet.title"),
       showLogo: false,
       showBackButton: true,
+      backTo: "/admin",
     }),
     [t],
   );
@@ -75,7 +74,7 @@ export default function WalletPage() {
           url.searchParams.delete("refresh");
           window.history.replaceState({}, "", url);
         } catch (err) {
-          logger.error("Refresh failed after redirect", {
+          logger.warn("Refresh failed after redirect", {
             error: err instanceof Error ? err.message : String(err),
             component: "WalletPage",
           });
@@ -91,7 +90,7 @@ export default function WalletPage() {
         await refetchWallet();
         refetchTransactions();
       } catch (err) {
-        logger.error("Refetch failed on window focus", {
+        logger.warn("Refetch failed on window focus", {
           error: err instanceof Error ? err.message : String(err),
           component: "WalletPage",
         });
@@ -143,29 +142,27 @@ export default function WalletPage() {
       <div className="pt-10 flex justify-between items-center">
         <h2 className="text-display-sm">{t("transactions.list.title")}</h2>
         <Link
-            href="/transactions"
-            className="text-sm border-b-[1px] border-black cursor-pointer bg-transparent p-0"
-            >
-            {t("transactions.list.communityHistoryLink")}
+          href="/transactions"
+          className="text-sm border-b-[1px] border-black cursor-pointer bg-transparent p-0"
+        >
+          {t("transactions.list.communityHistoryLink")}
         </Link>
       </div>
-      <div className="space-y-2 mt-2">
+      <div className="mt-2">
         {connection.edges?.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center pt-6">
             {t("transactions.list.emptyState")}
           </p>
         ) : (
-          connection.edges?.map((edge) => {
-            const node = edge?.node;
-            if (!node) return null;
-            const transaction = presenterTransaction(node, walletId);
-            if (!transaction) return null;
-            const image = getToWalletImage(node);
-            return <TransactionItem key={transaction.id} transaction={transaction} image={image} />;
-          })
+          <InfiniteTransactionList
+            initialTransactions={connection}
+            walletId={walletId}
+            perspectiveWalletId={walletId}
+            showSignedAmount={true}
+            showDid={true}
+            enableClickNavigation={true}
+          />
         )}
-
-        <div ref={loadMoreRef} className="h-10" />
       </div>
     </div>
   );

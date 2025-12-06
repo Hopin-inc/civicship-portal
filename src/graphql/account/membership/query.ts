@@ -35,25 +35,36 @@ export const GET_MEMBERSHIP_LIST = gql`
       edges {
         cursor
         node {
-          ...MembershipFields
+          role
+          status
           user {
-            ...UserFields
+            id
+            name
+            image
             didIssuanceRequests @include(if: $withDidIssuanceRequests) {
-              ...DidIssuanceRequestFields
+              status
+              didValue
             }
             wallets @include(if: $withWallets) {
-              ...WalletFields
+              id
+              type
+              currentPointView {
+                currentPoint
+              }
               community {
-                ...CommunityFields
+                id
+                name
+                image
               }
             }
           }
           community {
-            ...CommunityFields
+            id
+            name
+            image
           }
         }
       }
     }
   }
-  ${MEMBERSHIP_FRAGMENT}
 `;

@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import { logger } from "@/lib/logging";
 import { GqlCurrentPrefecture, GqlLanguage, GqlUser, useUserSignUpMutation } from "@/types/graphql";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
+import { useAuth } from "@/contexts/AuthProvider";
 
 const getLanguageCookie = (): string | null => {
   if (typeof document === "undefined") return null;
@@ -17,8 +18,9 @@ const mapLanguageToEnum = (language: string | null): GqlLanguage | undefined => 
   return undefined;
 };
 
-export const useCreateUser = (refetchUser: () => Promise<GqlUser | null>) => {
+export const useCreateUser = () => {
   const [userSignUp] = useUserSignUpMutation();
+  const { updateAuthState } = useAuth();
   const firebaseUser = useAuthStore((s) => s.state.firebaseUser);
 
   return useCallback(
@@ -49,23 +51,23 @@ export const useCreateUser = (refetchUser: () => Promise<GqlUser | null>) => {
         });
 
         if (data?.userSignUp?.user) {
-          const user = await refetchUser();
+          const user = await updateAuthState();
           if (user) {
             useAuthStore.getState().setState({
               firebaseUser,
               authenticationState: "user_registered",
               currentUser: user,
             });
+            return firebaseUser;
           }
-          return firebaseUser;
         }
         return null;
       } catch (error) {
         const msg = error instanceof Error ? error.message : String(error);
-        logger.error("User creation error", { error: msg });
+        logger.warn("User creation error", { error: msg });
         return null;
       }
     },
-    [firebaseUser, refetchUser, userSignUp],
+    [firebaseUser, userSignUp, updateAuthState],
   );
 };

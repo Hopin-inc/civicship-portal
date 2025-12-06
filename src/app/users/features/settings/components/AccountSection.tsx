@@ -1,13 +1,17 @@
 "use client";
 import { Card, CardContent } from "@/components/ui/card";
-import { Copy, FileKey, Info, LinkIcon, PhoneIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Copy, FileKey, Info, LinkIcon, PhoneIcon, AlertCircle } from "lucide-react";
 import Image from "next/image";
-import { toast } from "sonner";
+import Link from "next/link";
+import { toast } from "react-toastify";
 import { useAuth } from "@/contexts/AuthProvider";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 import { useUserProfileContext } from "@/app/users/features/shared/contexts/UserProfileContext";
 import { GqlDidIssuanceStatus } from "@/types/graphql";
 import { useTranslations } from "next-intl";
+
+const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 
 const truncateDid = (did: string | undefined | null, length: number = 20): string => {
   if (!did) return "";
@@ -22,9 +26,19 @@ export default function AccountSection() {
   const { isAuthenticated, isPhoneVerified, isAuthenticating } = useAuth();
   const { gqlUser } = useUserProfileContext();
 
-  const didValue = gqlUser?.didIssuanceRequests?.find(
+  const completedRequest = gqlUser?.didIssuanceRequests?.find(
     (req) => req?.status === GqlDidIssuanceStatus.Completed,
-  )?.didValue;
+  );
+  const didValue = completedRequest?.didValue;
+
+  // Find the latest DID issuance request to check for failed state
+  // NOTE: Assumes didIssuanceRequests is sorted by createdAt in descending order
+  const latestRequest = gqlUser?.didIssuanceRequests?.[0];
+  const isTargetForReverify =
+    !didValue &&
+    latestRequest?.createdAt &&
+    Date.now() - new Date(latestRequest.createdAt).getTime() >= SEVEN_DAYS_MS;
+
   const isNftWalletLinked = !!gqlUser?.nftWallet?.id;
 
   return (
@@ -40,6 +54,16 @@ export default function AccountSection() {
             <span>
               {didValue ? (
                 truncateDid(didValue, 16)
+              ) : isTargetForReverify ? (
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4 text-red-500" />
+                    <span className="text-label-sm text-red-500">{t("users.account.didFailed")}</span>
+                  </div>
+                  <Button variant="outline" size="sm" asChild className="h-6 px-2 text-xs">
+                    <Link href="/users/me/reverify-phone">{t("users.account.reverifyPhone")}</Link>
+                  </Button>
+                </div>
               ) : (
                 <div className="flex items-center gap-1">
                   <Info className="w-4 h-4 text-[#EAB308]" />

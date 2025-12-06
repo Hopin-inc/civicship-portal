@@ -3,7 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { CookiesProvider } from "next-client-cookies/server";
 import ApolloProvider from "@/components/providers/ApolloProvider";
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "@/components/ui/toast";
 import LoadingProvider from "@/components/providers/LoadingProvider";
 import { AuthProvider } from "@/contexts/AuthProvider";
 import HeaderProvider from "@/components/providers/HeaderProvider";
@@ -13,8 +13,9 @@ import { currentCommunityMetadata } from "@/lib/communities/metadata";
 import AnalyticsProvider from "@/components/providers/AnalyticsProvider";
 import ClientPolyfills from "@/components/polyfills/ClientPolyfills";
 import { getUserServer } from "@/lib/auth/init/getUserServer";
-import { NextIntlClientProvider } from 'next-intl';
-import { getLocale, getMessages } from 'next-intl/server';
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
+import { LiffDeepLinkHandler } from "@/components/liff/LiffDeepLinkHandler";
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -43,7 +44,7 @@ const RootLayout = async ({
   children: React.ReactNode;
 }>) => {
   const { user, lineAuthenticated, phoneAuthenticated } = await getUserServer();
-  
+
   const locale = await getLocale();
   const messages = await getMessages();
 
@@ -51,10 +52,7 @@ const RootLayout = async ({
     <html lang={locale}>
       <body className={font.className}>
         <ClientPolyfills />
-        <NextIntlClientProvider 
-          locale={locale} 
-          messages={messages}
-        >
+        <NextIntlClientProvider locale={locale} messages={messages}>
           <CookiesProvider>
             <ApolloProvider>
               <AuthProvider
@@ -62,11 +60,12 @@ const RootLayout = async ({
                 ssrLineAuthenticated={lineAuthenticated}
                 ssrPhoneAuthenticated={phoneAuthenticated}
               >
+                <LiffDeepLinkHandler />
                 <HeaderProvider>
                   <LoadingProvider>
                     <AnalyticsProvider />
                     <MainContent>{children}</MainContent>
-                    <Toaster richColors className="mx-8" />
+                    <Toaster />
                   </LoadingProvider>
                 </HeaderProvider>
               </AuthProvider>

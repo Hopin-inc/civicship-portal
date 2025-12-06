@@ -24,4 +24,21 @@ export const truncateText = (
     const end = text.substring(text.length - 10);
     return `${start}...${end}`;
   }
-}; 
+};
+
+/**
+ * 文字列の中央部分を省略して短縮する（ブロックチェーンアドレスやID用）
+ * @param text 短縮する文字列
+ * @param head 先頭から表示する文字数（デフォルト: 6）
+ * @param tail 末尾から表示する文字数（デフォルト: 4）
+ * @returns 短縮された文字列（例: "abc123...xyz9"）
+ */
+export const shortenMiddle = (
+  text: string | undefined | null,
+  head: number = 6,
+  tail: number = 4
+): string => {
+  if (!text) return "";
+  if (text.length <= head + tail) return text;
+  return `${text.substring(0, head)}...${text.substring(text.length - tail)}`;
+};   

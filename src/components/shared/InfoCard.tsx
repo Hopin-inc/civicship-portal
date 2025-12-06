@@ -1,7 +1,7 @@
 import { Card, CardHeader } from "@/components/ui/card";
 import { Copy, Info, ExternalLink } from "lucide-react";
-import { toast } from "sonner";
-import { truncateText } from "@/utils/stringUtils";
+import { toast } from "react-toastify";
+import { truncateText, shortenMiddle } from "@/utils/stringUtils";
 import { InfoCardProps } from "@/types";
 import Link from "next/link";
 
@@ -83,7 +83,9 @@ export const InfoCard = ({
   secondaryLabel,
   warningText,
   showTruncate = true,
-  truncatePattern
+  truncatePattern,
+  truncateHead,
+  truncateTail
 }: InfoCardProps) => {
   if (!label) {
     console.warn('InfoCard: label is required');
@@ -91,7 +93,15 @@ export const InfoCard = ({
   }
 
   const hasSecondaryContent = secondaryValue || warningText;
-  const displayValue = showTruncate ? truncateText(value, 15, truncatePattern) : value;
+  
+  let displayValue = value;
+  if (showTruncate && value) {
+    if (truncatePattern === 'middle' && truncateHead !== undefined && truncateTail !== undefined) {
+      displayValue = shortenMiddle(value, truncateHead, truncateTail);
+    } else {
+      displayValue = truncateText(value, 15, truncatePattern);
+    }
+  }
 
   return (
     <Card className="rounded-2xl border border-gray-200 bg-card shadow-none">
@@ -144,4 +154,4 @@ export const InfoCard = ({
       </CardHeader>
     </Card>
   );
-}; 
+};  

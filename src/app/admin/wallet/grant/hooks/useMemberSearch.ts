@@ -2,7 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { useSearchParams } from "next/navigation";
-import { GqlDidIssuanceStatus, GqlUser, useGetDidIssuanceRequestsQuery, useGetMembershipListQuery } from "@/types/graphql";
+import { GqlDidIssuanceStatus, GqlUser, useGetDidIssuanceRequestsQuery } from "@/types/graphql";
 
 export type MemberSearchFormValues = {
   searchQuery: string;
@@ -37,17 +37,6 @@ export const useMemberSearch = (
 
   const searchQuery = form.watch("searchQuery")?.toLowerCase() ?? "";
 
-  const { data: singleMembershipData } = useGetMembershipListQuery({
-    variables: {
-      filter: {
-        communityId: options?.communityId ?? "",
-      },
-      first: 1,
-      withDidIssuanceRequests: true,
-    },
-    skip: !searchQuery || !options?.communityId,
-  });
-
   const filteredMembers = members.filter(({ user }) =>
     user.name?.toLowerCase().includes(searchQuery)
   );
@@ -74,6 +63,5 @@ export const useMemberSearch = (
   return {
     form,
     filteredMembers: filteredMembersWithDid,
-    singleMembershipData,
   };
 };

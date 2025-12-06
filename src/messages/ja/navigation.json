@@ -2,8 +2,10 @@
   "navigation.bottomBar.discover": "見つける",
   "navigation.bottomBar.places": "拠点",
   "navigation.bottomBar.myPage": "マイページ",
+  "navigation.bottomBar.timeline": "タイムライン",
   "navigation.adminBottomBar.reservations": "予約",
   "navigation.adminBottomBar.tickets": "チケット",
   "navigation.adminBottomBar.credentials": "証明書",
-  "navigation.adminBottomBar.settings": "設定"
+  "navigation.adminBottomBar.settings": "設定",
+  "navigation.adminHeader.toUserScreen": "ユーザー画面"
 }

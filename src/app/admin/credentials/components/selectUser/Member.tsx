@@ -31,7 +31,7 @@ const truncateDid = (did: string | undefined | null, length: number = 20): strin
 
 export const MemberRow = ({ user, checked, onCheck, isDisabled, reason, didInfo, vcIssuanceRequestsData }: Props) => {
   const { selectedSlot } = useSelection();
-  const did = didInfo?.didValue;
+  const did = didInfo?.didValue ?? undefined;
   const hasCompletedVcIssuanceRequest =
     !!vcIssuanceRequestsData?.vcIssuanceRequests.edges.find(
       (edge) =>

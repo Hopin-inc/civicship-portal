@@ -3,14 +3,9 @@ import { logger } from "@/lib/logging";
 import { LiffService } from "@/lib/auth/service/liff-service";
 import { RawURIComponent } from "@/utils/path";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
-import { GqlUser } from "@/types/graphql";
 import { AuthStateManager } from "@/lib/auth/core/auth-state-manager";
 
-export const useLogin = (
-  liffService: LiffService,
-  refetchUser: () => Promise<GqlUser | null>,
-  authStateManager: AuthStateManager | null,
-) => {
+export const useLogin = (liffService: LiffService, authStateManager: AuthStateManager | null) => {
   const setState = useAuthStore((s) => s.setState);
 
   return useCallback(

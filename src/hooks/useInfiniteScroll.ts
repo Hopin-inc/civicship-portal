@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 
 interface UseInfiniteScrollProps {
   hasMore: boolean;
@@ -7,35 +7,60 @@ interface UseInfiniteScrollProps {
   threshold?: number;
 }
 
+const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
+
 export const useInfiniteScroll = ({
-    hasMore,
-    isLoading,
-    onLoadMore,
-    threshold = 0.1,
-  }: UseInfiniteScrollProps) => {
-  const observer = useRef<IntersectionObserver | null>(null);
-  const targetRef = useRef<HTMLDivElement | null>(null);
+  hasMore,
+  isLoading,
+  onLoadMore,
+  threshold = 0.1,
+}: UseInfiniteScrollProps) => {
+  const observerRef = useRef<IntersectionObserver | null>(null);
+
+  const hasMoreRef = useRef(hasMore);
+  const isLoadingRef = useRef(isLoading);
+  const onLoadMoreRef = useRef(onLoadMore);
+  const pendingRef = useRef(false);
+
+  useIsomorphicLayoutEffect(() => {
+    hasMoreRef.current = hasMore;
+    isLoadingRef.current = isLoading;
+    onLoadMoreRef.current = onLoadMore;
+  });
 
   useEffect(() => {
-    const el = targetRef.current;
-    if (!el) return;
+    if (!isLoading) {
+      pendingRef.current = false;
+    }
+  }, [isLoading]);
 
-    observer.current = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && hasMore && !isLoading) {
-          onLoadMore();
-        }
-      },
-      { threshold }
-    );
+  return useCallback(
+    (node: HTMLDivElement | null) => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+        observerRef.current = null;
+      }
 
-    observer.current.observe(el);
+      if (!node) return;
 
-    return () => {
-      observer.current?.unobserve(el);
-      observer.current?.disconnect();
-    };
-  }, [hasMore, isLoading, onLoadMore, threshold]);
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (
+            entry.isIntersecting &&
+            hasMoreRef.current &&
+            !isLoadingRef.current &&
+            !pendingRef.current
+          ) {
+            pendingRef.current = true;
+            onLoadMoreRef.current();
+          }
+        },
+        { threshold },
+      );
 
-  return targetRef;
+      observer.observe(node);
+      observerRef.current = observer;
+    },
+    [threshold],
+  );
 };

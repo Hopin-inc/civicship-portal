@@ -128,7 +128,7 @@ export const useReservationCommand = () => {
             code: code ?? GqlErrorCode.Unknown,
           };
         }
-        logger.error("Reservation mutation failed", {
+        logger.warn("Reservation mutation failed", {
           error: e instanceof Error ? e.message : String(e),
           component: "useReservationAction"
         });

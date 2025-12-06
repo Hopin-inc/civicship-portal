@@ -50,7 +50,7 @@ const useCancelReservation = () => {
           };
         }
 
-        logger.error("Reservation cancellation mutation failed", {
+        logger.warn("Reservation cancellation mutation failed", {
           error: e instanceof Error ? e.message : String(e),
           component: "useCancelReservation",
           reservationId

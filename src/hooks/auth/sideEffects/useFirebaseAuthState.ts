@@ -9,9 +9,13 @@ import { useAuthStore } from "@/lib/auth/core/auth-store";
 
 interface UseFirebaseAuthStateProps {
   authStateManager: AuthStateManager | null;
+  hasFullAuth: boolean;
 }
 
-export const useFirebaseAuthState = ({ authStateManager }: UseFirebaseAuthStateProps) => {
+export const useFirebaseAuthState = ({
+  authStateManager,
+  hasFullAuth,
+}: UseFirebaseAuthStateProps) => {
   const setState = useAuthStore((s) => s.setState);
   const state = useAuthStore((s) => s.state);
 
@@ -22,6 +26,9 @@ export const useFirebaseAuthState = ({ authStateManager }: UseFirebaseAuthStateP
   stateRef.current = state;
 
   useEffect(() => {
+    // 🚫 SSRで full-auth の場合は何もしない
+    if (hasFullAuth) return;
+
     const unsubscribe = lineAuth.onAuthStateChanged(async (user) => {
       const prevUser = stateRef.current.firebaseUser;
 
@@ -69,5 +76,5 @@ export const useFirebaseAuthState = ({ authStateManager }: UseFirebaseAuthStateP
     });
 
     return () => unsubscribe();
-  }, [setState]);
+  }, [hasFullAuth, setState]);
 };

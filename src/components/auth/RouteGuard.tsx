@@ -7,6 +7,7 @@ import { AuthRedirectService } from "@/lib/auth/service/auth-redirect-service";
 import { decodeURIComponentWithType, EncodedURIComponent, RawURIComponent } from "@/utils/path";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { logger } from "@/lib/logging";
 
 interface RouteGuardProps {
   children: React.ReactNode;
@@ -15,6 +16,7 @@ interface RouteGuardProps {
 export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   const { loading } = useAuth();
   const authState = useAuthStore((s) => s.state);
+  const currentUser = useAuthStore((s) => s.state.currentUser);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -50,7 +52,18 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     const redirectPath = authRedirectService.getRedirectPath(
       pathWithParams as RawURIComponent,
       decodeURIComponentWithType(nextParam),
+      currentUser,
     );
+
+    logger.info("[AUTH] RouteGuard redirect check", {
+      pathname,
+      pathWithParams,
+      authenticationState: authState.authenticationState,
+      currentUser: !!currentUser,
+      currentUserId: currentUser?.id,
+      redirectPath,
+      willRedirect: !!(redirectPath && redirectPath !== pathWithParams),
+    });
 
     if (redirectPath && redirectPath !== pathWithParams) {
       if (redirectedRef.current !== redirectPath) {
@@ -62,7 +75,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       redirectedRef.current = null;
       setIsReadyToRender(true);
     }
-  }, [pathname, authState, loading, router, authRedirectService, nextParam, searchParams]);
+  }, [pathname, authState, currentUser, loading, router, authRedirectService, nextParam, searchParams]);
 
   // --- 未確定中は描画しない（チラつき防止） ---
   if (!isReadyToRender) {

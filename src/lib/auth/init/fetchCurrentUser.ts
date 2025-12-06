@@ -46,7 +46,7 @@ export async function fetchCurrentUserClient(
 
     if (!response.ok) {
       const errorText = await response.text();
-      logger.error("[fetchCurrentUserClient] HTTP error", {
+      logger.warn("[fetchCurrentUserClient] HTTP error", {
         status: response.status,
         statusText: response.statusText,
         errorText,
@@ -65,7 +65,7 @@ export async function fetchCurrentUserClient(
 
     return result.data?.currentUser?.user ?? null;
   } catch (error) {
-    logger.error("[fetchCurrentUserClient] Request failed", { error });
+    logger.warn("[fetchCurrentUserClient] Request failed", { error });
     return null;
   }
 }

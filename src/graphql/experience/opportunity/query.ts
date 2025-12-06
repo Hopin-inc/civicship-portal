@@ -1,12 +1,4 @@
 import { gql } from "@apollo/client";
-import { OPPORTUNITY_FRAGMENT } from "@/graphql/experience/opportunity/fragment";
-import { COMMUNITY_FRAGMENT } from "@/graphql/account/community/fragment";
-import { PLACE_FRAGMENT } from "@/graphql/location/place/fragment";
-import { SLOT_FRAGMENT } from "@/graphql/experience/opportunitySlot/fragment";
-import { RESERVATION_FRAGMENT } from "@/graphql/experience/reservation/fragment";
-import { PARTICIPATION_FRAGMENT } from "@/graphql/experience/participation/fragment";
-import { USER_FRAGMENT } from "@/graphql/account/user/fragment";
-import { ARTICLE_FRAGMENT } from "@/graphql/content/article/fragment";
 
 export const GET_OPPORTUNITIES = gql`
   query GetOpportunities(
@@ -29,16 +21,25 @@ export const GET_OPPORTUNITIES = gql`
       edges {
         cursor
         node {
-          ...OpportunityFields
+          id
+          title
+          category
+          images
+          isReservableWithTicket
+          feeRequired
+          pointsToEarn
+          pointsRequired
           place {
             id
             name
-            address
-            latitude
-            longitude
           }
           slots(filter: $slotFilter, sort: $slotSort) @include(if: $includeSlot) {
-            ...OpportunitySlotFields
+            id
+            startsAt
+            endsAt
+            capacity
+            remainingCapacity
+            hostingStatus
           }
         }
       }
@@ -54,68 +55,77 @@ export const GET_OPPORTUNITY = gql`
     $slotSort: OpportunitySlotSortInput
   ) {
     opportunity(id: $id, permission: $permission) {
-      ...OpportunityFields
-
-      community {
-        ...CommunityFields
-      }
-
-      place {
-        ...PlaceFields
-      }
-      slots(filter: $slotFilter, sort: $slotSort) {
-        ...OpportunitySlotFields
-        reservations {
-          ...ReservationFields
-          participations {
-            ...ParticipationFields
-            user {
-              ...UserFields
-            }
-          }
-        }
-      }
-      articles {
-        ...ArticleFields
-      }
-      createdByUser {
-        ...UserFields
-        articlesAboutMe {
-          ...ArticleFields
-        }
-        opportunitiesCreatedByMe {
-          ...OpportunityFields
-          community {
-            ...CommunityFields
-          }
-          slots {
-            ...OpportunitySlotFields
-            reservations {
-              ...ReservationFields
-              participations {
-                ...ParticipationFields
-                user {
-                  ...UserFields
-                }
-              }
-            }
-          }
-        }
-      }
+      id
+      title
+      description
+      body
+      images
+      category
+      publishStatus
+      isReservableWithTicket
       requireApproval
+      feeRequired
+      pointsToEarn
+      pointsRequired
+      earliestReservableAt
+
       requiredUtilities {
         id
         pointsRequired
         publishStatus
       }
+
+      community {
+        id
+        name
+        image
+      }
+
+      place {
+        id
+        name
+        address
+        latitude
+        longitude
+        city {
+          state {
+            code
+          }
+        }
+      }
+
+      slots(filter: $slotFilter, sort: $slotSort) {
+        id
+        startsAt
+        endsAt
+        capacity
+        remainingCapacity
+        hostingStatus
+      }
+
+      articles {
+        id
+        category
+        title
+        thumbnail
+        introduction
+        publishedAt
+      }
+
+      createdByUser {
+        id
+        name
+        image
+        bio
+        articlesAboutMe {
+          id
+          category
+          title
+          thumbnail
+          introduction
+          publishedAt
+        }
+      }
     }
   }
-  ${OPPORTUNITY_FRAGMENT}
-  ${COMMUNITY_FRAGMENT}
-  ${PLACE_FRAGMENT}
-  ${SLOT_FRAGMENT}
-  ${RESERVATION_FRAGMENT}
-  ${PARTICIPATION_FRAGMENT}
-  ${USER_FRAGMENT}
-  ${ARTICLE_FRAGMENT}
 `;

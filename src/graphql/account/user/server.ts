@@ -140,10 +140,33 @@ export const GET_PUBLIC_USER_SERVER_QUERY = `
         }
       }
 
+      wallets {
+        id
+        community {
+          id
+        }
+        currentPointView {
+          currentPoint
+        }
+      }
+
       opportunitiesCreatedByMe {
         id
         title
         images
+      }
+
+      nftInstances {
+        totalCount
+        edges {
+          node {
+            id
+            instanceId
+            name
+            imageUrl
+            createdAt
+          }
+        }
       }
     }
   }

@@ -1,7 +1,11 @@
 import { executeServerGraphQLQuery } from "@/lib/graphql/server";
 import { GET_TRANSACTIONS_SERVER_QUERY } from "@/graphql/account/transaction/query";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { GqlTransactionsConnection, GqlGetTransactionsQuery, GqlGetTransactionsQueryVariables } from "@/types/graphql";
+import {
+  GqlGetTransactionsQuery,
+  GqlGetTransactionsQueryVariables,
+  GqlTransactionsConnection,
+} from "@/types/graphql";
 
 export interface ServerCommunityTransactionsParams {
   first?: number;
@@ -24,13 +28,9 @@ const fallbackConnection: GqlTransactionsConnection = {
  * サーバーサイドでコミュニティのトランザクションを取得する関数
  */
 export async function getServerCommunityTransactions(
-  params: ServerCommunityTransactionsParams = {}
+  params: ServerCommunityTransactionsParams = {},
 ): Promise<GqlTransactionsConnection> {
-  const {
-    first = 50,
-    after,
-    withDidIssuanceRequests = true,
-  } = params;
+  const { first = 20, after, withDidIssuanceRequests = true } = params;
 
   try {
     const variables: GqlGetTransactionsQueryVariables = {
@@ -42,10 +42,10 @@ export async function getServerCommunityTransactions(
       withDidIssuanceRequests,
     };
 
-    const data = await executeServerGraphQLQuery<GqlGetTransactionsQuery, GqlGetTransactionsQueryVariables>(
-      GET_TRANSACTIONS_SERVER_QUERY,
-      variables
-    );
+    const data = await executeServerGraphQLQuery<
+      GqlGetTransactionsQuery,
+      GqlGetTransactionsQueryVariables
+    >(GET_TRANSACTIONS_SERVER_QUERY, variables);
 
     return data.transactions ?? fallbackConnection;
   } catch (error) {
@@ -59,7 +59,7 @@ export async function getServerCommunityTransactions(
  */
 export async function getServerCommunityTransactionsWithCursor(
   cursor?: string,
-  first: number = 20
+  first: number = 20,
 ): Promise<GqlTransactionsConnection> {
   return getServerCommunityTransactions({
     first,

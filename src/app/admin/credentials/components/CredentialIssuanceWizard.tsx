@@ -4,6 +4,7 @@ import OpportunityList from "./opportunity/OpportunityList";
 import TimeSlotSelector from "./selectDate/TimeSlotSelector";
 import CredentialRecipientSelector from "./selectUser/CredentialRecipientSelector";
 import { useSearchParams, useRouter } from "next/navigation";
+import { GqlMembershipsConnection } from "@/types/graphql";
 
 export const STEPS = {
   SELECT_OPPORTUNITY: 1,
@@ -11,7 +12,13 @@ export const STEPS = {
   SELECT_CREDENTIAL_RECIPIENT: 3,
 };
 
-export default function CredentialIssuanceWizard() {
+interface CredentialIssuanceWizardProps {
+  initialConnection: GqlMembershipsConnection | null;
+}
+
+export default function CredentialIssuanceWizard({
+  initialConnection,
+}: CredentialIssuanceWizardProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -30,7 +37,7 @@ export default function CredentialIssuanceWizard() {
     return <TimeSlotSelector setStep={goToStep} />;
   }
   if (stepParam === STEPS.SELECT_CREDENTIAL_RECIPIENT) {
-    return <CredentialRecipientSelector setStep={goToStep} />;
+    return <CredentialRecipientSelector setStep={goToStep} initialConnection={initialConnection} />;
   }
 
   return null;

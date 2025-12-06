@@ -34,7 +34,7 @@
         "local-rules/apollo-armor/cost-limit": [
           "error",
           {
-            "maxCost": 200,
+            "maxCost": 2000,
             "objectCost": 2,
             "scalarCost": 1,
             "depthCostFactor": 1.5

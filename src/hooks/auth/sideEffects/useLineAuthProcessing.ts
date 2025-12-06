@@ -8,12 +8,14 @@ import { GqlUser } from "@/types/graphql";
 import { AuthStateManager } from "@/lib/auth/core/auth-state-manager";
 import { TokenManager } from "@/lib/auth/core/token-manager";
 import { lineAuth } from "@/lib/auth/core/firebase-config";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 interface UseLineAuthProcessingProps {
   shouldProcessRedirect: boolean;
   liffService: LiffService;
   refetchUser: () => Promise<GqlUser | null>;
   authStateManager: AuthStateManager | null;
+  hasFullAuth: boolean;
 }
 
 export const useLineAuthProcessing = ({
@@ -21,6 +23,7 @@ export const useLineAuthProcessing = ({
   liffService,
   refetchUser,
   authStateManager,
+  hasFullAuth,
 }: UseLineAuthProcessingProps) => {
   const processedRef = useRef(false);
   const setState = useAuthStore((s) => s.setState);
@@ -30,6 +33,16 @@ export const useLineAuthProcessing = ({
 
     const handleLineAuthRedirect = async () => {
       processedRef.current = true;
+
+      // SSR で user/line/phone そろってるなら、LIFF 初期化も含めて全てスキップ
+      if (hasFullAuth) {
+        logger.info("SSR full auth detected; skipping all LIFF processing", {
+          authType: "liff",
+          component: "useLineAuthProcessing",
+        });
+        return;
+      }
+
       setState({ isAuthenticating: true });
 
       try {
@@ -80,15 +93,40 @@ export const useLineAuthProcessing = ({
         const hasPhoneIdentity = !!user.identities?.some(
           (i) => i.platform?.toUpperCase() === "PHONE",
         );
+        const hasMembership = !!user.memberships?.some((m) => m.community?.id === COMMUNITY_ID);
+
         if (hasPhoneIdentity || TokenManager.phoneVerified()) {
           TokenManager.savePhoneAuthFlag(true);
-          setState({
-            currentUser: user,
-            authenticationState: "user_registered",
-            isAuthenticating: false,
-          });
-          authStateManager.updateState("user_registered", "useLineAuthProcessing (phone verified)");
-          await authStateManager.handleUserRegistrationStateChange(true);
+          
+          // Only set user_registered if BOTH phone identity AND membership exist
+          if (hasMembership) {
+            logger.info("[AUTH] useLineAuthProcessing: setting user_registered", {
+              userId: user.id,
+              hasPhoneIdentity,
+              hasMembership,
+              authState: "user_registered",
+            });
+            setState({
+              currentUser: user,
+              authenticationState: "user_registered",
+              isAuthenticating: false,
+            });
+            authStateManager.updateState("user_registered", "useLineAuthProcessing (phone + membership)");
+            await authStateManager.handleUserRegistrationStateChange(true);
+          } else {
+            logger.info("[AUTH] useLineAuthProcessing: setting phone_authenticated", {
+              userId: user.id,
+              hasPhoneIdentity,
+              hasMembership,
+              authState: "phone_authenticated",
+            });
+            setState({
+              currentUser: user,
+              authenticationState: "phone_authenticated",
+              isAuthenticating: false,
+            });
+            authStateManager.updateState("phone_authenticated", "useLineAuthProcessing (phone only, no membership)");
+          }
         } else {
           setState({
             currentUser: user,
@@ -114,5 +152,5 @@ export const useLineAuthProcessing = ({
     };
 
     handleLineAuthRedirect();
-  }, [shouldProcessRedirect, refetchUser, setState, liffService, authStateManager]);
+  }, [shouldProcessRedirect, refetchUser, setState, liffService, authStateManager, hasFullAuth]);
 };

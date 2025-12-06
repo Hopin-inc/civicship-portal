@@ -1,8 +1,7 @@
 import React from "react";
-import { GqlCurrentPrefecture, GqlCurrentUserPayload, GqlUser } from "@/types/graphql";
+import { GqlCurrentUserPayload, GqlUser } from "@/types/graphql";
 import { User } from "firebase/auth";
 import { AuthEnvironment } from "@/lib/auth/core/environment-detector";
-import { RawURIComponent } from "@/utils/path";
 
 export type AuthStore = {
   state: AuthState;
@@ -74,23 +73,8 @@ export interface AuthContextType {
   isAuthenticating: boolean;
   environment: AuthEnvironment;
 
-  loginWithLiff: (redirectPath?: RawURIComponent) => Promise<boolean>;
   logout: () => Promise<void>;
 
-  phoneAuth: {
-    startPhoneVerification: (phoneNumber: string) => Promise<string | null>;
-    verifyPhoneCode: (verificationCode: string) => Promise<boolean>;
-    clearRecaptcha?: () => void;
-    isVerifying: boolean;
-    phoneUid: string | null;
-    phoneNumber: string | null;
-  };
-
-  createUser: (
-    name: string,
-    prefecture: GqlCurrentPrefecture,
-    phoneUid: string,
-  ) => Promise<User | null>;
   updateAuthState: () => Promise<GqlUser | null>;
 
   loading: boolean;

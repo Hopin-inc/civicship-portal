@@ -8,10 +8,6 @@ interface UseLineAuthRedirectDetectionProps {
   liffService: LiffService;
 }
 
-/**
- * Detects when LIFF redirect handling should begin based on
- * authentication and LIFF state transitions.
- */
 export const useLineAuthRedirectDetection = ({
   liffService,
 }: UseLineAuthRedirectDetectionProps) => {

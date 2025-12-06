@@ -1,7 +1,7 @@
 "use client";
 import { useMemo, useRef, useEffect, useState } from "react";
 import { notFound, useRouter } from "next/navigation";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import { useAuth } from "@/contexts/AuthProvider";
 import { HeaderConfig } from "@/contexts/HeaderContext";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
@@ -122,7 +122,7 @@ export default function ConfirmPage() {
       } else {
         const message = errorMessages[result.code] ?? "予期しないエラーが発生しました。";
         toast.error(message);
-        logger.error("Reservation failed", {
+        logger.warn("Reservation failed", {
           code: result.code,
           component: "ReservationConfirmPage",
         });
