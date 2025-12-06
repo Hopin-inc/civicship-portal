@@ -31,10 +31,7 @@ export function ReverifyPhoneForm() {
   const [isVerifying, setIsVerifying] = useState(false);
 
   const { phoneAuthService, authStateManager } = useAuthDependencies();
-  const { phoneAuth, setPhoneAuth } = useAuthStore((s) => ({
-    phoneAuth: s.phoneAuth,
-    setPhoneAuth: s.setPhoneAuth,
-  }));
+  const { phoneAuth } = useAuthStore.getState();
   const startPhoneVerification = useStartPhoneVerification(phoneAuthService);
   const verifyPhoneCode = useVerifyPhoneCode(phoneAuthService, authStateManager);
   const clearRecaptcha = phoneAuthService.clearRecaptcha;
@@ -137,6 +134,8 @@ export function ReverifyPhoneForm() {
     setPhoneNumber(undefined);
     setVerificationCode("");
     setStep("phone");
+
+    const { setPhoneAuth } = useAuthStore.getState();
     setPhoneAuth({ verificationId: null });
   };
 
