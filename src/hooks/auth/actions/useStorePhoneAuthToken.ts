@@ -8,13 +8,18 @@ import {
   GqlMutationStorePhoneAuthTokenArgs,
 } from "@/types/graphql";
 
-export const useStorePhoneAuthToken = () => {
+export const useStorePhoneAuthToken = (userId: string | undefined) => {
   const [storePhoneAuthTokenMutation, { loading, error }] = useMutation<
     { storePhoneAuthToken: GqlStorePhoneAuthTokenPayload },
     GqlMutationStorePhoneAuthTokenArgs
   >(STORE_PHONE_AUTH_TOKEN);
 
   const storeTokens = useCallback(async (): Promise<{ success: boolean }> => {
+    if (!userId) {
+      logger.warn("[useStorePhoneAuthToken] Missing userId for permission");
+      return { success: false };
+    }
+
     const { phoneAuth } = useAuthStore.getState();
     const { phoneUid, phoneTokens } = phoneAuth;
 
@@ -45,6 +50,7 @@ export const useStorePhoneAuthToken = () => {
             refreshToken: phoneTokens.refreshToken,
             expiresIn,
           },
+          permission: { userId },
         },
       });
 
@@ -63,7 +69,7 @@ export const useStorePhoneAuthToken = () => {
       });
       return { success: false };
     }
-  }, [storePhoneAuthTokenMutation]);
+  }, [storePhoneAuthTokenMutation, userId]);
 
   return { storeTokens, loading, error };
 };

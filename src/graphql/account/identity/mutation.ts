@@ -12,8 +12,8 @@ export const USER_SIGN_UP = gql(`
 `);
 
 export const STORE_PHONE_AUTH_TOKEN = gql(`
-  mutation storePhoneAuthToken($input: StorePhoneAuthTokenInput!) {
-    storePhoneAuthToken(input: $input) {
+  mutation storePhoneAuthToken($input: StorePhoneAuthTokenInput!, $permission: CheckIsSelfPermissionInput!) {
+    storePhoneAuthToken(input: $input, permission: $permission) {
       success
       expiresAt
     }

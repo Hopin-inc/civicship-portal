@@ -24,7 +24,7 @@ type VerificationStep = "phone" | "code";
 export function ReverifyPhoneForm() {
   const t = useTranslations();
   const router = useRouter();
-  const { loading } = useAuth();
+  const { loading, user } = useAuth();
   const [phoneNumber, setPhoneNumber] = useState<string | undefined>(undefined);
   const [verificationCode, setVerificationCode] = useState("");
   const [step, setStep] = useState<VerificationStep>("phone");
@@ -35,7 +35,7 @@ export function ReverifyPhoneForm() {
   const startPhoneVerification = useStartPhoneVerification(phoneAuthService);
   const verifyPhoneCode = useVerifyPhoneCode(phoneAuthService, authStateManager);
   const clearRecaptcha = phoneAuthService.clearRecaptcha;
-  const { storeTokens, loading: isStoringTokens } = useStorePhoneAuthToken();
+  const { storeTokens, loading: isStoringTokens } = useStorePhoneAuthToken(user?.id);
 
   const { isDisabled: isResendDisabled, countdown, start: startResendTimer } = useResendTimer();
   const recaptchaManager = useRecaptchaManager();
