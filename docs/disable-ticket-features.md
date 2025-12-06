@@ -1,8 +1,8 @@
 # チケット機能停止 要件定義書
 
-**Document Version:** 1.2 (Final)
+**Document Version:** 1.3
 **作成日:** 2025-12-05
-**最終更新:** 2025-12-05
+**最終更新:** 2025-12-06
 **ステータス:** Ready for Implementation
 
 ---
@@ -73,13 +73,13 @@ civicship-portalにおけるチケット関連機能を全面的に停止する�
 - **Phase 1**: フィーチャーフラグの無効化（ナビゲーション自動非表示）
 - **Phase 2**: ページレベルのアクセス制御（404エラー）
 - **Phase 3**: 検索フィルターからのチケット項目削除
+- **Phase 4**: GraphQL クエリからのtickets削除
+- **Phase 5**: 予約確認画面のTicketsToggle明示的非表示化
 
 #### 実装対象外 (Out of Scope)
 
 - データベースからのチケットデータ削除
-- GraphQL APIの削除
-- GraphQL クエリの tickets フィールド削除（再有効化を容易にするため）
-- 予約確認画面の TicketsToggle コンポーネント修正（maxTickets=0 で自動非表示）
+- GraphQL バックエンドAPIの削除（フロントエンドスコープ外）
 
 ---
 
@@ -107,7 +107,16 @@ civicship-portalにおけるチケット関連機能を全面的に停止する�
 | `AdminBottomBar.tsx` | 管理画面ナビゲーションタブ |
 | `UserTicketsAndPoints.tsx` | プロフィールページのチケット表示 |
 | `admin/page.tsx` | 管理設定ページのリンク |
-| `PaymentSection.tsx` | 予約確認画面（maxTickets=0で自動非表示） |
+
+#### GraphQL関連の構成
+
+**クエリ/ミューテーション:**
+- `GET_WALLETS_WITH_TICKET` - ウォレット情報とチケット取得
+- `GET_USER_FLEXIBLE` - ユーザー情報（wallets.tickets含む）
+- `GET_USER_WALLET` - ユーザーウォレット（tickets含む）
+
+**使用箇所:**
+- `/src/app/reservation/confirm/hooks/useWalletData.ts` - 予約画面でのチケット情報取得
 
 ---
 
@@ -173,6 +182,39 @@ civicship-portalにおけるチケット関連機能を全面的に停止する�
 
 ---
 
+#### FR-5: GraphQLクエリからのtickets削除
+
+**要件:**
+チケット関連のフィールドをGraphQLクエリから削除
+
+**対象:**
+- `/src/graphql/account/wallet/query.ts` - GET_WALLETS_WITH_TICKET削除
+- `/src/graphql/account/user/query.ts` - tickets フィールド削除
+- `/src/app/reservation/confirm/hooks/useWalletData.ts` - クエリ変更対応
+
+**受入基準:**
+- [ ] GET_WALLETS_WITH_TICKET クエリが削除されている
+- [ ] GET_USER_FLEXIBLE, GET_USER_WALLET の tickets フィールドが削除されている
+- [ ] useWalletData が代替クエリを使用している
+- [ ] 型エラーが発生していない
+
+---
+
+#### FR-6: 予約確認画面のTicketsToggle明示的非表示化
+
+**要件:**
+PaymentSection でフィーチャーフラグをチェックし、TicketsToggle を明示的に非表示
+
+**対象:**
+- `/src/app/reservation/confirm/components/payment/PaymentSection.tsx`
+
+**受入基準:**
+- [ ] チケット機能無効時、TicketsToggle が表示されない
+- [ ] maxTickets=0 の条件に加え、フィーチャーフラグチェックが追加されている
+- [ ] ポイント機能は正常に動作している
+
+---
+
 ### 非機能要件
 
 #### NFR-1: パフォーマンス
@@ -184,9 +226,8 @@ civicship-portalにおけるチケット関連機能を全面的に停止する�
 - フィーチャーフラグが有効なコミュニティでは引き続き動作
 
 #### NFR-3: 保守性
-- 将来の再有効化を容易にする設計
-- データベースデータは保持
-- GraphQL クエリは保持（※理由は付録B参照）
+- データベースデータは保持（将来の再有効化に備える）
+- 削除するコードはGit履歴で管理
 
 #### NFR-4: セキュリティ
 - 無効化されたページへの不正アクセス防止（404エラー）
@@ -340,6 +381,224 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
 
 ---
 
+### Phase 4: GraphQLクエリからのtickets削除
+
+**実装時間:** 30分
+**優先度:** 🟡 高
+
+**変更ファイル:**
+1. `/src/graphql/account/wallet/query.ts`
+2. `/src/graphql/account/user/query.ts`
+3. `/src/app/reservation/confirm/hooks/useWalletData.ts`
+
+**実装内容:**
+
+**Step 1: GET_WALLETS_WITH_TICKET クエリ削除**
+```typescript
+// /src/graphql/account/wallet/query.ts
+// 以下のクエリ全体を削除
+export const GET_WALLETS_WITH_TICKET = gql`...`; // ← 削除
+```
+
+**Step 2: ユーザークエリからtickets削除**
+```typescript
+// /src/graphql/account/user/query.ts
+
+// GET_USER_FLEXIBLEから削除（L56-58）
+wallets @include(if: $withWallets) {
+  ...WalletFields
+  community {
+    ...CommunityFields
+  }
+  // tickets {              // ← 削除
+  //   ...TicketFields
+  // }
+}
+
+// GET_USER_WALLETから削除（L115-120）
+wallets {
+  ...WalletFields
+  community {
+    ...CommunityFields
+  }
+  transactions { ... }
+  // tickets {              // ← 削除
+  //   ...TicketFields
+  //   utility {
+  //     ...UtilityWithOwnerFields
+  //   }
+  // }
+}
+```
+
+**Step 3: useWalletData の修正**
+```typescript
+// /src/app/reservation/confirm/hooks/useWalletData.ts
+"use client";
+
+import { useMemo } from "react";
+import { GqlWalletType, useGetWalletsQuery } from "@/types/graphql"; // ← 変更
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { toNumberSafe } from "@/utils/bigint";
+
+export function useWalletData(userId?: string) {
+  const { data, loading, error, refetch } = useGetWalletsQuery({ // ← 変更
+    variables: {
+      filter: {
+        userId: userId,
+        type: GqlWalletType.Member,
+        communityId: COMMUNITY_ID,
+      },
+      first: 1,
+    },
+    skip: !userId,
+    fetchPolicy: "cache-and-network",
+  });
+
+  const wallets = useMemo(
+    () => data?.wallets?.edges?.flatMap((edge) => (edge?.node ? [edge.node] : [])) ?? null,
+    [data],
+  );
+
+  const currentPoint = useMemo(() => {
+    const memberWallet = wallets?.[0];
+    return toNumberSafe(memberWallet?.currentPointView?.currentPoint, 0);
+  }, [wallets]);
+
+  // ticketsは常に空配列を返す
+  const tickets = [];
+
+  return {
+    wallets,
+    currentPoint,
+    tickets,
+    loading,
+    error,
+    refetch,
+  };
+}
+```
+
+**Step 4: 型生成の再実行**
+```bash
+npm run codegen
+```
+
+**検証:**
+- `npm run codegen` がエラーなく完了
+- TypeScript型エラーがない
+- 予約画面が正常に動作（チケット欄は非表示）
+
+---
+
+### Phase 5: PaymentSection の明示的非表示化
+
+**実装時間:** 15分
+**優先度:** 🟢 中
+
+**変更ファイル:**
+- `/src/app/reservation/confirm/components/payment/PaymentSection.tsx`
+
+**実装内容:**
+
+```typescript
+import React, { memo, useCallback, useEffect, useState } from "react";
+import { TicketsToggle } from "./TicketsToggle";
+import { PointsToggle } from "./PointsToggle";
+import { AvailableTicket } from "@/app/reservation/confirm/presenters/presentReservationConfirm";
+import { isPointsOnlyOpportunity } from "@/utils/opportunity/isPointsOnlyOpportunity";
+import { currentCommunityConfig } from "@/lib/communities/metadata"; // ← 追加
+
+// ... (interfaceは変更なし)
+
+const PaymentSection: React.FC<PaymentSectionProps> = memo(
+  ({
+    maxTickets,
+    participantCount,
+    useTickets,
+    setUseTickets,
+    usePoints,
+    setUsePoints,
+    userWallet,
+    pointsRequired,
+    availableTickets,
+    pricePerPerson,
+    onPointCountChange,
+    onTicketCountChange,
+    onSelectedTicketsChange,
+  }) => {
+    const [selectedTicketCount, setSelectedTicketCount] = useState(0);
+    const [selectedPointCount, setSelectedPointCount] = useState(0);
+    const [allDisabled, setAllDisabled] = useState(false);
+
+    const isPointsOnly = isPointsOnlyOpportunity(pricePerPerson, pointsRequired);
+
+    // Feature flag チェック追加
+    const isTicketsEnabled = currentCommunityConfig.enableFeatures.includes("tickets");
+
+    // ... (その他のロジックは変更なし)
+
+    const getTitle = () => {
+      if (isTicketsEnabled && maxTickets > 0 && pointsRequired > 0) {
+        return "ポイント・チケットを利用";
+      } else if (pointsRequired > 0) {
+        return "ポイントを利用";
+      } else if (isTicketsEnabled && maxTickets > 0) {
+        return "チケットを利用";
+      }
+      return "支払い方法";
+    };
+
+    return (
+      <div className="rounded-lg px-6">
+        <h3 className="text-display-sm mb-4">{getTitle()}</h3>
+        {isTicketsEnabled && maxTickets > 0 && ( // ← isTicketsEnabled 追加
+          <TicketsToggle
+            useTickets={useTickets}
+            setUseTickets={setUseTickets}
+            maxTickets={maxTickets}
+            availableTickets={availableTickets}
+            participantCount={participantCount}
+            onTicketCountChange={handleTicketCountChange}
+            selectedTicketCount={selectedTicketCount}
+            remainingSlots={remainingSlots}
+            allDisabled={allDisabled}
+            onSelectedTicketsChange={handleSelectedTicketsChange}
+          />
+        )}
+        {pointsRequired > 0 && !isPointsOnly && (
+          <PointsToggle
+            usePoints={usePoints}
+            setUsePoints={setUsePoints}
+            maxPoints={userWallet ?? 0}
+            participantCount={participantCount}
+            pointsRequired={pointsRequired}
+            onPointCountChange={handlePointCountChange}
+            remainingSlots={remainingSlots}
+            disabled={
+              selectedTicketCount >= participantCount || !userWallet || userWallet < pointsRequired
+            }
+            allDisabled={allDisabled}
+            isPointsOnly={isPointsOnly}
+          />
+        )}
+      </div>
+    );
+  },
+);
+
+PaymentSection.displayName = "PaymentSection";
+
+export default PaymentSection;
+```
+
+**検証:**
+- 予約確認画面でチケットToggleが非表示
+- ポイント機能は正常に動作
+- タイトルが適切に表示される
+
+---
+
 ### ロールバック計画
 
 各Phaseは独立しており、個別にロールバック可能：
@@ -347,6 +606,8 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
 **Phase 1:** metadata.ts で "tickets" を戻す（1分）
 **Phase 2:** notFound() チェックを削除（10分）
 **Phase 3:** SearchFilters の条件分岐を削除（5分）
+**Phase 4:** Git履歴から GraphQL クエリを復元、codegen実行（15分）
+**Phase 5:** PaymentSection の isTicketsEnabled チェックを削除（5分）
 
 ---
 
@@ -382,6 +643,22 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
 | TC-4.1 | ポイントで予約作成 | 正常に完了 | P0 |
 | TC-4.2 | 現金で予約作成 | 正常に完了 | P0 |
 
+#### TS-5: GraphQLクエリ
+
+| ID | 操作 | 期待結果 | 優先度 |
+|----|------|---------|--------|
+| TC-5.1 | npm run codegen 実行 | エラーなく完了 | P0 |
+| TC-5.2 | TypeScript ビルド | 型エラーなし | P0 |
+| TC-5.3 | 予約画面データ取得 | ウォレット情報取得成功 | P0 |
+
+#### TS-6: 予約確認画面
+
+| ID | 操作 | 期待結果 | 優先度 |
+|----|------|---------|--------|
+| TC-6.1 | 予約確認画面を開く | チケットToggle非表示 | P0 |
+| TC-6.2 | ポイント利用確認 | 正常に動作 | P0 |
+| TC-6.3 | タイトル表示確認 | 適切なタイトル表示 | P1 |
+
 ---
 
 ## リスクと対策
@@ -391,6 +668,8 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
 | R-1 | Phase 1のみ実施時、URL直接アクセス可能 | 中 | 高 | Phase 2を必ず実施 |
 | R-2 | 他機能への影響 | 高 | 低 | 十分なリグレッションテスト |
 | R-3 | 実装漏れ | 中 | 低 | コードレビューで全箇所確認 |
+| R-4 | GraphQL型生成エラー | 中 | 中 | codegen後に即座にビルド確認 |
+| R-5 | 予約画面でのランタイムエラー | 高 | 低 | useWalletDataの空配列返却を確認 |
 
 ---
 
@@ -436,42 +715,38 @@ if (!currentCommunityConfig.enableFeatures.includes("tickets")) {
 
 ---
 
-### A-3. GraphQL クエリの扱い
+### A-3. GraphQL クエリの削除方針
 
-#### なぜ tickets フィールドを削除しないのか
+#### なぜ tickets フィールドを削除するのか
 
 **理由:**
 
-1. **再有効化の容易性**
-   フィーチャーフラグの切り替えのみで再有効化可能
+1. **完全な無効化**
+   チケット機能を完全に停止するため、フロントエンドから tickets 関連コードを削除
 
-2. **Codegen への影響**
-   tickets フィールドを削除すると、Apollo Client の型生成（GraphQL Code Generator）に影響し、型の不整合が発生する可能性がある
+2. **保守性の向上**
+   不要なコードを削除することで、コードベースの保守性を向上
 
-3. **キャッシュとスキーマの一貫性**
-   Apollo Client のキャッシュ正規化において、フィールドの存在が前提となっている箇所がある可能性
+3. **再有効化時の対応**
+   将来再有効化する場合は、Git履歴から復元可能
 
-4. **パフォーマンス影響は軽微**
-   tickets は通常0-10件程度で、データ取得のオーバーヘッドは無視できるレベル
+**削除対象:**
 
-**現状維持するクエリ:**
-```typescript
-// /src/graphql/account/wallet/query.ts
-export const GET_WALLETS_WITH_TICKET = gql`
-  query GetWalletsWithTicket(...) {
-    wallets(...) {
-      edges {
-        node {
-          ...WalletFields
-          tickets {              # ← 残す
-            ...TicketFields
-          }
-        }
-      }
-    }
-  }
-`;
-```
+1. **GET_WALLETS_WITH_TICKET クエリ**
+   - `/src/graphql/account/wallet/query.ts` から完全に削除
+
+2. **tickets フィールド**
+   - `GET_USER_FLEXIBLE` の wallets.tickets
+   - `GET_USER_WALLET` の wallets.tickets
+
+3. **使用箇所の修正**
+   - `useWalletData` は `useGetWalletsQuery` に切り替え
+   - tickets は空配列を返すように修正
+
+**Codegen への影響:**
+- tickets 削除後、`npm run codegen` で型を再生成
+- 既存の `GqlTicket` 型は残る（他の箇所で使用されている可能性）
+- `useGetWalletsWithTicketQuery` 型は削除される
 
 ---
 
@@ -480,11 +755,16 @@ export const GET_WALLETS_WITH_TICKET = gql`
 **現状:**
 `/reservation/confirm/page.tsx` は全体が Client Component ("use client")
 
+**変更方針:**
+PaymentSection に明示的なフィーチャーフラグチェックを追加
+
+**理由:**
+- より明確な制御
+- 将来の仕様変更に対応しやすい
+- `maxTickets > 0` だけでは不十分（tickets配列が空でもmaxTicketsが計算される可能性）
+
 **将来の可能性:**
 将来的に Server Component 化する可能性がある。その場合、フィーチャーフラグの参照を上位層（page.tsx）で行い、props として渡す構成も検討可能。
-
-**現在の実装方針:**
-既存の条件分岐（`maxTickets > 0`）により自動的に TicketsToggle が非表示になるため、追加実装は不要。
 
 ---
 
@@ -538,7 +818,7 @@ export const GET_WALLETS_WITH_TICKET = gql`
 
 **指摘内容:** tickets フィールド取得の可能性
 **調査結果:** `GET_WALLETS_WITH_TICKET` で取得している
-**対応:** ✅ 再有効化考慮でクエリは保持（付録A-3参照）
+**対応方針変更:** ✅ v1.3でスコープ変更、tickets フィールドを削除（付録A-3参照）
 
 #### 指摘4: 検索フィルター実装箇所
 
@@ -615,17 +895,23 @@ graph TD
 **Phase 3:**
 - `/src/app/search/components/SearchFilters.tsx` (L94-115)
 
+**Phase 4:**
+- `/src/graphql/account/wallet/query.ts` (GET_WALLETS_WITH_TICKET削除)
+- `/src/graphql/account/user/query.ts` (tickets削除: L56-58, L115-120)
+- `/src/app/reservation/confirm/hooks/useWalletData.ts` (クエリ変更、tickets空配列化)
+
+**Phase 5:**
+- `/src/app/reservation/confirm/components/payment/PaymentSection.tsx` (フィーチャーフラグチェック追加)
+
 ### D-2. 自動的に影響を受けるファイル（変更不要）
 
 - `/src/components/layout/AdminBottomBar.tsx` (L53-60)
 - `/src/app/users/features/profile/components/UserTicketsAndPoints.tsx` (L61-65)
 - `/src/app/admin/page.tsx` (L37-42, L76-80)
-- `/src/app/reservation/confirm/components/payment/PaymentSection.tsx` (L101-114)
 
-### D-3. 変更しないファイル
+### D-3. 型生成ファイル（自動更新）
 
-- `/src/graphql/account/wallet/query.ts` - GraphQLクエリ（理由は付録A-3参照）
-- `/src/app/reservation/confirm/hooks/useWalletData.ts`
+- `/src/types/graphql.tsx` - codegen で自動生成
 
 ---
 
@@ -726,6 +1012,7 @@ if (!currentCommunityConfig.enableFeatures.includes("tickets")) {
 | 1.0 | 2025-12-05 | 初版作成 | Claude |
 | 1.1 | 2025-12-05 | レビュー指摘反映（前提条件・調査結果・フロー図追加） | Claude |
 | 1.2 | 2025-12-05 | 最終版（本編スリム化、ステークホルダー追加、GraphQL説明強化） | Claude |
+| 1.3 | 2025-12-06 | スコープ拡張（GraphQLクエリ削除、PaymentSection修正をIn Scopeに追加、Phase 4/5追加） | Claude |
 
 ---
 
@@ -745,11 +1032,16 @@ if (!currentCommunityConfig.enableFeatures.includes("tickets")) {
 
 ## 📌 実装者へのメッセージ
 
-本要件定義書 Ver1.2 は以下の点を重視して作成しました：
+本要件定義書 Ver1.3 は以下の点を重視して作成しました：
 
-1. **本編のスリム化**: 実装に必要な最小情報のみに絞り込み
-2. **詳細情報の分離**: 技術的背景は付録に移動し、必要に応じて参照可能
-3. **実装の具体性**: 各Phase の変更箇所を明確に記載
-4. **保守性の確保**: 再有効化を容易にする設計
+1. **完全な無効化**: GraphQLクエリ削除まで含めた徹底的なチケット機能停止
+2. **段階的実装**: 5つのPhaseに分割し、各Phase独立してロールバック可能
+3. **実装の具体性**: 各Phase の変更箇所とコード例を明確に記載
+4. **保守性の確保**: Git履歴で管理、将来の再有効化も可能
+
+**重要な実装順序:**
+- Phase 1-3 は UI層の無効化（既存の v1.2 範囲）
+- Phase 4-5 は データ層/コンポーネント層の無効化（v1.3 で追加）
+- Phase 4 実施後は必ず `npm run codegen` を実行してください
 
 不明点があれば、まず付録Aの技術的前提条件を参照してください。
