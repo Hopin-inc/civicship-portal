@@ -1,12 +1,12 @@
 "use client";
 
 import { useMemo } from "react";
-import { GqlWalletType, useGetWalletsQuery } from "@/types/graphql";
+import { GqlWalletType, useGetMemberWalletsQuery } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { toNumberSafe } from "@/utils/bigint";
 
 export function useWalletData(userId?: string) {
-  const { data, loading, error, refetch } = useGetWalletsQuery({
+  const { data, loading, error, refetch } = useGetMemberWalletsQuery({
     variables: {
       filter: {
         userId: userId,
