@@ -2,7 +2,7 @@
 
 import React from "react";
 import { ActivityCard, QuestCard } from "@/components/domains/opportunities/types";
-import OpportunityVerticalCard from "@/components/domains/opportunities/components/OpportunityVerticalCard";
+import OpportunityHorizontalCard from "@/components/domains/opportunities/components/OpportunityHorizontalCard";
 import { formatOpportunities } from "@/components/domains/opportunities/utils";
 
 interface SimilarOpportunitiesProps {
@@ -22,11 +22,11 @@ export const SimilarOpportunities: React.FC<SimilarOpportunitiesProps> = ({
   if (filteredOpportunities.length === 0) return null;
   const formattedOpportunities = filteredOpportunities.map(formatOpportunities)
   return (
-    <section className="pt-6 pb-8 mt-0">
+    <section className="px-4 pt-6 pb-8 mt-0">
       <h2 className="text-display-md text-foreground mb-4">{header}</h2>
-      <div className="mt-6 flex gap-4 overflow-x-auto pb-8 scrollbar-hide">
+      <div className="flex flex-col gap-4">
         {formattedOpportunities.map((opportunity) => (
-          <OpportunityVerticalCard key={opportunity.id} {...opportunity} />
+          <OpportunityHorizontalCard key={opportunity.id} {...opportunity} />
         ))}
       </div>
     </section>

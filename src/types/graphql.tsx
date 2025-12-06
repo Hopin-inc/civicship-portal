@@ -4528,6 +4528,52 @@ export type GqlGetOpportunitySlotQuery = {
   opportunitySlot?: { __typename?: "OpportunitySlot"; id: string } | null;
 };
 
+export type GqlGetFeedOpportunitySlotsQueryVariables = Exact<{
+  filter?: InputMaybe<GqlOpportunitySlotFilterInput>;
+  sort?: InputMaybe<GqlOpportunitySlotSortInput>;
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+}>;
+
+export type GqlGetFeedOpportunitySlotsQuery = {
+  __typename?: "Query";
+  opportunitySlots: {
+    __typename?: "OpportunitySlotsConnection";
+    totalCount: number;
+    pageInfo: {
+      __typename?: "PageInfo";
+      startCursor?: string | null;
+      endCursor?: string | null;
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+    };
+    edges?: Array<{
+      __typename?: "OpportunitySlotEdge";
+      cursor: string;
+      node?: {
+        __typename?: "OpportunitySlot";
+        id: string;
+        hostingStatus: GqlOpportunitySlotHostingStatus;
+        startsAt: Date;
+        endsAt: Date;
+        opportunity?: {
+          __typename?: "Opportunity";
+          id: string;
+          title: string;
+          category: GqlOpportunityCategory;
+          images?: Array<string> | null;
+          isReservableWithTicket?: boolean | null;
+          feeRequired?: number | null;
+          pointsToEarn?: number | null;
+          pointsRequired?: number | null;
+          place?: { __typename?: "Place"; id: string; name: string } | null;
+          community?: { __typename?: "Community"; id: string } | null;
+        } | null;
+      } | null;
+    } | null> | null;
+  };
+};
+
 export type GqlGetOpportunitySlotWithParticipationsQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
@@ -9137,6 +9183,122 @@ export type GetOpportunitySlotSuspenseQueryHookResult = ReturnType<
 export type GetOpportunitySlotQueryResult = Apollo.QueryResult<
   GqlGetOpportunitySlotQuery,
   GqlGetOpportunitySlotQueryVariables
+>;
+export const GetFeedOpportunitySlotsDocument = gql`
+  query GetFeedOpportunitySlots(
+    $filter: OpportunitySlotFilterInput
+    $sort: OpportunitySlotSortInput
+    $cursor: String
+    $first: Int
+  ) {
+    opportunitySlots(filter: $filter, sort: $sort, cursor: $cursor, first: $first) {
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
+      }
+      totalCount
+      edges {
+        cursor
+        node {
+          id
+          hostingStatus
+          startsAt
+          endsAt
+          opportunity {
+            id
+            title
+            category
+            images
+            isReservableWithTicket
+            feeRequired
+            pointsToEarn
+            pointsRequired
+            place {
+              id
+              name
+            }
+            community {
+              id
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetFeedOpportunitySlotsQuery__
+ *
+ * To run a query within a React component, call `useGetFeedOpportunitySlotsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetFeedOpportunitySlotsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetFeedOpportunitySlotsQuery({
+ *   variables: {
+ *      filter: // value for 'filter'
+ *      sort: // value for 'sort'
+ *      cursor: // value for 'cursor'
+ *      first: // value for 'first'
+ *   },
+ * });
+ */
+export function useGetFeedOpportunitySlotsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GqlGetFeedOpportunitySlotsQuery,
+    GqlGetFeedOpportunitySlotsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetFeedOpportunitySlotsQuery, GqlGetFeedOpportunitySlotsQueryVariables>(
+    GetFeedOpportunitySlotsDocument,
+    options,
+  );
+}
+export function useGetFeedOpportunitySlotsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetFeedOpportunitySlotsQuery,
+    GqlGetFeedOpportunitySlotsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GqlGetFeedOpportunitySlotsQuery,
+    GqlGetFeedOpportunitySlotsQueryVariables
+  >(GetFeedOpportunitySlotsDocument, options);
+}
+export function useGetFeedOpportunitySlotsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetFeedOpportunitySlotsQuery,
+        GqlGetFeedOpportunitySlotsQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GqlGetFeedOpportunitySlotsQuery,
+    GqlGetFeedOpportunitySlotsQueryVariables
+  >(GetFeedOpportunitySlotsDocument, options);
+}
+export type GetFeedOpportunitySlotsQueryHookResult = ReturnType<
+  typeof useGetFeedOpportunitySlotsQuery
+>;
+export type GetFeedOpportunitySlotsLazyQueryHookResult = ReturnType<
+  typeof useGetFeedOpportunitySlotsLazyQuery
+>;
+export type GetFeedOpportunitySlotsSuspenseQueryHookResult = ReturnType<
+  typeof useGetFeedOpportunitySlotsSuspenseQuery
+>;
+export type GetFeedOpportunitySlotsQueryResult = Apollo.QueryResult<
+  GqlGetFeedOpportunitySlotsQuery,
+  GqlGetFeedOpportunitySlotsQueryVariables
 >;
 export const GetOpportunitySlotWithParticipationsDocument = gql`
   query GetOpportunitySlotWithParticipations($id: ID!) {

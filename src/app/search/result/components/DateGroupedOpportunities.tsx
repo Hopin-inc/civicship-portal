@@ -35,33 +35,22 @@ const DateGroupedOpportunities: React.FC<DateGroupedOpportunitiesProps> = ({
       {sortedEntries.map(([dateKey, opportunities]) => {
         if (opportunities.length === 0) return null;
         const first = opportunities[0];
-        if (first.category === GqlOpportunityCategory.Activity) {
-          const formattedOpportunities = opportunities.map(formatOpportunities);
-          return (
-            <OpportunitiesGridListSection
-              key={dateKey}
-              opportunityTitle={null}
-              opportunities={formattedOpportunities}
-              isInitialLoading={false}
-              isSectionLoading={false}
-              displayDate={getDisplayDate(dateKey)}
-            />
-          );
-        }
-        if (first.category === GqlOpportunityCategory.Quest) {
-          const formattedOpportunities = opportunities.map(formatOpportunities);
-          return (
-            <OpportunitiesGridListSection
-              key={dateKey}
-              opportunityTitle={null}
-              opportunities={formattedOpportunities}
-              isInitialLoading={false}
-              isSectionLoading={false}
-              displayDate={getDisplayDate(dateKey)}
-            />
-          );
-        }
-        return null;
+        const isValidCategory =
+          first.category === GqlOpportunityCategory.Activity ||
+          first.category === GqlOpportunityCategory.Quest;
+        if (!isValidCategory) return null;
+
+        const formattedOpportunities = opportunities.map(formatOpportunities);
+        return (
+          <OpportunitiesGridListSection
+            key={dateKey}
+            opportunityTitle={null}
+            opportunities={formattedOpportunities}
+            isInitialLoading={false}
+            isSectionLoading={false}
+            displayDate={getDisplayDate(dateKey)}
+          />
+        );
       })}
     </section>
   );

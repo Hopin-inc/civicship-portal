@@ -8,6 +8,10 @@ import OpportunityImageSlider from "@/components/domains/opportunities/component
 import OpportunityHorizontalCard from "../OpportunityHorizontalCard";
 import { formatOpportunities } from "../../utils";
 
+/**
+ * @deprecated This component uses Embla carousel for horizontal scrolling.
+ * Use FeaturedSection with static hero + vertical OpportunityHorizontalCard list instead.
+ */
 export default function FeaturedSlider({
   opportunities,
 }: {

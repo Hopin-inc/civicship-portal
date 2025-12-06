@@ -2,8 +2,7 @@
 
 import React from "react";
 import { FormattedOpportunityCard } from "@/components/domains/opportunities/types";
-import OpportunityVerticalCard from "@/components/domains/opportunities/components/OpportunityVerticalCard";
-import { CardCarousel } from "@/components/shared/CardCarousel";
+import OpportunityHorizontalCard from "@/components/domains/opportunities/components/OpportunityHorizontalCard";
 import OpportunitiesListSectionSkeleton from "./OpportunityListSectionSkeleton";
 
 interface OpportunityCarouselListSectionProps {
@@ -26,7 +25,7 @@ export const OpportunityCarouselListSection: React.FC<OpportunityCarouselListSec
   const [month, day, weekday] = match ? match.slice(1) : [];
 
   return (
-    <section className="ml-6 mt-6">
+    <section className="px-4 mt-6">
       {isSearchResult ? (
         <h2 className="flex items-baseline gap-1">
           <span className="text-md text-gray-500">{month}/</span>
@@ -36,14 +35,14 @@ export const OpportunityCarouselListSection: React.FC<OpportunityCarouselListSec
       ) : (
         <h2 className="text-display-md">{title}</h2>
       )}
-      <CardCarousel>
+      <div className="flex flex-col gap-4 mt-4">
         {opportunities.map((opportunity, index) => (
-          <OpportunityVerticalCard
+          <OpportunityHorizontalCard
             key={`${opportunity.id}_${index}`}
             {...opportunity}
           />
         ))}
-      </CardCarousel>
+      </div>
     </section>
   );
 };
