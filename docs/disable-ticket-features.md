@@ -1,6 +1,6 @@
 # チケット機能停止 要件定義書
 
-**Document Version:** 1.4
+**Document Version:** 1.5
 **作成日:** 2025-12-05
 **最終更新:** 2025-12-06
 **ステータス:** Ready for Implementation
@@ -72,9 +72,9 @@ civicship-portalにおけるチケット関連機能を全面的に停止する�
 
 - **Phase 1**: フィーチャーフラグの無効化（ナビゲーション自動非表示）
 - **Phase 2**: チケットディレクトリの削除
-- **Phase 3**: 検索フィルターからのチケット項目削除
+- **Phase 3**: 検索フィルターからのチケットコード削除
 - **Phase 4**: GraphQL クエリからのtickets削除
-- **Phase 5**: 予約確認画面のTicketsToggle明示的非表示化
+- **Phase 5**: 予約確認画面のTicketsToggleコード削除
 
 #### 実装対象外 (Out of Scope)
 
@@ -156,17 +156,19 @@ civicship-portalにおけるチケット関連機能を全面的に停止する�
 
 ---
 
-#### FR-3: 検索フィルターからのチケット項目削除
+#### FR-3: 検索フィルターからのチケットコード削除
 
 **要件:**
-チケット機能が無効な場合、検索画面で「チケット利用可」フィルターを非表示
+SearchFilters からチケット関連のコードを完全に削除
 
 **対象:**
-- `/src/app/search/components/SearchFilters.tsx`
+- `/src/app/search/components/SearchFilters.tsx` - チケットフィルター部分のコード削除
 
 **受入基準:**
-- [ ] 検索画面で「チケット利用可」フィルターが表示されない
-- [ ] ポイントフィルターは引き続き表示される
+- [ ] チケットフィルター関連のコードが削除されている
+- [ ] フィーチャーフラグチェック（`isTicketsEnabled`）が削除されている
+- [ ] ポイントフィルターは正常に動作
+- [ ] TypeScript ビルドエラーがない
 
 ---
 
@@ -188,18 +190,22 @@ civicship-portalにおけるチケット関連機能を全面的に停止する�
 
 ---
 
-#### FR-5: 予約確認画面のTicketsToggle明示的非表示化
+#### FR-5: 予約確認画面のTicketsToggleコード削除
 
 **要件:**
-PaymentSection でフィーチャーフラグをチェックし、TicketsToggle を明示的に非表示
+PaymentSection と呼び出し元からチケット関連のコードを完全に削除
 
 **対象:**
-- `/src/app/reservation/confirm/components/payment/PaymentSection.tsx`
+- `/src/app/reservation/confirm/components/payment/PaymentSection.tsx` - TicketsToggle呼び出し削除、props削除
+- `/src/app/reservation/confirm/components/ConfirmPageView.tsx` - チケット関連props削除
 
 **受入基準:**
-- [ ] チケット機能無効時、TicketsToggle が表示されない
-- [ ] maxTickets=0 の条件に加え、フィーチャーフラグチェックが追加されている
-- [ ] ポイント機能は正常に動作している
+- [ ] PaymentSection から TicketsToggle 呼び出しが削除されている
+- [ ] PaymentSection のチケット関連props（maxTickets, availableTickets, useTickets, etc.）が削除されている
+- [ ] ConfirmPageView からチケット関連props渡しが削除されている
+- [ ] フィーチャーフラグチェック（`isTicketsEnabled`）が削除されている
+- [ ] ポイント機能は正常に動作
+- [ ] TypeScript ビルドエラーがない
 
 ---
 
@@ -311,9 +317,9 @@ src/app/admin/tickets/
 
 ---
 
-### Phase 3: 検索フィルターの無効化
+### Phase 3: 検索フィルターからのチケットコード削除
 
-**実装時間:** 20分
+**実装時間:** 15分
 **優先度:** 🟢 中
 
 **変更ファイル:**
@@ -322,9 +328,6 @@ src/app/admin/tickets/
 **実装内容:**
 
 ```typescript
-// ファイル先頭に import 追加
-import { currentCommunityConfig } from "@/lib/communities/metadata";
-
 const SearchFilters: React.FC<SearchFiltersProps> = ({
   onFilterClick,
   formatDateRange,
@@ -332,13 +335,12 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
   location,
   dateRange,
   guests,
-  useTicket,
+  useTicket, // ← propsは残す（呼び出し元への影響最小化）
   usePoints,
 }) => {
   const { control } = useFormContext();
 
-  // Feature flag チェック
-  const isTicketsEnabled = currentCommunityConfig.enableFeatures.includes("tickets");
+  // チケット関連の Feature flag チェックを削除
 
   return (
     <div className="bg-background rounded-xl overflow-hidden">
@@ -347,30 +349,23 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
       <FormField ... />
       <FormField ... />
 
-      {/* その他の条件 - チケット機能が無効でもポイントがあれば表示 */}
-      {(isTicketsEnabled || usePoints) && (
+      {/* ポイントフィルターのみ表示 */}
+      {usePoints && ( // ← チケット条件を削除
         <FormField
           control={control}
-          name="useTicket"
+          name="usePoints" // ← name変更
           render={() => (
             <FormItem>
               <FormControl>
                 <FilterButton
                   icon={<Tags className="h-4 w-4" />}
-                  label="その他の条件"
+                  label="ポイント利用可" // ← label変更
                   value=""
-                  active={useTicket}
-                  onClick={() => onFilterClick("other")}
+                  active={usePoints}
+                  onClick={() => onFilterClick("points")} // ← "other"から変更
                   verticalLayout={true}
                   className="rounded-b-xl"
-                >
-                  {[
-                    isTicketsEnabled && useTicket && "チケット利用可",
-                    usePoints && "ポイント利用可"
-                  ]
-                    .filter(Boolean)
-                    .join(",")}
-                </FilterButton>
+                />
               </FormControl>
             </FormItem>
           )}
@@ -381,9 +376,16 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
 };
 ```
 
+**削除するコード:**
+- `import { currentCommunityConfig } ...` （不要なら削除）
+- `const isTicketsEnabled = ...` （完全削除）
+- チケットフィルター条件部分（`isTicketsEnabled &&`）
+- チケット表示ラベル（`"チケット利用可"`）
+
 **検証:**
-- 検索画面で「チケット利用可」フィルターが非表示
-- ポイントフィルターは表示される
+- チケットフィルターが表示されない
+- ポイントフィルターは正常に動作
+- TypeScript ビルドエラーがない
 
 ---
 
@@ -497,60 +499,105 @@ npm run codegen
 
 ---
 
-### Phase 5: PaymentSection の明示的非表示化
+### Phase 5: 予約確認画面のTicketsToggleコード削除
 
-**実装時間:** 15分
+**実装時間:** 20分
 **優先度:** 🟢 中
 
 **変更ファイル:**
-- `/src/app/reservation/confirm/components/payment/PaymentSection.tsx`
+1. `/src/app/reservation/confirm/components/payment/PaymentSection.tsx`
+2. `/src/app/reservation/confirm/components/ConfirmPageView.tsx`
 
 **実装内容:**
 
+**Step 1: PaymentSection.tsx の修正**
+
+チケット関連のコードを完全に削除:
+
 ```typescript
 import React, { memo, useCallback, useEffect, useState } from "react";
-import { TicketsToggle } from "./TicketsToggle";
+// import { TicketsToggle } from "./TicketsToggle"; // ← 削除
 import { PointsToggle } from "./PointsToggle";
-import { AvailableTicket } from "@/app/reservation/confirm/presenters/presentReservationConfirm";
+// import { AvailableTicket } ... // ← 削除（不要なら）
 import { isPointsOnlyOpportunity } from "@/utils/opportunity/isPointsOnlyOpportunity";
-import { currentCommunityConfig } from "@/lib/communities/metadata"; // ← 追加
 
-// ... (interfaceは変更なし)
+interface PaymentSectionProps {
+  ticketCount: number;
+  onIncrement: () => void;
+  onDecrement: () => void;
+  // maxTickets: number;              // ← 削除
+  // availableTickets: AvailableTicket[];  // ← 削除
+  pricePerPerson: number | null;
+  participantCount: number;
+  // useTickets: boolean;             // ← 削除
+  // setUseTickets: (value: boolean) => void;  // ← 削除
+  usePoints: boolean;
+  setUsePoints: (value: boolean) => void;
+  userWallet: number | null;
+  pointsRequired: number;
+  onPointCountChange?: (count: number) => void;
+  // onTicketCountChange?: (count: number) => void;  // ← 削除
+  // onSelectedTicketsChange?: ...    // ← 削除
+}
 
 const PaymentSection: React.FC<PaymentSectionProps> = memo(
   ({
-    maxTickets,
+    // maxTickets,                     // ← 削除
     participantCount,
-    useTickets,
-    setUseTickets,
+    // useTickets,                     // ← 削除
+    // setUseTickets,                  // ← 削除
     usePoints,
     setUsePoints,
     userWallet,
     pointsRequired,
-    availableTickets,
+    // availableTickets,               // ← 削除
     pricePerPerson,
     onPointCountChange,
-    onTicketCountChange,
-    onSelectedTicketsChange,
+    // onTicketCountChange,            // ← 削除
+    // onSelectedTicketsChange,        // ← 削除
   }) => {
-    const [selectedTicketCount, setSelectedTicketCount] = useState(0);
+    // const [selectedTicketCount, setSelectedTicketCount] = useState(0);  // ← 削除
     const [selectedPointCount, setSelectedPointCount] = useState(0);
     const [allDisabled, setAllDisabled] = useState(false);
 
     const isPointsOnly = isPointsOnlyOpportunity(pricePerPerson, pointsRequired);
 
-    // Feature flag チェック追加
-    const isTicketsEnabled = currentCommunityConfig.enableFeatures.includes("tickets");
+    // const totalSelected = selectedTicketCount + selectedPointCount;  // ← 削除
+    const totalSelected = selectedPointCount;  // ← チケットカウント削除
+    const remainingSlots = Math.max(0, participantCount - totalSelected);
 
-    // ... (その他のロジックは変更なし)
+    useEffect(() => {
+      // const shouldBeDisabled = selectedTicketCount + selectedPointCount >= participantCount;  // ← 削除
+      const shouldBeDisabled = selectedPointCount >= participantCount;  // ← 修正
+
+      if (shouldBeDisabled) {
+        setAllDisabled(true);
+      } else {
+        setAllDisabled(false);
+      }
+    }, [selectedPointCount, participantCount]);  // ← selectedTicketCount削除
+
+    // handleTicketCountChange 削除
+    // handleSelectedTicketsChange 削除
+
+    const handlePointCountChange = useCallback(
+      (count: number) => {
+        setSelectedPointCount(count);
+        if (onPointCountChange) {
+          onPointCountChange(count);
+        }
+      },
+      [onPointCountChange],
+    );
 
     const getTitle = () => {
-      if (isTicketsEnabled && maxTickets > 0 && pointsRequired > 0) {
-        return "ポイント・チケットを利用";
-      } else if (pointsRequired > 0) {
+      // if (maxTickets > 0 && pointsRequired > 0) {  // ← 削除
+      //   return "ポイント・チケットを利用";
+      // } else
+      if (pointsRequired > 0) {
         return "ポイントを利用";
-      } else if (isTicketsEnabled && maxTickets > 0) {
-        return "チケットを利用";
+      // } else {                      // ← 削除
+      //   return "チケットを利用";
       }
       return "支払い方法";
     };
@@ -558,20 +605,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = memo(
     return (
       <div className="rounded-lg px-6">
         <h3 className="text-display-sm mb-4">{getTitle()}</h3>
-        {isTicketsEnabled && maxTickets > 0 && ( // ← isTicketsEnabled 追加
-          <TicketsToggle
-            useTickets={useTickets}
-            setUseTickets={setUseTickets}
-            maxTickets={maxTickets}
-            availableTickets={availableTickets}
-            participantCount={participantCount}
-            onTicketCountChange={handleTicketCountChange}
-            selectedTicketCount={selectedTicketCount}
-            remainingSlots={remainingSlots}
-            allDisabled={allDisabled}
-            onSelectedTicketsChange={handleSelectedTicketsChange}
-          />
-        )}
+        {/* TicketsToggle コンポーネント呼び出し全体を削除 */}
         {pointsRequired > 0 && !isPointsOnly && (
           <PointsToggle
             usePoints={usePoints}
@@ -582,7 +616,8 @@ const PaymentSection: React.FC<PaymentSectionProps> = memo(
             onPointCountChange={handlePointCountChange}
             remainingSlots={remainingSlots}
             disabled={
-              selectedTicketCount >= participantCount || !userWallet || userWallet < pointsRequired
+              // selectedTicketCount >= participantCount ||  // ← 削除
+              !userWallet || userWallet < pointsRequired
             }
             allDisabled={allDisabled}
             isPointsOnly={isPointsOnly}
@@ -598,10 +633,111 @@ PaymentSection.displayName = "PaymentSection";
 export default PaymentSection;
 ```
 
+**Step 2: ConfirmPageView.tsx の修正**
+
+PaymentSection 呼び出し箇所からチケット関連propsを削除:
+
+```typescript
+// interface からチケット関連props削除
+export interface ConfirmPageViewProps {
+  // ... 他のprops
+  calculations: {
+    feeRequired: number | null;
+    pointsRequired: number;
+    isActivity: boolean;
+    isQuest: boolean;
+    // maxTickets: number;                // ← 削除
+    isPointsOnly: boolean;
+    totalPointsRequired: number;
+    hasInsufficientPoints: boolean;
+  };
+  // ... 他のprops
+  // selectedTicketCount: number;          // ← 削除
+  // onTicketCountChange: (count: number) => void;  // ← 削除
+  // selectedTickets: Record<string, number>;       // ← 削除
+  // onSelectedTicketsChange: (tickets: Record<string, number>) => void;  // ← 削除
+  // useTickets: boolean;                  // ← 削除
+  // setUseTickets: (use: boolean) => void;  // ← 削除
+  // availableTickets: AvailableTicket[];  // ← 削除
+  // ... 他のprops
+}
+
+export default function ConfirmPageView(props: ConfirmPageViewProps) {
+  const {
+    // ... 他の変数
+    // selectedTicketCount,              // ← 削除
+    // onTicketCountChange,              // ← 削除
+    // selectedTickets,                  // ← 削除
+    // onSelectedTicketsChange,          // ← 削除
+    // useTickets,                       // ← 削除
+    // setUseTickets,                    // ← 削除
+    // availableTickets,                 // ← 削除
+    // ... 他の変数
+  } = props;
+
+  const {
+    feeRequired,
+    pointsRequired,
+    isActivity,
+    isQuest,
+    // maxTickets,                       // ← 削除
+    isPointsOnly,
+    hasInsufficientPoints,
+  } = calculations;
+
+  // ...
+
+  {/* PaymentSection 呼び出し修正 */}
+  {isActivity && pointsRequired > 0 && !isPointsOnly && (  {/* maxTickets条件削除 */}
+    <PaymentSection
+      ticketCount={ticketCounter.count}
+      onIncrement={ticketCounter.increment}
+      onDecrement={ticketCounter.decrement}
+      // maxTickets={maxTickets}         // ← 削除
+      // availableTickets={availableTickets}  // ← 削除
+      pricePerPerson={feeRequired}
+      participantCount={participantCount}
+      // useTickets={useTickets}         // ← 削除
+      // setUseTickets={setUseTickets}   // ← 削除
+      userWallet={userWallet}
+      usePoints={usePoints}
+      setUsePoints={setUsePoints}
+      pointsRequired={pointsRequired}
+      onPointCountChange={onPointCountChange}
+      // onTicketCountChange={onTicketCountChange}  // ← 削除
+      // onSelectedTicketsChange={onSelectedTicketsChange}  // ← 削除
+    />
+  )}
+}
+```
+
+**削除するコード一覧:**
+
+**PaymentSection.tsx:**
+- TicketsToggle import
+- AvailableTicket import（不要なら）
+- Interface の ticket 関連 props (6つ)
+- selectedTicketCount state
+- handleTicketCountChange callback
+- handleSelectedTicketsChange callback
+- getTitle() のチケット関連分岐
+- TicketsToggle コンポーネント呼び出し全体
+- PointsToggle の disabled 条件から selectedTicketCount
+
+**ConfirmPageView.tsx:**
+- calculations の maxTickets
+- selectedTicketCount, onTicketCountChange props
+- selectedTickets, onSelectedTicketsChange props
+- useTickets, setUseTickets props
+- availableTickets props
+- PaymentSection 条件から maxTickets チェック
+- PaymentSection に渡すチケット関連 props (7つ)
+
 **検証:**
-- 予約確認画面でチケットToggleが非表示
+- 予約確認画面でチケットToggleが表示されない
 - ポイント機能は正常に動作
-- タイトルが適切に表示される
+- タイトルが「ポイントを利用」または「支払い方法」のみ表示
+- TypeScript ビルドエラーがない
 
 ---
 
@@ -611,9 +747,9 @@ export default PaymentSection;
 
 **Phase 1:** metadata.ts で "tickets" を戻す（1分）
 **Phase 2:** Git履歴からディレクトリを復元（`git revert` または `git checkout`）（5分）
-**Phase 3:** SearchFilters の条件分岐を削除（5分）
+**Phase 3:** Git履歴から SearchFilters のチケットコードを復元（5分）
 **Phase 4:** Git履歴から GraphQL クエリを復元、codegen実行（15分）
-**Phase 5:** PaymentSection の isTicketsEnabled チェックを削除（5分）
+**Phase 5:** Git履歴から PaymentSection/ConfirmPageView のチケットコードを復元（10分）
 
 ---
 
@@ -640,8 +776,9 @@ export default PaymentSection;
 
 | ID | 操作 | 期待結果 | 優先度 |
 |----|------|---------|--------|
-| TC-3.1 | 検索画面を開く | チケットフィルター非表示 | P0 |
-| TC-3.2 | ポイントフィルター確認 | 正常に表示・動作 | P0 |
+| TC-3.1 | 検索画面を開く | チケットフィルター非表示、ポイントフィルターのみ表示 | P0 |
+| TC-3.2 | ポイントフィルター確認 | 正常に表示・動作（ラベル「ポイント利用可」） | P0 |
+| TC-3.3 | TypeScript ビルド | エラーなし | P0 |
 
 #### TS-4: リグレッション
 
@@ -664,7 +801,8 @@ export default PaymentSection;
 |----|------|---------|--------|
 | TC-6.1 | 予約確認画面を開く | チケットToggle非表示 | P0 |
 | TC-6.2 | ポイント利用確認 | 正常に動作 | P0 |
-| TC-6.3 | タイトル表示確認 | 適切なタイトル表示 | P1 |
+| TC-6.3 | タイトル表示確認 | 「ポイントを利用」または「支払い方法」のみ表示 | P0 |
+| TC-6.4 | TypeScript ビルド | エラーなし | P0 |
 
 ---
 
@@ -921,21 +1059,33 @@ graph TD
 
 ## 付録E: 実装パターン集
 
-### E-1. Client Component での条件付きレンダリング
+### E-1. コード削除方式（v1.5 アプローチ）
 
+**基本方針:**
+チケット機能を完全に停止するため、条件分岐ではなくコードそのものを削除する
+
+**理由:**
+- フィーチャーフラグが無効 + ディレクトリ削除済み → 条件チェックは冗長
+- コードが簡潔になり保守性が向上
+- Git履歴で管理するため、再有効化時も復元可能
+
+**例: SearchFilters.tsx**
 ```typescript
-"use client";
-import { currentCommunityConfig } from "@/lib/communities/metadata";
+// ❌ v1.4 アプローチ（条件分岐）
+const isTicketsEnabled = currentCommunityConfig.enableFeatures.includes("tickets");
+{(isTicketsEnabled || usePoints) && <FormField ... />}
 
-export function SearchFilters() {
-  const isTicketsEnabled = currentCommunityConfig.enableFeatures.includes("tickets");
+// ✅ v1.5 アプローチ（コード削除）
+{usePoints && <FormField ... />}
+```
 
-  return (
-    <div>
-      {isTicketsEnabled && <FilterButton label="チケット利用可" />}
-    </div>
-  );
-}
+**例: PaymentSection.tsx**
+```typescript
+// ❌ v1.4 アプローチ（条件分岐）
+{isTicketsEnabled && maxTickets > 0 && <TicketsToggle ... />}
+
+// ✅ v1.5 アプローチ（コード削除）
+// TicketsToggle コンポーネント呼び出し全体を削除
 ```
 
 ---
@@ -967,18 +1117,18 @@ git rm -r src/app/tickets/
 git rm -r src/app/admin/tickets/
 ```
 
-### F-3. 検索フィルターが完全に消える
+### F-3. Phase 3/5 実装後に TypeScript エラーが発生
 
-**原因:** ポイントフィルターも非表示にしている
+**原因:** チケット関連のコードを完全に削除していない（props、state、callbacks等が残っている）
 
-**正しい実装:**
-```typescript
-// ✅ 正しい
-{(isTicketsEnabled || usePoints) && <FormField ... />}
-
-// ❌ 間違い
-{isTicketsEnabled && <FormField ... />}
-```
+**対処:**
+Phase 3, Phase 5 の実装内容を再確認し、すべてのチケット関連コードを削除:
+- imports
+- interface props
+- state variables
+- callbacks
+- component calls
+- 条件分岐
 
 ---
 
@@ -1004,6 +1154,7 @@ git rm -r src/app/admin/tickets/
 | 1.2 | 2025-12-05 | 最終版（本編スリム化、ステークホルダー追加、GraphQL説明強化） | Claude |
 | 1.3 | 2025-12-06 | スコープ拡張（GraphQLクエリ削除、PaymentSection修正をIn Scopeに追加、Phase 4/5追加） | Claude |
 | 1.4 | 2025-12-06 | Phase 2変更（ページアクセス制御→ディレクトリ削除に変更、よりシンプルで徹底的な実装） | Claude |
+| 1.5 | 2025-12-06 | Phase 3/5をコード削除方式に変更（フィーチャーフラグチェック削除、冗長なコード排除、一貫性向上） | Claude |
 
 ---
 
@@ -1023,21 +1174,29 @@ git rm -r src/app/admin/tickets/
 
 ## 📌 実装者へのメッセージ
 
-本要件定義書 Ver1.4 は以下の点を重視して作成しました：
+本要件定義書 Ver1.5 は以下の点を重視して作成しました：
 
-1. **完全な無効化**: ディレクトリ削除+GraphQLクエリ削除による徹底的なチケット機能停止
-2. **シンプルな実装**: Phase 2はディレクトリごと削除（`git rm -r`）、コード追加不要
-3. **段階的実装**: 5つのPhaseに分割し、各Phase独立してロールバック可能
-4. **保守性の確保**: Git履歴で管理、将来の再有効化も可能
+1. **完全な無効化**: ディレクトリ削除+GraphQLクエリ削除+コード削除による徹底的なチケット機能停止
+2. **一貫したアプローチ**: Phase 2-5すべてで「削除」方式を採用（条件分岐ではなくコード削除）
+3. **シンプルで保守しやすいコード**: 冗長なフィーチャーフラグチェックを排除
+4. **段階的実装**: 5つのPhaseに分割し、各Phase独立してロールバック可能
+5. **Git履歴による管理**: 削除したコードはGit履歴で管理、将来の再有効化も可能
 
 **重要な実装順序:**
 - Phase 1: フィーチャーフラグ無効化（5分）
-- Phase 2: ディレクトリ削除（5分） - **notFound()不要、Next.jsが自動404**
-- Phase 3: SearchFilters修正（20分）
+- Phase 2: ディレクトリ削除（5分）
+- Phase 3: SearchFiltersのチケットコード削除（15分）
 - Phase 4: GraphQLクエリ削除+codegen（30分）
-- Phase 5: PaymentSection修正（15分）
+- Phase 5: PaymentSection/ConfirmPageViewのチケットコード削除（20分）
 
-**Phase 2のポイント:**
-ディレクトリごと削除するため、notFound()などのコード追加は不要です。Next.jsが自動的に404を返します。
+**v1.5の主な変更点（v1.4からの差分）:**
+- Phase 3: `isTicketsEnabled`チェック削除、条件を`usePoints`のみに簡素化
+- Phase 5: `isTicketsEnabled`チェック追加 → TicketsToggle完全削除に変更
+- 一貫性: すべてのPhaseで「コード削除」方式を採用
 
-不明点があれば、まず付録Aの技術的前提条件を参照してください。
+**実装のポイント:**
+- Phase 2: ディレクトリごと削除（`git rm -r`）、Next.jsが自動404
+- Phase 3/5: 条件分岐ではなくコード自体を削除（imports、props、callbacks、component callsすべて）
+- TypeScriptエラーが出たら、削除漏れがないか確認
+
+不明点があれば、まず付録Aの技術的前提条件と付録Eの実装パターン集を参照してください。
