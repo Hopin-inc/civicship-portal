@@ -2974,6 +2974,7 @@ export type GqlCurrentUserServerQuery = {
       __typename?: "User";
       id: string;
       name: string;
+      preferredLanguage: GqlLanguage;
       identities?: Array<{
         __typename?: "Identity";
         uid: string;
@@ -6816,6 +6817,7 @@ export const CurrentUserServerDocument = gql`
       user {
         id
         name
+        preferredLanguage
         identities {
           uid
           platform
