@@ -45,7 +45,7 @@ export function calculateReservationDetails(
   const pointsRequired = "pointsRequired" in opportunity ? opportunity.pointsRequired : 0;
   const isActivity = opportunity.category === GqlOpportunityCategory.Activity;
   const isQuest = opportunity.category === GqlOpportunityCategory.Quest;
-  const isPointsOnly = isPointsOnlyOpportunity(feeRequired, pointsRequired);
+  const isPointsOnly = isActivity && isPointsOnlyOpportunity(feeRequired, pointsRequired);
   const totalPointsRequired = pointsRequired * participantCount;
   const userPoint = wallet?.currentPoint ?? null;
   const hasInsufficientPoints = isPointsOnly && (userPoint === null || userPoint < totalPointsRequired);
