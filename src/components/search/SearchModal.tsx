@@ -119,7 +119,6 @@ export default function SearchModal({ isOpen, onClose, type }: SearchModalProps)
               location={location}
               dateRange={dateRange}
               guests={guests}
-              useTicket={useTicket}
               usePoints={usePoints}
             />
             <SearchFilterSheets
@@ -131,8 +130,6 @@ export default function SearchModal({ isOpen, onClose, type }: SearchModalProps)
               setDateRange={(val) => setValue("dateRange", val)}
               guests={guests}
               setGuests={(val) => setValue("guests", val)}
-              useTicket={useTicket}
-              setUseTicket={(val) => setValue("useTicket", val)}
               usePoints={usePoints}
               setUsePoints={(val) => setValue("usePoints", val)}
               clearActiveFilter={clearActiveFilter}

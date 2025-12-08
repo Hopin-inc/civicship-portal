@@ -11,7 +11,6 @@ import { CommentTextarea } from "@/app/reservation/confirm/components/CommentTex
 import { ExpectedPoints } from "@/app/reservation/confirm/components/payment/ExpectedPoints";
 import { PaymentSummary } from "@/app/reservation/confirm/components/payment/PaymentSummary";
 import { ActivityDetail, QuestDetail, isActivityCategory, isQuestCategory } from "@/components/domains/opportunities/types";
-import { AvailableTicket } from "@/app/reservation/confirm/presenters/presentReservationConfirm";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 export interface ConfirmPageViewProps {
@@ -41,11 +40,6 @@ export interface ConfirmPageViewProps {
   ageComment: string | null;
   onAgeCommentChange: (comment: string | null) => void;
   userWallet: number | null;
-  ticketCounter: {
-    count: number;
-    increment: () => void;
-    decrement: () => void;
-  };
   onConfirm: () => Promise<void>;
   validation: {
     isButtonDisabled: boolean;
@@ -75,7 +69,6 @@ export default function ConfirmPageView(props: ConfirmPageViewProps) {
     ageComment,
     onAgeCommentChange,
     userWallet,
-    ticketCounter,
     onConfirm,
     validation,
     creatingReservation,
@@ -139,9 +132,6 @@ export default function ConfirmPageView(props: ConfirmPageViewProps) {
 
       {isActivity && pointsRequired > 0 && !isPointsOnly && (
         <PaymentSection
-          ticketCount={ticketCounter.count}
-          onIncrement={ticketCounter.increment}
-          onDecrement={ticketCounter.decrement}
           pricePerPerson={feeRequired}
           participantCount={participantCount}
           userWallet={userWallet}

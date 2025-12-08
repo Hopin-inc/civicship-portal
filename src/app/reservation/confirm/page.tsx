@@ -15,7 +15,6 @@ import { useReservationWallet } from "@/app/reservation/confirm/hooks/useReserva
 import { useReservationParams } from "@/app/reservation/confirm/hooks/useReservationParams";
 import { useReservationUIState } from "@/app/reservation/confirm/hooks/useReservationUIState";
 import { useReservationCommand } from "@/app/reservation/confirm/hooks/useReservationAction";
-import { useTicketCounter } from "@/app/reservation/confirm/hooks/useTicketCounter";
 import { calculateReservationDetails } from "@/app/reservation/confirm/utils/reservationCalculations";
 import { validateReservation } from "@/app/reservation/confirm/utils/reservationValidation";
 import ConfirmPageView from "@/app/reservation/confirm/components/ConfirmPageView";
@@ -67,7 +66,6 @@ export default function ConfirmPage() {
     refetchRef.current = triggerRefetch;
   }, [triggerRefetch]);
 
-  const ticketCounter = useTicketCounter(0); // チケット機能停止: 常に0
   const ui = useReservationUIState();
   const { handleReservation, creatingReservation } = useReservationCommand();
 
@@ -100,7 +98,6 @@ export default function ConfirmPage() {
       selectedSlot,
       wallet,
       user: user ?? null,
-      ticketCounter,
       participantCount,
       comment: ui.ageComment ?? undefined,
       usePoints: ui.usePoints,
@@ -157,7 +154,6 @@ export default function ConfirmPage() {
       ageComment={ui.ageComment}
       onAgeCommentChange={ui.setAgeComment}
       userWallet={wallet?.currentPoint ?? null}
-      ticketCounter={ticketCounter}
       onConfirm={handleConfirm}
       validation={validation}
       creatingReservation={creatingReservation}

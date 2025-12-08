@@ -10,14 +10,12 @@ export function useSearchForm() {
   const location = watch("location") as string;
   const dateRange = watch("dateRange") as DateRange | undefined;
   const guests = watch("guests") as number;
-  const useTicket = watch("useTicket") as boolean;
   const usePoints = watch("usePoints") as boolean;
 
   const handleClear = () => {
     setValue("location", "");
     setValue("dateRange", undefined);
     setValue("guests", 1);
-    setValue("useTicket", false);
     setValue("usePoints", false);
     setValue("type", "activity");
   };
@@ -34,7 +32,7 @@ export function useSearchForm() {
         setValue("guests", 0);
         break;
       case "other":
-        setValue("useTicket", false);
+        setValue("usePoints", false);
         break;
     }
   };
@@ -43,7 +41,6 @@ export function useSearchForm() {
     location,
     dateRange,
     guests,
-    useTicket,
     usePoints,
     handleClear,
     baseClearActiveFilter,

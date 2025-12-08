@@ -47,7 +47,7 @@ export const useSearch = () => {
         setValue("guests", 0);
         break;
       case "other":
-        setValue("useTicket", false);
+        setValue("usePoints", false);
         break;
     }
   };

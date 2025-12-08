@@ -7,13 +7,10 @@ import {
 } from "@/types/graphql";
 import { ActivityDetail, QuestDetail } from "@/components/domains/opportunities/types";
 import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
-import { UseTicketCounterReturn } from "@/app/reservation/confirm/hooks/useTicketCounter";
 import { ReservationWallet } from "@/app/reservation/confirm/presenters/presentReservationConfirm";
 import { ApolloError } from "@apollo/client";
 import { logger } from "@/lib/logging";
 import { isPointsOnlyOpportunity } from "@/utils/opportunity/isPointsOnlyOpportunity";
-
-// チケット機能停止: getSelectedTicketIds は削除
 
 type Result =
   | { success: true; reservation: GqlReservation }
@@ -24,7 +21,6 @@ interface ReservationParams {
   selectedSlot: ActivitySlot | QuestSlot | null;
   wallet: ReservationWallet | null;
   user: Pick<GqlUser, "id"> | null;
-  ticketCounter: UseTicketCounterReturn;
   participantCount: number;
   usePoints: boolean;
   selectedPointCount: number;
@@ -41,7 +37,6 @@ export const useReservationCommand = () => {
       selectedSlot,
       wallet,
       user,
-      ticketCounter,
       comment,
       participantCount,
       usePoints,
