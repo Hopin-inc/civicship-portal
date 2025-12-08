@@ -9,6 +9,7 @@ import { applySsrAuthState } from "@/lib/auth/init/applySsrAuthState";
 import { useAuthActions } from "@/hooks/auth/actions";
 import { useAuthSideEffects } from "@/hooks/auth/sideEffects";
 import { useAuthValue } from "@/hooks/auth/init/useAuthValue";
+import { useLanguageSync } from "@/hooks/useLanguageSync";
 import { logger } from "@/lib/logging";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -70,6 +71,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
   const actions = React.useMemo(() => ({ logout }), [logout]);
 
   const value = useAuthValue({ refetchUser, actions });
+
+  // Sync browser language preference to server on first visit
+  useLanguageSync({ user: value.user, loading: value.loading });
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
