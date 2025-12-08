@@ -12,6 +12,7 @@ export const GET_CURRENT_USER = gql`
           user {
             id
             name
+            preferredLanguage
           }
           community {
             id
@@ -42,6 +43,7 @@ export const GET_CURRENT_USER_SERVER = gql`
           user {
             id
             name
+            preferredLanguage
           }
           community {
             id

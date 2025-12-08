@@ -2957,7 +2957,12 @@ export type GqlCurrentUserQuery = {
         headline?: string | null;
         bio?: string | null;
         reason: GqlMembershipStatusReason;
-        user?: { __typename?: "User"; id: string; name: string } | null;
+        user?: {
+          __typename?: "User";
+          id: string;
+          name: string;
+          preferredLanguage: GqlLanguage;
+        } | null;
         community?: { __typename?: "Community"; id: string; name?: string | null } | null;
       }> | null;
     } | null;
@@ -2987,7 +2992,12 @@ export type GqlCurrentUserServerQuery = {
         headline?: string | null;
         bio?: string | null;
         reason: GqlMembershipStatusReason;
-        user?: { __typename?: "User"; id: string; name: string } | null;
+        user?: {
+          __typename?: "User";
+          id: string;
+          name: string;
+          preferredLanguage: GqlLanguage;
+        } | null;
         community?: { __typename?: "Community"; id: string; name?: string | null } | null;
       }> | null;
     } | null;
@@ -6745,6 +6755,7 @@ export const CurrentUserDocument = gql`
           user {
             id
             name
+            preferredLanguage
           }
           community {
             id
@@ -6827,6 +6838,7 @@ export const CurrentUserServerDocument = gql`
           user {
             id
             name
+            preferredLanguage
           }
           community {
             id
