@@ -3084,6 +3084,7 @@ export type GqlGetSingleMembershipQuery = {
       bio?: string | null;
       currentPrefecture?: GqlCurrentPrefecture | null;
       phoneNumber?: string | null;
+      preferredLanguage: GqlLanguage;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
@@ -3124,30 +3125,47 @@ export type GqlGetMembershipListQuery = {
       cursor: string;
       node?: {
         __typename?: "Membership";
+        headline?: string | null;
+        bio?: string | null;
         role: GqlRole;
         status: GqlMembershipStatus;
+        reason: GqlMembershipStatusReason;
         user?: {
           __typename?: "User";
           id: string;
           name: string;
           image?: string | null;
+          bio?: string | null;
+          currentPrefecture?: GqlCurrentPrefecture | null;
+          phoneNumber?: string | null;
+          preferredLanguage: GqlLanguage;
+          urlFacebook?: string | null;
+          urlInstagram?: string | null;
+          urlX?: string | null;
           didIssuanceRequests?: Array<{
             __typename?: "DidIssuanceRequest";
+            id: string;
             status: GqlDidIssuanceStatus;
             didValue?: string | null;
+            requestedAt?: Date | null;
+            processedAt?: Date | null;
+            completedAt?: Date | null;
+            createdAt?: Date | null;
+            updatedAt?: Date | null;
           }> | null;
           wallets?: Array<{
             __typename?: "Wallet";
             id: string;
             type: GqlWalletType;
-            currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
             community?: {
               __typename?: "Community";
               id: string;
               name?: string | null;
               image?: string | null;
             } | null;
+            currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
           }> | null;
+          nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
         } | null;
         community?: {
           __typename?: "Community";
@@ -3278,6 +3296,7 @@ export type GqlGetCurrentUserProfileQuery = {
       bio?: string | null;
       currentPrefecture?: GqlCurrentPrefecture | null;
       phoneNumber?: string | null;
+      preferredLanguage: GqlLanguage;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
@@ -3318,6 +3337,7 @@ export type GqlGetCurrentUserProfileQuery = {
           bio?: string | null;
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
+          preferredLanguage: GqlLanguage;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -3377,6 +3397,7 @@ export type GqlUserFieldsFragment = {
   bio?: string | null;
   currentPrefecture?: GqlCurrentPrefecture | null;
   phoneNumber?: string | null;
+  preferredLanguage: GqlLanguage;
   urlFacebook?: string | null;
   urlInstagram?: string | null;
   urlX?: string | null;
@@ -3415,6 +3436,7 @@ export type GqlUserPortfolioFieldsFragment = {
     bio?: string | null;
     currentPrefecture?: GqlCurrentPrefecture | null;
     phoneNumber?: string | null;
+    preferredLanguage: GqlLanguage;
     urlFacebook?: string | null;
     urlInstagram?: string | null;
     urlX?: string | null;
@@ -3469,6 +3491,7 @@ export type GqlGetUserFlexibleQuery = {
     bio?: string | null;
     currentPrefecture?: GqlCurrentPrefecture | null;
     phoneNumber?: string | null;
+    preferredLanguage: GqlLanguage;
     urlFacebook?: string | null;
     urlInstagram?: string | null;
     urlX?: string | null;
@@ -3504,6 +3527,7 @@ export type GqlGetUserFlexibleQuery = {
         bio?: string | null;
         currentPrefecture?: GqlCurrentPrefecture | null;
         phoneNumber?: string | null;
+        preferredLanguage: GqlLanguage;
         urlFacebook?: string | null;
         urlInstagram?: string | null;
         urlX?: string | null;
@@ -3616,6 +3640,7 @@ export type GqlGetUserWalletQuery = {
     bio?: string | null;
     currentPrefecture?: GqlCurrentPrefecture | null;
     phoneNumber?: string | null;
+    preferredLanguage: GqlLanguage;
     urlFacebook?: string | null;
     urlInstagram?: string | null;
     urlX?: string | null;
@@ -3738,6 +3763,7 @@ export type GqlGetWalletsWithTransactionQuery = {
               bio?: string | null;
               currentPrefecture?: GqlCurrentPrefecture | null;
               phoneNumber?: string | null;
+              preferredLanguage: GqlLanguage;
               urlFacebook?: string | null;
               urlInstagram?: string | null;
               urlX?: string | null;
@@ -3757,6 +3783,7 @@ export type GqlGetWalletsWithTransactionQuery = {
               bio?: string | null;
               currentPrefecture?: GqlCurrentPrefecture | null;
               phoneNumber?: string | null;
+              preferredLanguage: GqlLanguage;
               urlFacebook?: string | null;
               urlInstagram?: string | null;
               urlX?: string | null;
@@ -3878,17 +3905,30 @@ export type GqlGetMemberWalletsQuery = {
         __typename?: "Wallet";
         id: string;
         type: GqlWalletType;
-        currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
         user?: {
           __typename?: "User";
           id: string;
           name: string;
           image?: string | null;
+          bio?: string | null;
+          currentPrefecture?: GqlCurrentPrefecture | null;
+          phoneNumber?: string | null;
+          preferredLanguage: GqlLanguage;
+          urlFacebook?: string | null;
+          urlInstagram?: string | null;
+          urlX?: string | null;
           didIssuanceRequests?: Array<{
             __typename?: "DidIssuanceRequest";
+            id: string;
             status: GqlDidIssuanceStatus;
             didValue?: string | null;
+            requestedAt?: Date | null;
+            processedAt?: Date | null;
+            completedAt?: Date | null;
+            createdAt?: Date | null;
+            updatedAt?: Date | null;
           }> | null;
+          nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
         } | null;
         community?: {
           __typename?: "Community";
@@ -3896,6 +3936,7 @@ export type GqlGetMemberWalletsQuery = {
           name?: string | null;
           image?: string | null;
         } | null;
+        currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
       } | null;
     } | null> | null;
   };
@@ -3953,6 +3994,7 @@ export type GqlGetArticlesQuery = {
           bio?: string | null;
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
+          preferredLanguage: GqlLanguage;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -3988,6 +4030,7 @@ export type GqlGetArticleQuery = {
       bio?: string | null;
       currentPrefecture?: GqlCurrentPrefecture | null;
       phoneNumber?: string | null;
+      preferredLanguage: GqlLanguage;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
@@ -4036,6 +4079,7 @@ export type GqlGetArticleQuery = {
       bio?: string | null;
       currentPrefecture?: GqlCurrentPrefecture | null;
       phoneNumber?: string | null;
+      preferredLanguage: GqlLanguage;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
@@ -4073,6 +4117,7 @@ export type GqlGetArticleQuery = {
           bio?: string | null;
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
+          preferredLanguage: GqlLanguage;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -4318,21 +4363,33 @@ export type GqlGetOpportunitiesQuery = {
         __typename?: "Opportunity";
         id: string;
         title: string;
-        category: GqlOpportunityCategory;
+        description: string;
+        body?: string | null;
         images?: Array<string> | null;
+        category: GqlOpportunityCategory;
+        publishStatus: GqlPublishStatus;
         isReservableWithTicket?: boolean | null;
+        requireApproval: boolean;
         feeRequired?: number | null;
         pointsToEarn?: number | null;
         pointsRequired?: number | null;
-        place?: { __typename?: "Place"; id: string; name: string } | null;
+        earliestReservableAt?: Date | null;
+        place?: {
+          __typename?: "Place";
+          id: string;
+          name: string;
+          address: string;
+          latitude: any;
+          longitude: any;
+        } | null;
         slots?: Array<{
           __typename?: "OpportunitySlot";
           id: string;
+          hostingStatus: GqlOpportunitySlotHostingStatus;
           startsAt: Date;
           endsAt: Date;
           capacity?: number | null;
           remainingCapacity?: number | null;
-          hostingStatus: GqlOpportunitySlotHostingStatus;
         }> | null;
       } | null;
     }>;
@@ -4350,6 +4407,7 @@ export type GqlGetOpportunityQuery = {
   __typename?: "Query";
   opportunity?: {
     __typename?: "Opportunity";
+    requireApproval: boolean;
     id: string;
     title: string;
     description: string;
@@ -4358,17 +4416,10 @@ export type GqlGetOpportunityQuery = {
     category: GqlOpportunityCategory;
     publishStatus: GqlPublishStatus;
     isReservableWithTicket?: boolean | null;
-    requireApproval: boolean;
     feeRequired?: number | null;
     pointsToEarn?: number | null;
     pointsRequired?: number | null;
     earliestReservableAt?: Date | null;
-    requiredUtilities?: Array<{
-      __typename?: "Utility";
-      id: string;
-      pointsRequired: number;
-      publishStatus: GqlPublishStatus;
-    }> | null;
     community?: {
       __typename?: "Community";
       id: string;
@@ -4382,24 +4433,61 @@ export type GqlGetOpportunityQuery = {
       address: string;
       latitude: any;
       longitude: any;
-      city?: { __typename?: "City"; state?: { __typename?: "State"; code: string } | null } | null;
+      city?: {
+        __typename?: "City";
+        code: string;
+        name: string;
+        state?: { __typename?: "State"; code: string; countryCode: string; name: string } | null;
+      } | null;
     } | null;
     slots?: Array<{
       __typename?: "OpportunitySlot";
       id: string;
+      hostingStatus: GqlOpportunitySlotHostingStatus;
       startsAt: Date;
       endsAt: Date;
       capacity?: number | null;
       remainingCapacity?: number | null;
-      hostingStatus: GqlOpportunitySlotHostingStatus;
+      reservations?: Array<{
+        __typename?: "Reservation";
+        id: string;
+        status: GqlReservationStatus;
+        comment?: string | null;
+        participantCountWithPoint?: number | null;
+        participations?: Array<{
+          __typename?: "Participation";
+          id: string;
+          source?: GqlSource | null;
+          status: GqlParticipationStatus;
+          reason: GqlParticipationStatusReason;
+          images?: Array<string> | null;
+          description?: string | null;
+          user?: {
+            __typename?: "User";
+            id: string;
+            name: string;
+            image?: string | null;
+            bio?: string | null;
+            currentPrefecture?: GqlCurrentPrefecture | null;
+            phoneNumber?: string | null;
+            preferredLanguage: GqlLanguage;
+            urlFacebook?: string | null;
+            urlInstagram?: string | null;
+            urlX?: string | null;
+            nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
+          } | null;
+        }> | null;
+      }> | null;
     }> | null;
     articles?: Array<{
       __typename?: "Article";
       id: string;
-      category: GqlArticleCategory;
       title: string;
-      thumbnail?: string | null;
+      body?: string | null;
       introduction: string;
+      thumbnail?: string | null;
+      category: GqlArticleCategory;
+      publishStatus: GqlPublishStatus;
       publishedAt?: Date | null;
     }> | null;
     createdByUser?: {
@@ -4408,16 +4496,92 @@ export type GqlGetOpportunityQuery = {
       name: string;
       image?: string | null;
       bio?: string | null;
+      currentPrefecture?: GqlCurrentPrefecture | null;
+      phoneNumber?: string | null;
+      preferredLanguage: GqlLanguage;
+      urlFacebook?: string | null;
+      urlInstagram?: string | null;
+      urlX?: string | null;
       articlesAboutMe?: Array<{
         __typename?: "Article";
         id: string;
-        category: GqlArticleCategory;
         title: string;
-        thumbnail?: string | null;
+        body?: string | null;
         introduction: string;
+        thumbnail?: string | null;
+        category: GqlArticleCategory;
+        publishStatus: GqlPublishStatus;
         publishedAt?: Date | null;
       }> | null;
+      opportunitiesCreatedByMe?: Array<{
+        __typename?: "Opportunity";
+        id: string;
+        title: string;
+        description: string;
+        body?: string | null;
+        images?: Array<string> | null;
+        category: GqlOpportunityCategory;
+        publishStatus: GqlPublishStatus;
+        isReservableWithTicket?: boolean | null;
+        requireApproval: boolean;
+        feeRequired?: number | null;
+        pointsToEarn?: number | null;
+        pointsRequired?: number | null;
+        earliestReservableAt?: Date | null;
+        community?: {
+          __typename?: "Community";
+          id: string;
+          name?: string | null;
+          image?: string | null;
+        } | null;
+        slots?: Array<{
+          __typename?: "OpportunitySlot";
+          id: string;
+          hostingStatus: GqlOpportunitySlotHostingStatus;
+          startsAt: Date;
+          endsAt: Date;
+          capacity?: number | null;
+          remainingCapacity?: number | null;
+          reservations?: Array<{
+            __typename?: "Reservation";
+            id: string;
+            status: GqlReservationStatus;
+            comment?: string | null;
+            participantCountWithPoint?: number | null;
+            participations?: Array<{
+              __typename?: "Participation";
+              id: string;
+              source?: GqlSource | null;
+              status: GqlParticipationStatus;
+              reason: GqlParticipationStatusReason;
+              images?: Array<string> | null;
+              description?: string | null;
+              user?: {
+                __typename?: "User";
+                id: string;
+                name: string;
+                image?: string | null;
+                bio?: string | null;
+                currentPrefecture?: GqlCurrentPrefecture | null;
+                phoneNumber?: string | null;
+                preferredLanguage: GqlLanguage;
+                urlFacebook?: string | null;
+                urlInstagram?: string | null;
+                urlX?: string | null;
+                nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
+              } | null;
+            }> | null;
+          }> | null;
+        }> | null;
+      }> | null;
+      nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
     } | null;
+    requiredUtilities?: Array<{
+      __typename?: "Utility";
+      id: string;
+      pointsRequired: number;
+      publishStatus: GqlPublishStatus;
+    }> | null;
   } | null;
 };
 
@@ -4598,6 +4762,7 @@ export type GqlGetOpportunitySlotWithParticipationsQuery = {
           bio?: string | null;
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
+          preferredLanguage: GqlLanguage;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -4739,6 +4904,7 @@ export type GqlGetParticipationQuery = {
             bio?: string | null;
             currentPrefecture?: GqlCurrentPrefecture | null;
             phoneNumber?: string | null;
+            preferredLanguage: GqlLanguage;
             urlFacebook?: string | null;
             urlInstagram?: string | null;
             urlX?: string | null;
@@ -4803,6 +4969,7 @@ export type GqlGetParticipationQuery = {
           bio?: string | null;
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
+          preferredLanguage: GqlLanguage;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -4876,6 +5043,7 @@ export type GqlGetParticipationQuery = {
         bio?: string | null;
         currentPrefecture?: GqlCurrentPrefecture | null;
         phoneNumber?: string | null;
+        preferredLanguage: GqlLanguage;
         urlFacebook?: string | null;
         urlInstagram?: string | null;
         urlX?: string | null;
@@ -4890,6 +5058,7 @@ export type GqlGetParticipationQuery = {
       bio?: string | null;
       currentPrefecture?: GqlCurrentPrefecture | null;
       phoneNumber?: string | null;
+      preferredLanguage: GqlLanguage;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
@@ -5022,6 +5191,7 @@ export type GqlGetReservationsQuery = {
           bio?: string | null;
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
+          preferredLanguage: GqlLanguage;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -5081,6 +5251,7 @@ export type GqlGetReservationQuery = {
       bio?: string | null;
       currentPrefecture?: GqlCurrentPrefecture | null;
       phoneNumber?: string | null;
+      preferredLanguage: GqlLanguage;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
@@ -5138,6 +5309,7 @@ export type GqlGetReservationQuery = {
           bio?: string | null;
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
+          preferredLanguage: GqlLanguage;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -5191,6 +5363,7 @@ export type GqlGetReservationQuery = {
         bio?: string | null;
         currentPrefecture?: GqlCurrentPrefecture | null;
         phoneNumber?: string | null;
+        preferredLanguage: GqlLanguage;
         urlFacebook?: string | null;
         urlInstagram?: string | null;
         urlX?: string | null;
@@ -5345,6 +5518,7 @@ export type GqlGetPlacesQuery = {
               bio?: string | null;
               currentPrefecture?: GqlCurrentPrefecture | null;
               phoneNumber?: string | null;
+              preferredLanguage: GqlLanguage;
               urlFacebook?: string | null;
               urlInstagram?: string | null;
               urlX?: string | null;
@@ -5423,6 +5597,7 @@ export type GqlGetPlaceQuery = {
         bio?: string | null;
         currentPrefecture?: GqlCurrentPrefecture | null;
         phoneNumber?: string | null;
+        preferredLanguage: GqlLanguage;
         urlFacebook?: string | null;
         urlInstagram?: string | null;
         urlX?: string | null;
@@ -5457,6 +5632,7 @@ export type GqlGetPlaceQuery = {
           bio?: string | null;
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
+          preferredLanguage: GqlLanguage;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -5570,6 +5746,7 @@ export type GqlGetTicketsQuery = {
               bio?: string | null;
               currentPrefecture?: GqlCurrentPrefecture | null;
               phoneNumber?: string | null;
+              preferredLanguage: GqlLanguage;
               urlFacebook?: string | null;
               urlInstagram?: string | null;
               urlX?: string | null;
@@ -5918,11 +6095,25 @@ export type GqlGetTransactionsQuery = {
             id: string;
             name: string;
             image?: string | null;
+            bio?: string | null;
+            currentPrefecture?: GqlCurrentPrefecture | null;
+            phoneNumber?: string | null;
+            preferredLanguage: GqlLanguage;
+            urlFacebook?: string | null;
+            urlInstagram?: string | null;
+            urlX?: string | null;
             didIssuanceRequests?: Array<{
               __typename?: "DidIssuanceRequest";
+              id: string;
               status: GqlDidIssuanceStatus;
               didValue?: string | null;
+              requestedAt?: Date | null;
+              processedAt?: Date | null;
+              completedAt?: Date | null;
+              createdAt?: Date | null;
+              updatedAt?: Date | null;
             }> | null;
+            nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
           } | null;
           community?: {
             __typename?: "Community";
@@ -5930,6 +6121,7 @@ export type GqlGetTransactionsQuery = {
             name?: string | null;
             image?: string | null;
           } | null;
+          currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
         } | null;
         toWallet?: {
           __typename?: "Wallet";
@@ -5940,11 +6132,25 @@ export type GqlGetTransactionsQuery = {
             id: string;
             name: string;
             image?: string | null;
+            bio?: string | null;
+            currentPrefecture?: GqlCurrentPrefecture | null;
+            phoneNumber?: string | null;
+            preferredLanguage: GqlLanguage;
+            urlFacebook?: string | null;
+            urlInstagram?: string | null;
+            urlX?: string | null;
             didIssuanceRequests?: Array<{
               __typename?: "DidIssuanceRequest";
+              id: string;
               status: GqlDidIssuanceStatus;
               didValue?: string | null;
+              requestedAt?: Date | null;
+              processedAt?: Date | null;
+              completedAt?: Date | null;
+              createdAt?: Date | null;
+              updatedAt?: Date | null;
             }> | null;
+            nftWallet?: { __typename?: "NftWallet"; id: string; walletAddress: string } | null;
           } | null;
           community?: {
             __typename?: "Community";
@@ -5952,6 +6158,7 @@ export type GqlGetTransactionsQuery = {
             name?: string | null;
             image?: string | null;
           } | null;
+          currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
         } | null;
       } | null;
     } | null> | null;
@@ -6017,6 +6224,7 @@ export const UserFieldsFragmentDoc = gql`
     bio
     currentPrefecture
     phoneNumber
+    preferredLanguage
     nftWallet {
       id
       walletAddress
@@ -6964,38 +7172,31 @@ export const GetMembershipListDocument = gql`
       edges {
         cursor
         node {
-          role
-          status
+          ...MembershipFields
           user {
-            id
-            name
-            image
+            ...UserFields
             didIssuanceRequests @include(if: $withDidIssuanceRequests) {
-              status
-              didValue
+              ...DidIssuanceRequestFields
             }
             wallets @include(if: $withWallets) {
-              id
-              type
-              currentPointView {
-                currentPoint
-              }
+              ...WalletFields
               community {
-                id
-                name
-                image
+                ...CommunityFields
               }
             }
           }
           community {
-            id
-            name
-            image
+            ...CommunityFields
           }
         }
       }
     }
   }
+  ${MembershipFieldsFragmentDoc}
+  ${UserFieldsFragmentDoc}
+  ${DidIssuanceRequestFieldsFragmentDoc}
+  ${WalletFieldsFragmentDoc}
+  ${CommunityFieldsFragmentDoc}
 `;
 
 /**
@@ -8018,29 +8219,24 @@ export const GetMemberWalletsDocument = gql`
       edges {
         cursor
         node {
-          id
-          type
-          currentPointView {
-            currentPoint
-          }
+          ...WalletFields
           user {
-            id
-            name
-            image
+            ...UserFields
             didIssuanceRequests @include(if: $withDidIssuanceRequests) {
-              status
-              didValue
+              ...DidIssuanceRequestFields
             }
           }
           community {
-            id
-            name
-            image
+            ...CommunityFields
           }
         }
       }
     }
   }
+  ${WalletFieldsFragmentDoc}
+  ${UserFieldsFragmentDoc}
+  ${DidIssuanceRequestFieldsFragmentDoc}
+  ${CommunityFieldsFragmentDoc}
 `;
 
 /**
@@ -8662,30 +8858,23 @@ export const GetOpportunitiesDocument = gql`
       edges {
         cursor
         node {
-          id
-          title
-          category
-          images
-          isReservableWithTicket
-          feeRequired
-          pointsToEarn
-          pointsRequired
+          ...OpportunityFields
           place {
             id
             name
+            address
+            latitude
+            longitude
           }
           slots(filter: $slotFilter, sort: $slotSort) @include(if: $includeSlot) {
-            id
-            startsAt
-            endsAt
-            capacity
-            remainingCapacity
-            hostingStatus
+            ...OpportunitySlotFields
           }
         }
       }
     }
   }
+  ${OpportunityFieldsFragmentDoc}
+  ${OpportunitySlotFieldsFragmentDoc}
 `;
 
 /**
@@ -8763,73 +8952,68 @@ export const GetOpportunityDocument = gql`
     $slotSort: OpportunitySlotSortInput
   ) {
     opportunity(id: $id, permission: $permission) {
-      id
-      title
-      description
-      body
-      images
-      category
-      publishStatus
-      isReservableWithTicket
+      ...OpportunityFields
+      community {
+        ...CommunityFields
+      }
+      place {
+        ...PlaceFields
+      }
+      slots(filter: $slotFilter, sort: $slotSort) {
+        ...OpportunitySlotFields
+        reservations {
+          ...ReservationFields
+          participations {
+            ...ParticipationFields
+            user {
+              ...UserFields
+            }
+          }
+        }
+      }
+      articles {
+        ...ArticleFields
+      }
+      createdByUser {
+        ...UserFields
+        articlesAboutMe {
+          ...ArticleFields
+        }
+        opportunitiesCreatedByMe {
+          ...OpportunityFields
+          community {
+            ...CommunityFields
+          }
+          slots {
+            ...OpportunitySlotFields
+            reservations {
+              ...ReservationFields
+              participations {
+                ...ParticipationFields
+                user {
+                  ...UserFields
+                }
+              }
+            }
+          }
+        }
+      }
       requireApproval
-      feeRequired
-      pointsToEarn
-      pointsRequired
-      earliestReservableAt
       requiredUtilities {
         id
         pointsRequired
         publishStatus
       }
-      community {
-        id
-        name
-        image
-      }
-      place {
-        id
-        name
-        address
-        latitude
-        longitude
-        city {
-          state {
-            code
-          }
-        }
-      }
-      slots(filter: $slotFilter, sort: $slotSort) {
-        id
-        startsAt
-        endsAt
-        capacity
-        remainingCapacity
-        hostingStatus
-      }
-      articles {
-        id
-        category
-        title
-        thumbnail
-        introduction
-        publishedAt
-      }
-      createdByUser {
-        id
-        name
-        image
-        bio
-        articlesAboutMe {
-          id
-          category
-          title
-          thumbnail
-          introduction
-          publishedAt
-        }
-      }
     }
   }
+  ${OpportunityFieldsFragmentDoc}
+  ${CommunityFieldsFragmentDoc}
+  ${PlaceFieldsFragmentDoc}
+  ${OpportunitySlotFieldsFragmentDoc}
+  ${ReservationFieldsFragmentDoc}
+  ${ParticipationFieldsFragmentDoc}
+  ${UserFieldsFragmentDoc}
+  ${ArticleFieldsFragmentDoc}
 `;
 
 /**
@@ -11282,39 +11466,27 @@ export const GetTransactionsDocument = gql`
         node {
           ...TransactionFields
           fromWallet {
-            id
-            type
+            ...WalletFields
             user {
-              id
-              name
-              image
               didIssuanceRequests @include(if: $withDidIssuanceRequests) {
-                status
-                didValue
+                ...DidIssuanceRequestFields
               }
+              ...UserFields
             }
             community {
-              id
-              name
-              image
+              ...CommunityFields
             }
           }
           toWallet {
-            id
-            type
+            ...WalletFields
             user {
-              id
-              name
-              image
               didIssuanceRequests @include(if: $withDidIssuanceRequests) {
-                status
-                didValue
+                ...DidIssuanceRequestFields
               }
+              ...UserFields
             }
             community {
-              id
-              name
-              image
+              ...CommunityFields
             }
           }
         }
@@ -11322,6 +11494,10 @@ export const GetTransactionsDocument = gql`
     }
   }
   ${TransactionFieldsFragmentDoc}
+  ${WalletFieldsFragmentDoc}
+  ${DidIssuanceRequestFieldsFragmentDoc}
+  ${UserFieldsFragmentDoc}
+  ${CommunityFieldsFragmentDoc}
 `;
 
 /**

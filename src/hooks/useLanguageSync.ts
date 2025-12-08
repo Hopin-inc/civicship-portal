@@ -20,7 +20,7 @@ const mapCookieToEnum = (cookie: string | null): GqlLanguage | null => {
 };
 
 interface UseLanguageSyncOptions {
-  user: GqlUser | null;
+  user: GqlUser | null | undefined;
   loading: boolean;
 }
 
