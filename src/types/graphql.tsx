@@ -3084,6 +3084,7 @@ export type GqlGetSingleMembershipQuery = {
       bio?: string | null;
       currentPrefecture?: GqlCurrentPrefecture | null;
       phoneNumber?: string | null;
+      preferredLanguage: GqlLanguage;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
@@ -3137,6 +3138,7 @@ export type GqlGetMembershipListQuery = {
           bio?: string | null;
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
+          preferredLanguage: GqlLanguage;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -3294,6 +3296,7 @@ export type GqlGetCurrentUserProfileQuery = {
       bio?: string | null;
       currentPrefecture?: GqlCurrentPrefecture | null;
       phoneNumber?: string | null;
+      preferredLanguage: GqlLanguage;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
@@ -3334,6 +3337,7 @@ export type GqlGetCurrentUserProfileQuery = {
           bio?: string | null;
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
+          preferredLanguage: GqlLanguage;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -3393,6 +3397,7 @@ export type GqlUserFieldsFragment = {
   bio?: string | null;
   currentPrefecture?: GqlCurrentPrefecture | null;
   phoneNumber?: string | null;
+  preferredLanguage: GqlLanguage;
   urlFacebook?: string | null;
   urlInstagram?: string | null;
   urlX?: string | null;
@@ -3431,6 +3436,7 @@ export type GqlUserPortfolioFieldsFragment = {
     bio?: string | null;
     currentPrefecture?: GqlCurrentPrefecture | null;
     phoneNumber?: string | null;
+    preferredLanguage: GqlLanguage;
     urlFacebook?: string | null;
     urlInstagram?: string | null;
     urlX?: string | null;
@@ -3485,6 +3491,7 @@ export type GqlGetUserFlexibleQuery = {
     bio?: string | null;
     currentPrefecture?: GqlCurrentPrefecture | null;
     phoneNumber?: string | null;
+    preferredLanguage: GqlLanguage;
     urlFacebook?: string | null;
     urlInstagram?: string | null;
     urlX?: string | null;
@@ -3520,6 +3527,7 @@ export type GqlGetUserFlexibleQuery = {
         bio?: string | null;
         currentPrefecture?: GqlCurrentPrefecture | null;
         phoneNumber?: string | null;
+        preferredLanguage: GqlLanguage;
         urlFacebook?: string | null;
         urlInstagram?: string | null;
         urlX?: string | null;
@@ -3632,6 +3640,7 @@ export type GqlGetUserWalletQuery = {
     bio?: string | null;
     currentPrefecture?: GqlCurrentPrefecture | null;
     phoneNumber?: string | null;
+    preferredLanguage: GqlLanguage;
     urlFacebook?: string | null;
     urlInstagram?: string | null;
     urlX?: string | null;
@@ -3754,6 +3763,7 @@ export type GqlGetWalletsWithTransactionQuery = {
               bio?: string | null;
               currentPrefecture?: GqlCurrentPrefecture | null;
               phoneNumber?: string | null;
+              preferredLanguage: GqlLanguage;
               urlFacebook?: string | null;
               urlInstagram?: string | null;
               urlX?: string | null;
@@ -3773,6 +3783,7 @@ export type GqlGetWalletsWithTransactionQuery = {
               bio?: string | null;
               currentPrefecture?: GqlCurrentPrefecture | null;
               phoneNumber?: string | null;
+              preferredLanguage: GqlLanguage;
               urlFacebook?: string | null;
               urlInstagram?: string | null;
               urlX?: string | null;
@@ -3902,6 +3913,7 @@ export type GqlGetMemberWalletsQuery = {
           bio?: string | null;
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
+          preferredLanguage: GqlLanguage;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -3982,6 +3994,7 @@ export type GqlGetArticlesQuery = {
           bio?: string | null;
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
+          preferredLanguage: GqlLanguage;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -4017,6 +4030,7 @@ export type GqlGetArticleQuery = {
       bio?: string | null;
       currentPrefecture?: GqlCurrentPrefecture | null;
       phoneNumber?: string | null;
+      preferredLanguage: GqlLanguage;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
@@ -4065,6 +4079,7 @@ export type GqlGetArticleQuery = {
       bio?: string | null;
       currentPrefecture?: GqlCurrentPrefecture | null;
       phoneNumber?: string | null;
+      preferredLanguage: GqlLanguage;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
@@ -4102,6 +4117,7 @@ export type GqlGetArticleQuery = {
           bio?: string | null;
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
+          preferredLanguage: GqlLanguage;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -4454,6 +4470,7 @@ export type GqlGetOpportunityQuery = {
             bio?: string | null;
             currentPrefecture?: GqlCurrentPrefecture | null;
             phoneNumber?: string | null;
+            preferredLanguage: GqlLanguage;
             urlFacebook?: string | null;
             urlInstagram?: string | null;
             urlX?: string | null;
@@ -4481,6 +4498,7 @@ export type GqlGetOpportunityQuery = {
       bio?: string | null;
       currentPrefecture?: GqlCurrentPrefecture | null;
       phoneNumber?: string | null;
+      preferredLanguage: GqlLanguage;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
@@ -4546,6 +4564,7 @@ export type GqlGetOpportunityQuery = {
                 bio?: string | null;
                 currentPrefecture?: GqlCurrentPrefecture | null;
                 phoneNumber?: string | null;
+                preferredLanguage: GqlLanguage;
                 urlFacebook?: string | null;
                 urlInstagram?: string | null;
                 urlX?: string | null;
@@ -4743,6 +4762,7 @@ export type GqlGetOpportunitySlotWithParticipationsQuery = {
           bio?: string | null;
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
+          preferredLanguage: GqlLanguage;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -4884,6 +4904,7 @@ export type GqlGetParticipationQuery = {
             bio?: string | null;
             currentPrefecture?: GqlCurrentPrefecture | null;
             phoneNumber?: string | null;
+            preferredLanguage: GqlLanguage;
             urlFacebook?: string | null;
             urlInstagram?: string | null;
             urlX?: string | null;
@@ -4948,6 +4969,7 @@ export type GqlGetParticipationQuery = {
           bio?: string | null;
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
+          preferredLanguage: GqlLanguage;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -5021,6 +5043,7 @@ export type GqlGetParticipationQuery = {
         bio?: string | null;
         currentPrefecture?: GqlCurrentPrefecture | null;
         phoneNumber?: string | null;
+        preferredLanguage: GqlLanguage;
         urlFacebook?: string | null;
         urlInstagram?: string | null;
         urlX?: string | null;
@@ -5035,6 +5058,7 @@ export type GqlGetParticipationQuery = {
       bio?: string | null;
       currentPrefecture?: GqlCurrentPrefecture | null;
       phoneNumber?: string | null;
+      preferredLanguage: GqlLanguage;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
@@ -5167,6 +5191,7 @@ export type GqlGetReservationsQuery = {
           bio?: string | null;
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
+          preferredLanguage: GqlLanguage;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -5226,6 +5251,7 @@ export type GqlGetReservationQuery = {
       bio?: string | null;
       currentPrefecture?: GqlCurrentPrefecture | null;
       phoneNumber?: string | null;
+      preferredLanguage: GqlLanguage;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
@@ -5283,6 +5309,7 @@ export type GqlGetReservationQuery = {
           bio?: string | null;
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
+          preferredLanguage: GqlLanguage;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -5336,6 +5363,7 @@ export type GqlGetReservationQuery = {
         bio?: string | null;
         currentPrefecture?: GqlCurrentPrefecture | null;
         phoneNumber?: string | null;
+        preferredLanguage: GqlLanguage;
         urlFacebook?: string | null;
         urlInstagram?: string | null;
         urlX?: string | null;
@@ -5490,6 +5518,7 @@ export type GqlGetPlacesQuery = {
               bio?: string | null;
               currentPrefecture?: GqlCurrentPrefecture | null;
               phoneNumber?: string | null;
+              preferredLanguage: GqlLanguage;
               urlFacebook?: string | null;
               urlInstagram?: string | null;
               urlX?: string | null;
@@ -5568,6 +5597,7 @@ export type GqlGetPlaceQuery = {
         bio?: string | null;
         currentPrefecture?: GqlCurrentPrefecture | null;
         phoneNumber?: string | null;
+        preferredLanguage: GqlLanguage;
         urlFacebook?: string | null;
         urlInstagram?: string | null;
         urlX?: string | null;
@@ -5602,6 +5632,7 @@ export type GqlGetPlaceQuery = {
           bio?: string | null;
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
+          preferredLanguage: GqlLanguage;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -5715,6 +5746,7 @@ export type GqlGetTicketsQuery = {
               bio?: string | null;
               currentPrefecture?: GqlCurrentPrefecture | null;
               phoneNumber?: string | null;
+              preferredLanguage: GqlLanguage;
               urlFacebook?: string | null;
               urlInstagram?: string | null;
               urlX?: string | null;
@@ -6066,6 +6098,7 @@ export type GqlGetTransactionsQuery = {
             bio?: string | null;
             currentPrefecture?: GqlCurrentPrefecture | null;
             phoneNumber?: string | null;
+            preferredLanguage: GqlLanguage;
             urlFacebook?: string | null;
             urlInstagram?: string | null;
             urlX?: string | null;
@@ -6102,6 +6135,7 @@ export type GqlGetTransactionsQuery = {
             bio?: string | null;
             currentPrefecture?: GqlCurrentPrefecture | null;
             phoneNumber?: string | null;
+            preferredLanguage: GqlLanguage;
             urlFacebook?: string | null;
             urlInstagram?: string | null;
             urlX?: string | null;
@@ -6190,6 +6224,7 @@ export const UserFieldsFragmentDoc = gql`
     bio
     currentPrefecture
     phoneNumber
+    preferredLanguage
     nftWallet {
       id
       walletAddress
