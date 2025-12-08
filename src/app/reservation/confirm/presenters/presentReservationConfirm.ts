@@ -7,8 +7,6 @@ import {
   GqlOpportunityCategory,
   GqlOpportunitySlot,
   GqlOpportunitySlotHostingStatus,
-  GqlTicket,
-  GqlTicketStatus,
   Maybe,
 } from "@/types/graphql";
 import { ActivityDetail, QuestDetail } from "@/components/domains/opportunities/types";
@@ -23,28 +21,11 @@ import { QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
 import { isDateReservable } from "@/app/reservation/data/presenter/opportunitySlot";
 
 /**
- * 利用可能なチケット情報
- */
-export interface AvailableTicket {
-  id: string;
-  utility: {
-    id: string;
-    name: string | null;
-    owner: {
-      id: string;
-      name: string;
-    } | null;
-  } | null;
-  status: GqlTicketStatus;
-  count: number;
-}
-
-/**
  * 予約確認画面で使用するウォレット情報
  */
 export interface ReservationWallet {
   currentPoint: number;
-  tickets: AvailableTicket[];
+  tickets: never[];
 }
 
 /**
@@ -178,21 +159,10 @@ export function presentReservationWallet(
   const currentPoint = toNumberSafe(memberWallet?.currentPointView?.currentPoint, 0);
 
   // チケット機能停止: ticketsは常に空配列
-  const tickets: AvailableTicket[] = [];
+  const tickets: never[] = [];
 
   return {
     currentPoint,
     tickets,
   };
-}
-
-/**
- * チケット機能停止により常に空配列を返す
- * @deprecated チケット機能は停止されました
- */
-function presentAvailableTickets(
-  tickets: GqlTicket[],
-  opportunity: ActivityDetail | QuestDetail | null,
-): AvailableTicket[] {
-  return [];
 }
