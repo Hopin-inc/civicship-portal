@@ -30,10 +30,6 @@ export const GET_CURRENT_USER_PROFILE = gql`
           community {
             id
           }
-          tickets {
-            id
-            status
-          }
         }
 
         nftWallet {
