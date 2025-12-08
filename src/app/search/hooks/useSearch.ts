@@ -17,7 +17,6 @@ export const useSearch = () => {
     setValue("location", "");
     setValue("dateRange", undefined);
     setValue("guests", 0);
-    setValue("useTicket", false);
     setActiveForm(null);
   };
 
@@ -28,7 +27,6 @@ export const useSearch = () => {
       values.location,
       values.dateRange,
       values.guests,
-      values.useTicket,
       "activity",
       // selectedTab,
     );

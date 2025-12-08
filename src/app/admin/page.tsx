@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { ClipboardList, Ticket, Users, Wallet, ArrowLeftRight } from "lucide-react";
+import { ClipboardList, Users, Wallet, ArrowLeftRight } from "lucide-react";
 import { currentCommunityConfig, FeaturesType } from "@/lib/communities/metadata";
 import { useAdminRole } from "@/app/admin/context/AdminRoleContext";
 import { GqlRole } from "@/types/graphql";
@@ -32,14 +32,7 @@ const adminSettings = [
   },
 ];
 
-const operatorSettings = [
-  {
-    title: "チケット管理",
-    href: "/admin/tickets",
-    icon: Ticket,
-    requiredFeature: "tickets" as FeaturesType,
-  },
-];
+const operatorSettings: typeof adminSettings = [];
 
 export default function AdminPage() {
   const router = useRouter();

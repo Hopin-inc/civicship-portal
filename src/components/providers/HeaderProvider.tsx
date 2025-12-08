@@ -93,7 +93,7 @@ const HeaderProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       return PAGE_TYPES.SEARCH;
     } else if (path.startsWith("/places")) {
       return PAGE_TYPES.PLACES;
-    } else if (path.startsWith("/users") || path.startsWith("/wallets") || path.startsWith("/tickets")) {
+    } else if (path.startsWith("/users") || path.startsWith("/wallets")) {
       return PAGE_TYPES.USER;
     }
     return PAGE_TYPES.HOME;

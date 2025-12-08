@@ -22,8 +22,6 @@ const pathHierarchy: PathHierarchy = {
   "/users/me": "/",
   "/wallets": "/users/me",
   "/wallets/[id]": "/wallets",
-  "/tickets": "/users/me",
-  "/tickets/receive": "/",
 };
 
 export const PAGE_TYPES = {
@@ -73,8 +71,7 @@ export const useHierarchicalNavigation = () => {
       return PAGE_TYPES.PLACES;
     } else if (
       path.startsWith("/users") ||
-      path.startsWith("/wallets") ||
-      path.startsWith("/tickets")
+      path.startsWith("/wallets")
     ) {
       return PAGE_TYPES.USER;
     }

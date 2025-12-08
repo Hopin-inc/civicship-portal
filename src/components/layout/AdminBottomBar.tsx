@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Book, ClipboardList, Settings, Ticket } from "lucide-react";
+import { Book, ClipboardList, Settings } from "lucide-react";
 import { usePathname } from "next/navigation";
 import React from "react";
 import { cn } from "@/lib/utils";
@@ -22,7 +22,6 @@ const AdminBottomBar: React.FC<AdminBottomBarProps> = ({ className }) => {
     !pathname.startsWith("/admin") ||
     pathname.startsWith("/admin/reservations/") ||
     pathname.startsWith("/admin/credentials/") ||
-    pathname.startsWith("/admin/tickets/") ||
     pathname.startsWith("/admin/members") ||
     pathname.startsWith("/admin/wallet/")
   ) {
@@ -48,15 +47,6 @@ const AdminBottomBar: React.FC<AdminBottomBarProps> = ({ className }) => {
             >
               <Book size={24} />
               <span className="text-xs mt-1">{t("navigation.adminBottomBar.reservations")}</span>
-            </Link>
-          )}
-          {enabledFeatures.includes("tickets") && (
-            <Link
-              href="/admin/tickets"
-              className={cn(getLinkStyle("/admin/tickets", "/admin/tickets/*"), "flex-grow")}
-            >
-              <Ticket size={24} />
-              <span className="text-xs mt-1">{t("navigation.adminBottomBar.tickets")}</span>
             </Link>
           )}
           {enabledFeatures.includes("credentials") && (

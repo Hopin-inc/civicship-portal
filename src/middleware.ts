@@ -9,7 +9,6 @@ const featureToRoutesMap: Partial<Record<FeaturesType, string[]>> = {
   places: ["/places"],
   opportunities: ["/activities", "/search"],
   points: ["/wallets"],
-  tickets: ["/tickets"],
   articles: ["/articles"],
 };
 

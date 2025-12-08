@@ -13,7 +13,6 @@ export interface SearchParams {
   to?: string;
   guests?: string;
   type?: "activity" | "quest";
-  ticket?: string;
   points?: string;
   q?: string;
 }
@@ -29,7 +28,6 @@ export function buildSearchResultParams(
   location: string,
   dateRange: DateRange | undefined,
   guests: number,
-  useTicket: boolean,
   usePoints: boolean,
   type: "activity" | "quest",
 ): URLSearchParams {
@@ -40,7 +38,6 @@ export function buildSearchResultParams(
   if (dateRange?.from) params.set("from", formatDateToJST(dateRange.from));
   if (dateRange?.to) params.set("to", formatDateToJST(dateRange.to));
   if (guests > 0) params.set("guests", guests.toString());
-  if (useTicket) params.set("ticket", "1");
   if (usePoints) params.set("points", "1");
   params.set("type", type);
 
@@ -60,7 +57,7 @@ export const mapNodeToCardProps = (node: GraphQLOpportunity): ActivityCard => ({
   location: node.place?.name || "場所未定",
   images: node.images || [],
   communityId: node.community?.id || "",
-  hasReservableTicket: node.isReservableWithTicket || false,
+  hasReservableTicket: false,
   pointsRequired: node.pointsRequired ?? null,
   slots: node.slots || [],
 });

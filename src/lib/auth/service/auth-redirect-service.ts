@@ -127,7 +127,7 @@ export class AuthRedirectService {
   }
 
   private isUserPath(pathname: string): boolean {
-    const userPaths = ["/users/me", "/tickets", "/wallets", "/wallets/*", "/admin", "/admin/*"];
+    const userPaths = ["/users/me", "/wallets", "/wallets/*", "/admin", "/admin/*"];
     return matchPaths(pathname, ...userPaths);
   }
 

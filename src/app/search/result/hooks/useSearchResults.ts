@@ -254,10 +254,6 @@ function buildFilter(searchParams: SearchParams): OpportunityFilterInput {
     }
   }
 
-  if (searchParams.ticket === "1") {
-    filter.isReservableWithTicket = true;
-  }
-
   if (searchParams.points === "1") {
     filter.isReservableWithPoint = true;
   }

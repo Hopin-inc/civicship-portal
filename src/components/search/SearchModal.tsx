@@ -37,7 +37,6 @@ export default function SearchModal({ isOpen, onClose, type }: SearchModalProps)
     location,
     dateRange,
     guests,
-    useTicket,
     usePoints,
     getValues,
     setValue,
@@ -51,7 +50,6 @@ export default function SearchModal({ isOpen, onClose, type }: SearchModalProps)
     !values.location &&
     !values.dateRange &&
     !values.guests &&
-    !values.useTicket &&
     !values.usePoints;
 
   const prefectureLabels = useMemo(
@@ -79,7 +77,6 @@ export default function SearchModal({ isOpen, onClose, type }: SearchModalProps)
       values.location,
       values.dateRange,
       values.guests,
-      values.useTicket,
       values.usePoints,
       type,
     );
