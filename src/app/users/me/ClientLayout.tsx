@@ -20,6 +20,13 @@ interface ClientLayoutProps {
 }
 
 export function ClientLayout({ children, ssrUser }: ClientLayoutProps) {
+  logger.info("[AUTH] /users/me ClientLayout: component rendering", {
+    hasSsrUser: !!ssrUser,
+    ssrUserId: ssrUser?.id,
+    ssrUserName: ssrUser?.name,
+    component: "ClientLayout",
+  });
+
   const { data, loading, error } = useQuery<CurrentUserProfileQueryResult>(GET_CURRENT_USER_PROFILE, {
     skip: !!ssrUser,
     fetchPolicy: "network-only",
@@ -32,9 +39,14 @@ export function ClientLayout({ children, ssrUser }: ClientLayoutProps) {
   logger.info("[AUTH] /users/me ClientLayout state", {
     hasSsrUser: !!ssrUser,
     ssrUserId: ssrUser?.id,
+    ssrUserName: ssrUser?.name,
+    querySkipped: !!ssrUser,
     loading,
     hasCsrUser: !!csrUser,
     csrUserId: csrUser?.id,
+    csrUserName: csrUser?.name,
+    hasData: !!data,
+    hasCurrentUser: !!data?.currentUser,
     hasError: !!error,
     errorMessage: error?.message,
     component: "ClientLayout",
@@ -51,6 +63,7 @@ export function ClientLayout({ children, ssrUser }: ClientLayoutProps) {
     logger.info("[AUTH] /users/me ClientLayout: loading spinner", {
       loading,
       hasCsrUser: !!csrUser,
+      hasData: !!data,
       hasError: !!error,
       errorMessage: error?.message,
       component: "ClientLayout",
@@ -59,7 +72,14 @@ export function ClientLayout({ children, ssrUser }: ClientLayoutProps) {
   }
 
   if (!csrUser) {
-    logger.info("[AUTH] /users/me ClientLayout: notFound", {
+    logger.warn("[AUTH] /users/me ClientLayout: notFound - no csrUser", {
+      hasData: !!data,
+      hasCurrentUser: !!data?.currentUser,
+      currentUserIsNull: data?.currentUser === null,
+      userIsNull: data?.currentUser?.user === null,
+      hasError: !!error,
+      errorMessage: error?.message,
+      loading,
       component: "ClientLayout",
     });
     return notFound();

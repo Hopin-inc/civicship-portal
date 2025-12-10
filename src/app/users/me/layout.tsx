@@ -4,11 +4,20 @@ import { mapGqlPortfolio, UserProfileProvider } from "@/app/users/features/share
 import { logger } from "@/lib/logging";
 
 export default async function MyPageLayout({ children }: { children: React.ReactNode }) {
+  logger.info("[AUTH] /users/me layout: Starting to fetch user", {
+    component: "MyPageLayout",
+  });
+
   const gqlUser = await fetchPrivateUserServer();
 
   logger.info("[AUTH] /users/me layout fetchPrivateUserServer result", {
     hasUser: !!gqlUser,
     userId: gqlUser?.id,
+    userName: gqlUser?.name,
+    hasWallets: !!gqlUser?.wallets,
+    walletsCount: gqlUser?.wallets?.length,
+    hasPortfolios: !!gqlUser?.portfolios,
+    portfoliosCount: gqlUser?.portfolios?.length,
     component: "MyPageLayout",
   });
 

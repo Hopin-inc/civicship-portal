@@ -16,27 +16,41 @@ export async function fetchPrivateUserServer(): Promise<GqlUser | null> {
 
   logger.info("[AUTH] fetchPrivateUserServer: checking session", {
     hasSession,
+    hasCookieHeader: !!cookieHeader,
+    cookieHeaderLength: cookieHeader?.length,
     component: "fetchPrivateUserServer",
   });
 
   if (!hasSession) {
-    logger.info("[AUTH] fetchPrivateUserServer: no session cookie, returning null", {
+    logger.warn("[AUTH] fetchPrivateUserServer: no session cookie, returning null", {
+      hasCookieHeader: !!cookieHeader,
       component: "fetchPrivateUserServer",
     });
     return null;
   }
 
   try {
+    logger.info("[AUTH] fetchPrivateUserServer: executing GraphQL query", {
+      component: "fetchPrivateUserServer",
+    });
+
     const res = await executeServerGraphQLQuery<
       FetchProfileServerResult,
       GqlCurrentUserServerQueryVariables
     >(FETCH_PROFILE_SERVER_QUERY, {}, cookieHeader ? { cookie: cookieHeader } : {});
+
+    logger.info("[AUTH] fetchPrivateUserServer: query response received", {
+      hasCurrentUser: !!res.currentUser,
+      hasUser: !!res.currentUser?.user,
+      component: "fetchPrivateUserServer",
+    });
 
     const user = res.currentUser?.user ?? null;
 
     logger.info("[AUTH] fetchPrivateUserServer: query succeeded", {
       hasUser: !!user,
       userId: user?.id,
+      userName: user?.name,
       component: "fetchPrivateUserServer",
     });
 
@@ -55,9 +69,11 @@ export async function fetchPrivateUserServer(): Promise<GqlUser | null> {
 
     return user;
   } catch (error) {
-    logger.warn("[AUTH] fetchPrivateUserServer: query failed", {
+    logger.error("[AUTH] fetchPrivateUserServer: query failed", {
+      errorType: error?.constructor?.name,
       message: (error as Error).message,
       stack: (error as Error).stack,
+      fullError: JSON.stringify(error, null, 2),
       component: "fetchPrivateUserServer",
     });
     return null;

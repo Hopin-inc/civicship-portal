@@ -77,10 +77,6 @@ export const FETCH_PROFILE_SERVER_QUERY = `
           community {
             id
           }
-          tickets {
-            id
-            status
-          }
         }
 
         nftWallet {
