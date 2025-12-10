@@ -25,7 +25,6 @@ export type UserProfileViewModel = {
     facebook: string | null;
   };
 
-  ticketsAvailable?: number;
   points?: number;
 
   portfolios: AppPortfolio[];
