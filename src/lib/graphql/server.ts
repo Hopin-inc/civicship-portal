@@ -31,11 +31,17 @@ export async function executeServerGraphQLQuery<
     ...headers,
   };
 
+  // Normalize cookie header to proper "Cookie" casing
+  if (requestHeaders["cookie"]) {
+    requestHeaders["Cookie"] = requestHeaders["cookie"];
+    delete requestHeaders["cookie"];
+  }
+
   logger.info("[GraphQL] executeServerGraphQLQuery: sending request", {
     endpoint: process.env.NEXT_PUBLIC_API_ENDPOINT,
     authMode: requestHeaders["X-Auth-Mode"],
-    hasCookie: !!requestHeaders["cookie"],
-    cookieLength: requestHeaders["cookie"]?.length ?? 0,
+    hasCookie: !!requestHeaders["Cookie"],
+    cookieLength: requestHeaders["Cookie"]?.length ?? 0,
     headerKeys: Object.keys(requestHeaders),
     component: "executeServerGraphQLQuery",
   });
