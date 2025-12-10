@@ -31,6 +31,15 @@ export async function executeServerGraphQLQuery<
     ...headers,
   };
 
+  logger.info("[GraphQL] executeServerGraphQLQuery: sending request", {
+    endpoint: process.env.NEXT_PUBLIC_API_ENDPOINT,
+    authMode: requestHeaders["X-Auth-Mode"],
+    hasCookie: !!requestHeaders["cookie"],
+    cookieLength: requestHeaders["cookie"]?.length ?? 0,
+    headerKeys: Object.keys(requestHeaders),
+    component: "executeServerGraphQLQuery",
+  });
+
   const response = await fetch(process.env.NEXT_PUBLIC_API_ENDPOINT!, {
     method: "POST",
     headers: requestHeaders,
@@ -41,13 +50,25 @@ export async function executeServerGraphQLQuery<
   });
 
   if (!response.ok) {
+    logger.error("[GraphQL] executeServerGraphQLQuery: HTTP error", {
+      status: response.status,
+      statusText: response.statusText,
+      component: "executeServerGraphQLQuery",
+    });
     throw new Error(`HTTP error! status: ${response.status}`);
   }
 
   const result: GraphQLResponse<TData> = await response.json();
 
+  logger.info("[GraphQL] executeServerGraphQLQuery: response received", {
+    hasData: !!result.data,
+    hasErrors: !!result.errors,
+    errorCount: result.errors?.length ?? 0,
+    component: "executeServerGraphQLQuery",
+  });
+
   if (result.errors) {
-    logger.error("GraphQL errors", {
+    logger.error("[GraphQL] executeServerGraphQLQuery: GraphQL errors", {
       errors: result.errors,
       component: "executeServerGraphQLQuery",
     });
