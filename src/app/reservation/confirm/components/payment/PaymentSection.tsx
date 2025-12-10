@@ -3,9 +3,6 @@ import { PointsToggle } from "./PointsToggle";
 import { isPointsOnlyOpportunity } from "@/utils/opportunity/isPointsOnlyOpportunity";
 
 interface PaymentSectionProps {
-  ticketCount: number;
-  onIncrement: () => void;
-  onDecrement: () => void;
   pricePerPerson: number | null;
   participantCount: number;
   usePoints: boolean;
