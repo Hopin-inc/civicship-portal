@@ -62,7 +62,6 @@ export const presenterActivityCard = (node: Partial<GqlOpportunity>): ActivityCa
     location: node?.place?.name || "場所未定",
     images: node?.images || [],
     communityId: COMMUNITY_ID || "",
-    hasReservableTicket: node?.isReservableWithTicket || false,
     pointsRequired: node?.pointsRequired ?? null,
     slots: node?.slots ?? [],
   };
@@ -76,7 +75,6 @@ export const presenterQuestCard = (node: Partial<GqlOpportunity>): QuestCard => 
     location: node?.place?.name || "場所未定",
     images: node?.images || [],
     communityId: COMMUNITY_ID || "",
-    hasReservableTicket: node?.isReservableWithTicket || false,
     pointsToEarn: node?.pointsToEarn ?? 0,
     slots: node?.slots ?? [],
     pointsRequired: node?.pointsRequired ?? null,
@@ -110,7 +108,6 @@ export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail =>
     slots: activitySlots,
 
     recentOpportunities: [],
-    reservableTickets: [],
     relatedActivities: [],
   };
 };

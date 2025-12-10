@@ -27,8 +27,6 @@ export type OpportunityBaseCard = CommunityId & {
   title: string;
   images: string[];
   location: string;
-
-  hasReservableTicket: boolean;
 };
 
 // ---------------------------------------------
@@ -49,7 +47,6 @@ export type ActivityDetail = OpportunityDetail & {
   feeRequired: number | null;
   slots: ActivitySlot[];
 
-  reservableTickets: ReservableActivityTicket[];
   relatedActivities: ActivityCard[];
 };
 
