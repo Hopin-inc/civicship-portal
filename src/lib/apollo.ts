@@ -24,9 +24,7 @@ const httpLink = createUploadLink({
 const requestLink = setContext(async (operation, prevContext) => {
   const isBrowser = typeof window !== "undefined";
   let token: string | null = null;
-  // Browser uses id_token mode only (session mode is SSR-only via executeServerGraphQLQuery)
-  // Server keeps session mode for any server-side Apollo usage
-  let authMode: "session" | "id_token" = isBrowser ? "id_token" : "session";
+  let authMode: "session" | "id_token" = "session"; // Default to session mode
 
   if (isBrowser) {
     const { firebaseUser } = useAuthStore.getState().state;
@@ -34,10 +32,14 @@ const requestLink = setContext(async (operation, prevContext) => {
     if (firebaseUser) {
       try {
         token = await firebaseUser.getIdToken();
+        // Only use id_token mode when we have a valid token
+        authMode = "id_token";
       } catch (error) {
         logger.warn("Failed to get ID token", { error });
+        // Keep session mode on error
       }
     }
+    // If no firebaseUser, keep session mode to use cookies
   }
 
   const headers = {

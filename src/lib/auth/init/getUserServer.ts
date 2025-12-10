@@ -20,7 +20,18 @@ export async function getUserServer(): Promise<{
 
   const phoneAuthenticated = cookieStore.get("phone_authenticated")?.value === "true";
 
+  logger.info("[AUTH] getUserServer: checking session", {
+    hasSession,
+    hasCookieHeader: !!cookieHeader,
+    cookieHeaderLength: cookieHeader?.length ?? 0,
+    phoneAuthenticated,
+    component: "getUserServer",
+  });
+
   if (!hasSession) {
+    logger.info("[AUTH] getUserServer: no session, returning null", {
+      component: "getUserServer",
+    });
     return {
       user: null,
       lineAuthenticated: false,
@@ -37,15 +48,23 @@ export async function getUserServer(): Promise<{
     const user: GqlUser | null = res.currentUser?.user ?? null;
     const hasPhoneIdentity = !!user?.identities?.some((i) => i.platform?.toUpperCase() === "PHONE");
 
+    logger.info("[AUTH] getUserServer: query succeeded", {
+      hasUser: !!user,
+      userId: user?.id,
+      hasPhoneIdentity,
+      component: "getUserServer",
+    });
+
     return {
       user,
       lineAuthenticated: true, // SSR時点でsessionがあればtrue扱い
       phoneAuthenticated: hasPhoneIdentity,
     };
   } catch (error) {
-    logger.warn("⚠️ Failed to fetch currentUser:", {
+    logger.warn("[AUTH] getUserServer: query failed", {
       message: (error as Error).message,
       stack: (error as Error).stack,
+      component: "getUserServer",
     });
     return {
       user: null,

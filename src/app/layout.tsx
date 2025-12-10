@@ -19,6 +19,9 @@ import { LiffDeepLinkHandler } from "@/components/liff/LiffDeepLinkHandler";
 
 const font = Inter({ subsets: ["latin"] });
 
+// Force dynamic rendering to ensure getUserServer runs on every request
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata(): Promise<Metadata> {
   const metadata = currentCommunityMetadata;
 

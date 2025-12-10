@@ -3,6 +3,9 @@ import { fetchPrivateUserServer } from "@/app/users/features/shared/server";
 import { mapGqlPortfolio, UserProfileProvider } from "@/app/users/features/shared";
 import { logger } from "@/lib/logging";
 
+// Force dynamic rendering to ensure fetchPrivateUserServer runs on every request
+export const dynamic = 'force-dynamic';
+
 export default async function MyPageLayout({ children }: { children: React.ReactNode }) {
   const gqlUser = await fetchPrivateUserServer();
 
