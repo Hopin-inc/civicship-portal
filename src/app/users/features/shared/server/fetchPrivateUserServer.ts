@@ -16,6 +16,8 @@ export async function fetchPrivateUserServer(): Promise<GqlUser | null> {
 
   logger.info("[AUTH] fetchPrivateUserServer: checking session", {
     hasSession,
+    hasCookieHeader: !!cookieHeader,
+    cookieHeaderLength: cookieHeader?.length ?? 0,
     component: "fetchPrivateUserServer",
   });
 
