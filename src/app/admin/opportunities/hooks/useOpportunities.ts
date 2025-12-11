@@ -1,14 +1,20 @@
 "use client";
 
-import { useInfiniteScrollQuery } from "@/hooks/useInfiniteScrollQuery";
-import { GET_ADMIN_OPPORTUNITIES } from "@/graphql/experience/opportunity/query";
-import {
-  GqlPublishStatus,
-  GqlOpportunitiesConnection,
-  GqlGetAdminOpportunitiesQuery,
-} from "@/types/graphql";
+import { useGetAdminOpportunitiesQuery, GqlPublishStatus, GqlOpportunitiesConnection } from "@/types/graphql";
 import { presentOpportunityList } from "../presenters/presentOpportunityList";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+
+const fallbackConnection: GqlOpportunitiesConnection = {
+  edges: [],
+  pageInfo: {
+    hasNextPage: false,
+    hasPreviousPage: false,
+    startCursor: null,
+    endCursor: null,
+  },
+  totalCount: 0,
+};
 
 interface UseOpportunitiesOptions {
   /**
@@ -30,6 +36,7 @@ interface UseOpportunitiesReturn {
 
 export function useOpportunities(options?: UseOpportunitiesOptions): UseOpportunitiesReturn {
   const { publishStatus = "all" } = options || {};
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   // GraphQLフィルタの構築
   const filter = useMemo(() => {
@@ -37,19 +44,63 @@ export function useOpportunities(options?: UseOpportunitiesOptions): UseOpportun
     return { publishStatus };
   }, [publishStatus]);
 
-  // useInfiniteScrollQueryを使用
-  const { data, loading, error, loadMoreRef, hasNextPage, isLoadingMore, refetch } =
-    useInfiniteScrollQuery<GqlGetAdminOpportunitiesQuery, GqlOpportunitiesConnection, any>(
-      GET_ADMIN_OPPORTUNITIES,
-      {
-        connectionKey: "opportunities",
+  // useQueryを直接使用
+  const { data, loading, error, fetchMore, refetch } = useGetAdminOpportunitiesQuery({
+    variables: {
+      filter,
+      first: 20,
+    },
+    fetchPolicy: "cache-first",
+  });
+
+  const opportunities = data?.opportunities ?? fallbackConnection;
+  const endCursor = opportunities.pageInfo?.endCursor;
+  const hasNextPage = opportunities.pageInfo?.hasNextPage ?? false;
+
+  const handleFetchMore = async () => {
+    if (!hasNextPage || isLoadingMore) return;
+
+    setIsLoadingMore(true);
+    try {
+      await fetchMore({
         variables: {
           filter,
+          cursor: endCursor,
           first: 20,
         },
-        onError: () => "募集の取得に失敗しました",
-      }
-    );
+        updateQuery: (prev, { fetchMoreResult }) => {
+          if (!fetchMoreResult || !prev.opportunities || !fetchMoreResult.opportunities) {
+            return prev;
+          }
+
+          return {
+            ...prev,
+            opportunities: {
+              ...prev.opportunities,
+              edges: [
+                ...new Map(
+                  [...prev.opportunities.edges, ...fetchMoreResult.opportunities.edges].map(
+                    (edge) => [edge?.node?.id, edge],
+                  ),
+                ).values(),
+              ],
+              pageInfo: fetchMoreResult.opportunities.pageInfo,
+            },
+          };
+        },
+      });
+    } catch (err) {
+      console.error("Failed to fetch more opportunities:", err);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
+
+  const loadMoreRef = useInfiniteScroll({
+    hasMore: hasNextPage,
+    isLoading: loading || isLoadingMore,
+    onLoadMore: handleFetchMore,
+  });
 
   // プレゼンテーション層への変換
   const formatted = useMemo(() => {
