@@ -7773,6 +7773,22 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "CheckIsSelfPermissionInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
               }
             ],
             "type": {
@@ -21616,13 +21632,9 @@
             "description": null,
             "args": [],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "ENUM",
-                "name": "Language",
-                "ofType": null
-              }
+              "kind": "ENUM",
+              "name": "Language",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -22197,6 +22209,18 @@
                 "name": "String",
                 "ofType": null
               }
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "preferredLanguage",
+            "description": null,
+            "type": {
+              "kind": "ENUM",
+              "name": "Language",
+              "ofType": null
             },
             "defaultValue": null,
             "isDeprecated": false,

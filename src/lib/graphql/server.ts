@@ -8,21 +8,23 @@ export interface GraphQLResponse<T> {
   data: T;
   errors?: Array<{
     message: string;
-    locations?: Array<{
-      line: number;
-      column: number;
-    }>;
+    locations?: Array<{ line: number; column: number }>;
     path?: Array<string | number>;
   }>;
 }
 
-/**
- * サーバーサイドでGraphQLクエリを実行する関数
- */
 export async function executeServerGraphQLQuery<
   TData = unknown,
   TVariables = Record<string, unknown>,
->(query: string, variables: TVariables, headers: Record<string, string> = {}): Promise<TData> {
+>(
+  query: string,
+  variables: TVariables,
+  headers: Record<string, string> = {},
+  timeoutMs: number = 5000, // ← ★ タイムアウト（デフォルト5秒）
+): Promise<TData> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
   const requestHeaders = {
     "Content-Type": "application/json",
     "X-Auth-Mode": "session",
@@ -31,21 +33,48 @@ export async function executeServerGraphQLQuery<
     ...headers,
   };
 
-  const response = await fetch(process.env.NEXT_PUBLIC_API_ENDPOINT!, {
-    method: "POST",
-    headers: requestHeaders,
-    body: JSON.stringify({
-      query,
-      variables,
-    }),
-  });
+  let response: Response;
 
+  try {
+    response = await fetch(process.env.NEXT_PUBLIC_API_ENDPOINT!, {
+      method: "POST",
+      headers: requestHeaders,
+      body: JSON.stringify({ query, variables }),
+      signal: controller.signal, // ← ★重要
+    });
+  } catch (err: any) {
+    clearTimeout(timeout);
+
+    // タイムアウトの場合
+    if (err.name === "AbortError") {
+      logger.error("GraphQL request timeout", {
+        query,
+        variables,
+        timeoutMs,
+        component: "executeServerGraphQLQuery",
+      });
+      throw new Error(`GraphQL request timeout after ${timeoutMs}ms`);
+    }
+
+    throw err;
+  }
+
+  clearTimeout(timeout);
+
+  // HTTP エラー（403 など）
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    const text = await response.text().catch(() => "");
+    logger.error("GraphQL HTTP error", {
+      status: response.status,
+      body: text,
+      component: "executeServerGraphQLQuery",
+    });
+    throw new Error(`GraphQL HTTP error! status: ${response.status}`);
   }
 
   const result: GraphQLResponse<TData> = await response.json();
 
+  // GraphQL エラー
   if (result.errors) {
     logger.error("GraphQL errors", {
       errors: result.errors,
