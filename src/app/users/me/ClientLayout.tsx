@@ -7,6 +7,7 @@ import { GET_CURRENT_USER_PROFILE } from "@/graphql/account/user/client-query";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { notFound } from "next/navigation";
 import { logger } from "@/lib/logging";
+import { useAuthStore } from "@/lib/auth/core/auth-store";
 
 interface CurrentUserProfileQueryResult {
   currentUser?: {
@@ -20,8 +21,10 @@ interface ClientLayoutProps {
 }
 
 export function ClientLayout({ children, ssrUser }: ClientLayoutProps) {
+  const { firebaseUser } = useAuthStore((state) => state.state);
+
   const { data, loading, error } = useQuery<CurrentUserProfileQueryResult>(GET_CURRENT_USER_PROFILE, {
-    skip: !!ssrUser,
+    skip: !!ssrUser || !firebaseUser,
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
   });
@@ -32,6 +35,7 @@ export function ClientLayout({ children, ssrUser }: ClientLayoutProps) {
   logger.info("[AUTH] /users/me ClientLayout state", {
     hasSsrUser: !!ssrUser,
     ssrUserId: ssrUser?.id,
+    hasFirebaseUser: !!firebaseUser,
     loading,
     hasCsrUser: !!csrUser,
     csrUserId: csrUser?.id,
@@ -45,6 +49,14 @@ export function ClientLayout({ children, ssrUser }: ClientLayoutProps) {
       component: "ClientLayout",
     });
     return <>{children}</>;
+  }
+
+  // Wait for Firebase authentication to complete
+  if (!firebaseUser) {
+    logger.info("[AUTH] /users/me ClientLayout: waiting for Firebase auth", {
+      component: "ClientLayout",
+    });
+    return <LoadingIndicator />;
   }
 
   if (loading && !csrUser) {

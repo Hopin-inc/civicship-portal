@@ -31,9 +31,20 @@ const requestLink = setContext(async (operation, prevContext) => {
   if (isBrowser) {
     const { firebaseUser } = useAuthStore.getState().state;
 
+    logger.info("[AUTH] Apollo requestLink", {
+      hasFirebaseUser: !!firebaseUser,
+      operation: operation.operationName,
+      component: "ApolloRequestLink",
+    });
+
     if (firebaseUser) {
       try {
         token = await firebaseUser.getIdToken();
+        logger.info("[AUTH] Apollo token retrieved", {
+          hasToken: !!token,
+          operation: operation.operationName,
+          component: "ApolloRequestLink",
+        });
       } catch (error) {
         logger.warn("Failed to get ID token", { error });
       }
