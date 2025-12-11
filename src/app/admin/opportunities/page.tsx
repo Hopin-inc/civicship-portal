@@ -33,15 +33,15 @@ export default function OpportunitiesPage() {
         </TabsList>
 
         <TabsContent value="all" className="mt-4">
-          <OpportunityList status="all" />
+          <OpportunityList key="all" status="all" />
         </TabsContent>
 
         <TabsContent value="published" className="mt-4">
-          <OpportunityList status={GqlPublishStatus.Public} />
+          <OpportunityList key="published" status={GqlPublishStatus.Public} />
         </TabsContent>
 
         <TabsContent value="draft" className="mt-4">
-          <OpportunityList status={GqlPublishStatus.Private} />
+          <OpportunityList key="draft" status={GqlPublishStatus.Private} />
         </TabsContent>
       </Tabs>
     </div>
