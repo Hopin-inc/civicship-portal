@@ -26,12 +26,11 @@ function OpportunityHorizontalCard({ title, image, imageAlt, badge, price, locat
       href={href ?? ""}
       className="block"
     >
-      <div className="mx-auto max-w-md">
-        <div
-          className={`flex overflow-hidden rounded-xl bg-background ${
-            withShadow ? "shadow-lg" : ""
-          }`}
-        >
+      <div
+        className={`flex overflow-hidden rounded-xl bg-background ${
+          withShadow ? "shadow-lg" : ""
+        }`}
+      >
           <div className="relative h-[108px] w-[88px] flex-shrink-0">
             <Image
               src={image ?? PLACEHOLDER_IMAGE}
@@ -81,7 +80,6 @@ function OpportunityHorizontalCard({ title, image, imageAlt, badge, price, locat
             )}
           </div>
         </div>
-      </div>
     </Link>
   );
 }
