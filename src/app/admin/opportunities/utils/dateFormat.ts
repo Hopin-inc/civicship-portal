@@ -1,40 +1,47 @@
 // src/app/admin/opportunities/utils/dateFormat.ts
 
 /**
- * ISO 8601形式の日付文字列を YYYY-MM-DD 形式にフォーマット
- * @param isoDateString ISO 8601形式の日付文字列
- * @returns YYYY-MM-DD 形式の文字列、または空文字列
+ * ISO文字列 → YYYY-MM-DD HH:mm
  */
-export function formatISODate(isoDateString: string | null | undefined): string {
-  if (!isoDateString) return "";
-
+export function formatISODateTime(iso: string | null | undefined): string {
+  if (!iso) return "";
   try {
-    return isoDateString.split("T")[0];
+    const date = new Date(iso);
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, "0");
+    const dd = String(date.getDate()).padStart(2, "0");
+    const hh = String(date.getHours()).padStart(2, "0");
+    const min = String(date.getMinutes()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
   } catch {
     return "";
   }
 }
 
 /**
- * ISO 8601形式の日付文字列を相対時間表示に変換
- * @param isoDateString ISO 8601形式の日付文字列
- * @returns 「○日前」形式の文字列、またはYYYY-MM-DD
+ * ISO文字列 → 相対表現 or YYYY-MM-DD HH:mm
  */
-export function formatRelativeDate(isoDateString: string | null | undefined): string {
-  if (!isoDateString) return "";
+export function formatRelativeDateTime(iso: string | null | undefined): string {
+  if (!iso) return "";
 
   try {
-    const date = new Date(isoDateString);
+    const date = new Date(iso);
     const now = new Date();
+
     const diffMs = now.getTime() - date.getTime();
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-    if (diffDays === 0) return "今日";
-    if (diffDays === 1) return "昨日";
-    if (diffDays < 7) return `${diffDays}日前`;
+    const time = `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(
+      2,
+      "0",
+    )}`;
 
-    return formatISODate(isoDateString);
+    if (diffDays === 0) return `今日 ${time}`;
+    if (diffDays === 1) return `昨日 ${time}`;
+    if (diffDays < 7) return `${diffDays}日前 ${time}`;
+
+    return formatISODateTime(iso);
   } catch {
-    return formatISODate(isoDateString);
+    return formatISODateTime(iso);
   }
 }
