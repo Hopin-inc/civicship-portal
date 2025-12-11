@@ -34,6 +34,15 @@ export async function fetchPrivateUserServer(): Promise<GqlUser | null> {
 
     const user = res.currentUser?.user ?? null;
 
+    logger.info("[AUTH] fetchPrivateUserServer: full response", {
+      hasCurrentUser: !!res.currentUser,
+      currentUserKeys: res.currentUser ? Object.keys(res.currentUser) : [],
+      hasUser: !!user,
+      userId: user?.id,
+      fullResponse: JSON.stringify(res),
+      component: "fetchPrivateUserServer",
+    });
+
     logger.info("[AUTH] fetchPrivateUserServer: query succeeded", {
       hasUser: !!user,
       userId: user?.id,
