@@ -81,10 +81,9 @@ export function SwipeBackNavigation({ children }: SwipeBackNavigationProps) {
       }
 
       const deltaX = touch.clientX - touchStartX.current;
-      const deltaY = Math.abs(touch.clientY - touchStartY.current);
 
-      // スワイプが逆方向または垂直方向に進んでいる場合はキャンセル
-      if (deltaX < 0 || deltaY > MAX_SWIPE_DISTANCE_Y) {
+      // スワイプが逆方向に進んでいる場合はキャンセル
+      if (deltaX < 0) {
         cancelSwipe();
       }
     };
