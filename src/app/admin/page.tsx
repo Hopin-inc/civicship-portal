@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { ArrowLeftRight, ClipboardList, Ticket, Users, Wallet } from "lucide-react";
+import { ArrowLeftRight, ClipboardList, MegaphoneIcon, Ticket, Users, Wallet } from "lucide-react";
 import { currentCommunityConfig, FeaturesType } from "@/lib/communities/metadata";
 import { useAdminRole } from "@/app/admin/context/AdminRoleContext";
 import { GqlRole } from "@/types/graphql";
@@ -33,6 +33,12 @@ const adminSettings = [
 ];
 
 const operatorSettings = [
+  {
+    title: "募集管理",
+    href: "/admin/opportunities",
+    icon: MegaphoneIcon,
+    requiredFeature: "opportunities" as FeaturesType,
+  },
   {
     title: "チケット管理",
     href: "/admin/tickets",
