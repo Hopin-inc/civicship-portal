@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { ClipboardList, Ticket, Users, Wallet, ArrowLeftRight } from "lucide-react";
+import { ArrowLeftRight, ClipboardList, Ticket, Users, Wallet } from "lucide-react";
 import { currentCommunityConfig, FeaturesType } from "@/lib/communities/metadata";
 import { useAdminRole } from "@/app/admin/context/AdminRoleContext";
 import { GqlRole } from "@/types/graphql";
@@ -53,7 +53,7 @@ export default function AdminPage() {
       showLogo: false,
       action: (
         <Link href="/users/me">
-          <Button variant="outline" size="sm">
+          <Button variant="tertiary" size="sm">
             {t("navigation.adminHeader.toUserScreen")}
             <ArrowLeftRight className="w-4 h-4 ml-1" />
           </Button>
