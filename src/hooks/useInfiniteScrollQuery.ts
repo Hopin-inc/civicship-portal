@@ -9,7 +9,7 @@ export interface UseInfiniteScrollQueryResult<TData, TEdge> {
   data: TData | undefined;
   loading: boolean;
   error: ApolloError | undefined;
-  loadMoreRef: React.RefObject<HTMLDivElement>;
+  loadMoreRef: (node: HTMLDivElement | null) => void;
   refetch: () => void;
   hasNextPage: boolean;
   isLoadingMore: boolean;
@@ -29,7 +29,7 @@ const fallbackConnection = {
 
 export const useInfiniteScrollQuery = <
   TData = unknown,
-  TConnection extends { edges: TEdge[]; pageInfo: { hasNextPage: boolean; endCursor: string | null } } = any,
+  TConnection extends { edges: TEdge[]; pageInfo: { hasNextPage: boolean; endCursor?: string | null } } = any,
   TEdge = unknown
 >(
   query: DocumentNode,
