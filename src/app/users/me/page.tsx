@@ -1,6 +1,6 @@
 "use client";
 
-import { useUserProfileContext, presentUserProfile } from "@/app/users/features/shared";
+import { presentUserProfile, useUserProfileContext } from "@/app/users/features/shared";
 import { UserProfileView } from "@/app/users/features/profile";
 import { useAuth } from "@/contexts/AuthProvider";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
@@ -31,7 +31,7 @@ export default function MyProfilePage() {
     () => ({
       action: hasAdminRole ? (
         <Link href="/admin">
-          <Button variant="outline" size="sm">
+          <Button variant="tertiary" size="sm">
             {t("users.profileHeader.adminButton")}
             <ArrowLeftRight className="w-4 h-4 ml-1" />
           </Button>
