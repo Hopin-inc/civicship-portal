@@ -21,6 +21,7 @@ export function SwipeBackNavigation({ children }: SwipeBackNavigationProps) {
   const { navigateBack } = useHierarchicalNavigation();
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
+  const touchId = useRef<number | null>(null);
   const isSwipeGesture = useRef(false);
 
   useEffect(() => {
@@ -29,15 +30,21 @@ export function SwipeBackNavigation({ children }: SwipeBackNavigationProps) {
     // LIFF環境でのみ有効化
     if (env !== AuthEnvironment.LIFF) return;
 
+    const cancelSwipe = () => {
+      isSwipeGesture.current = false;
+      touchId.current = null;
+    };
+
     const handleTouchStart = (e: TouchEvent) => {
-      // 画面左端からSWIPE_START_AREA_WIDTH以内からのスワイプのみ有効
+      // マルチタッチ時または既にスワイプ中の場合は無視
+      if (isSwipeGesture.current || e.touches.length > 1) return;
+
       const touch = e.touches[0];
-      if (touch.clientX > SWIPE_START_AREA_WIDTH) {
-        isSwipeGesture.current = false;
-        return;
-      }
+      // 画面左端からSWIPE_START_AREA_WIDTH以内からのスワイプのみ有効
+      if (touch.clientX > SWIPE_START_AREA_WIDTH) return;
 
       isSwipeGesture.current = true;
+      touchId.current = touch.identifier;
       touchStartX.current = touch.clientX;
       touchStartY.current = touch.clientY;
     };
@@ -45,31 +52,40 @@ export function SwipeBackNavigation({ children }: SwipeBackNavigationProps) {
     const handleTouchEnd = (e: TouchEvent) => {
       if (!isSwipeGesture.current) return;
 
-      const touch = e.changedTouches[0];
-      const touchEndX = touch.clientX;
-      const touchEndY = touch.clientY;
+      // identifier が一致するタッチを探す
+      const touch = Array.from(e.changedTouches).find((t) => t.identifier === touchId.current);
 
-      const deltaX = touchEndX - touchStartX.current;
-      const deltaY = Math.abs(touchEndY - touchStartY.current);
+      // ジェスチャーが終了したので状態をリセット
+      cancelSwipe();
+
+      if (!touch) return;
+
+      const deltaX = touch.clientX - touchStartX.current;
+      const deltaY = Math.abs(touch.clientY - touchStartY.current);
 
       // 横方向にMIN_SWIPE_DISTANCE_X以上、縦方向はMAX_SWIPE_DISTANCE_Y未満（横スワイプ判定）
       if (deltaX > MIN_SWIPE_DISTANCE_X && deltaY < MAX_SWIPE_DISTANCE_Y) {
         e.preventDefault();
         navigateBack();
       }
-
-      isSwipeGesture.current = false;
     };
 
     const handleTouchMove = (e: TouchEvent) => {
       if (!isSwipeGesture.current) return;
 
-      const touch = e.touches[0];
-      const deltaX = touch.clientX - touchStartX.current;
+      // identifier が一致するタッチを探す
+      const touch = Array.from(e.touches).find((t) => t.identifier === touchId.current);
+      if (!touch) {
+        cancelSwipe();
+        return;
+      }
 
-      // スワイプが逆方向に進んでいる場合はキャンセル
-      if (deltaX < 0) {
-        isSwipeGesture.current = false;
+      const deltaX = touch.clientX - touchStartX.current;
+      const deltaY = Math.abs(touch.clientY - touchStartY.current);
+
+      // スワイプが逆方向または垂直方向に進んでいる場合はキャンセル
+      if (deltaX < 0 || deltaY > MAX_SWIPE_DISTANCE_Y) {
+        cancelSwipe();
       }
     };
 
