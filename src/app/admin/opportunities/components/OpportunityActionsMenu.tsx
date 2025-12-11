@@ -32,7 +32,7 @@ export function OpportunityActionsMenu({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <ItemActions className="items-start pt-1 cursor-pointer">
+        <ItemActions className="items-start pt-1 cursor-pointer" aria-label="アクションメニューを開く">
           <Ellipsis className="size-5 text-foreground" />
         </ItemActions>
       </DropdownMenuTrigger>

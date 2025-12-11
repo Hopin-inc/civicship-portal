@@ -1,12 +1,25 @@
+"use client";
+
 import { Item, ItemContent, ItemFooter, ItemTitle } from "@/components/ui/item";
 import { OpportunityListItem } from "../types/OpportunityListItem";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { OpportunityActionsMenu } from "./OpportunityActionsMenu";
+import { useOpportunityActions } from "../hooks/useOpportunityActions";
+import { formatISODate } from "../utils/dateFormat";
+import { PUBLISH_STATUS_COLORS } from "../constants/opportunity";
 
-export function OpportunityItem({ opportunity }: { opportunity: OpportunityListItem }) {
+interface OpportunityItemProps {
+  opportunity: OpportunityListItem;
+}
+
+export function OpportunityItem({ opportunity }: OpportunityItemProps) {
   const hasImage = opportunity.images.length > 0;
   const imageUrl = hasImage ? opportunity.images[0] : null;
+
+  // アクションフックを使用
+  const { handleEdit, handleBackToDraft, handleCopyUrl, handleDeleteDraft } =
+    useOpportunityActions();
 
   return (
     <Item asChild>
@@ -16,10 +29,7 @@ export function OpportunityItem({ opportunity }: { opportunity: OpportunityListI
           <ItemContent>
             {/* タイトル（2行で ...） */}
             <ItemTitle
-              className={cn(
-                "font-bold text-base leading-snug",
-                "line-clamp-2", // ★ 2行制限
-              )}
+              className={cn("font-bold text-base leading-snug", "line-clamp-2")}
             >
               {opportunity.title}
             </ItemTitle>
@@ -32,10 +42,11 @@ export function OpportunityItem({ opportunity }: { opportunity: OpportunityListI
                 <span
                   className={cn(
                     "size-2.5 rounded-full",
-                    opportunity.publishStatusLabel === "公開中" ? "bg-green-500" : "bg-gray-400",
+                    PUBLISH_STATUS_COLORS[opportunity.publishStatus]
                   )}
+                  aria-label={opportunity.publishStatusLabel}
                 />
-                {opportunity.publishStatusLabel}・{formatDate(opportunity.updatedAt)}
+                {opportunity.publishStatusLabel}・{formatISODate(opportunity.updatedAt)}
               </span>
             </div>
           </ItemFooter>
@@ -44,7 +55,13 @@ export function OpportunityItem({ opportunity }: { opportunity: OpportunityListI
         {/* --- RIGHT IMAGE (あれば表示) --- */}
         {hasImage && (
           <div className="shrink-0 w-20 h-14 overflow-hidden rounded-md relative bg-muted">
-            <Image src={imageUrl!} alt="" fill className="object-cover" />
+            <Image
+              src={imageUrl!}
+              alt=""
+              fill
+              className="object-cover"
+              sizes="80px"
+            />
           </div>
         )}
 
@@ -59,32 +76,4 @@ export function OpportunityItem({ opportunity }: { opportunity: OpportunityListI
       </a>
     </Item>
   );
-}
-
-function formatDate(date: string) {
-  return date.split("T")[0];
-}
-
-function handleEdit(id: string) {
-  console.log("編集:", id);
-  // 例: 遷移する場合
-  // router.push(`/admin/opportunities/${id}/edit`);
-}
-
-function handleBackToDraft(id: string) {
-  console.log("下書きに戻す:", id);
-  // 例:
-  // mutateBackToDraft({ id })
-}
-
-function handleCopyUrl(id: string) {
-  const url = `${window.location.origin}/opportunities/${id}`;
-  navigator.clipboard.writeText(url);
-  console.log("URLコピー:", url);
-}
-
-function handleDeleteDraft(id: string) {
-  console.log("下書き削除:", id);
-  // 例:
-  // mutateDeleteDraft({ id })
 }

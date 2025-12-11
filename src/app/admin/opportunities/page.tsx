@@ -4,6 +4,7 @@ import { OpportunityList } from "./components/OpportunityList";
 import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { GqlPublishStatus } from "@/types/graphql";
 
 export default function OpportunitiesPage() {
   const headerConfig = useMemo(
@@ -13,24 +14,35 @@ export default function OpportunitiesPage() {
       showBackButton: true,
       backTo: "/admin",
     }),
-    [],
+    []
   );
   useHeaderConfig(headerConfig);
 
   return (
     <div className="p-4 max-w-2xl mx-auto">
-      <div className="flex justify-between items-center">{/*<CreateOpportunitySheet />*/}</div>
+      <div className="flex justify-between items-center mb-4">
+        {/* 新規作成ボタン（Phase 2で実装予定） */}
+        {/*<CreateOpportunitySheet />*/}
+      </div>
+
       <Tabs defaultValue="all" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="all">すべて</TabsTrigger>
           <TabsTrigger value="published">公開済み</TabsTrigger>
           <TabsTrigger value="draft">下書き</TabsTrigger>
         </TabsList>
-        <TabsContent value="all">
-          <OpportunityList />
+
+        <TabsContent value="all" className="mt-4">
+          <OpportunityList status="all" />
         </TabsContent>
-        <TabsContent value="published">{/*<OpportunityList status="published" />*/}</TabsContent>
-        <TabsContent value="draft">{/*<OpportunityList status="draft" />*/}</TabsContent>
+
+        <TabsContent value="published" className="mt-4">
+          <OpportunityList status={GqlPublishStatus.Public} />
+        </TabsContent>
+
+        <TabsContent value="draft" className="mt-4">
+          <OpportunityList status={GqlPublishStatus.Private} />
+        </TabsContent>
       </Tabs>
     </div>
   );
