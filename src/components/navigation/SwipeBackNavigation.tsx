@@ -1,8 +1,13 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useHierarchicalNavigation } from "@/hooks/useHierarchicalNavigation";
 import { detectEnvironment, AuthEnvironment } from "@/lib/auth/core/environment-detector";
+
+// スワイプジェスチャーの判定定数
+const SWIPE_START_AREA_WIDTH = 50; // 画面左端からの有効エリア (px)
+const MIN_SWIPE_DISTANCE_X = 100; // 最小横方向スワイプ距離 (px)
+const MAX_SWIPE_DISTANCE_Y = 75; // 最大縦方向移動距離 (px)
 
 interface SwipeBackNavigationProps {
   children: React.ReactNode;
@@ -14,6 +19,9 @@ interface SwipeBackNavigationProps {
  */
 export function SwipeBackNavigation({ children }: SwipeBackNavigationProps) {
   const { navigateBack } = useHierarchicalNavigation();
+  const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
+  const isSwipeGesture = useRef(false);
 
   useEffect(() => {
     const env = detectEnvironment();
@@ -21,51 +29,47 @@ export function SwipeBackNavigation({ children }: SwipeBackNavigationProps) {
     // LIFF環境でのみ有効化
     if (env !== AuthEnvironment.LIFF) return;
 
-    let touchStartX = 0;
-    let touchStartY = 0;
-    let isSwipeGesture = false;
-
     const handleTouchStart = (e: TouchEvent) => {
-      // 画面左端50px以内からのスワイプのみ有効
+      // 画面左端からSWIPE_START_AREA_WIDTH以内からのスワイプのみ有効
       const touch = e.touches[0];
-      if (touch.clientX > 50) {
-        isSwipeGesture = false;
+      if (touch.clientX > SWIPE_START_AREA_WIDTH) {
+        isSwipeGesture.current = false;
         return;
       }
 
-      isSwipeGesture = true;
-      touchStartX = touch.clientX;
-      touchStartY = touch.clientY;
+      isSwipeGesture.current = true;
+      touchStartX.current = touch.clientX;
+      touchStartY.current = touch.clientY;
     };
 
     const handleTouchEnd = (e: TouchEvent) => {
-      if (!isSwipeGesture) return;
+      if (!isSwipeGesture.current) return;
 
       const touch = e.changedTouches[0];
       const touchEndX = touch.clientX;
       const touchEndY = touch.clientY;
 
-      const deltaX = touchEndX - touchStartX;
-      const deltaY = Math.abs(touchEndY - touchStartY);
+      const deltaX = touchEndX - touchStartX.current;
+      const deltaY = Math.abs(touchEndY - touchStartY.current);
 
-      // 横方向に100px以上、縦方向は75px未満（横スワイプ判定）
-      if (deltaX > 100 && deltaY < 75) {
+      // 横方向にMIN_SWIPE_DISTANCE_X以上、縦方向はMAX_SWIPE_DISTANCE_Y未満（横スワイプ判定）
+      if (deltaX > MIN_SWIPE_DISTANCE_X && deltaY < MAX_SWIPE_DISTANCE_Y) {
         e.preventDefault();
         navigateBack();
       }
 
-      isSwipeGesture = false;
+      isSwipeGesture.current = false;
     };
 
     const handleTouchMove = (e: TouchEvent) => {
-      if (!isSwipeGesture) return;
+      if (!isSwipeGesture.current) return;
 
       const touch = e.touches[0];
-      const deltaX = touch.clientX - touchStartX;
+      const deltaX = touch.clientX - touchStartX.current;
 
       // スワイプが逆方向に進んでいる場合はキャンセル
       if (deltaX < 0) {
-        isSwipeGesture = false;
+        isSwipeGesture.current = false;
       }
     };
 
