@@ -1,42 +1,32 @@
-import {
-  GqlOpportunitiesConnection,
-  GqlOpportunityCategory,
-  GqlPublishStatus,
-} from "@/types/graphql";
+import { GqlOpportunitiesConnection } from "@/types/graphql";
+import { PUBLISH_STATUS_LABELS, OPPORTUNITY_CATEGORY_LABELS } from "../constants/opportunity";
 
+/**
+ * GraphQLのOpportunitiesConnectionをUI表示用に変換
+ * @param connection GraphQLから取得したOpportunitiesConnection
+ * @returns UI表示用に整形されたデータ
+ */
 export function presentOpportunityList(connection: GqlOpportunitiesConnection) {
   return {
     list: connection.edges
       .filter((edge) => edge.node != null)
       .map(({ node }) => {
-        // ★ updatedAt が null → createdAt fallback
-        const rawDate = node!.updatedAt ?? node!.createdAt ?? "";
+        // updatedAt が null の場合は createdAt にフォールバック
+        const updatedAt = node!.updatedAt ?? node!.createdAt ?? "";
 
         return {
           id: node!.id,
           title: node!.title,
           images: node!.images ?? [],
           category: node!.category,
-          categoryLabel: CATEGORY_LABELS[node!.category],
+          categoryLabel: OPPORTUNITY_CATEGORY_LABELS[node!.category],
           description: node!.description,
           publishStatus: node!.publishStatus,
-          publishStatusLabel: publishStatusLabelMap[node!.publishStatus] ?? "未設定",
-          updatedAt: rawDate ? String(rawDate) : "",
+          publishStatusLabel: PUBLISH_STATUS_LABELS[node!.publishStatus] ?? "未設定",
+          updatedAt: updatedAt ? String(updatedAt) : "",
           createdByUserName: node!.createdByUser?.name ?? "不明",
         };
       }),
     pageInfo: connection.pageInfo,
   };
 }
-
-const publishStatusLabelMap = {
-  [GqlPublishStatus.Public]: "公開中",
-  [GqlPublishStatus.CommunityInternal]: "限定公開",
-  [GqlPublishStatus.Private]: "非公開",
-};
-
-const CATEGORY_LABELS: Record<GqlOpportunityCategory, string> = {
-  ACTIVITY: "体験",
-  QUEST: "お手伝い",
-  EVENT: "イベント",
-};
