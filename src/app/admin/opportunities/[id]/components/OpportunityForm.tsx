@@ -18,6 +18,7 @@ import { PointField } from "@/app/admin/opportunities/[id]/components/fields/Poi
 import { SlotsField } from "@/app/admin/opportunities/[id]/components/fields/SlotsField";
 import { ImagesField } from "@/app/admin/opportunities/[id]/components/fields/ImagesField";
 import { PublishStatusField } from "@/app/admin/opportunities/[id]/components/fields/PublishStatusField";
+import { GqlOpportunityCategory } from "@/types/graphql";
 
 type Props = {
   mode: "create" | "update";
@@ -25,6 +26,15 @@ type Props = {
   initialValues: OpportunityFormValues;
   onSuccess?: (opportunityId?: string) => void;
 };
+
+// TODO: これらを実際のAPIから取得するように変更
+const CATEGORIES = [
+  { value: GqlOpportunityCategory.Activity, label: "アクティビティ" },
+  { value: GqlOpportunityCategory.Quest, label: "クエスト" },
+];
+
+const HOSTS: { id: string; name: string }[] = [];
+const PLACES: { id: string; label: string }[] = [];
 
 export function OpportunityForm({ mode, opportunityId, initialValues, onSuccess }: Props) {
   const form = useOpportunityForm(initialValues, { mode, opportunityId });
@@ -47,7 +57,7 @@ export function OpportunityForm({ mode, opportunityId, initialValues, onSuccess 
             <CardDescription>カテゴリ、タイトル、概要、詳細などを入力します</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <CategoryField form={form} />
+            <CategoryField form={form} categories={CATEGORIES} />
             <TitleField form={form} />
             <SummaryField form={form} />
             <DescriptionField form={form} />
@@ -60,8 +70,8 @@ export function OpportunityForm({ mode, opportunityId, initialValues, onSuccess 
             <CardTitle>主催・場所</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            <HostUserField form={form} />
-            <PlaceField form={form} />
+            <HostUserField form={form} hosts={HOSTS} />
+            <PlaceField form={form} places={PLACES} />
             <RequireApprovalField form={form} />
           </CardContent>
         </Card>
