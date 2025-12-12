@@ -7,7 +7,7 @@ import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { GqlPublishStatus } from "@/types/graphql";
-import { PlusIcon } from "@heroicons/react/24/outline";
+import { Plus } from "lucide-react";
 
 export default function OpportunitiesPage() {
   const router = useRouter();
@@ -31,7 +31,7 @@ export default function OpportunitiesPage() {
           onClick={() => router.push("/admin/opportunities/new")}
           className="flex items-center gap-2"
         >
-          <PlusIcon className="h-4 w-4" />
+          <Plus className="h-4 w-4" />
           新規作成
         </Button>
       </div>
