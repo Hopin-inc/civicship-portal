@@ -4317,6 +4317,45 @@ export type GqlOpportunityFieldsFragment = {
   earliestReservableAt?: Date | null;
 };
 
+export type GqlGetAdminOpportunitiesQueryVariables = Exact<{
+  filter?: InputMaybe<GqlOpportunityFilterInput>;
+  sort?: InputMaybe<GqlOpportunitySortInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+}>;
+
+export type GqlGetAdminOpportunitiesQuery = {
+  __typename?: "Query";
+  opportunities: {
+    __typename?: "OpportunitiesConnection";
+    totalCount: number;
+    pageInfo: {
+      __typename?: "PageInfo";
+      startCursor?: string | null;
+      endCursor?: string | null;
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+    };
+    edges: Array<{
+      __typename?: "OpportunityEdge";
+      cursor: string;
+      node?: {
+        __typename?: "Opportunity";
+        id: string;
+        title: string;
+        description: string;
+        publishStatus: GqlPublishStatus;
+        category: GqlOpportunityCategory;
+        images?: Array<string> | null;
+        requireApproval: boolean;
+        createdAt?: Date | null;
+        updatedAt?: Date | null;
+        createdByUser?: { __typename?: "User"; id: string; name: string } | null;
+      } | null;
+    }>;
+  };
+};
+
 export type GqlGetOpportunitiesQueryVariables = Exact<{
   filter?: InputMaybe<GqlOpportunityFilterInput>;
   sort?: InputMaybe<GqlOpportunitySortInput>;
@@ -8689,6 +8728,112 @@ export type GetEvaluationSuspenseQueryHookResult = ReturnType<typeof useGetEvalu
 export type GetEvaluationQueryResult = Apollo.QueryResult<
   GqlGetEvaluationQuery,
   GqlGetEvaluationQueryVariables
+>;
+export const GetAdminOpportunitiesDocument = gql`
+  query GetAdminOpportunities(
+    $filter: OpportunityFilterInput
+    $sort: OpportunitySortInput
+    $first: Int
+    $cursor: String
+  ) {
+    opportunities(filter: $filter, sort: $sort, first: $first, cursor: $cursor) {
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
+      }
+      totalCount
+      edges {
+        cursor
+        node {
+          id
+          title
+          description
+          publishStatus
+          category
+          images
+          requireApproval
+          createdAt
+          updatedAt
+          createdByUser {
+            id
+            name
+          }
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetAdminOpportunitiesQuery__
+ *
+ * To run a query within a React component, call `useGetAdminOpportunitiesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAdminOpportunitiesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAdminOpportunitiesQuery({
+ *   variables: {
+ *      filter: // value for 'filter'
+ *      sort: // value for 'sort'
+ *      first: // value for 'first'
+ *      cursor: // value for 'cursor'
+ *   },
+ * });
+ */
+export function useGetAdminOpportunitiesQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GqlGetAdminOpportunitiesQuery,
+    GqlGetAdminOpportunitiesQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetAdminOpportunitiesQuery, GqlGetAdminOpportunitiesQueryVariables>(
+    GetAdminOpportunitiesDocument,
+    options,
+  );
+}
+export function useGetAdminOpportunitiesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetAdminOpportunitiesQuery,
+    GqlGetAdminOpportunitiesQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetAdminOpportunitiesQuery, GqlGetAdminOpportunitiesQueryVariables>(
+    GetAdminOpportunitiesDocument,
+    options,
+  );
+}
+export function useGetAdminOpportunitiesSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetAdminOpportunitiesQuery,
+        GqlGetAdminOpportunitiesQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GqlGetAdminOpportunitiesQuery,
+    GqlGetAdminOpportunitiesQueryVariables
+  >(GetAdminOpportunitiesDocument, options);
+}
+export type GetAdminOpportunitiesQueryHookResult = ReturnType<typeof useGetAdminOpportunitiesQuery>;
+export type GetAdminOpportunitiesLazyQueryHookResult = ReturnType<
+  typeof useGetAdminOpportunitiesLazyQuery
+>;
+export type GetAdminOpportunitiesSuspenseQueryHookResult = ReturnType<
+  typeof useGetAdminOpportunitiesSuspenseQuery
+>;
+export type GetAdminOpportunitiesQueryResult = Apollo.QueryResult<
+  GqlGetAdminOpportunitiesQuery,
+  GqlGetAdminOpportunitiesQueryVariables
 >;
 export const GetOpportunitiesDocument = gql`
   query GetOpportunities(

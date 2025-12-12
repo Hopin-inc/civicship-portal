@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { OpportunityActionsMenu } from "./OpportunityActionsMenu";
 import { useOpportunityActions } from "../hooks/useOpportunityActions";
-import { formatISODate } from "../utils/dateFormat";
+import { formatISODateTime } from "../utils/dateFormat";
 import { PUBLISH_STATUS_COLORS } from "../constants/opportunity";
 
 interface OpportunityItemProps {
@@ -28,9 +28,7 @@ export function OpportunityItem({ opportunity }: OpportunityItemProps) {
         <div className="flex flex-1 flex-col min-w-0">
           <ItemContent>
             {/* タイトル（2行で ...） */}
-            <ItemTitle
-              className={cn("font-bold text-base leading-snug", "line-clamp-2")}
-            >
+            <ItemTitle className={cn("font-bold text-base leading-snug", "line-clamp-2")}>
               {opportunity.title}
             </ItemTitle>
           </ItemContent>
@@ -42,11 +40,11 @@ export function OpportunityItem({ opportunity }: OpportunityItemProps) {
                 <span
                   className={cn(
                     "size-2.5 rounded-full",
-                    PUBLISH_STATUS_COLORS[opportunity.publishStatus]
+                    PUBLISH_STATUS_COLORS[opportunity.publishStatus],
                   )}
                   aria-label={opportunity.publishStatusLabel}
                 />
-                {opportunity.publishStatusLabel}・{formatISODate(opportunity.updatedAt)}
+                {opportunity.publishStatusLabel}・{formatISODateTime(opportunity.updatedAt)}
               </span>
             </div>
           </ItemFooter>
@@ -55,13 +53,7 @@ export function OpportunityItem({ opportunity }: OpportunityItemProps) {
         {/* --- RIGHT IMAGE (あれば表示) --- */}
         {hasImage && (
           <div className="shrink-0 w-20 h-14 overflow-hidden rounded-md relative bg-muted">
-            <Image
-              src={imageUrl!}
-              alt=""
-              fill
-              className="object-cover"
-              sizes="80px"
-            />
+            <Image src={imageUrl!} alt="" fill className="object-cover" sizes="80px" />
           </div>
         )}
 
