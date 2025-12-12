@@ -24,7 +24,7 @@ export function OpportunityItem({ opportunity, refetch }: OpportunityItemProps) 
 
   return (
     <Item asChild>
-      <a href={`/admin/opportunities/${opportunity.id}`} className="flex flex-1 gap-3">
+      <a href={`/opportunities/${opportunity.id}?admin=true`} className="flex flex-1 gap-3">
         {/* --- LEFT CONTENT --- */}
         <div className="flex flex-1 flex-col min-w-0">
           <ItemContent>

@@ -2,10 +2,12 @@
 
 import React from "react";
 import Link from "next/link";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { AuthEnvironment, detectEnvironment } from "@/lib/auth/core/environment-detector";
 import { cn } from "@/lib/utils";
+import { Edit } from "lucide-react";
 
 export type DisableReasonType = "noSlots" | "reservationClosed" | "externalBooking";
 
@@ -32,6 +34,10 @@ export const OpportunityDetailsFooter: React.FC<OpportunityDetailsFooterProps> =
   communityId,
   disableReason,
 }) => {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const isAdminView = searchParams.get("admin") === "true";
+
   const query = new URLSearchParams({
     id: opportunityId,
     community_id: communityId ?? COMMUNITY_ID,
@@ -41,6 +47,21 @@ export const OpportunityDetailsFooter: React.FC<OpportunityDetailsFooterProps> =
   const isLiff = env === AuthEnvironment.LIFF;
 
   const renderActionElement = () => {
+    // 管理者モードの場合は編集ボタンを表示
+    if (isAdminView) {
+      return (
+        <Button
+          variant="primary"
+          size="lg"
+          className="px-8"
+          onClick={() => router.push(`/admin/opportunities/${opportunityId}/edit`)}
+        >
+          <Edit className="h-4 w-4 mr-2" />
+          編集
+        </Button>
+      );
+    }
+
     if (disableReason && disableReason in DISABLE_MESSAGES) {
       return (
         <p className="text-muted-foreground text-body-md">

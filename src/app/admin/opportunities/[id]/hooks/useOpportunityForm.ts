@@ -12,6 +12,9 @@ import { toast } from "react-toastify";
 import { opportunityFormSchema, OpportunityFormValues } from "../opportunityForm";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
+// Re-export for convenience
+export type { OpportunityFormValues };
+
 type UseOpportunityFormOptions = {
   mode: "create" | "update";
   opportunityId?: string; // update のとき必須
