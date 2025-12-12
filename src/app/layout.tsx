@@ -16,6 +16,7 @@ import { getUserServer } from "@/lib/auth/init/getUserServer";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { LiffDeepLinkHandler } from "@/components/liff/LiffDeepLinkHandler";
+import { SwipeBackNavigation } from "@/components/navigation/SwipeBackNavigation";
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -62,11 +63,13 @@ const RootLayout = async ({
               >
                 <LiffDeepLinkHandler />
                 <HeaderProvider>
-                  <LoadingProvider>
-                    <AnalyticsProvider />
-                    <MainContent>{children}</MainContent>
-                    <Toaster />
-                  </LoadingProvider>
+                  <SwipeBackNavigation>
+                    <LoadingProvider>
+                      <AnalyticsProvider />
+                      <MainContent>{children}</MainContent>
+                      <Toaster />
+                    </LoadingProvider>
+                  </SwipeBackNavigation>
                 </HeaderProvider>
               </AuthProvider>
             </ApolloProvider>
