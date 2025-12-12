@@ -6,9 +6,9 @@ import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 import { toast } from "react-toastify";
 import {
-  useSetPublishStatusMutation,
-  useDeleteOpportunityMutation,
   GqlPublishStatus,
+  useDeleteOpportunityMutation,
+  useSetPublishStatusMutation,
 } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
@@ -20,9 +20,7 @@ interface UseOpportunityActionsReturn {
   handleDeleteDraft: (opportunityId: string) => Promise<void>;
 }
 
-export function useOpportunityActions(
-  refetch?: () => void
-): UseOpportunityActionsReturn {
+export function useOpportunityActions(refetch?: () => void): UseOpportunityActionsReturn {
   const router = useRouter();
   const [setPublishStatus] = useSetPublishStatusMutation();
   const [deleteOpportunity] = useDeleteOpportunityMutation();
@@ -34,7 +32,7 @@ export function useOpportunityActions(
     (opportunityId: string) => {
       router.push(`/admin/opportunities/${opportunityId}/edit`);
     },
-    [router]
+    [router],
   );
 
   /**
@@ -44,27 +42,24 @@ export function useOpportunityActions(
     (opportunityId: string) => {
       router.push(`/admin/opportunities/${opportunityId}`);
     },
-    [router]
+    [router],
   );
 
   /**
    * 募集URLをクリップボードにコピー
    */
-  const handleCopyUrl = useCallback(
-    (opportunityId: string) => {
-      const url = `${window.location.origin}/opportunities/${opportunityId}`;
+  const handleCopyUrl = useCallback((opportunityId: string) => {
+    const url = `${window.location.origin}/opportunities/${opportunityId}`;
 
-      navigator.clipboard
-        .writeText(url)
-        .then(() => {
-          toast.success("URLをコピーしました");
-        })
-        .catch(() => {
-          toast.error("URLのコピーに失敗しました");
-        });
-    },
-    []
-  );
+    navigator.clipboard
+      .writeText(url)
+      .then(() => {
+        toast.success("URLをコピーしました");
+      })
+      .catch(() => {
+        toast.error("URLのコピーに失敗しました");
+      });
+  }, []);
 
   /**
    * 下書きに戻す
@@ -76,7 +71,7 @@ export function useOpportunityActions(
           variables: {
             id: opportunityId,
             input: { publishStatus: GqlPublishStatus.Private },
-            permission: { communityId: COMMUNITY_ID },
+            permission: { communityId: COMMUNITY_ID, opportunityId },
           },
         });
         toast.success("下書きに戻しました");
@@ -86,7 +81,7 @@ export function useOpportunityActions(
         toast.error("下書きに戻せませんでした");
       }
     },
-    [setPublishStatus, refetch]
+    [setPublishStatus, refetch],
   );
 
   /**
@@ -113,7 +108,7 @@ export function useOpportunityActions(
         toast.error("下書きの削除に失敗しました");
       }
     },
-    [deleteOpportunity, refetch]
+    [deleteOpportunity, refetch],
   );
 
   return {

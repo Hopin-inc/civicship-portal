@@ -19,29 +19,30 @@ export default function OpportunitiesPage() {
       showBackButton: true,
       backTo: "/admin",
     }),
-    []
+    [],
   );
   useHeaderConfig(headerConfig);
 
   return (
     <div className="p-4 max-w-2xl mx-auto">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">募集管理</h1>
-        <Button
-          onClick={() => router.push("/admin/opportunities/new")}
-          className="flex items-center gap-2"
-        >
-          <Plus className="h-4 w-4" />
-          新規作成
-        </Button>
-      </div>
-
       <Tabs defaultValue="all" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="all">すべて</TabsTrigger>
-          <TabsTrigger value="published">公開済み</TabsTrigger>
-          <TabsTrigger value="draft">下書き</TabsTrigger>
-        </TabsList>
+        <div className="flex items-center justify-between mb-4">
+          <TabsList className="flex space-x-2">
+            <TabsTrigger value="all">すべて</TabsTrigger>
+            <TabsTrigger value="published">公開済み</TabsTrigger>
+            <TabsTrigger value="draft">下書き</TabsTrigger>
+          </TabsList>
+
+          <Button
+            onClick={() => router.push("/admin/opportunities/new")}
+            variant="primary"
+            size="sm"
+            className="gap-1" // ← アイコンとラベルの距離を詰める
+          >
+            <Plus className="h-4 w-4" /> {/* ← アイコンを縮小 */}
+            新規作成
+          </Button>
+        </div>
 
         <TabsContent value="all" className="mt-4">
           <OpportunityList key="all" status="all" />
