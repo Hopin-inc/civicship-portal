@@ -53,7 +53,7 @@ export function OpportunityList({ status = "all" }: OpportunityListProps) {
       {data.list.map((opportunity, idx) => (
         <div key={opportunity.id}>
           {idx !== 0 && <hr className="border-muted" />}
-          <OpportunityItem opportunity={opportunity} />
+          <OpportunityItem opportunity={opportunity} refetch={refetch} />
         </div>
       ))}
 

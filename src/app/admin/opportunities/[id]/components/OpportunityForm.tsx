@@ -20,20 +20,24 @@ import { ImagesField } from "@/app/admin/opportunities/[id]/components/fields/Im
 import { PublishStatusField } from "@/app/admin/opportunities/[id]/components/fields/PublishStatusField";
 
 type Props = {
+  mode: "create" | "update";
+  opportunityId?: string;
   initialValues: OpportunityFormValues;
-  categories: { value: OpportunityFormValues["category"]; label: string }[];
-  hosts: { id: string; name: string }[];
-  places: { id: string; label: string }[];
-  onSubmit: (v: OpportunityFormValues) => Promise<void>;
+  onSuccess?: (opportunityId?: string) => void;
 };
 
-export function OpportunityForm({ initialValues, categories, hosts, places, onSubmit }: Props) {
-  const form = useOpportunityForm(initialValues, onSubmit);
+export function OpportunityForm({ mode, opportunityId, initialValues, onSuccess }: Props) {
+  const form = useOpportunityForm(initialValues, { mode, opportunityId });
+
+  const handleSubmit = async (values: OpportunityFormValues) => {
+    const resultId = await form.submit(values);
+    onSuccess?.(resultId);
+  };
 
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(form.submit)}
+        onSubmit={form.handleSubmit(handleSubmit)}
         className="space-y-8 max-w-mobile-l mx-auto pb-20"
       >
         {/* 基本情報 */}
@@ -43,7 +47,7 @@ export function OpportunityForm({ initialValues, categories, hosts, places, onSu
             <CardDescription>カテゴリ、タイトル、概要、詳細などを入力します</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <CategoryField form={form} categories={categories} />
+            <CategoryField form={form} />
             <TitleField form={form} />
             <SummaryField form={form} />
             <DescriptionField form={form} />
@@ -56,8 +60,8 @@ export function OpportunityForm({ initialValues, categories, hosts, places, onSu
             <CardTitle>主催・場所</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            <HostUserField form={form} hosts={hosts} />
-            <PlaceField form={form} places={places} />
+            <HostUserField form={form} />
+            <PlaceField form={form} />
             <RequireApprovalField form={form} />
           </CardContent>
         </Card>
@@ -91,8 +95,8 @@ export function OpportunityForm({ initialValues, categories, hosts, places, onSu
         </Card>
 
         {/* 送信 */}
-        <Button type="submit" className="w-full py-4">
-          実行する
+        <Button type="submit" disabled={form.isSubmitting} className="w-full py-4">
+          {form.isSubmitting ? "保存中..." : mode === "create" ? "作成" : "更新"}
         </Button>
       </form>
     </Form>

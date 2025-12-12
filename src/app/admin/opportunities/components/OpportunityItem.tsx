@@ -11,15 +11,16 @@ import { PUBLISH_STATUS_COLORS } from "../constants/opportunity";
 
 interface OpportunityItemProps {
   opportunity: OpportunityListItem;
+  refetch?: () => void;
 }
 
-export function OpportunityItem({ opportunity }: OpportunityItemProps) {
+export function OpportunityItem({ opportunity, refetch }: OpportunityItemProps) {
   const hasImage = opportunity.images.length > 0;
   const imageUrl = hasImage ? opportunity.images[0] : null;
 
-  // アクションフックを使用
+  // アクションフックを使用（refetchを渡す）
   const { handleEdit, handleBackToDraft, handleCopyUrl, handleDeleteDraft } =
-    useOpportunityActions();
+    useOpportunityActions(refetch);
 
   return (
     <Item asChild>

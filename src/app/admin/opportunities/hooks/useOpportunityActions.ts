@@ -5,6 +5,12 @@
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 import { toast } from "react-toastify";
+import {
+  useSetPublishStatusMutation,
+  useDeleteOpportunityMutation,
+  GqlPublishStatus,
+} from "@/types/graphql";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 interface UseOpportunityActionsReturn {
   handleEdit: (opportunityId: string) => void;
@@ -14,8 +20,12 @@ interface UseOpportunityActionsReturn {
   handleDeleteDraft: (opportunityId: string) => Promise<void>;
 }
 
-export function useOpportunityActions(): UseOpportunityActionsReturn {
+export function useOpportunityActions(
+  refetch?: () => void
+): UseOpportunityActionsReturn {
   const router = useRouter();
+  const [setPublishStatus] = useSetPublishStatusMutation();
+  const [deleteOpportunity] = useDeleteOpportunityMutation();
 
   /**
    * 編集ページへ遷移
@@ -57,60 +67,53 @@ export function useOpportunityActions(): UseOpportunityActionsReturn {
   );
 
   /**
-   * 下書きに戻す（TODO: GraphQL mutation実装）
+   * 下書きに戻す
    */
   const handleBackToDraft = useCallback(
     async (opportunityId: string) => {
-      // TODO: GraphQL mutationを実装
-      console.log("下書きに戻す:", opportunityId);
-      toast.info("この機能は実装予定です");
-
-      // 実装例:
-      // try {
-      //   await updateOpportunityPublishStatus({
-      //     variables: {
-      //       id: opportunityId,
-      //       publishStatus: GqlPublishStatus.Private,
-      //     },
-      //   });
-      //   toast.success("下書きに戻しました");
-      //   refetch();
-      // } catch (error) {
-      //   toast.error("下書きに戻せませんでした");
-      // }
+      try {
+        await setPublishStatus({
+          variables: {
+            id: opportunityId,
+            input: { publishStatus: GqlPublishStatus.Private },
+            permission: { communityId: COMMUNITY_ID },
+          },
+        });
+        toast.success("下書きに戻しました");
+        refetch?.();
+      } catch (error) {
+        console.error(error);
+        toast.error("下書きに戻せませんでした");
+      }
     },
-    []
+    [setPublishStatus, refetch]
   );
 
   /**
-   * 下書きを削除（TODO: GraphQL mutation実装 + 確認ダイアログ）
+   * 下書きを削除
    */
   const handleDeleteDraft = useCallback(
     async (opportunityId: string) => {
-      // TODO: AlertDialogで確認を追加
-      // TODO: GraphQL mutationを実装
-      console.log("下書き削除:", opportunityId);
-      toast.info("この機能は実装予定です");
+      // 確認ダイアログ
+      if (!window.confirm("下書きを削除しますか？この操作は取り消せません。")) {
+        return;
+      }
 
-      // 実装例:
-      // const confirmed = await showConfirmDialog({
-      //   title: "下書きを削除しますか？",
-      //   description: "この操作は取り消せません。",
-      // });
-      //
-      // if (!confirmed) return;
-      //
-      // try {
-      //   await deleteOpportunity({
-      //     variables: { id: opportunityId },
-      //   });
-      //   toast.success("下書きを削除しました");
-      //   refetch();
-      // } catch (error) {
-      //   toast.error("下書きの削除に失敗しました");
-      // }
+      try {
+        await deleteOpportunity({
+          variables: {
+            id: opportunityId,
+            permission: { communityId: COMMUNITY_ID },
+          },
+        });
+        toast.success("下書きを削除しました");
+        refetch?.();
+      } catch (error) {
+        console.error(error);
+        toast.error("下書きの削除に失敗しました");
+      }
     },
-    []
+    [deleteOpportunity, refetch]
   );
 
   return {
