@@ -1,9 +1,15 @@
 "use client";
 
-import { useGetAdminOpportunitiesQuery, GqlPublishStatus, GqlOpportunitiesConnection } from "@/types/graphql";
+import {
+  useGetAdminOpportunitiesQuery,
+  GqlPublishStatus,
+  GqlOpportunitiesConnection,
+  GqlOpportunityFilterInput,
+} from "@/types/graphql";
 import { presentOpportunityList } from "../presenters/presentOpportunityList";
 import { useMemo, useState } from "react";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 const fallbackConnection: GqlOpportunitiesConnection = {
   edges: [],
@@ -39,9 +45,13 @@ export function useOpportunities(options?: UseOpportunitiesOptions): UseOpportun
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   // GraphQLフィルタの構築
-  const filter = useMemo(() => {
-    if (publishStatus === "all") return undefined;
-    return { publishStatus };
+  const filter = useMemo((): GqlOpportunityFilterInput => {
+    if (publishStatus === "all")
+      return {
+        communityIds: [COMMUNITY_ID],
+      };
+
+    return { publishStatus: [publishStatus], communityIds: [COMMUNITY_ID] };
   }, [publishStatus]);
 
   // useQueryを直接使用
