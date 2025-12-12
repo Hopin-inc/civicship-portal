@@ -113,7 +113,7 @@ export const SET_PUBLISH_STATUS = gql`
   mutation SetPublishStatus(
     $id: ID!
     $input: OpportunitySetPublishStatusInput!
-    $permission: CheckCommunityPermissionInput!
+    $permission: CheckOpportunityPermissionInput!
   ) {
     opportunitySetPublishStatus(id: $id, input: $input, permission: $permission) {
       ... on OpportunitySetPublishStatusSuccess {
@@ -131,10 +131,7 @@ export const SET_PUBLISH_STATUS = gql`
 // DELETE OPPORTUNITY
 // =====================================
 export const DELETE_OPPORTUNITY = gql`
-  mutation DeleteOpportunity(
-    $id: ID!
-    $permission: CheckCommunityPermissionInput!
-  ) {
+  mutation DeleteOpportunity($id: ID!, $permission: CheckCommunityPermissionInput!) {
     opportunityDelete(id: $id, permission: $permission) {
       ... on OpportunityDeleteSuccess {
         opportunityId
