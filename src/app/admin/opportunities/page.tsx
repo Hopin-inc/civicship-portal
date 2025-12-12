@@ -2,11 +2,16 @@
 
 import { OpportunityList } from "./components/OpportunityList";
 import { useMemo } from "react";
+import { useRouter } from "next/navigation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 import { GqlPublishStatus } from "@/types/graphql";
+import { PlusIcon } from "@heroicons/react/24/outline";
 
 export default function OpportunitiesPage() {
+  const router = useRouter();
+
   const headerConfig = useMemo(
     () => ({
       title: "募集一覧",
@@ -21,8 +26,14 @@ export default function OpportunitiesPage() {
   return (
     <div className="p-4 max-w-2xl mx-auto">
       <div className="flex justify-between items-center mb-4">
-        {/* 新規作成ボタン（Phase 2で実装予定） */}
-        {/*<CreateOpportunitySheet />*/}
+        <h1 className="text-2xl font-bold">募集管理</h1>
+        <Button
+          onClick={() => router.push("/admin/opportunities/new")}
+          className="flex items-center gap-2"
+        >
+          <PlusIcon className="h-4 w-4" />
+          新規作成
+        </Button>
       </div>
 
       <Tabs defaultValue="all" className="w-full">
