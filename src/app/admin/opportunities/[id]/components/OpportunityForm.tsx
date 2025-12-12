@@ -18,7 +18,15 @@ import { PointField } from "@/app/admin/opportunities/[id]/components/fields/Poi
 import { SlotsField } from "@/app/admin/opportunities/[id]/components/fields/SlotsField";
 import { ImagesField } from "@/app/admin/opportunities/[id]/components/fields/ImagesField";
 import { PublishStatusField } from "@/app/admin/opportunities/[id]/components/fields/PublishStatusField";
-import { GqlOpportunityCategory } from "@/types/graphql";
+import {
+  GqlOpportunityCategory,
+  useGetMembershipListQuery,
+  useGetPlacesQuery,
+  GqlMembershipStatus,
+} from "@/types/graphql";
+import { useMemo } from "react";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
 
 type Props = {
   mode: "create" | "update";
@@ -27,22 +35,71 @@ type Props = {
   onSuccess?: (opportunityId?: string) => void;
 };
 
-// TODO: これらを実際のAPIから取得するように変更
-const CATEGORIES = [
-  { value: GqlOpportunityCategory.Activity, label: "アクティビティ" },
-  { value: GqlOpportunityCategory.Quest, label: "クエスト" },
-];
-
-const HOSTS: { id: string; name: string }[] = [];
-const PLACES: { id: string; label: string }[] = [];
-
 export function OpportunityForm({ mode, opportunityId, initialValues, onSuccess }: Props) {
+  // メンバー一覧取得
+  const { data: membersData, loading: membersLoading } = useGetMembershipListQuery({
+    variables: {
+      filter: {
+        communityId: COMMUNITY_ID,
+        status: GqlMembershipStatus.Approved,
+      },
+      first: 100,
+    },
+    fetchPolicy: "cache-first",
+  });
+
+  // 場所一覧取得
+  const { data: placesData, loading: placesLoading } = useGetPlacesQuery({
+    variables: {
+      filter: {
+        communityId: COMMUNITY_ID,
+      },
+      first: 100,
+    },
+    fetchPolicy: "cache-first",
+  });
+
+  // データ変換
+  const hosts = useMemo(() => {
+    return (membersData?.memberships?.edges || [])
+      .map((edge) => edge?.node?.user)
+      .filter((user): user is NonNullable<typeof user> => user != null)
+      .map((user) => ({
+        id: user.id,
+        name: user.name || "名前なし",
+      }));
+  }, [membersData]);
+
+  const places = useMemo(() => {
+    return (placesData?.places?.edges || [])
+      .map((edge) => edge?.node)
+      .filter((place): place is NonNullable<typeof place> => place != null)
+      .map((place) => ({
+        id: place.id,
+        label: place.name,
+      }));
+  }, [placesData]);
+
+  const categories = [
+    { value: GqlOpportunityCategory.Activity, label: "アクティビティ" },
+    { value: GqlOpportunityCategory.Quest, label: "クエスト" },
+  ];
+
   const form = useOpportunityForm(initialValues, { mode, opportunityId });
 
   const handleSubmit = async (values: OpportunityFormValues) => {
     const resultId = await form.submit(values);
     onSuccess?.(resultId);
   };
+
+  // ローディング中
+  if (membersLoading || placesLoading) {
+    return (
+      <div className="container mx-auto py-8">
+        <LoadingIndicator />
+      </div>
+    );
+  }
 
   return (
     <Form {...form}>
@@ -57,7 +114,7 @@ export function OpportunityForm({ mode, opportunityId, initialValues, onSuccess 
             <CardDescription>カテゴリ、タイトル、概要、詳細などを入力します</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <CategoryField form={form} categories={CATEGORIES} />
+            <CategoryField form={form} categories={categories} />
             <TitleField form={form} />
             <SummaryField form={form} />
             <DescriptionField form={form} />
@@ -70,8 +127,8 @@ export function OpportunityForm({ mode, opportunityId, initialValues, onSuccess 
             <CardTitle>主催・場所</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            <HostUserField form={form} hosts={HOSTS} />
-            <PlaceField form={form} places={PLACES} />
+            <HostUserField form={form} hosts={hosts} />
+            <PlaceField form={form} places={places} />
             <RequireApprovalField form={form} />
           </CardContent>
         </Card>

@@ -8,7 +8,7 @@ import {
   useUpdateOpportunityContentMutation,
   useUpdateOpportunitySlotsBulkMutation,
 } from "@/types/graphql";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "react-toastify";
 import { opportunityFormSchema, OpportunityFormValues } from "../opportunityForm";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
@@ -26,8 +26,6 @@ export const useOpportunityForm = (
   initialValues: OpportunityFormValues,
   options: UseOpportunityFormOptions,
 ): OpportunityFormInstance => {
-  const { toast } = useToast();
-
   const [createOpportunity, createResult] = useCreateOpportunityMutation();
   const [updateOpportunityContent, updateContentResult] = useUpdateOpportunityContentMutation();
   const [updateOpportunitySlots, updateSlotsResult] = useUpdateOpportunitySlotsBulkMutation();
@@ -104,11 +102,7 @@ export const useOpportunityForm = (
           });
         }
 
-        toast({
-          title: "募集情報を更新しました",
-          description: "変更内容が保存されました。",
-        });
-
+        toast.success("募集情報を更新しました");
         return options.opportunityId;
       } else {
         // CREATE時は1回のmutationで完結
@@ -136,20 +130,12 @@ export const useOpportunityForm = (
 
         const createdId = result.data?.opportunityCreate?.opportunity?.id;
 
-        toast({
-          title: "募集を作成しました",
-          description: "新しい募集が作成されました。",
-        });
-
+        toast.success("募集を作成しました");
         return createdId;
       }
     } catch (error) {
       console.error(error);
-      toast({
-        title: "保存に失敗しました",
-        description: "通信状況を確認して、もう一度お試しください。",
-        variant: "destructive",
-      });
+      toast.error("保存に失敗しました。通信状況を確認して、もう一度お試しください。");
       return undefined;
     }
   };
