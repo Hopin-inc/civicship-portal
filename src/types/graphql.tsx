@@ -891,7 +891,7 @@ export type GqlMutationOpportunityDeleteArgs = {
 export type GqlMutationOpportunitySetPublishStatusArgs = {
   id: Scalars["ID"]["input"];
   input: GqlOpportunitySetPublishStatusInput;
-  permission: GqlCheckCommunityPermissionInput;
+  permission: GqlCheckOpportunityPermissionInput;
 };
 
 export type GqlMutationOpportunitySlotCreateArgs = {
@@ -4409,7 +4409,7 @@ export type GqlUpdateOpportunitySlotsBulkMutation = {
 export type GqlSetPublishStatusMutationVariables = Exact<{
   id: Scalars["ID"]["input"];
   input: GqlOpportunitySetPublishStatusInput;
-  permission: GqlCheckCommunityPermissionInput;
+  permission: GqlCheckOpportunityPermissionInput;
 }>;
 
 export type GqlSetPublishStatusMutation = {
@@ -9075,7 +9075,7 @@ export const SetPublishStatusDocument = gql`
   mutation SetPublishStatus(
     $id: ID!
     $input: OpportunitySetPublishStatusInput!
-    $permission: CheckCommunityPermissionInput!
+    $permission: CheckOpportunityPermissionInput!
   ) {
     opportunitySetPublishStatus(id: $id, input: $input, permission: $permission) {
       ... on OpportunitySetPublishStatusSuccess {
