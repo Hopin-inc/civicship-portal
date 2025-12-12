@@ -41,7 +41,7 @@ export function OpportunityForm({ mode, opportunityId, initialValues, onSuccess 
     variables: {
       filter: {
         communityId: COMMUNITY_ID,
-        status: GqlMembershipStatus.Approved,
+        status: GqlMembershipStatus.Joined,
       },
       first: 100,
     },
