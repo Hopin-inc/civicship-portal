@@ -5,12 +5,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { GqlOpportunityCategory, GqlPublishStatus } from "@/types/graphql";
 import { useOpportunityEditor } from "../hooks/useOpportunityEditor";
-import { OpportunityFormData, HostOption, PlaceOption } from "../types";
+import { HostOption, OpportunityFormData, PlaceOption } from "../types";
 import { SlotBatchAdder } from "./SlotBatchAdder";
 import { SlotPicker } from "./SlotPicker";
 import { ImageUploadSection } from "./ImageUploadSection";
@@ -43,12 +49,9 @@ export const OpportunityFormEditor = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8 pb-24">
+    <form onSubmit={handleSubmit} className="space-y-4">
       {/* ========== 基本情報 ========== */}
       <div className="space-y-6">
-        <h2 className="text-lg font-semibold">基本情報</h2>
-
-        {/* カテゴリ */}
         <div>
           <Label className="mb-2 block">カテゴリ *</Label>
 
@@ -61,13 +64,13 @@ export const OpportunityFormEditor = ({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={GqlOpportunityCategory.Activity}>アクティビティ</SelectItem>
-                <SelectItem value={GqlOpportunityCategory.Quest}>クエスト</SelectItem>
+                <SelectItem value={GqlOpportunityCategory.Activity}>体験</SelectItem>
+                <SelectItem value={GqlOpportunityCategory.Quest}>お手伝い</SelectItem>
               </SelectContent>
             </Select>
           ) : (
             <div className="flex h-10 w-full rounded-md border border-input bg-muted px-3 py-2 text-sm">
-              {isActivity ? "アクティビティ" : "クエスト"}
+              {isActivity ? "体験" : "お手伝い"}
             </div>
           )}
 
@@ -161,9 +164,14 @@ export const OpportunityFormEditor = ({
         <div className="flex items-center justify-between py-2">
           <div>
             <Label className="mb-1 block">主催者からの承認 *</Label>
-            <p className="text-sm text-muted-foreground">参加には主催者の承認が必要かどうかを設定します</p>
+            <p className="text-sm text-muted-foreground">
+              参加には主催者の承認が必要かどうかを設定します
+            </p>
           </div>
-          <Switch checked={editor.requireHostApproval} onCheckedChange={editor.setRequireHostApproval} />
+          <Switch
+            checked={editor.requireHostApproval}
+            onCheckedChange={editor.setRequireHostApproval}
+          />
         </div>
       </div>
 
@@ -288,34 +296,33 @@ export const OpportunityFormEditor = ({
       <Separator />
 
       {/* ========== 公開設定 ========== */}
-      <div className="space-y-6">
-        <h2 className="text-lg font-semibold">公開設定</h2>
-
-        <div>
-          <Label className="mb-2 block">公開状況 *</Label>
-          <Select
-            value={editor.publishStatus}
-            onValueChange={(v) => editor.setPublishStatus(v as GqlPublishStatus)}
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={GqlPublishStatus.Public}>公開中</SelectItem>
-              <SelectItem value={GqlPublishStatus.Private}>下書き</SelectItem>
-            </SelectContent>
-          </Select>
-          <p className="text-sm text-muted-foreground mt-2">
-            「下書き」の募集は公開されず、主催者と運用担当者・管理者のみが閲覧できます
-          </p>
-        </div>
+      <div>
+        <Label className="mb-2 block">公開状況 *</Label>
+        <Select
+          value={editor.publishStatus}
+          onValueChange={(v) => editor.setPublishStatus(v as GqlPublishStatus)}
+        >
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={GqlPublishStatus.Public}>公開中</SelectItem>
+            <SelectItem value={GqlPublishStatus.Private}>下書き</SelectItem>
+          </SelectContent>
+        </Select>
+        <p className="text-sm text-muted-foreground mt-2">
+          「下書き」の募集は公開されず、主催者と運用担当者・管理者のみが閲覧できます
+        </p>
       </div>
-
-      <Separator />
 
       {/* ========== 送信ボタン ========== */}
       <div className="w-full max-w-[345px] mx-auto">
-        <Button type="submit" variant="primary" className="w-full h-[56px]" disabled={editor.saving}>
+        <Button
+          type="submit"
+          variant="primary"
+          className="w-full h-[56px]"
+          disabled={editor.saving}
+        >
           {editor.saving ? "保存中..." : mode === "create" ? "作成" : "更新"}
         </Button>
       </div>
