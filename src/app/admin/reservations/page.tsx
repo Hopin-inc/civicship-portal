@@ -128,11 +128,15 @@ export default function ReservationsPage() {
 
   return (
     <>
-      <div className={"px-4"}>
-        <Tabs value={activeTab} onValueChange={handleTabChange} className="sticky p-4 pb-0 mt-4">
-          <TabsList className="mb-2">
-            <TabsTrigger value="pending">未対応</TabsTrigger>
-            <TabsTrigger value="resolved">完了</TabsTrigger>
+      <div className={"px-4 pt-4"}>
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+          <TabsList className="mb-2 grid w-full grid-cols-2">
+            <TabsTrigger value="pending" className="w-full">
+              未対応
+            </TabsTrigger>
+            <TabsTrigger value="resolved" className="w-full">
+              完了
+            </TabsTrigger>
           </TabsList>
         </Tabs>
 
