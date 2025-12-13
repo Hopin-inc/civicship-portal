@@ -80,4 +80,29 @@ const FieldMessage = React.forwardRef<
 });
 FieldMessage.displayName = "FieldMessage";
 
-export { Field, FieldLabel, FieldControl, FieldDescription, FieldMessage };
+/**
+ * FieldRow - ラベルと入力を横並びにするフィールド
+ * 数値入力などコンパクトなフォームに適している
+ */
+const FieldRow = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => {
+  return (
+    <div
+      ref={ref}
+      className={cn("flex items-center justify-between gap-4", className)}
+      {...props}
+    />
+  );
+});
+FieldRow.displayName = "FieldRow";
+
+export {
+  Field,
+  FieldLabel,
+  FieldControl,
+  FieldDescription,
+  FieldMessage,
+  FieldRow,
+};

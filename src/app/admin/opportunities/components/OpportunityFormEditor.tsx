@@ -7,13 +7,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
-import { Field, FieldLabel, FieldControl, FieldDescription } from "@/components/ui/field";
+import { Field, FieldLabel, FieldControl, FieldDescription, FieldRow } from "@/components/ui/field";
+import { ChoiceCardGroup } from "@/components/ui/choice-card";
 import { GqlOpportunityCategory, GqlPublishStatus } from "@/types/graphql";
 import { useOpportunityEditor } from "../hooks/useOpportunityEditor";
 import { OpportunityFormData, HostOption, PlaceOption } from "../types";
 import { SlotBatchAdder } from "./SlotBatchAdder";
 import { SlotPicker } from "./SlotPicker";
 import { ImageUploadSection } from "./ImageUploadSection";
+import { Activity, Gift } from "lucide-react";
 
 interface OpportunityFormEditorProps {
   mode: "create" | "update";
@@ -51,28 +53,48 @@ export const OpportunityFormEditor = ({
         {/* カテゴリ */}
         <Field>
           <FieldLabel required>カテゴリ</FieldLabel>
-          <FieldControl>
-            {mode === "create" ? (
-              <Select
-                value={editor.category}
-                onValueChange={(v) => editor.setCategory(v as GqlOpportunityCategory)}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={GqlOpportunityCategory.Activity}>アクティビティ</SelectItem>
-                  <SelectItem value={GqlOpportunityCategory.Quest}>クエスト</SelectItem>
-                </SelectContent>
-              </Select>
-            ) : (
-              <div className="flex h-10 w-full rounded-md border border-input bg-muted px-3 py-2 text-sm">
-                {isActivity ? "アクティビティ" : "クエスト"}
+          {mode === "create" ? (
+            <ChoiceCardGroup
+              value={editor.category}
+              onValueChange={(v) => editor.setCategory(v as GqlOpportunityCategory)}
+              options={[
+                {
+                  value: GqlOpportunityCategory.Activity,
+                  label: "アクティビティ",
+                  description: "参加費やポイントが必要な有料イベント",
+                  icon: <Activity className="h-5 w-5 text-primary" />,
+                },
+                {
+                  value: GqlOpportunityCategory.Quest,
+                  label: "クエスト",
+                  description: "参加でポイントを獲得できる活動",
+                  icon: <Gift className="h-5 w-5 text-primary" />,
+                },
+              ]}
+            />
+          ) : (
+            <>
+              <div className="flex items-center gap-3 rounded-lg border-2 border-muted bg-muted/50 p-4">
+                {isActivity ? (
+                  <>
+                    <Activity className="h-5 w-5 text-muted-foreground" />
+                    <div>
+                      <div className="font-semibold text-sm">アクティビティ</div>
+                      <div className="text-sm text-muted-foreground">参加費やポイントが必要な有料イベント</div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <Gift className="h-5 w-5 text-muted-foreground" />
+                    <div>
+                      <div className="font-semibold text-sm">クエスト</div>
+                      <div className="text-sm text-muted-foreground">参加でポイントを獲得できる活動</div>
+                    </div>
+                  </>
+                )}
               </div>
-            )}
-          </FieldControl>
-          {mode === "update" && (
-            <FieldDescription>※ カテゴリは作成後に変更できません</FieldDescription>
+              <FieldDescription>※ カテゴリは作成後に変更できません</FieldDescription>
+            </>
           )}
         </Field>
 
@@ -187,8 +209,8 @@ export const OpportunityFormEditor = ({
 
         {/* 定員（共通） */}
         <Field>
-          <FieldLabel required>定員</FieldLabel>
-          <FieldControl>
+          <FieldRow>
+            <FieldLabel required>定員</FieldLabel>
             <Input
               type="number"
               inputMode="numeric"
@@ -196,8 +218,9 @@ export const OpportunityFormEditor = ({
               value={editor.capacity}
               onChange={(e) => editor.setCapacity(Number(e.target.value))}
               required
+              className="w-32"
             />
-          </FieldControl>
+          </FieldRow>
           <FieldDescription>
             1開催枠あたりの参加人数の上限を入力してください
           </FieldDescription>
@@ -208,32 +231,40 @@ export const OpportunityFormEditor = ({
           <>
             {/* 参加費 */}
             <Field>
-              <FieldLabel required>参加費</FieldLabel>
-              <FieldControl>
-                <Input
-                  type="number"
-                  inputMode="numeric"
-                  min="0"
-                  value={editor.feeRequired}
-                  onChange={(e) => editor.setFeeRequired(Number(e.target.value))}
-                  required
-                />
-              </FieldControl>
+              <FieldRow>
+                <FieldLabel required>参加費</FieldLabel>
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="number"
+                    inputMode="numeric"
+                    min="0"
+                    value={editor.feeRequired}
+                    onChange={(e) => editor.setFeeRequired(Number(e.target.value))}
+                    required
+                    className="w-32"
+                  />
+                  <span className="text-sm text-muted-foreground">円</span>
+                </div>
+              </FieldRow>
               <FieldDescription>0の場合は無料として扱われます</FieldDescription>
             </Field>
 
             {/* 必要ポイント */}
             <Field>
-              <FieldLabel>必要ポイント</FieldLabel>
-              <FieldControl>
-                <Input
-                  type="number"
-                  inputMode="numeric"
-                  min="0"
-                  value={editor.pointsRequired}
-                  onChange={(e) => editor.setPointsRequired(Number(e.target.value))}
-                />
-              </FieldControl>
+              <FieldRow>
+                <FieldLabel>必要ポイント</FieldLabel>
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="number"
+                    inputMode="numeric"
+                    min="0"
+                    value={editor.pointsRequired}
+                    onChange={(e) => editor.setPointsRequired(Number(e.target.value))}
+                    className="w-32"
+                  />
+                  <span className="text-sm text-muted-foreground">pt</span>
+                </div>
+              </FieldRow>
               <FieldDescription>
                 参加に必要なポイント数（0の場合は不要）
               </FieldDescription>
@@ -244,17 +275,21 @@ export const OpportunityFormEditor = ({
         {/* Quest専用フィールド */}
         {isQuest && (
           <Field>
-            <FieldLabel required>獲得ポイント</FieldLabel>
-            <FieldControl>
-              <Input
-                type="number"
-                inputMode="numeric"
-                min="0"
-                value={editor.pointsToEarn}
-                onChange={(e) => editor.setPointsToEarn(Number(e.target.value))}
-                required
-              />
-            </FieldControl>
+            <FieldRow>
+              <FieldLabel required>獲得ポイント</FieldLabel>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  inputMode="numeric"
+                  min="0"
+                  value={editor.pointsToEarn}
+                  onChange={(e) => editor.setPointsToEarn(Number(e.target.value))}
+                  required
+                  className="w-32"
+                />
+                <span className="text-sm text-muted-foreground">pt</span>
+              </div>
+            </FieldRow>
             <FieldDescription>参加者が獲得できるポイント数</FieldDescription>
           </Field>
         )}
