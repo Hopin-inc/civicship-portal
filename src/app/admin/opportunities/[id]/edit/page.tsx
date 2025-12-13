@@ -46,6 +46,10 @@ export default function EditOpportunityPage() {
     const opp = data.opportunity;
     const isActivity = opp.category === GqlOpportunityCategory.Activity;
 
+    // 先に capacity を取得（slots mapping 前）
+    const firstSlot = (opp.slots || []).find((slot) => slot != null);
+    const capacity = firstSlot?.capacity || 10;
+
     // slots の型安全な処理
     const slots = (opp.slots || [])
       .filter((slot): slot is NonNullable<typeof slot> => slot != null)
@@ -66,7 +70,7 @@ export default function EditOpportunityPage() {
       title: opp.title,
       summary: opp.description,
       description: opp.body || "",
-      capacity: slots[0]?.capacity || 10,
+      capacity,
 
       // カテゴリ別フィールド
       ...(isActivity
