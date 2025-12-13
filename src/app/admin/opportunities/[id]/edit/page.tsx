@@ -4,10 +4,10 @@ import { useParams, useRouter } from "next/navigation";
 import { useMemo, useRef } from "react";
 import dayjs from "dayjs";
 import {
-  GqlOpportunityCategory,
   GqlMembershipStatus,
-  useGetOpportunityQuery,
+  GqlOpportunityCategory,
   useGetMembershipListQuery,
+  useGetOpportunityQuery,
   useGetPlacesQuery,
 } from "@/types/graphql";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
@@ -27,7 +27,7 @@ export default function EditOpportunityPage() {
       showLogo: false,
       showBackButton: true,
     }),
-    []
+    [],
   );
   useHeaderConfig(headerConfig);
 
@@ -133,11 +133,6 @@ export default function EditOpportunityPage() {
   return (
     <div className="min-h-screen bg-background">
       <main className="px-6 py-6 pb-24 max-w-md mx-auto">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold">募集編集</h1>
-          <p className="text-muted-foreground mt-2">募集情報を編集してください</p>
-        </div>
-
         <OpportunityFormEditor
           mode="update"
           opportunityId={opportunityId}

@@ -3,11 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import {
-  GqlMembershipStatus,
-  useGetMembershipListQuery,
-  useGetPlacesQuery,
-} from "@/types/graphql";
+import { GqlMembershipStatus, useGetMembershipListQuery, useGetPlacesQuery } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { OpportunityFormEditor } from "../components/OpportunityFormEditor";
@@ -21,7 +17,7 @@ export default function CreateOpportunityPage() {
       showLogo: false,
       showBackButton: true,
     }),
-    []
+    [],
   );
   useHeaderConfig(headerConfig);
 
@@ -76,11 +72,6 @@ export default function CreateOpportunityPage() {
   return (
     <div className="min-h-screen bg-background">
       <main className="px-6 py-6 pb-24 max-w-md mx-auto">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold">新規募集作成</h1>
-          <p className="text-muted-foreground mt-2">募集情報を入力してください</p>
-        </div>
-
         <OpportunityFormEditor
           mode="create"
           hosts={hosts}
