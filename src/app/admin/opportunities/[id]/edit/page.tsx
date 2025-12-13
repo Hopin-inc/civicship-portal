@@ -59,6 +59,7 @@ export default function EditOpportunityPage() {
           typeof slot.endsAt === "number"
             ? dayjs.unix(slot.endsAt).format("YYYY-MM-DDTHH:mm")
             : dayjs(slot.endsAt).format("YYYY-MM-DDTHH:mm"),
+        capacity: slot.capacity,
       }));
 
     return {
@@ -66,7 +67,7 @@ export default function EditOpportunityPage() {
       title: opp.title,
       summary: opp.description,
       description: opp.body || "",
-      capacity: slots[0]?.capacity || 10,
+      capacity: slots[0]?.capacity || 0,
 
       // カテゴリ別フィールド
       ...(isActivity
