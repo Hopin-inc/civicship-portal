@@ -3,18 +3,13 @@
 import { useParams, useRouter } from "next/navigation";
 import { useMemo, useRef } from "react";
 import dayjs from "dayjs";
-import {
-  GqlMembershipStatus,
-  GqlOpportunityCategory,
-  useGetMembershipListQuery,
-  useGetOpportunityQuery,
-  useGetPlacesQuery,
-} from "@/types/graphql";
+import { GqlOpportunityCategory, useGetOpportunityQuery } from "@/types/graphql";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { OpportunityFormEditor } from "../../components/OpportunityFormEditor";
+import { useHostsAndPlaces } from "../../hooks/useHostsAndPlaces";
 
 export default function EditOpportunityPage() {
   const params = useParams();
@@ -41,49 +36,8 @@ export default function EditOpportunityPage() {
     },
   });
 
-  // メンバー一覧取得
-  const { data: membersData, loading: membersLoading } = useGetMembershipListQuery({
-    variables: {
-      filter: {
-        communityId: COMMUNITY_ID,
-        status: GqlMembershipStatus.Joined,
-      },
-      first: 100,
-    },
-    fetchPolicy: "cache-first",
-  });
-
-  // 場所一覧取得
-  const { data: placesData, loading: placesLoading } = useGetPlacesQuery({
-    variables: {
-      filter: {
-        communityId: COMMUNITY_ID,
-      },
-      first: 100,
-    },
-    fetchPolicy: "cache-first",
-  });
-
-  // データ変換
-  const hosts = useMemo(() => {
-    return (membersData?.memberships?.edges || [])
-      .map((edge) => edge?.node?.user)
-      .filter((user): user is NonNullable<typeof user> => user != null)
-      .map((user) => ({
-        id: user.id,
-        name: user.name || "名前なし",
-      }));
-  }, [membersData]);
-
-  const places = useMemo(() => {
-    return (placesData?.places?.edges || [])
-      .map((edge) => edge?.node)
-      .filter((place): place is NonNullable<typeof place> => place != null)
-      .map((place) => ({
-        id: place.id,
-        label: place.name,
-      }));
-  }, [placesData]);
+  // ホスト・場所データ取得
+  const { hosts, places, loading: hostsPlacesLoading } = useHostsAndPlaces();
 
   // 初期データ変換
   const initialData = useMemo(() => {
@@ -92,12 +46,27 @@ export default function EditOpportunityPage() {
     const opp = data.opportunity;
     const isActivity = opp.category === GqlOpportunityCategory.Activity;
 
+    // slots の型安全な処理
+    const slots = (opp.slots || [])
+      .filter((slot): slot is NonNullable<typeof slot> => slot != null)
+      .map((slot) => ({
+        id: slot.id,
+        startAt:
+          typeof slot.startsAt === "number"
+            ? dayjs.unix(slot.startsAt).format("YYYY-MM-DDTHH:mm")
+            : dayjs(slot.startsAt).format("YYYY-MM-DDTHH:mm"),
+        endAt:
+          typeof slot.endsAt === "number"
+            ? dayjs.unix(slot.endsAt).format("YYYY-MM-DDTHH:mm")
+            : dayjs(slot.endsAt).format("YYYY-MM-DDTHH:mm"),
+      }));
+
     return {
       category: opp.category,
       title: opp.title,
       summary: opp.description,
       description: opp.body || "",
-      capacity: opp.slots[0]?.capacity || 10,
+      capacity: slots[0]?.capacity || 10,
 
       // カテゴリ別フィールド
       ...(isActivity
@@ -112,17 +81,13 @@ export default function EditOpportunityPage() {
       placeId: opp.place?.id || null,
       hostUserId: opp.createdByUser?.id || "",
       requireHostApproval: opp.requireApproval,
-      slots: (opp.slots || []).map((slot) => ({
-        id: slot.id,
-        startAt: dayjs.unix(slot.startsAt).format("YYYY-MM-DDTHH:mm"),
-        endAt: dayjs.unix(slot.endsAt).format("YYYY-MM-DDTHH:mm"),
-      })),
+      slots,
       images: (opp.images || []).map((url) => ({ url })),
       publishStatus: opp.publishStatus,
     };
   }, [data]);
 
-  if (loading || membersLoading || placesLoading) {
+  if (loading || hostsPlacesLoading) {
     return <LoadingIndicator fullScreen />;
   }
 
