@@ -3,6 +3,7 @@
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useCallback, useMemo } from "react";
 import { useCommunityId } from "@/contexts/CommunityContext";
+import { prefixPath as prefixPathUtil, prefixStringPath, PrefixableHref } from "@/lib/communities/prefixPath";
 
 interface NavigateOptions {
   scroll?: boolean;
@@ -15,30 +16,14 @@ export function useCommunityRouter() {
   const communityId = useCommunityId();
 
   const prefixPath = useCallback(
-    (path: string): string => {
-      if (path.startsWith("http://") || path.startsWith("https://")) {
-        return path;
-      }
-
-      if (path.startsWith("#")) {
-        return path;
-      }
-
-      if (path.startsWith(`/${communityId}/`) || path === `/${communityId}`) {
-        return path;
-      }
-
-      if (path.startsWith("/")) {
-        return `/${communityId}${path}`;
-      }
-
-      return `/${communityId}/${path}`;
+    (path: PrefixableHref): PrefixableHref => {
+      return prefixPathUtil(path, communityId);
     },
     [communityId],
   );
 
   const push = useCallback(
-    (path: string, options?: NavigateOptions) => {
+    (path: PrefixableHref, options?: NavigateOptions) => {
       const prefixedPath = prefixPath(path);
       router.push(prefixedPath, options);
     },
@@ -46,7 +31,7 @@ export function useCommunityRouter() {
   );
 
   const replace = useCallback(
-    (path: string, options?: NavigateOptions) => {
+    (path: PrefixableHref, options?: NavigateOptions) => {
       const prefixedPath = prefixPath(path);
       router.replace(prefixedPath, options);
     },
