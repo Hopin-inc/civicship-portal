@@ -147,20 +147,6 @@ export function middleware(request: NextRequest) {
       : []),
   ].join(" ");
 
-  const res = NextResponse.next();
-  res.headers.set("x-nonce", nonce);
-  
-  // Set community headers for SSR
-  if (effectiveCommunityId) {
-    res.headers.set("X-Community-Id", effectiveCommunityId);
-    // Set cookie for fallback (when user navigates without community in path)
-    res.cookies.set("communityId", effectiveCommunityId, {
-      path: "/",
-      maxAge: 60 * 60 * 24 * 365, // 1 year
-      sameSite: "lax",
-    });
-  }
-
   const csp = [
     `default-src 'self'`,
     `base-uri 'self'`,
@@ -177,9 +163,46 @@ export function middleware(request: NextRequest) {
     `form-action 'self'`,
   ].join("; ");
 
+  // Prepare request headers for SSR (these are passed to the server components)
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-nonce", nonce);
+  if (effectiveCommunityId) {
+    requestHeaders.set("X-Community-Id", effectiveCommunityId);
+  }
+
+  // If there's a communityId in the path, rewrite to the path without the prefix
+  // This allows /neo88/activities to be served by app/activities/page.tsx
+  let res: NextResponse;
+  if (pathCommunityId) {
+    const rewriteUrl = new URL(remainingPath, request.url);
+    rewriteUrl.search = request.nextUrl.search;
+    res = NextResponse.rewrite(rewriteUrl, {
+      request: {
+        headers: requestHeaders,
+      },
+    });
+  } else {
+    res = NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    });
+  }
+
+  // Set response headers
+  res.headers.set("x-nonce", nonce);
   res.headers.set("Content-Security-Policy", csp);
   res.headers.set("X-Content-Type-Options", "nosniff");
   res.headers.set("Referrer-Policy", "no-referrer");
+  
+  // Set community cookie for fallback (when user navigates without community in path)
+  if (effectiveCommunityId) {
+    res.cookies.set("communityId", effectiveCommunityId, {
+      path: "/",
+      maxAge: 60 * 60 * 24 * 365, // 1 year
+      sameSite: "lax",
+    });
+  }
 
   const hasLanguageSwitcher = enabledFeatures.includes("languageSwitcher");
   const languageCookie = request.cookies.get('language');
