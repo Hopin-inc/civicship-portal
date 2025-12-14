@@ -123,7 +123,5 @@ export async function getCommunityConfigOrThrow(
   return config;
 }
 
-export function isValidCommunityId(communityId: string): boolean {
-  const validCommunityIds = ["neo88", "kibotcha", "dais", "kotohira", "himeji-ymca", "izu"];
-  return validCommunityIds.includes(communityId);
-}
+// Re-export from edge-safe module for backwards compatibility
+export { isValidCommunityId, VALID_COMMUNITY_IDS, type CommunityId } from "./communityIds";

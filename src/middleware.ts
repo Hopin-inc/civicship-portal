@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 import { FeaturesType, currentCommunityConfig, COMMUNITY_ID } from "@/lib/communities/metadata";
 import { detectPreferredLocale } from "@/lib/i18n/languageDetection";
 import { locales, defaultLocale } from "@/lib/i18n/config";
-import { isValidCommunityId } from "@/lib/communities/getCommunityConfig";
+import { isValidCommunityId } from "@/lib/communities/communityIds";
 
 // Map features to their corresponding route paths
 const featureToRoutesMap: Partial<Record<FeaturesType, string[]>> = {
