@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { FeaturesType, currentCommunityConfig, COMMUNITY_ID } from "@/lib/communities/metadata";
+import { FeaturesType, COMMUNITY_BASE_CONFIG, COMMUNITY_ID } from "@/lib/communities/metadata";
 import { detectPreferredLocale } from "@/lib/i18n/languageDetection";
 import { locales, defaultLocale } from "@/lib/i18n/config";
 import { isValidCommunityId } from "@/lib/communities/communityIds";
@@ -50,15 +50,18 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(newUrl);
   }
   
+  // Get community config dynamically based on effectiveCommunityId
+  const communityConfig = COMMUNITY_BASE_CONFIG[effectiveCommunityId] || COMMUNITY_BASE_CONFIG.default;
+  
   // For root path without communityId, redirect to community root
   if (pathname === "/" && effectiveCommunityId) {
-    const rootPath = currentCommunityConfig.rootPath || "/";
+    const rootPath = communityConfig.rootPath || "/";
     return NextResponse.redirect(new URL(`/${effectiveCommunityId}${rootPath}`, request.url));
   }
 
-  // Use the path-based communityId for feature checks if available
-  const enabledFeatures = currentCommunityConfig.enableFeatures || [];
-  const rootPath = currentCommunityConfig.rootPath || "/";
+  // Use the dynamic community config for feature checks
+  const enabledFeatures = communityConfig.enableFeatures || [];
+  const rootPath = communityConfig.rootPath || "/";
 
   // liff.state がある場合はrootPathへのリダイレクトをスキップ（LIFFのルーティングバグ対策）
   const hasLiffState = request.nextUrl.searchParams.get("liff.state");
