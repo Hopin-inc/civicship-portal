@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { FeaturesType, currentCommunityConfig } from "@/lib/communities/metadata";
+import { FeaturesType, currentCommunityConfig, COMMUNITY_ID } from "@/lib/communities/metadata";
 import { detectPreferredLocale } from "@/lib/i18n/languageDetection";
 import { locales, defaultLocale } from "@/lib/i18n/config";
+import { isValidCommunityId } from "@/lib/communities/getCommunityConfig";
 
 // Map features to their corresponding route paths
 const featureToRoutesMap: Partial<Record<FeaturesType, string[]>> = {
@@ -13,9 +14,49 @@ const featureToRoutesMap: Partial<Record<FeaturesType, string[]>> = {
   articles: ["/articles"],
 };
 
+function extractCommunityIdFromPath(pathname: string): { communityId: string | null; remainingPath: string } {
+  const segments = pathname.split("/").filter(Boolean);
+  if (segments.length === 0) {
+    return { communityId: null, remainingPath: "/" };
+  }
+
+  const potentialCommunityId = segments[0];
+  if (isValidCommunityId(potentialCommunityId)) {
+    const remainingPath = "/" + segments.slice(1).join("/") || "/";
+    return { communityId: potentialCommunityId, remainingPath };
+  }
+
+  return { communityId: null, remainingPath: pathname };
+}
+
 export function middleware(request: NextRequest) {
   const isDev = process.env.NODE_ENV !== "production";
   const pathname = request.nextUrl.pathname;
+  
+  // Extract communityId from URL path
+  const { communityId: pathCommunityId, remainingPath } = extractCommunityIdFromPath(pathname);
+  
+  // Determine the effective communityId:
+  // 1. From URL path (highest priority)
+  // 2. From cookie (fallback)
+  // 3. From environment variable (legacy support)
+  const cookieCommunityId = request.cookies.get("communityId")?.value;
+  const effectiveCommunityId = pathCommunityId || cookieCommunityId || COMMUNITY_ID;
+  
+  // If no communityId in path and we have one from cookie/env, redirect to include it
+  if (!pathCommunityId && effectiveCommunityId && pathname !== "/" && !pathname.startsWith("/_next") && !pathname.startsWith("/api")) {
+    const newUrl = new URL(`/${effectiveCommunityId}${pathname}`, request.url);
+    newUrl.search = request.nextUrl.search;
+    return NextResponse.redirect(newUrl);
+  }
+  
+  // For root path without communityId, redirect to community root
+  if (pathname === "/" && effectiveCommunityId) {
+    const rootPath = currentCommunityConfig.rootPath || "/";
+    return NextResponse.redirect(new URL(`/${effectiveCommunityId}${rootPath}`, request.url));
+  }
+
+  // Use the path-based communityId for feature checks if available
   const enabledFeatures = currentCommunityConfig.enableFeatures || [];
   const rootPath = currentCommunityConfig.rootPath || "/";
 
@@ -23,20 +64,24 @@ export function middleware(request: NextRequest) {
   const hasLiffState = request.nextUrl.searchParams.get("liff.state");
 
   // ルートページへのアクセスを処理（liff.stateがない場合、またはliff.stateが/の場合のみrootPathにリダイレクト）
-  if (pathname === "/" && rootPath !== "/" && (!hasLiffState || hasLiffState === "/")) {
-    return NextResponse.redirect(new URL(rootPath, request.url));
+  // Note: Now we check remainingPath instead of pathname for community-prefixed URLs
+  const effectivePath = pathCommunityId ? remainingPath : pathname;
+  if (effectivePath === "/" && rootPath !== "/" && (!hasLiffState || hasLiffState === "/")) {
+    const redirectPath = pathCommunityId ? `/${pathCommunityId}${rootPath}` : rootPath;
+    return NextResponse.redirect(new URL(redirectPath, request.url));
   }
 
   for (const [feature, routes] of Object.entries(featureToRoutesMap)) {
     if (!enabledFeatures.includes(feature as FeaturesType)) {
       for (const route of routes) {
-        if (feature === "opportunities" && /^\/activities\/[^/]+$/.test(pathname)) {
+        if (feature === "opportunities" && /^\/activities\/[^/]+$/.test(effectivePath)) {
           continue;
         }
 
-        if (pathname === route || pathname.startsWith(`${route}/`)) {
-          console.log(`Redirecting from disabled feature path: ${pathname} to ${rootPath}`);
-          return NextResponse.redirect(new URL(rootPath, request.url));
+        if (effectivePath === route || effectivePath.startsWith(`${route}/`)) {
+          console.log(`Redirecting from disabled feature path: ${effectivePath} to ${rootPath}`);
+          const redirectPath = pathCommunityId ? `/${pathCommunityId}${rootPath}` : rootPath;
+          return NextResponse.redirect(new URL(redirectPath, request.url));
         }
       }
     }
@@ -101,6 +146,17 @@ export function middleware(request: NextRequest) {
 
   const res = NextResponse.next();
   res.headers.set("x-nonce", nonce);
+  
+  // Set community headers for SSR
+  if (effectiveCommunityId) {
+    res.headers.set("X-Community-Id", effectiveCommunityId);
+    // Set cookie for fallback (when user navigates without community in path)
+    res.cookies.set("communityId", effectiveCommunityId, {
+      path: "/",
+      maxAge: 60 * 60 * 24 * 365, // 1 year
+      sameSite: "lax",
+    });
+  }
 
   const csp = [
     `default-src 'self'`,
