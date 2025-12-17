@@ -3,7 +3,6 @@
 import { FormEvent, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -102,104 +101,82 @@ export const OpportunityFormEditor = ({
           </div>
         )}
         <p className="text-xs text-muted-foreground text-center">
-          {isActivity
-            ? "参加費やポイントが必要な有料イベント"
-            : "参加でポイントを獲得できる活動"}
+          {isActivity ? "参加費やポイントが必要な有料イベント" : "参加でポイントを獲得できる活動"}
         </p>
       </div>
 
       {/* タイトル〜開催枠のグループ */}
-      <ItemGroup className="border rounded-lg">
-        <Item size="sm">
-          <ItemContent>
-            <Input
-              value={editor.title}
-              onChange={(e) => editor.setTitle(e.target.value)}
-              placeholder="タイトル（例：春の親子料理教室）"
-              required
-            />
-          </ItemContent>
-        </Item>
+      <Input
+        value={editor.title}
+        onChange={(e) => editor.setTitle(e.target.value)}
+        placeholder="タイトル（例：春の親子料理教室）"
+        required
+      />
 
-        <ItemSeparator />
+      <Textarea
+        value={editor.summary}
+        onChange={(e) => editor.setSummary(e.target.value)}
+        placeholder="概要（例：旬の野菜を使った料理を親子で楽しく学べます）"
+        className="min-h-[80px]"
+        required
+      />
 
-        <Item size="sm">
-          <ItemContent>
-            <Textarea
-              value={editor.summary}
-              onChange={(e) => editor.setSummary(e.target.value)}
-              placeholder="概要（例：旬の野菜を使った料理を親子で楽しく学べます）"
-              className="min-h-[80px]"
-              required
-            />
-          </ItemContent>
-        </Item>
+      {/* 詳細 */}
+      <Item
+        size="sm"
+        variant={"outline"}
+        role="button"
+        tabIndex={0}
+        onClick={() => setDescriptionSheetOpen(true)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            setDescriptionSheetOpen(true);
+          }
+        }}
+        className="cursor-pointer"
+      >
+        <ItemContent>
+          <ItemTitle>詳細</ItemTitle>
+          <ItemDescription className="whitespace-pre-wrap">
+            {getDescriptionSummary()}
+          </ItemDescription>
+        </ItemContent>
+        <ItemActions>
+          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+        </ItemActions>
+      </Item>
 
-        <ItemSeparator />
+      <ImageUploadSection
+        images={editor.images}
+        onImageSelect={editor.handleImageSelect}
+        onRemoveImage={editor.removeImage}
+      />
 
-        {/* 詳細 */}
-        <Item
-          size="sm"
-          role="button"
-          tabIndex={0}
-          onClick={() => setDescriptionSheetOpen(true)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              setDescriptionSheetOpen(true);
-            }
-          }}
-          className="cursor-pointer"
-        >
-          <ItemContent>
-            <ItemTitle>詳細</ItemTitle>
-            <ItemDescription className="whitespace-pre-wrap">
-              {getDescriptionSummary()}
-            </ItemDescription>
-          </ItemContent>
-          <ItemActions>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          </ItemActions>
-        </Item>
-
-        <ItemSeparator />
-
-        <Item size="sm">
-          <ItemContent>
-            <ImageUploadSection
-              images={editor.images}
-              onImageSelect={editor.handleImageSelect}
-              onRemoveImage={editor.removeImage}
-            />
-          </ItemContent>
-        </Item>
-
-        <ItemSeparator />
-
-        {/* 開催枠 */}
-        <Item
-          size="sm"
-          role="button"
-          tabIndex={0}
-          onClick={() => setSlotsSheetOpen(true)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              setSlotsSheetOpen(true);
-            }
-          }}
-          className="cursor-pointer"
-        >
-          <ItemContent>
-            <ItemTitle>
-              <Calendar className="h-3.5 w-3.5" />
-              開催枠
-            </ItemTitle>
-            <ItemDescription>{getSlotsSummary()}</ItemDescription>
-          </ItemContent>
-          <ItemActions>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          </ItemActions>
-        </Item>
-      </ItemGroup>
+      {/* 開催枠 */}
+      <Item
+        size="sm"
+        variant={"outline"}
+        role="button"
+        tabIndex={0}
+        onClick={() => setSlotsSheetOpen(true)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            setSlotsSheetOpen(true);
+          }
+        }}
+        className="cursor-pointer"
+      >
+        <ItemContent>
+          <ItemTitle>
+            <Calendar className="h-3.5 w-3.5" />
+            開催枠
+          </ItemTitle>
+          <ItemDescription>{getSlotsSummary()}</ItemDescription>
+        </ItemContent>
+        <ItemActions>
+          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+        </ItemActions>
+      </Item>
 
       <ItemGroup className="border rounded-lg">
         {/* 主催者 */}
@@ -379,9 +356,6 @@ export const OpportunityFormEditor = ({
         <Item size="sm">
           <ItemContent>
             <ItemTitle>承認が必要</ItemTitle>
-            <ItemDescription>
-              オンにすると、参加者の申込みを主催者が承認するまで確定しません
-            </ItemDescription>
           </ItemContent>
 
           <ItemActions>
@@ -398,7 +372,6 @@ export const OpportunityFormEditor = ({
         <Item size="sm">
           <ItemContent>
             <ItemTitle>公開設定</ItemTitle>
-            <ItemDescription>下書きは主催者と運用担当者のみ閲覧できます</ItemDescription>
           </ItemContent>
 
           <ItemActions className="min-w-[140px]">
