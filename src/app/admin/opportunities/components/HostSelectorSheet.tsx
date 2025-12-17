@@ -66,7 +66,7 @@ export function HostSelectorSheet({
         className="rounded-t-3xl max-w-md mx-auto p-8 overflow-y-auto max-h-[80vh]"
       >
         <SheetHeader className="text-left pb-6 text-title-sm">
-          <SheetTitle>主催者を選択</SheetTitle>
+          <SheetTitle className={"text-title-sm"}>主催者を選択</SheetTitle>
         </SheetHeader>
 
         <div>
