@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useHierarchicalNavigation } from "@/hooks/useHierarchicalNavigation";
-import { detectEnvironment, AuthEnvironment } from "@/lib/auth/core/environment-detector";
+import { useAuthEnvironment } from "@/hooks/useAuthEnvironment";
 
 // スワイプジェスチャーの判定定数
 const SWIPE_START_AREA_WIDTH = 50; // 画面左端からの有効エリア (px)
@@ -19,16 +19,15 @@ interface SwipeBackNavigationProps {
  */
 export function SwipeBackNavigation({ children }: SwipeBackNavigationProps) {
   const { navigateBack } = useHierarchicalNavigation();
+  const { isLiffClient } = useAuthEnvironment();
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
   const touchId = useRef<number | null>(null);
   const isSwipeGesture = useRef(false);
 
   useEffect(() => {
-    const env = detectEnvironment();
-
     // LIFF環境でのみ有効化
-    if (env !== AuthEnvironment.LIFF) return;
+    if (!isLiffClient) return;
 
     const cancelSwipe = () => {
       isSwipeGesture.current = false;
@@ -97,7 +96,7 @@ export function SwipeBackNavigation({ children }: SwipeBackNavigationProps) {
       document.removeEventListener("touchmove", handleTouchMove);
       document.removeEventListener("touchend", handleTouchEnd);
     };
-  }, [navigateBack]);
+  }, [navigateBack, isLiffClient]);
 
   return <>{children}</>;
 }
