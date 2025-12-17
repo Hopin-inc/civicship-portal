@@ -39,7 +39,7 @@ export const OpportunityFormEditor = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-8">
       {/* === セクション1: カテゴリ === */}
       <CategorySection
         mode={mode}

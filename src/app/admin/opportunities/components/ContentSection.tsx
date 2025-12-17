@@ -3,13 +3,7 @@
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar, ChevronRight } from "lucide-react";
-import {
-  Item,
-  ItemActions,
-  ItemContent,
-  ItemDescription,
-  ItemTitle,
-} from "@/components/ui/item";
+import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from "@/components/ui/item";
 import { ImageUploadSection } from "./ImageUploadSection";
 import { SlotData } from "../types";
 
@@ -59,7 +53,7 @@ export function ContentSection({
   };
 
   return (
-    <section className="space-y-3">
+    <section className="space-y-2">
       <Input
         value={title}
         onChange={(e) => onTitleChange(e.target.value)}
