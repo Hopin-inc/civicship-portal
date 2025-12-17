@@ -8,10 +8,10 @@ import { useFormSheets } from "../hooks/useFormSheets";
 import { HostOption, OpportunityFormData, PlaceOption } from "../types";
 import { EditDescriptionSheet } from "./EditDescriptionSheet";
 import { EditSlotsSheet } from "./EditSlotsSheet";
-import { CategorySettingsSection } from "./CategorySettingsSection";
 import { ContentSection } from "./ContentSection";
 import { SettingsSection } from "./SettingsSection";
 import { OperationSection } from "./OperationSection";
+import { CategorySettingsSection } from "@/app/admin/opportunities/components/CategorySettingsSection";
 
 interface OpportunityFormEditorProps {
   mode: "create" | "update";
@@ -55,6 +55,18 @@ export const OpportunityFormEditor = ({
         onSlotsClick={() => sheets.slotsSheet.setOpen(true)}
       />
 
+      {/* === セクション3: 設定 === */}
+      <SettingsSection
+        hostUserId={editor.hostUserId}
+        onHostUserIdChange={editor.setHostUserId}
+        hosts={hosts}
+        placeId={editor.placeId}
+        onPlaceIdChange={editor.setPlaceId}
+        places={places}
+        capacity={editor.capacity}
+        onCapacityChange={editor.setCapacity}
+      />
+
       {/* === セクション2: カテゴリ・料金設定 === */}
       <CategorySettingsSection
         mode={mode}
@@ -66,18 +78,6 @@ export const OpportunityFormEditor = ({
         onPointsRequiredChange={editor.setPointsRequired}
         pointsToEarn={editor.pointsToEarn}
         onPointsToEarnChange={editor.setPointsToEarn}
-      />
-
-      {/* === セクション3: 設定 === */}
-      <SettingsSection
-        hostUserId={editor.hostUserId}
-        onHostUserIdChange={editor.setHostUserId}
-        hosts={hosts}
-        placeId={editor.placeId}
-        onPlaceIdChange={editor.setPlaceId}
-        places={places}
-        capacity={editor.capacity}
-        onCapacityChange={editor.setCapacity}
       />
 
       {/* === セクション4: 運用・公開設定 === */}
