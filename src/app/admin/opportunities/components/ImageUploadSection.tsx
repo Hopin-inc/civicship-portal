@@ -29,7 +29,7 @@ export const ImageUploadSection = ({
         <ItemActions>
           <Button
             type="button"
-            variant="tertiary"
+            variant="text"
             size="sm"
             onClick={() => fileInputRef.current?.click()}
             disabled={images.length >= 5}

@@ -57,14 +57,14 @@ export function ContentSection({
       <Input
         value={title}
         onChange={(e) => onTitleChange(e.target.value)}
-        placeholder="タイトル（例：春の親子料理教室）"
+        placeholder="募集タイトルを入力"
         required
       />
 
       <Textarea
         value={summary}
         onChange={(e) => onSummaryChange(e.target.value)}
-        placeholder="概要（例：旬の野菜を使った料理を親子で楽しく学べます）"
+        placeholder="概要（50字程度）を入力"
         className="min-h-[80px]"
         required
       />
