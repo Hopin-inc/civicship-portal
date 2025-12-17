@@ -1,34 +1,17 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { GqlOpportunityCategory, GqlPublishStatus } from "@/types/graphql";
+import { GqlPublishStatus } from "@/types/graphql";
 import { useOpportunityEditor } from "../hooks/useOpportunityEditor";
+import { useFormSheets } from "../hooks/useFormSheets";
 import { HostOption, OpportunityFormData, PlaceOption } from "../types";
-import { ImageUploadSection } from "./ImageUploadSection";
-import { Calendar, ChevronRight, Coins, Gift, MapPin, Star, Users } from "lucide-react";
-import {
-  Item,
-  ItemActions,
-  ItemContent,
-  ItemDescription,
-  ItemGroup,
-  ItemSeparator,
-  ItemTitle,
-} from "@/components/ui/item";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Switch } from "@/components/ui/switch";
 import { EditDescriptionSheet } from "./EditDescriptionSheet";
 import { EditSlotsSheet } from "./EditSlotsSheet";
+import { CategorySection } from "./CategorySection";
+import { ContentSection } from "./ContentSection";
+import { SettingsSection } from "./SettingsSection";
+import { OperationSection } from "./OperationSection";
 
 interface OpportunityFormEditorProps {
   mode: "create" | "update";
@@ -48,351 +31,63 @@ export const OpportunityFormEditor = ({
   onSuccess,
 }: OpportunityFormEditorProps) => {
   const editor = useOpportunityEditor({ mode, opportunityId, initialData });
-
-  const isActivity = editor.category === GqlOpportunityCategory.Activity;
-  const isQuest = editor.category === GqlOpportunityCategory.Quest;
-
-  // Sheet open/close state
-  const [descriptionSheetOpen, setDescriptionSheetOpen] = useState(false);
-  const [slotsSheetOpen, setSlotsSheetOpen] = useState(false);
+  const sheets = useFormSheets();
 
   const handleSubmit = async (e: FormEvent) => {
     const resultId = await editor.handleSave(e);
     onSuccess?.(resultId);
   };
 
-  // 詳細の要約表示（先頭2-3行）
-  const getDescriptionSummary = () => {
-    if (!editor.description || editor.description.trim() === "") {
-      return "未入力";
-    }
-    const lines = editor.description.split("\n").filter((line) => line.trim() !== "");
-    const preview = lines.slice(0, 3).join("\n");
-    return preview.length > 100 ? preview.slice(0, 100) + "..." : preview;
-  };
-
-  // 開催枠の要約表示（件数）
-  const getSlotsSummary = () => {
-    if (editor.slots.length === 0) {
-      return "未登録";
-    }
-    return `${editor.slots.length}件`;
-  };
-
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* === セクション1: カテゴリ === */}
-      <section className="space-y-2">
-        {mode === "create" ? (
-          <ToggleGroup
-            type="single"
-            value={editor.category}
-            onValueChange={(v) => {
-              if (v) editor.setCategory(v as GqlOpportunityCategory);
-            }}
-            className="grid grid-cols-2 w-full"
-          >
-            <ToggleGroupItem value={GqlOpportunityCategory.Activity}>体験</ToggleGroupItem>
-            <ToggleGroupItem value={GqlOpportunityCategory.Quest}>お手伝い</ToggleGroupItem>
-          </ToggleGroup>
-        ) : (
-          <div className="text-center text-sm font-medium py-2 border rounded-lg">
-            {isActivity ? "体験" : "お手伝い"}
-          </div>
-        )}
-        <p className="text-xs text-muted-foreground text-center">
-          {isActivity ? "参加費やポイントが必要な有料イベント" : "参加でポイントを獲得できる活動"}
-        </p>
-      </section>
+      <CategorySection
+        mode={mode}
+        category={editor.category}
+        onCategoryChange={editor.setCategory}
+      />
 
       {/* === セクション2: コンテンツ（タイトル〜開催枠） === */}
-      <section className="space-y-3">
-        <Input
-          value={editor.title}
-          onChange={(e) => editor.setTitle(e.target.value)}
-          placeholder="タイトル（例：春の親子料理教室）"
-          required
-        />
-
-        <Textarea
-          value={editor.summary}
-          onChange={(e) => editor.setSummary(e.target.value)}
-          placeholder="概要（例：旬の野菜を使った料理を親子で楽しく学べます）"
-          className="min-h-[80px]"
-          required
-        />
-
-        <Item
-          size="sm"
-          variant={"outline"}
-          role="button"
-          tabIndex={0}
-          onClick={() => setDescriptionSheetOpen(true)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              setDescriptionSheetOpen(true);
-            }
-          }}
-          className="cursor-pointer"
-        >
-          <ItemContent>
-            <ItemTitle>詳細</ItemTitle>
-            <ItemDescription className="whitespace-pre-wrap">
-              {getDescriptionSummary()}
-            </ItemDescription>
-          </ItemContent>
-          <ItemActions>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          </ItemActions>
-        </Item>
-
-        <ImageUploadSection
-          images={editor.images}
-          onImageSelect={editor.handleImageSelect}
-          onRemoveImage={editor.removeImage}
-        />
-
-        <Item
-          size="sm"
-          variant={"outline"}
-          role="button"
-          tabIndex={0}
-          onClick={() => setSlotsSheetOpen(true)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              setSlotsSheetOpen(true);
-            }
-          }}
-          className="cursor-pointer"
-        >
-          <ItemContent>
-            <ItemTitle>
-              <Calendar className="h-3.5 w-3.5" />
-              開催枠
-            </ItemTitle>
-            <ItemDescription>{getSlotsSummary()}</ItemDescription>
-          </ItemContent>
-          <ItemActions>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          </ItemActions>
-        </Item>
-      </section>
+      <ContentSection
+        title={editor.title}
+        onTitleChange={editor.setTitle}
+        summary={editor.summary}
+        onSummaryChange={editor.setSummary}
+        description={editor.description}
+        onDescriptionClick={() => sheets.descriptionSheet.setOpen(true)}
+        images={editor.images}
+        onImageSelect={editor.handleImageSelect}
+        onRemoveImage={editor.removeImage}
+        slots={editor.slots}
+        onSlotsClick={() => sheets.slotsSheet.setOpen(true)}
+      />
 
       {/* === セクション3: 設定 === */}
-
-      <ItemGroup className="border rounded-lg">
-        {/* 主催者 */}
-        <Item size="sm">
-          <ItemContent>
-            <ItemTitle>
-              <Users className="h-3.5 w-3.5" />
-              主催者
-              <span className="text-primary text-xs font-bold bg-primary-foreground px-1 py-0.5 rounded">
-                必須
-              </span>
-            </ItemTitle>
-          </ItemContent>
-
-          <ItemActions className="min-w-[180px]">
-            <Select value={editor.hostUserId} onValueChange={editor.setHostUserId}>
-              <SelectTrigger>
-                <SelectValue placeholder="選択してください" />
-              </SelectTrigger>
-              <SelectContent>
-                {hosts.map((h) => (
-                  <SelectItem key={h.id} value={h.id}>
-                    {h.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </ItemActions>
-        </Item>
-
-        <ItemSeparator />
-
-        {/* 開催場所 */}
-        <Item size="sm">
-          <ItemContent>
-            <ItemTitle>
-              <MapPin className="h-3.5 w-3.5" />
-              開催場所
-            </ItemTitle>
-          </ItemContent>
-
-          <ItemActions className="min-w-[180px]">
-            <Select
-              value={editor.placeId ?? ""}
-              onValueChange={(v) => editor.setPlaceId(v || null)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="選択してください" />
-              </SelectTrigger>
-              <SelectContent>
-                {places.map((p) => (
-                  <SelectItem key={p.id} value={p.id}>
-                    {p.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </ItemActions>
-        </Item>
-
-        <ItemSeparator />
-
-        {/* 定員 */}
-        <Item size="sm">
-          <ItemContent>
-            <ItemTitle>
-              <Users className="h-3.5 w-3.5" />
-              定員
-            </ItemTitle>
-          </ItemContent>
-
-          <ItemActions>
-            <div className="flex items-center gap-2">
-              <Input
-                type="number"
-                min="1"
-                value={editor.capacity}
-                onChange={(e) => editor.setCapacity(Number(e.target.value))}
-                className="w-24"
-              />
-              <span className="text-sm text-muted-foreground">名</span>
-            </div>
-          </ItemActions>
-        </Item>
-
-        {/* Activity */}
-        {isActivity && (
-          <>
-            <ItemSeparator />
-
-            <Item size="sm">
-              <ItemContent>
-                <ItemTitle>
-                  <Coins className="h-3.5 w-3.5" />
-                  1人あたりの必要料金
-                </ItemTitle>
-              </ItemContent>
-
-              <ItemActions>
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="number"
-                    min="0"
-                    value={editor.feeRequired}
-                    onChange={(e) => editor.setFeeRequired(Number(e.target.value))}
-                    className="w-24"
-                  />
-                  <span className="text-sm text-muted-foreground">円</span>
-                </div>
-              </ItemActions>
-            </Item>
-
-            <ItemSeparator />
-
-            <Item size="sm">
-              <ItemContent>
-                <ItemTitle>
-                  <Star className="h-3.5 w-3.5" />
-                  1人あたりの必要pt
-                </ItemTitle>
-              </ItemContent>
-
-              <ItemActions>
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="number"
-                    min="0"
-                    value={editor.pointsRequired}
-                    onChange={(e) => editor.setPointsRequired(Number(e.target.value))}
-                    className="w-24"
-                  />
-                  <span className="text-sm text-muted-foreground">pt</span>
-                </div>
-              </ItemActions>
-            </Item>
-          </>
-        )}
-
-        {/* Quest */}
-        {isQuest && (
-          <>
-            <ItemSeparator />
-
-            <Item size="sm">
-              <ItemContent>
-                <ItemTitle>
-                  <Gift className="h-3.5 w-3.5" />
-                  1人あたりの獲得pt
-                </ItemTitle>
-              </ItemContent>
-
-              <ItemActions>
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="number"
-                    min="0"
-                    value={editor.pointsToEarn}
-                    onChange={(e) => editor.setPointsToEarn(Number(e.target.value))}
-                    className="w-24"
-                  />
-                  <span className="text-sm text-muted-foreground">pt</span>
-                </div>
-              </ItemActions>
-            </Item>
-          </>
-        )}
-      </ItemGroup>
+      <SettingsSection
+        category={editor.category}
+        hostUserId={editor.hostUserId}
+        onHostUserIdChange={editor.setHostUserId}
+        hosts={hosts}
+        placeId={editor.placeId}
+        onPlaceIdChange={editor.setPlaceId}
+        places={places}
+        capacity={editor.capacity}
+        onCapacityChange={editor.setCapacity}
+        feeRequired={editor.feeRequired}
+        onFeeRequiredChange={editor.setFeeRequired}
+        pointsRequired={editor.pointsRequired}
+        onPointsRequiredChange={editor.setPointsRequired}
+        pointsToEarn={editor.pointsToEarn}
+        onPointsToEarnChange={editor.setPointsToEarn}
+      />
 
       {/* === セクション4: 運用・公開設定 === */}
-      <ItemGroup className="border rounded-lg">
-        <Item size="sm">
-          <ItemContent>
-            <ItemTitle className="flex items-center font-bold gap-2">運用・公開設定</ItemTitle>
-          </ItemContent>
-        </Item>
-
-        {/* 承認設定 */}
-        <Item size="sm">
-          <ItemContent>
-            <ItemTitle>承認が必要</ItemTitle>
-          </ItemContent>
-
-          <ItemActions>
-            <Switch
-              checked={editor.requireHostApproval}
-              onCheckedChange={editor.setRequireHostApproval}
-            />
-          </ItemActions>
-        </Item>
-
-        <ItemSeparator />
-
-        {/* 公開設定 */}
-        <Item size="sm">
-          <ItemContent>
-            <ItemTitle>公開設定</ItemTitle>
-          </ItemContent>
-
-          <ItemActions className="min-w-[140px]">
-            <Select
-              value={editor.publishStatus}
-              onValueChange={(v) => editor.setPublishStatus(v as GqlPublishStatus)}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={GqlPublishStatus.Public}>公開</SelectItem>
-                <SelectItem value={GqlPublishStatus.Private}>下書き</SelectItem>
-              </SelectContent>
-            </Select>
-          </ItemActions>
-        </Item>
-      </ItemGroup>
+      <OperationSection
+        requireHostApproval={editor.requireHostApproval}
+        onRequireHostApprovalChange={editor.setRequireHostApproval}
+        publishStatus={editor.publishStatus}
+        onPublishStatusChange={(v) => editor.setPublishStatus(v as GqlPublishStatus)}
+      />
 
       {/* 送信ボタン */}
       <div className="w-full max-w-[345px] mx-auto">
@@ -408,15 +103,15 @@ export const OpportunityFormEditor = ({
 
       {/* Sheets */}
       <EditDescriptionSheet
-        open={descriptionSheetOpen}
-        onOpenChange={setDescriptionSheetOpen}
+        open={sheets.descriptionSheet.open}
+        onOpenChange={sheets.descriptionSheet.setOpen}
         value={editor.description}
         onChange={editor.setDescription}
       />
 
       <EditSlotsSheet
-        open={slotsSheetOpen}
-        onOpenChange={setSlotsSheetOpen}
+        open={sheets.slotsSheet.open}
+        onOpenChange={sheets.slotsSheet.setOpen}
         slots={editor.slots}
         onAddSlotsBatch={editor.addSlotsBatch}
         onUpdateSlot={editor.updateSlot}
