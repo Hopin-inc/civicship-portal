@@ -156,8 +156,8 @@ export const useOpportunityEditor = ({
     try {
       // スロット変換
       const slotsInput = slots.map((slot) => ({
-        startsAt: dayjs(slot.startAt).unix(),
-        endsAt: dayjs(slot.endAt).unix(),
+        startsAt: dayjs(slot.startAt).toISOString(),
+        endsAt: dayjs(slot.endAt).toISOString(),
         capacity,
         ...(slot.id ? { id: slot.id } : {}),
       }));
