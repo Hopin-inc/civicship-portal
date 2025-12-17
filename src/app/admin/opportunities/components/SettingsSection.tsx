@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Coins, Gift, MapPin, Star, Users } from "lucide-react";
+import { MapPin, Users } from "lucide-react";
 import {
   Item,
   ItemActions,
@@ -17,11 +17,9 @@ import {
   ItemSeparator,
   ItemTitle,
 } from "@/components/ui/item";
-import { GqlOpportunityCategory } from "@/types/graphql";
 import { HostOption, PlaceOption } from "../types";
 
 interface SettingsSectionProps {
-  category: GqlOpportunityCategory;
   hostUserId: string;
   onHostUserIdChange: (value: string) => void;
   hosts: HostOption[];
@@ -30,16 +28,9 @@ interface SettingsSectionProps {
   places: PlaceOption[];
   capacity: number;
   onCapacityChange: (value: number) => void;
-  feeRequired: number;
-  onFeeRequiredChange: (value: number) => void;
-  pointsRequired: number;
-  onPointsRequiredChange: (value: number) => void;
-  pointsToEarn: number;
-  onPointsToEarnChange: (value: number) => void;
 }
 
 export function SettingsSection({
-  category,
   hostUserId,
   onHostUserIdChange,
   hosts,
@@ -48,15 +39,7 @@ export function SettingsSection({
   places,
   capacity,
   onCapacityChange,
-  feeRequired,
-  onFeeRequiredChange,
-  pointsRequired,
-  onPointsRequiredChange,
-  pointsToEarn,
-  onPointsToEarnChange,
 }: SettingsSectionProps) {
-  const isActivity = category === GqlOpportunityCategory.Activity;
-  const isQuest = category === GqlOpportunityCategory.Quest;
 
   return (
     <ItemGroup className="border rounded-lg">
@@ -139,88 +122,6 @@ export function SettingsSection({
           </div>
         </ItemActions>
       </Item>
-
-      {/* Activity */}
-      {isActivity && (
-        <>
-          <ItemSeparator />
-
-          <Item size="sm">
-            <ItemContent>
-              <ItemTitle>
-                <Coins className="h-3.5 w-3.5" />
-                1人あたりの必要料金
-              </ItemTitle>
-            </ItemContent>
-
-            <ItemActions>
-              <div className="flex items-center gap-2">
-                <Input
-                  type="number"
-                  min="0"
-                  value={feeRequired}
-                  onChange={(e) => onFeeRequiredChange(Number(e.target.value))}
-                  className="w-24"
-                />
-                <span className="text-sm text-muted-foreground">円</span>
-              </div>
-            </ItemActions>
-          </Item>
-
-          <ItemSeparator />
-
-          <Item size="sm">
-            <ItemContent>
-              <ItemTitle>
-                <Star className="h-3.5 w-3.5" />
-                1人あたりの必要pt
-              </ItemTitle>
-            </ItemContent>
-
-            <ItemActions>
-              <div className="flex items-center gap-2">
-                <Input
-                  type="number"
-                  min="0"
-                  value={pointsRequired}
-                  onChange={(e) => onPointsRequiredChange(Number(e.target.value))}
-                  className="w-24"
-                />
-                <span className="text-sm text-muted-foreground">pt</span>
-              </div>
-            </ItemActions>
-          </Item>
-        </>
-      )}
-
-      {/* Quest */}
-      {isQuest && (
-        <>
-          <ItemSeparator />
-
-          <Item size="sm">
-            <ItemContent>
-              <ItemTitle>
-                <Gift className="h-3.5 w-3.5" />
-                1人あたりの獲得pt
-              </ItemTitle>
-            </ItemContent>
-
-            <ItemActions>
-              <div className="flex items-center gap-2">
-                <Input
-                  type="number"
-                  min="0"
-                  value={pointsToEarn}
-                  onChange={(e) => onPointsToEarnChange(Number(e.target.value))}
-                  className="w-24"
-                />
-                <span className="text-sm text-muted-foreground">pt</span>
-              </div>
-            </ItemActions>
-          </Item>
-        </>
-      )}
     </ItemGroup>
   );
 }

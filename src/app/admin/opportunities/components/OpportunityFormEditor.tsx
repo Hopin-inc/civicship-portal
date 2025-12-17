@@ -8,7 +8,7 @@ import { useFormSheets } from "../hooks/useFormSheets";
 import { HostOption, OpportunityFormData, PlaceOption } from "../types";
 import { EditDescriptionSheet } from "./EditDescriptionSheet";
 import { EditSlotsSheet } from "./EditSlotsSheet";
-import { CategorySection } from "./CategorySection";
+import { CategorySettingsSection } from "./CategorySettingsSection";
 import { ContentSection } from "./ContentSection";
 import { SettingsSection } from "./SettingsSection";
 import { OperationSection } from "./OperationSection";
@@ -40,14 +40,7 @@ export const OpportunityFormEditor = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
-      {/* === セクション1: カテゴリ === */}
-      <CategorySection
-        mode={mode}
-        category={editor.category}
-        onCategoryChange={editor.setCategory}
-      />
-
-      {/* === セクション2: コンテンツ（タイトル〜開催枠） === */}
+      {/* === セクション1: コンテンツ（タイトル〜開催枠） === */}
       <ContentSection
         title={editor.title}
         onTitleChange={editor.setTitle}
@@ -62,9 +55,21 @@ export const OpportunityFormEditor = ({
         onSlotsClick={() => sheets.slotsSheet.setOpen(true)}
       />
 
+      {/* === セクション2: カテゴリ・料金設定 === */}
+      <CategorySettingsSection
+        mode={mode}
+        category={editor.category}
+        onCategoryChange={editor.setCategory}
+        feeRequired={editor.feeRequired}
+        onFeeRequiredChange={editor.setFeeRequired}
+        pointsRequired={editor.pointsRequired}
+        onPointsRequiredChange={editor.setPointsRequired}
+        pointsToEarn={editor.pointsToEarn}
+        onPointsToEarnChange={editor.setPointsToEarn}
+      />
+
       {/* === セクション3: 設定 === */}
       <SettingsSection
-        category={editor.category}
         hostUserId={editor.hostUserId}
         onHostUserIdChange={editor.setHostUserId}
         hosts={hosts}
@@ -73,12 +78,6 @@ export const OpportunityFormEditor = ({
         places={places}
         capacity={editor.capacity}
         onCapacityChange={editor.setCapacity}
-        feeRequired={editor.feeRequired}
-        onFeeRequiredChange={editor.setFeeRequired}
-        pointsRequired={editor.pointsRequired}
-        onPointsRequiredChange={editor.setPointsRequired}
-        pointsToEarn={editor.pointsToEarn}
-        onPointsToEarnChange={editor.setPointsToEarn}
       />
 
       {/* === セクション4: 運用・公開設定 === */}
