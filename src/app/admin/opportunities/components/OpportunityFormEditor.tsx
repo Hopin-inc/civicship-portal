@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent } from "react";
+import { FormEvent, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,10 +15,8 @@ import {
 import { GqlOpportunityCategory, GqlPublishStatus } from "@/types/graphql";
 import { useOpportunityEditor } from "../hooks/useOpportunityEditor";
 import { HostOption, OpportunityFormData, PlaceOption } from "../types";
-import { SlotBatchAdder } from "./SlotBatchAdder";
-import { SlotPicker } from "./SlotPicker";
 import { ImageUploadSection } from "./ImageUploadSection";
-import { Calendar, Coins, Gift, MapPin, Star, Users } from "lucide-react";
+import { Calendar, ChevronRight, Coins, Gift, MapPin, Star, Users } from "lucide-react";
 import {
   Item,
   ItemActions,
@@ -30,6 +28,8 @@ import {
 } from "@/components/ui/item";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Switch } from "@/components/ui/switch";
+import { EditDescriptionSheet } from "./EditDescriptionSheet";
+import { EditSlotsSheet } from "./EditSlotsSheet";
 
 interface OpportunityFormEditorProps {
   mode: "create" | "update";
@@ -53,9 +53,31 @@ export const OpportunityFormEditor = ({
   const isActivity = editor.category === GqlOpportunityCategory.Activity;
   const isQuest = editor.category === GqlOpportunityCategory.Quest;
 
+  // Sheet open/close state
+  const [descriptionSheetOpen, setDescriptionSheetOpen] = useState(false);
+  const [slotsSheetOpen, setSlotsSheetOpen] = useState(false);
+
   const handleSubmit = async (e: FormEvent) => {
     const resultId = await editor.handleSave(e);
     onSuccess?.(resultId);
+  };
+
+  // 詳細の要約表示（先頭2-3行）
+  const getDescriptionSummary = () => {
+    if (!editor.description || editor.description.trim() === "") {
+      return "未入力";
+    }
+    const lines = editor.description.split("\n").filter((line) => line.trim() !== "");
+    const preview = lines.slice(0, 3).join("\n");
+    return preview.length > 100 ? preview.slice(0, 100) + "..." : preview;
+  };
+
+  // 開催枠の要約表示（件数）
+  const getSlotsSummary = () => {
+    if (editor.slots.length === 0) {
+      return "未登録";
+    }
+    return `${editor.slots.length}件`;
   };
 
   return (
@@ -124,15 +146,29 @@ export const OpportunityFormEditor = ({
       </div>
 
       {/* 詳細 */}
-      <div>
-        <Label className="mb-2 block">詳細</Label>
-        <Textarea
-          value={editor.description}
-          onChange={(e) => editor.setDescription(e.target.value)}
-          placeholder="詳しい内容を入力してください"
-          className="min-h-[120px]"
-        />
-      </div>
+      <Item
+        size="sm"
+        variant="outline"
+        role="button"
+        tabIndex={0}
+        onClick={() => setDescriptionSheetOpen(true)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            setDescriptionSheetOpen(true);
+          }
+        }}
+        className="cursor-pointer"
+      >
+        <ItemContent>
+          <ItemTitle>詳細</ItemTitle>
+          <ItemDescription className="whitespace-pre-wrap">
+            {getDescriptionSummary()}
+          </ItemDescription>
+        </ItemContent>
+        <ItemActions>
+          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+        </ItemActions>
+      </Item>
 
       {/* 画像 */}
       <ImageUploadSection
@@ -142,41 +178,30 @@ export const OpportunityFormEditor = ({
       />
 
       {/* 開催枠 */}
-      <div>
-        <Label className="mb-2 flex items-center gap-x-2">
-          <Calendar className="h-3.5 w-3.5" />
-          開催枠
-          {editor.slots.length > 0 && (
-            <span className="text-xs text-muted-foreground">({editor.slots.length}件)</span>
-          )}
-        </Label>
-
-        {/* 一括追加UI */}
-        <SlotBatchAdder onAddSlots={editor.addSlotsBatch} />
-
-        {/* 既存スロット一覧 */}
-        {editor.slots.length > 0 && (
-          <div className="mt-4 space-y-3">
-            {editor.slots.map((slot, index) => (
-              <SlotPicker
-                key={index}
-                index={index}
-                slot={slot}
-                onUpdate={editor.updateSlot}
-                onRemove={editor.removeSlot}
-              />
-            ))}
-          </div>
-        )}
-
-        {editor.slots.length === 0 && (
-          <div className="mt-4 text-center py-8 text-muted-foreground text-sm rounded-lg border border-dashed">
-            開催枠が登録されていません。
-            <br />
-            上のカレンダーから日付を選択して追加してください。
-          </div>
-        )}
-      </div>
+      <Item
+        size="sm"
+        variant="outline"
+        role="button"
+        tabIndex={0}
+        onClick={() => setSlotsSheetOpen(true)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            setSlotsSheetOpen(true);
+          }
+        }}
+        className="cursor-pointer"
+      >
+        <ItemContent>
+          <ItemTitle>
+            <Calendar className="h-3.5 w-3.5" />
+            開催枠
+          </ItemTitle>
+          <ItemDescription>{getSlotsSummary()}</ItemDescription>
+        </ItemContent>
+        <ItemActions>
+          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+        </ItemActions>
+      </Item>
 
       <ItemGroup className="border rounded-lg">
         {/* 主催者 */}
@@ -406,6 +431,23 @@ export const OpportunityFormEditor = ({
           {editor.saving ? "保存中..." : mode === "create" ? "作成" : "更新"}
         </Button>
       </div>
+
+      {/* Sheets */}
+      <EditDescriptionSheet
+        open={descriptionSheetOpen}
+        onOpenChange={setDescriptionSheetOpen}
+        value={editor.description}
+        onChange={editor.setDescription}
+      />
+
+      <EditSlotsSheet
+        open={slotsSheetOpen}
+        onOpenChange={setSlotsSheetOpen}
+        slots={editor.slots}
+        onAddSlotsBatch={editor.addSlotsBatch}
+        onUpdateSlot={editor.updateSlot}
+        onRemoveSlot={editor.removeSlot}
+      />
     </form>
   );
 };
