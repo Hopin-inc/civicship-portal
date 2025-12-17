@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { GqlMembershipRole, GqlMembershipStatus, useGetMembershipListQuery } from "@/types/graphql";
+import { GqlMembershipStatus, GqlRole, useGetMembershipListQuery } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import SearchForm from "@/components/shared/SearchForm";
 import { Item, ItemContent, ItemTitle } from "@/components/ui/item";
@@ -30,7 +30,7 @@ export function HostSelectorSheet({
       filter: {
         communityId: COMMUNITY_ID,
         status: GqlMembershipStatus.Joined,
-        role: [GqlMembershipRole.Manager, GqlMembershipRole.Owner],
+        role: [GqlRole.Manager, GqlRole.Owner],
       },
       first: 100,
     },
@@ -62,7 +62,10 @@ export function HostSelectorSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="rounded-t-3xl max-w-md mx-auto p-8 overflow-y-auto max-h-[80vh]">
+      <SheetContent
+        side="bottom"
+        className="rounded-t-3xl max-w-md mx-auto p-8 overflow-y-auto max-h-[80vh]"
+      >
         <SheetHeader className="text-left pb-6">
           <SheetTitle>主催者を選択</SheetTitle>
         </SheetHeader>
@@ -104,7 +107,7 @@ export function HostSelectorSheet({
                     <ItemTitle className="flex items-center justify-between">
                       <span>{host.name}</span>
                       <span className="text-xs text-muted-foreground">
-                        {host.role === GqlMembershipRole.Owner ? "オーナー" : "マネージャー"}
+                        {host.role === GqlRole.Owner ? "管理者" : "運用担当者"}
                       </span>
                     </ItemTitle>
                   </ItemContent>
