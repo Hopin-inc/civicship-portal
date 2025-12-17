@@ -6,7 +6,7 @@ import { logger } from "@/lib/logging";
 export default async function MyPageLayout({ children }: { children: React.ReactNode }) {
   const gqlUser = await fetchPrivateUserServer();
 
-  logger.info("[AUTH] /users/me layout fetchPrivateUserServer result", {
+  logger.debug("[AUTH] /users/me layout fetchPrivateUserServer result", {
     hasUser: !!gqlUser,
     userId: gqlUser?.id,
     component: "MyPageLayout",
@@ -29,7 +29,7 @@ export default async function MyPageLayout({ children }: { children: React.React
     );
   }
 
-  logger.info("[AUTH] /users/me layout: no SSR user, using ClientLayout with null", {
+  logger.debug("[AUTH] /users/me layout: no SSR user, using ClientLayout with null", {
     component: "MyPageLayout",
   });
 
