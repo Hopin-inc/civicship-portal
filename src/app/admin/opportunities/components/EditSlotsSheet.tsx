@@ -1,9 +1,11 @@
 "use client";
 
+import { useEffect } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { SlotBatchAdder } from "./SlotBatchAdder";
 import { SlotPicker } from "./SlotPicker";
 import { SlotData } from "../types";
+import useHeaderConfig from "@/hooks/useHeaderConfig";
 
 interface EditSlotsSheetProps {
   open: boolean;
@@ -22,14 +24,27 @@ export function EditSlotsSheet({
   onUpdateSlot,
   onRemoveSlot,
 }: EditSlotsSheetProps) {
+  const { updateConfig, resetConfig } = useHeaderConfig();
+
+  useEffect(() => {
+    if (open) {
+      updateConfig({
+        title: "開催枠を編集",
+        showBackButton: true,
+      });
+    } else {
+      resetConfig();
+    }
+  }, [open, updateConfig, resetConfig]);
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-full overflow-y-auto">
-        <SheetHeader>
+      <SheetContent side="bottom" className="rounded-t-3xl max-w-md mx-auto p-8 overflow-y-auto">
+        <SheetHeader className="text-left pb-6">
           <SheetTitle>開催枠を編集</SheetTitle>
         </SheetHeader>
 
-        <div className="mt-6 space-y-4">
+        <div className="space-y-4">
           {/* 一括追加UI */}
           <SlotBatchAdder onAddSlots={onAddSlotsBatch} />
 
