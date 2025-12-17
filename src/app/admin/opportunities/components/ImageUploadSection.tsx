@@ -57,7 +57,7 @@ export const ImageUploadSection = ({
         )}
       </ItemContent>
 
-      <ItemActions>
+      <ItemActions className="self-start">
         <Button
           type="button"
           variant="text"
