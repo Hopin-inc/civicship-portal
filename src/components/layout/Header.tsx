@@ -8,6 +8,7 @@ import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useHeader } from "@/components/providers/HeaderProvider";
 import { useHierarchicalNavigation } from "@/hooks/useHierarchicalNavigation";
+import { useAuthEnvironment } from "@/hooks/useAuthEnvironment";
 import { cn } from "@/lib/utils";
 import SearchBox from "@/app/search/components/SearchBox";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
@@ -17,8 +18,9 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ className }) => {
-  const { config, isLiffEnvironment } = useHeader();
+  const { config } = useHeader();
   const { navigateBack } = useHierarchicalNavigation();
+  const { isInLine } = useAuthEnvironment();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -39,11 +41,11 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
     return null;
   }
 
-  // LIFF環境では戻るボタンを非表示にする
+  // LIFF/LINEブラウザ環境では戻るボタンを非表示にする
   const shouldShowBackButton =
     config.showBackButton &&
     pathname !== "/" &&
-    !isLiffEnvironment;
+    !isInLine;
 
   // レイアウト意図ベースの判定（LIFF環境でも戻るボタンの意図がある場合は左スロットとして扱う）
   const hasLeftSlotForLayout = config.showLogo || (config.showBackButton && pathname !== "/");

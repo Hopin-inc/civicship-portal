@@ -2,7 +2,6 @@
 
 import React, { ReactNode, useState, useEffect, createContext, useContext, useCallback, useMemo } from "react";
 import { usePathname } from "next/navigation";
-import { AuthEnvironment, detectEnvironment } from "@/lib/auth/core/environment-detector";
 
 export interface HeaderConfig {
   title?: string;
@@ -30,7 +29,6 @@ export type HeaderContextState = {
   resetConfig: () => void;
   lastVisitedUrls: Record<string, string>;
   addToHistory: (pageType: string, url: string) => void;
-  isLiffEnvironment: boolean;
 };
 
 const defaultConfig: HeaderConfig = {
@@ -50,7 +48,6 @@ export const HeaderContext = createContext<HeaderContextState>({
   resetConfig: () => {},
   lastVisitedUrls: {},
   addToHistory: () => {},
-  isLiffEnvironment: false,
 });
 
 export const useHeader = () => {
@@ -73,12 +70,6 @@ const HeaderProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [config, setConfig] = useState<HeaderConfig>(defaultConfig);
   const [lastVisitedUrls, setLastVisitedUrls] = useState<Record<string, string>>({});
   const pathname = usePathname();
-
-  // LIFF環境かどうかを一度だけ判定して保持
-  const isLiffEnvironment = useMemo(() => {
-    const env = detectEnvironment();
-    return env === AuthEnvironment.LIFF || env === AuthEnvironment.LINE_BROWSER;
-  }, []);
 
   const updateConfig = useCallback((newConfig: Partial<HeaderConfig>) => {
     setConfig((prevConfig: HeaderConfig) => ({
@@ -134,8 +125,7 @@ const HeaderProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     resetConfig, 
     lastVisitedUrls,
     addToHistory,
-    isLiffEnvironment,
-  }), [config, updateConfig, resetConfig, lastVisitedUrls, addToHistory, isLiffEnvironment]);
+  }), [config, updateConfig, resetConfig, lastVisitedUrls, addToHistory]);
 
   return (
     <HeaderContext.Provider value={contextValue}>
