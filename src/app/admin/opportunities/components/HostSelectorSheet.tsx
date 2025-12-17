@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { GqlMembershipStatus, GqlRole, useGetMembershipListQuery } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import SearchForm from "@/components/shared/SearchForm";
 import { Item, ItemContent, ItemTitle } from "@/components/ui/item";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 
@@ -70,14 +69,7 @@ export function HostSelectorSheet({
           <SheetTitle>主催者を選択</SheetTitle>
         </SheetHeader>
 
-        <div className="space-y-4">
-          <SearchForm
-            value={input}
-            onInputChange={setInput}
-            onSearch={setSearchQuery}
-            placeholder="名前で検索"
-          />
-
+        <div>
           {loading && <LoadingIndicator />}
 
           {!loading && filteredHosts.length === 0 && (
