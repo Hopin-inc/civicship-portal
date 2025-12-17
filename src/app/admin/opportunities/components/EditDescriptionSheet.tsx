@@ -1,7 +1,6 @@
 "use client";
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
 interface EditDescriptionSheetProps {
@@ -19,13 +18,12 @@ export function EditDescriptionSheet({
 }: EditDescriptionSheetProps) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-full sm:max-w-xl">
+      <SheetContent side="right" className="w-full">
         <SheetHeader>
           <SheetTitle>詳細を編集</SheetTitle>
         </SheetHeader>
 
         <div className="mt-6">
-          <Label className="mb-2 block">詳細</Label>
           <Textarea
             value={value}
             onChange={(e) => onChange(e.target.value)}

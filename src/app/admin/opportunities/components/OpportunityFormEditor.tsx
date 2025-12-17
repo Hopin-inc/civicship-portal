@@ -113,37 +113,21 @@ export const OpportunityFormEditor = ({
       </Item>
 
       {/* タイトル */}
-      <div>
-        <Label className="mb-2 flex items-center gap-x-2">
-          タイトル
-          <span className="text-primary text-xs font-bold bg-primary-foreground px-1 py-0.5 rounded">
-            必須
-          </span>
-        </Label>
-        <Input
-          value={editor.title}
-          onChange={(e) => editor.setTitle(e.target.value)}
-          placeholder="例）春の親子料理教室"
-          required
-        />
-      </div>
+      <Input
+        value={editor.title}
+        onChange={(e) => editor.setTitle(e.target.value)}
+        placeholder="タイトル（例：春の親子料理教室）"
+        required
+      />
 
       {/* 概要 */}
-      <div>
-        <Label className="mb-2 flex items-center gap-x-2">
-          概要
-          <span className="text-primary text-xs font-bold bg-primary-foreground px-1 py-0.5 rounded">
-            必須
-          </span>
-        </Label>
-        <Textarea
-          value={editor.summary}
-          onChange={(e) => editor.setSummary(e.target.value)}
-          placeholder="例）旬の野菜を使った料理を親子で楽しく学べます"
-          className="min-h-[80px]"
-          required
-        />
-      </div>
+      <Textarea
+        value={editor.summary}
+        onChange={(e) => editor.setSummary(e.target.value)}
+        placeholder="概要（例：旬の野菜を使った料理を親子で楽しく学べます）"
+        className="min-h-[80px]"
+        required
+      />
 
       {/* 詳細 */}
       <Item
