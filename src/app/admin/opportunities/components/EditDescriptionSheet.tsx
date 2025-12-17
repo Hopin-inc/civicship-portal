@@ -1,9 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
-import useHeaderConfig from "@/hooks/useHeaderConfig";
 
 interface EditDescriptionSheetProps {
   open: boolean;
@@ -18,19 +16,6 @@ export function EditDescriptionSheet({
   value,
   onChange,
 }: EditDescriptionSheetProps) {
-  const { updateConfig, resetConfig } = useHeaderConfig();
-
-  useEffect(() => {
-    if (open) {
-      updateConfig({
-        title: "詳細を編集",
-        showBackButton: true,
-      });
-    } else {
-      resetConfig();
-    }
-  }, [open, updateConfig, resetConfig]);
-
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="rounded-t-3xl max-w-md mx-auto p-8">
