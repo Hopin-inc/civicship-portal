@@ -82,110 +82,124 @@ export const OpportunityFormEditor = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <Item size="sm" variant={"outline"}>
-        <ItemContent>
-          <ItemTitle>
-            カテゴリ
-            <span className="ml-2 text-primary text-xs font-bold bg-primary-foreground px-1 py-0.5 rounded">
-              必須
-            </span>
-          </ItemTitle>
-        </ItemContent>
+      {/* カテゴリ - 横幅いっぱいのタブ */}
+      <div className="space-y-2">
+        {mode === "create" ? (
+          <ToggleGroup
+            type="single"
+            value={editor.category}
+            onValueChange={(v) => {
+              if (v) editor.setCategory(v as GqlOpportunityCategory);
+            }}
+            className="grid grid-cols-2 w-full"
+          >
+            <ToggleGroupItem value={GqlOpportunityCategory.Activity}>体験</ToggleGroupItem>
+            <ToggleGroupItem value={GqlOpportunityCategory.Quest}>お手伝い</ToggleGroupItem>
+          </ToggleGroup>
+        ) : (
+          <div className="text-center text-sm font-medium py-2 border rounded-lg">
+            {isActivity ? "体験" : "お手伝い"}
+          </div>
+        )}
+        <p className="text-xs text-muted-foreground text-center">
+          {isActivity
+            ? "参加費やポイントが必要な有料イベント"
+            : "参加でポイントを獲得できる活動"}
+        </p>
+      </div>
 
-        <ItemActions>
-          {mode === "create" ? (
-            <ToggleGroup
-              type="single"
-              value={editor.category}
-              onValueChange={(v) => {
-                if (v) editor.setCategory(v as GqlOpportunityCategory);
-              }}
-            >
-              <ToggleGroupItem value={GqlOpportunityCategory.Activity}>体験</ToggleGroupItem>
-              <ToggleGroupItem value={GqlOpportunityCategory.Quest}>お手伝い</ToggleGroupItem>
-            </ToggleGroup>
-          ) : (
-            <span className="text-sm text-muted-foreground">
-              {isActivity ? "体験" : "お手伝い"}
-            </span>
-          )}
-        </ItemActions>
-      </Item>
+      {/* タイトル〜開催枠のグループ */}
+      <ItemGroup className="border rounded-lg">
+        <Item size="sm">
+          <ItemContent>
+            <Input
+              value={editor.title}
+              onChange={(e) => editor.setTitle(e.target.value)}
+              placeholder="タイトル（例：春の親子料理教室）"
+              required
+            />
+          </ItemContent>
+        </Item>
 
-      {/* タイトル */}
-      <Input
-        value={editor.title}
-        onChange={(e) => editor.setTitle(e.target.value)}
-        placeholder="タイトル（例：春の親子料理教室）"
-        required
-      />
+        <ItemSeparator />
 
-      {/* 概要 */}
-      <Textarea
-        value={editor.summary}
-        onChange={(e) => editor.setSummary(e.target.value)}
-        placeholder="概要（例：旬の野菜を使った料理を親子で楽しく学べます）"
-        className="min-h-[80px]"
-        required
-      />
+        <Item size="sm">
+          <ItemContent>
+            <Textarea
+              value={editor.summary}
+              onChange={(e) => editor.setSummary(e.target.value)}
+              placeholder="概要（例：旬の野菜を使った料理を親子で楽しく学べます）"
+              className="min-h-[80px]"
+              required
+            />
+          </ItemContent>
+        </Item>
 
-      {/* 詳細 */}
-      <Item
-        size="sm"
-        variant="outline"
-        role="button"
-        tabIndex={0}
-        onClick={() => setDescriptionSheetOpen(true)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            setDescriptionSheetOpen(true);
-          }
-        }}
-        className="cursor-pointer"
-      >
-        <ItemContent>
-          <ItemTitle>詳細</ItemTitle>
-          <ItemDescription className="whitespace-pre-wrap">
-            {getDescriptionSummary()}
-          </ItemDescription>
-        </ItemContent>
-        <ItemActions>
-          <ChevronRight className="h-4 w-4 text-muted-foreground" />
-        </ItemActions>
-      </Item>
+        <ItemSeparator />
 
-      {/* 画像 */}
-      <ImageUploadSection
-        images={editor.images}
-        onImageSelect={editor.handleImageSelect}
-        onRemoveImage={editor.removeImage}
-      />
+        {/* 詳細 */}
+        <Item
+          size="sm"
+          role="button"
+          tabIndex={0}
+          onClick={() => setDescriptionSheetOpen(true)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              setDescriptionSheetOpen(true);
+            }
+          }}
+          className="cursor-pointer"
+        >
+          <ItemContent>
+            <ItemTitle>詳細</ItemTitle>
+            <ItemDescription className="whitespace-pre-wrap">
+              {getDescriptionSummary()}
+            </ItemDescription>
+          </ItemContent>
+          <ItemActions>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </ItemActions>
+        </Item>
 
-      {/* 開催枠 */}
-      <Item
-        size="sm"
-        variant="outline"
-        role="button"
-        tabIndex={0}
-        onClick={() => setSlotsSheetOpen(true)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            setSlotsSheetOpen(true);
-          }
-        }}
-        className="cursor-pointer"
-      >
-        <ItemContent>
-          <ItemTitle>
-            <Calendar className="h-3.5 w-3.5" />
-            開催枠
-          </ItemTitle>
-          <ItemDescription>{getSlotsSummary()}</ItemDescription>
-        </ItemContent>
-        <ItemActions>
-          <ChevronRight className="h-4 w-4 text-muted-foreground" />
-        </ItemActions>
-      </Item>
+        <ItemSeparator />
+
+        <Item size="sm">
+          <ItemContent>
+            <ImageUploadSection
+              images={editor.images}
+              onImageSelect={editor.handleImageSelect}
+              onRemoveImage={editor.removeImage}
+            />
+          </ItemContent>
+        </Item>
+
+        <ItemSeparator />
+
+        {/* 開催枠 */}
+        <Item
+          size="sm"
+          role="button"
+          tabIndex={0}
+          onClick={() => setSlotsSheetOpen(true)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              setSlotsSheetOpen(true);
+            }
+          }}
+          className="cursor-pointer"
+        >
+          <ItemContent>
+            <ItemTitle>
+              <Calendar className="h-3.5 w-3.5" />
+              開催枠
+            </ItemTitle>
+            <ItemDescription>{getSlotsSummary()}</ItemDescription>
+          </ItemContent>
+          <ItemActions>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </ItemActions>
+        </Item>
+      </ItemGroup>
 
       <ItemGroup className="border rounded-lg">
         {/* 主催者 */}
