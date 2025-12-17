@@ -9,6 +9,7 @@ export type OpportunityFormData = {
 
   // 主催・場所
   hostUserId: string;
+  hostName?: string;
   placeId: string | null;
   requireHostApproval: boolean;
 

@@ -8,21 +8,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MapPin, Users } from "lucide-react";
+import { ChevronRight, MapPin, Users } from "lucide-react";
 import {
   Item,
   ItemActions,
   ItemContent,
+  ItemDescription,
   ItemGroup,
   ItemSeparator,
   ItemTitle,
 } from "@/components/ui/item";
-import { HostOption, PlaceOption } from "../types";
+import { PlaceOption } from "../types";
 
 interface SettingsSectionProps {
-  hostUserId: string;
-  onHostUserIdChange: (value: string) => void;
-  hosts: HostOption[];
+  selectedHostName: string | null;
+  onHostClick: () => void;
   placeId: string | null;
   onPlaceIdChange: (value: string | null) => void;
   places: PlaceOption[];
@@ -31,9 +31,8 @@ interface SettingsSectionProps {
 }
 
 export function SettingsSection({
-  hostUserId,
-  onHostUserIdChange,
-  hosts,
+  selectedHostName,
+  onHostClick,
   placeId,
   onPlaceIdChange,
   places,
@@ -44,30 +43,31 @@ export function SettingsSection({
   return (
     <ItemGroup className="border rounded-lg">
       {/* 主催者 */}
-      <Item size="sm">
+      <Item
+        size="sm"
+        role="button"
+        tabIndex={0}
+        onClick={onHostClick}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            onHostClick();
+          }
+        }}
+        className="cursor-pointer"
+      >
         <ItemContent>
           <ItemTitle>
             <Users className="h-3.5 w-3.5" />
-            主催者
+            主催者を選択
             <span className="text-primary text-xs font-bold bg-primary-foreground px-1 py-0.5 rounded">
               必須
             </span>
           </ItemTitle>
+          <ItemDescription>{selectedHostName || "未選択"}</ItemDescription>
         </ItemContent>
 
-        <ItemActions className="min-w-[180px]">
-          <Select value={hostUserId} onValueChange={onHostUserIdChange}>
-            <SelectTrigger>
-              <SelectValue placeholder="選択してください" />
-            </SelectTrigger>
-            <SelectContent>
-              {hosts.map((h) => (
-                <SelectItem key={h.id} value={h.id}>
-                  {h.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <ItemActions>
+          <ChevronRight className="h-4 w-4 text-muted-foreground" />
         </ItemActions>
       </Item>
 
