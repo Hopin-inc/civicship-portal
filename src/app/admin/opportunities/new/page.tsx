@@ -20,8 +20,8 @@ export default function CreateOpportunityPage() {
   );
   useHeaderConfig(headerConfig);
 
-  // ホスト・場所データ取得
-  const { hosts, places, loading } = useHostsAndPlaces();
+  // 場所データ取得
+  const { places, loading } = useHostsAndPlaces();
 
   if (loading) {
     return <LoadingIndicator fullScreen />;
@@ -32,7 +32,6 @@ export default function CreateOpportunityPage() {
       <main className="px-6 py-6 pb-24 max-w-md mx-auto">
         <OpportunityFormEditor
           mode="create"
-          hosts={hosts}
           places={places}
           onSuccess={() => router.push("/admin/opportunities")}
         />

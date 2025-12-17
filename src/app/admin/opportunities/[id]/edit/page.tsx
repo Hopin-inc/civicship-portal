@@ -36,8 +36,8 @@ export default function EditOpportunityPage() {
     },
   });
 
-  // ホスト・場所データ取得
-  const { hosts, places, loading: hostsPlacesLoading } = useHostsAndPlaces();
+  // 場所データ取得
+  const { places, loading: hostsPlacesLoading } = useHostsAndPlaces();
 
   // 初期データ変換
   const initialData = useMemo(() => {
@@ -84,6 +84,7 @@ export default function EditOpportunityPage() {
 
       placeId: opp.place?.id || null,
       hostUserId: opp.createdByUser?.id || "",
+      hostName: opp.createdByUser?.name || null,
       requireHostApproval: opp.requireApproval,
       slots,
       images: (opp.images || []).map((url) => ({ url })),
@@ -106,7 +107,6 @@ export default function EditOpportunityPage() {
           mode="update"
           opportunityId={opportunityId}
           initialData={initialData}
-          hosts={hosts}
           places={places}
           onSuccess={() => router.push("/admin/opportunities")}
         />

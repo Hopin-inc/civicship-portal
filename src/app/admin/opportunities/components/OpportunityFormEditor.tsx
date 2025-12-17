@@ -1,13 +1,14 @@
 "use client";
 
-import { FormEvent } from "react";
+import { FormEvent, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { GqlPublishStatus } from "@/types/graphql";
 import { useOpportunityEditor } from "../hooks/useOpportunityEditor";
 import { useFormSheets } from "../hooks/useFormSheets";
-import { HostOption, OpportunityFormData, PlaceOption } from "../types";
+import { OpportunityFormData, PlaceOption } from "../types";
 import { EditDescriptionSheet } from "./EditDescriptionSheet";
 import { EditSlotsSheet } from "./EditSlotsSheet";
+import { HostSelectorSheet } from "./HostSelectorSheet";
 import { CategorySettingsSection } from "./CategorySettingsSection";
 import { ContentSection } from "./ContentSection";
 import { SettingsSection } from "./SettingsSection";
@@ -17,7 +18,6 @@ interface OpportunityFormEditorProps {
   mode: "create" | "update";
   opportunityId?: string;
   initialData?: Partial<OpportunityFormData>;
-  hosts: HostOption[];
   places: PlaceOption[];
   onSuccess?: (id?: string) => void;
 }
@@ -26,12 +26,19 @@ export const OpportunityFormEditor = ({
   mode,
   opportunityId,
   initialData,
-  hosts,
   places,
   onSuccess,
 }: OpportunityFormEditorProps) => {
   const editor = useOpportunityEditor({ mode, opportunityId, initialData });
   const sheets = useFormSheets();
+  const [selectedHostName, setSelectedHostName] = useState<string | null>(
+    initialData?.hostName || null
+  );
+
+  const handleHostSelect = (hostId: string, hostName: string) => {
+    editor.setHostUserId(hostId);
+    setSelectedHostName(hostName);
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     const resultId = await editor.handleSave(e);
@@ -70,9 +77,8 @@ export const OpportunityFormEditor = ({
 
       {/* === セクション3: 設定 === */}
       <SettingsSection
-        hostUserId={editor.hostUserId}
-        onHostUserIdChange={editor.setHostUserId}
-        hosts={hosts}
+        selectedHostName={selectedHostName}
+        onHostClick={() => sheets.hostSheet.setOpen(true)}
         placeId={editor.placeId}
         onPlaceIdChange={editor.setPlaceId}
         places={places}
@@ -115,6 +121,13 @@ export const OpportunityFormEditor = ({
         onAddSlotsBatch={editor.addSlotsBatch}
         onUpdateSlot={editor.updateSlot}
         onRemoveSlot={editor.removeSlot}
+      />
+
+      <HostSelectorSheet
+        open={sheets.hostSheet.open}
+        onOpenChange={sheets.hostSheet.setOpen}
+        selectedHostId={editor.hostUserId}
+        onSelectHost={handleHostSelect}
       />
     </form>
   );
