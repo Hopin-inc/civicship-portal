@@ -17,7 +17,7 @@ export function applySsrAuthState(
     initialState = "line_authenticated";
   }
 
-  logger.info("[AUTH] applySsrAuthState", {
+  logger.debug("[AUTH] applySsrAuthState", {
     initialState,
     ssrCurrentUser: !!ssrCurrentUser,
     ssrCurrentUserId: ssrCurrentUser?.id,

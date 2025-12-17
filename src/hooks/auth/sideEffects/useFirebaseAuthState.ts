@@ -56,7 +56,7 @@ export const useFirebaseAuthState = ({
 
           TokenManager.saveLineAuthFlag(true);
         } catch (error) {
-          logger.info("Failed to sync Firebase token", {
+          logger.warn("Failed to sync Firebase token", {
             error: error instanceof Error ? error.message : String(error),
             component: "useFirebaseAuthState",
           });

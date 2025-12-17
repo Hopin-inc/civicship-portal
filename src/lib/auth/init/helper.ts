@@ -108,7 +108,9 @@ async function createSession(idToken: string) {
     throw new Error(`Failed to create session cookie (${res.status})`);
   }
 
-  console.info("✅ Session cookie successfully created (via proxy)");
+  if (process.env.NODE_ENV !== "production") {
+    console.info("✅ Session cookie successfully created (via proxy)");
+  }
   return true;
 }
 

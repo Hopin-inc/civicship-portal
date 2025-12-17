@@ -82,7 +82,7 @@ export const useLanguageSync = ({ user, loading }: UseLanguageSyncOptions) => {
     })
       .then(() => {
         localStorage.setItem(storageKey, "1");
-        logger.info("[useLanguageSync] Language synced to server", {
+        logger.debug("[useLanguageSync] Language synced to server", {
           userId: user.id,
           language: mappedLanguage,
         });
