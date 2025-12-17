@@ -39,7 +39,6 @@ export function SettingsSection({
   capacity,
   onCapacityChange,
 }: SettingsSectionProps) {
-
   return (
     <ItemGroup className="border rounded-lg">
       {/* 主催者 */}
@@ -58,7 +57,7 @@ export function SettingsSection({
         <ItemContent>
           <ItemTitle>
             <Users className="h-3.5 w-3.5" />
-            主催者を選択
+            主催者
             <span className="text-primary text-xs font-bold bg-primary-foreground px-1 py-0.5 rounded">
               必須
             </span>

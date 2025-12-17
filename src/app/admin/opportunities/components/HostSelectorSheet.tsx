@@ -66,7 +66,7 @@ export function HostSelectorSheet({
         side="bottom"
         className="rounded-t-3xl max-w-md mx-auto p-8 overflow-y-auto max-h-[80vh]"
       >
-        <SheetHeader className="text-left pb-6">
+        <SheetHeader className="text-left pb-6 text-title-sm">
           <SheetTitle>主催者を選択</SheetTitle>
         </SheetHeader>
 
@@ -104,7 +104,7 @@ export function HostSelectorSheet({
                   className="cursor-pointer"
                 >
                   <ItemContent>
-                    <ItemTitle className="flex items-center justify-between">
+                    <ItemTitle className="flex items-center justify-between text-body-md">
                       <span>{host.name}</span>
                       <span className="text-xs text-muted-foreground">
                         {host.role === GqlRole.Owner ? "管理者" : "運用担当者"}
