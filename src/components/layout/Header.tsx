@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -10,7 +10,6 @@ import { useHeader } from "@/components/providers/HeaderProvider";
 import { useHierarchicalNavigation } from "@/hooks/useHierarchicalNavigation";
 import { cn } from "@/lib/utils";
 import SearchBox from "@/app/search/components/SearchBox";
-import { AuthEnvironment, detectEnvironment } from "@/lib/auth/core/environment-detector";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 
 interface HeaderProps {
@@ -18,13 +17,10 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ className }) => {
-  const { config } = useHeader();
+  const { config, isLiffEnvironment } = useHeader();
   const { navigateBack } = useHierarchicalNavigation();
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const pathname = usePathname();
   const searchParams = useSearchParams();
-
-  const env = detectEnvironment();
   const router = useRouter();
 
   const handleBackButton = () => {
@@ -33,7 +29,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
     } else if (pathname === "/search/result") {
       // When on search results page, preserve all search parameters when going back to search page
       const params = new URLSearchParams(searchParams);
-      router.push(`${config.searchParams?.redirectTo ?? "/search"}?${params.toString()}`);
+      router.push(`/search?${params.toString()}`);
     } else {
       navigateBack();
     }
@@ -43,10 +39,20 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
     return null;
   }
 
+  // LIFF環境では戻るボタンを非表示にする
   const shouldShowBackButton =
     config.showBackButton &&
     pathname !== "/" &&
-    !(env === AuthEnvironment.LIFF || env === AuthEnvironment.LINE_BROWSER);
+    !isLiffEnvironment;
+
+  // レイアウト意図ベースの判定（LIFF環境でも戻るボタンの意図がある場合は左スロットとして扱う）
+  const hasLeftSlotForLayout = config.showLogo || (config.showBackButton && pathname !== "/");
+  const hasRightSlot = config.action != null;
+
+  // タイトル中央寄せの判定
+  // - 左スロット（ロゴまたは戻るボタンの意図）がある場合は中央寄せ
+  // - 右側actionがない場合も中央寄せ
+  const shouldCenterTitle = hasLeftSlotForLayout || !hasRightSlot;
 
   return (
     <header
@@ -83,14 +89,13 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
             type={config.searchParams?.type}
             ticket={config.searchParams?.ticket}
             points={config.searchParams?.points}
-            redirectTo={config.searchParams?.redirectTo}
           />
         </div>
       )}
       {config.title && !config.showSearchForm && (
         <div
           className={cn(
-            config.showLogo || shouldShowBackButton
+            shouldCenterTitle
               ? "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
               : "",
           )}
@@ -98,7 +103,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
           <h1
             className={cn(
               "text-title-sm truncate max-w-[80vw]",
-              config.showLogo || shouldShowBackButton ? "text-center" : "text-left",
+              shouldCenterTitle ? "text-center" : "text-left",
             )}
           >
             {config.title}
