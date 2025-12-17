@@ -124,7 +124,7 @@ const HeaderProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     updateConfig, 
     resetConfig, 
     lastVisitedUrls,
-    addToHistory
+    addToHistory,
   }), [config, updateConfig, resetConfig, lastVisitedUrls, addToHistory]);
 
   return (

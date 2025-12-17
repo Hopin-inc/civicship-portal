@@ -5,7 +5,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { useLocaleDateTimeFormat } from "@/utils/i18n";
 import { TransactionCardBase } from "@/shared/transactions/components/TransactionCardBase";
 import { formatTransactionDescription, getTransactionInfo } from "@/shared/transactions/utils/format";
-import { computeProfileHref } from "@/shared/transactions/utils/navigation";
+import { computeTransactionHref } from "@/shared/transactions/utils/navigation";
 import { getStatusLabel } from "@/shared/transactions/utils/statusLabel";
 import { computeCardProps } from "@/shared/transactions/utils/cardProps";
 
@@ -57,8 +57,8 @@ export const TransactionCard = ({
     to,
   });
 
-  const profileHref = enableClickNavigation
-    ? computeProfileHref(transaction, { perspectiveWalletId })
+  const transactionHref = enableClickNavigation
+    ? computeTransactionHref(transaction.id)
     : null;
 
   return (
@@ -74,7 +74,7 @@ export const TransactionCard = ({
       didValue={truncatedDidValue}
       comment={info.comment}
       formattedDateTime={formatDateTime(info.transferredAt)}
-      profileHref={profileHref}
+      transactionHref={transactionHref}
     />
   );
 };
