@@ -35,7 +35,9 @@ export function middleware(request: NextRequest) {
         }
 
         if (pathname === route || pathname.startsWith(`${route}/`)) {
-          console.log(`Redirecting from disabled feature path: ${pathname} to ${rootPath}`);
+          if (isDev) {
+            console.log(`Redirecting from disabled feature path: ${pathname} to ${rootPath}`);
+          }
           return NextResponse.redirect(new URL(rootPath, request.url));
         }
       }

@@ -206,7 +206,7 @@ export const useSearchResults = (
 
   useEffect(() => {
     if (error) {
-      logger.info("Error fetching search results", {
+      logger.warn("Error fetching search results", {
         error: error.message || String(error),
         component: "useSearchResults",
       });

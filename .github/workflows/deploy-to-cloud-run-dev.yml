@@ -116,3 +116,6 @@ jobs:
           service: ${{ env.APPLICATION_NAME }}-${{ matrix.community }}
           image: ${{ env.ARTIFACT_REGISTRY }}/${{ env.APPLICATION_NAME }}-${{ matrix.community }}:latest
           region: ${{ env.GCP_REGION }}
+          flags: >
+            --min-instances=0
+            --max-instances=10

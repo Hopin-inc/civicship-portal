@@ -30,7 +30,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
 
     if (!authStateManager) return;
 
-    logger.info("[AUTH] AuthProvider initialization", {
+    logger.debug("[AUTH] AuthProvider initialization", {
       hasFullAuth,
       ssrCurrentUser: !!ssrCurrentUser,
       ssrCurrentUserId: ssrCurrentUser?.id,

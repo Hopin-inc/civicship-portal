@@ -36,7 +36,7 @@ export const useLineAuthProcessing = ({
 
       // SSR で user/line/phone そろってるなら、LIFF 初期化も含めて全てスキップ
       if (hasFullAuth) {
-        logger.info("SSR full auth detected; skipping all LIFF processing", {
+        logger.debug("SSR full auth detected; skipping all LIFF processing", {
           authType: "liff",
           component: "useLineAuthProcessing",
         });
@@ -49,7 +49,7 @@ export const useLineAuthProcessing = ({
         const initialized = await liffService.initialize();
 
         if (!initialized) {
-          logger.info("LIFF init failed", {
+          logger.warn("LIFF init failed", {
             authType: "liff",
             component: "useLineAuthProcessing",
           });
@@ -60,14 +60,14 @@ export const useLineAuthProcessing = ({
         if (!isLoggedIn) return;
 
         if (lineAuth.currentUser) {
-          logger.info("Firebase already authenticated, skipping signInWithLiffToken", {
+          logger.debug("Firebase already authenticated, skipping signInWithLiffToken", {
             authType: "liff",
             component: "useLineAuthProcessing",
           });
         } else {
           const success = await liffService.signInWithLiffToken();
           if (!success) {
-            logger.info("signInWithLiffToken failed", {
+            logger.warn("signInWithLiffToken failed", {
               authType: "liff",
               component: "useLineAuthProcessing",
             });
@@ -100,7 +100,7 @@ export const useLineAuthProcessing = ({
           
           // Only set user_registered if BOTH phone identity AND membership exist
           if (hasMembership) {
-            logger.info("[AUTH] useLineAuthProcessing: setting user_registered", {
+            logger.debug("[AUTH] useLineAuthProcessing: setting user_registered", {
               userId: user.id,
               hasPhoneIdentity,
               hasMembership,
@@ -114,7 +114,7 @@ export const useLineAuthProcessing = ({
             authStateManager.updateState("user_registered", "useLineAuthProcessing (phone + membership)");
             await authStateManager.handleUserRegistrationStateChange(true);
           } else {
-            logger.info("[AUTH] useLineAuthProcessing: setting phone_authenticated", {
+            logger.debug("[AUTH] useLineAuthProcessing: setting phone_authenticated", {
               userId: user.id,
               hasPhoneIdentity,
               hasMembership,
@@ -137,7 +137,7 @@ export const useLineAuthProcessing = ({
           await authStateManager.handleUserRegistrationStateChange(false);
         }
       } catch (err) {
-        logger.info("Error during LINE auth", {
+        logger.warn("Error during LINE auth", {
           authType: "liff",
           error: err instanceof Error ? err.message : String(err),
           component: "useLineAuthProcessing",

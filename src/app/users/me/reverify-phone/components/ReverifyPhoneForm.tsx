@@ -109,7 +109,7 @@ export function ReverifyPhoneForm() {
       const storeResult = await storeTokens();
 
       if (storeResult.success) {
-        logger.info("[ReverifyPhoneForm] Phone auth token stored successfully");
+        logger.debug("[ReverifyPhoneForm] Phone auth token stored successfully");
         toast.success(t("phoneVerification.verification.completed"));
         router.push("/users/me");
       } else {

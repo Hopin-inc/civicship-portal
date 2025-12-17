@@ -52,7 +52,7 @@ export const useReservationOpportunity = ({
 
   useEffect(() => {
     if (error)
-      logger.info("Opportunity query error", {
+      logger.warn("Opportunity query error", {
         error: error.message || String(error),
         component: "useReservationOpportunity",
         opportunityId,
