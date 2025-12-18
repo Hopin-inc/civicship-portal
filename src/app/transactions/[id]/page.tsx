@@ -80,17 +80,15 @@ export default function TransactionDetailPage({
 
     return (
       <>
-        <div className="flex justify-center mt-10">
-          <div>
-            <Image
-              src={currentCommunityConfig.squareLogoPath}
-              alt={currentCommunityConfig.title}
-              width={120}
-              height={120}
-              className="object-cover border-none shadow-none mx-auto rounded-sm"
-            />
-          </div>
-        </div>
+                <div className="flex justify-center mt-10">
+                  <Image
+                    src={currentCommunityConfig.squareLogoPath}
+                    alt={currentCommunityConfig.title}
+                    width={120}
+                    height={120}
+                    className="object-cover border-none shadow-none mx-auto rounded-sm"
+                  />
+                </div>
         <div className="mt-6 p-4">
           <div className="grid grid-cols-1 gap-1">
             {infoCards.map((card, index) => (
