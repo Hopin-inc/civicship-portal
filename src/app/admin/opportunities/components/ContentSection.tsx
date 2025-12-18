@@ -57,7 +57,9 @@ export function ContentSection({
       <div className="space-y-1">
         <div className="flex items-center gap-2 px-1">
           <span className="text-sm text-muted-foreground">タイトル</span>
-          <span className="text-destructive text-xs font-bold">*必須</span>
+          <span className="text-primary text-xs font-bold bg-primary-foreground px-1 py-0.5 rounded">
+            必須
+          </span>
         </div>
         <Input
           value={title}
@@ -71,7 +73,9 @@ export function ContentSection({
       <div className="space-y-1">
         <div className="flex items-center gap-2 px-1">
           <span className="text-sm text-muted-foreground">概要</span>
-          <span className="text-destructive text-xs font-bold">*必須</span>
+          <span className="text-primary text-xs font-bold bg-primary-foreground px-1 py-0.5 rounded">
+            必須
+          </span>
         </div>
         <Textarea
           value={summary}
@@ -129,7 +133,9 @@ export function ContentSection({
           <ItemTitle>
             <Calendar className="h-3.5 w-3.5" />
             開催枠
-            <span className="text-destructive text-xs font-bold">*必須</span>
+            <span className="text-primary text-xs font-bold bg-primary-foreground px-1 py-0.5 rounded">
+              必須
+            </span>
           </ItemTitle>
           <ItemDescription>{getSlotsSummary()}</ItemDescription>
         </ItemContent>
