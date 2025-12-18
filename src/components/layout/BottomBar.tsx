@@ -7,7 +7,7 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import { matchPaths } from "@/utils/path";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
-import { AuthEnvironment, detectEnvironment } from "@/lib/auth/core/environment-detector";
+import { useAuthEnvironment } from "@/hooks/useAuthEnvironment";
 import { currentCommunityConfig } from "@/lib/communities/metadata";
 import { useTranslations } from "next-intl";
 
@@ -21,8 +21,7 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
   const searchParams = useSearchParams();
   const placeId = searchParams.get("placeId");
 
-  const env = detectEnvironment();
-  const isLiff = env === AuthEnvironment.LIFF;
+  const { isLiffClient } = useAuthEnvironment();
 
   const { isVisible } = useScrollDirection({ threshold: 20 });
 
@@ -61,7 +60,7 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
       className={cn(
         className,
         "fixed bottom-0 left-0 w-full bg-background border-t border-input z-40 transition-transform duration-300",
-        !isLiff ? "py-4" : "pt-4 pb-10",
+        !isLiffClient ? "py-4" : "pt-4 pb-10",
         !isVisible && "transform translate-y-full",
       )}
     >

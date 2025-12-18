@@ -83,7 +83,7 @@ export function useCodeVerification(
         const phoneUid = useAuthStore.getState().phoneAuth.phoneUid;
 
         if (!success || !phoneUid) {
-          logger.info("[useCodeVerification] Invalid code or missing phoneUid", {
+          logger.debug("[useCodeVerification] Invalid code or missing phoneUid", {
             component: "useCodeVerification",
             errorCategory: "user_input",
             retryable: true,

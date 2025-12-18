@@ -57,7 +57,7 @@ export const useStorePhoneAuthToken = (userId: string | undefined) => {
       const success = result.data?.storePhoneAuthToken?.success ?? false;
 
       if (success) {
-        logger.info("[useStorePhoneAuthToken] Phone auth token stored successfully");
+        logger.debug("[useStorePhoneAuthToken] Phone auth token stored successfully");
       } else {
         logger.warn("[useStorePhoneAuthToken] Failed to store phone auth token");
       }

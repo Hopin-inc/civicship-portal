@@ -25,7 +25,7 @@ export const useReservationWallet = ({
 
   useEffect(() => {
     if (walletData.error)
-      logger.info("Wallet error", {
+      logger.warn("Wallet error", {
         error: walletData.error.message || String(walletData.error),
         component: "useReservationWallet",
         userId,

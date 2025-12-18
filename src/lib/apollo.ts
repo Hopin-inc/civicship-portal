@@ -55,7 +55,7 @@ const requestLink = setContext(async (operation, prevContext) => {
 const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) => {
   if (graphQLErrors) {
     for (const error of graphQLErrors) {
-      logger.info("GraphQL error", {
+      logger.warn("GraphQL error", {
         message: error.message,
         locations: error.locations,
         path: error.path,
@@ -82,7 +82,7 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
 
   if (networkError) {
     if ("statusCode" in networkError && networkError.statusCode === 401) {
-      logger.info("Network authentication error", {
+      logger.warn("Network authentication error", {
         error: networkError.message || String(networkError),
         statusCode: networkError.statusCode,
         component: "ApolloErrorLink",

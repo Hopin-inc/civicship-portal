@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { AuthEnvironment, detectEnvironment } from "@/lib/auth/core/environment-detector";
+import { useAuthEnvironment } from "@/hooks/useAuthEnvironment";
 import { cn } from "@/lib/utils";
 import { Edit } from "lucide-react";
 
@@ -43,8 +43,7 @@ export const OpportunityDetailsFooter: React.FC<OpportunityDetailsFooterProps> =
     community_id: communityId ?? COMMUNITY_ID,
   });
 
-  const env = detectEnvironment();
-  const isLiff = env === AuthEnvironment.LIFF;
+  const { isLiffClient } = useAuthEnvironment();
 
   const renderActionElement = () => {
     // 管理者モードの場合は編集ボタンを表示
@@ -84,7 +83,7 @@ export const OpportunityDetailsFooter: React.FC<OpportunityDetailsFooterProps> =
       <div
         className={cn(
           "max-w-mobile-l mx-auto px-4 flex items-center justify-between w-full",
-          isLiff ? "h-28" : "h-20",
+          isLiffClient ? "h-28" : "h-20",
         )}
       >
         <div>

@@ -11,7 +11,7 @@ export function presentUserProfile(
 ): UserProfileViewModel {
   const wallet = gqlUser?.wallets?.find((w) => w.community?.id === COMMUNITY_ID);
 
-  logger.info("[AUTH] presentUserProfile: wallet selection", {
+  logger.debug("[AUTH] presentUserProfile: wallet selection", {
     communityId: COMMUNITY_ID,
     walletsCount: gqlUser?.wallets?.length ?? 0,
     walletCommunities: (gqlUser?.wallets ?? []).map((w) => w.community?.id),
