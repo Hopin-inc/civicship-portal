@@ -38,7 +38,10 @@ export const SlotBatchAdder = ({ onAddSlots }: SlotBatchAdderProps) => {
     }
 
     const newSlots = selectedDates.map((date) => {
-      const startDateTime = dayjs(date).hour(startHour).minute(startMinute).format("YYYY-MM-DDTHH:mm");
+      const startDateTime = dayjs(date)
+        .hour(startHour)
+        .minute(startMinute)
+        .format("YYYY-MM-DDTHH:mm");
 
       const endDateTime = dayjs(date).hour(endHour).minute(endMinute).format("YYYY-MM-DDTHH:mm");
 
@@ -52,10 +55,7 @@ export const SlotBatchAdder = ({ onAddSlots }: SlotBatchAdderProps) => {
 
   return (
     <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
-      <h3 className="font-semibold">開催枠を一括追加</h3>
-
       <div>
-        <Label className="mb-2 block">開催日を選択（複数選択可）</Label>
         <div className="border rounded-lg p-2 bg-background">
           <Calendar
             mode="multiple"
@@ -93,7 +93,12 @@ export const SlotBatchAdder = ({ onAddSlots }: SlotBatchAdderProps) => {
         </div>
         <div>
           <Label className="mb-2 block">終了時刻</Label>
-          <Input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} required />
+          <Input
+            type="time"
+            value={endTime}
+            onChange={(e) => setEndTime(e.target.value)}
+            required
+          />
         </div>
       </div>
 
@@ -108,12 +113,14 @@ export const SlotBatchAdder = ({ onAddSlots }: SlotBatchAdderProps) => {
 
       <Button
         type="button"
-        variant="primary"
+        variant="secondary"
         className="w-full"
         onClick={handleAddSlots}
         disabled={selectedDates.length === 0}
       >
-        {selectedDates.length > 0 ? `${selectedDates.length}日分の開催枠を追加` : "日付を選択してください"}
+        {selectedDates.length > 0
+          ? `${selectedDates.length}日分の開催枠を追加`
+          : "日付を選択してください"}
       </Button>
     </div>
   );

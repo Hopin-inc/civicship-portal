@@ -24,9 +24,12 @@ export function EditSlotsSheet({
 }: EditSlotsSheetProps) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="rounded-t-3xl max-w-md mx-auto p-8 overflow-y-auto max-h-[70vh]">
+      <SheetContent
+        side="bottom"
+        className="rounded-t-3xl max-w-md mx-auto p-8 overflow-y-auto max-h-[70vh]"
+      >
         <SheetHeader className="text-left pb-6">
-          <SheetTitle>開催枠を編集</SheetTitle>
+          <SheetTitle className={"text-title-sm"}>開催枠を編集</SheetTitle>
         </SheetHeader>
 
         <div className="space-y-4">
@@ -46,14 +49,6 @@ export function EditSlotsSheet({
                   onRemove={onRemoveSlot}
                 />
               ))}
-            </div>
-          )}
-
-          {slots.length === 0 && (
-            <div className="text-center py-8 text-muted-foreground text-sm rounded-lg border border-dashed">
-              開催枠が登録されていません。
-              <br />
-              上のカレンダーから日付を選択して追加してください。
             </div>
           )}
         </div>

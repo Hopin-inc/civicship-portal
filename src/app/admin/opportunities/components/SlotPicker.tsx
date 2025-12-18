@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { cn } from "@/lib/utils";
@@ -21,10 +21,10 @@ interface SlotPickerProps {
 
 export const SlotPicker = ({ index, slot, onUpdate, onRemove }: SlotPickerProps) => {
   const [date, setDate] = useState<Date | undefined>(
-    slot.startAt ? new Date(slot.startAt) : undefined
+    slot.startAt ? new Date(slot.startAt) : undefined,
   );
   const [startTime, setStartTime] = useState(
-    slot.startAt ? dayjs(slot.startAt).format("HH:mm") : ""
+    slot.startAt ? dayjs(slot.startAt).format("HH:mm") : "",
   );
   const [endTime, setEndTime] = useState(slot.endAt ? dayjs(slot.endAt).format("HH:mm") : "");
 
@@ -67,7 +67,10 @@ export const SlotPicker = ({ index, slot, onUpdate, onRemove }: SlotPickerProps)
 
     if (date && time) {
       const [hour, minute] = time.split(":");
-      const startDateTime = dayjs(date).hour(Number(hour)).minute(Number(minute)).format("YYYY-MM-DDTHH:mm");
+      const startDateTime = dayjs(date)
+        .hour(Number(hour))
+        .minute(Number(minute))
+        .format("YYYY-MM-DDTHH:mm");
       onUpdate(index, "startAt", startDateTime);
     }
   };
@@ -77,7 +80,10 @@ export const SlotPicker = ({ index, slot, onUpdate, onRemove }: SlotPickerProps)
 
     if (date && time) {
       const [hour, minute] = time.split(":");
-      const endDateTime = dayjs(date).hour(Number(hour)).minute(Number(minute)).format("YYYY-MM-DDTHH:mm");
+      const endDateTime = dayjs(date)
+        .hour(Number(hour))
+        .minute(Number(minute))
+        .format("YYYY-MM-DDTHH:mm");
       onUpdate(index, "endAt", endDateTime);
     }
   };
@@ -88,7 +94,9 @@ export const SlotPicker = ({ index, slot, onUpdate, onRemove }: SlotPickerProps)
         <div className="flex-1">
           {slot.startAt && slot.endAt ? (
             <div>
-              <p className="font-semibold text-sm">{dayjs(slot.startAt).format("YYYY年M月D日(dd)")}</p>
+              <p className="font-semibold text-sm">
+                {dayjs(slot.startAt).format("YYYY年M月D日(dd)")}
+              </p>
               <p className="text-sm text-muted-foreground">
                 {dayjs(slot.startAt).format("HH:mm")} 〜 {dayjs(slot.endAt).format("HH:mm")}
               </p>
@@ -97,7 +105,13 @@ export const SlotPicker = ({ index, slot, onUpdate, onRemove }: SlotPickerProps)
             <p className="text-sm text-muted-foreground">未設定</p>
           )}
         </div>
-        <Button type="button" variant="text" size="sm" onClick={() => onRemove(index)}>
+        <Button
+          type="button"
+          variant="destructive-outline"
+          size="sm"
+          onClick={() => onRemove(index)}
+        >
+          <Trash2 className="h-4 w-4" />
           削除
         </Button>
       </div>
@@ -114,7 +128,7 @@ export const SlotPicker = ({ index, slot, onUpdate, onRemove }: SlotPickerProps)
                 variant="tertiary"
                 className={cn(
                   "w-full justify-start text-left font-normal h-9 text-sm",
-                  !date && "text-muted-foreground"
+                  !date && "text-muted-foreground",
                 )}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
