@@ -10,6 +10,8 @@ import { useTranslations } from "next-intl";
 import { useLocaleDateTimeFormat } from "@/utils/i18n";
 import { useTransactionDetailData } from "./lib/useTransactionDetailData";
 import { VerificationSection } from "../components/VerificationSection";
+import Image from "next/image";
+import { currentCommunityConfig } from "@/lib/communities/metadata";
 
 export default function TransactionDetailPage({
   params,
@@ -48,10 +50,11 @@ export default function TransactionDetailPage({
       label: t("transactions.detail.transactionType"),
       value: detail.transactionType,
     },
-    {
-      label: t("transactions.detail.dateTime"),
-      value: formatDateTime(detail.dateTime),
-    },
+        {
+          label: t("transactions.detail.dateTime"),
+          value: formatDateTime(detail.dateTime),
+          showTruncate: false,
+        },
     {
       label: t("transactions.detail.from"),
       value: detail.fromName,
@@ -75,14 +78,25 @@ export default function TransactionDetailPage({
       : []),
   ];
 
-  return (
-    <div className="p-4">
-      <div className="grid grid-cols-1 gap-1">
-        {infoCards.map((card, index) => (
-          <InfoCard key={index} {...card} />
-        ))}
-      </div>
-      <VerificationSection transactionId={id} />
-    </div>
-  );
+    return (
+      <>
+                <div className="flex justify-center mt-10">
+                  <Image
+                    src={currentCommunityConfig.squareLogoPath}
+                    alt={currentCommunityConfig.title}
+                    width={120}
+                    height={120}
+                    className="object-cover border-none shadow-none mx-auto rounded-sm"
+                  />
+                </div>
+        <div className="mt-6 p-4">
+          <div className="grid grid-cols-1 gap-1">
+            {infoCards.map((card, index) => (
+              <InfoCard key={index} {...card} />
+            ))}
+          </div>
+          <VerificationSection transactionId={id} />
+        </div>
+      </>
+    );
 }
