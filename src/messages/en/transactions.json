@@ -70,6 +70,7 @@
   "transactions.detail.type.refund": "Refund",
   "transactions.detail.verification.showButton": "Show Verification Results",
   "transactions.detail.verification.description": "Display confirmation results and technical information",
+  "transactions.detail.verification.loading": "Verifying...",
     "transactions.detail.verification.error": "Failed to retrieve verification results",
     "transactions.detail.verification.notFound": "Verification results not found",
     "transactions.detail.verification.notVerified": "This exchange has not been verified yet",

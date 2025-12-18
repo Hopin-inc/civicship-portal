@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { InfoCard } from "@/components/shared";
 import { useVerifyTransactionsQuery, GqlVerificationStatus } from "@/types/graphql";
 import { useTranslations } from "next-intl";
-import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { Loader2 } from "lucide-react";
 
 interface VerificationSectionProps {
   transactionId: string;
@@ -26,11 +26,22 @@ export const VerificationSection = ({ transactionId }: VerificationSectionProps)
     setShowVerification(true);
   };
 
-    if (!showVerification) {
+      if (!showVerification || loading) {
       return (
         <div className="mt-6 flex flex-col items-center gap-2">
-          <Button variant="text" onClick={handleShowVerification}>
-            {t("transactions.detail.verification.showButton")}
+          <Button 
+            variant="text" 
+            onClick={handleShowVerification}
+            disabled={loading}
+          >
+            {loading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                {t("transactions.detail.verification.loading")}
+              </>
+            ) : (
+              t("transactions.detail.verification.showButton")
+            )}
           </Button>
           <p className="text-label-xs text-muted-foreground text-center">
             {t("transactions.detail.verification.description")}
@@ -38,14 +49,6 @@ export const VerificationSection = ({ transactionId }: VerificationSectionProps)
         </div>
       );
     }
-
-  if (loading) {
-    return (
-      <div className="mt-6">
-        <LoadingIndicator />
-      </div>
-    );
-  }
 
   if (error) {
     return (

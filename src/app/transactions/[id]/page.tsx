@@ -65,15 +65,16 @@ export default function TransactionDetailPage({
         label: t("transactions.detail.pointAmount"),
         value: `${detail.pointAmount.toLocaleString()}pt`,
       },
-      ...(detail.comment
-        ? [
-            {
-              label: t("transactions.detail.comment"),
-              value: detail.comment,
-              showTruncate: false,
-            },
-          ]
-        : []),
+            ...(detail.comment
+              ? [
+                  {
+                    label: t("transactions.detail.comment"),
+                    value: detail.comment,
+                    showTruncate: false,
+                    valueAlign: 'left' as const,
+                  },
+                ]
+              : []),
     ];
 
         return (
