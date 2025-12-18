@@ -19,6 +19,11 @@ interface ContentSectionProps {
   onRemoveImage: (index: number) => void;
   slots: SlotData[];
   onSlotsClick: () => void;
+  errors?: {
+    title?: string;
+    summary?: string;
+    slots?: string;
+  };
 }
 
 export function ContentSection({
@@ -33,6 +38,7 @@ export function ContentSection({
   onRemoveImage,
   slots,
   onSlotsClick,
+  errors,
 }: ContentSectionProps) {
   // 詳細の要約表示（先頭2-3行）
   const getDescriptionSummary = () => {
@@ -65,9 +71,12 @@ export function ContentSection({
           value={title}
           onChange={(e) => onTitleChange(e.target.value)}
           placeholder="募集タイトルを入力"
-          className="placeholder:text-sm"
+          className={`placeholder:text-sm ${errors?.title ? "border-destructive focus-visible:ring-destructive" : ""}`}
           required
         />
+        {errors?.title && (
+          <p className="text-xs text-destructive px-1">{errors.title}</p>
+        )}
       </div>
 
       <div className="space-y-1">
@@ -81,9 +90,12 @@ export function ContentSection({
           value={summary}
           onChange={(e) => onSummaryChange(e.target.value)}
           placeholder="概要（50字程度）を入力"
-          className="min-h-[80px] placeholder:text-sm"
+          className={`min-h-[80px] placeholder:text-sm ${errors?.summary ? "border-destructive focus-visible:ring-destructive" : ""}`}
           required
         />
+        {errors?.summary && (
+          <p className="text-xs text-destructive px-1">{errors.summary}</p>
+        )}
       </div>
 
       <Item
@@ -116,33 +128,38 @@ export function ContentSection({
         onRemoveImage={onRemoveImage}
       />
 
-      <Item
-        size="sm"
-        variant={"outline"}
-        role="button"
-        tabIndex={0}
-        onClick={onSlotsClick}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            onSlotsClick();
-          }
-        }}
-        className="cursor-pointer"
-      >
-        <ItemContent>
-          <ItemTitle>
-            <Calendar className="h-3.5 w-3.5" />
-            開催枠
-            <span className="text-primary text-xs font-bold bg-primary-foreground px-1 py-0.5 rounded">
-              必須
-            </span>
-          </ItemTitle>
-          <ItemDescription>{getSlotsSummary()}</ItemDescription>
-        </ItemContent>
-        <ItemActions>
-          <ChevronRight className="h-4 w-4 text-muted-foreground" />
-        </ItemActions>
-      </Item>
+      <div className="space-y-1">
+        <Item
+          size="sm"
+          variant={"outline"}
+          role="button"
+          tabIndex={0}
+          onClick={onSlotsClick}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              onSlotsClick();
+            }
+          }}
+          className={`cursor-pointer ${errors?.slots ? "border-destructive" : ""}`}
+        >
+          <ItemContent>
+            <ItemTitle>
+              <Calendar className="h-3.5 w-3.5" />
+              開催枠
+              <span className="text-primary text-xs font-bold bg-primary-foreground px-1 py-0.5 rounded">
+                必須
+              </span>
+            </ItemTitle>
+            <ItemDescription>{getSlotsSummary()}</ItemDescription>
+          </ItemContent>
+          <ItemActions>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </ItemActions>
+        </Item>
+        {errors?.slots && (
+          <p className="text-xs text-destructive px-1">{errors.slots}</p>
+        )}
+      </div>
     </section>
   );
 }

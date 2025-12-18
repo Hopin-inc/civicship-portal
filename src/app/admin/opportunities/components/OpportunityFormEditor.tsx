@@ -69,6 +69,7 @@ export const OpportunityFormEditor = ({
         onRemoveImage={editor.removeImage}
         slots={editor.slots}
         onSlotsClick={() => sheets.slotsSheet.setOpen(true)}
+        errors={editor.errors}
       />
 
       {/* === セクション2: 設定 === */}
@@ -79,6 +80,7 @@ export const OpportunityFormEditor = ({
         onPlaceClick={() => sheets.placeSheet.setOpen(true)}
         capacity={editor.capacity}
         onCapacityChange={editor.setCapacity}
+        errors={editor.errors}
       />
 
       {/* === セクション3: カテゴリ・料金設定 === */}

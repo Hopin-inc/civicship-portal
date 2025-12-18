@@ -19,6 +19,14 @@ type UseOpportunityEditorOptions = {
   initialData?: Partial<OpportunityFormData>;
 };
 
+type ValidationErrors = {
+  title?: string;
+  summary?: string;
+  hostUserId?: string;
+  placeId?: string;
+  slots?: string;
+};
+
 export const useOpportunityEditor = ({
   mode,
   opportunityId,
@@ -57,6 +65,9 @@ export const useOpportunityEditor = ({
   const [publishStatus, setPublishStatus] = useState<GqlPublishStatus>(
     initialData?.publishStatus ?? GqlPublishStatus.Published
   );
+
+  // バリデーションエラー
+  const [errors, setErrors] = useState<ValidationErrors>({});
 
   // ========== GraphQL Mutations ==========
   const [createOpportunity, createResult] = useCreateOpportunityMutation();
@@ -104,48 +115,125 @@ export const useOpportunityEditor = ({
 
   // ========== スロット管理 ==========
   const addSlot = () => {
-    setSlots((prev) => [...prev, { startAt: "", endAt: "" }]);
+    setSlotsWithClear((prev) => [...prev, { startAt: "", endAt: "" }]);
   };
 
   const addSlotsBatch = (newSlots: { startAt: string; endAt: string }[]) => {
-    setSlots((prev) => [...prev, ...newSlots]);
+    setSlotsWithClear((prev) => [...prev, ...newSlots]);
   };
 
   const updateSlot = (index: number, field: keyof SlotData, value: string) => {
-    setSlots((prev) => prev.map((slot, i) => (i === index ? { ...slot, [field]: value } : slot)));
+    setSlotsWithClear((prev) => prev.map((slot, i) => (i === index ? { ...slot, [field]: value } : slot)));
   };
 
   const removeSlot = (index: number) => {
-    setSlots((prev) => prev.filter((_, i) => i !== index));
+    setSlotsWithClear((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  // ========== バリデーション ==========
+  // 純粋なバリデーションロジック（必須項目のチェック）
+  const buildValidationErrors = (): ValidationErrors => {
+    const newErrors: ValidationErrors = {};
+
+    if (!title.trim()) {
+      newErrors.title = "タイトルを入力してください";
+    }
+    if (!summary.trim()) {
+      newErrors.summary = "概要を入力してください";
+    }
+    if (!hostUserId) {
+      newErrors.hostUserId = "主催者を選択してください";
+    }
+    if (!placeId) {
+      newErrors.placeId = "開催場所を選択してください";
+    }
+    if (slots.length === 0) {
+      newErrors.slots = "開催枠を最低1つ登録してください";
+    }
+
+    return newErrors;
+  };
+
+  // バリデーション実行（副作用あり）
+  const validateForm = (): boolean => {
+    const newErrors = buildValidationErrors();
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
+      toast.error("必須項目を入力してください");
+      return false;
+    }
+
+    return true;
+  };
+
+  // エラー自動クリア付きセッター
+  const setTitleWithClear = (value: string) => {
+    setTitle(value);
+    if (errors.title) {
+      setErrors((prev) => {
+        const { title, ...rest } = prev;
+        return rest;
+      });
+    }
+  };
+
+  const setSummaryWithClear = (value: string) => {
+    setSummary(value);
+    if (errors.summary) {
+      setErrors((prev) => {
+        const { summary, ...rest } = prev;
+        return rest;
+      });
+    }
+  };
+
+  const setHostUserIdWithClear = (value: string) => {
+    setHostUserId(value);
+    if (errors.hostUserId) {
+      setErrors((prev) => {
+        const { hostUserId, ...rest } = prev;
+        return rest;
+      });
+    }
+  };
+
+  const setPlaceIdWithClear = (value: string | null) => {
+    setPlaceId(value);
+    if (errors.placeId) {
+      setErrors((prev) => {
+        const { placeId, ...rest } = prev;
+        return rest;
+      });
+    }
+  };
+
+  const setSlotsWithClear = (value: SlotData[] | ((prev: SlotData[]) => SlotData[])) => {
+    setSlots(value);
+    if (errors.slots) {
+      setErrors((prev) => {
+        const { slots, ...rest } = prev;
+        return rest;
+      });
+    }
   };
 
   // ========== 保存処理 ==========
   const handleSave = async (e: FormEvent) => {
     e.preventDefault();
 
-    // バリデーション
-    if (!title.trim()) {
-      toast.error("タイトルを入力してください");
+    // Tier 1: 必須項目のバリデーション
+    if (!validateForm()) {
       return;
     }
-    if (!summary.trim()) {
-      toast.error("概要を入力してください");
-      return;
-    }
-    if (!hostUserId) {
-      toast.error("主催者を選択してください");
-      return;
-    }
+
+    // Tier 2: ドメイン制約のバリデーション
     if (images.length < 2) {
       toast.error("最低2枚の画像を登録してください");
       return;
     }
     if (images.length > 5) {
       toast.error("画像は最大5枚までです");
-      return;
-    }
-    if (slots.length === 0) {
-      toast.error("最低1つの開催枠が必要です");
       return;
     }
     if (slots.some((slot) => !slot.startAt || !slot.endAt)) {
@@ -255,17 +343,17 @@ export const useOpportunityEditor = ({
     category,
     setCategory,
     title,
-    setTitle,
+    setTitle: setTitleWithClear,
     summary,
-    setSummary,
+    setSummary: setSummaryWithClear,
     description,
     setDescription,
 
     // 主催・場所
     hostUserId,
-    setHostUserId,
+    setHostUserId: setHostUserIdWithClear,
     placeId,
-    setPlaceId,
+    setPlaceId: setPlaceIdWithClear,
     requireHostApproval,
     setRequireHostApproval,
 
@@ -294,6 +382,9 @@ export const useOpportunityEditor = ({
     // 公開設定
     publishStatus,
     setPublishStatus,
+
+    // バリデーション
+    errors,
 
     // 保存
     handleSave,
