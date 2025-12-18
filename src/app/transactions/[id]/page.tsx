@@ -79,9 +79,9 @@ export default function TransactionDetailPage({
         return (
         <div className="p-4">
           <div className="grid grid-cols-1 gap-1">
-            {infoCards.map((card, index) => (
-              <InfoCard key={index} {...card} />
-            ))}
+                        {infoCards.map((card) => (
+                          <InfoCard key={card.label} {...card} />
+                        ))}
           </div>
           <VerificationSection transactionId={id} />
         </div>

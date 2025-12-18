@@ -109,10 +109,10 @@ export const InfoCard = ({
           <div className="text-gray-400 text-xs whitespace-pre-wrap shrink-0">
             {label}
           </div>
-                {hasSecondaryContent ? (
-                  <div className="flex-1 flex flex-col items-end text-right break-words">
-                    <div className="text-sm text-black font-bold flex items-center">
-                      {value}
+                                {hasSecondaryContent ? (
+                                  <div className="flex-1 flex flex-col items-end text-right break-words">
+                                    <div className="text-sm text-black font-bold flex items-center">
+                                      {displayValue}
               <ExternalLinkButton
                 externalLink={externalLink}
                 label={label}
@@ -154,4 +154,4 @@ export const InfoCard = ({
       </CardHeader>
     </Card>
   );
-};            
+};                
