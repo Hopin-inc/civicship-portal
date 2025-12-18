@@ -54,21 +54,33 @@ export function ContentSection({
 
   return (
     <section className="space-y-2">
-      <Input
-        value={title}
-        onChange={(e) => onTitleChange(e.target.value)}
-        placeholder="募集タイトルを入力"
-        className="placeholder:text-sm"
-        required
-      />
+      <div className="space-y-1">
+        <div className="flex items-center gap-2 px-1">
+          <span className="text-sm text-muted-foreground">タイトル</span>
+          <span className="text-destructive text-xs font-bold">*必須</span>
+        </div>
+        <Input
+          value={title}
+          onChange={(e) => onTitleChange(e.target.value)}
+          placeholder="募集タイトルを入力"
+          className="placeholder:text-sm"
+          required
+        />
+      </div>
 
-      <Textarea
-        value={summary}
-        onChange={(e) => onSummaryChange(e.target.value)}
-        placeholder="概要（50字程度）を入力"
-        className="min-h-[80px] placeholder:text-sm"
-        required
-      />
+      <div className="space-y-1">
+        <div className="flex items-center gap-2 px-1">
+          <span className="text-sm text-muted-foreground">概要</span>
+          <span className="text-destructive text-xs font-bold">*必須</span>
+        </div>
+        <Textarea
+          value={summary}
+          onChange={(e) => onSummaryChange(e.target.value)}
+          placeholder="概要（50字程度）を入力"
+          className="min-h-[80px] placeholder:text-sm"
+          required
+        />
+      </div>
 
       <Item
         size="sm"
@@ -117,6 +129,7 @@ export function ContentSection({
           <ItemTitle>
             <Calendar className="h-3.5 w-3.5" />
             開催枠
+            <span className="text-destructive text-xs font-bold">*必須</span>
           </ItemTitle>
           <ItemDescription>{getSlotsSummary()}</ItemDescription>
         </ItemContent>

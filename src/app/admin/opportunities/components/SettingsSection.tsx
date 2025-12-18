@@ -48,9 +48,7 @@ export function SettingsSection({
           <ItemTitle>
             <Users className="h-3.5 w-3.5" />
             主催者
-            <span className="text-primary text-xs font-bold bg-primary-foreground px-1 py-0.5 rounded">
-              必須
-            </span>
+            <span className="text-destructive text-xs font-bold">*必須</span>
           </ItemTitle>
           <ItemDescription>{selectedHostName || "未選択"}</ItemDescription>
         </ItemContent>
@@ -79,6 +77,7 @@ export function SettingsSection({
           <ItemTitle>
             <MapPin className="h-3.5 w-3.5" />
             開催場所
+            <span className="text-destructive text-xs font-bold">*必須</span>
           </ItemTitle>
           <ItemDescription>{selectedPlaceName || "未選択"}</ItemDescription>
         </ItemContent>
