@@ -10,8 +10,6 @@ import { useTranslations } from "next-intl";
 import { useLocaleDateTimeFormat } from "@/utils/i18n";
 import { useTransactionDetailData } from "./lib/useTransactionDetailData";
 import { VerificationSection } from "../components/VerificationSection";
-import Image from "next/image";
-import { currentCommunityConfig } from "@/lib/communities/metadata";
 
 export default function TransactionDetailPage({
   params,
@@ -45,51 +43,41 @@ export default function TransactionDetailPage({
     return <ErrorState title={t("transactions.detail.notFound")} />;
   }
 
-  const infoCards: InfoCardProps[] = [
-    {
-      label: t("transactions.detail.transactionType"),
-      value: detail.transactionType,
-    },
-        {
-          label: t("transactions.detail.dateTime"),
-          value: formatDateTime(detail.dateTime),
-          showTruncate: false,
-        },
-    {
-      label: t("transactions.detail.from"),
-      value: detail.fromName,
-    },
-    {
-      label: t("transactions.detail.pointAmount"),
-      value: `${detail.pointAmount.toLocaleString()}pt`,
-    },
-    {
-      label: t("transactions.detail.to"),
-      value: detail.toName,
-    },
-    ...(detail.comment
-      ? [
-          {
-            label: t("transactions.detail.comment"),
-            value: detail.comment,
-            showTruncate: false,
-          },
-        ]
-      : []),
-  ];
+    const infoCards: InfoCardProps[] = [
+      {
+        label: t("transactions.detail.dateTime"),
+        value: formatDateTime(detail.dateTime),
+        showTruncate: false,
+      },
+      {
+        label: t("transactions.detail.transactionType"),
+        value: detail.transactionType,
+      },
+      {
+        label: t("transactions.detail.from"),
+        value: detail.fromName,
+      },
+      {
+        label: t("transactions.detail.to"),
+        value: detail.toName,
+      },
+      {
+        label: t("transactions.detail.pointAmount"),
+        value: `${detail.pointAmount.toLocaleString()}pt`,
+      },
+      ...(detail.comment
+        ? [
+            {
+              label: t("transactions.detail.comment"),
+              value: detail.comment,
+              showTruncate: false,
+            },
+          ]
+        : []),
+    ];
 
-    return (
-      <>
-                <div className="flex justify-center mt-10">
-                  <Image
-                    src={currentCommunityConfig.squareLogoPath}
-                    alt={currentCommunityConfig.title}
-                    width={120}
-                    height={120}
-                    className="object-cover border-none shadow-none mx-auto rounded-sm"
-                  />
-                </div>
-        <div className="mt-6 p-4">
+        return (
+        <div className="p-4">
           <div className="grid grid-cols-1 gap-1">
             {infoCards.map((card, index) => (
               <InfoCard key={index} {...card} />
@@ -97,6 +85,5 @@ export default function TransactionDetailPage({
           </div>
           <VerificationSection transactionId={id} />
         </div>
-      </>
-    );
+      );
 }

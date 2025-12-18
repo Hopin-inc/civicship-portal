@@ -103,16 +103,16 @@ export const InfoCard = ({
     }
   }
 
-  return (
-    <Card className="rounded-2xl border border-gray-200 bg-card shadow-none">
-      <CardHeader className="flex flex-row items-center justify-between py-4 px-6">
-        <div className="text-gray-400 text-xs whitespace-pre-wrap">
-          {label}
-        </div>
-        {hasSecondaryContent ? (
-          <div className="flex flex-col items-end">
-            <div className="text-sm text-black font-bold flex items-center">
-              {value}
+    return (
+      <Card className="rounded-2xl border border-gray-200 bg-card shadow-none">
+        <CardHeader className="flex flex-row items-start gap-4 py-4 px-6">
+          <div className="text-gray-400 text-xs whitespace-pre-wrap shrink-0">
+            {label}
+          </div>
+                {hasSecondaryContent ? (
+                  <div className="flex-1 flex flex-col items-end text-right break-words">
+                    <div className="text-sm text-black font-bold flex items-center">
+                      {value}
               <ExternalLinkButton
                 externalLink={externalLink}
                 label={label}
@@ -132,26 +132,26 @@ export const InfoCard = ({
               )}
             </div>
           </div>
-        ) : (
-          <div className="flex items-center text-gray-400 text-sm mt-1">
-            {isWarning && warningText && <WarningDisplay warningText={warningText} />}
-            <ActionButtons
-              showCopy={showCopy}
-              copyData={copyData}
-              label={label}
-              secondaryLabel={secondaryLabel}
-            />
-            <span className={isWarning ? "text-gray-400" : "font-bold text-black"}>
-              {displayValue?.length === 0 ? "データが存在しません" : displayValue}
-            </span>
-            <ExternalLinkButton
-              externalLink={externalLink}
-              label={label}
-              secondaryLabel={secondaryLabel}
-            />
-          </div>
-        )}
+                ) : (
+                  <div className="flex-1 flex items-center justify-end text-right text-gray-400 text-sm">
+                    {isWarning && warningText && <WarningDisplay warningText={warningText} />}
+                    <ActionButtons
+                      showCopy={showCopy}
+                      copyData={copyData}
+                      label={label}
+                      secondaryLabel={secondaryLabel}
+                    />
+                    <span className={`break-words ${isWarning ? "text-gray-400" : "font-bold text-black"}`}>
+                      {displayValue?.length === 0 ? "データが存在しません" : displayValue}
+                    </span>
+                    <ExternalLinkButton
+                      externalLink={externalLink}
+                      label={label}
+                      secondaryLabel={secondaryLabel}
+                    />
+                  </div>
+                )}
       </CardHeader>
     </Card>
   );
-};  
+};            
