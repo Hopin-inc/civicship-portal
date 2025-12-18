@@ -86,7 +86,8 @@ export const InfoCard = ({
   truncatePattern,
   truncateHead,
   truncateTail,
-  valueAlign = 'right'
+  valueAlign = 'right',
+  layout = 'horizontal'
 }: InfoCardProps) => {
   if (!label) {
     console.warn('InfoCard: label is required');
@@ -95,18 +96,33 @@ export const InfoCard = ({
 
   const hasSecondaryContent = secondaryValue || warningText;
   
-  let displayValue = value;
-  if (showTruncate && value) {
-    if (truncatePattern === 'middle' && truncateHead !== undefined && truncateTail !== undefined) {
-      displayValue = shortenMiddle(value, truncateHead, truncateTail);
-    } else {
-      displayValue = truncateText(value, 15, truncatePattern);
+    let displayValue = value;
+    if (showTruncate && value) {
+      if (truncatePattern === 'middle' && truncateHead !== undefined && truncateTail !== undefined) {
+        displayValue = shortenMiddle(value, truncateHead, truncateTail);
+      } else {
+        displayValue = truncateText(value, 15, truncatePattern);
+      }
     }
-  }
 
-    return (
-      <Card className="rounded-2xl border border-gray-200 bg-card shadow-none">
-        <CardHeader className="flex flex-row items-center gap-4 py-4 px-6">
+    if (layout === 'vertical') {
+      return (
+        <Card className="rounded-2xl border border-gray-200 bg-card shadow-none">
+          <CardHeader className="flex flex-col gap-1 py-4 px-6">
+            <div className="text-gray-400 text-xs">
+              {label}
+            </div>
+            <div className="text-sm text-black font-bold whitespace-pre-wrap break-words text-left">
+              {displayValue?.length === 0 ? "データが存在しません" : displayValue}
+            </div>
+          </CardHeader>
+        </Card>
+      );
+    }
+
+      return (
+        <Card className="rounded-2xl border border-gray-200 bg-card shadow-none">
+          <CardHeader className="flex flex-row items-center gap-4 py-4 px-6">
           <div className="text-gray-400 text-xs whitespace-pre-wrap shrink-0">
             {label}
           </div>
@@ -155,4 +171,4 @@ export const InfoCard = ({
       </CardHeader>
     </Card>
   );
-};                                
+};                                        
