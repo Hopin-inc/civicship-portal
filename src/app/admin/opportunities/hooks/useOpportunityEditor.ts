@@ -55,7 +55,7 @@ export const useOpportunityEditor = ({
 
   // 公開設定
   const [publishStatus, setPublishStatus] = useState<GqlPublishStatus>(
-    initialData?.publishStatus ?? GqlPublishStatus.Private
+    initialData?.publishStatus ?? GqlPublishStatus.Published
   );
 
   // ========== GraphQL Mutations ==========

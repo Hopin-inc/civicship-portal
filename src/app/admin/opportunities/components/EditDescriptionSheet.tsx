@@ -18,7 +18,7 @@ export function EditDescriptionSheet({
 }: EditDescriptionSheetProps) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="rounded-t-3xl max-w-md mx-auto p-8">
+      <SheetContent side="bottom" className="rounded-t-3xl max-w-md mx-auto p-8 overflow-y-auto max-h-[70vh]">
         <SheetHeader className="text-left pb-6">
           <SheetTitle>詳細を編集</SheetTitle>
         </SheetHeader>
