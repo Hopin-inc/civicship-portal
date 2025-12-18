@@ -35,4 +35,5 @@ export interface InfoCardProps {
   truncatePattern?: 'middle' | 'end';
   truncateHead?: number;
   truncateTail?: number;
+  valueAlign?: 'left' | 'right';
 }

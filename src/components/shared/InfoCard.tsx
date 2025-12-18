@@ -85,7 +85,8 @@ export const InfoCard = ({
   showTruncate = true,
   truncatePattern,
   truncateHead,
-  truncateTail
+  truncateTail,
+  valueAlign = 'right'
 }: InfoCardProps) => {
   if (!label) {
     console.warn('InfoCard: label is required');
@@ -105,12 +106,12 @@ export const InfoCard = ({
 
     return (
       <Card className="rounded-2xl border border-gray-200 bg-card shadow-none">
-        <CardHeader className="flex flex-row items-start gap-4 py-4 px-6">
+        <CardHeader className="flex flex-row items-center gap-4 py-4 px-6">
           <div className="text-gray-400 text-xs whitespace-pre-wrap shrink-0">
             {label}
           </div>
-                                {hasSecondaryContent ? (
-                                  <div className="flex-1 flex flex-col items-end text-right break-words">
+                                                                {hasSecondaryContent ? (
+                                                                  <div className={`flex-1 flex flex-col break-words ${valueAlign === 'left' ? 'items-start text-left' : 'items-end text-right'}`}>
                                     <div className="text-sm text-black font-bold flex items-center">
                                       {displayValue}
               <ExternalLinkButton
@@ -132,8 +133,8 @@ export const InfoCard = ({
               )}
             </div>
           </div>
-                ) : (
-                  <div className="flex-1 flex items-center justify-end text-right text-gray-400 text-sm">
+                                ) : (
+                                  <div className={`flex-1 flex items-center text-gray-400 text-sm ${valueAlign === 'left' ? 'justify-start text-left' : 'justify-end text-right'}`}>
                     {isWarning && warningText && <WarningDisplay warningText={warningText} />}
                     <ActionButtons
                       showCopy={showCopy}
@@ -154,4 +155,4 @@ export const InfoCard = ({
       </CardHeader>
     </Card>
   );
-};                
+};                                
