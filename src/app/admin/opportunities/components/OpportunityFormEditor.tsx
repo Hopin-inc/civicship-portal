@@ -49,7 +49,9 @@ export const OpportunityFormEditor = ({
 
   const handleSubmit = async (e: FormEvent) => {
     const resultId = await editor.handleSave(e);
-    onSuccess?.(resultId);
+    if (resultId) {
+      onSuccess?.(resultId);
+    }
   };
 
   return (

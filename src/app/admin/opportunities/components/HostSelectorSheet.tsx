@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { GqlMembershipStatus, GqlRole, useGetMembershipListQuery } from "@/types/graphql";
@@ -8,7 +8,6 @@ import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { Item, ItemContent, ItemTitle } from "@/components/ui/item";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { PLACEHOLDER_IMAGE } from "@/utils";
-import SearchForm from "@/components/shared/SearchForm";
 
 interface HostSelectorSheetProps {
   open: boolean;
@@ -23,8 +22,6 @@ export function HostSelectorSheet({
   selectedHostId,
   onSelectHost,
 }: HostSelectorSheetProps) {
-  const [searchQuery, setSearchQuery] = useState("");
-
   // クエリはSheetが開いている時のみ実行
   const { data, loading } = useGetMembershipListQuery({
     variables: {
@@ -39,9 +36,9 @@ export function HostSelectorSheet({
     fetchPolicy: "network-only",
   });
 
-  // 検索フィルタリング
-  const filteredHosts = useMemo(() => {
-    const hosts = (data?.memberships?.edges || [])
+  // ホストリスト
+  const hosts = useMemo(() => {
+    return (data?.memberships?.edges || [])
       .map((edge) => edge?.node)
       .filter((membership) => membership?.user != null)
       .map((membership) => ({
@@ -50,12 +47,7 @@ export function HostSelectorSheet({
         role: membership!.role,
         image: membership!.user!.image,
       }));
-
-    if (!searchQuery.trim()) return hosts;
-
-    const query = searchQuery.toLowerCase();
-    return hosts.filter((host) => host.name.toLowerCase().includes(query));
-  }, [data, searchQuery]);
+  }, [data]);
 
   const handleSelect = (hostId: string, hostName: string) => {
     onSelectHost(hostId, hostName);
@@ -73,24 +65,17 @@ export function HostSelectorSheet({
         </SheetHeader>
 
         <div className="space-y-4">
-          <SearchForm
-            value={searchQuery}
-            onInputChange={setSearchQuery}
-            onSearch={setSearchQuery}
-            placeholder="主催者を検索"
-          />
-
           {loading && <LoadingIndicator />}
 
-          {!loading && filteredHosts.length === 0 && (
+          {!loading && hosts.length === 0 && (
             <div className="text-center py-8 text-muted-foreground text-sm">
-              {searchQuery ? "該当する主催者が見つかりません" : "主催者が登録されていません"}
+              主催者が登録されていません
             </div>
           )}
 
-          {!loading && filteredHosts.length > 0 && (
+          {!loading && hosts.length > 0 && (
             <div className="space-y-2">
-              {filteredHosts.map((host) => (
+              {hosts.map((host) => (
                 <Item
                   key={host.id}
                   size="sm"
@@ -106,15 +91,15 @@ export function HostSelectorSheet({
                   className="cursor-pointer"
                 >
                   <ItemContent className="flex items-center gap-3">
-                    <Avatar className="h-10 w-10">
+                    <Avatar className="h-10 w-10 flex-shrink-0">
                       <AvatarImage
                         src={host.image ?? PLACEHOLDER_IMAGE}
                         alt={host.name}
                       />
                       <AvatarFallback>{host.name[0] ?? "?"}</AvatarFallback>
                     </Avatar>
-                    <div className="flex flex-col">
-                      <span className="text-body-md font-bold">{host.name}</span>
+                    <div className="flex flex-col max-w-[200px] overflow-hidden flex-1">
+                      <span className="text-body-sm font-bold truncate">{host.name}</span>
                       <span className="text-muted-foreground text-label-xs">
                         {host.role === GqlRole.Owner ? "管理者" : "運用担当者"}
                       </span>

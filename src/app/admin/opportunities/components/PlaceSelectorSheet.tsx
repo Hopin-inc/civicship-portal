@@ -1,12 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useGetPlacesQuery } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { Item, ItemContent, ItemTitle } from "@/components/ui/item";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import SearchForm from "@/components/shared/SearchForm";
 
 interface PlaceSelectorSheetProps {
   open: boolean;
@@ -21,8 +20,6 @@ export function PlaceSelectorSheet({
   selectedPlaceId,
   onSelectPlace,
 }: PlaceSelectorSheetProps) {
-  const [searchQuery, setSearchQuery] = useState("");
-
   // クエリはSheetが開いている時のみ実行
   const { data, loading } = useGetPlacesQuery({
     variables: {
@@ -35,21 +32,16 @@ export function PlaceSelectorSheet({
     fetchPolicy: "network-only",
   });
 
-  // 検索フィルタリング
-  const filteredPlaces = useMemo(() => {
-    const places = (data?.places?.edges || [])
+  // 場所リスト
+  const places = useMemo(() => {
+    return (data?.places?.edges || [])
       .map((edge) => edge?.node)
       .filter((place) => place != null)
       .map((place) => ({
         id: place!.id,
         name: place!.name,
       }));
-
-    if (!searchQuery.trim()) return places;
-
-    const query = searchQuery.toLowerCase();
-    return places.filter((place) => place.name.toLowerCase().includes(query));
-  }, [data, searchQuery]);
+  }, [data]);
 
   const handleSelect = (placeId: string, placeName: string) => {
     onSelectPlace(placeId, placeName);
@@ -67,24 +59,17 @@ export function PlaceSelectorSheet({
         </SheetHeader>
 
         <div className="space-y-4">
-          <SearchForm
-            value={searchQuery}
-            onInputChange={setSearchQuery}
-            onSearch={setSearchQuery}
-            placeholder="場所を検索"
-          />
-
           {loading && <LoadingIndicator />}
 
-          {!loading && filteredPlaces.length === 0 && (
+          {!loading && places.length === 0 && (
             <div className="text-center py-8 text-muted-foreground text-sm">
-              {searchQuery ? "該当する場所が見つかりません" : "場所が登録されていません"}
+              場所が登録されていません
             </div>
           )}
 
-          {!loading && filteredPlaces.length > 0 && (
+          {!loading && places.length > 0 && (
             <div className="space-y-2">
-              {filteredPlaces.map((place) => (
+              {places.map((place) => (
                 <Item
                   key={place.id}
                   size="sm"
