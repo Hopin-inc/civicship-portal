@@ -26,18 +26,18 @@ export const VerificationSection = ({ transactionId }: VerificationSectionProps)
     setShowVerification(true);
   };
 
-  if (!showVerification) {
-    return (
-      <div className="mt-6 flex flex-col items-center gap-2">
-        <Button variant="secondary" onClick={handleShowVerification}>
-          {t("transactions.detail.verification.showButton")}
-        </Button>
-        <p className="text-label-xs text-muted-foreground text-center">
-          {t("transactions.detail.verification.description")}
-        </p>
-      </div>
-    );
-  }
+    if (!showVerification) {
+      return (
+        <div className="mt-6 flex flex-col items-center gap-2">
+          <Button variant="text" onClick={handleShowVerification}>
+            {t("transactions.detail.verification.showButton")}
+          </Button>
+          <p className="text-label-xs text-muted-foreground text-center">
+            {t("transactions.detail.verification.description")}
+          </p>
+        </div>
+      );
+    }
 
   if (loading) {
     return (
@@ -63,40 +63,48 @@ export const VerificationSection = ({ transactionId }: VerificationSectionProps)
     );
   }
 
-  const isVerified = verificationResult.status === GqlVerificationStatus.Verified;
+    const isVerified = verificationResult.status === GqlVerificationStatus.Verified;
 
-  return (
-    <div className="mt-6">
-      <div className="grid grid-cols-1 gap-1">
-        {verificationResult.transactionHash && (
-          <InfoCard
-            label={t("transactions.detail.verification.transactionHash")}
-            value={verificationResult.transactionHash}
-            showCopy={true}
-            copyData={verificationResult.transactionHash}
-            truncatePattern="middle"
-            truncateHead={6}
-            truncateTail={4}
-          />
-        )}
-        {verificationResult.rootHash && (
-          <InfoCard
-            label={t("transactions.detail.verification.rootHash")}
-            value={verificationResult.rootHash}
-            showCopy={true}
-            copyData={verificationResult.rootHash}
-            truncatePattern="middle"
-            truncateHead={6}
-            truncateTail={4}
-          />
-        )}
-        {verificationResult.label !== null && verificationResult.label !== undefined && (
-          <InfoCard
-            label={t("transactions.detail.verification.label")}
-            value={String(verificationResult.label)}
-          />
-        )}
+    if (!isVerified) {
+      return (
+        <div className="mt-6 text-center text-label-sm text-muted-foreground">
+          {t("transactions.detail.verification.notVerified")}
+        </div>
+      );
+    }
+
+    return (
+      <div className="mt-6">
+        <div className="grid grid-cols-1 gap-1">
+          {verificationResult.transactionHash && (
+            <InfoCard
+              label={t("transactions.detail.verification.transactionHash")}
+              value={verificationResult.transactionHash}
+              showCopy={true}
+              copyData={verificationResult.transactionHash}
+              truncatePattern="middle"
+              truncateHead={6}
+              truncateTail={4}
+            />
+          )}
+          {verificationResult.rootHash && (
+            <InfoCard
+              label={t("transactions.detail.verification.rootHash")}
+              value={verificationResult.rootHash}
+              showCopy={true}
+              copyData={verificationResult.rootHash}
+              truncatePattern="middle"
+              truncateHead={6}
+              truncateTail={4}
+            />
+          )}
+          {verificationResult.label !== null && verificationResult.label !== undefined && (
+            <InfoCard
+              label={t("transactions.detail.verification.label")}
+              value={String(verificationResult.label)}
+            />
+          )}
+        </div>
       </div>
-    </div>
-  );
+    );
 };
