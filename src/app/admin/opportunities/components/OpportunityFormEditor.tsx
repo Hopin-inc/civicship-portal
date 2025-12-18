@@ -5,10 +5,11 @@ import { Button } from "@/components/ui/button";
 import { GqlPublishStatus } from "@/types/graphql";
 import { useOpportunityEditor } from "../hooks/useOpportunityEditor";
 import { useFormSheets } from "../hooks/useFormSheets";
-import { OpportunityFormData, PlaceOption } from "../types";
+import { OpportunityFormData } from "../types";
 import { EditDescriptionSheet } from "./EditDescriptionSheet";
 import { EditSlotsSheet } from "./EditSlotsSheet";
 import { HostSelectorSheet } from "./HostSelectorSheet";
+import { PlaceSelectorSheet } from "./PlaceSelectorSheet";
 import { CategorySettingsSection } from "./CategorySettingsSection";
 import { ContentSection } from "./ContentSection";
 import { SettingsSection } from "./SettingsSection";
@@ -18,7 +19,6 @@ interface OpportunityFormEditorProps {
   mode: "create" | "update";
   opportunityId?: string;
   initialData?: Partial<OpportunityFormData>;
-  places: PlaceOption[];
   onSuccess?: (id?: string) => void;
 }
 
@@ -26,7 +26,6 @@ export const OpportunityFormEditor = ({
   mode,
   opportunityId,
   initialData,
-  places,
   onSuccess,
 }: OpportunityFormEditorProps) => {
   const editor = useOpportunityEditor({ mode, opportunityId, initialData });
@@ -34,10 +33,18 @@ export const OpportunityFormEditor = ({
   const [selectedHostName, setSelectedHostName] = useState<string | null>(
     initialData?.hostName || null
   );
+  const [selectedPlaceName, setSelectedPlaceName] = useState<string | null>(
+    initialData?.placeName || null
+  );
 
   const handleHostSelect = (hostId: string, hostName: string) => {
     editor.setHostUserId(hostId);
     setSelectedHostName(hostName);
+  };
+
+  const handlePlaceSelect = (placeId: string, placeName: string) => {
+    editor.setPlaceId(placeId);
+    setSelectedPlaceName(placeName);
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -66,9 +73,8 @@ export const OpportunityFormEditor = ({
       <SettingsSection
         selectedHostName={selectedHostName}
         onHostClick={() => sheets.hostSheet.setOpen(true)}
-        placeId={editor.placeId}
-        onPlaceIdChange={editor.setPlaceId}
-        places={places}
+        selectedPlaceName={selectedPlaceName}
+        onPlaceClick={() => sheets.placeSheet.setOpen(true)}
         capacity={editor.capacity}
         onCapacityChange={editor.setCapacity}
       />
@@ -128,6 +134,13 @@ export const OpportunityFormEditor = ({
         onOpenChange={sheets.hostSheet.setOpen}
         selectedHostId={editor.hostUserId}
         onSelectHost={handleHostSelect}
+      />
+
+      <PlaceSelectorSheet
+        open={sheets.placeSheet.open}
+        onOpenChange={sheets.placeSheet.setOpen}
+        selectedPlaceId={editor.placeId}
+        onSelectPlace={handlePlaceSelect}
       />
     </form>
   );

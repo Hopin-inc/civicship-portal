@@ -1,13 +1,6 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { ChevronRight, MapPin, Users } from "lucide-react";
 import {
   Item,
@@ -18,14 +11,12 @@ import {
   ItemSeparator,
   ItemTitle,
 } from "@/components/ui/item";
-import { PlaceOption } from "../types";
 
 interface SettingsSectionProps {
   selectedHostName: string | null;
   onHostClick: () => void;
-  placeId: string | null;
-  onPlaceIdChange: (value: string | null) => void;
-  places: PlaceOption[];
+  selectedPlaceName: string | null;
+  onPlaceClick: () => void;
   capacity: number;
   onCapacityChange: (value: number) => void;
 }
@@ -33,9 +24,8 @@ interface SettingsSectionProps {
 export function SettingsSection({
   selectedHostName,
   onHostClick,
-  placeId,
-  onPlaceIdChange,
-  places,
+  selectedPlaceName,
+  onPlaceClick,
   capacity,
   onCapacityChange,
 }: SettingsSectionProps) {
@@ -73,27 +63,28 @@ export function SettingsSection({
       <ItemSeparator />
 
       {/* 開催場所 */}
-      <Item size="sm">
+      <Item
+        size="sm"
+        role="button"
+        tabIndex={0}
+        onClick={onPlaceClick}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            onPlaceClick();
+          }
+        }}
+        className="cursor-pointer"
+      >
         <ItemContent>
           <ItemTitle>
             <MapPin className="h-3.5 w-3.5" />
             開催場所
           </ItemTitle>
+          <ItemDescription>{selectedPlaceName || "未選択"}</ItemDescription>
         </ItemContent>
 
-        <ItemActions className="min-w-[180px]">
-          <Select value={placeId ?? ""} onValueChange={(v) => onPlaceIdChange(v || null)}>
-            <SelectTrigger>
-              <SelectValue placeholder="選択してください" />
-            </SelectTrigger>
-            <SelectContent>
-              {places.map((p) => (
-                <SelectItem key={p.id} value={p.id}>
-                  {p.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <ItemActions>
+          <ChevronRight className="h-4 w-4 text-muted-foreground" />
         </ItemActions>
       </Item>
 

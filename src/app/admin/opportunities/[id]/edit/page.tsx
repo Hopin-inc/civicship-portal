@@ -9,7 +9,6 @@ import { ErrorState } from "@/components/shared";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { OpportunityFormEditor } from "../../components/OpportunityFormEditor";
-import { useHostsAndPlaces } from "../../hooks/useHostsAndPlaces";
 
 export default function EditOpportunityPage() {
   const params = useParams();
@@ -35,9 +34,6 @@ export default function EditOpportunityPage() {
       permission: { communityId: COMMUNITY_ID },
     },
   });
-
-  // 場所データ取得
-  const { places, loading: hostsPlacesLoading } = useHostsAndPlaces();
 
   // 初期データ変換
   const initialData = useMemo(() => {
@@ -83,6 +79,7 @@ export default function EditOpportunityPage() {
           }),
 
       placeId: opp.place?.id || null,
+      placeName: opp.place?.name || null,
       hostUserId: opp.createdByUser?.id || "",
       hostName: opp.createdByUser?.name || null,
       requireHostApproval: opp.requireApproval,
@@ -92,7 +89,7 @@ export default function EditOpportunityPage() {
     };
   }, [data]);
 
-  if (loading || hostsPlacesLoading) {
+  if (loading) {
     return <LoadingIndicator fullScreen />;
   }
 
@@ -107,7 +104,6 @@ export default function EditOpportunityPage() {
           mode="update"
           opportunityId={opportunityId}
           initialData={initialData}
-          places={places}
           onSuccess={() => router.push("/admin/opportunities")}
         />
       </main>

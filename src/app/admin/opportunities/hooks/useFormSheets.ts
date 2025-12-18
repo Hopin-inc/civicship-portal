@@ -4,6 +4,7 @@ export function useFormSheets() {
   const [descriptionSheetOpen, setDescriptionSheetOpen] = useState(false);
   const [slotsSheetOpen, setSlotsSheetOpen] = useState(false);
   const [hostSheetOpen, setHostSheetOpen] = useState(false);
+  const [placeSheetOpen, setPlaceSheetOpen] = useState(false);
 
   return {
     descriptionSheet: {
@@ -17,6 +18,10 @@ export function useFormSheets() {
     hostSheet: {
       open: hostSheetOpen,
       setOpen: setHostSheetOpen,
+    },
+    placeSheet: {
+      open: placeSheetOpen,
+      setOpen: setPlaceSheetOpen,
     },
   };
 }

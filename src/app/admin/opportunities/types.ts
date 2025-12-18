@@ -9,8 +9,9 @@ export type OpportunityFormData = {
 
   // 主催・場所
   hostUserId: string;
-  hostName?: string;
+  hostName?: string | null;
   placeId: string | null;
+  placeName?: string | null;
   requireHostApproval: boolean;
 
   // 募集条件（共通）

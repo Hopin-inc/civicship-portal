@@ -58,6 +58,7 @@ export function ContentSection({
         value={title}
         onChange={(e) => onTitleChange(e.target.value)}
         placeholder="募集タイトルを入力"
+        className="placeholder:text-sm"
         required
       />
 
@@ -65,7 +66,7 @@ export function ContentSection({
         value={summary}
         onChange={(e) => onSummaryChange(e.target.value)}
         placeholder="概要（50字程度）を入力"
-        className="min-h-[80px]"
+        className="min-h-[80px] placeholder:text-sm"
         required
       />
 

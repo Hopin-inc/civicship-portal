@@ -2,10 +2,12 @@
 
 import { useMemo, useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { GqlMembershipStatus, GqlRole, useGetMembershipListQuery } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { Item, ItemContent, ItemTitle } from "@/components/ui/item";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { PLACEHOLDER_IMAGE } from "@/utils";
 
 interface HostSelectorSheetProps {
   open: boolean;
@@ -46,6 +48,7 @@ export function HostSelectorSheet({
         id: membership!.user!.id,
         name: membership!.user!.name || "名前なし",
         role: membership!.role,
+        image: membership!.user!.image,
       }));
 
     if (!searchQuery.trim()) return hosts;
@@ -95,13 +98,20 @@ export function HostSelectorSheet({
                   }}
                   className="cursor-pointer"
                 >
-                  <ItemContent>
-                    <ItemTitle className="flex items-center justify-between text-body-md">
-                      <span>{host.name}</span>
-                      <span className="text-xs text-muted-foreground">
+                  <ItemContent className="flex items-center gap-3">
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage
+                        src={host.image ?? PLACEHOLDER_IMAGE}
+                        alt={host.name}
+                      />
+                      <AvatarFallback>{host.name[0] ?? "?"}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col">
+                      <span className="text-body-md font-bold">{host.name}</span>
+                      <span className="text-muted-foreground text-label-xs">
                         {host.role === GqlRole.Owner ? "管理者" : "運用担当者"}
                       </span>
-                    </ItemTitle>
+                    </div>
                   </ItemContent>
                 </Item>
               ))}
