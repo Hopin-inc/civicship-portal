@@ -22,7 +22,6 @@ interface ContentSectionProps {
   errors?: {
     title?: string;
     summary?: string;
-    slots?: string;
   };
 }
 
@@ -128,38 +127,30 @@ export function ContentSection({
         onRemoveImage={onRemoveImage}
       />
 
-      <div className="space-y-1">
-        <Item
-          size="sm"
-          variant={"outline"}
-          role="button"
-          tabIndex={0}
-          onClick={onSlotsClick}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              onSlotsClick();
-            }
-          }}
-          className={`cursor-pointer ${errors?.slots ? "border-destructive" : ""}`}
-        >
-          <ItemContent>
-            <ItemTitle>
-              <Calendar className="h-3.5 w-3.5" />
-              開催枠
-              <span className="text-primary text-xs font-bold bg-primary-foreground px-1 py-0.5 rounded">
-                必須
-              </span>
-            </ItemTitle>
-            <ItemDescription>{getSlotsSummary()}</ItemDescription>
-          </ItemContent>
-          <ItemActions>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          </ItemActions>
-        </Item>
-        {errors?.slots && (
-          <p className="text-xs text-destructive px-1">{errors.slots}</p>
-        )}
-      </div>
+      <Item
+        size="sm"
+        variant={"outline"}
+        role="button"
+        tabIndex={0}
+        onClick={onSlotsClick}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            onSlotsClick();
+          }
+        }}
+        className="cursor-pointer"
+      >
+        <ItemContent>
+          <ItemTitle>
+            <Calendar className="h-3.5 w-3.5" />
+            開催枠
+          </ItemTitle>
+          <ItemDescription>{getSlotsSummary()}</ItemDescription>
+        </ItemContent>
+        <ItemActions>
+          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+        </ItemActions>
+      </Item>
     </section>
   );
 }

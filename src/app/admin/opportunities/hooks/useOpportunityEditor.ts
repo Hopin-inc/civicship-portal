@@ -23,8 +23,6 @@ type ValidationErrors = {
   title?: string;
   summary?: string;
   hostUserId?: string;
-  placeId?: string;
-  slots?: string;
 };
 
 export const useOpportunityEditor = ({
@@ -115,19 +113,19 @@ export const useOpportunityEditor = ({
 
   // ========== スロット管理 ==========
   const addSlot = () => {
-    setSlotsWithClear((prev) => [...prev, { startAt: "", endAt: "" }]);
+    setSlots((prev) => [...prev, { startAt: "", endAt: "" }]);
   };
 
   const addSlotsBatch = (newSlots: { startAt: string; endAt: string }[]) => {
-    setSlotsWithClear((prev) => [...prev, ...newSlots]);
+    setSlots((prev) => [...prev, ...newSlots]);
   };
 
   const updateSlot = (index: number, field: keyof SlotData, value: string) => {
-    setSlotsWithClear((prev) => prev.map((slot, i) => (i === index ? { ...slot, [field]: value } : slot)));
+    setSlots((prev) => prev.map((slot, i) => (i === index ? { ...slot, [field]: value } : slot)));
   };
 
   const removeSlot = (index: number) => {
-    setSlotsWithClear((prev) => prev.filter((_, i) => i !== index));
+    setSlots((prev) => prev.filter((_, i) => i !== index));
   };
 
   // ========== バリデーション ==========
@@ -143,12 +141,6 @@ export const useOpportunityEditor = ({
     }
     if (!hostUserId) {
       newErrors.hostUserId = "主催者を選択してください";
-    }
-    if (!placeId) {
-      newErrors.placeId = "開催場所を選択してください";
-    }
-    if (slots.length === 0) {
-      newErrors.slots = "開催枠を最低1つ登録してください";
     }
 
     return newErrors;
@@ -193,26 +185,6 @@ export const useOpportunityEditor = ({
     if (errors.hostUserId) {
       setErrors((prev) => {
         const { hostUserId, ...rest } = prev;
-        return rest;
-      });
-    }
-  };
-
-  const setPlaceIdWithClear = (value: string | null) => {
-    setPlaceId(value);
-    if (errors.placeId) {
-      setErrors((prev) => {
-        const { placeId, ...rest } = prev;
-        return rest;
-      });
-    }
-  };
-
-  const setSlotsWithClear = (value: SlotData[] | ((prev: SlotData[]) => SlotData[])) => {
-    setSlots(value);
-    if (errors.slots) {
-      setErrors((prev) => {
-        const { slots, ...rest } = prev;
         return rest;
       });
     }
@@ -353,7 +325,7 @@ export const useOpportunityEditor = ({
     hostUserId,
     setHostUserId: setHostUserIdWithClear,
     placeId,
-    setPlaceId: setPlaceIdWithClear,
+    setPlaceId,
     requireHostApproval,
     setRequireHostApproval,
 

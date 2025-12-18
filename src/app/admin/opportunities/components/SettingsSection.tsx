@@ -21,7 +21,6 @@ interface SettingsSectionProps {
   onCapacityChange: (value: number) => void;
   errors?: {
     hostUserId?: string;
-    placeId?: string;
   };
 }
 
@@ -79,15 +78,12 @@ export function SettingsSection({
               onPlaceClick();
             }
           }}
-          className={`cursor-pointer ${errors?.placeId ? "border-destructive" : ""}`}
+          className="cursor-pointer"
         >
           <ItemContent>
             <ItemTitle>
               <MapPin className="h-3.5 w-3.5" />
               開催場所
-              <span className="text-primary text-xs font-bold bg-primary-foreground px-1 py-0.5 rounded">
-                必須
-              </span>
             </ItemTitle>
             <ItemDescription>{selectedPlaceName || "未選択"}</ItemDescription>
           </ItemContent>
@@ -124,9 +120,6 @@ export function SettingsSection({
       </ItemGroup>
       {errors?.hostUserId && (
         <p className="text-xs text-destructive px-1">{errors.hostUserId}</p>
-      )}
-      {errors?.placeId && (
-        <p className="text-xs text-destructive px-1">{errors.placeId}</p>
       )}
     </div>
   );
