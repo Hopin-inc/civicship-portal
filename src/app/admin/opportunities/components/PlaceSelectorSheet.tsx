@@ -69,7 +69,8 @@ export function PlaceSelectorSheet({
         <div className="space-y-4">
           <SearchForm
             value={searchQuery}
-            onChange={setSearchQuery}
+            onInputChange={setSearchQuery}
+            onSearch={setSearchQuery}
             placeholder="場所を検索"
           />
 

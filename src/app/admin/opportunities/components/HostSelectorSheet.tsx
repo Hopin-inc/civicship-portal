@@ -8,6 +8,7 @@ import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { Item, ItemContent, ItemTitle } from "@/components/ui/item";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { PLACEHOLDER_IMAGE } from "@/utils";
+import SearchForm from "@/components/shared/SearchForm";
 
 interface HostSelectorSheetProps {
   open: boolean;
@@ -23,7 +24,6 @@ export function HostSelectorSheet({
   onSelectHost,
 }: HostSelectorSheetProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [input, setInput] = useState("");
 
   // クエリはSheetが開いている時のみ実行
   const { data, loading } = useGetMembershipListQuery({
@@ -72,7 +72,14 @@ export function HostSelectorSheet({
           <SheetTitle className={"text-title-sm"}>主催者を選択</SheetTitle>
         </SheetHeader>
 
-        <div>
+        <div className="space-y-4">
+          <SearchForm
+            value={searchQuery}
+            onInputChange={setSearchQuery}
+            onSearch={setSearchQuery}
+            placeholder="主催者を検索"
+          />
+
           {loading && <LoadingIndicator />}
 
           {!loading && filteredHosts.length === 0 && (
