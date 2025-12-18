@@ -90,7 +90,7 @@ export function HostSelectorSheet({
                   }}
                   className="cursor-pointer"
                 >
-                  <ItemContent className="flex items-center gap-3">
+                  <ItemContent className="flex flex-row items-center gap-3">
                     <Avatar className="h-10 w-10 flex-shrink-0">
                       <AvatarImage
                         src={host.image ?? PLACEHOLDER_IMAGE}
