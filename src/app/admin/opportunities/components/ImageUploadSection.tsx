@@ -32,7 +32,7 @@ export const ImageUploadSection = ({
                 <div key={index} className="relative">
                   <img
                     src={img.url}
-                    alt={img.alt || ""}
+                    alt={`画像 ${index + 1}`}
                     className="aspect-square w-full rounded-md object-cover"
                   />
 
