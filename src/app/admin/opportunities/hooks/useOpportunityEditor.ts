@@ -15,6 +15,7 @@ import { OpportunityFormData, SlotData, ImageData, ValidationErrors, isNewImage 
 import { useImageManager } from "./useImageManager";
 import { useSlotManager } from "./useSlotManager";
 import { useOpportunityValidation } from "./useOpportunityValidation";
+import { useValidatedState } from "./useValidatedState";
 
 type UseOpportunityEditorOptions = {
   mode: "create" | "update";
@@ -38,12 +39,27 @@ export const useOpportunityEditor = ({
   const [category, setCategory] = useState<GqlOpportunityCategory>(
     initialData?.category ?? GqlOpportunityCategory.Activity
   );
-  const [title, setTitle] = useState(initialData?.title ?? "");
-  const [summary, setSummary] = useState(initialData?.summary ?? "");
+  const [title, setTitle] = useValidatedState(
+    initialData?.title ?? "",
+    'title',
+    validation.errors,
+    validation.clearError
+  );
+  const [summary, setSummary] = useValidatedState(
+    initialData?.summary ?? "",
+    'summary',
+    validation.errors,
+    validation.clearError
+  );
   const [description, setDescription] = useState(initialData?.description ?? "");
 
   // 主催・場所
-  const [hostUserId, setHostUserId] = useState(initialData?.hostUserId ?? "");
+  const [hostUserId, setHostUserId] = useValidatedState(
+    initialData?.hostUserId ?? "",
+    'hostUserId',
+    validation.errors,
+    validation.clearError
+  );
   const [placeId, setPlaceId] = useState<string | null>(initialData?.placeId ?? null);
   const [requireHostApproval, setRequireHostApproval] = useState(
     initialData?.requireHostApproval ?? false
@@ -66,28 +82,6 @@ export const useOpportunityEditor = ({
   const [updateSlots, updateSlotsResult] = useUpdateOpportunitySlotsBulkMutation();
 
   const saving = createResult.loading || updateContentResult.loading || updateSlotsResult.loading;
-
-  // ========== エラー自動クリア付きセッター ==========
-  const setTitleWithClear = (value: string) => {
-    setTitle(value);
-    if (validation.errors.title) {
-      validation.clearError('title');
-    }
-  };
-
-  const setSummaryWithClear = (value: string) => {
-    setSummary(value);
-    if (validation.errors.summary) {
-      validation.clearError('summary');
-    }
-  };
-
-  const setHostUserIdWithClear = (value: string) => {
-    setHostUserId(value);
-    if (validation.errors.hostUserId) {
-      validation.clearError('hostUserId');
-    }
-  };
 
   // ========== 保存処理 ==========
   const handleSave = async (e: FormEvent) => {
@@ -216,15 +210,15 @@ export const useOpportunityEditor = ({
     category,
     setCategory,
     title,
-    setTitle: setTitleWithClear,
+    setTitle, // useValidatedStateがエラー自動クリアを処理
     summary,
-    setSummary: setSummaryWithClear,
+    setSummary, // useValidatedStateがエラー自動クリアを処理
     description,
     setDescription,
 
     // 主催・場所
     hostUserId,
-    setHostUserId: setHostUserIdWithClear,
+    setHostUserId, // useValidatedStateがエラー自動クリアを処理
     placeId,
     setPlaceId,
     requireHostApproval,
