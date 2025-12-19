@@ -2,12 +2,12 @@
 
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Plus } from "lucide-react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { SlotData } from "../types";
 import { SlotBatchAdder } from "./SlotBatchAdder";
 import { SlotPicker } from "./SlotPicker";
+import { SingleSlotForm } from "./SingleSlotForm";
 
 interface EditSlotsPageProps {
   slots: SlotData[];
@@ -57,35 +57,13 @@ export function EditSlotsPage({
             // 空の時: 単一開催枠追加フォーム
             <div className="space-y-4">
               <p className="text-muted-foreground text-sm">開催枠を追加してください</p>
-
-              <div className="space-y-3">
-                <div className="space-y-1">
-                  <label className="text-sm text-muted-foreground px-1">開始日時</label>
-                  <Input
-                    type="datetime-local"
-                    value={startAt}
-                    onChange={(e) => setStartAt(e.target.value)}
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-sm text-muted-foreground px-1">終了日時</label>
-                  <Input
-                    type="datetime-local"
-                    value={endAt}
-                    onChange={(e) => setEndAt(e.target.value)}
-                  />
-                </div>
-
-                <Button
-                  onClick={handleAddSingleSlot}
-                  disabled={!startAt || !endAt}
-                  className="w-full"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  追加
-                </Button>
-              </div>
+              <SingleSlotForm
+                startAt={startAt}
+                endAt={endAt}
+                onStartAtChange={setStartAt}
+                onEndAtChange={setEndAt}
+                onAdd={handleAddSingleSlot}
+              />
             </div>
           ) : (
             // 既存スロット表示
@@ -116,36 +94,16 @@ export function EditSlotsPage({
               </div>
 
               {/* さらに追加フォーム */}
-              <div className="space-y-3 pt-4 border-t">
-                <p className="text-sm font-medium">さらに追加</p>
-
-                <div className="space-y-1">
-                  <label className="text-sm text-muted-foreground px-1">開始日時</label>
-                  <Input
-                    type="datetime-local"
-                    value={startAt}
-                    onChange={(e) => setStartAt(e.target.value)}
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-sm text-muted-foreground px-1">終了日時</label>
-                  <Input
-                    type="datetime-local"
-                    value={endAt}
-                    onChange={(e) => setEndAt(e.target.value)}
-                  />
-                </div>
-
-                <Button
-                  onClick={handleAddSingleSlot}
-                  disabled={!startAt || !endAt}
-                  className="w-full"
+              <div className="pt-4 border-t">
+                <SingleSlotForm
+                  startAt={startAt}
+                  endAt={endAt}
+                  onStartAtChange={setStartAt}
+                  onEndAtChange={setEndAt}
+                  onAdd={handleAddSingleSlot}
                   variant="secondary"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  追加
-                </Button>
+                  title="さらに追加"
+                />
               </div>
             </>
           )}
