@@ -55,7 +55,7 @@ export function EditSlotsPage({
       {!isEmpty && (
         <div className="fixed top-4 right-4 z-10">
           <Button
-            variant="outline"
+            variant="secondary"
             size="sm"
             onClick={() => setShowBatchAdder(true)}
           >
@@ -147,7 +147,7 @@ export function EditSlotsPage({
                   onClick={handleAddSingleSlot}
                   disabled={!startAt || !endAt}
                   className="w-full"
-                  variant="outline"
+                  variant="secondary"
                 >
                   <Plus className="h-4 w-4 mr-2" />
                   追加
