@@ -12,6 +12,9 @@ import {
 } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { OpportunityFormData, SlotData, ImageData, ValidationErrors, isNewImage } from "../types";
+import { useImageManager } from "./useImageManager";
+import { useSlotManager } from "./useSlotManager";
+import { useOpportunityValidation } from "./useOpportunityValidation";
 
 type UseOpportunityEditorOptions = {
   mode: "create" | "update";
@@ -24,6 +27,11 @@ export const useOpportunityEditor = ({
   opportunityId,
   initialData,
 }: UseOpportunityEditorOptions) => {
+  // ========== フック統合 ==========
+  const imageManager = useImageManager(initialData?.images);
+  const slotManager = useSlotManager(initialData?.slots);
+  const validation = useOpportunityValidation();
+
   // ========== State管理 ==========
 
   // 基本情報
@@ -47,19 +55,10 @@ export const useOpportunityEditor = ({
   const [pointsRequired, setPointsRequired] = useState(initialData?.pointsRequired ?? 0);
   const [pointsToEarn, setPointsToEarn] = useState(initialData?.pointsToEarn ?? 0);
 
-  // 開催枠
-  const [slots, setSlots] = useState<SlotData[]>(initialData?.slots ?? []);
-
-  // 画像
-  const [images, setImages] = useState<ImageData[]>(initialData?.images ?? []);
-
   // 公開設定
   const [publishStatus, setPublishStatus] = useState<GqlPublishStatus>(
     initialData?.publishStatus ?? GqlPublishStatus.Published
   );
-
-  // バリデーションエラー
-  const [errors, setErrors] = useState<ValidationErrors>({});
 
   // ========== GraphQL Mutations ==========
   const [createOpportunity, createResult] = useCreateOpportunityMutation();
@@ -68,121 +67,25 @@ export const useOpportunityEditor = ({
 
   const saving = createResult.loading || updateContentResult.loading || updateSlotsResult.loading;
 
-  // ========== 画像管理 ==========
-  const handleImageSelect = (e: ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files ?? []);
-    if (images.length + files.length > 5) {
-      toast.error("画像は最大5枚までです");
-      return;
-    }
-
-    const newImages: ImageData[] = files.map((file) => ({
-      type: 'new' as const,
-      file,
-      url: URL.createObjectURL(file),
-    }));
-
-    setImages((prev) => [...prev, ...newImages]);
-  };
-
-  const removeImage = (index: number) => {
-    setImages((prev) => {
-      const removed = prev[index];
-      // 新規画像の場合、blob URLを解放
-      if (isNewImage(removed)) {
-        URL.revokeObjectURL(removed.url);
-      }
-      return prev.filter((_, i) => i !== index);
-    });
-  };
-
-  // クリーンアップ
-  useEffect(() => {
-    return () => {
-      images.forEach((img) => {
-        if (isNewImage(img)) {
-          URL.revokeObjectURL(img.url);
-        }
-      });
-    };
-  }, [images]);
-
-  // ========== スロット管理 ==========
-  const addSlot = () => {
-    setSlots((prev) => [...prev, { startAt: "", endAt: "" }]);
-  };
-
-  const addSlotsBatch = (newSlots: { startAt: string; endAt: string }[]) => {
-    setSlots((prev) => [...prev, ...newSlots]);
-  };
-
-  const updateSlot = (index: number, field: keyof SlotData, value: string) => {
-    setSlots((prev) => prev.map((slot, i) => (i === index ? { ...slot, [field]: value } : slot)));
-  };
-
-  const removeSlot = (index: number) => {
-    setSlots((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  // ========== バリデーション ==========
-  // 純粋なバリデーションロジック（必須項目のチェック）
-  const buildValidationErrors = (): ValidationErrors => {
-    const newErrors: ValidationErrors = {};
-
-    if (!title.trim()) {
-      newErrors.title = "タイトルを入力してください";
-    }
-    if (!summary.trim()) {
-      newErrors.summary = "概要を入力してください";
-    }
-    if (!hostUserId) {
-      newErrors.hostUserId = "主催者を選択してください";
-    }
-
-    return newErrors;
-  };
-
-  // バリデーション実行（副作用あり）
-  const validateForm = (): boolean => {
-    const newErrors = buildValidationErrors();
-    setErrors(newErrors);
-
-    if (Object.keys(newErrors).length > 0) {
-      toast.error("必須項目を入力してください");
-      return false;
-    }
-
-    return true;
-  };
-
-  // エラー自動クリア付きセッター
+  // ========== エラー自動クリア付きセッター ==========
   const setTitleWithClear = (value: string) => {
     setTitle(value);
-    if (errors.title) {
-      setErrors((prev) => {
-        const { title, ...rest } = prev;
-        return rest;
-      });
+    if (validation.errors.title) {
+      validation.clearError('title');
     }
   };
 
   const setSummaryWithClear = (value: string) => {
     setSummary(value);
-    if (errors.summary) {
-      setErrors((prev) => {
-        const { summary, ...rest } = prev;
-        return rest;
-      });
+    if (validation.errors.summary) {
+      validation.clearError('summary');
     }
   };
 
   const setHostUserIdWithClear = (value: string) => {
     setHostUserId(value);
-    if (errors.hostUserId) {
-      setErrors((prev) => {
-        const { hostUserId, ...rest } = prev;
-        return rest;
-      });
+    if (validation.errors.hostUserId) {
+      validation.clearError('hostUserId');
     }
   };
 
@@ -191,27 +94,27 @@ export const useOpportunityEditor = ({
     e.preventDefault();
 
     // Tier 1: 必須項目のバリデーション
-    if (!validateForm()) {
+    if (!validation.validateForm(title, summary, hostUserId)) {
       return;
     }
 
     // Tier 2: ドメイン制約のバリデーション
-    if (images.length < 2) {
+    if (imageManager.images.length < 2) {
       toast.error("最低2枚の画像を登録してください");
       return;
     }
-    if (images.length > 5) {
+    if (imageManager.images.length > 5) {
       toast.error("画像は最大5枚までです");
       return;
     }
-    if (slots.some((slot) => !slot.startAt || !slot.endAt)) {
+    if (slotManager.slots.some((slot) => !slot.startAt || !slot.endAt)) {
       toast.error("すべての開催枠の日時を入力してください");
       return;
     }
 
     try {
       // スロット変換
-      const slotsInput = slots.map((slot) => ({
+      const slotsInput = slotManager.slots.map((slot) => ({
         startsAt: dayjs(slot.startAt).toISOString(),
         endsAt: dayjs(slot.endAt).toISOString(),
         capacity,
@@ -219,7 +122,7 @@ export const useOpportunityEditor = ({
       }));
 
       // 画像変換（新規画像のみ送信）
-      const imagesInput = images
+      const imagesInput = imageManager.images
         .filter(isNewImage)
         .map((img) => ({
           file: img.file,
@@ -337,24 +240,24 @@ export const useOpportunityEditor = ({
     pointsToEarn,
     setPointsToEarn,
 
-    // 開催枠
-    slots,
-    addSlot,
-    addSlotsBatch,
-    updateSlot,
-    removeSlot,
+    // 開催枠（slotManager から）
+    slots: slotManager.slots,
+    addSlot: slotManager.addSlot,
+    addSlotsBatch: slotManager.addSlotsBatch,
+    updateSlot: slotManager.updateSlot,
+    removeSlot: slotManager.removeSlot,
 
-    // 画像
-    images,
-    handleImageSelect,
-    removeImage,
+    // 画像（imageManager から）
+    images: imageManager.images,
+    handleImageSelect: imageManager.handleImageSelect,
+    removeImage: imageManager.removeImage,
 
     // 公開設定
     publishStatus,
     setPublishStatus,
 
-    // バリデーション
-    errors,
+    // バリデーション（validation から）
+    errors: validation.errors,
 
     // 保存
     handleSave,
