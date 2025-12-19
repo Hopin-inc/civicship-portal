@@ -52,7 +52,6 @@ function DateTimeField({ label, value, onChange, defaultTime }: DateTimeFieldPro
         <PopoverContent className="w-auto p-3 space-y-3" align="start">
           <Calendar
             mode="single"
-            captionLayout="dropdown"
             selected={date}
             onSelect={handleDateChange}
             disabled={(d) => d < new Date()}
