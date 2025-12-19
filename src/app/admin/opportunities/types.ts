@@ -79,3 +79,6 @@ export type PlaceOption = {
   id: string;
   label: string;
 };
+
+// フォーム編集モード
+export type FormEditMode = 'form' | 'slots';

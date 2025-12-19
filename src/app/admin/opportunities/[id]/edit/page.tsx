@@ -7,23 +7,12 @@ import { GqlOpportunityCategory, useGetOpportunityQuery } from "@/types/graphql"
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { OpportunityFormEditor } from "../../components/OpportunityFormEditor";
 
 export default function EditOpportunityPage() {
   const params = useParams();
   const router = useRouter();
   const opportunityId = params.id as string;
-
-  const headerConfig = useMemo(
-    () => ({
-      title: "募集編集",
-      showLogo: false,
-      showBackButton: true,
-    }),
-    [],
-  );
-  useHeaderConfig(headerConfig);
 
   const refetchRef = useRef<(() => void) | null>(null);
 

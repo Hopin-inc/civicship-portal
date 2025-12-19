@@ -1,11 +1,12 @@
 "use client";
 
-import { FormEvent, useState, useCallback } from "react";
+import { FormEvent, useState, useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { GqlPublishStatus } from "@/types/graphql";
+import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useOpportunityEditor } from "../hooks/useOpportunityEditor";
 import { useFormSheets } from "../hooks/useFormSheets";
-import { OpportunityFormData } from "../types";
+import { OpportunityFormData, FormEditMode } from "../types";
 import { EditDescriptionSheet } from "./EditDescriptionSheet";
 import { EditSlotsPage } from "./EditSlotsPage";
 import { HostSelectorSheet } from "./HostSelectorSheet";
@@ -28,6 +29,7 @@ export const OpportunityFormEditor = ({
   initialData,
   onSuccess,
 }: OpportunityFormEditorProps) => {
+  const [editMode, setEditMode] = useState<FormEditMode>('form');
   const editor = useOpportunityEditor({ mode, opportunityId, initialData });
   const sheets = useFormSheets();
   const [selectedHostName, setSelectedHostName] = useState<string | null>(
@@ -36,6 +38,17 @@ export const OpportunityFormEditor = ({
   const [selectedPlaceName, setSelectedPlaceName] = useState<string | null>(
     initialData?.placeName || null
   );
+
+  // ヘッダー設定（formモード時のみ）
+  const headerConfig = useMemo(
+    () => ({
+      title: mode === "create" ? "募集作成" : "募集編集",
+      showLogo: false,
+      showBackButton: true,
+    }),
+    [mode],
+  );
+  useHeaderConfig(editMode === 'form' ? headerConfig : null);
 
   const handleHostSelect = (hostId: string, hostName: string) => {
     editor.setHostUserId(hostId);
@@ -61,6 +74,25 @@ export const OpportunityFormEditor = ({
     }
   };
 
+  // モード切り替えハンドラー
+  const enterSlotsMode = useCallback(() => setEditMode('slots'), []);
+  const exitSlotsMode = useCallback(() => setEditMode('form'), []);
+
+  // 開催枠編集モードの場合は EditSlotsPage のみ表示
+  if (editMode === 'slots') {
+    return (
+      <div className="fixed inset-0 z-50 bg-background">
+        <EditSlotsPage
+          slots={editor.slots}
+          onAddSlotsBatch={editor.addSlotsBatch}
+          onUpdateSlot={editor.updateSlot}
+          onRemoveSlot={editor.removeSlot}
+          onClose={exitSlotsMode}
+        />
+      </div>
+    );
+  }
+
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
       {/* === セクション1: コンテンツ（タイトル〜開催枠） === */}
@@ -75,7 +107,7 @@ export const OpportunityFormEditor = ({
         onImageSelect={editor.handleImageSelect}
         onRemoveImage={editor.removeImage}
         slots={editor.slots}
-        onSlotsClick={() => sheets.slotsSheet.setOpen(true)}
+        onSlotsClick={enterSlotsMode}
         errors={editor.errors}
       />
 
@@ -130,19 +162,6 @@ export const OpportunityFormEditor = ({
         value={editor.description}
         onChange={editor.setDescription}
       />
-
-      {/* 開催枠編集ページ（全画面） */}
-      {sheets.slotsSheet.open && (
-        <div className="fixed inset-0 z-50">
-          <EditSlotsPage
-            slots={editor.slots}
-            onAddSlotsBatch={editor.addSlotsBatch}
-            onUpdateSlot={editor.updateSlot}
-            onRemoveSlot={editor.removeSlot}
-            onClose={() => sheets.slotsSheet.setOpen(false)}
-          />
-        </div>
-      )}
 
       <HostSelectorSheet
         open={sheets.hostSheet.open}
