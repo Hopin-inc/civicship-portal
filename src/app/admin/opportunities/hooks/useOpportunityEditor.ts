@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, FormEvent, ChangeEvent } from "react";
+import { useState, useEffect, FormEvent, ChangeEvent, useCallback, useMemo } from "react";
 import { toast } from "react-toastify";
 import dayjs from "dayjs";
 import {
@@ -84,29 +84,30 @@ export const useOpportunityEditor = ({
   const saving = createResult.loading || updateContentResult.loading || updateSlotsResult.loading;
 
   // ========== 保存処理 ==========
-  const handleSave = async (e: FormEvent) => {
-    e.preventDefault();
+  const handleSave = useCallback(
+    async (e: FormEvent) => {
+      e.preventDefault();
 
-    // Tier 1: 必須項目のバリデーション
-    if (!validation.validateForm(title, summary, hostUserId)) {
-      return;
-    }
+      // Tier 1: 必須項目のバリデーション
+      if (!validation.validateForm(title, summary, hostUserId)) {
+        return;
+      }
 
-    // Tier 2: ドメイン制約のバリデーション
-    if (imageManager.images.length < 2) {
-      toast.error("最低2枚の画像を登録してください");
-      return;
-    }
-    if (imageManager.images.length > 5) {
-      toast.error("画像は最大5枚までです");
-      return;
-    }
-    if (slotManager.slots.some((slot) => !slot.startAt || !slot.endAt)) {
-      toast.error("すべての開催枠の日時を入力してください");
-      return;
-    }
+      // Tier 2: ドメイン制約のバリデーション
+      if (imageManager.images.length < 2) {
+        toast.error("最低2枚の画像を登録してください");
+        return;
+      }
+      if (imageManager.images.length > 5) {
+        toast.error("画像は最大5枚までです");
+        return;
+      }
+      if (slotManager.slots.some((slot) => !slot.startAt || !slot.endAt)) {
+        toast.error("すべての開催枠の日時を入力してください");
+        return;
+      }
 
-    try {
+      try {
       // スロット変換
       const slotsInput = slotManager.slots.map((slot) => ({
         startsAt: dayjs(slot.startAt).toISOString(),
@@ -200,10 +201,33 @@ export const useOpportunityEditor = ({
       }
     } catch (error) {
       console.error(error);
-      toast.error("保存に失敗しました");
-      return undefined;
-    }
-  };
+        toast.error("保存に失敗しました");
+        return undefined;
+      }
+    },
+    [
+      validation,
+      title,
+      summary,
+      hostUserId,
+      imageManager.images,
+      slotManager.slots,
+      capacity,
+      category,
+      feeRequired,
+      pointsRequired,
+      pointsToEarn,
+      placeId,
+      description,
+      requireHostApproval,
+      publishStatus,
+      mode,
+      opportunityId,
+      createOpportunity,
+      updateContent,
+      updateSlots,
+    ]
+  );
 
   return {
     // 基本情報
