@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { GqlPublishStatus } from "@/types/graphql";
 import { useOpportunityEditor } from "../hooks/useOpportunityEditor";
@@ -46,6 +46,13 @@ export const OpportunityFormEditor = ({
     editor.setPlaceId(placeId);
     setSelectedPlaceName(placeName);
   };
+
+  const handlePublishStatusChange = useCallback(
+    (value: string) => {
+      editor.setPublishStatus(value as GqlPublishStatus);
+    },
+    [editor.setPublishStatus]
+  );
 
   const handleSubmit = async (e: FormEvent) => {
     const resultId = await editor.handleSave(e);
@@ -101,7 +108,7 @@ export const OpportunityFormEditor = ({
         requireHostApproval={editor.requireHostApproval}
         onRequireHostApprovalChange={editor.setRequireHostApproval}
         publishStatus={editor.publishStatus}
-        onPublishStatusChange={(v) => editor.setPublishStatus(v as GqlPublishStatus)}
+        onPublishStatusChange={handlePublishStatusChange}
       />
 
       {/* 送信ボタン */}
