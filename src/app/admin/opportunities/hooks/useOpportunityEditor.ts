@@ -11,18 +11,12 @@ import {
   useUpdateOpportunitySlotsBulkMutation,
 } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { OpportunityFormData, SlotData, ImageData } from "../types";
+import { OpportunityFormData, SlotData, ImageData, ValidationErrors, isNewImage } from "../types";
 
 type UseOpportunityEditorOptions = {
   mode: "create" | "update";
   opportunityId?: string;
   initialData?: Partial<OpportunityFormData>;
-};
-
-type ValidationErrors = {
-  title?: string;
-  summary?: string;
-  hostUserId?: string;
 };
 
 export const useOpportunityEditor = ({
@@ -83,8 +77,9 @@ export const useOpportunityEditor = ({
     }
 
     const newImages: ImageData[] = files.map((file) => ({
-      url: URL.createObjectURL(file),
+      type: 'new' as const,
       file,
+      url: URL.createObjectURL(file),
     }));
 
     setImages((prev) => [...prev, ...newImages]);
@@ -93,7 +88,8 @@ export const useOpportunityEditor = ({
   const removeImage = (index: number) => {
     setImages((prev) => {
       const removed = prev[index];
-      if (removed.url.startsWith("blob:")) {
+      // 新規画像の場合、blob URLを解放
+      if (isNewImage(removed)) {
         URL.revokeObjectURL(removed.url);
       }
       return prev.filter((_, i) => i !== index);
@@ -104,12 +100,12 @@ export const useOpportunityEditor = ({
   useEffect(() => {
     return () => {
       images.forEach((img) => {
-        if (img.url.startsWith("blob:")) {
+        if (isNewImage(img)) {
           URL.revokeObjectURL(img.url);
         }
       });
     };
-  }, []);
+  }, [images]);
 
   // ========== スロット管理 ==========
   const addSlot = () => {
@@ -222,12 +218,14 @@ export const useOpportunityEditor = ({
         ...(slot.id ? { id: slot.id } : {}),
       }));
 
-      // 画像変換
-      const imagesInput = images.map((img) => ({
-        file: img.file,
-        alt: img.alt || "",
-        caption: img.caption || "",
-      }));
+      // 画像変換（新規画像のみ送信）
+      const imagesInput = images
+        .filter(isNewImage)
+        .map((img) => ({
+          file: img.file,
+          alt: "",
+          caption: "",
+        }));
 
       // カテゴリ別入力
       const isActivity = category === GqlOpportunityCategory.Activity;
