@@ -41,14 +41,14 @@ export const OpportunityFormEditor = ({
 
   // ヘッダー設定（formモード時のみ）
   const headerConfig = useMemo(
-    () => ({
+    () => editMode === 'form' ? ({
       title: mode === "create" ? "募集作成" : "募集編集",
       showLogo: false,
       showBackButton: true,
-    }),
-    [mode],
+    }) : undefined,
+    [mode, editMode],
   );
-  useHeaderConfig(editMode === 'form' ? headerConfig : null);
+  useHeaderConfig(headerConfig);
 
   const handleHostSelect = (hostId: string, hostName: string) => {
     editor.setHostUserId(hostId);
