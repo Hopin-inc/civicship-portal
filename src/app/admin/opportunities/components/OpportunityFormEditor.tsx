@@ -64,7 +64,7 @@ export const OpportunityFormEditor = ({
     (value: string) => {
       editor.setPublishStatus(value as GqlPublishStatus);
     },
-    [editor.setPublishStatus]
+    [editor]
   );
 
   const handleSubmit = async (e: FormEvent) => {
