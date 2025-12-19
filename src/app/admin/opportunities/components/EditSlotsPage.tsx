@@ -40,8 +40,8 @@ export function EditSlotsPage({
       </header>
 
       {/* メインコンテンツ */}
-      <main className="flex-1 overflow-y-auto p-4">
-        <div className="max-w-2xl mx-auto space-y-6">
+      <main className="flex-1 overflow-y-auto px-6">
+        <div className="max-w-md mx-auto space-y-6 py-4">
           {isEmpty ? (
             // 初回: カレンダー選択UI（後で実装）
             <div className="text-center py-12">
