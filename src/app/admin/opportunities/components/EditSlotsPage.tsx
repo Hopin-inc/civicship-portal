@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
+import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { SlotData } from "../types";
 import { SlotBatchAdder } from "./SlotBatchAdder";
 import { SlotPicker } from "./SlotPicker";
@@ -24,24 +25,24 @@ export function EditSlotsPage({
 }: EditSlotsPageProps) {
   const [showBatchAdder, setShowBatchAdder] = useState(false);
 
+  // ヘッダー設定
+  const headerConfig = useMemo(
+    () => ({
+      title: "開催枠編集",
+      showLogo: false,
+      showBackButton: true,
+      onBackClick: onClose,
+    }),
+    [onClose],
+  );
+  useHeaderConfig(headerConfig);
+
   const isEmpty = slots.length === 0;
 
   return (
-    <div className="flex flex-col h-full bg-background">
-      {/* ヘッダー */}
-      <header className="flex items-center justify-between px-4 py-3 border-b bg-background sticky top-0 z-10">
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={onClose}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <h1 className="text-title-md font-bold">開催枠の編集</h1>
-        </div>
-        <Button onClick={onClose}>完了</Button>
-      </header>
-
-      {/* メインコンテンツ */}
-      <main className="flex-1 overflow-y-auto px-6">
-        <div className="max-w-md mx-auto space-y-6 py-4">
+    <div className="min-h-screen bg-background">
+      <main className="px-6 max-w-md mx-auto">
+        <div className="space-y-6 py-4">
           {isEmpty ? (
             // 初回: カレンダー選択UI（後で実装）
             <div className="text-center py-12">
@@ -90,7 +91,7 @@ export function EditSlotsPage({
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-title-sm font-bold">一括追加</h3>
               <Button
-                variant="ghost"
+                variant="text"
                 size="sm"
                 onClick={() => setShowBatchAdder(false)}
               >
