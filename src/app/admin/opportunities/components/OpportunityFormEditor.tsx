@@ -7,7 +7,7 @@ import { useOpportunityEditor } from "../hooks/useOpportunityEditor";
 import { useFormSheets } from "../hooks/useFormSheets";
 import { OpportunityFormData } from "../types";
 import { EditDescriptionSheet } from "./EditDescriptionSheet";
-import { EditSlotsSheet } from "./EditSlotsSheet";
+import { EditSlotsPage } from "./EditSlotsPage";
 import { HostSelectorSheet } from "./HostSelectorSheet";
 import { PlaceSelectorSheet } from "./PlaceSelectorSheet";
 import { CategorySettingsSection } from "./CategorySettingsSection";
@@ -124,14 +124,18 @@ export const OpportunityFormEditor = ({
         onChange={editor.setDescription}
       />
 
-      <EditSlotsSheet
-        open={sheets.slotsSheet.open}
-        onOpenChange={sheets.slotsSheet.setOpen}
-        slots={editor.slots}
-        onAddSlotsBatch={editor.addSlotsBatch}
-        onUpdateSlot={editor.updateSlot}
-        onRemoveSlot={editor.removeSlot}
-      />
+      {/* 開催枠編集ページ（全画面） */}
+      {sheets.slotsSheet.open && (
+        <div className="fixed inset-0 z-50">
+          <EditSlotsPage
+            slots={editor.slots}
+            onAddSlotsBatch={editor.addSlotsBatch}
+            onUpdateSlot={editor.updateSlot}
+            onRemoveSlot={editor.removeSlot}
+            onClose={() => sheets.slotsSheet.setOpen(false)}
+          />
+        </div>
+      )}
 
       <HostSelectorSheet
         open={sheets.hostSheet.open}
