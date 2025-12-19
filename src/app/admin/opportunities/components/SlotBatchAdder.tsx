@@ -5,7 +5,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { format } from "date-fns";
+import { format, startOfToday } from "date-fns";
 import { ja } from "date-fns/locale";
 import dayjs from "dayjs";
 import { toast } from "react-toastify";
@@ -18,6 +18,8 @@ export const SlotBatchAdder = ({ onAddSlots }: SlotBatchAdderProps) => {
   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
   const [startTime, setStartTime] = useState("10:00");
   const [endTime, setEndTime] = useState("12:00");
+
+  const now = dayjs();
 
   const handleAddSlots = () => {
     if (selectedDates.length === 0) {
@@ -38,14 +40,16 @@ export const SlotBatchAdder = ({ onAddSlots }: SlotBatchAdderProps) => {
     }
 
     const newSlots = selectedDates.map((date) => {
-      const startDateTime = dayjs(date)
-        .hour(startHour)
-        .minute(startMinute)
-        .format("YYYY-MM-DDTHH:mm");
+      const startDateTime = dayjs(date).hour(startHour).minute(startMinute);
 
-      const endDateTime = dayjs(date).hour(endHour).minute(endMinute).format("YYYY-MM-DDTHH:mm");
+      if (startDateTime.isBefore(now)) {
+        throw new Error("過去の日時は設定できません");
+      }
 
-      return { startAt: startDateTime, endAt: endDateTime };
+      return {
+        startAt: startDateTime.format("YYYY-MM-DDTHH:mm"),
+        endAt: dayjs(date).hour(endHour).minute(endMinute).format("YYYY-MM-DDTHH:mm"),
+      };
     });
 
     onAddSlots(newSlots);
@@ -61,6 +65,7 @@ export const SlotBatchAdder = ({ onAddSlots }: SlotBatchAdderProps) => {
             mode="multiple"
             selected={selectedDates}
             onSelect={(dates) => setSelectedDates(dates || [])}
+            disabled={(date) => date < startOfToday()}
             locale={ja}
           />
         </div>
