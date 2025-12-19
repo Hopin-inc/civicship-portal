@@ -51,20 +51,6 @@ export function EditSlotsPage({
 
   return (
     <div className="min-h-screen bg-background">
-      {/* 一括追加ボタン（ヘッダー右側、slots.length >= 1の時のみ） */}
-      {!isEmpty && (
-        <div className="fixed top-4 right-4 z-10">
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => setShowBatchAdder(true)}
-          >
-            <Plus className="h-4 w-4 mr-1" />
-            一括追加
-          </Button>
-        </div>
-      )}
-
       <main className="px-6 max-w-md mx-auto">
         <div className="space-y-6 py-4">
           {isEmpty ? (
@@ -106,6 +92,14 @@ export function EditSlotsPage({
             <>
               <div className="flex items-center justify-between">
                 <h2 className="text-title-sm">登録済み開催枠 ({slots.length}件)</h2>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setShowBatchAdder(true)}
+                >
+                  <Plus className="h-4 w-4 mr-1" />
+                  一括追加
+                </Button>
               </div>
 
               {/* スロット一覧 */}

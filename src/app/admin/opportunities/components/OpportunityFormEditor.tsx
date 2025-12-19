@@ -81,15 +81,13 @@ export const OpportunityFormEditor = ({
   // 開催枠編集モードの場合は EditSlotsPage のみ表示
   if (editMode === 'slots') {
     return (
-      <div className="fixed inset-0 z-50 bg-background">
-        <EditSlotsPage
-          slots={editor.slots}
-          onAddSlotsBatch={editor.addSlotsBatch}
-          onUpdateSlot={editor.updateSlot}
-          onRemoveSlot={editor.removeSlot}
-          onClose={exitSlotsMode}
-        />
-      </div>
+      <EditSlotsPage
+        slots={editor.slots}
+        onAddSlotsBatch={editor.addSlotsBatch}
+        onUpdateSlot={editor.updateSlot}
+        onRemoveSlot={editor.removeSlot}
+        onClose={exitSlotsMode}
+      />
     );
   }
 
