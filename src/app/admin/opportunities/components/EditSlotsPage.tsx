@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Plus } from "lucide-react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { SlotData } from "../types";
@@ -24,6 +25,8 @@ export function EditSlotsPage({
   onClose,
 }: EditSlotsPageProps) {
   const [showBatchAdder, setShowBatchAdder] = useState(false);
+  const [startAt, setStartAt] = useState("");
+  const [endAt, setEndAt] = useState("");
 
   // ヘッダー設定
   const headerConfig = useMemo(
@@ -39,32 +42,70 @@ export function EditSlotsPage({
 
   const isEmpty = slots.length === 0;
 
+  const handleAddSingleSlot = () => {
+    if (!startAt || !endAt) return;
+    onAddSlotsBatch([{ startAt, endAt }]);
+    setStartAt("");
+    setEndAt("");
+  };
+
   return (
     <div className="min-h-screen bg-background">
+      {/* 一括追加ボタン（ヘッダー右側、slots.length >= 1の時のみ） */}
+      {!isEmpty && (
+        <div className="fixed top-4 right-4 z-10">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowBatchAdder(true)}
+          >
+            <Plus className="h-4 w-4 mr-1" />
+            一括追加
+          </Button>
+        </div>
+      )}
+
       <main className="px-6 max-w-md mx-auto">
         <div className="space-y-6 py-4">
           {isEmpty ? (
-            // 初回: カレンダー選択UI（後で実装）
-            <div className="text-center py-12">
-              <p className="text-muted-foreground mb-4">開催枠を追加してください</p>
-              <Button onClick={() => setShowBatchAdder(true)}>
-                <Plus className="h-4 w-4 mr-2" />
-                開催枠を追加
-              </Button>
+            // 空の時: 単一開催枠追加フォーム
+            <div className="space-y-4">
+              <p className="text-muted-foreground text-sm">開催枠を追加してください</p>
+
+              <div className="space-y-3">
+                <div className="space-y-1">
+                  <label className="text-sm text-muted-foreground px-1">開始日時</label>
+                  <Input
+                    type="datetime-local"
+                    value={startAt}
+                    onChange={(e) => setStartAt(e.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-sm text-muted-foreground px-1">終了日時</label>
+                  <Input
+                    type="datetime-local"
+                    value={endAt}
+                    onChange={(e) => setEndAt(e.target.value)}
+                  />
+                </div>
+
+                <Button
+                  onClick={handleAddSingleSlot}
+                  disabled={!startAt || !endAt}
+                  className="w-full"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  追加
+                </Button>
+              </div>
             </div>
           ) : (
             // 既存スロット表示
             <>
               <div className="flex items-center justify-between">
                 <h2 className="text-title-sm">登録済み開催枠 ({slots.length}件)</h2>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowBatchAdder(true)}
-                >
-                  <Plus className="h-4 w-4 mr-1" />
-                  一括追加
-                </Button>
               </div>
 
               {/* スロット一覧 */}
@@ -78,6 +119,39 @@ export function EditSlotsPage({
                     onRemove={onRemoveSlot}
                   />
                 ))}
+              </div>
+
+              {/* さらに追加フォーム */}
+              <div className="space-y-3 pt-4 border-t">
+                <p className="text-sm font-medium">さらに追加</p>
+
+                <div className="space-y-1">
+                  <label className="text-sm text-muted-foreground px-1">開始日時</label>
+                  <Input
+                    type="datetime-local"
+                    value={startAt}
+                    onChange={(e) => setStartAt(e.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-sm text-muted-foreground px-1">終了日時</label>
+                  <Input
+                    type="datetime-local"
+                    value={endAt}
+                    onChange={(e) => setEndAt(e.target.value)}
+                  />
+                </div>
+
+                <Button
+                  onClick={handleAddSingleSlot}
+                  disabled={!startAt || !endAt}
+                  className="w-full"
+                  variant="outline"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  追加
+                </Button>
               </div>
             </>
           )}
