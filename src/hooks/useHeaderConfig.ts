@@ -5,6 +5,7 @@ import { useHeader } from '@/components/providers/HeaderProvider';
 
 type HeaderConfig = {
   hideHeader?: boolean;
+  hideFooter?: boolean;
   title?: string;
   showBackButton?: boolean;
   showLogo?: boolean;
