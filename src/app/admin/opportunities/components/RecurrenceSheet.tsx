@@ -3,6 +3,25 @@
 import { useState, useMemo } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { ChevronDownIcon } from "lucide-react";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import {
+  Item,
+  ItemActions,
+  ItemContent,
+  ItemGroup,
+  ItemSeparator,
+  ItemTitle,
+} from "@/components/ui/item";
 import { RecurrenceType, RecurrenceSettings, RecurrenceInput, RecurrenceError, SlotData } from "../types";
 import { generateRecurrenceSlots } from "../utils/recurrenceGenerator";
 import dayjs from "dayjs";
@@ -86,15 +105,6 @@ export function RecurrenceSheet({
     return generateRecurrenceSlots(input);
   }, [baseStartAt, baseEndAt, recurrenceType, selectedDays, hasEndDate, endDateInput, errors]);
 
-  // 曜日トグル
-  const toggleDay = (day: number) => {
-    setSelectedDays(prev =>
-      prev.includes(day)
-        ? prev.filter(d => d !== day)
-        : [...prev, day]
-    );
-  };
-
   // 確定ボタン
   const handleConfirm = () => {
     if (!validate()) return;
@@ -112,133 +122,184 @@ export function RecurrenceSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="bottom"
-        className="rounded-t-3xl max-w-md mx-auto p-8 overflow-y-auto max-h-[80vh]"
+        className="rounded-t-3xl max-w-md mx-auto overflow-y-auto max-h-[80vh]"
       >
-        <SheetHeader className="text-left pb-6">
+        <SheetHeader className="text-left pb-6 px-8 pt-8">
           <SheetTitle className="text-title-sm">繰り返し</SheetTitle>
           <p className="text-body-sm text-muted-foreground pt-2">
             同じ時間帯の開催枠をまとめて作成します
           </p>
         </SheetHeader>
 
-        <div className="space-y-6">
-          {/* 繰り返し種別 */}
-          <div>
-            <label className="block text-label-sm font-bold mb-3">繰り返し種別</label>
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                variant={recurrenceType === 'daily' ? 'primary' : 'secondary'}
-                size="md"
-                onClick={() => setRecurrenceType('daily')}
-                className="flex-1"
-              >
-                毎日
-              </Button>
-              <Button
-                type="button"
-                variant={recurrenceType === 'weekly' ? 'primary' : 'secondary'}
-                size="md"
-                onClick={() => setRecurrenceType('weekly')}
-                className="flex-1"
-              >
-                毎週
-              </Button>
-            </div>
-          </div>
+        <div className="px-8 pb-8">
+          <ItemGroup className="border rounded-lg">
+            {/* 繰り返し種別 */}
+            <Item size="sm">
+              <ItemContent className="space-y-2">
+                <ItemTitle>繰り返し種別</ItemTitle>
+                <ToggleGroup
+                  type="single"
+                  value={recurrenceType}
+                  onValueChange={(v) => {
+                    if (v) setRecurrenceType(v as RecurrenceType);
+                  }}
+                  className="grid grid-cols-2 w-full"
+                >
+                  <ToggleGroupItem value="daily">毎日</ToggleGroupItem>
+                  <ToggleGroupItem value="weekly">毎週</ToggleGroupItem>
+                </ToggleGroup>
+              </ItemContent>
+            </Item>
 
-          {/* 曜日選択（毎週の場合のみ） */}
-          {recurrenceType === 'weekly' && (
-            <div>
-              <label className="block text-label-sm font-bold mb-3">曜日選択</label>
-              <div className="grid grid-cols-4 gap-2">
-                {WEEKDAYS.map(({ value, label }) => (
-                  <Button
-                    key={value}
-                    type="button"
-                    variant={selectedDays.includes(value) ? 'primary' : 'secondary'}
-                    size="sm"
-                    onClick={() => toggleDay(value)}
-                  >
-                    {label}
-                  </Button>
-                ))}
-              </div>
-              {errors.days && (
-                <p className="text-body-sm text-destructive mt-2">{errors.days}</p>
-              )}
-            </div>
-          )}
+            {/* 曜日選択（毎週の場合のみ） */}
+            {recurrenceType === 'weekly' && (
+              <>
+                <ItemSeparator />
+                <Item size="sm">
+                  <ItemContent className="space-y-2">
+                    <ItemTitle>曜日選択</ItemTitle>
+                    <ToggleGroup
+                      type="multiple"
+                      value={selectedDays.map(String)}
+                      onValueChange={(values) => setSelectedDays(values.map(Number))}
+                      className="grid grid-cols-7 gap-2"
+                    >
+                      {WEEKDAYS.map(({ value, label }) => (
+                        <ToggleGroupItem
+                          key={value}
+                          value={String(value)}
+                          className="rounded-full aspect-square p-0 w-10 h-10"
+                          size="sm"
+                        >
+                          {label}
+                        </ToggleGroupItem>
+                      ))}
+                    </ToggleGroup>
+                    {errors.days && (
+                      <p className="text-body-sm text-destructive">{errors.days}</p>
+                    )}
+                  </ItemContent>
+                </Item>
+              </>
+            )}
 
-          {/* 終了日 */}
-          <div>
-            <label className="block text-label-sm font-bold mb-3">終了日</label>
-            <div className="space-y-3">
-              <Button
-                type="button"
-                variant={!hasEndDate ? 'primary' : 'secondary'}
-                size="md"
-                onClick={() => setHasEndDate(false)}
-                className="w-full"
-              >
-                指定しない
-              </Button>
-              <Button
-                type="button"
-                variant={hasEndDate ? 'primary' : 'secondary'}
-                size="md"
-                onClick={() => setHasEndDate(true)}
-                className="w-full"
-              >
-                日付を指定
-              </Button>
-              {hasEndDate && (
-                <div>
-                  <input
-                    type="date"
-                    value={endDateInput}
-                    onChange={(e) => setEndDateInput(e.target.value)}
-                    className="w-full h-12 px-4 rounded-lg border border-border bg-background text-foreground"
-                  />
-                  {errors.endDate && (
-                    <p className="text-body-sm text-destructive mt-2">{errors.endDate}</p>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
+            <ItemSeparator />
 
-          {/* プレビュー */}
-          {previewSlots.length > 0 && (
-            <div className="bg-muted p-4 rounded-lg">
-              <p className="text-body-sm text-foreground">
-                💡 {previewSlots.length}件の開催枠が作成されます
-              </p>
-            </div>
-          )}
+            {/* 終了日選択 */}
+            <Item size="sm">
+              <ItemContent>
+                <ItemTitle>終了日</ItemTitle>
+              </ItemContent>
 
-          {/* ボタン */}
-          <div className="flex gap-3 pt-4">
-            <Button
-              type="button"
-              variant="text"
-              size="md"
-              onClick={handleCancel}
-              className="flex-1"
-            >
-              やめる
-            </Button>
-            <Button
-              type="button"
-              variant="primary"
-              size="md"
-              onClick={handleConfirm}
-              disabled={previewSlots.length === 0}
-              className="flex-1"
-            >
-              追加
-            </Button>
-          </div>
+              <ItemActions className="min-w-[140px]">
+                <Select
+                  value={hasEndDate ? "specified" : "none"}
+                  onValueChange={(v) => setHasEndDate(v === "specified")}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">指定しない</SelectItem>
+                    <SelectItem value="specified">日付を指定</SelectItem>
+                  </SelectContent>
+                </Select>
+              </ItemActions>
+            </Item>
+
+            {/* 日付入力（指定する場合のみ） */}
+            {hasEndDate && (
+              <>
+                <ItemSeparator />
+                <Item size="sm">
+                  <ItemContent>
+                    <ItemTitle>終了日を選択</ItemTitle>
+                  </ItemContent>
+
+                  <ItemActions>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="tertiary"
+                          size="sm"
+                          className="w-[180px] justify-between font-normal"
+                        >
+                          {endDateInput ? dayjs(endDateInput).format("YYYY/MM/DD") : "日付を選択"}
+                          <ChevronDownIcon className="h-4 w-4" />
+                        </Button>
+                      </PopoverTrigger>
+
+                      <PopoverContent className="w-auto p-3" align="end">
+                        <Calendar
+                          mode="single"
+                          selected={endDateInput ? dayjs(endDateInput).toDate() : undefined}
+                          onSelect={(date) => {
+                            if (date) {
+                              setEndDateInput(dayjs(date).format('YYYY-MM-DD'));
+                            }
+                          }}
+                          disabled={(d) => {
+                            if (d < new Date()) return true;
+                            const baseDate = dayjs(baseStartAt).toDate();
+                            if (dayjs(d).isBefore(dayjs(baseDate), "day")) return true;
+                            return false;
+                          }}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </ItemActions>
+                </Item>
+
+                {errors.endDate && (
+                  <>
+                    <ItemSeparator />
+                    <Item size="sm">
+                      <ItemContent>
+                        <p className="text-body-sm text-destructive">{errors.endDate}</p>
+                      </ItemContent>
+                    </Item>
+                  </>
+                )}
+              </>
+            )}
+
+            {/* プレビュー */}
+            {previewSlots.length > 0 && (
+              <>
+                <ItemSeparator />
+                <Item size="sm" variant="muted">
+                  <ItemContent>
+                    <p className="text-body-sm text-foreground">
+                      💡 {previewSlots.length}件の開催枠が作成されます
+                    </p>
+                  </ItemContent>
+                </Item>
+              </>
+            )}
+          </ItemGroup>
+        </div>
+
+        {/* ボタンエリア */}
+        <div className="sticky bottom-0 bg-background border-t p-4 flex gap-3">
+          <Button
+            type="button"
+            variant="text"
+            size="md"
+            onClick={handleCancel}
+            className="flex-1"
+          >
+            やめる
+          </Button>
+          <Button
+            type="button"
+            variant="primary"
+            size="md"
+            onClick={handleConfirm}
+            disabled={previewSlots.length === 0}
+            className="flex-1"
+          >
+            追加
+          </Button>
         </div>
       </SheetContent>
     </Sheet>
