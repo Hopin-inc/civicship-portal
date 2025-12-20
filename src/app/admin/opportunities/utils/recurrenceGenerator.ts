@@ -63,7 +63,7 @@ export function generateRecurrenceSlots(input: RecurrenceInput): SlotData[] {
   let currentDate = startDate;
 
   // 3. 日付を進めながら生成
-  while (currentDate.isSameOrBefore(actualEndDate, 'day')) {
+  while (!currentDate.isAfter(actualEndDate, 'day')) {
     let shouldAdd = false;
 
     if (type === 'daily') {
