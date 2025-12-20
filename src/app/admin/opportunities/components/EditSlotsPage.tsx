@@ -23,7 +23,6 @@ export function EditSlotsPage({
   onRemoveSlot,
   onClose,
 }: EditSlotsPageProps) {
-  const [showBatchAdder, setShowBatchAdder] = useState(false);
   const [startAt, setStartAt] = useState("");
   const [endAt, setEndAt] = useState("");
 
@@ -57,7 +56,7 @@ export function EditSlotsPage({
   return (
     <div className="min-h-screen bg-background">
       <main className="max-w-md mx-auto">
-        <div className="space-y-6 py-4">
+        <div className="space-y-6 py-6">
           <div className="flex items-center justify-between">
             <h2 className="text-label-sm text-muted-foreground">開催枠一覧 ({slots.length}件)</h2>
           </div>
