@@ -83,6 +83,7 @@ export function EditSlotsPage({
             onStartAtChange={setStartAt}
             onEndAtChange={setEndAt}
             onAdd={handleAddSingleSlot}
+            onAddSlotsBatch={onAddSlotsBatch}
             variant="secondary"
           />
         </div>
