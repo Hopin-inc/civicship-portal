@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Calendar, ChevronRight } from "lucide-react";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from "@/components/ui/item";
 import { ImageUploadSection } from "./ImageUploadSection";
-import { SlotData } from "../types";
+import { SlotData, ImageData } from "../types";
 
 interface ContentSectionProps {
   title: string;
@@ -14,7 +14,7 @@ interface ContentSectionProps {
   onSummaryChange: (value: string) => void;
   description: string;
   onDescriptionClick: () => void;
-  images: Array<{ file?: File; url: string }>;
+  images: ImageData[];
   onImageSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onRemoveImage: (index: number) => void;
   slots: SlotData[];
