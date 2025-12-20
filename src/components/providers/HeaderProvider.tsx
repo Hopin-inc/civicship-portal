@@ -12,6 +12,7 @@ export interface HeaderConfig {
   backTo?: string;
   onBackClick?: () => void;
   hideHeader?: boolean; // ヘッダー全体を非表示にする
+  hideFooter?: boolean; // フッター（BottomBar）を非表示にする
   searchParams?: {
     location?: string;
     from?: string;

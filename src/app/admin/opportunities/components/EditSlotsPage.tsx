@@ -34,6 +34,7 @@ export function EditSlotsPage({
       showLogo: false,
       showBackButton: true,
       onBackClick: onClose,
+      hideFooter: true,
     }),
     [onClose],
   );

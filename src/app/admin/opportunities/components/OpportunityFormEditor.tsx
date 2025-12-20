@@ -45,6 +45,7 @@ export const OpportunityFormEditor = ({
       title: mode === "create" ? "募集作成" : "募集編集",
       showLogo: false,
       showBackButton: true,
+      hideFooter: true,
     }) : undefined,
     [mode, editMode],
   );
