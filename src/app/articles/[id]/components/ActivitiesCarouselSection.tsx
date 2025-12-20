@@ -3,7 +3,7 @@
 import React from "react";
 import { ActivityCard } from "@/components/domains/opportunities/types";
 import OpportunitiesListSectionSkeleton from "@/components/domains/opportunities/components/ListSection/OpportunityListSectionSkeleton";
-import OpportunityVerticalCard from "@/components/domains/opportunities/components/OpportunityVerticalCard";
+import OpportunityHorizontalCard from "@/components/domains/opportunities/components/OpportunityHorizontalCard";
 import { formatOpportunities } from "@/components/domains/opportunities/utils";
 
 interface Props {
@@ -23,11 +23,11 @@ export const ActivitiesCarouselSection: React.FC<Props> = ({
   const formattedOpportunities = opportunities.map(formatOpportunities);
 
   return (
-    <section className="pl-4 pr-0 mt-0 pt-6">
+    <section className="px-4 mt-0 pt-6">
       <h2 className="text-display-md">{title}</h2>
-      <div className="mt-4 flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+      <div className="flex flex-col gap-4 mt-4">
         {formattedOpportunities.map((opportunity) => (
-          <OpportunityVerticalCard key={opportunity.id} {...opportunity} />
+          <OpportunityHorizontalCard key={opportunity.id} {...opportunity} />
         ))}
       </div>
     </section>
