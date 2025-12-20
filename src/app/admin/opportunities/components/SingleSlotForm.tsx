@@ -2,13 +2,14 @@
 
 import * as React from "react";
 import dayjs from "dayjs";
-import { ChevronDownIcon, Plus } from "lucide-react";
+import { ChevronDownIcon } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { Button, ButtonProps } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Card, CardContent } from "@/components/ui/card";
 
 /* =========================
  * 内部コンポーネント
@@ -19,9 +20,18 @@ interface DateTimeFieldProps {
   value: string;
   onChange: (value: string) => void;
   defaultTime: string;
+  disabled?: boolean;
+  minDate?: Date;
 }
 
-function DateTimeField({ label, value, onChange, defaultTime }: DateTimeFieldProps) {
+function DateTimeField({
+  label,
+  value,
+  onChange,
+  defaultTime,
+  disabled,
+  minDate,
+}: DateTimeFieldProps) {
   const date = value ? dayjs(value).toDate() : undefined;
   const time = value ? dayjs(value).format("HH:mm") : defaultTime;
 
@@ -39,24 +49,43 @@ function DateTimeField({ label, value, onChange, defaultTime }: DateTimeFieldPro
 
   return (
     <div className="space-y-1">
-      <Label className="px-1 text-muted-foreground">{label}</Label>
+      <Label className="px-1 text-muted-foreground text-sm">{label}</Label>
 
       <Popover>
         <PopoverTrigger asChild>
-          <Button variant="tertiary" className="w-full justify-between font-normal">
+          <Button
+            variant="tertiary"
+            size="sm"
+            disabled={disabled}
+            className="w-full justify-between font-normal"
+          >
             {value ? dayjs(value).format("YYYY/MM/DD HH:mm") : "日時を選択"}
-            <ChevronDownIcon />
+            <ChevronDownIcon className={disabled ? "opacity-30" : undefined} />
           </Button>
         </PopoverTrigger>
 
         <PopoverContent className="w-auto p-3 space-y-3" align="start">
+          {/* 日付 */}
           <Calendar
             mode="single"
             selected={date}
             onSelect={handleDateChange}
-            disabled={(d) => d < new Date()}
+            disabled={(d) => {
+              if (d < new Date()) return true;
+              if (minDate && dayjs(d).isBefore(dayjs(minDate), "day")) return true;
+              return false;
+            }}
           />
-          <Input type="time" value={time} onChange={(e) => handleTimeChange(e.target.value)} />
+
+          {/* 時刻 */}
+          <div className="pt-2">
+            <Input
+              type="time"
+              value={time}
+              onChange={(e) => handleTimeChange(e.target.value)}
+              disabled={disabled}
+            />
+          </div>
         </PopoverContent>
       </Popover>
     </div>
@@ -73,8 +102,7 @@ interface SingleSlotFormProps {
   onStartAtChange: (value: string) => void;
   onEndAtChange: (value: string) => void;
   onAdd: () => void;
-  variant?: "primary" | "secondary";
-  title?: string;
+  variant?: ButtonProps["variant"];
 }
 
 export function SingleSlotForm({
@@ -83,28 +111,46 @@ export function SingleSlotForm({
   onStartAtChange,
   onEndAtChange,
   onAdd,
-  variant = "primary",
-  title,
+  variant = "ghost",
 }: SingleSlotFormProps) {
-  const isDisabled = !startAt || !endAt;
+  const startDate = startAt ? dayjs(startAt).toDate() : undefined;
+  const canAdd = !!startAt && !!endAt && dayjs(endAt).isAfter(dayjs(startAt));
+  const showError = !!startAt && !!endAt && !dayjs(endAt).isAfter(dayjs(startAt));
 
   return (
-    <div className="space-y-3">
-      {title && <p className="text-sm font-medium">{title}</p>}
+    <Card>
+      <CardContent className="space-y-3 pt-4">
+        <DateTimeField
+          label="開始日時"
+          value={startAt}
+          onChange={(v) => {
+            onStartAtChange(v);
 
-      <DateTimeField
-        label="開始日時"
-        value={startAt}
-        onChange={onStartAtChange}
-        defaultTime="10:00"
-      />
+            // 開始日時を変えたら、終了が不正ならリセット
+            if (endAt && dayjs(endAt).isBefore(v)) {
+              onEndAtChange("");
+            }
+          }}
+          defaultTime="10:00"
+        />
 
-      <DateTimeField label="終了日時" value={endAt} onChange={onEndAtChange} defaultTime="12:00" />
+        <DateTimeField
+          label="終了日時"
+          value={endAt}
+          onChange={onEndAtChange}
+          defaultTime="12:00"
+          disabled={!startAt}
+          minDate={startDate}
+        />
 
-      <Button onClick={onAdd} disabled={isDisabled} className="w-full" variant={variant}>
-        <Plus className="h-4 w-4 mr-2" />
-        追加
-      </Button>
-    </div>
+        {showError && (
+          <p className="text-sm text-destructive">開始時刻以降の日時を指定してください</p>
+        )}
+
+        <Button onClick={onAdd} disabled={!canAdd} className="w-full" variant={variant} size="sm">
+          追加
+        </Button>
+      </CardContent>
+    </Card>
   );
 }
