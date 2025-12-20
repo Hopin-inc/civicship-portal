@@ -4,9 +4,9 @@ import { useMemo, useState } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { SlotData } from "../types";
 import { SlotPicker } from "./SlotPicker";
-import { SingleSlotForm } from "./SingleSlotForm";
 import dayjs from "dayjs";
 import { toast } from "react-toastify";
+import { SingleSlotForm } from "@/app/admin/opportunities/components/SingleSlotForm";
 
 interface EditSlotsPageProps {
   slots: SlotData[];
@@ -61,6 +61,16 @@ export function EditSlotsPage({
             <h2 className="text-label-sm text-muted-foreground">開催枠一覧 ({slots.length}件)</h2>
           </div>
 
+          <SingleSlotForm
+            startAt={startAt}
+            endAt={endAt}
+            onStartAtChange={setStartAt}
+            onEndAtChange={setEndAt}
+            onAdd={handleAddSingleSlot}
+            onAddSlotsBatch={onAddSlotsBatch}
+            variant="secondary"
+          />
+
           {/* スロット一覧 */}
           {slots.length > 0 && (
             <div className="space-y-3">
@@ -75,17 +85,6 @@ export function EditSlotsPage({
               ))}
             </div>
           )}
-
-          {/* さらに追加フォーム */}
-          <SingleSlotForm
-            startAt={startAt}
-            endAt={endAt}
-            onStartAtChange={setStartAt}
-            onEndAtChange={setEndAt}
-            onAdd={handleAddSingleSlot}
-            onAddSlotsBatch={onAddSlotsBatch}
-            variant="secondary"
-          />
         </div>
       </main>
     </div>
