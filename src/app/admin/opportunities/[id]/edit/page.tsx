@@ -73,7 +73,7 @@ export default function EditOpportunityPage() {
       hostName: opp.createdByUser?.name || null,
       requireHostApproval: opp.requireApproval,
       slots,
-      images: (opp.images || []).map((url) => ({ url })),
+      images: (opp.images || []).map((url) => ({ type: 'existing' as const, url })),
       publishStatus: opp.publishStatus,
     };
   }, [data]);
