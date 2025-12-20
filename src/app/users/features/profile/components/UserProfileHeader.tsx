@@ -65,12 +65,16 @@ export function UserProfileHeader({
 
         <div className="flex items-start w-full">
           <div>
-            <h1 className="text-title-lg mb-2">{name}</h1>
+            <h1 className="text-title-md mb-2">{name}</h1>
 
             {currentCommunityConfig.enableFeatures.includes("prefectures") && currentPrefecture && (
               <div className="flex items-center text-label-md text-caption mb-3">
                 <Home className="w-4 h-4 mr-1" />
-                <span>{getPrefectureKey(currentPrefecture) ? t(getPrefectureKey(currentPrefecture)) : currentPrefecture}</span>
+                <span>
+                  {getPrefectureKey(currentPrefecture)
+                    ? t(getPrefectureKey(currentPrefecture))
+                    : currentPrefecture}
+                </span>
               </div>
             )}
           </div>
@@ -116,7 +120,9 @@ function BioSection({ bio }: { bio: string }) {
   });
 
   return (
-    <div className="mb-4 relative">
+    // ★ w-full を追加して、flex items-center の中でも幅いっぱいに広げる
+    <div className="mb-4 relative w-full">
+      {/* Bio 本文（左寄せ） */}
       <div
         ref={textRef}
         className="text-body-md text-foreground whitespace-pre-line transition-all duration-300 text-left"
@@ -124,11 +130,20 @@ function BioSection({ bio }: { bio: string }) {
       >
         {bio}
       </div>
+
+      {/* Read More + グラデーション */}
       {showReadMore && !expanded && (
-        <div className="absolute bottom-0 left-0 w-full">
-          <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent"></div>
+        <div className="absolute bottom-0 left-0 w-full pointer-events-none">
+          <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
+
+          {/* ボタンはこの w-full コンテナ内で中央寄せ */}
           <div className="relative flex justify-center pt-8">
-            <Button variant="tertiary" size="sm" onClick={toggleExpanded} className="bg-white px-6">
+            <Button
+              variant="tertiary"
+              size="sm"
+              onClick={toggleExpanded}
+              className="bg-white px-6 pointer-events-auto"
+            >
               <span className="text-label-sm font-bold">{t("users.profileHeader.readMore")}</span>
             </Button>
           </div>

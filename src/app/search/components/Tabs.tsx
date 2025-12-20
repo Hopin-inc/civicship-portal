@@ -19,17 +19,15 @@ const SearchTabs: React.FC<SearchTabsProps> = ({ selectedTab, onTabChange }) => 
     <Tabs
       value={selectedTab}
       onValueChange={(v) => {
-        if (isSearchTabType(v)) {
-          onTabChange(v);
-        }
+        if (isSearchTabType(v)) onTabChange(v);
       }}
-      className="mb-2"
+      className="mb-2 w-full"
     >
-      <TabsList>
-        <TabsTrigger value="activity">
+      <TabsList className="w-full">
+        <TabsTrigger value="activity" className="flex-1">
           体験
         </TabsTrigger>
-        <TabsTrigger value="quest">
+        <TabsTrigger value="quest" className="flex-1">
           お手伝い
         </TabsTrigger>
       </TabsList>

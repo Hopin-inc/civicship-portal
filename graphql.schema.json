@@ -7014,7 +7014,7 @@
                   "name": null,
                   "ofType": {
                     "kind": "INPUT_OBJECT",
-                    "name": "CheckCommunityPermissionInput",
+                    "name": "CheckOpportunityPermissionInput",
                     "ofType": null
                   }
                 },
