@@ -11,6 +11,7 @@ type HeaderConfig = {
   showSearchForm?: boolean;
   action?: React.ReactNode;
   backTo?: string;
+  onBackClick?: () => void;
   searchParams?: {
     location?: string;
     from?: string;
