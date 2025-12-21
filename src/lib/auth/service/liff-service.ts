@@ -152,7 +152,7 @@ export class LiffService {
     } else {
       const infoMessage = operation === "login" ? "LIFF login process failed" : "LIFF initialization failed";
       const errorCategory = operation === "login" ? "auth_temporary" : "initialization_error";
-      logger.info(infoMessage, {
+      logger.warn(infoMessage, {
         ...logContext,
         errorCategory,
       });
@@ -174,7 +174,7 @@ export class LiffService {
       };
     } catch (error) {
       const processedError = error instanceof Error ? error : new Error(String(error));
-      logger.info("Failed to get LIFF profile", {
+      logger.warn("Failed to get LIFF profile", {
         authType: "liff",
         error: processedError.message,
         component: "LiffService",

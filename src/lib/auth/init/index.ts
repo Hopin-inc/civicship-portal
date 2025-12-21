@@ -39,7 +39,7 @@ export async function initAuth(params: InitAuthParams) {
 
   const environment = detectEnvironment();
 
-  logger.info("[AUTH] initAuth", {
+  logger.debug("[AUTH] initAuth", {
     environment,
     ssrCurrentUser: !!ssrCurrentUser,
     ssrCurrentUserId: ssrCurrentUser?.id,
@@ -107,7 +107,7 @@ async function initAuthFast({
           const firebaseUser = await initializeFirebase(liffService, environment);
           if (firebaseUser) {
             useAuthStore.getState().setState({ firebaseUser });
-            logger.info("[AUTH] initAuthFast: Firebase user hydrated for CSR", {
+            logger.debug("[AUTH] initAuthFast: Firebase user hydrated for CSR", {
               uid: firebaseUser.uid,
             });
           }

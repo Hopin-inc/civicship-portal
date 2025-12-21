@@ -14,13 +14,13 @@ export async function fetchPrivateUserServer(): Promise<GqlUser | null> {
   const hasSession = await hasServerSession();
   const cookieHeader = await getServerCookieHeader();
 
-  logger.info("[AUTH] fetchPrivateUserServer: checking session", {
+  logger.debug("[AUTH] fetchPrivateUserServer: checking session", {
     hasSession,
     component: "fetchPrivateUserServer",
   });
 
   if (!hasSession) {
-    logger.info("[AUTH] fetchPrivateUserServer: no session cookie, returning null", {
+    logger.debug("[AUTH] fetchPrivateUserServer: no session cookie, returning null", {
       component: "fetchPrivateUserServer",
     });
     return null;
@@ -34,13 +34,13 @@ export async function fetchPrivateUserServer(): Promise<GqlUser | null> {
 
     const user = res.currentUser?.user ?? null;
 
-    logger.info("[AUTH] fetchPrivateUserServer: query succeeded", {
+    logger.debug("[AUTH] fetchPrivateUserServer: query succeeded", {
       hasUser: !!user,
       userId: user?.id,
       component: "fetchPrivateUserServer",
     });
 
-    logger.info("[AUTH] fetchPrivateUserServer: wallet data snapshot", {
+    logger.debug("[AUTH] fetchPrivateUserServer: wallet data snapshot", {
       hasUser: !!user,
       walletsCount: user?.wallets?.length ?? 0,
       walletSummary: (user?.wallets ?? []).map((w) => ({

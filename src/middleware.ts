@@ -82,7 +82,9 @@ export function middleware(request: NextRequest) {
         }
 
         if (effectivePath === route || effectivePath.startsWith(`${route}/`)) {
-          console.log(`Redirecting from disabled feature path: ${effectivePath} to ${rootPath}`);
+          if (isDev) {
+            console.log(`Redirecting from disabled feature path: ${effectivePath} to ${rootPath}`);
+          }
           const redirectPath = pathCommunityId ? `/${pathCommunityId}${rootPath}` : rootPath;
           return NextResponse.redirect(new URL(redirectPath, request.url));
         }

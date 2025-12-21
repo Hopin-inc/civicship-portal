@@ -101,3 +101,6 @@ jobs:
           service: ${{ env.APPLICATION_NAME }}
           image: ${{ env.ARTIFACT_REGISTRY }}/${{ env.APPLICATION_NAME }}:latest
           region: ${{ env.GCP_REGION }}
+          flags: >
+            --min-instances=0
+            --max-instances=10

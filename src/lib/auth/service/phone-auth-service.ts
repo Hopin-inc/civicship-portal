@@ -58,7 +58,7 @@ export class PhoneAuthService {
         try {
           (window as any).grecaptcha.reset();
         } catch (e) {
-          logger.info("reCAPTCHA reset (expected)", {
+          logger.debug("reCAPTCHA reset (expected)", {
             authType: "phone",
             error: e instanceof Error ? e.message : String(e),
             component: "PhoneAuthService",
@@ -68,7 +68,7 @@ export class PhoneAuthService {
       this.recaptchaContainerElement = null;
       this.isRecaptchaRendered = false;
     } catch (e) {
-      logger.info("Error clearing reCAPTCHA", {
+      logger.debug("Error clearing reCAPTCHA", {
         authType: "phone",
         error: e instanceof Error ? e.message : String(e),
         component: "PhoneAuthService",
@@ -105,7 +105,7 @@ export class PhoneAuthService {
           }
         },
         "expired-callback": () => {
-          logger.info("[PhoneAuthService] reCAPTCHA expired");
+          logger.debug("[PhoneAuthService] reCAPTCHA expired");
           this.clearRecaptcha();
         },
       });

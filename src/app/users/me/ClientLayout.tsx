@@ -29,7 +29,7 @@ export function ClientLayout({ children, ssrUser }: ClientLayoutProps) {
   const csrUser = data?.currentUser?.user ?? null;
 
   // Log the current state for debugging
-  logger.info("[AUTH] /users/me ClientLayout state", {
+  logger.debug("[AUTH] /users/me ClientLayout state", {
     hasSsrUser: !!ssrUser,
     ssrUserId: ssrUser?.id,
     loading,
@@ -41,14 +41,14 @@ export function ClientLayout({ children, ssrUser }: ClientLayoutProps) {
   });
 
   if (ssrUser) {
-    logger.info("[AUTH] /users/me ClientLayout: using ssrUser", {
+    logger.debug("[AUTH] /users/me ClientLayout: using ssrUser", {
       component: "ClientLayout",
     });
     return <>{children}</>;
   }
 
   if (loading && !csrUser) {
-    logger.info("[AUTH] /users/me ClientLayout: loading spinner", {
+    logger.debug("[AUTH] /users/me ClientLayout: loading spinner", {
       loading,
       hasCsrUser: !!csrUser,
       hasError: !!error,
@@ -59,13 +59,13 @@ export function ClientLayout({ children, ssrUser }: ClientLayoutProps) {
   }
 
   if (!csrUser) {
-    logger.info("[AUTH] /users/me ClientLayout: notFound", {
+    logger.debug("[AUTH] /users/me ClientLayout: notFound", {
       component: "ClientLayout",
     });
     return notFound();
   }
 
-  logger.info("[AUTH] /users/me ClientLayout: rendering with csrUser", {
+  logger.debug("[AUTH] /users/me ClientLayout: rendering with csrUser", {
     csrUserId: csrUser.id,
     component: "ClientLayout",
   });

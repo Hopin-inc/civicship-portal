@@ -29,7 +29,7 @@ export class AuthRedirectService {
     const basePath = pathname.split("?")[0];
     const nextParam = next ? this.generateNextParam(next) : this.generateNextParam(pathname);
 
-    logger.info("[AUTH] AuthRedirectService.getRedirectPath", {
+    logger.debug("[AUTH] AuthRedirectService.getRedirectPath", {
       pathname,
       basePath,
       authState,
@@ -39,7 +39,7 @@ export class AuthRedirectService {
     });
 
     if (authState === "loading" || authState === "authenticating") {
-      logger.info("[AUTH] AuthRedirectService: skipping (loading/authenticating)");
+      logger.debug("[AUTH] AuthRedirectService: skipping (loading/authenticating)");
       return null;
     }
 
@@ -51,7 +51,7 @@ export class AuthRedirectService {
       nextParam,
     );
     if (redirectFromLogin) {
-      logger.info("[AUTH] AuthRedirectService: redirect from handleAuthEntryFlow", {
+      logger.debug("[AUTH] AuthRedirectService: redirect from handleAuthEntryFlow", {
         redirectPath: redirectFromLogin,
       });
       return redirectFromLogin;
@@ -59,7 +59,7 @@ export class AuthRedirectService {
 
     const redirectFromUserPath = this.handleUserPath(basePath, authState, currentUser, nextParam);
     if (redirectFromUserPath) {
-      logger.info("[AUTH] AuthRedirectService: redirect from handleUserPath", {
+      logger.debug("[AUTH] AuthRedirectService: redirect from handleUserPath", {
         redirectPath: redirectFromUserPath,
       });
       return redirectFromUserPath;
@@ -67,13 +67,13 @@ export class AuthRedirectService {
 
     const redirectByRole = this.handleRoleRestriction(currentUser, basePath);
     if (redirectByRole) {
-      logger.info("[AUTH] AuthRedirectService: redirect from handleRoleRestriction", {
+      logger.debug("[AUTH] AuthRedirectService: redirect from handleRoleRestriction", {
         redirectPath: redirectByRole,
       });
       return redirectByRole;
     }
 
-    logger.info("[AUTH] AuthRedirectService: no redirect needed");
+    logger.debug("[AUTH] AuthRedirectService: no redirect needed");
     return null;
   }
 
@@ -162,7 +162,7 @@ export class AuthRedirectService {
     currentUser: GqlUser | null | undefined,
     basePath: string,
   ): RawURIComponent | null {
-    logger.info("[AUTH] handleRoleRestriction: start", {
+    logger.debug("[AUTH] handleRoleRestriction: start", {
       basePath,
       userId: currentUser?.id,
       hasMemberships: !!currentUser?.memberships?.length,
@@ -172,14 +172,14 @@ export class AuthRedirectService {
     });
 
     if (!currentUser) {
-      logger.info("[AUTH] handleRoleRestriction: no currentUser", {
+      logger.debug("[AUTH] handleRoleRestriction: no currentUser", {
         component: "AuthRedirectService",
       });
       return null;
     }
 
     const canAccess = AccessPolicy.canAccessRole(currentUser, basePath);
-    logger.info("[AUTH] handleRoleRestriction: canAccessRole result", {
+    logger.debug("[AUTH] handleRoleRestriction: canAccessRole result", {
       basePath,
       userId: currentUser.id,
       canAccess,
@@ -188,7 +188,7 @@ export class AuthRedirectService {
 
     if (!canAccess) {
       const fallbackPath = AccessPolicy.getFallbackPath(currentUser);
-      logger.info("[AUTH] handleRoleRestriction: redirecting to fallback (master logic)", {
+      logger.debug("[AUTH] handleRoleRestriction: redirecting to fallback (master logic)", {
         basePath,
         userId: currentUser.id,
         fallbackPath,
@@ -198,7 +198,7 @@ export class AuthRedirectService {
       return fallbackPath as RawURIComponent;
     }
 
-    logger.info("[AUTH] handleRoleRestriction: access allowed", {
+    logger.debug("[AUTH] handleRoleRestriction: access allowed", {
       basePath,
       userId: currentUser.id,
       component: "AuthRedirectService",
