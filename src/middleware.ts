@@ -92,7 +92,9 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
+  // Generate nonce using Web Crypto API (Edge Runtime compatible)
+  // crypto.randomUUID() returns a safe ASCII string, so we can use btoa directly
+  const nonce = btoa(crypto.randomUUID());
 
   const scriptSrc = [
     `'self'`,
