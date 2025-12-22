@@ -6,8 +6,9 @@ import { ErrorState } from "@/components/shared";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import NavigationButtons from "@/components/shared/NavigationButtons";
 import { useAuth } from "@/contexts/AuthProvider";
+import { useCommunityId } from "@/contexts/CommunityContext";
 import { useOpportunityDetails } from "@/hooks/opportunities/useOpportunityDetails";
-import { notFound, useParams, useSearchParams } from "next/navigation";
+import { notFound, useParams } from "next/navigation";
 import { useEffect, useMemo, useRef } from "react";
 import OpportunityDetailsHeader from "./components/OpportunityDetailsHeader";
 import { OpportunityDetailsContent } from "./components/OpportunityDetailsContent";
@@ -17,9 +18,8 @@ import { isActivityCategory, isQuestCategory } from "@/components/domains/opport
 
 export default function OpportunityDetailPage() {
   const params = useParams();
-  const searchParams = useSearchParams();
+  const communityId = useCommunityId();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
-  const community_id = searchParams.get("community_id") ?? "";
   const headerConfig = useMemo(
     () => ({
       hideHeader: true,
@@ -77,7 +77,7 @@ export default function OpportunityDetailPage() {
                 opportunity={opportunity} 
                 availableDates={sortedSlots}
                 sameStateActivities={sameStateOpportunities}
-                communityId={community_id}
+                communityId={communityId}
             />
         </div>
       </main>
@@ -86,7 +86,7 @@ export default function OpportunityDetailPage() {
         price={isActivityCategory(opportunity) ? opportunity.feeRequired : null}
         point={isQuestCategory(opportunity) ? opportunity.pointsToEarn : null}
         pointsRequired={isActivityCategory(opportunity) ? opportunity.pointsRequired : null}
-        communityId={community_id}
+        communityId={communityId}
         disableReason={getDisableReason(sortedSlots, isExternalBooking, opportunity.isReservable)}
       />
     </>

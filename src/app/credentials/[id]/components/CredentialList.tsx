@@ -63,7 +63,8 @@ export default function CredentialList(props: OpportunityListProps) {
       value: data?.participation?.opportunitySlot?.opportunity?.title ?? "",
       showExternalLink: true,
       externalLink: {
-        url: `/activities/${data?.participation?.opportunitySlot?.opportunity?.id}?community_id=${data?.participation?.opportunitySlot?.opportunity?.community?.id}`,
+        // Link without community_id query param - communityId is now in URL path prefix
+        url: `/activities/${data?.participation?.opportunitySlot?.opportunity?.id}`,
         text: "詳細を見る"
       },
     },

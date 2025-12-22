@@ -13,11 +13,13 @@ export const selectBadge = (hasReservableTicket: boolean | null, pointsRequired:
   }
 }
 
-export const getLink = (id: string, communityId: string, category: GqlOpportunityCategory) => {
+// Note: communityId parameter is kept for backwards compatibility but no longer used in URL
+// The communityId is now determined from the URL path prefix (e.g., /neo88/opportunities/[id])
+export const getLink = (id: string, _communityId: string, category: GqlOpportunityCategory) => {
   if (category === GqlOpportunityCategory.Activity) {
-    return `/opportunities/${id}?community_id=${communityId}&type=activity`;
+    return `/opportunities/${id}?type=activity`;
   } else if (category === GqlOpportunityCategory.Quest) {
-    return `/opportunities/${id}?community_id=${communityId}&type=quest`;
+    return `/opportunities/${id}?type=quest`;
   }
   return "";
 }
