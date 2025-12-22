@@ -9,7 +9,8 @@ import { AuthProvider } from "@/contexts/AuthProvider";
 import HeaderProvider from "@/components/providers/HeaderProvider";
 import MainContent from "@/components/layout/MainContent";
 import React from "react";
-import { currentCommunityMetadata, COMMUNITY_ID, COMMUNITY_BASE_CONFIG } from "@/lib/communities/metadata";
+import { COMMUNITY_ID, COMMUNITY_BASE_CONFIG } from "@/lib/communities/metadata";
+import { DEFAULT_ASSET_PATHS } from "@/lib/communities/constants";
 import AnalyticsProvider from "@/components/providers/AnalyticsProvider";
 import ClientPolyfills from "@/components/polyfills/ClientPolyfills";
 import { getUserServer } from "@/lib/auth/init/getUserServer";
@@ -25,14 +26,77 @@ import { getCommunityConfig, CommunityPortalConfig } from "@/lib/communities/get
 const font = Inter({ subsets: ["latin"] });
 
 export async function generateMetadata(): Promise<Metadata> {
-  const metadata = currentCommunityMetadata;
+  // Get communityId from request headers (set by middleware) or cookies or env var
+  const headersList = await headers();
+  const cookieStore = await cookies();
+  const communityId = headersList.get("x-community-id") || cookieStore.get("communityId")?.value || COMMUNITY_ID;
+  
+  // Try to get config from database first, fallback to hardcoded config
+  let config = await getCommunityConfig(communityId);
+  if (!config) {
+    const baseConfig = COMMUNITY_BASE_CONFIG[communityId] || COMMUNITY_BASE_CONFIG.default;
+    config = {
+      communityId: baseConfig.id,
+      tokenName: baseConfig.tokenName,
+      title: baseConfig.title,
+      description: baseConfig.description,
+      shortDescription: baseConfig.shortDescription || null,
+      domain: baseConfig.domain,
+      faviconPrefix: baseConfig.faviconPrefix,
+      logoPath: baseConfig.logoPath,
+      squareLogoPath: baseConfig.squareLogoPath,
+      ogImagePath: baseConfig.ogImagePath,
+      enableFeatures: baseConfig.enableFeatures,
+      rootPath: baseConfig.rootPath || "/",
+      adminRootPath: baseConfig.adminRootPath || "/admin",
+      documents: baseConfig.documents || null,
+      commonDocumentOverrides: baseConfig.commonDocumentOverrides || null,
+      regionName: null,
+      regionKey: null,
+      liffId: null,
+      liffBaseUrl: null,
+      firebaseTenantId: null,
+    };
+  }
 
   return {
-    title: metadata.title,
-    description: metadata.description,
-    icons: metadata.icons,
-    openGraph: metadata.openGraph,
-    alternates: metadata.alternates,
+    title: config.title,
+    description: config.description,
+    icons: {
+      icon: [
+        {
+          url: config.faviconPrefix
+            ? `${config.faviconPrefix}/favicon.ico`
+            : DEFAULT_ASSET_PATHS.FAVICON,
+        },
+      ],
+      apple: [
+        {
+          url: config.faviconPrefix
+            ? `${config.faviconPrefix}/apple-touch-icon.png`
+            : DEFAULT_ASSET_PATHS.APPLE_TOUCH_ICON,
+        },
+      ],
+    },
+    openGraph: {
+      title: config.title,
+      description: config.description,
+      url: config.domain,
+      siteName: config.title,
+      locale: "ja_JP",
+      type: "website",
+      images: [
+        {
+          url: config.ogImagePath,
+          width: 1200,
+          height: 630,
+          alt: config.title,
+        },
+      ],
+    },
+    alternates: {
+      canonical: config.domain,
+    },
   };
 }
 

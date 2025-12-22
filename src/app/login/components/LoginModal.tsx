@@ -8,7 +8,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { currentCommunityConfig } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { encodeURIComponentWithType, RawURIComponent } from "@/utils/path";
 import { cn } from "@/lib/utils";
 
@@ -24,6 +24,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, nextPath }) =>
   const [agreedPrivacy, setAgreedPrivacy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { loginWithLiff, isAuthenticating, isAuthenticated } = useAuth();
+  const communityConfig = useCommunityConfig();
 
   const handleLogin = async () => {
     if (!agreedTerms || !agreedPrivacy) {
@@ -61,7 +62,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, nextPath }) =>
       >
         <SheetTitle className={"text-body-md mb-4"}>
           <div className="text-body-md mb-6">
-            <strong className="font-bold">{currentCommunityConfig.title}</strong>
+            <strong className="font-bold">{communityConfig?.title ?? ""}</strong>
             {!isAuthenticated
               ? "を利用するにはLINEでログインして下さい"
               : "を利用するにはユーザー登録してください"}
