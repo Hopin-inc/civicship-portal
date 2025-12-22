@@ -8,9 +8,11 @@ import {
   GqlSortDirection,
 } from "@/types/graphql";
 import { mapOpportunityCards, sliceActivitiesBySection } from "./presenter";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { getRuntimeCommunityId } from "@/lib/communities/communityIds";
 
-export async function fetchFeaturedAndCarousel() {
+export async function fetchFeaturedAndCarousel(communityId?: string) {
+  // Use provided communityId or get it at runtime
+  const effectiveCommunityId = communityId || getRuntimeCommunityId();
   const { data, loading } = await apolloClient.query<
     GqlGetOpportunitiesQuery,
     GqlGetOpportunitiesQueryVariables
@@ -18,7 +20,7 @@ export async function fetchFeaturedAndCarousel() {
     query: GetOpportunitiesDocument,
     variables: {
       filter: {
-        communityIds: [COMMUNITY_ID],
+        communityIds: [effectiveCommunityId],
         category: GqlOpportunityCategory.Activity,
         publishStatus: [GqlPublishStatus.Public],
       },

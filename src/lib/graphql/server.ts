@@ -25,11 +25,14 @@ export async function executeServerGraphQLQuery<
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
+  // X-Community-Id should be passed via headers parameter from the caller
+  // (e.g., from Server Components that read it from request headers)
+  // Fall back to env var for backwards compatibility
   const requestHeaders = {
     "Content-Type": "application/json",
     "X-Auth-Mode": "session",
     "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID!,
-    "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID!,
+    "X-Community-Id": headers["X-Community-Id"] || process.env.NEXT_PUBLIC_COMMUNITY_ID || "default",
     ...headers,
   };
 

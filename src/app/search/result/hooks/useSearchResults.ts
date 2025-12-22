@@ -21,7 +21,7 @@ import {
 import { IPrefectureCodeMap } from "@/app/search/data/type";
 import { logger } from "@/lib/logging";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useCommunityId } from "@/contexts/CommunityContext";
 
 type CardType = ActivityCard | QuestCard;
 const DEFAULT_PAGE_SIZE = 15;
@@ -90,7 +90,8 @@ export const useSearchResults = (
   hasNextPage: boolean;
   isLoadingMore: boolean;
 } => {
-  const filter = useMemo(() => buildFilter(searchParams), [searchParams]);
+  const communityId = useCommunityId();
+  const filter = useMemo(() => buildFilter(searchParams, communityId), [searchParams, communityId]);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   // 共通のクエリ変数を定義
@@ -228,10 +229,10 @@ export const useSearchResults = (
   };
 };
 
-function buildFilter(searchParams: SearchParams): OpportunityFilterInput {
+function buildFilter(searchParams: SearchParams, communityId: string): OpportunityFilterInput {
   const filter: OpportunityFilterInput = {
     publishStatus: [PublishStatus.Public],
-    communityIds: [COMMUNITY_ID],
+    communityIds: [communityId],
   };
 
   if (searchParams.type === "activity") {

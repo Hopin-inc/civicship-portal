@@ -28,3 +28,49 @@ export type CommunityId = (typeof VALID_COMMUNITY_IDS)[number];
 export function isValidCommunityId(communityId: string): communityId is CommunityId {
   return VALID_COMMUNITY_IDS.includes(communityId as CommunityId);
 }
+
+/**
+ * Extract communityId from a URL pathname.
+ * Returns null if the first segment is not a valid community ID.
+ */
+export function extractCommunityIdFromPath(pathname: string): CommunityId | null {
+  const segments = pathname.split("/").filter(Boolean);
+  if (segments.length === 0) {
+    return null;
+  }
+  const potentialCommunityId = segments[0];
+  if (isValidCommunityId(potentialCommunityId)) {
+    return potentialCommunityId;
+  }
+  return null;
+}
+
+/**
+ * Get the communityId at runtime from URL path or cookie.
+ * This is for browser-side use only.
+ * Priority: URL path > cookie > environment variable > "default"
+ */
+export function getRuntimeCommunityId(): string {
+  if (typeof window === "undefined") {
+    // Server-side: return env var or default
+    return process.env.NEXT_PUBLIC_COMMUNITY_ID || "default";
+  }
+
+  // Browser-side: check URL path first
+  const pathCommunityId = extractCommunityIdFromPath(window.location.pathname);
+  if (pathCommunityId) {
+    return pathCommunityId;
+  }
+
+  // Fallback to cookie
+  const cookieMatch = document.cookie.match(/(?:^|;\s*)communityId=([^;]*)/);
+  if (cookieMatch && cookieMatch[1]) {
+    const cookieCommunityId = cookieMatch[1];
+    if (isValidCommunityId(cookieCommunityId)) {
+      return cookieCommunityId;
+    }
+  }
+
+  // Fallback to environment variable or default
+  return process.env.NEXT_PUBLIC_COMMUNITY_ID || "default";
+}
