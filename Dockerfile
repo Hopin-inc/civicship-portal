@@ -55,11 +55,12 @@ COPY . ./
 # ビルド
 RUN pnpm build
 
-# Cloud Run sets PORT environment variable (default 8080, but service may override)
-# Use shell form to expand $PORT at runtime, with fallback to 8080
+# Cloud Run sets PORT environment variable (default 8080, but service may override to 8000)
+# We run Next.js directly to avoid the hardcoded port in package.json start script
 ENV PORT=8080
 EXPOSE 8080
 
 # アプリケーション起動
-# Use shell form to expand $PORT at runtime, allowing Cloud Run to override
-CMD ["sh", "-c", "pnpm start -- -p ${PORT:-8080}"]
+# Run Next.js directly with $PORT to respect Cloud Run's PORT env var
+# -H 0.0.0.0 ensures the server binds to all interfaces (required for Cloud Run health checks)
+CMD ["sh", "-c", "pnpm exec next start -p ${PORT} -H 0.0.0.0"]
