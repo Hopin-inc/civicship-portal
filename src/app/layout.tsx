@@ -9,7 +9,7 @@ import { AuthProvider } from "@/contexts/AuthProvider";
 import HeaderProvider from "@/components/providers/HeaderProvider";
 import MainContent from "@/components/layout/MainContent";
 import React from "react";
-import { currentCommunityMetadata } from "@/lib/communities/metadata";
+import { currentCommunityMetadata, COMMUNITY_ID } from "@/lib/communities/metadata";
 import AnalyticsProvider from "@/components/providers/AnalyticsProvider";
 import ClientPolyfills from "@/components/polyfills/ClientPolyfills";
 import { getUserServer } from "@/lib/auth/init/getUserServer";
@@ -17,6 +17,8 @@ import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { LiffDeepLinkHandler } from "@/components/liff/LiffDeepLinkHandler";
 import { SwipeBackNavigation } from "@/components/navigation/SwipeBackNavigation";
+import { CommunityProvider } from "@/contexts/CommunityContext";
+import { headers, cookies } from "next/headers";
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -49,30 +51,37 @@ const RootLayout = async ({
   const locale = await getLocale();
   const messages = await getMessages();
 
+  // Get communityId from request headers (set by middleware) or cookies or env var
+  const headersList = await headers();
+  const cookieStore = await cookies();
+  const communityId = headersList.get("x-community-id") || cookieStore.get("communityId")?.value || COMMUNITY_ID;
+
   return (
     <html lang={locale}>
       <body className={font.className}>
         <ClientPolyfills />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <CookiesProvider>
-            <ApolloProvider>
-              <AuthProvider
-                ssrCurrentUser={user}
-                ssrLineAuthenticated={lineAuthenticated}
-                ssrPhoneAuthenticated={phoneAuthenticated}
-              >
-                <LiffDeepLinkHandler />
-                <HeaderProvider>
-                  <SwipeBackNavigation>
-                    <LoadingProvider>
-                      <AnalyticsProvider />
-                      <MainContent>{children}</MainContent>
-                      <Toaster />
-                    </LoadingProvider>
-                  </SwipeBackNavigation>
-                </HeaderProvider>
-              </AuthProvider>
-            </ApolloProvider>
+            <CommunityProvider communityId={communityId}>
+              <ApolloProvider>
+                <AuthProvider
+                  ssrCurrentUser={user}
+                  ssrLineAuthenticated={lineAuthenticated}
+                  ssrPhoneAuthenticated={phoneAuthenticated}
+                >
+                  <LiffDeepLinkHandler />
+                  <HeaderProvider>
+                    <SwipeBackNavigation>
+                      <LoadingProvider>
+                        <AnalyticsProvider />
+                        <MainContent>{children}</MainContent>
+                        <Toaster />
+                      </LoadingProvider>
+                    </SwipeBackNavigation>
+                  </HeaderProvider>
+                </AuthProvider>
+              </ApolloProvider>
+            </CommunityProvider>
           </CookiesProvider>
         </NextIntlClientProvider>
       </body>
