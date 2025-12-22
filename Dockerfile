@@ -55,10 +55,11 @@ COPY . ./
 # ビルド
 RUN pnpm build
 
-# Cloud Run uses PORT environment variable (default 8080)
-# Override the hardcoded port in package.json start script
+# Cloud Run sets PORT environment variable (default 8080, but service may override)
+# Use shell form to expand $PORT at runtime, with fallback to 8080
 ENV PORT=8080
 EXPOSE 8080
 
 # アプリケーション起動
-CMD ["pnpm", "start", "-p", "8080"]
+# Use shell form to expand $PORT at runtime, allowing Cloud Run to override
+CMD ["sh", "-c", "pnpm start -- -p ${PORT:-8080}"]
