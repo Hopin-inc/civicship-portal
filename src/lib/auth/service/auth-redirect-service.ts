@@ -4,6 +4,11 @@ import { encodeURIComponentWithType, matchPaths, RawURIComponent } from "@/utils
 import { AccessPolicy } from "@/lib/auth/core/access-policy";
 import { AuthenticationState } from "@/types/auth";
 import { logger } from "@/lib/logging";
+import {
+  extractCommunityIdFromPath,
+  stripCommunityPrefix,
+  addCommunityPrefix,
+} from "@/lib/communities/communityIds";
 
 export class AuthRedirectService {
   private static instance: AuthRedirectService;
@@ -26,12 +31,20 @@ export class AuthRedirectService {
     currentUser?: GqlUser | null,
   ): RawURIComponent | null {
     const authState = this.authStateManager.getState();
-    const basePath = pathname.split("?")[0];
+    const fullBasePath = pathname.split("?")[0];
+    
+    // Extract community prefix and normalize path for matching
+    const communityId = extractCommunityIdFromPath(fullBasePath);
+    const basePath = stripCommunityPrefix(fullBasePath);
+    
+    // Keep the original pathname (with community prefix) for next param
     const nextParam = next ? this.generateNextParam(next) : this.generateNextParam(pathname);
 
     logger.debug("[AUTH] AuthRedirectService.getRedirectPath", {
       pathname,
+      fullBasePath,
       basePath,
+      communityId,
       authState,
       currentUser: !!currentUser,
       currentUserId: currentUser?.id,
@@ -51,26 +64,38 @@ export class AuthRedirectService {
       nextParam,
     );
     if (redirectFromLogin) {
+      // Add community prefix to redirect path if we have one
+      const finalRedirect = communityId
+        ? addCommunityPrefix(redirectFromLogin, communityId)
+        : redirectFromLogin;
       logger.debug("[AUTH] AuthRedirectService: redirect from handleAuthEntryFlow", {
-        redirectPath: redirectFromLogin,
+        redirectPath: finalRedirect,
       });
-      return redirectFromLogin;
+      return finalRedirect as RawURIComponent;
     }
 
     const redirectFromUserPath = this.handleUserPath(basePath, authState, currentUser, nextParam);
     if (redirectFromUserPath) {
+      // Add community prefix to redirect path if we have one
+      const finalRedirect = communityId
+        ? addCommunityPrefix(redirectFromUserPath, communityId)
+        : redirectFromUserPath;
       logger.debug("[AUTH] AuthRedirectService: redirect from handleUserPath", {
-        redirectPath: redirectFromUserPath,
+        redirectPath: finalRedirect,
       });
-      return redirectFromUserPath;
+      return finalRedirect as RawURIComponent;
     }
 
     const redirectByRole = this.handleRoleRestriction(currentUser, basePath);
     if (redirectByRole) {
+      // Add community prefix to redirect path if we have one
+      const finalRedirect = communityId
+        ? addCommunityPrefix(redirectByRole, communityId)
+        : redirectByRole;
       logger.debug("[AUTH] AuthRedirectService: redirect from handleRoleRestriction", {
-        redirectPath: redirectByRole,
+        redirectPath: finalRedirect,
       });
-      return redirectByRole;
+      return finalRedirect as RawURIComponent;
     }
 
     logger.debug("[AUTH] AuthRedirectService: no redirect needed");

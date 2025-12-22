@@ -50,6 +50,38 @@ export function extractCommunityIdFromPath(pathname: string): CommunityId | null
  * This is for browser-side use only.
  * Priority: URL path > cookie > environment variable > "default"
  */
+/**
+ * Strip the community ID prefix from a pathname.
+ * Returns the path without the community prefix.
+ * e.g., "/neo88/users/me" -> "/users/me"
+ * e.g., "/users/me" -> "/users/me" (no change if no prefix)
+ */
+export function stripCommunityPrefix(pathname: string): string {
+  const communityId = extractCommunityIdFromPath(pathname);
+  if (!communityId) {
+    return pathname;
+  }
+  // Remove the community prefix (e.g., "/neo88/users/me" -> "/users/me")
+  const withoutPrefix = pathname.slice(`/${communityId}`.length);
+  // Ensure the path starts with "/" or return "/" if empty
+  return withoutPrefix || "/";
+}
+
+/**
+ * Add community prefix to a path if not already present.
+ * e.g., "/users/me" with communityId "neo88" -> "/neo88/users/me"
+ * e.g., "/neo88/users/me" with communityId "neo88" -> "/neo88/users/me" (no change)
+ */
+export function addCommunityPrefix(pathname: string, communityId: string): string {
+  const existingCommunityId = extractCommunityIdFromPath(pathname);
+  if (existingCommunityId) {
+    // Already has a community prefix
+    return pathname;
+  }
+  // Add the community prefix
+  return `/${communityId}${pathname === "/" ? "" : pathname}`;
+}
+
 export function getRuntimeCommunityId(): string {
   if (typeof window === "undefined") {
     // Server-side: return env var or default
