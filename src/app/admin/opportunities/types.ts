@@ -1,4 +1,4 @@
-import { GqlOpportunityCategory, GqlPublishStatus } from "@/types/graphql";
+import { GqlOpportunityCategory, GqlPublishStatus, GqlOpportunitySlotHostingStatus } from "@/types/graphql";
 
 export type OpportunityFormData = {
   // 基本情報
@@ -38,6 +38,7 @@ export type SlotData = {
   id?: string;
   startAt: string;
   endAt: string;
+  hostingStatus?: GqlOpportunitySlotHostingStatus;
 };
 
 // 判別可能ユニオン型による画像データ

@@ -1,19 +1,20 @@
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import dayjs from "dayjs";
+import { GqlOpportunitySlotHostingStatus } from "@/types/graphql";
+import { HOSTING_STATUS_LABELS, HOSTING_STATUS_COLORS } from "../constants/slot";
+import { cn } from "@/lib/utils";
+import { SlotData } from "../types";
 
 interface SlotPickerProps {
   index: number;
-  slot: {
-    id?: string;
-    startAt: string;
-    endAt: string;
-  };
+  slot: SlotData;
   onUpdate: (index: number, field: "startAt" | "endAt", value: string) => void;
   onRemove: (index: number) => void;
+  onCancel?: (index: number) => void;
 }
 
-export const SlotPicker = ({ index, slot, onUpdate, onRemove }: SlotPickerProps) => {
+export const SlotPicker = ({ index, slot, onUpdate, onRemove, onCancel }: SlotPickerProps) => {
   if (!slot.startAt || !slot.endAt) {
     return (
       <div className="space-y-3 rounded-xl border p-4 bg-muted/30">
@@ -24,18 +25,49 @@ export const SlotPicker = ({ index, slot, onUpdate, onRemove }: SlotPickerProps)
 
   const { dateLabel, timeRangeLabel } = formatSlotRange(slot.startAt, slot.endAt);
 
+  // アクション判定
+  const canDelete = !slot.id || !slot.hostingStatus;  // DB未登録
+  const canCancel = slot.hostingStatus === GqlOpportunitySlotHostingStatus.Scheduled;
+  const showNoAction = slot.hostingStatus === GqlOpportunitySlotHostingStatus.Cancelled ||
+                       slot.hostingStatus === GqlOpportunitySlotHostingStatus.Completed;
+
   return (
     <div className="space-y-3 rounded-xl border p-4 bg-muted/30">
+      {/* ステータス表示（admin/opportunities スタイル） */}
+      {slot.hostingStatus && (
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <span
+            className={cn(
+              "size-2.5 rounded-full",
+              HOSTING_STATUS_COLORS[slot.hostingStatus]
+            )}
+            aria-label={HOSTING_STATUS_LABELS[slot.hostingStatus]}
+          />
+          <span>{HOSTING_STATUS_LABELS[slot.hostingStatus]}</span>
+        </div>
+      )}
+
       <div className="flex justify-between items-center">
         <div className="flex-1">
           <p className="font-semibold text-sm">{dateLabel}</p>
           <p className="text-sm text-muted-foreground">{timeRangeLabel}</p>
         </div>
 
-        <Button type="button" variant="destructive-text" size="sm" onClick={() => onRemove(index)}>
-          <Trash2 className="h-4 w-4" />
-          削除
-        </Button>
+        {/* 条件付きアクションボタン */}
+        <div className="flex gap-2">
+          {canCancel && onCancel && (
+            <Button type="button" variant="destructive" size="sm" onClick={() => onCancel(index)}>
+              開催中止
+            </Button>
+          )}
+
+          {canDelete && (
+            <Button type="button" variant="destructive-text" size="sm" onClick={() => onRemove(index)}>
+              <Trash2 className="h-4 w-4" />
+              削除
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );
