@@ -87,6 +87,7 @@ export const OpportunityFormEditor = ({
         onAddSlotsBatch={editor.addSlotsBatch}
         onUpdateSlot={editor.updateSlot}
         onRemoveSlot={editor.removeSlot}
+        onCancelSlot={editor.cancelSlot}
         onClose={exitSlotsMode}
       />
     );

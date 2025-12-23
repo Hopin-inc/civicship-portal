@@ -19,6 +19,7 @@ interface EditSlotsPageProps {
   onAddSlotsBatch: (slots: SlotData[]) => void;
   onUpdateSlot: (index: number, field: keyof SlotData, value: string) => void;
   onRemoveSlot: (index: number) => void;
+  onCancelSlot: (index: number) => void;
   onClose: () => void;
 }
 
@@ -50,6 +51,7 @@ export function EditSlotsPage({
   onAddSlotsBatch,
   onUpdateSlot,
   onRemoveSlot,
+  onCancelSlot,
   onClose,
 }: EditSlotsPageProps) {
   const [startAt, setStartAt] = useState("");
@@ -132,6 +134,7 @@ export function EditSlotsPage({
                               slot={slot}
                               onUpdate={onUpdateSlot}
                               onRemove={onRemoveSlot}
+                              onCancel={onCancelSlot}
                             />
                           ))}
                         </div>

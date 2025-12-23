@@ -128,6 +128,30 @@ export const SET_PUBLISH_STATUS = gql`
 `;
 
 // =====================================
+// SET OPPORTUNITY SLOT HOSTING STATUS
+// =====================================
+export const SET_OPPORTUNITY_SLOT_HOSTING_STATUS = gql`
+  mutation SetOpportunitySlotHostingStatus(
+    $id: ID!
+    $input: OpportunitySlotSetHostingStatusInput!
+    $permission: CheckOpportunityPermissionInput!
+  ) {
+    opportunitySlotSetHostingStatus(id: $id, input: $input, permission: $permission) {
+      ... on OpportunitySlotSetHostingStatusSuccess {
+        slot {
+          id
+          startsAt
+          endsAt
+          capacity
+          hostingStatus
+          remainingCapacity
+        }
+      }
+    }
+  }
+`;
+
+// =====================================
 // DELETE OPPORTUNITY
 // =====================================
 export const DELETE_OPPORTUNITY = gql`

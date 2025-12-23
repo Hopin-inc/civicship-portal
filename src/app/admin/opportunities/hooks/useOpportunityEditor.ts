@@ -6,10 +6,13 @@ import dayjs from "dayjs";
 import {
   GqlOpportunityCategory,
   GqlPublishStatus,
+  GqlOpportunitySlotHostingStatus,
   useCreateOpportunityMutation,
   useUpdateOpportunityContentMutation,
   useUpdateOpportunitySlotsBulkMutation,
 } from "@/types/graphql";
+import { useMutation, gql } from "@apollo/client";
+import { SET_OPPORTUNITY_SLOT_HOSTING_STATUS } from "@/graphql/experience/opportunity/mutation";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { OpportunityFormData, SlotData, ImageData, ValidationErrors, isNewImage } from "../types";
 import { useImageManager } from "./useImageManager";
@@ -80,6 +83,7 @@ export const useOpportunityEditor = ({
   const [createOpportunity, createResult] = useCreateOpportunityMutation();
   const [updateContent, updateContentResult] = useUpdateOpportunityContentMutation();
   const [updateSlots, updateSlotsResult] = useUpdateOpportunitySlotsBulkMutation();
+  const [setSlotHostingStatus] = useMutation(SET_OPPORTUNITY_SLOT_HOSTING_STATUS);
 
   const saving = createResult.loading || updateContentResult.loading || updateSlotsResult.loading;
 
@@ -229,6 +233,43 @@ export const useOpportunityEditor = ({
     ]
   );
 
+  // ========== 開催中止処理 ==========
+  const cancelSlot = useCallback(
+    async (index: number) => {
+      const slot = slotManager.slots[index];
+      if (!slot.id) {
+        toast.error("このスロットは開催中止できません");
+        return;
+      }
+
+      try {
+        const result = await setSlotHostingStatus({
+          variables: {
+            id: slot.id,
+            input: {
+              status: GqlOpportunitySlotHostingStatus.Cancelled,
+              startsAt: dayjs(slot.startAt).toISOString(),
+              endsAt: dayjs(slot.endAt).toISOString(),
+              capacity,
+            },
+            permission: {
+              communityId: COMMUNITY_ID,
+              opportunityId: opportunityId!,
+            },
+          },
+        });
+
+        // ローカルステートを更新
+        slotManager.updateSlot(index, "hostingStatus", GqlOpportunitySlotHostingStatus.Cancelled);
+        toast.success("開催を中止しました");
+      } catch (error) {
+        console.error(error);
+        toast.error("開催中止に失敗しました");
+      }
+    },
+    [slotManager, setSlotHostingStatus, capacity, opportunityId]
+  );
+
   return {
     // 基本情報
     category,
@@ -264,6 +305,7 @@ export const useOpportunityEditor = ({
     addSlotsBatch: slotManager.addSlotsBatch,
     updateSlot: slotManager.updateSlot,
     removeSlot: slotManager.removeSlot,
+    cancelSlot,
 
     // 画像（imageManager から）
     images: imageManager.images,
