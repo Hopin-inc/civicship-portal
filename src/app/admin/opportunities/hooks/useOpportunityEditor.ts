@@ -10,9 +10,8 @@ import {
   useCreateOpportunityMutation,
   useUpdateOpportunityContentMutation,
   useUpdateOpportunitySlotsBulkMutation,
+  useSetOpportunitySlotHostingStatusMutation,
 } from "@/types/graphql";
-import { useMutation, gql } from "@apollo/client";
-import { SET_OPPORTUNITY_SLOT_HOSTING_STATUS } from "@/graphql/experience/opportunity/mutation";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { OpportunityFormData, SlotData, ImageData, ValidationErrors, isNewImage } from "../types";
 import { useImageManager } from "./useImageManager";
@@ -83,7 +82,7 @@ export const useOpportunityEditor = ({
   const [createOpportunity, createResult] = useCreateOpportunityMutation();
   const [updateContent, updateContentResult] = useUpdateOpportunityContentMutation();
   const [updateSlots, updateSlotsResult] = useUpdateOpportunitySlotsBulkMutation();
-  const [setSlotHostingStatus] = useMutation(SET_OPPORTUNITY_SLOT_HOSTING_STATUS);
+  const [setSlotHostingStatus] = useSetOpportunitySlotHostingStatusMutation();
 
   const saving = createResult.loading || updateContentResult.loading || updateSlotsResult.loading;
 
