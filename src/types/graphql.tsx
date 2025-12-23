@@ -4425,6 +4425,28 @@ export type GqlSetPublishStatusMutation = {
   } | null;
 };
 
+export type GqlSetOpportunitySlotHostingStatusMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+  input: GqlOpportunitySlotSetHostingStatusInput;
+  permission: GqlCheckOpportunityPermissionInput;
+}>;
+
+export type GqlSetOpportunitySlotHostingStatusMutation = {
+  __typename?: "Mutation";
+  opportunitySlotSetHostingStatus?: {
+    __typename?: "OpportunitySlotSetHostingStatusSuccess";
+    slot: {
+      __typename?: "OpportunitySlot";
+      id: string;
+      startsAt: Date;
+      endsAt: Date;
+      capacity?: number | null;
+      hostingStatus: GqlOpportunitySlotHostingStatus;
+      remainingCapacity?: number | null;
+    };
+  } | null;
+};
+
 export type GqlDeleteOpportunityMutationVariables = Exact<{
   id: Scalars["ID"]["input"];
   permission: GqlCheckCommunityPermissionInput;
@@ -9129,6 +9151,71 @@ export type SetPublishStatusMutationResult = Apollo.MutationResult<GqlSetPublish
 export type SetPublishStatusMutationOptions = Apollo.BaseMutationOptions<
   GqlSetPublishStatusMutation,
   GqlSetPublishStatusMutationVariables
+>;
+export const SetOpportunitySlotHostingStatusDocument = gql`
+  mutation SetOpportunitySlotHostingStatus(
+    $id: ID!
+    $input: OpportunitySlotSetHostingStatusInput!
+    $permission: CheckOpportunityPermissionInput!
+  ) {
+    opportunitySlotSetHostingStatus(id: $id, input: $input, permission: $permission) {
+      ... on OpportunitySlotSetHostingStatusSuccess {
+        slot {
+          id
+          startsAt
+          endsAt
+          capacity
+          hostingStatus
+          remainingCapacity
+        }
+      }
+    }
+  }
+`;
+export type GqlSetOpportunitySlotHostingStatusMutationFn = Apollo.MutationFunction<
+  GqlSetOpportunitySlotHostingStatusMutation,
+  GqlSetOpportunitySlotHostingStatusMutationVariables
+>;
+
+/**
+ * __useSetOpportunitySlotHostingStatusMutation__
+ *
+ * To run a mutation, you first call `useSetOpportunitySlotHostingStatusMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSetOpportunitySlotHostingStatusMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [setOpportunitySlotHostingStatusMutation, { data, loading, error }] = useSetOpportunitySlotHostingStatusMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      input: // value for 'input'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function useSetOpportunitySlotHostingStatusMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlSetOpportunitySlotHostingStatusMutation,
+    GqlSetOpportunitySlotHostingStatusMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    GqlSetOpportunitySlotHostingStatusMutation,
+    GqlSetOpportunitySlotHostingStatusMutationVariables
+  >(SetOpportunitySlotHostingStatusDocument, options);
+}
+export type SetOpportunitySlotHostingStatusMutationHookResult = ReturnType<
+  typeof useSetOpportunitySlotHostingStatusMutation
+>;
+export type SetOpportunitySlotHostingStatusMutationResult =
+  Apollo.MutationResult<GqlSetOpportunitySlotHostingStatusMutation>;
+export type SetOpportunitySlotHostingStatusMutationOptions = Apollo.BaseMutationOptions<
+  GqlSetOpportunitySlotHostingStatusMutation,
+  GqlSetOpportunitySlotHostingStatusMutationVariables
 >;
 export const DeleteOpportunityDocument = gql`
   mutation DeleteOpportunity($id: ID!, $permission: CheckCommunityPermissionInput!) {
