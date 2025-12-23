@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Button } from "@/components/ui/button";
 import {
   Accordion,
   AccordionContent,
@@ -10,7 +9,6 @@ import {
 } from "@/components/ui/accordion";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { SlotData } from "../types";
-import { RecurrenceSheet } from "./RecurrenceSheet";
 import { SlotPicker } from "./SlotPicker";
 import { SingleSlotForm } from "./SingleSlotForm";
 import dayjs from "dayjs";
@@ -54,7 +52,6 @@ export function EditSlotsPage({
   onRemoveSlot,
   onClose,
 }: EditSlotsPageProps) {
-  const [showBatchAdder, setShowBatchAdder] = useState(false);
   const [startAt, setStartAt] = useState("");
   const [endAt, setEndAt] = useState("");
 
@@ -100,12 +97,8 @@ export function EditSlotsPage({
     <div className="min-h-screen bg-background">
       <main className="max-w-md mx-auto">
         <div className="space-y-6 py-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-label-sm text-muted-foreground">開催枠一覧 ({slots.length}件)</h2>
-            <Button size="sm" onClick={() => setShowBatchAdder(true)} className={"w-32"}>
-              一括追加
-            </Button>
-          </div>
+          {/* ヘッダー */}
+          <h2 className="text-label-sm text-muted-foreground">開催枠 {slots.length}件</h2>
 
           {/* スロット一覧（月ごとにグルーピング） */}
           {slots.length > 0 && (
@@ -136,29 +129,18 @@ export function EditSlotsPage({
             </Accordion>
           )}
 
-          {/* さらに追加フォーム */}
+          {/* 開催枠追加フォーム */}
           <SingleSlotForm
             startAt={startAt}
             endAt={endAt}
             onStartAtChange={setStartAt}
             onEndAtChange={setEndAt}
             onAdd={handleAddSingleSlot}
+            onAddSlotsBatch={onAddSlotsBatch}
             variant="ghost"
           />
         </div>
       </main>
-
-      {/* 一括追加シート */}
-      <RecurrenceSheet
-        open={showBatchAdder}
-        onOpenChange={setShowBatchAdder}
-        baseStartAt={startAt || dayjs().add(1, "day").hour(10).minute(0).format("YYYY-MM-DDTHH:mm")}
-        baseEndAt={endAt || dayjs().add(1, "day").hour(12).minute(0).format("YYYY-MM-DDTHH:mm")}
-        onConfirm={(newSlots) => {
-          onAddSlotsBatch(newSlots);
-          setShowBatchAdder(false);
-        }}
-      />
     </div>
   );
 }
