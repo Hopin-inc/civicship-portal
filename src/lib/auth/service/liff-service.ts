@@ -21,13 +21,15 @@ export type LiffState = {
 };
 
 export class LiffService {
-  private static instance: LiffService;
+  private static instances: Map<string, LiffService> = new Map();
   private liffId: string;
+  private communityId: string;
   private state: LiffState;
   private initializationPromise: Promise<boolean> | null = null;
 
-  private constructor(liffId: string) {
+  private constructor(liffId: string, communityId: string) {
     this.liffId = liffId;
+    this.communityId = communityId;
     this.state = {
       isInitialized: false,
       isLoggedIn: false,
@@ -48,14 +50,27 @@ export class LiffService {
     return `${baseUrl}?next=${encodedNext}`;
   }
 
-  public static getInstance(liffId?: string): LiffService {
-    if (!LiffService.instance) {
-      if (!liffId) {
-        throw new Error("LIFF ID is required for the first initialization");
-      }
-      LiffService.instance = new LiffService(liffId);
+  public static getInstance(liffId?: string, communityId?: string): LiffService {
+    const effectiveCommunityId = communityId || "default";
+    
+    // If we have an existing instance for this community, return it
+    const existingInstance = LiffService.instances.get(effectiveCommunityId);
+    if (existingInstance) {
+      return existingInstance;
     }
-    return LiffService.instance;
+    
+    // Create new instance if liffId is provided
+    if (!liffId) {
+      throw new Error("LIFF ID is required for the first initialization");
+    }
+    
+    const newInstance = new LiffService(liffId, effectiveCommunityId);
+    LiffService.instances.set(effectiveCommunityId, newInstance);
+    return newInstance;
+  }
+  
+  public getCommunityId(): string {
+    return this.communityId;
   }
 
   public async initialize(): Promise<boolean> {
@@ -193,7 +208,8 @@ export class LiffService {
     const accessToken = this.getAccessToken();
     if (!accessToken) return false;
 
-    const communityId = process.env.NEXT_PUBLIC_COMMUNITY_ID;
+    // Use the instance's communityId (set at construction time from CommunityConfigContext)
+    const communityId = this.communityId;
     const endpoint = `${process.env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT}/line/liff-login`;
     const authStateManager = AuthStateManager.getInstance();
 
@@ -204,7 +220,7 @@ export class LiffService {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-Community-Id": communityId ?? "",
+            "X-Community-Id": communityId,
           },
           body: JSON.stringify({ accessToken }),
         });
