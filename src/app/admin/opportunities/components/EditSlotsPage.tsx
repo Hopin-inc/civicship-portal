@@ -73,7 +73,7 @@ export function EditSlotsPage({
   // 月キーを降順（新しい月が先）にソート
   const sortedMonthKeys = useMemo(
     () => Object.keys(groupedSlots).sort((a, b) => b.localeCompare(a)),
-    [groupedSlots]
+    [groupedSlots],
   );
 
   // 直近月（デフォルトで開く月）
@@ -97,38 +97,6 @@ export function EditSlotsPage({
     <div className="min-h-screen bg-background">
       <main className="max-w-md mx-auto">
         <div className="space-y-6 py-4">
-          {/* ヘッダー */}
-          <h2 className="text-label-sm text-muted-foreground">開催枠 {slots.length}件</h2>
-
-          {/* スロット一覧（月ごとにグルーピング） */}
-          {slots.length > 0 && (
-            <Accordion type="multiple" defaultValue={latestMonth ? [latestMonth] : []}>
-              {sortedMonthKeys.map((monthKey) => {
-                const monthSlots = groupedSlots[monthKey];
-                return (
-                  <AccordionItem key={monthKey} value={monthKey}>
-                    <AccordionTrigger>
-                      {formatMonthHeader(monthKey, monthSlots.length)}
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <div className="space-y-3">
-                        {monthSlots.map(({ slot, index }) => (
-                          <SlotPicker
-                            key={index}
-                            index={index}
-                            slot={slot}
-                            onUpdate={onUpdateSlot}
-                            onRemove={onRemoveSlot}
-                          />
-                        ))}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                );
-              })}
-            </Accordion>
-          )}
-
           {/* 開催枠追加フォーム */}
           <SingleSlotForm
             startAt={startAt}
@@ -139,6 +107,41 @@ export function EditSlotsPage({
             onAddSlotsBatch={onAddSlotsBatch}
             variant="ghost"
           />
+
+          {/* 開催枠ブロック */}
+          <div>
+            <h2 className="text-label-sm text-muted-foreground">開催枠 {slots.length}件</h2>
+
+            {slots.length > 0 && (
+              <Accordion type="multiple" defaultValue={latestMonth ? [latestMonth] : []}>
+                {sortedMonthKeys.map((monthKey) => {
+                  const monthSlots = groupedSlots[monthKey];
+
+                  return (
+                    <AccordionItem key={monthKey} value={monthKey}>
+                      <AccordionTrigger>
+                        {formatMonthHeader(monthKey, monthSlots.length)}
+                      </AccordionTrigger>
+
+                      <AccordionContent>
+                        <div className="space-y-3">
+                          {monthSlots.map(({ slot, index }) => (
+                            <SlotPicker
+                              key={index}
+                              index={index}
+                              slot={slot}
+                              onUpdate={onUpdateSlot}
+                              onRemove={onRemoveSlot}
+                            />
+                          ))}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  );
+                })}
+              </Accordion>
+            )}
+          </div>
         </div>
       </main>
     </div>
