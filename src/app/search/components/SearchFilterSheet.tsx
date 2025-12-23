@@ -94,7 +94,7 @@ const SearchFilterSheets: React.FC<FilterSheetsProps> = ({
         <SheetTitle>日付を選択</SheetTitle>
       </SheetHeader>
       <div className="flex-1 overflow-auto pb-24">
-        <div className="-mx-6 px-4">
+        <div className="-mx-6 px-4 flex justify-center">
           <Calendar
             mode="range"
             selected={dateRange}
@@ -156,7 +156,8 @@ const SearchFilterSheets: React.FC<FilterSheetsProps> = ({
                 チケット利用可
               </Label>
               <p className="text-muted-foreground text-sm mt-1 leading-tight">
-                主催者からもらったチケットを使って、<br />
+                主催者からもらったチケットを使って、
+                <br />
                 無料で参加することができます。
               </p>
             </div>
@@ -170,8 +171,9 @@ const SearchFilterSheets: React.FC<FilterSheetsProps> = ({
                 ポイント利用可
               </Label>
               <p className="text-muted-foreground text-sm mt-1 leading-tight">
-              お手伝いでもらったポイントを使って、<br />
-              無料で参加することができます。
+                お手伝いでもらったポイントを使って、
+                <br />
+                無料で参加することができます。
               </p>
             </div>
           </div>

@@ -14,7 +14,7 @@ export function PortfoliosPage() {
   const [input, setInput] = useState<string>("");
 
   return (
-    <div className="py-6 px-6">
+    <div className="py-6">
       <PortfolioTabs activeTab={activeTab} setActiveTab={setActiveTab} />
       <div className="mt-4">
         <SearchForm

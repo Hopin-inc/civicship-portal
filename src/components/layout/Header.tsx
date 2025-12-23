@@ -26,7 +26,9 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
   const router = useRouter();
 
   const handleBackButton = () => {
-    if (config?.backTo) {
+    if (config?.onBackClick) {
+      config.onBackClick();
+    } else if (config?.backTo) {
       router.push(config.backTo);
     } else if (pathname === "/search/result") {
       // When on search results page, preserve all search parameters when going back to search page
