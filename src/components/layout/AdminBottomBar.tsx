@@ -1,12 +1,13 @@
 "use client";
 
-import Link from "next/link";
 import { Book, ClipboardList, Settings, Ticket } from "lucide-react";
 import { usePathname } from "next/navigation";
 import React from "react";
 import { cn } from "@/lib/utils";
 import { matchPaths } from "@/utils/path";
-import { currentCommunityConfig } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
+import { stripCommunityPrefix } from "@/lib/communities/communityIds";
+import { CommunityLink } from "@/components/navigation/CommunityLink";
 import { useTranslations } from "next-intl";
 
 interface AdminBottomBarProps {
@@ -16,21 +17,27 @@ interface AdminBottomBarProps {
 const AdminBottomBar: React.FC<AdminBottomBarProps> = ({ className }) => {
   const t = useTranslations();
   const pathname = usePathname();
-  const enabledFeatures = currentCommunityConfig.enableFeatures;
+  const communityConfig = useCommunityConfig();
+  
+  // Strip community prefix from pathname for path matching
+  const basePath = stripCommunityPrefix(pathname);
+  
+  // Use runtime config from CommunityConfigContext
+  const enabledFeatures = communityConfig?.enableFeatures ?? [];
 
   if (
-    !pathname.startsWith("/admin") ||
-    pathname.startsWith("/admin/reservations/") ||
-    pathname.startsWith("/admin/credentials/") ||
-    pathname.startsWith("/admin/tickets/") ||
-    pathname.startsWith("/admin/members") ||
-    pathname.startsWith("/admin/wallet/")
+    !basePath.startsWith("/admin") ||
+    basePath.startsWith("/admin/reservations/") ||
+    basePath.startsWith("/admin/credentials/") ||
+    basePath.startsWith("/admin/tickets/") ||
+    basePath.startsWith("/admin/members") ||
+    basePath.startsWith("/admin/wallet/")
   ) {
     return null;
   }
 
   const getLinkStyle = (...paths: string[]) => {
-    const isActive = matchPaths(pathname, ...paths);
+    const isActive = matchPaths(basePath, ...paths);
     return `flex flex-col items-center ${isActive ? "text-primary" : "text-muted-foreground"} hover:text-primary`;
   };
 
@@ -39,7 +46,7 @@ const AdminBottomBar: React.FC<AdminBottomBarProps> = ({ className }) => {
       <div className="max-w-screen-xl mx-auto px-4">
         <div className="flex justify-around items-center">
           {enabledFeatures.includes("opportunities") && (
-            <Link
+            <CommunityLink
               href="/admin/reservations"
               className={cn(
                 getLinkStyle("/admin/reservations", "/admin/reservations/*"),
@@ -48,19 +55,19 @@ const AdminBottomBar: React.FC<AdminBottomBarProps> = ({ className }) => {
             >
               <Book size={24} />
               <span className="text-xs mt-1">{t("navigation.adminBottomBar.reservations")}</span>
-            </Link>
+            </CommunityLink>
           )}
           {enabledFeatures.includes("tickets") && (
-            <Link
+            <CommunityLink
               href="/admin/tickets"
               className={cn(getLinkStyle("/admin/tickets", "/admin/tickets/*"), "flex-grow")}
             >
               <Ticket size={24} />
               <span className="text-xs mt-1">{t("navigation.adminBottomBar.tickets")}</span>
-            </Link>
+            </CommunityLink>
           )}
           {enabledFeatures.includes("credentials") && (
-            <Link
+            <CommunityLink
               href="/admin/credentials"
               className={cn(
                 getLinkStyle("/admin/credentials", "/admin/credentials/*"),
@@ -69,15 +76,15 @@ const AdminBottomBar: React.FC<AdminBottomBarProps> = ({ className }) => {
             >
               <ClipboardList size={24} />
               <span className="text-xs mt-1">{t("navigation.adminBottomBar.credentials")}</span>
-            </Link>
+            </CommunityLink>
           )}
-          <Link
+          <CommunityLink
             href="/admin"
             className={cn(getLinkStyle("/admin", "/admin/*"), "flex-grow")}
           >
             <Settings size={24} />
             <span className="text-xs mt-1">{t("navigation.adminBottomBar.settings")}</span>
-          </Link>
+          </CommunityLink>
         </div>
       </div>
     </nav>

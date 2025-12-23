@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { Globe, Home, Search, User } from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
 import React from "react";
@@ -8,7 +7,9 @@ import { cn } from "@/lib/utils";
 import { matchPaths } from "@/utils/path";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
 import { useAuthEnvironment } from "@/hooks/useAuthEnvironment";
-import { currentCommunityConfig } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
+import { stripCommunityPrefix } from "@/lib/communities/communityIds";
+import { CommunityLink } from "@/components/navigation/CommunityLink";
 import { useTranslations } from "next-intl";
 
 interface HeaderProps {
@@ -22,36 +23,42 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
   const placeId = searchParams.get("placeId");
 
   const { isLiffClient } = useAuthEnvironment();
+  const communityConfig = useCommunityConfig();
 
   const { isVisible } = useScrollDirection({ threshold: 20 });
 
-  const hasOppOrQuest =
-    currentCommunityConfig.enableFeatures.includes("opportunities") ||
-    currentCommunityConfig.enableFeatures.includes("quests");
+  // Strip community prefix from pathname for path matching
+  const basePath = stripCommunityPrefix(pathname);
 
-  if (currentCommunityConfig.enableFeatures.length < 2) {
+  // Use runtime config from CommunityConfigContext
+  const enableFeatures = communityConfig?.enableFeatures ?? [];
+  const hasOppOrQuest =
+    enableFeatures.includes("opportunities") ||
+    enableFeatures.includes("quests");
+
+  if (enableFeatures.length < 2) {
     return null;
   }
 
   if (
-    pathname.startsWith("/admin") ||
-    (pathname.startsWith("/reservation") && !pathname.includes("/complete")) ||
-    pathname.startsWith("/activities/") ||
-    pathname.startsWith("/quests/") ||
-    pathname.startsWith("/participations/") ||
-    pathname.startsWith("/sign-up") ||
-    pathname === "/users/me/edit" ||
-    (pathname.startsWith("/places") && placeId) ||
-    pathname.startsWith("/search") ||
-    pathname.startsWith("/wallets") ||
-    pathname.startsWith("/credentials") ||
-    pathname.startsWith("/transactions")
+    basePath.startsWith("/admin") ||
+    (basePath.startsWith("/reservation") && !basePath.includes("/complete")) ||
+    basePath.startsWith("/activities/") ||
+    basePath.startsWith("/quests/") ||
+    basePath.startsWith("/participations/") ||
+    basePath.startsWith("/sign-up") ||
+    basePath === "/users/me/edit" ||
+    (basePath.startsWith("/places") && placeId) ||
+    basePath.startsWith("/search") ||
+    basePath.startsWith("/wallets") ||
+    basePath.startsWith("/credentials") ||
+    basePath.startsWith("/transactions")
   ) {
     return null;
   }
 
   const getLinkStyle = (...paths: string[]) => {
-    const isActive = matchPaths(pathname, ...paths);
+    const isActive = matchPaths(basePath, ...paths);
     return `flex flex-col items-center ${isActive ? "text-primary" : "text-muted-foreground"} hover:text-primary`;
   };
 
@@ -67,7 +74,7 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
       <div className="max-w-screen-xl mx-auto px-4">
         <div className="flex justify-around items-center">
           {hasOppOrQuest ? (
-            <Link
+            <CommunityLink
               href="/opportunities"
               className={cn(
                 getLinkStyle("/opportunities", "/opportunities/*", "opportunities/search/*"),
@@ -76,29 +83,29 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
             >
               <Search size={24} />
               <span className="text-xs mt-1">{t("navigation.bottomBar.discover")}</span>
-            </Link>
+            </CommunityLink>
           ) : (
-            <Link
+            <CommunityLink
               href="/transactions"
               className={cn(getLinkStyle("/transactions", "/transactions/*"), "flex-grow")}
             >
               <Home size={24} />
               <span className="text-xs mt-1">{t("navigation.bottomBar.timeline")}</span>
-            </Link>
+            </CommunityLink>
           )}
-          {currentCommunityConfig.enableFeatures.includes("places") && (
-            <Link href="/places" className={cn(getLinkStyle("/places", "/places/*"), "flex-grow")}>
+          {enableFeatures.includes("places") && (
+            <CommunityLink href="/places" className={cn(getLinkStyle("/places", "/places/*"), "flex-grow")}>
               <Globe size={24} />
               <span className="text-xs mt-1">{t("navigation.bottomBar.places")}</span>
-            </Link>
+            </CommunityLink>
           )}
-          <Link
+          <CommunityLink
             href="/users/me"
             className={cn(getLinkStyle("/users/me", "/users/me/*"), "flex-grow")}
           >
             <User size={24} />
             <span className="text-xs mt-1">{t("navigation.bottomBar.myPage")}</span>
-          </Link>
+          </CommunityLink>
         </div>
       </div>
     </nav>
