@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/accordion";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { SlotData } from "../types";
-import { SlotBatchAdder } from "./SlotBatchAdder";
+import { RecurrenceSheet } from "./RecurrenceSheet";
 import { SlotPicker } from "./SlotPicker";
 import { SingleSlotForm } from "./SingleSlotForm";
 import dayjs from "dayjs";
@@ -143,30 +143,22 @@ export function EditSlotsPage({
             onStartAtChange={setStartAt}
             onEndAtChange={setEndAt}
             onAdd={handleAddSingleSlot}
-            variant="secondary"
+            variant="ghost"
           />
         </div>
       </main>
 
-      {/* 一括追加モーダル */}
-      {showBatchAdder && (
-        <div className="fixed inset-0 bg-black/50 z-20 flex items-end">
-          <div className="bg-background rounded-t-3xl max-w-md mx-auto w-full p-6 max-h-[80vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-title-sm font-bold">一括追加</h3>
-              <Button variant="text" size="sm" onClick={() => setShowBatchAdder(false)}>
-                閉じる
-              </Button>
-            </div>
-            <SlotBatchAdder
-              onAddSlots={(newSlots) => {
-                onAddSlotsBatch(newSlots);
-                setShowBatchAdder(false);
-              }}
-            />
-          </div>
-        </div>
-      )}
+      {/* 一括追加シート */}
+      <RecurrenceSheet
+        open={showBatchAdder}
+        onOpenChange={setShowBatchAdder}
+        baseStartAt={startAt || dayjs().add(1, "day").hour(10).minute(0).format("YYYY-MM-DDTHH:mm")}
+        baseEndAt={endAt || dayjs().add(1, "day").hour(12).minute(0).format("YYYY-MM-DDTHH:mm")}
+        onConfirm={(newSlots) => {
+          onAddSlotsBatch(newSlots);
+          setShowBatchAdder(false);
+        }}
+      />
     </div>
   );
 }
