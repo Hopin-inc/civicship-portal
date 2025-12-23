@@ -13,37 +13,15 @@ import { SlotPicker } from "./SlotPicker";
 import { SingleSlotForm } from "./SingleSlotForm";
 import dayjs from "dayjs";
 import { toast } from "react-toastify";
+import { groupSlotsByMonth, formatMonthHeader } from "../utils/slotGrouping";
 
 interface EditSlotsPageProps {
   slots: SlotData[];
   onAddSlotsBatch: (slots: SlotData[]) => void;
-  onUpdateSlot: (index: number, field: keyof SlotData, value: string) => void;
+  onUpdateSlot: <K extends keyof SlotData>(index: number, field: K, value: SlotData[K]) => void;
   onRemoveSlot: (index: number) => void;
   onCancelSlot: (index: number) => void;
   onClose: () => void;
-}
-
-// 月ごとにスロットをグルーピング
-type GroupedSlots = Record<string, Array<{ slot: SlotData; index: number }>>;
-
-function groupSlotsByMonth(slots: SlotData[]): GroupedSlots {
-  const grouped: GroupedSlots = {};
-
-  slots.forEach((slot, index) => {
-    const monthKey = dayjs(slot.startAt).format("YYYY-MM");
-    if (!grouped[monthKey]) {
-      grouped[monthKey] = [];
-    }
-    grouped[monthKey].push({ slot, index });
-  });
-
-  return grouped;
-}
-
-// 月キーを表示用フォーマットに変換
-function formatMonthHeader(monthKey: string, count: number): string {
-  const [year, month] = monthKey.split("-");
-  return `${year}年${parseInt(month)}月（${count}件）`;
 }
 
 export function EditSlotsPage({

@@ -1,11 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
-import dayjs from "dayjs";
-import { GqlOpportunitySlotHostingStatus } from "@/types/graphql";
 import { HOSTING_STATUS_LABELS, HOSTING_STATUS_COLORS } from "../constants/slot";
 import { cn } from "@/lib/utils";
 import { SlotData } from "../types";
 import { canDeleteSlot, canCancelSlot } from "../utils/slotPermissions";
+import { formatSlotRange } from "../utils/dateFormat";
 
 interface SlotPickerProps {
   index: number;
@@ -71,29 +70,3 @@ export const SlotPicker = ({ index, slot, onUpdate, onRemove, onCancel }: SlotPi
     </div>
   );
 };
-
-function formatSlotRange(startAt: string, endAt: string) {
-  const start = dayjs(startAt);
-  const end = dayjs(endAt);
-
-  const diffDays = end.startOf("day").diff(start.startOf("day"), "day");
-
-  const startText = start.format("YYYY年M月D日(dd)");
-  const startTime = start.format("HH:mm");
-  const endTime = end.format("HH:mm");
-
-  let endLabel = endTime;
-
-  if (diffDays === 1) {
-    endLabel = `翌日 ${endTime}`;
-  } else if (diffDays === 2) {
-    endLabel = `翌々日 ${endTime}`;
-  } else if (diffDays >= 3) {
-    endLabel = `${diffDays}日後 ${endTime}`;
-  }
-
-  return {
-    dateLabel: startText,
-    timeRangeLabel: `${startTime} 〜 ${endLabel}`,
-  };
-}

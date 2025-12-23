@@ -13,6 +13,35 @@ export function convertSlotToISO(slot: { startAt: string; endAt: string }) {
 }
 
 /**
+ * スロットの日時範囲を表示用にフォーマット
+ */
+export function formatSlotRange(startAt: string, endAt: string) {
+  const start = dayjs(startAt);
+  const end = dayjs(endAt);
+
+  const diffDays = end.startOf("day").diff(start.startOf("day"), "day");
+
+  const startText = start.format("YYYY年M月D日(dd)");
+  const startTime = start.format("HH:mm");
+  const endTime = end.format("HH:mm");
+
+  let endLabel = endTime;
+
+  if (diffDays === 1) {
+    endLabel = `翌日 ${endTime}`;
+  } else if (diffDays === 2) {
+    endLabel = `翌々日 ${endTime}`;
+  } else if (diffDays >= 3) {
+    endLabel = `${diffDays}日後 ${endTime}`;
+  }
+
+  return {
+    dateLabel: startText,
+    timeRangeLabel: `${startTime} 〜 ${endLabel}`,
+  };
+}
+
+/**
  * ISO文字列 → YYYY-MM-DD HH:mm
  */
 export function formatISODateTime(iso: string | null | undefined): string {
