@@ -7,6 +7,7 @@ import { GqlOpportunityCategory, useGetOpportunityQuery } from "@/types/graphql"
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { DEFAULT_CAPACITY } from "../../constants/opportunity";
 import { OpportunityFormEditor } from "../../components/OpportunityFormEditor";
 
 export default function EditOpportunityPage() {
@@ -33,7 +34,7 @@ export default function EditOpportunityPage() {
 
     // 先に capacity を取得（slots mapping 前）
     const firstSlot = (opp.slots || []).find((slot) => slot != null);
-    const capacity = firstSlot?.capacity || 10;
+    const capacity = firstSlot?.capacity || DEFAULT_CAPACITY;
 
     // slots の型安全な処理
     const slots = (opp.slots || [])

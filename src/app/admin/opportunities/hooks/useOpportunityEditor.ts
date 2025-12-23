@@ -6,16 +6,17 @@ import dayjs from "dayjs";
 import {
   GqlOpportunityCategory,
   GqlPublishStatus,
-  GqlOpportunitySlotHostingStatus,
   useCreateOpportunityMutation,
   useUpdateOpportunityContentMutation,
   useUpdateOpportunitySlotsBulkMutation,
-  useSetOpportunitySlotHostingStatusMutation,
 } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { OpportunityFormData, SlotData, ImageData, ValidationErrors, isNewImage } from "../types";
+import { DEFAULT_CAPACITY, MIN_IMAGES, MAX_IMAGES } from "../constants/opportunity";
+import { convertSlotToISO } from "../utils/dateFormat";
 import { useImageManager } from "./useImageManager";
 import { useSlotManager } from "./useSlotManager";
+import { useSlotActions } from "./useSlotActions";
 import { useOpportunityValidation } from "./useOpportunityValidation";
 import { useValidatedState } from "./useValidatedState";
 
@@ -68,7 +69,7 @@ export const useOpportunityEditor = ({
   );
 
   // 募集条件
-  const [capacity, setCapacity] = useState(initialData?.capacity ?? 10);
+  const [capacity, setCapacity] = useState(initialData?.capacity ?? DEFAULT_CAPACITY);
   const [feeRequired, setFeeRequired] = useState(initialData?.feeRequired ?? 0);
   const [pointsRequired, setPointsRequired] = useState(initialData?.pointsRequired ?? 0);
   const [pointsToEarn, setPointsToEarn] = useState(initialData?.pointsToEarn ?? 0);
@@ -82,7 +83,13 @@ export const useOpportunityEditor = ({
   const [createOpportunity, createResult] = useCreateOpportunityMutation();
   const [updateContent, updateContentResult] = useUpdateOpportunityContentMutation();
   const [updateSlots, updateSlotsResult] = useUpdateOpportunitySlotsBulkMutation();
-  const [setSlotHostingStatus] = useSetOpportunitySlotHostingStatusMutation();
+
+  // ========== スロットアクション ==========
+  const slotActions = useSlotActions({
+    opportunityId,
+    capacity,
+    onSlotUpdate: slotManager.updateSlot,
+  });
 
   const saving = createResult.loading || updateContentResult.loading || updateSlotsResult.loading;
 
@@ -97,12 +104,12 @@ export const useOpportunityEditor = ({
       }
 
       // Tier 2: ドメイン制約のバリデーション
-      if (imageManager.images.length < 2) {
-        toast.error("最低2枚の画像を登録してください");
+      if (imageManager.images.length < MIN_IMAGES) {
+        toast.error(`最低${MIN_IMAGES}枚の画像を登録してください`);
         return;
       }
-      if (imageManager.images.length > 5) {
-        toast.error("画像は最大5枚までです");
+      if (imageManager.images.length > MAX_IMAGES) {
+        toast.error(`画像は最大${MAX_IMAGES}枚までです`);
         return;
       }
       if (slotManager.slots.some((slot) => !slot.startAt || !slot.endAt)) {
@@ -113,8 +120,7 @@ export const useOpportunityEditor = ({
       try {
       // スロット変換
       const slotsInput = slotManager.slots.map((slot) => ({
-        startsAt: dayjs(slot.startAt).toISOString(),
-        endsAt: dayjs(slot.endAt).toISOString(),
+        ...convertSlotToISO(slot),
         capacity,
         ...(slot.id ? { id: slot.id } : {}),
       }));
@@ -236,37 +242,9 @@ export const useOpportunityEditor = ({
   const cancelSlot = useCallback(
     async (index: number) => {
       const slot = slotManager.slots[index];
-      if (!slot.id) {
-        toast.error("このスロットは開催中止できません");
-        return;
-      }
-
-      try {
-        const result = await setSlotHostingStatus({
-          variables: {
-            id: slot.id,
-            input: {
-              status: GqlOpportunitySlotHostingStatus.Cancelled,
-              startsAt: dayjs(slot.startAt).toISOString(),
-              endsAt: dayjs(slot.endAt).toISOString(),
-              capacity,
-            },
-            permission: {
-              communityId: COMMUNITY_ID,
-              opportunityId: opportunityId!,
-            },
-          },
-        });
-
-        // ローカルステートを更新
-        slotManager.updateSlot(index, "hostingStatus", GqlOpportunitySlotHostingStatus.Cancelled);
-        toast.success("開催を中止しました");
-      } catch (error) {
-        console.error(error);
-        toast.error("開催中止に失敗しました");
-      }
+      await slotActions.cancelSlot(index, slot);
     },
-    [slotManager, setSlotHostingStatus, capacity, opportunityId]
+    [slotManager.slots, slotActions]
   );
 
   return {

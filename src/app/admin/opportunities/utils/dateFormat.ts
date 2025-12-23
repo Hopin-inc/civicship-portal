@@ -1,5 +1,17 @@
 // src/app/admin/opportunities/utils/dateFormat.ts
 
+import dayjs from "dayjs";
+
+/**
+ * スロットの日時をISO形式に変換
+ */
+export function convertSlotToISO(slot: { startAt: string; endAt: string }) {
+  return {
+    startsAt: dayjs(slot.startAt).toISOString(),
+    endsAt: dayjs(slot.endAt).toISOString(),
+  };
+}
+
 /**
  * ISO文字列 → YYYY-MM-DD HH:mm
  */

@@ -5,6 +5,7 @@ import { GqlOpportunitySlotHostingStatus } from "@/types/graphql";
 import { HOSTING_STATUS_LABELS, HOSTING_STATUS_COLORS } from "../constants/slot";
 import { cn } from "@/lib/utils";
 import { SlotData } from "../types";
+import { canDeleteSlot, canCancelSlot } from "../utils/slotPermissions";
 
 interface SlotPickerProps {
   index: number;
@@ -26,10 +27,8 @@ export const SlotPicker = ({ index, slot, onUpdate, onRemove, onCancel }: SlotPi
   const { dateLabel, timeRangeLabel } = formatSlotRange(slot.startAt, slot.endAt);
 
   // アクション判定
-  const canDelete = !slot.id || !slot.hostingStatus;  // DB未登録
-  const canCancel = slot.hostingStatus === GqlOpportunitySlotHostingStatus.Scheduled;
-  const showNoAction = slot.hostingStatus === GqlOpportunitySlotHostingStatus.Cancelled ||
-                       slot.hostingStatus === GqlOpportunitySlotHostingStatus.Completed;
+  const canDelete = canDeleteSlot(slot);
+  const canCancel = canCancelSlot(slot);
 
   return (
     <div className="space-y-3 rounded-xl border p-4 bg-muted/30">

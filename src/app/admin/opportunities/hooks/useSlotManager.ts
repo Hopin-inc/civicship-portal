@@ -12,7 +12,11 @@ export function useSlotManager(initialSlots: SlotData[] = []) {
     setSlots((prev) => [...prev, ...newSlots]);
   };
 
-  const updateSlot = (index: number, field: keyof SlotData, value: any) => {
+  const updateSlot = <K extends keyof SlotData>(
+    index: number,
+    field: K,
+    value: SlotData[K]
+  ) => {
     setSlots((prev) => prev.map((slot, i) => (i === index ? { ...slot, [field]: value } : slot)));
   };
 
