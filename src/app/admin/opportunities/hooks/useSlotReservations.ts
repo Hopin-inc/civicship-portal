@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import { GET_SLOT_RESERVATIONS } from "../graphql/slotReservations";
+import { GET_SLOT_RESERVATIONS } from "@/graphql/experience/opportunitySlot/query";
 
 /**
  * スロットの予約情報を取得するフック

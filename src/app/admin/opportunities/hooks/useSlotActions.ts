@@ -7,7 +7,7 @@ import {
 } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { SlotData } from "../types";
-import { convertSlotToISO } from "../utils/dateFormat";
+import { convertSlotToDates } from "../utils/dateFormat";
 
 interface UseSlotActionsOptions {
   opportunityId?: string;
@@ -46,7 +46,7 @@ export const useSlotActions = ({
             id: slot.id,
             input: {
               status: GqlOpportunitySlotHostingStatus.Cancelled,
-              ...convertSlotToISO(slot),
+              ...convertSlotToDates(slot),
               capacity,
               // TODO: バックエンドがcancellationMessageをサポートしたら有効化
               // cancellationMessage: message,

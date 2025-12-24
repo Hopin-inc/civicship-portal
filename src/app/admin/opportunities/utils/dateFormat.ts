@@ -3,12 +3,12 @@
 import dayjs from "dayjs";
 
 /**
- * スロットの日時をISO形式に変換
+ * スロットの日時をDate型に変換（GraphQL mutation用）
  */
-export function convertSlotToISO(slot: { startAt: string; endAt: string }) {
+export function convertSlotToDates(slot: { startAt: string; endAt: string }) {
   return {
-    startsAt: dayjs(slot.startAt).toISOString(),
-    endsAt: dayjs(slot.endAt).toISOString(),
+    startsAt: dayjs(slot.startAt).toDate(),
+    endsAt: dayjs(slot.endAt).toDate(),
   };
 }
 

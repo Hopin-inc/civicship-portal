@@ -13,7 +13,7 @@ import {
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { OpportunityFormData, SlotData, ImageData, ValidationErrors, isNewImage } from "../types";
 import { DEFAULT_CAPACITY, MIN_IMAGES, MAX_IMAGES } from "../constants/opportunity";
-import { convertSlotToISO } from "../utils/dateFormat";
+import { convertSlotToDates } from "../utils/dateFormat";
 import { useImageManager } from "./useImageManager";
 import { useSlotManager } from "./useSlotManager";
 import { useSlotActions } from "./useSlotActions";
@@ -76,7 +76,7 @@ export const useOpportunityEditor = ({
 
   // 公開設定
   const [publishStatus, setPublishStatus] = useState<GqlPublishStatus>(
-    initialData?.publishStatus ?? GqlPublishStatus.Published
+    initialData?.publishStatus ?? GqlPublishStatus.Public
   );
 
   // ========== GraphQL Mutations ==========
@@ -120,7 +120,7 @@ export const useOpportunityEditor = ({
       try {
       // スロット変換
       const slotsInput = slotManager.slots.map((slot) => ({
-        ...convertSlotToISO(slot),
+        ...convertSlotToDates(slot),
         capacity,
         ...(slot.id ? { id: slot.id } : {}),
       }));
