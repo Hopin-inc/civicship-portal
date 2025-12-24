@@ -1,14 +1,15 @@
 import { useState, useEffect, ChangeEvent } from "react";
 import { toast } from "react-toastify";
 import { ImageData, isNewImage } from "../../../types";
+import { MAX_IMAGES } from "../../../constants/opportunity";
 
 export function useImageManager(initialImages: ImageData[] = []) {
   const [images, setImages] = useState<ImageData[]>(initialImages);
 
   const handleImageSelect = (e: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
-    if (images.length + files.length > 5) {
-      toast.error("画像は最大5枚までです");
+    if (images.length + files.length > MAX_IMAGES) {
+      toast.error(`画像は最大${MAX_IMAGES}枚までです`);
       return;
     }
 

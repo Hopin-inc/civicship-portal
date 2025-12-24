@@ -37,9 +37,9 @@ export const DEFAULT_CAPACITY = 10;
 /**
  * 画像の最小枚数
  */
-export const MIN_IMAGES = 2;
+export const MIN_IMAGES = 0;
 
 /**
  * 画像の最大枚数
  */
-export const MAX_IMAGES = 5;
+export const MAX_IMAGES = 10;

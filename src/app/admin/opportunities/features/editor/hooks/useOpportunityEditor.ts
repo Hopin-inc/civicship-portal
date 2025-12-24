@@ -104,7 +104,7 @@ export const useOpportunityEditor = ({
       }
 
       // Tier 2: ドメイン制約のバリデーション
-      if (imageManager.images.length < MIN_IMAGES) {
+      if (MIN_IMAGES > 0 && imageManager.images.length < MIN_IMAGES) {
         toast.error(`最低${MIN_IMAGES}枚の画像を登録してください`);
         return;
       }
