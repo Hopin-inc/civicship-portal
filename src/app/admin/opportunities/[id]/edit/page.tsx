@@ -90,7 +90,7 @@ export default function EditOpportunityPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <main className="px-6 py-6 pb-24 max-w-md mx-auto">
+      <main className="px-6 max-w-md mx-auto">
         <OpportunityFormEditor
           mode="update"
           opportunityId={opportunityId}
