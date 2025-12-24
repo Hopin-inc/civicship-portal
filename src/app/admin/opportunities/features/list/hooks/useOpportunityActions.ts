@@ -98,7 +98,7 @@ export function useOpportunityActions(refetch?: () => void): UseOpportunityActio
         await deleteOpportunity({
           variables: {
             id: opportunityId,
-            permission: { communityId: COMMUNITY_ID },
+            permission: { communityId: COMMUNITY_ID, opportunityId },
           },
         });
         toast.success("下書きを削除しました");

@@ -6,7 +6,7 @@ import { GqlMembershipStatus, GqlRole, useGetMembershipListQuery } from "@/types
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { ItemContent } from "@/components/ui/item";
 import { PLACEHOLDER_IMAGE } from "@/utils";
-import { SelectorSheet } from "../../shared/components/SelectorSheet";
+import { SelectorSheet } from "../../../shared/components/SelectorSheet";
 
 interface HostSelectorSheetProps {
   open: boolean;

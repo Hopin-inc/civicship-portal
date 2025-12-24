@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { useGetPlacesQuery } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { ItemContent, ItemTitle } from "@/components/ui/item";
-import { SelectorSheet } from "../../shared/components/SelectorSheet";
+import { SelectorSheet } from "../../../shared/components/SelectorSheet";
 
 interface PlaceSelectorSheetProps {
   open: boolean;
