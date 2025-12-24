@@ -183,7 +183,10 @@ export const useOpportunityEditor = ({
               ...commonInput,
               ...categorySpecificInput,
             },
-            permission: { communityId: COMMUNITY_ID },
+            permission: {
+              communityId: COMMUNITY_ID,
+              opportunityId: opportunityId!,
+            },
           },
         });
 
