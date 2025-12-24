@@ -1,6 +1,6 @@
 "use client";
 
-import { OpportunityList } from "./components/OpportunityList";
+import { OpportunityList } from "./features/list/components/OpportunityList";
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";

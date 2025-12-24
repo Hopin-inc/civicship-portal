@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { toast } from "react-toastify";
-import { ValidationErrors, ValidationErrorField } from "../types";
+import { ValidationErrors, ValidationErrorField } from "../../types";
 
 export function useOpportunityValidation() {
   const [errors, setErrors] = useState<ValidationErrors>({});

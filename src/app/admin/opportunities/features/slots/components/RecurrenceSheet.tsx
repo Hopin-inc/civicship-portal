@@ -28,8 +28,8 @@ import {
   RecurrenceSettings,
   RecurrenceType,
   SlotData,
-} from "../types";
-import { generateRecurrenceSlots } from "../utils/recurrenceGenerator";
+} from "../../types";
+import { generateRecurrenceSlots } from "../../utils/recurrenceGenerator";
 import dayjs from "dayjs";
 
 interface RecurrenceSheetProps {

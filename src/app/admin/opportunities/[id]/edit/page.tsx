@@ -8,7 +8,7 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { DEFAULT_CAPACITY } from "../../constants/opportunity";
-import { OpportunityFormEditor } from "../../components/OpportunityFormEditor";
+import { OpportunityFormEditor } from "../../features/editor/components/OpportunityFormEditor";
 
 export default function EditOpportunityPage() {
   const params = useParams();

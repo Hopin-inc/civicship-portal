@@ -1,7 +1,7 @@
 "use client";
 
-import { useOpportunities } from "@/app/admin/opportunities/hooks/useOpportunities";
-import { OpportunityItem } from "@/app/admin/opportunities/components/OpportunityItem";
+import { useOpportunities } from "../hooks/useOpportunities";
+import { OpportunityItem } from "./OpportunityItem";
 import { GqlPublishStatus } from "@/types/graphql";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";

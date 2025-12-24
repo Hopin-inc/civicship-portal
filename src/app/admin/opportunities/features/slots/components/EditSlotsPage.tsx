@@ -8,13 +8,13 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { SlotData } from "../types";
+import { SlotData } from "../../types";
 import { SlotPicker } from "./SlotPicker";
 import { SingleSlotForm } from "./SingleSlotForm";
 import { CancelSlotSheet } from "./CancelSlotSheet";
 import dayjs from "dayjs";
 import { toast } from "react-toastify";
-import { groupSlotsByMonth, formatMonthHeader } from "../utils/slotGrouping";
+import { groupSlotsByMonth, formatMonthHeader } from "../../utils/slotGrouping";
 import { useCancelSlotState } from "../hooks/useCancelSlotState";
 import { useSlotReservations } from "../hooks/useSlotReservations";
 

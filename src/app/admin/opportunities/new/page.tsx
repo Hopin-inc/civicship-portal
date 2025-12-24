@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { OpportunityFormEditor } from "../components/OpportunityFormEditor";
+import { OpportunityFormEditor } from "../features/editor/components/OpportunityFormEditor";
 
 export default function CreateOpportunityPage() {
   const router = useRouter();

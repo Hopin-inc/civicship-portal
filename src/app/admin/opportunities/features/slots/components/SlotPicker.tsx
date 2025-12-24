@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
-import { HOSTING_STATUS_LABELS, HOSTING_STATUS_COLORS } from "../constants/slot";
+import { HOSTING_STATUS_LABELS, HOSTING_STATUS_COLORS } from "../../constants/slot";
 import { cn } from "@/lib/utils";
-import { SlotData } from "../types";
-import { canDeleteSlot, canCancelSlot } from "../utils/slotPermissions";
-import { formatSlotRange } from "../utils/dateFormat";
+import { SlotData } from "../../types";
+import { canDeleteSlot, canCancelSlot } from "../../utils/slotPermissions";
+import { formatSlotRange } from "../../utils/dateFormat";
 
 interface SlotPickerProps {
   index: number;
