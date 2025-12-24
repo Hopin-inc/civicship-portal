@@ -153,7 +153,7 @@ export const useOpportunityEditor = ({
         title,
         description: summary,
         body: description,
-        placeId,
+        placeId: placeId ?? undefined,
         createdBy: hostUserId,
         requireApproval: requireHostApproval,
         images: imagesInput,
@@ -189,7 +189,7 @@ export const useOpportunityEditor = ({
 
         // スロット更新
         const createSlots = slotsInput.filter((s) => !s.id);
-        const updateSlotsData = slotsInput.filter((s) => s.id);
+        const updateSlotsData = slotsInput.filter((s): s is typeof s & { id: string } => !!s.id);
 
         await updateSlots({
           variables: {
