@@ -9,9 +9,9 @@ import {
 } from "@/components/ui/accordion";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { SlotData } from "../../../types";
-import { SlotPicker } from "./SlotPicker";
-import { SingleSlotForm } from "./SingleSlotForm";
-import { CancelSlotSheet } from "./CancelSlotSheet";
+import { SlotPicker } from "./forms/SlotPicker";
+import { SingleSlotForm } from "./forms/SingleSlotForm";
+import { CancelSlotSheet } from "./sheets/CancelSlotSheet";
 import dayjs from "dayjs";
 import { toast } from "react-toastify";
 import { groupSlotsByMonth, formatMonthHeader } from "../../../utils/slotGrouping";

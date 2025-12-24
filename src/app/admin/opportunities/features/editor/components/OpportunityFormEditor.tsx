@@ -7,14 +7,14 @@ import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useOpportunityEditor } from "../hooks/useOpportunityEditor";
 import { useFormSheets } from "../hooks/useFormSheets";
 import { OpportunityFormData, FormEditMode } from "../../../types";
-import { EditDescriptionSheet } from "./EditDescriptionSheet";
+import { EditDescriptionSheet } from "./sheets/EditDescriptionSheet";
 import { EditSlotsPage } from "../../slots/components/EditSlotsPage";
-import { HostSelectorSheet } from "./HostSelectorSheet";
-import { PlaceSelectorSheet } from "./PlaceSelectorSheet";
-import { CategorySettingsSection } from "./CategorySettingsSection";
-import { ContentSection } from "./ContentSection";
-import { SettingsSection } from "./SettingsSection";
-import { OperationSection } from "./OperationSection";
+import { HostSelectorSheet } from "./sheets/HostSelectorSheet";
+import { PlaceSelectorSheet } from "./sheets/PlaceSelectorSheet";
+import { CategorySettingsSection } from "./sections/CategorySettingsSection";
+import { ContentSection } from "./sections/ContentSection";
+import { SettingsSection } from "./sections/SettingsSection";
+import { OperationSection } from "./sections/OperationSection";
 
 interface OpportunityFormEditorProps {
   mode: "create" | "update";

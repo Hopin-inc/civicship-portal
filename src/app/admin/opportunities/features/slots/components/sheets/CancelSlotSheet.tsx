@@ -9,8 +9,8 @@ import {
 } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { SlotData } from "../../../types";
-import { formatSlotRange } from "../../../utils/dateFormat";
+import { SlotData } from "../../../../types";
+import { formatSlotRange } from "../../../../utils/dateFormat";
 
 interface CancelSlotSheetProps {
   open: boolean;
