@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { SlotData } from "../../types";
+import { SlotData } from "../../../types";
 
 export function useSlotManager(initialSlots: SlotData[] = []) {
   const [slots, setSlots] = useState<SlotData[]>(initialSlots);

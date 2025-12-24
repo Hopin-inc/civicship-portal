@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { ValidationErrors, ValidationErrorField } from "../../types";
+import { ValidationErrors, ValidationErrorField } from "../../../types";
 
 /**
  * エラー自動クリア機能付きの状態管理フック

@@ -1,13 +1,13 @@
 "use client";
 
 import { Item, ItemContent, ItemFooter, ItemTitle } from "@/components/ui/item";
-import { OpportunityListItem } from "../../types/OpportunityListItem";
+import { OpportunityListItem } from "../../../types/OpportunityListItem";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { OpportunityActionsMenu } from "./OpportunityActionsMenu";
 import { useOpportunityActions } from "../hooks/useOpportunityActions";
-import { formatISODateTime } from "../../utils/dateFormat";
-import { PUBLISH_STATUS_COLORS } from "../../constants/opportunity";
+import { formatISODateTime } from "../../../utils/dateFormat";
+import { PUBLISH_STATUS_COLORS } from "../../../constants/opportunity";
 
 interface OpportunityItemProps {
   opportunity: OpportunityListItem;

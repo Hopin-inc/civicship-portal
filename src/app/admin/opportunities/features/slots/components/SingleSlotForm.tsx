@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Card, CardContent } from "@/components/ui/card";
 import { RecurrenceSheet } from "./RecurrenceSheet";
-import { SlotData } from "../../types";
+import { SlotData } from "../../../types";
 
 /* =========================
  * 内部コンポーネント

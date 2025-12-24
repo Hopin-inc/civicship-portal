@@ -1,6 +1,6 @@
 import { useState, useEffect, ChangeEvent } from "react";
 import { toast } from "react-toastify";
-import { ImageData, isNewImage } from "../../types";
+import { ImageData, isNewImage } from "../../../types";
 
 export function useImageManager(initialImages: ImageData[] = []) {
   const [images, setImages] = useState<ImageData[]>(initialImages);

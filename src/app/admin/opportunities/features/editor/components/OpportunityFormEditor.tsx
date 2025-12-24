@@ -6,7 +6,7 @@ import { GqlPublishStatus } from "@/types/graphql";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useOpportunityEditor } from "../hooks/useOpportunityEditor";
 import { useFormSheets } from "../hooks/useFormSheets";
-import { OpportunityFormData, FormEditMode } from "../../types";
+import { OpportunityFormData, FormEditMode } from "../../../types";
 import { EditDescriptionSheet } from "./EditDescriptionSheet";
 import { EditSlotsPage } from "../../slots/components/EditSlotsPage";
 import { HostSelectorSheet } from "./HostSelectorSheet";
