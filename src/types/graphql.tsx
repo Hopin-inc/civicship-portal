@@ -152,12 +152,11 @@ export type GqlAuthZDirectiveDeepCompositeRulesInput = {
 };
 
 export const GqlAuthZRules = {
-  CanReadPhoneNumber: "CanReadPhoneNumber",
+  CanManageOpportunity: "CanManageOpportunity",
   IsAdmin: "IsAdmin",
   IsCommunityManager: "IsCommunityManager",
   IsCommunityMember: "IsCommunityMember",
   IsCommunityOwner: "IsCommunityOwner",
-  IsOpportunityOwner: "IsOpportunityOwner",
   IsSelf: "IsSelf",
   IsUser: "IsUser",
 } as const;
@@ -885,7 +884,7 @@ export type GqlMutationOpportunityCreateArgs = {
 
 export type GqlMutationOpportunityDeleteArgs = {
   id: Scalars["ID"]["input"];
-  permission: GqlCheckCommunityPermissionInput;
+  permission: GqlCheckOpportunityPermissionInput;
 };
 
 export type GqlMutationOpportunitySetPublishStatusArgs = {
@@ -914,7 +913,7 @@ export type GqlMutationOpportunitySlotsBulkUpdateArgs = {
 export type GqlMutationOpportunityUpdateContentArgs = {
   id: Scalars["ID"]["input"];
   input: GqlOpportunityUpdateContentInput;
-  permission: GqlCheckCommunityPermissionInput;
+  permission: GqlCheckOpportunityPermissionInput;
 };
 
 export type GqlMutationParticipationBulkCreateArgs = {
@@ -4358,7 +4357,7 @@ export type GqlCreateOpportunityMutation = {
 export type GqlUpdateOpportunityContentMutationVariables = Exact<{
   id: Scalars["ID"]["input"];
   input: GqlOpportunityUpdateContentInput;
-  permission: GqlCheckCommunityPermissionInput;
+  permission: GqlCheckOpportunityPermissionInput;
 }>;
 
 export type GqlUpdateOpportunityContentMutation = {
@@ -4449,7 +4448,7 @@ export type GqlSetOpportunitySlotHostingStatusMutation = {
 
 export type GqlDeleteOpportunityMutationVariables = Exact<{
   id: Scalars["ID"]["input"];
-  permission: GqlCheckCommunityPermissionInput;
+  permission: GqlCheckOpportunityPermissionInput;
 }>;
 
 export type GqlDeleteOpportunityMutation = {
@@ -4813,6 +4812,23 @@ export type GqlGetOpportunitySlotWithParticipationsQuery = {
         } | null;
         evaluation?: { __typename?: "Evaluation"; id: string; status: GqlEvaluationStatus } | null;
       }> | null;
+    }> | null;
+  } | null;
+};
+
+export type GqlGetSlotReservationsQueryVariables = Exact<{
+  slotId: Scalars["ID"]["input"];
+}>;
+
+export type GqlGetSlotReservationsQuery = {
+  __typename?: "Query";
+  opportunitySlot?: {
+    __typename?: "OpportunitySlot";
+    id: string;
+    reservations?: Array<{
+      __typename?: "Reservation";
+      id: string;
+      status: GqlReservationStatus;
     }> | null;
   } | null;
 };
@@ -8955,7 +8971,7 @@ export const UpdateOpportunityContentDocument = gql`
   mutation UpdateOpportunityContent(
     $id: ID!
     $input: OpportunityUpdateContentInput!
-    $permission: CheckCommunityPermissionInput!
+    $permission: CheckOpportunityPermissionInput!
   ) {
     opportunityUpdateContent(id: $id, input: $input, permission: $permission) {
       ... on OpportunityUpdateContentSuccess {
@@ -9218,7 +9234,7 @@ export type SetOpportunitySlotHostingStatusMutationOptions = Apollo.BaseMutation
   GqlSetOpportunitySlotHostingStatusMutationVariables
 >;
 export const DeleteOpportunityDocument = gql`
-  mutation DeleteOpportunity($id: ID!, $permission: CheckCommunityPermissionInput!) {
+  mutation DeleteOpportunity($id: ID!, $permission: CheckOpportunityPermissionInput!) {
     opportunityDelete(id: $id, permission: $permission) {
       ... on OpportunityDeleteSuccess {
         opportunityId
@@ -9991,6 +10007,85 @@ export type GetOpportunitySlotWithParticipationsSuspenseQueryHookResult = Return
 export type GetOpportunitySlotWithParticipationsQueryResult = Apollo.QueryResult<
   GqlGetOpportunitySlotWithParticipationsQuery,
   GqlGetOpportunitySlotWithParticipationsQueryVariables
+>;
+export const GetSlotReservationsDocument = gql`
+  query GetSlotReservations($slotId: ID!) {
+    opportunitySlot(id: $slotId) {
+      id
+      reservations {
+        id
+        status
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetSlotReservationsQuery__
+ *
+ * To run a query within a React component, call `useGetSlotReservationsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetSlotReservationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetSlotReservationsQuery({
+ *   variables: {
+ *      slotId: // value for 'slotId'
+ *   },
+ * });
+ */
+export function useGetSlotReservationsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GqlGetSlotReservationsQuery,
+    GqlGetSlotReservationsQueryVariables
+  > &
+    ({ variables: GqlGetSlotReservationsQueryVariables; skip?: boolean } | { skip: boolean }),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetSlotReservationsQuery, GqlGetSlotReservationsQueryVariables>(
+    GetSlotReservationsDocument,
+    options,
+  );
+}
+export function useGetSlotReservationsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetSlotReservationsQuery,
+    GqlGetSlotReservationsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetSlotReservationsQuery, GqlGetSlotReservationsQueryVariables>(
+    GetSlotReservationsDocument,
+    options,
+  );
+}
+export function useGetSlotReservationsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetSlotReservationsQuery,
+        GqlGetSlotReservationsQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetSlotReservationsQuery, GqlGetSlotReservationsQueryVariables>(
+    GetSlotReservationsDocument,
+    options,
+  );
+}
+export type GetSlotReservationsQueryHookResult = ReturnType<typeof useGetSlotReservationsQuery>;
+export type GetSlotReservationsLazyQueryHookResult = ReturnType<
+  typeof useGetSlotReservationsLazyQuery
+>;
+export type GetSlotReservationsSuspenseQueryHookResult = ReturnType<
+  typeof useGetSlotReservationsSuspenseQuery
+>;
+export type GetSlotReservationsQueryResult = Apollo.QueryResult<
+  GqlGetSlotReservationsQuery,
+  GqlGetSlotReservationsQueryVariables
 >;
 export const ParticipationBulkCreateDocument = gql`
   mutation ParticipationBulkCreate(

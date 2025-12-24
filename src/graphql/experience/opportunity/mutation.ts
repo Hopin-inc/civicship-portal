@@ -52,7 +52,7 @@ export const UPDATE_OPPORTUNITY_CONTENT = gql`
   mutation UpdateOpportunityContent(
     $id: ID!
     $input: OpportunityUpdateContentInput!
-    $permission: CheckCommunityPermissionInput!
+    $permission: CheckOpportunityPermissionInput!
   ) {
     opportunityUpdateContent(id: $id, input: $input, permission: $permission) {
       ... on OpportunityUpdateContentSuccess {
@@ -155,7 +155,7 @@ export const SET_OPPORTUNITY_SLOT_HOSTING_STATUS = gql`
 // DELETE OPPORTUNITY
 // =====================================
 export const DELETE_OPPORTUNITY = gql`
-  mutation DeleteOpportunity($id: ID!, $permission: CheckCommunityPermissionInput!) {
+  mutation DeleteOpportunity($id: ID!, $permission: CheckOpportunityPermissionInput!) {
     opportunityDelete(id: $id, permission: $permission) {
       ... on OpportunityDeleteSuccess {
         opportunityId
