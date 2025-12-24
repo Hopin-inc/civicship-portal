@@ -11,16 +11,19 @@ import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { SlotData } from "../types";
 import { SlotPicker } from "./SlotPicker";
 import { SingleSlotForm } from "./SingleSlotForm";
+import { CancelSlotSheet } from "./CancelSlotSheet";
 import dayjs from "dayjs";
 import { toast } from "react-toastify";
 import { groupSlotsByMonth, formatMonthHeader } from "../utils/slotGrouping";
+import { useCancelSlotState } from "../hooks/useCancelSlotState";
+import { useSlotReservations } from "../hooks/useSlotReservations";
 
 interface EditSlotsPageProps {
   slots: SlotData[];
   onAddSlotsBatch: (slots: SlotData[]) => void;
   onUpdateSlot: <K extends keyof SlotData>(index: number, field: K, value: SlotData[K]) => void;
   onRemoveSlot: (index: number) => void;
-  onCancelSlot: (index: number) => void;
+  onCancelSlot: (index: number, message?: string) => void;
   onClose: () => void;
 }
 
@@ -34,6 +37,12 @@ export function EditSlotsPage({
 }: EditSlotsPageProps) {
   const [startAt, setStartAt] = useState("");
   const [endAt, setEndAt] = useState("");
+
+  // 開催中止シートの状態管理
+  const cancelState = useCancelSlotState();
+  const { reservationCount, loading: reservationsLoading } = useSlotReservations(
+    cancelState.selectedSlot?.slot.id
+  );
 
   // ヘッダー設定
   const headerConfig = useMemo(
@@ -71,6 +80,13 @@ export function EditSlotsPage({
     onAddSlotsBatch([{ startAt, endAt }]);
     setStartAt("");
     setEndAt("");
+  };
+
+  const handleCancelSlot = async (message?: string) => {
+    if (!cancelState.selectedSlot) return;
+
+    await onCancelSlot(cancelState.selectedSlot.index, message);
+    cancelState.closeCancelSheet();
   };
 
   return (
@@ -112,7 +128,7 @@ export function EditSlotsPage({
                               slot={slot}
                               onUpdate={onUpdateSlot}
                               onRemove={onRemoveSlot}
-                              onCancel={onCancelSlot}
+                              onCancel={() => cancelState.openCancelSheet(slot, index)}
                             />
                           ))}
                         </div>
@@ -125,6 +141,18 @@ export function EditSlotsPage({
           </div>
         </div>
       </main>
+
+      {/* 開催中止確認シート */}
+      {cancelState.selectedSlot && (
+        <CancelSlotSheet
+          open={cancelState.isSheetOpen}
+          onOpenChange={cancelState.closeCancelSheet}
+          slot={cancelState.selectedSlot.slot}
+          reservationCount={reservationCount}
+          onConfirm={handleCancelSlot}
+          loading={reservationsLoading}
+        />
+      )}
     </div>
   );
 }

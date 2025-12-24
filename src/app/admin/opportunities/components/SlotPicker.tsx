@@ -11,7 +11,7 @@ interface SlotPickerProps {
   slot: SlotData;
   onUpdate: (index: number, field: "startAt" | "endAt", value: string) => void;
   onRemove: (index: number) => void;
-  onCancel?: (index: number) => void;
+  onCancel?: () => void;
 }
 
 export const SlotPicker = ({ index, slot, onUpdate, onRemove, onCancel }: SlotPickerProps) => {
@@ -54,7 +54,7 @@ export const SlotPicker = ({ index, slot, onUpdate, onRemove, onCancel }: SlotPi
         {/* 条件付きアクションボタン */}
         <div className="flex gap-2">
           {canCancel && onCancel && (
-            <Button type="button" variant="destructive" size="sm" onClick={() => onCancel(index)}>
+            <Button type="button" variant="destructive" size="sm" onClick={onCancel}>
               開催中止
             </Button>
           )}

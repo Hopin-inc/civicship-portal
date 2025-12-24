@@ -240,9 +240,9 @@ export const useOpportunityEditor = ({
 
   // ========== 開催中止処理 ==========
   const cancelSlot = useCallback(
-    async (index: number) => {
+    async (index: number, message?: string) => {
       const slot = slotManager.slots[index];
-      await slotActions.cancelSlot(index, slot);
+      await slotActions.cancelSlot(index, slot, message);
     },
     [slotManager.slots, slotActions]
   );

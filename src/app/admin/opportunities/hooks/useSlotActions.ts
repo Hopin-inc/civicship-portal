@@ -29,9 +29,9 @@ export const useSlotActions = ({
    * スロットを開催中止にする
    */
   const cancelSlot = useCallback(
-    async (index: number, slot: SlotData) => {
+    async (index: number, slot: SlotData, message?: string) => {
       if (!slot.id) {
-        toast.error("このスロットは開催中止できません");
+        toast.error("この開催枠は中止できません");
         return;
       }
 
@@ -48,6 +48,8 @@ export const useSlotActions = ({
               status: GqlOpportunitySlotHostingStatus.Cancelled,
               ...convertSlotToISO(slot),
               capacity,
+              // TODO: バックエンドがcancellationMessageをサポートしたら有効化
+              // cancellationMessage: message,
             },
             permission: {
               communityId: COMMUNITY_ID,
@@ -69,9 +71,9 @@ export const useSlotActions = ({
           if (errorCode === "PERMISSION_DENIED") {
             toast.error("開催中止の権限がありません");
           } else if (errorCode === "NOT_FOUND") {
-            toast.error("スロットが見つかりません");
+            toast.error("開催枠が見つかりません");
           } else if (errorCode === "INVALID_STATE") {
-            toast.error("このスロットは中止できない状態です");
+            toast.error("この開催枠は中止できない状態です");
           } else {
             toast.error("開催中止に失敗しました");
           }
