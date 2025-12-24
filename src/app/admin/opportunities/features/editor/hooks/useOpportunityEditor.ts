@@ -118,12 +118,21 @@ export const useOpportunityEditor = ({
       }
 
       try {
-      // スロット変換
-      const slotsInput = slotManager.slots.map((slot) => ({
-        ...convertSlotToDates(slot),
-        capacity,
-        ...(slot.id ? { id: slot.id } : {}),
-      }));
+      // スロット変換（create用：capacityを含む）
+      const slotsInputForCreate = slotManager.slots
+        .filter((slot) => !slot.id)
+        .map((slot) => ({
+          ...convertSlotToDates(slot),
+          capacity,
+        }));
+
+      // スロット変換（update用：capacityを含まない）
+      const slotsInputForUpdate = slotManager.slots
+        .filter((slot): slot is typeof slot & { id: string } => !!slot.id)
+        .map((slot) => ({
+          id: slot.id,
+          ...convertSlotToDates(slot),
+        }));
 
       // 画像変換（新規画像のみ送信）
       const imagesInput = imageManager.images
@@ -166,7 +175,7 @@ export const useOpportunityEditor = ({
             input: {
               ...commonInput,
               ...categorySpecificInput,
-              slots: slotsInput,
+              slots: slotsInputForCreate,
             },
             permission: { communityId: COMMUNITY_ID },
           },
@@ -191,15 +200,12 @@ export const useOpportunityEditor = ({
         });
 
         // スロット更新
-        const createSlots = slotsInput.filter((s) => !s.id);
-        const updateSlotsData = slotsInput.filter((s): s is typeof s & { id: string } => !!s.id);
-
         await updateSlots({
           variables: {
             input: {
               opportunityId: opportunityId!,
-              create: createSlots.length > 0 ? createSlots : undefined,
-              update: updateSlotsData.length > 0 ? updateSlotsData : undefined,
+              create: slotsInputForCreate.length > 0 ? slotsInputForCreate : undefined,
+              update: slotsInputForUpdate.length > 0 ? slotsInputForUpdate : undefined,
             },
             permission: {
               communityId: COMMUNITY_ID,
