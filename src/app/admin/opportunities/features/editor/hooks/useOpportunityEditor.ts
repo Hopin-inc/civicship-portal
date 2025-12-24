@@ -140,11 +140,11 @@ export const useOpportunityEditor = ({
         ? {
             feeRequired,
             pointsRequired,
-            pointsToEarn: null,
+            pointsToEarn: undefined,
           }
         : {
-            feeRequired: null,
-            pointsRequired: null,
+            feeRequired: undefined,
+            pointsRequired: undefined,
             pointsToEarn,
           };
 
