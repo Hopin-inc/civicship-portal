@@ -14,7 +14,7 @@ interface ReservationDetailsProps {
   reservation: GqlReservation;
   activityCard: ActivityCard;
   label: string;
-  variant: "primary" | "secondary" | "success" | "outline" | "destructive" | "warning";
+  variant: "default" | "primary" | "secondary" | "success" | "outline" | "destructive" | "warning";
   priceInfo: PriceInfo;
 }
 
