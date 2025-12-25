@@ -1,14 +1,14 @@
 import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { ExternalLink } from "lucide-react";
 import { displayPhoneNumber } from "@/utils";
 import { displayDuration } from "@/utils/date";
 import { cn } from "@/lib/utils";
 import { GqlOpportunityCategory, GqlReservation, Maybe } from "@/types/graphql";
 import { ActivityCard } from "@/components/domains/opportunities/types";
-import OpportunityHorizontalCard from "@/components/domains/opportunities/components/OpportunityHorizontalCard";
-import { formatOpportunities } from "@/components/domains/opportunities/utils";
 import { PriceInfo } from "@/app/admin/reservations/types";
+import Link from "next/link";
 
 interface ReservationDetailsProps {
   reservation: GqlReservation;
@@ -25,36 +25,31 @@ const AdminReservationDetails: React.FC<ReservationDetailsProps> = ({
   variant,
   priceInfo,
 }) => {
+  const {
+    participationFee,
+    participantCount,
+    pointsRequired,
+    totalPointsRequired,
+    isPointsOnly,
+    category,
+    pointsToEarn,
+    totalPointsToEarn
+  } = priceInfo;
+
+  const isQuest = category === GqlOpportunityCategory.Quest;
+  const opportunity = reservation.opportunitySlot?.opportunity;
+  const opportunityLink = opportunity
+    ? isQuest
+      ? `/quests/${opportunity.id}?community_id=${opportunity.community?.id}`
+      : `/activities/${opportunity.id}?community_id=${opportunity.community?.id}`
+    : "#";
+
   return (
     <div>
-      <h2 className="text-title-sm font-bold mb-3">予約者</h2>
-      <UserSection reservation={reservation} label={label} variant={variant} />
-
-      <h2 className="text-title-sm font-bold mb-3">予約内容</h2>
-      <ReservationSection
-        activityCard={activityCard}
-        reservation={reservation}
-        priceInfo={priceInfo}
-      />
-
-      <h2 className="text-title-sm font-bold mb-3">コメント</h2>
-      <CommentSection comment={reservation.comment} />
-    </div>
-  );
-};
-
-// 予約者情報を表示するコンポーネント
-const UserSection: React.FC<{
-  reservation: GqlReservation;
-  label: string;
-  variant: "primary" | "secondary" | "success" | "outline" | "destructive" | "warning";
-}> = ({ reservation, label, variant }) => {
-  return (
-    <div className="mb-10">
       {/* ユーザー名とステータス */}
       <dl className="flex justify-between items-center py-5 border-b border-foreground-caption">
         <div className="flex items-center gap-3 flex-grow min-w-0">
-          <Avatar>
+          <Avatar className="h-8 w-8">
             <AvatarImage src={reservation.createdByUser?.image || ""} />
             <AvatarFallback>{reservation.createdByUser?.name?.[0] || "U"}</AvatarFallback>
           </Avatar>
@@ -67,16 +62,8 @@ const UserSection: React.FC<{
         </dd>
       </dl>
 
-      {/* 自己紹介 */}
-      {reservation.createdByUser?.bio?.trim() && (
-        <dl className="py-5 border-b border-foreground-caption">
-          <dt className="text-label-sm font-bold mb-2">自己紹介</dt>
-          <dd className="text-body-sm">{reservation.createdByUser.bio}</dd>
-        </dl>
-      )}
-
       {/* 電話番号 */}
-      <dl className="flex justify-between items-center py-5">
+      <dl className="flex justify-between items-center py-5 border-b border-foreground-caption">
         <dt className="text-label-sm font-bold">電話番号</dt>
         <dd className="text-body-sm">
           {reservation.createdByUser?.phoneNumber ? (
@@ -91,39 +78,28 @@ const UserSection: React.FC<{
           )}
         </dd>
       </dl>
-    </div>
-  );
-};
 
-// 予約内容を表示するコンポーネント
-const ReservationSection: React.FC<{
-  activityCard: ActivityCard;
-  reservation: GqlReservation;
-  priceInfo: PriceInfo;
-}> = ({ activityCard, reservation, priceInfo }) => {
-  const formattedActivityCard = formatOpportunities(activityCard);
-  const {
-    participationFee,
-    participantCount,
-    pointsRequired,
-    totalPointsRequired,
-    isPointsOnly,
-    category,
-    pointsToEarn,
-    totalPointsToEarn
-  } = priceInfo;
+      {/* 自己紹介 */}
+      {reservation.createdByUser?.bio?.trim() && (
+        <dl className="py-5 border-b border-foreground-caption">
+          <dt className="text-label-sm font-bold mb-2">自己紹介</dt>
+          <dd className="text-body-sm">{reservation.createdByUser.bio}</dd>
+        </dl>
+      )}
 
-  const isQuest = category === GqlOpportunityCategory.Quest;
-
-  return (
-    <div className="mb-10">
-      {/* 募集情報 */}
-      <div className="mb-4">
-        <OpportunityHorizontalCard
-          {...formattedActivityCard}
-          withShadow={false}
-        />
-      </div>
+      {/* 募集タイトル（リンク） */}
+      <dl className="flex justify-between items-center py-5 border-b border-foreground-caption">
+        <dt className="text-label-sm font-bold">募集</dt>
+        <dd className="text-body-sm text-right flex-1 min-w-0 ml-4">
+          <Link
+            href={opportunityLink}
+            className="text-primary hover:underline inline-flex items-center gap-1.5 justify-end"
+          >
+            <span className="truncate">{opportunity?.title || "未設定"}</span>
+            <ExternalLink className="h-4 w-4 flex-shrink-0" />
+          </Link>
+        </dd>
+      </dl>
 
       {/* 日時 */}
       <dl className="flex justify-between items-center py-5 border-b border-foreground-caption">
@@ -184,17 +160,14 @@ const ReservationSection: React.FC<{
           </dd>
         </dl>
       )}
-    </div>
-  );
-};
 
-// コメントを表示するコンポーネント
-const CommentSection: React.FC<{ comment?: Maybe<string> | undefined }> = ({ comment }) => {
-  return (
-    <div className="mb-10">
-      <p className={cn("text-body-sm", !comment?.trim() && "text-muted-foreground")}>
-        {comment?.trim() ? comment : "コメントはありません"}
-      </p>
+      {/* コメント */}
+      {reservation.comment?.trim() && (
+        <dl className="py-5">
+          <dt className="text-label-sm font-bold mb-2">コメント</dt>
+          <dd className="text-body-sm">{reservation.comment}</dd>
+        </dl>
+      )}
     </div>
   );
 };
