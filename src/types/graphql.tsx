@@ -1099,6 +1099,7 @@ export type GqlNftInstanceEdge = GqlEdge & {
 
 export type GqlNftInstanceFilterInput = {
   and?: InputMaybe<Array<GqlNftInstanceFilterInput>>;
+  communityId?: InputMaybe<Scalars["ID"]["input"]>;
   hasDescription?: InputMaybe<Scalars["Boolean"]["input"]>;
   hasImage?: InputMaybe<Scalars["Boolean"]["input"]>;
   hasName?: InputMaybe<Scalars["Boolean"]["input"]>;
