@@ -28,12 +28,16 @@ export default function ReservationPage() {
     return null;
   }, [modeParam]);
 
-  useHeaderConfig({
-    title: "予約詳細",
-    showBackButton: true,
-    showLogo: false,
-    backTo: "/admin/reservations",
-  });
+  const headerConfig = useMemo(
+    () => ({
+      title: "予約詳細",
+      showBackButton: true,
+      showLogo: false,
+      backTo: "/admin/reservations",
+    }),
+    [],
+  );
+  useHeaderConfig(headerConfig);
 
   const {
     reservation,
