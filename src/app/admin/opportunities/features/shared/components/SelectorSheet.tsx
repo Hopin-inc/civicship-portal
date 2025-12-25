@@ -82,7 +82,10 @@ export function SelectorSheet<T>({
                         {renderItem(item, isSelected)}
                       </div>
                       {isSelected && (
-                        <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                        <div className="flex items-center gap-1 flex-shrink-0">
+                          <span className="text-label-xs text-muted-foreground">選択済み</span>
+                          <Check className="h-4 w-4 text-primary" />
+                        </div>
                       )}
                     </div>
                   </Item>
