@@ -16,7 +16,7 @@ interface TransactionCardBaseProps {
   didValue?: string | null;
   comment?: string;
   formattedDateTime: string;
-  profileHref?: string | null;
+  transactionHref?: string | null;
 }
 
 export const TransactionCardBase = ({
@@ -31,7 +31,7 @@ export const TransactionCardBase = ({
   didValue,
   comment,
   formattedDateTime,
-  profileHref,
+  transactionHref,
 }: TransactionCardBaseProps) => {
   const cardContent = (
     <div className="flex items-start gap-3 py-6">
@@ -85,10 +85,10 @@ export const TransactionCardBase = ({
     </div>
   );
 
-  if (profileHref) {
+  if (transactionHref) {
     return (
       <Link
-        href={profileHref}
+        href={transactionHref}
         prefetch={false}
         className="block cursor-pointer hover:bg-zinc-50 rounded-lg transition-colors"
       >
