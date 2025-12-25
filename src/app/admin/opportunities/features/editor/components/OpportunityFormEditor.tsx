@@ -7,13 +7,7 @@ import { useOpportunityEditor } from "../hooks/useOpportunityEditor";
 import { useFormSheets } from "../hooks/useFormSheets";
 import { OpportunityFormData, FormEditMode } from "../types/form";
 import { EditSlotsPage } from "../../slots/components/EditSlotsPage";
-import {
-  OpportunityForm,
-  ContentProps,
-  SettingsProps,
-  CategoryProps,
-  OperationProps,
-} from "./OpportunityForm";
+import { OpportunityForm } from "./OpportunityForm";
 import { OpportunityFormSheets } from "./OpportunityFormSheets";
 
 interface OpportunityFormEditorProps {
@@ -79,49 +73,6 @@ export const OpportunityFormEditor = ({
   const enterSlotsMode = useCallback(() => setEditMode('slots'), []);
   const exitSlotsMode = useCallback(() => setEditMode('form'), []);
 
-  // グループ化された props
-  const contentProps: ContentProps = {
-    title: editor.title,
-    onTitleChange: editor.setTitle,
-    summary: editor.summary,
-    onSummaryChange: editor.setSummary,
-    description: editor.description,
-    onDescriptionClick: () => sheets.descriptionSheet.setOpen(true),
-    images: editor.images,
-    onImageSelect: editor.handleImageSelect,
-    onRemoveImage: editor.removeImage,
-    slots: editor.slots,
-    onSlotsClick: enterSlotsMode,
-  };
-
-  const settingsProps: SettingsProps = {
-    selectedHostName,
-    onHostClick: () => sheets.hostSheet.setOpen(true),
-    selectedPlaceName,
-    onPlaceClick: () => sheets.placeSheet.setOpen(true),
-    capacity: editor.capacity,
-    onCapacityChange: editor.setCapacity,
-  };
-
-  const categoryProps: CategoryProps = {
-    mode,
-    category: editor.category,
-    onCategoryChange: editor.setCategory,
-    feeRequired: editor.feeRequired,
-    onFeeRequiredChange: editor.setFeeRequired,
-    pointsRequired: editor.pointsRequired,
-    onPointsRequiredChange: editor.setPointsRequired,
-    pointsToEarn: editor.pointsToEarn,
-    onPointsToEarnChange: editor.setPointsToEarn,
-  };
-
-  const operationProps: OperationProps = {
-    requireHostApproval: editor.requireHostApproval,
-    onRequireHostApprovalChange: editor.setRequireHostApproval,
-    publishStatus: editor.publishStatus,
-    onPublishStatusChange: handlePublishStatusChange,
-  };
-
   // 開催枠編集モードの場合は EditSlotsPage のみ表示
   if (editMode === 'slots') {
     return (
@@ -140,13 +91,15 @@ export const OpportunityFormEditor = ({
     <>
       <OpportunityForm
         mode={mode}
-        saving={editor.saving}
+        editor={editor}
         onSubmit={handleSubmit}
-        content={contentProps}
-        settings={settingsProps}
-        category={categoryProps}
-        operation={operationProps}
-        errors={editor.errors}
+        onDescriptionClick={() => sheets.descriptionSheet.setOpen(true)}
+        onSlotsClick={enterSlotsMode}
+        onHostClick={() => sheets.hostSheet.setOpen(true)}
+        onPlaceClick={() => sheets.placeSheet.setOpen(true)}
+        selectedHostName={selectedHostName}
+        selectedPlaceName={selectedPlaceName}
+        onPublishStatusChange={handlePublishStatusChange}
       />
 
       <OpportunityFormSheets

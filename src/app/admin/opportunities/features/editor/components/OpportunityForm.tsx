@@ -1,96 +1,85 @@
 import { FormEvent } from "react";
 import { Button } from "@/components/ui/button";
-import { GqlPublishStatus, GqlOpportunityCategory } from "@/types/graphql";
 import { ContentSection } from "./sections/ContentSection";
 import { SettingsSection } from "./sections/SettingsSection";
 import { CategorySettingsSection } from "./sections/CategorySettingsSection";
 import { OperationSection } from "./sections/OperationSection";
-import { ImageData, ValidationErrors } from "../types/form";
-import { SlotData } from "../../shared/types/slot";
-
-// グループ化された props 型定義
-export interface ContentProps {
-  title: string;
-  onTitleChange: (value: string) => void;
-  summary: string;
-  onSummaryChange: (value: string) => void;
-  description: string;
-  onDescriptionClick: () => void;
-  images: ImageData[];
-  onImageSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onRemoveImage: (index: number) => void;
-  slots: SlotData[];
-  onSlotsClick: () => void;
-}
-
-export interface SettingsProps {
-  selectedHostName: string | null;
-  onHostClick: () => void;
-  selectedPlaceName: string | null;
-  onPlaceClick: () => void;
-  capacity: number;
-  onCapacityChange: (value: number) => void;
-}
-
-export interface CategoryProps {
-  mode: "create" | "update";
-  category: GqlOpportunityCategory;
-  onCategoryChange: (value: GqlOpportunityCategory) => void;
-  feeRequired: number;
-  onFeeRequiredChange: (value: number) => void;
-  pointsRequired: number;
-  onPointsRequiredChange: (value: number) => void;
-  pointsToEarn: number;
-  onPointsToEarnChange: (value: number) => void;
-}
-
-export interface OperationProps {
-  requireHostApproval: boolean;
-  onRequireHostApprovalChange: (value: boolean) => void;
-  publishStatus: GqlPublishStatus;
-  onPublishStatusChange: (value: string) => void;
-}
+import { useOpportunityEditor } from "../hooks/useOpportunityEditor";
 
 interface OpportunityFormProps {
   mode: "create" | "update";
-  saving: boolean;
+  editor: ReturnType<typeof useOpportunityEditor>;
   onSubmit: (e: FormEvent) => void;
-  content: ContentProps;
-  settings: SettingsProps;
-  category: CategoryProps;
-  operation: OperationProps;
-  errors: ValidationErrors;
+  onDescriptionClick: () => void;
+  onSlotsClick: () => void;
+  onHostClick: () => void;
+  onPlaceClick: () => void;
+  selectedHostName: string | null;
+  selectedPlaceName: string | null;
+  onPublishStatusChange: (value: string) => void;
 }
 
 export function OpportunityForm({
   mode,
-  saving,
+  editor,
   onSubmit,
-  content,
-  settings,
-  category,
-  operation,
-  errors,
+  onDescriptionClick,
+  onSlotsClick,
+  onHostClick,
+  onPlaceClick,
+  selectedHostName,
+  selectedPlaceName,
+  onPublishStatusChange,
 }: OpportunityFormProps) {
   return (
     <form onSubmit={onSubmit} className="space-y-8">
       {/* === セクション1: コンテンツ === */}
       <ContentSection
-        {...content}
-        errors={errors}
+        title={editor.title}
+        onTitleChange={editor.setTitle}
+        summary={editor.summary}
+        onSummaryChange={editor.setSummary}
+        description={editor.description}
+        onDescriptionClick={onDescriptionClick}
+        images={editor.images}
+        onImageSelect={editor.handleImageSelect}
+        onRemoveImage={editor.removeImage}
+        slots={editor.slots}
+        onSlotsClick={onSlotsClick}
+        errors={editor.errors}
       />
 
       {/* === セクション2: 設定 === */}
       <SettingsSection
-        {...settings}
-        errors={errors}
+        selectedHostName={selectedHostName}
+        onHostClick={onHostClick}
+        selectedPlaceName={selectedPlaceName}
+        onPlaceClick={onPlaceClick}
+        capacity={editor.capacity}
+        onCapacityChange={editor.setCapacity}
+        errors={editor.errors}
       />
 
       {/* === セクション3: カテゴリ・料金設定 === */}
-      <CategorySettingsSection {...category} />
+      <CategorySettingsSection
+        mode={mode}
+        category={editor.category}
+        onCategoryChange={editor.setCategory}
+        feeRequired={editor.feeRequired}
+        onFeeRequiredChange={editor.setFeeRequired}
+        pointsRequired={editor.pointsRequired}
+        onPointsRequiredChange={editor.setPointsRequired}
+        pointsToEarn={editor.pointsToEarn}
+        onPointsToEarnChange={editor.setPointsToEarn}
+      />
 
       {/* === セクション4: 運用・公開設定 === */}
-      <OperationSection {...operation} />
+      <OperationSection
+        requireHostApproval={editor.requireHostApproval}
+        onRequireHostApprovalChange={editor.setRequireHostApproval}
+        publishStatus={editor.publishStatus}
+        onPublishStatusChange={onPublishStatusChange}
+      />
 
       {/* 送信ボタン */}
       <div className="w-full max-w-[345px] mx-auto">
@@ -98,9 +87,9 @@ export function OpportunityForm({
           type="submit"
           variant="primary"
           className="w-full h-[56px]"
-          disabled={saving}
+          disabled={editor.saving}
         >
-          {saving ? "保存中..." : mode === "create" ? "作成" : "更新"}
+          {editor.saving ? "保存中..." : mode === "create" ? "作成" : "更新"}
         </Button>
       </div>
     </form>
