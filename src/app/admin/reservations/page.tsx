@@ -73,7 +73,6 @@ export default function ReservationsPage() {
         loading={loading}
         error={error}
         loadMoreRef={loadMoreRef}
-        activeTab={activeTab}
       />
     </div>
   );

@@ -4,14 +4,12 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";
 import { GqlReservation } from "@/types/graphql";
 import { ReservationItem } from "./ReservationItem";
-import { TabType } from "../constants/filters";
 
 interface ReservationListProps {
   reservations: GqlReservation[];
   loading: boolean;
   error: any;
   loadMoreRef: React.RefObject<HTMLDivElement>;
-  activeTab: TabType;
 }
 
 export function ReservationList({
@@ -19,7 +17,6 @@ export function ReservationList({
   loading,
   error,
   loadMoreRef,
-  activeTab,
 }: ReservationListProps) {
   // 初期ロード中
   if (loading && reservations.length === 0) {
@@ -52,7 +49,6 @@ export function ReservationList({
           <ReservationItem
             key={reservation.id}
             reservation={reservation}
-            showActionButton={activeTab === "pending"}
           />
         ))}
 

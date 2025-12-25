@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { displayRelativeTime } from "@/utils";
 import { displayDuration } from "@/utils/date";
 import { GqlReservation } from "@/types/graphql";
@@ -11,10 +10,9 @@ import { cn } from "@/lib/utils";
 
 interface ReservationItemProps {
   reservation: GqlReservation;
-  showActionButton?: boolean;
 }
 
-export function ReservationItem({ reservation, showActionButton = false }: ReservationItemProps) {
+export function ReservationItem({ reservation }: ReservationItemProps) {
   const router = useRouter();
   const { step, label, variant } = getReservationStatusMeta(reservation);
 
@@ -50,50 +48,34 @@ export function ReservationItem({ reservation, showActionButton = false }: Reser
         <span>{displayRelativeTime(reservation.createdAt ?? "")}</span>
       </div>
 
-      <div className="flex justify-between items-start gap-4">
-        {/* 左側：情報 */}
-        <div className="flex-1 min-w-0 space-y-2">
-          {/* ユーザー情報 */}
-          <div className="flex items-center gap-2">
-            <Avatar className="h-6 w-6">
-              <AvatarImage src={reservation.createdByUser?.image || ""} />
-              <AvatarFallback className="text-xs">
-                {reservation.createdByUser?.name?.[0] || "U"}
-              </AvatarFallback>
-            </Avatar>
-            <span className="font-semibold text-sm truncate">
-              {reservation.createdByUser?.name || "未設定"}
-            </span>
-          </div>
-
-          {/* 募集タイトル・開催日時 */}
-          <div className="text-xs text-muted-foreground truncate">
-            {reservation.opportunitySlot?.opportunity?.title}
-            {reservation.opportunitySlot?.startsAt && (
-              <>
-                ・
-                {displayDuration(
-                  reservation.opportunitySlot.startsAt,
-                  reservation.opportunitySlot.endsAt,
-                )}
-              </>
-            )}
-          </div>
+      {/* 情報 */}
+      <div className="flex-1 min-w-0 space-y-2">
+        {/* ユーザー情報 */}
+        <div className="flex items-center gap-2">
+          <Avatar className="h-6 w-6">
+            <AvatarImage src={reservation.createdByUser?.image || ""} />
+            <AvatarFallback className="text-xs">
+              {reservation.createdByUser?.name?.[0] || "U"}
+            </AvatarFallback>
+          </Avatar>
+          <span className="font-semibold text-sm truncate">
+            {reservation.createdByUser?.name || "未設定"}
+          </span>
         </div>
 
-        {/* 右側：アクションボタン */}
-        {showActionButton && (
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleClick();
-            }}
-          >
-            対応する
-          </Button>
-        )}
+        {/* 募集タイトル・開催日時 */}
+        <div className="text-xs text-muted-foreground truncate">
+          {reservation.opportunitySlot?.opportunity?.title}
+          {reservation.opportunitySlot?.startsAt && (
+            <>
+              ・
+              {displayDuration(
+                reservation.opportunitySlot.startsAt,
+                reservation.opportunitySlot.endsAt,
+              )}
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
