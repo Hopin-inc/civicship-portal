@@ -7,7 +7,7 @@ import { GqlOpportunityCategory, useGetOpportunityQuery } from "@/types/graphql"
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { DEFAULT_CAPACITY } from "../../constants/opportunity";
+import { DEFAULT_CAPACITY } from "../../features/editor/constants/form";
 import { OpportunityFormEditor } from "../../features/editor/components/OpportunityFormEditor";
 
 export default function EditOpportunityPage() {

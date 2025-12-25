@@ -1,4 +1,5 @@
-import { GqlOpportunityCategory, GqlPublishStatus, GqlOpportunitySlotHostingStatus } from "@/types/graphql";
+import { GqlOpportunityCategory, GqlPublishStatus } from "@/types/graphql";
+import { SlotData } from "../../shared/types/slot";
 
 export type OpportunityFormData = {
   // 基本情報
@@ -32,13 +33,6 @@ export type OpportunityFormData = {
 
   // 公開設定
   publishStatus: GqlPublishStatus;
-};
-
-export type SlotData = {
-  id?: string;
-  startAt: string;
-  endAt: string;
-  hostingStatus?: GqlOpportunitySlotHostingStatus;
 };
 
 // 判別可能ユニオン型による画像データ
@@ -83,26 +77,3 @@ export type PlaceOption = {
 
 // フォーム編集モード
 export type FormEditMode = 'form' | 'slots';
-
-// 繰り返し種別
-export type RecurrenceType = 'daily' | 'weekly';
-
-// 繰り返し設定（UI状態のみ）
-export type RecurrenceSettings = {
-  type: RecurrenceType;
-  endDate: string | null; // YYYY-MM-DD or null
-  selectedDays?: number[]; // 0=日, 1=月, ..., 6=土（毎週の場合のみ）
-};
-
-// 生成入力（baseを含む完全な入力）
-export type RecurrenceInput = {
-  baseStartAt: string;    // ISO datetime
-  baseEndAt: string;      // ISO datetime
-  settings: RecurrenceSettings;
-};
-
-// 繰り返しバリデーションエラー
-export type RecurrenceError = {
-  days?: string;
-  endDate?: string;
-};

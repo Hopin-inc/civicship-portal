@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
-import { RecurrenceInput, SlotData } from '../types';
+import { RecurrenceInput } from '../types/recurrence';
+import { SlotData } from '../../shared/types/slot';
 
 const MAX_MONTHS = 3; // 3ヶ月上限
 

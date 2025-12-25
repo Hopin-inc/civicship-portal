@@ -6,8 +6,8 @@ import {
   useSetOpportunitySlotHostingStatusMutation,
 } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { SlotData } from "../../../types";
-import { convertSlotToDates } from "../../../utils/dateFormat";
+import { SlotData } from "../../shared/types/slot";
+import { convertSlotToDates } from "../../shared/utils/dateFormat";
 
 interface UseSlotActionsOptions {
   opportunityId?: string;

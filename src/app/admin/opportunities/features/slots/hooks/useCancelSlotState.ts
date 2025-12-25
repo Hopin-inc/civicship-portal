@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { SlotData } from "../../../types";
+import { SlotData } from "../../shared/types/slot";
 
 /**
  * スロット中止の状態を管理するフック

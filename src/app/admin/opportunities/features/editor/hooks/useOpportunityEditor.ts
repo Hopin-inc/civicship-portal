@@ -11,9 +11,10 @@ import {
   useUpdateOpportunitySlotsBulkMutation,
 } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { OpportunityFormData, SlotData, ImageData, ValidationErrors, isNewImage } from "../../../types";
-import { DEFAULT_CAPACITY, MIN_IMAGES, MAX_IMAGES } from "../../../constants/opportunity";
-import { convertSlotToDates } from "../../../utils/dateFormat";
+import { OpportunityFormData, ImageData, ValidationErrors, isNewImage } from "../types/form";
+import { SlotData } from "../../shared/types/slot";
+import { DEFAULT_CAPACITY, MIN_IMAGES, MAX_IMAGES } from "../constants/form";
+import { convertSlotToDates } from "../../shared/utils/dateFormat";
 import { useImageManager } from "./useImageManager";
 import { useSlotManager } from "../../slots/hooks/useSlotManager";
 import { useSlotActions } from "../../slots/hooks/useSlotActions";

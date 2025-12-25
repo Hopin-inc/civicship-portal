@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { SlotData } from "../types";
+import { SlotData } from "../../shared/types/slot";
 
 /**
  * 月ごとにグルーピングされたスロット

@@ -8,7 +8,7 @@ import { Button, ButtonProps } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { DateTimeField } from "./DateTimeField";
 import { RecurrenceSheet } from "../sheets/RecurrenceSheet";
-import { SlotData } from "../../../../types";
+import { SlotData } from "../../../shared/types/slot";
 
 interface SingleSlotFormProps {
   startAt: string;

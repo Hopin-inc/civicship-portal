@@ -9,9 +9,9 @@ import {
   useUpdateOpportunitySlotsBulkMutation,
 } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { isNewImage } from "../../../types";
-import { MIN_IMAGES, MAX_IMAGES } from "../../../constants/opportunity";
-import { convertSlotToDates } from "../../../utils/dateFormat";
+import { isNewImage } from "../types/form";
+import { MIN_IMAGES, MAX_IMAGES } from "../constants/form";
+import { convertSlotToDates } from "../../shared/utils/dateFormat";
 import { OpportunityFormState } from "./useOpportunityFormState";
 
 export type UseOpportunitySaveOptions = {

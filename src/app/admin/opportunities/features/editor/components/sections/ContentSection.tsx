@@ -5,7 +5,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Calendar, ChevronRight } from "lucide-react";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from "@/components/ui/item";
 import { ImageUploadSection } from "./ImageUploadSection";
-import { SlotData, ImageData } from "../../../../types";
+import { ImageData } from "../../types/form";
+import { SlotData } from "../../../shared/types/slot";
 
 interface ContentSectionProps {
   title: string;

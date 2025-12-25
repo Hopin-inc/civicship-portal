@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { GqlOpportunityCategory, GqlPublishStatus } from "@/types/graphql";
-import { OpportunityFormData } from "../../../types";
-import { DEFAULT_CAPACITY } from "../../../constants/opportunity";
+import { OpportunityFormData } from "../types/form";
+import { DEFAULT_CAPACITY } from "../constants/form";
 import { useImageManager } from "./useImageManager";
 import { useSlotManager } from "../../slots/hooks/useSlotManager";
 import { useOpportunityValidation } from "./useOpportunityValidation";

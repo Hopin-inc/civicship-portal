@@ -6,7 +6,7 @@ import {
   GqlOpportunitiesConnection,
   GqlOpportunityFilterInput,
 } from "@/types/graphql";
-import { presentOpportunityList } from "../../../presenters/presentOpportunityList";
+import { presentOpportunityList } from "../presenters/presentOpportunityList";
 import { useMemo, useState } from "react";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";

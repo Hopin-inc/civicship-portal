@@ -1,7 +1,7 @@
 import { useState, useEffect, ChangeEvent } from "react";
 import { toast } from "react-toastify";
-import { ImageData, isNewImage } from "../../../types";
-import { MAX_IMAGES } from "../../../constants/opportunity";
+import { ImageData, isNewImage } from "../types/form";
+import { MAX_IMAGES } from "../constants/form";
 
 export function useImageManager(initialImages: ImageData[] = []) {
   const [images, setImages] = useState<ImageData[]>(initialImages);

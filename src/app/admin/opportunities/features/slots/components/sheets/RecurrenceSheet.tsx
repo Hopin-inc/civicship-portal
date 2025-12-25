@@ -21,7 +21,8 @@ import {
   ItemSeparator,
   ItemTitle,
 } from "@/components/ui/item";
-import { RecurrenceType, SlotData } from "../../../../types";
+import { RecurrenceType } from "../../types/recurrence";
+import { SlotData } from "../../../shared/types/slot";
 import { useRecurrenceState } from "../../hooks/useRecurrenceState";
 import dayjs from "dayjs";
 

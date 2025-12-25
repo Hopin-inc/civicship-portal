@@ -4,7 +4,7 @@ import { ChangeEvent, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Item, ItemActions, ItemContent, ItemTitle } from "@/components/ui/item";
 import { X } from "lucide-react";
-import { ImageData } from "../../../../types";
+import { ImageData } from "../../types/form";
 
 interface ImageUploadSectionProps {
   images: ImageData[];

@@ -1,5 +1,5 @@
 import { GqlOpportunitySlotHostingStatus } from "@/types/graphql";
-import { SlotData } from "../types";
+import { SlotData } from "../../shared/types/slot";
 
 /**
  * スロットが削除可能かどうかを判定
