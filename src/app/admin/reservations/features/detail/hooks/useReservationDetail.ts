@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { GqlEvaluationStatus, useGetReservationQuery } from "@/types/graphql";
+import { GqlEvaluationStatus, GqlOpportunityCategory, useGetReservationQuery } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { presentReservationDetail } from "../presenters/presentReservationDetail";
 import {
@@ -103,25 +103,36 @@ export function useReservationDetail(id: string, mode: ReservationMode | null) {
     },
   });
 
-  // ポイント計算
+  // ポイント計算（Questのみチェック）
+  const isQuest = opportunity?.category === GqlOpportunityCategory.Quest;
+  const pointsToEarn = opportunity?.pointsToEarn || 0;
+
   const passedCount = Object.values(attendanceData).filter(
     (status) => status === GqlEvaluationStatus.Passed,
   ).length;
 
-  const requiredPointsForApproval = calculateRequiredPointsForApproval(
-    priceInfo?.participantCount ?? 0,
-    opportunity?.pointsToEarn || 0,
-  );
+  // Questかつポイント報酬がある場合のみ計算
+  const requiredPointsForApproval =
+    isQuest && pointsToEarn > 0
+      ? calculateRequiredPointsForApproval(priceInfo?.participantCount ?? 0, pointsToEarn)
+      : 0;
 
-  const requiredPointsForAttendance = calculateRequiredPointsForAttendance(
-    passedCount,
-    opportunity?.pointsToEarn || 0,
-  );
+  const requiredPointsForAttendance =
+    isQuest && pointsToEarn > 0
+      ? calculateRequiredPointsForAttendance(passedCount, pointsToEarn)
+      : 0;
 
   const isInsufficientBalanceForApproval =
-    !balanceLoading && organizerBalance < BigInt(requiredPointsForApproval);
+    isQuest &&
+    pointsToEarn > 0 &&
+    !balanceLoading &&
+    organizerBalance < BigInt(requiredPointsForApproval);
+
   const isInsufficientBalanceForAttendance =
-    !balanceLoading && organizerBalance < BigInt(requiredPointsForAttendance);
+    isQuest &&
+    pointsToEarn > 0 &&
+    !balanceLoading &&
+    organizerBalance < BigInt(requiredPointsForAttendance);
 
   return {
     // データ
