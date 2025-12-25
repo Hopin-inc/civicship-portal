@@ -3,9 +3,9 @@ import { GqlEvaluationStatus, useGetReservationQuery } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { presentReservationDetail } from "../presenters/presentReservationDetail";
 import {
-  presentReservationPrice,
   calculateRequiredPointsForApproval,
   calculateRequiredPointsForAttendance,
+  presentReservationPrice,
 } from "../presenters/presentReservationPrice";
 import { useReservationApproval } from "./approval/useReservationApproval";
 import { useCancelSlot } from "./cancellation/useCancelSlot";
@@ -34,7 +34,7 @@ export function useReservationDetail(id: string, mode: ReservationMode | null) {
         opportunity: null,
         participations: [],
         activityCard: null,
-        statusMeta: { label: "", variant: "default" as const, step: "" },
+        statusMeta: { label: "", variant: "primary" as const, step: "" },
       };
     }
     return presentReservationDetail(data.reservation);

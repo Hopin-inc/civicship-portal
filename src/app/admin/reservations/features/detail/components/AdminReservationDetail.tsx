@@ -4,8 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { ExternalLink } from "lucide-react";
 import { displayPhoneNumber } from "@/utils";
 import { displayDuration } from "@/utils/date";
-import { cn } from "@/lib/utils";
-import { GqlOpportunityCategory, GqlReservation, Maybe } from "@/types/graphql";
+import { GqlOpportunityCategory, GqlReservation } from "@/types/graphql";
 import { ActivityCard } from "@/components/domains/opportunities/types";
 import { PriceInfo } from "@/app/admin/reservations/types";
 import Link from "next/link";
@@ -14,7 +13,7 @@ interface ReservationDetailsProps {
   reservation: GqlReservation;
   activityCard: ActivityCard;
   label: string;
-  variant: "default" | "primary" | "secondary" | "success" | "outline" | "destructive" | "warning";
+  variant: "primary" | "secondary" | "success" | "outline" | "destructive" | "warning";
   priceInfo: PriceInfo;
 }
 
@@ -33,7 +32,7 @@ const AdminReservationDetails: React.FC<ReservationDetailsProps> = ({
     isPointsOnly,
     category,
     pointsToEarn,
-    totalPointsToEarn
+    totalPointsToEarn,
   } = priceInfo;
 
   const isQuest = category === GqlOpportunityCategory.Quest;

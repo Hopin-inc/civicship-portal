@@ -71,7 +71,7 @@ export default function ReservationPage() {
   if (!reservation || !opportunity || !activityCard || !priceInfo) {
     return (
       <div className="p-4 pt-16">
-        <NotFound titleTarget="予約" />
+        <NotFound />
       </div>
     );
   }
