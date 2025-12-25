@@ -3,7 +3,7 @@ import { isPointsOnlyOpportunity } from "@/utils/opportunity/isPointsOnlyOpportu
 import { PriceInfo } from "@/app/admin/reservations/types";
 
 /**
- * 予約の料金情報を計算してプレゼンテーション用のデータに変換
+ * 予約の料金情報を計算
  */
 export function presentReservationPrice(
   reservation: GqlReservation,
@@ -29,4 +29,24 @@ export function presentReservationPrice(
     pointsToEarn,
     totalPointsToEarn,
   };
+}
+
+/**
+ * 承認に必要なポイントを計算
+ */
+export function calculateRequiredPointsForApproval(
+  participantCount: number,
+  pointsToEarn: number,
+): number {
+  return participantCount * pointsToEarn;
+}
+
+/**
+ * 出席確認に必要なポイントを計算
+ */
+export function calculateRequiredPointsForAttendance(
+  passedCount: number,
+  pointsToEarn: number,
+): number {
+  return passedCount * pointsToEarn;
 }
