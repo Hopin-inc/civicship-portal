@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { displayRelativeTime } from "@/utils";
 import { GqlReservation } from "@/types/graphql";
-import getReservationStatusMeta from "../hooks/useGetReservationStatusMeta";
+import getReservationStatusMeta from "../../detail/hooks/useGetReservationStatusMeta";
 import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
 

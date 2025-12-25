@@ -3,13 +3,13 @@
 import React, { useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import useReservations from "@/app/admin/reservations/hooks/useReservations";
+import useReservations from "./features/list/hooks/useReservations";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GqlReservation } from "@/types/graphql";
-import { useReservationSearch } from "@/app/admin/reservations/hooks/useReservationSearch";
+import { useReservationSearch } from "./features/list/hooks/useReservationSearch";
 import { Form } from "@/components/ui/form";
 import SearchForm from "@/app/search/components/SearchForm";
-import { ReservationList } from "./components/ReservationList";
+import { ReservationList } from "./features/list/components/ReservationList";
 import { TABS, isTabType, getReservationFilterFromTab } from "./constants/filters";
 
 export default function ReservationsPage() {

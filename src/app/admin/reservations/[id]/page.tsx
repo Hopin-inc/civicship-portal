@@ -7,24 +7,24 @@ import { GqlEvaluationStatus, GqlParticipation, useGetReservationQuery } from "@
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";
 import { presenterActivityCard } from "@/components/domains/opportunities/data/presenter";
-import getReservationStatusMeta from "@/app/admin/reservations/hooks/useGetReservationStatusMeta";
+import getReservationStatusMeta from "../features/detail/hooks/useGetReservationStatusMeta";
 import NotFound from "@/app/not-found";
-import { useReservationApproval } from "@/app/admin/reservations/hooks/approval/useReservationApproval";
-import { useCancelSlot } from "@/app/admin/reservations/hooks/cancellation/useCancelSlot";
-import { useCancelState } from "@/app/admin/reservations/hooks/cancellation/useCancelState";
-import { useReservationStatus } from "@/app/admin/reservations/hooks/cancellation/useCancelablity";
-import { useApprovalState } from "@/app/admin/reservations/hooks/approval/useApprovalState";
-import AdminReservationDetails from "@/app/admin/reservations/[id]/components/AdminReservationDetail";
-import CancelReservationSheet from "@/app/admin/reservations/components/CancelReservationSheet";
-import ApprovalSheet from "@/app/admin/reservations/components/ApprovalSheet";
-import AttendanceSheet from "@/app/admin/reservations/components/AttendanceSheet";
-import { useAttendanceState } from "@/app/admin/reservations/hooks/attendance/useAttendanceState";
-import { useSaveAttendances } from "@/app/admin/reservations/hooks/attendance/useSaveAttendances";
+import { useReservationApproval } from "../features/detail/hooks/approval/useReservationApproval";
+import { useCancelSlot } from "../features/detail/hooks/cancellation/useCancelSlot";
+import { useCancelState } from "../features/detail/hooks/cancellation/useCancelState";
+import { useReservationStatus } from "../features/detail/hooks/cancellation/useCancelablity";
+import { useApprovalState } from "../features/detail/hooks/approval/useApprovalState";
+import AdminReservationDetails from "../features/detail/components/AdminReservationDetail";
+import CancelReservationSheet from "../features/detail/components/CancelReservationSheet";
+import ApprovalSheet from "../features/detail/components/ApprovalSheet";
+import AttendanceSheet from "../features/detail/components/AttendanceSheet";
+import { useAttendanceState } from "../features/detail/hooks/attendance/useAttendanceState";
+import { useSaveAttendances } from "../features/detail/hooks/attendance/useSaveAttendances";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { PriceInfo } from "@/app/admin/reservations/types";
 import { isPointsOnlyOpportunity } from "@/utils/opportunity/isPointsOnlyOpportunity";
-import { useOrganizerWallet } from "@/app/admin/reservations/hooks/useOrganizerWallet";
-import { InsufficientBalanceNotice } from "@/app/admin/reservations/[id]/components/InsufficientBalanceNotice";
+import { useOrganizerWallet } from "../features/detail/hooks/useOrganizerWallet";
+import { InsufficientBalanceNotice } from "../features/detail/components/InsufficientBalanceNotice";
 
 export default function ReservationPage() {
   const params = useParams();
