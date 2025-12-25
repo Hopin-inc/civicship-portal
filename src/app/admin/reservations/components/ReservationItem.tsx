@@ -39,13 +39,16 @@ export function ReservationItem({ reservation, showActionButton = false }: Reser
       onClick={handleClick}
       className="space-y-3 rounded-xl border p-4 bg-muted/30 cursor-pointer hover:bg-muted/50 transition-colors"
     >
-      {/* ステータス表示 */}
-      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-        <span
-          className={cn("size-2.5 rounded-full", statusColorClass)}
-          aria-label={label}
-        />
-        <span>{label}</span>
+      {/* ステータスと作成日時 */}
+      <div className="flex items-center justify-between text-xs text-muted-foreground">
+        <div className="flex items-center gap-1.5">
+          <span
+            className={cn("size-2.5 rounded-full", statusColorClass)}
+            aria-label={label}
+          />
+          <span>{label}</span>
+        </div>
+        <span>{displayRelativeTime(reservation.createdAt ?? "")}</span>
       </div>
 
       <div className="flex justify-between items-start gap-4">
@@ -82,11 +85,6 @@ export function ReservationItem({ reservation, showActionButton = false }: Reser
                   reservation.opportunitySlot.endsAt,
                 )}
             </span>
-          </div>
-
-          {/* 作成日時 */}
-          <div className="text-xs text-muted-foreground">
-            {displayRelativeTime(reservation.createdAt ?? "")}
           </div>
         </div>
 
