@@ -3,7 +3,6 @@
 import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Bookmark, CalendarIcon } from "lucide-react";
 import { displayRelativeTime } from "@/utils";
 import { displayDuration } from "@/utils/date";
 import { GqlReservation } from "@/types/graphql";
@@ -67,24 +66,18 @@ export function ReservationItem({ reservation, showActionButton = false }: Reser
             </span>
           </div>
 
-          {/* 募集タイトル */}
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Bookmark size={14} className="flex-shrink-0" />
-            <span className="truncate">
-              {reservation.opportunitySlot?.opportunity?.title}
-            </span>
-          </div>
-
-          {/* 開催日時 */}
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <CalendarIcon size={14} className="flex-shrink-0" />
-            <span className="truncate">
-              {reservation.opportunitySlot?.startsAt &&
-                displayDuration(
+          {/* 募集タイトル・開催日時 */}
+          <div className="text-xs text-muted-foreground truncate">
+            {reservation.opportunitySlot?.opportunity?.title}
+            {reservation.opportunitySlot?.startsAt && (
+              <>
+                ・
+                {displayDuration(
                   reservation.opportunitySlot.startsAt,
                   reservation.opportunitySlot.endsAt,
                 )}
-            </span>
+              </>
+            )}
           </div>
         </div>
 
