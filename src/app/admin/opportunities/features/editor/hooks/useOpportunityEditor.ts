@@ -44,13 +44,55 @@ export const useOpportunityEditor = ({
   );
 
   return {
-    // フォーム状態をそのまま展開
-    ...formState,
+    // 基本情報
+    category: formState.category,
+    setCategory: formState.setCategory,
+    title: formState.title,
+    setTitle: formState.setTitle,
+    summary: formState.summary,
+    setSummary: formState.setSummary,
+    description: formState.description,
+    setDescription: formState.setDescription,
 
-    // スロット操作に cancelSlot を追加
+    // 主催・場所
+    hostUserId: formState.hostUserId,
+    setHostUserId: formState.setHostUserId,
+    placeId: formState.placeId,
+    setPlaceId: formState.setPlaceId,
+    requireHostApproval: formState.requireHostApproval,
+    setRequireHostApproval: formState.setRequireHostApproval,
+
+    // 募集条件
+    capacity: formState.capacity,
+    setCapacity: formState.setCapacity,
+    feeRequired: formState.feeRequired,
+    setFeeRequired: formState.setFeeRequired,
+    pointsRequired: formState.pointsRequired,
+    setPointsRequired: formState.setPointsRequired,
+    pointsToEarn: formState.pointsToEarn,
+    setPointsToEarn: formState.setPointsToEarn,
+
+    // 公開設定
+    publishStatus: formState.publishStatus,
+    setPublishStatus: formState.setPublishStatus,
+
+    // 開催枠（slotManager から直接展開）
+    slots: formState.slotManager.slots,
+    addSlot: formState.slotManager.addSlot,
+    addSlotsBatch: formState.slotManager.addSlotsBatch,
+    updateSlot: formState.slotManager.updateSlot,
+    removeSlot: formState.slotManager.removeSlot,
     cancelSlot,
 
-    // 保存処理
+    // 画像（imageManager から直接展開）
+    images: formState.imageManager.images,
+    handleImageSelect: formState.imageManager.handleImageSelect,
+    removeImage: formState.imageManager.removeImage,
+
+    // バリデーション
+    errors: formState.validation.errors,
+
+    // 保存
     handleSave,
     saving,
   };
