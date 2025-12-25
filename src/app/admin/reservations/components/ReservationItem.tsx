@@ -52,7 +52,7 @@ export function ReservationItem({ reservation }: ReservationItemProps) {
   return (
     <div
       onClick={handleClick}
-      className="space-y-3 rounded-xl border p-4 bg-muted/30 cursor-pointer hover:bg-muted/50 transition-colors"
+      className="space-y-2 rounded-xl border p-3 bg-muted/30 cursor-pointer hover:bg-muted/50 transition-colors"
     >
       {/* ステータスと作成日時 */}
       <div className="flex items-center justify-between text-xs text-muted-foreground">
@@ -67,7 +67,7 @@ export function ReservationItem({ reservation }: ReservationItemProps) {
       </div>
 
       {/* 情報 */}
-      <div className="flex-1 min-w-0 space-y-2">
+      <div className="flex-1 min-w-0 space-y-1.5">
         {/* ユーザー情報 */}
         <div className="flex items-center gap-2">
           <Avatar className="h-6 w-6">

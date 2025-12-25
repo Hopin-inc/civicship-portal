@@ -9,7 +9,6 @@ import { ActivityCard } from "@/components/domains/opportunities/types";
 import OpportunityHorizontalCard from "@/components/domains/opportunities/components/OpportunityHorizontalCard";
 import { formatOpportunities } from "@/components/domains/opportunities/utils";
 import { PriceInfo } from "@/app/admin/reservations/types";
-import Link from "next/link";
 
 interface ReservationDetailsProps {
   reservation: GqlReservation;
@@ -115,22 +114,16 @@ const ReservationSection: React.FC<{
   } = priceInfo;
 
   const isQuest = category === GqlOpportunityCategory.Quest;
-  const opportunity = reservation.opportunitySlot?.opportunity;
-  const link = opportunity
-    ? isQuest
-      ? `/quests/${opportunity.id}?community_id=${opportunity.community?.id}`
-      : `/activities/${opportunity.id}?community_id=${opportunity.community?.id}`
-    : "#";
 
   return (
     <div className="mb-10">
       {/* 募集情報 */}
-      <Link href={link} className="block mb-4">
+      <div className="mb-4">
         <OpportunityHorizontalCard
           {...formattedActivityCard}
           withShadow={false}
         />
-      </Link>
+      </div>
 
       {/* 日時 */}
       <dl className="flex justify-between items-center py-5 border-b border-foreground-caption">

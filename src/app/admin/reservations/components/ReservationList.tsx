@@ -44,7 +44,7 @@ export function ReservationList({
   // データ表示
   return (
     <>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-2">
         {reservations.map((reservation: GqlReservation) => (
           <ReservationItem
             key={reservation.id}
