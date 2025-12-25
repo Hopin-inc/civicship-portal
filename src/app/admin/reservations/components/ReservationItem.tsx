@@ -3,10 +3,10 @@
 import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { displayRelativeTime } from "@/utils";
-import { displayDuration } from "@/utils/date";
 import { GqlReservation } from "@/types/graphql";
 import getReservationStatusMeta from "../hooks/useGetReservationStatusMeta";
 import { cn } from "@/lib/utils";
+import dayjs from "dayjs";
 
 interface ReservationItemProps {
   reservation: GqlReservation;
@@ -18,6 +18,24 @@ export function ReservationItem({ reservation }: ReservationItemProps) {
 
   const handleClick = () => {
     router.push(`/admin/reservations/${reservation.id}/?mode=${step}`);
+  };
+
+  // 日付フォーマット（月/日 時:分 - 時:分）
+  const formatSlotTime = (start: Date | string, end?: Date | string) => {
+    const dStart = dayjs(start);
+    const dEnd = end ? dayjs(end) : null;
+
+    if (!dEnd) {
+      return dStart.format("M/D H:mm");
+    }
+
+    if (dStart.isSame(dEnd, "date")) {
+      // 同じ日付の場合: 01/15 10:00 - 12:00
+      return `${dStart.format("M/D H:mm")} - ${dEnd.format("H:mm")}`;
+    } else {
+      // 日付を跨ぐ場合: 01/15 10:00 - 01/16 12:00
+      return `${dStart.format("M/D H:mm")} - ${dEnd.format("M/D H:mm")}`;
+    }
   };
 
   // バリアントに応じた色クラス
@@ -69,7 +87,7 @@ export function ReservationItem({ reservation }: ReservationItemProps) {
           {reservation.opportunitySlot?.startsAt && (
             <>
               ・
-              {displayDuration(
+              {formatSlotTime(
                 reservation.opportunitySlot.startsAt,
                 reservation.opportunitySlot.endsAt,
               )}
