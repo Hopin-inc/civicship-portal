@@ -3,6 +3,7 @@
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Item } from "@/components/ui/item";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { Check } from "lucide-react";
 
 interface SelectorSheetProps<T> {
   open: boolean;
@@ -74,9 +75,16 @@ export function SelectorSheet<T>({
                         onOpenChange(false);
                       }
                     }}
-                    className="cursor-pointer"
+                    className="cursor-pointer relative"
                   >
-                    {renderItem(item, isSelected)}
+                    <div className="flex items-center gap-3 w-full">
+                      <div className="flex-1">
+                        {renderItem(item, isSelected)}
+                      </div>
+                      {isSelected && (
+                        <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                      )}
+                    </div>
                   </Item>
                 );
               })}
