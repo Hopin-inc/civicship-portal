@@ -4,7 +4,16 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { ArrowLeftRight, CalendarCheck, ClipboardList, Image, MegaphoneIcon, Ticket, Users, Wallet } from "lucide-react";
+import {
+  ArrowLeftRight,
+  CalendarCheck,
+  ClipboardList,
+  Image,
+  MegaphoneIcon,
+  Ticket,
+  Users,
+  Wallet,
+} from "lucide-react";
 import { currentCommunityConfig, FeaturesType } from "@/lib/communities/metadata";
 import { useAdminRole } from "@/app/admin/context/AdminRoleContext";
 import { GqlRole } from "@/types/graphql";
@@ -24,18 +33,6 @@ const adminSettings = [
     icon: Wallet,
     requiredFeature: "points" as FeaturesType,
   },
-  {
-    title: "証明書管理",
-    href: "/admin/credentials",
-    icon: ClipboardList,
-    requiredFeature: "credentials" as FeaturesType,
-  },
-  {
-    title: "NFT管理",
-    href: "/admin/nfts",
-    icon: Image,
-    requiredFeature: "credentials" as FeaturesType,
-  },
 ];
 
 const operatorSettings = [
@@ -50,6 +47,17 @@ const operatorSettings = [
     href: "/admin/reservations",
     icon: CalendarCheck,
     requiredFeature: "opportunities" as FeaturesType,
+  },
+  {
+    title: "証明書管理",
+    href: "/admin/credentials",
+    icon: ClipboardList,
+    requiredFeature: "credentials" as FeaturesType,
+  },
+  {
+    title: "NFT管理",
+    href: "/admin/nfts",
+    icon: Image,
   },
   {
     title: "チケット管理",
