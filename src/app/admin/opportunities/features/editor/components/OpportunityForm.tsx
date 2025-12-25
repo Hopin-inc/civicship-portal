@@ -1,21 +1,15 @@
 import { FormEvent } from "react";
 import { Button } from "@/components/ui/button";
-import { GqlPublishStatus } from "@/types/graphql";
+import { GqlPublishStatus, GqlOpportunityCategory } from "@/types/graphql";
 import { ContentSection } from "./sections/ContentSection";
 import { SettingsSection } from "./sections/SettingsSection";
 import { CategorySettingsSection } from "./sections/CategorySettingsSection";
 import { OperationSection } from "./sections/OperationSection";
-import { ImageData } from "../types/form";
+import { ImageData, ValidationErrors } from "../types/form";
 import { SlotData } from "../../shared/types/slot";
-import { ValidationErrors } from "../types/form";
-import { GqlOpportunityCategory } from "@/types/graphql";
 
-interface OpportunityFormProps {
-  mode: "create" | "update";
-  saving: boolean;
-  onSubmit: (e: FormEvent) => void;
-
-  // Content
+// グループ化された props 型定義
+export interface ContentProps {
   title: string;
   onTitleChange: (value: string) => void;
   summary: string;
@@ -27,16 +21,19 @@ interface OpportunityFormProps {
   onRemoveImage: (index: number) => void;
   slots: SlotData[];
   onSlotsClick: () => void;
+}
 
-  // Settings
+export interface SettingsProps {
   selectedHostName: string | null;
   onHostClick: () => void;
   selectedPlaceName: string | null;
   onPlaceClick: () => void;
   capacity: number;
   onCapacityChange: (value: number) => void;
+}
 
-  // Category
+export interface CategoryProps {
+  mode: "create" | "update";
   category: GqlOpportunityCategory;
   onCategoryChange: (value: GqlOpportunityCategory) => void;
   feeRequired: number;
@@ -45,14 +42,23 @@ interface OpportunityFormProps {
   onPointsRequiredChange: (value: number) => void;
   pointsToEarn: number;
   onPointsToEarnChange: (value: number) => void;
+}
 
-  // Operation
+export interface OperationProps {
   requireHostApproval: boolean;
   onRequireHostApprovalChange: (value: boolean) => void;
   publishStatus: GqlPublishStatus;
   onPublishStatusChange: (value: string) => void;
+}
 
-  // Validation
+interface OpportunityFormProps {
+  mode: "create" | "update";
+  saving: boolean;
+  onSubmit: (e: FormEvent) => void;
+  content: ContentProps;
+  settings: SettingsProps;
+  category: CategoryProps;
+  operation: OperationProps;
   errors: ValidationErrors;
 }
 
@@ -60,86 +66,31 @@ export function OpportunityForm({
   mode,
   saving,
   onSubmit,
-  title,
-  onTitleChange,
-  summary,
-  onSummaryChange,
-  description,
-  onDescriptionClick,
-  images,
-  onImageSelect,
-  onRemoveImage,
-  slots,
-  onSlotsClick,
-  selectedHostName,
-  onHostClick,
-  selectedPlaceName,
-  onPlaceClick,
-  capacity,
-  onCapacityChange,
+  content,
+  settings,
   category,
-  onCategoryChange,
-  feeRequired,
-  onFeeRequiredChange,
-  pointsRequired,
-  onPointsRequiredChange,
-  pointsToEarn,
-  onPointsToEarnChange,
-  requireHostApproval,
-  onRequireHostApprovalChange,
-  publishStatus,
-  onPublishStatusChange,
+  operation,
   errors,
 }: OpportunityFormProps) {
   return (
     <form onSubmit={onSubmit} className="space-y-8">
-      {/* === セクション1: コンテンツ（タイトル〜開催枠） === */}
+      {/* === セクション1: コンテンツ === */}
       <ContentSection
-        title={title}
-        onTitleChange={onTitleChange}
-        summary={summary}
-        onSummaryChange={onSummaryChange}
-        description={description}
-        onDescriptionClick={onDescriptionClick}
-        images={images}
-        onImageSelect={onImageSelect}
-        onRemoveImage={onRemoveImage}
-        slots={slots}
-        onSlotsClick={onSlotsClick}
+        {...content}
         errors={errors}
       />
 
       {/* === セクション2: 設定 === */}
       <SettingsSection
-        selectedHostName={selectedHostName}
-        onHostClick={onHostClick}
-        selectedPlaceName={selectedPlaceName}
-        onPlaceClick={onPlaceClick}
-        capacity={capacity}
-        onCapacityChange={onCapacityChange}
+        {...settings}
         errors={errors}
       />
 
       {/* === セクション3: カテゴリ・料金設定 === */}
-      <CategorySettingsSection
-        mode={mode}
-        category={category}
-        onCategoryChange={onCategoryChange}
-        feeRequired={feeRequired}
-        onFeeRequiredChange={onFeeRequiredChange}
-        pointsRequired={pointsRequired}
-        onPointsRequiredChange={onPointsRequiredChange}
-        pointsToEarn={pointsToEarn}
-        onPointsToEarnChange={onPointsToEarnChange}
-      />
+      <CategorySettingsSection {...category} />
 
       {/* === セクション4: 運用・公開設定 === */}
-      <OperationSection
-        requireHostApproval={requireHostApproval}
-        onRequireHostApprovalChange={onRequireHostApprovalChange}
-        publishStatus={publishStatus}
-        onPublishStatusChange={onPublishStatusChange}
-      />
+      <OperationSection {...operation} />
 
       {/* 送信ボタン */}
       <div className="w-full max-w-[345px] mx-auto">
