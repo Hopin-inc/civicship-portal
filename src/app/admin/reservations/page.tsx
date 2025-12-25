@@ -84,6 +84,8 @@ export default function ReservationsPage() {
     () => ({
       title: "予約管理",
       showLogo: false,
+      showBackButton: true,
+      backTo: "/admin",
     }),
     [],
   );
