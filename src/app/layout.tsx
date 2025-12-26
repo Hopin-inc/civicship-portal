@@ -141,15 +141,15 @@ const RootLayout = async ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
-  const { user, lineAuthenticated, phoneAuthenticated } = await getUserServer();
-
-  const locale = await getLocale();
-  const messages = await getMessages();
-
-  // Get communityId from request headers (set by middleware) or cookies or env var
+  // Get communityId early for getUserServer call
   const headersList = await headers();
   const cookieStore = await cookies();
   const communityId = headersList.get("x-community-id") || cookieStore.get("communityId")?.value || COMMUNITY_ID;
+  
+  const { user, lineAuthenticated, phoneAuthenticated } = await getUserServer(communityId);
+
+  const locale = await getLocale();
+  const messages = await getMessages();
 
   // Fetch community config from database, fallback to hardcoded config
   let communityConfig: CommunityPortalConfig | null = null;

@@ -31,9 +31,10 @@ const fallbackConnection: GqlTransactionsConnection = {
 
 /**
  * サーバーサイドでマイウォレット情報とトランザクションを統合取得する関数
+ * @param params.communityId - Runtime community ID from URL path (optional)
  */
 export async function getServerMyWalletWithTransactions(
-  params: { first?: number; after?: string } = {}
+  params: { communityId?: string; first?: number; after?: string } = {}
 ): Promise<MyWalletWithTransactionsResult> {
   const hasSession = await hasServerSession();
   const cookieHeader = await getServerCookieHeader();
@@ -45,7 +46,7 @@ export async function getServerMyWalletWithTransactions(
     };
   }
 
-  const { first = 20, after } = params;
+  const { communityId, first = 20, after } = params;
 
   try {
     const variables = {
@@ -53,6 +54,14 @@ export async function getServerMyWalletWithTransactions(
       cursor: after,
       sort: { createdAt: 'desc' },
     };
+
+    const headers: Record<string, string> = {};
+    if (cookieHeader) {
+      headers.cookie = cookieHeader;
+    }
+    if (communityId) {
+      headers["X-Community-Id"] = communityId;
+    }
 
     const data = await executeServerGraphQLQuery<{
       myWallet: {
@@ -70,7 +79,7 @@ export async function getServerMyWalletWithTransactions(
     }>(
       GET_MY_WALLET_WITH_TRANSACTIONS_SERVER_QUERY,
       variables,
-      cookieHeader ? { cookie: cookieHeader } : {}
+      headers
     );
 
     const myWallet = data.myWallet;

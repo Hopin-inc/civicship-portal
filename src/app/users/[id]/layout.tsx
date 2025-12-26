@@ -13,12 +13,13 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const user = await fetchUserServer(id);
   
   // Get communityId from request headers (set by middleware) or cookies
   const headersList = await headers();
   const cookieStore = await cookies();
   const communityId = headersList.get("x-community-id") || cookieStore.get("communityId")?.value || "";
+  
+  const user = await fetchUserServer(id, communityId);
   
   // Fetch community config from database
   const communityConfig = await getCommunityConfig(communityId);
@@ -62,7 +63,13 @@ export default async function Layout({
   params: { id: string };
 }) {
   const { id } = await params;
-  const gqlUser = await fetchUserServer(id);
+  
+  // Get communityId from request headers (set by middleware) or cookies
+  const headersList = await headers();
+  const cookieStore = await cookies();
+  const communityId = headersList.get("x-community-id") || cookieStore.get("communityId")?.value || "";
+  
+  const gqlUser = await fetchUserServer(id, communityId);
 
   if (!gqlUser) {
     notFound();

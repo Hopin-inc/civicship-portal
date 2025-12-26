@@ -9,7 +9,7 @@ import { logger } from "@/lib/logging";
 import { GET_CURRENT_USER_SERVER_QUERY } from "@/graphql/account/user/server";
 import { hasServerSession, getServerCookieHeader } from "@/lib/auth/server/session";
 
-export async function getUserServer(): Promise<{
+export async function getUserServer(communityId?: string): Promise<{
   user: GqlUser | null;
   lineAuthenticated: boolean;
   phoneAuthenticated: boolean;
@@ -28,11 +28,19 @@ export async function getUserServer(): Promise<{
     };
   }
 
+  const headers: Record<string, string> = {};
+  if (cookieHeader) {
+    headers.cookie = cookieHeader;
+  }
+  if (communityId) {
+    headers["X-Community-Id"] = communityId;
+  }
+
   try {
     const res = await executeServerGraphQLQuery<
       GqlCurrentUserServerQuery,
       GqlCurrentUserServerQueryVariables
-    >(GET_CURRENT_USER_SERVER_QUERY, {}, cookieHeader ? { cookie: cookieHeader } : {});
+    >(GET_CURRENT_USER_SERVER_QUERY, {}, headers);
 
     const user: GqlUser | null = res.currentUser?.user ?? null;
     const hasPhoneIdentity = !!user?.identities?.some((i) => i.platform?.toUpperCase() === "PHONE");
