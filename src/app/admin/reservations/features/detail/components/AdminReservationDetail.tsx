@@ -1,10 +1,9 @@
 import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Phone, MessageSquare } from "lucide-react";
+import { ExternalLink, MessageSquare, Phone } from "lucide-react";
 import { displayDuration } from "@/utils/date";
 import { GqlOpportunityCategory, GqlReservation } from "@/types/graphql";
-import { ActivityCard } from "@/components/domains/opportunities/types";
 import { PriceInfo } from "@/app/admin/reservations/types";
 import { PaymentBreakdown } from "../presenters/presentPaymentBreakdown";
 import Link from "next/link";
@@ -12,7 +11,6 @@ import { cn } from "@/lib/utils";
 
 interface ReservationDetailsProps {
   reservation: GqlReservation;
-  activityCard: ActivityCard;
   label: string;
   variant: "primary" | "secondary" | "success" | "outline" | "destructive" | "warning";
   priceInfo: PriceInfo;
@@ -21,7 +19,6 @@ interface ReservationDetailsProps {
 
 const AdminReservationDetails: React.FC<ReservationDetailsProps> = ({
   reservation,
-  activityCard,
   label,
   variant,
   priceInfo,
@@ -38,14 +35,15 @@ const AdminReservationDetails: React.FC<ReservationDetailsProps> = ({
     : "#";
 
   // バリアントに応じた色クラス
-  const statusColorClass = {
-    primary: "bg-primary",
-    secondary: "bg-secondary",
-    success: "bg-success",
-    warning: "bg-warning",
-    destructive: "bg-destructive",
-    outline: "bg-muted-foreground",
-  }[variant] || "bg-muted-foreground";
+  const statusColorClass =
+    {
+      primary: "bg-primary",
+      secondary: "bg-secondary",
+      success: "bg-success",
+      warning: "bg-warning",
+      destructive: "bg-destructive",
+      outline: "bg-muted-foreground",
+    }[variant] || "bg-muted-foreground";
 
   return (
     <div>
@@ -55,10 +53,7 @@ const AdminReservationDetails: React.FC<ReservationDetailsProps> = ({
         <div className="flex flex-col gap-2.5 flex-grow min-w-0">
           {/* ステータス */}
           <div className="flex items-center gap-1.5 text-label-sm">
-            <span
-              className={cn("size-2.5 rounded-full", statusColorClass)}
-              aria-label={label}
-            />
+            <span className={cn("size-2.5 rounded-full", statusColorClass)} aria-label={label} />
             <span>{label}</span>
           </div>
 
@@ -80,21 +75,13 @@ const AdminReservationDetails: React.FC<ReservationDetailsProps> = ({
         <div className="flex gap-2 flex-shrink-0">
           {reservation.createdByUser?.phoneNumber && (
             <>
-              <Button
-                variant="outline"
-                size="sm"
-                asChild
-              >
+              <Button variant="tertiary" size="sm" asChild>
                 <a href={`tel:${reservation.createdByUser.phoneNumber}`}>
                   <Phone className="h-4 w-4 mr-1.5" />
                   電話
                 </a>
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                asChild
-              >
+              <Button variant="tertiary" size="sm" asChild>
                 <a href={`sms:${reservation.createdByUser.phoneNumber}`}>
                   <MessageSquare className="h-4 w-4 mr-1.5" />
                   メッセージ

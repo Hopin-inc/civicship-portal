@@ -1,5 +1,9 @@
 import { useMemo, useState } from "react";
-import { GqlEvaluationStatus, GqlOpportunityCategory, useGetReservationQuery } from "@/types/graphql";
+import {
+  GqlEvaluationStatus,
+  GqlOpportunityCategory,
+  useGetReservationQuery,
+} from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { presentReservationDetail } from "../presenters/presentReservationDetail";
 import {
@@ -28,13 +32,12 @@ export function useReservationDetail(id: string, mode: ReservationMode | null) {
   });
 
   // データ整形
-  const { reservation, opportunity, participations, activityCard, statusMeta } = useMemo(() => {
+  const { reservation, opportunity, participations, statusMeta } = useMemo(() => {
     if (!data?.reservation) {
       return {
         reservation: null,
         opportunity: null,
         participations: [],
-        activityCard: null,
         statusMeta: { label: "", variant: "primary" as const, step: "" },
       };
     }
@@ -146,7 +149,6 @@ export function useReservationDetail(id: string, mode: ReservationMode | null) {
     reservation,
     opportunity,
     participations,
-    activityCard,
     priceInfo,
     paymentBreakdown,
     statusMeta,

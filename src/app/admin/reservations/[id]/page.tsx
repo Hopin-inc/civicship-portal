@@ -42,7 +42,6 @@ export default function ReservationPage() {
   const {
     reservation,
     opportunity,
-    activityCard,
     priceInfo,
     paymentBreakdown,
     statusMeta,
@@ -73,7 +72,7 @@ export default function ReservationPage() {
     );
   }
 
-  if (!reservation || !opportunity || !activityCard || !priceInfo) {
+  if (!reservation || !opportunity || !priceInfo) {
     return (
       <div className="p-4 pt-16">
         <NotFound />
@@ -96,7 +95,6 @@ export default function ReservationPage() {
       <div>
         <AdminReservationDetails
           reservation={reservation}
-          activityCard={activityCard}
           priceInfo={priceInfo}
           paymentBreakdown={paymentBreakdown}
           label={statusMeta.label}
