@@ -8,6 +8,16 @@ import { logger } from "@/lib/logging";
 import { GET_MEMBERSHIP_LIST_SERVER_QUERY } from "@/graphql/account/membership/server";
 import { hasServerSession, getServerCookieHeader } from "@/lib/auth/server/session";
 
+interface GetMembershipListServerOptions {
+  first?: number;
+  cursor?: { userId: string; communityId: string };
+  filter?: GqlMembershipFilterInput;
+  sort?: GqlMembershipSortInput;
+  withWallets?: boolean;
+  withDidIssuanceRequests?: boolean;
+  communityId?: string;
+}
+
 interface GetMembershipListServerVariables {
   first?: number;
   cursor?: { userId: string; communityId: string };
@@ -22,10 +32,11 @@ interface GetMembershipListServerResponse {
 }
 
 export async function getMembershipListServer(
-  variables: GetMembershipListServerVariables
+  options: GetMembershipListServerOptions
 ): Promise<{
   connection: GqlMembershipsConnection | null;
 }> {
+  const { communityId, ...variables } = options;
   const hasSession = await hasServerSession();
   const cookieHeader = await getServerCookieHeader();
 
@@ -36,6 +47,14 @@ export async function getMembershipListServer(
     };
   }
 
+  const headers: Record<string, string> = {};
+  if (cookieHeader) {
+    headers.cookie = cookieHeader;
+  }
+  if (communityId) {
+    headers["X-Community-Id"] = communityId;
+  }
+
   try {
     const res = await executeServerGraphQLQuery<
       GetMembershipListServerResponse,
@@ -43,7 +62,7 @@ export async function getMembershipListServer(
     >(
       GET_MEMBERSHIP_LIST_SERVER_QUERY,
       variables,
-      cookieHeader ? { cookie: cookieHeader } : {}
+      headers
     );
 
     return {

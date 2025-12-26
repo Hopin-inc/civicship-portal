@@ -92,6 +92,7 @@ export function useMemberWithDidSearch(
         first: pageSize,
         withWallets: true,
         withDidIssuanceRequests: true,
+        communityId,
       })
         .then((result) => {
           if (cancelled) return;
@@ -131,6 +132,7 @@ export function useMemberWithDidSearch(
       first: pageSize,
       withWallets: true,
       withDidIssuanceRequests: true,
+      communityId,
     })
       .then((result) => {
         if (cancelled) return;
@@ -184,6 +186,7 @@ export function useMemberWithDidSearch(
         first: pageSize,
         withWallets: true,
         withDidIssuanceRequests: true,
+        communityId,
       });
 
       if (result.connection) {
@@ -231,6 +234,7 @@ export function useMemberWithDidSearch(
         first: pageSize,
         withWallets: true,
         withDidIssuanceRequests: true,
+        communityId,
       });
       if (result.connection) {
         setLocalConnection(result.connection);

@@ -16,6 +16,7 @@ export default async function SelectOpportunity() {
       first: 20,
       withWallets: true,
       withDidIssuanceRequests: true,
+      communityId: communityId,
     });
     connection = result.connection;
   } catch (error) {

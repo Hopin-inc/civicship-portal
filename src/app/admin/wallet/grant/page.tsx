@@ -18,6 +18,7 @@ export default async function GrantPage() {
       first: 20,
       withWallets: true,
       withDidIssuanceRequests: true,
+      communityId: communityId,
     });
     connection = result.connection;
   } catch (error) {
