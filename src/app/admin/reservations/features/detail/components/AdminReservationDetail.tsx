@@ -73,26 +73,29 @@ const AdminReservationDetails: React.FC<ReservationDetailsProps> = ({
 
         {/* 右側：電話・メッセージボタン */}
         <div className="flex gap-2 flex-shrink-0">
-          {reservation.createdByUser?.phoneNumber && (
+          {reservation.createdByUser?.phoneNumber ? (
             <>
               <Button variant="tertiary" size="sm" asChild>
                 <a href={`tel:${reservation.createdByUser.phoneNumber}`}>
-                  <Phone className="h-4 w-4 mr-1.5" />
+                  <Phone className="h-4 w-4 mr-1" />
                   電話
                 </a>
               </Button>
               <Button variant="tertiary" size="sm" asChild>
                 <a href={`sms:${reservation.createdByUser.phoneNumber}`}>
-                  <MessageSquare className="h-4 w-4 mr-1.5" />
+                  <MessageSquare className="h-4 w-4 mr-1" />
                   メッセージ
                 </a>
               </Button>
             </>
+          ) : (
+            <span className="text-label-sm text-muted-foreground">電話番号 未設定</span>
           )}
         </div>
       </div>
 
-      {/* 自己紹介 */}
+      {/* コンテンツ（bg-card） */}
+      <div className="bg-card rounded-lg p-5 mt-5">{/* 自己紹介 */}
       {reservation.createdByUser?.bio?.trim() && (
         <dl className="py-5 border-b border-foreground-caption">
           <dt className="text-label-sm font-bold mb-2">自己紹介</dt>
@@ -212,6 +215,7 @@ const AdminReservationDetails: React.FC<ReservationDetailsProps> = ({
           <dd className="text-body-sm">{reservation.comment}</dd>
         </dl>
       )}
+      </div>
     </div>
   );
 };
