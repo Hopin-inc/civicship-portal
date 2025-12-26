@@ -1,5 +1,7 @@
 import { GqlOpportunity, GqlReservation } from "@/types/graphql";
 
+export type PaymentType = "FEE_ONLY" | "POINT_ONLY" | "MIXED";
+
 export interface PaymentBreakdown {
   // 現金払い
   feePayerCount: number;
@@ -13,6 +15,9 @@ export interface PaymentBreakdown {
 
   // 合計
   totalParticipants: number;
+
+  // 支払いタイプ
+  paymentType: PaymentType;
 }
 
 /**
@@ -32,6 +37,14 @@ export function presentPaymentBreakdown(
   const totalFee = feePerPerson * feePayerCount;
   const totalPoints = pointsPerPerson * pointPayerCount;
 
+  // 支払いタイプを判定
+  const paymentType: PaymentType =
+    pointPayerCount === 0
+      ? "FEE_ONLY"
+      : pointPayerCount === totalParticipants
+      ? "POINT_ONLY"
+      : "MIXED";
+
   return {
     feePayerCount,
     totalFee,
@@ -40,5 +53,6 @@ export function presentPaymentBreakdown(
     totalPoints,
     pointsPerPerson,
     totalParticipants,
+    paymentType,
   };
 }

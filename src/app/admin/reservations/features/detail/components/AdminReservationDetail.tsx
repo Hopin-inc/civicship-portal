@@ -14,7 +14,7 @@ interface ReservationDetailsProps {
   reservation: GqlReservation;
   activityCard: ActivityCard;
   label: string;
-  variant: "default" | "primary" | "secondary" | "success" | "outline" | "destructive" | "warning";
+  variant: "primary" | "secondary" | "success" | "outline" | "destructive" | "warning";
   priceInfo: PriceInfo;
   paymentBreakdown?: PaymentBreakdown;
 }
@@ -124,9 +124,9 @@ const AdminReservationDetails: React.FC<ReservationDetailsProps> = ({
       {/* 料金・ポイント（内訳表示） */}
       {!isQuest && paymentBreakdown && (
         <>
-          {paymentBreakdown.feePayerCount > 0 && (
+          {paymentBreakdown.paymentType === "FEE_ONLY" && (
             <dl className="flex justify-between items-center py-5 border-b border-foreground-caption">
-              <dt className="text-label-sm font-bold">参加費（現金）</dt>
+              <dt className="text-label-sm font-bold">参加費</dt>
               <dd className="text-body-sm">
                 {paymentBreakdown.totalFee.toLocaleString()}円
                 <span className="text-label-sm text-muted-foreground ml-2">
@@ -137,9 +137,9 @@ const AdminReservationDetails: React.FC<ReservationDetailsProps> = ({
             </dl>
           )}
 
-          {paymentBreakdown.pointPayerCount > 0 && (
+          {paymentBreakdown.paymentType === "POINT_ONLY" && (
             <dl className="flex justify-between items-center py-5 border-b border-foreground-caption">
-              <dt className="text-label-sm font-bold">参加費（ポイント）</dt>
+              <dt className="text-label-sm font-bold">参加費</dt>
               <dd className="text-body-sm">
                 {paymentBreakdown.totalPoints.toLocaleString()}pt
                 <span className="text-label-sm text-muted-foreground ml-2">
@@ -148,6 +148,36 @@ const AdminReservationDetails: React.FC<ReservationDetailsProps> = ({
                 </span>
               </dd>
             </dl>
+          )}
+
+          {paymentBreakdown.paymentType === "MIXED" && (
+            <>
+              {paymentBreakdown.feePayerCount > 0 && (
+                <dl className="flex justify-between items-center py-5 border-b border-foreground-caption">
+                  <dt className="text-label-sm font-bold">参加費（現金）</dt>
+                  <dd className="text-body-sm">
+                    {paymentBreakdown.totalFee.toLocaleString()}円
+                    <span className="text-label-sm text-muted-foreground ml-2">
+                      ({paymentBreakdown.feePerPerson.toLocaleString()}円×
+                      {paymentBreakdown.feePayerCount.toLocaleString()}人)
+                    </span>
+                  </dd>
+                </dl>
+              )}
+
+              {paymentBreakdown.pointPayerCount > 0 && (
+                <dl className="flex justify-between items-center py-5 border-b border-foreground-caption">
+                  <dt className="text-label-sm font-bold">参加費（ポイント）</dt>
+                  <dd className="text-body-sm">
+                    {paymentBreakdown.totalPoints.toLocaleString()}pt
+                    <span className="text-label-sm text-muted-foreground ml-2">
+                      ({paymentBreakdown.pointsPerPerson.toLocaleString()}pt×
+                      {paymentBreakdown.pointPayerCount.toLocaleString()}人)
+                    </span>
+                  </dd>
+                </dl>
+              )}
+            </>
           )}
         </>
       )}
