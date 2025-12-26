@@ -98,7 +98,15 @@ export function presentReservationDetailRows({
 
   // 料金・ポイント（Activity の場合）
   if (!isQuest && paymentBreakdown) {
-    const { paymentType, totalFee, feePerPerson, feePayerCount, totalPoints, pointsPerPerson, pointPayerCount } = paymentBreakdown;
+    const {
+      paymentType,
+      totalFee,
+      feePerPerson,
+      feePayerCount,
+      totalPoints,
+      pointsPerPerson,
+      pointPayerCount,
+    } = paymentBreakdown;
 
     if (paymentType === "FEE_ONLY") {
       rows.push({
@@ -158,11 +166,11 @@ export function presentReservationDetailRows({
     }
   }
 
-  // 獲得予定ポイント（Quest の場合）
+  // 報酬ポイント（Quest の場合）
   if (isQuest && pointsToEarn && pointsToEarn > 0) {
     rows.push({
       key: "points_to_earn",
-      label: "獲得予定ポイント",
+      label: "報酬ポイント",
       value: (
         <>
           {totalPointsToEarn?.toLocaleString()}pt
