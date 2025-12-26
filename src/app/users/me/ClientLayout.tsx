@@ -5,7 +5,6 @@ import { mapGqlPortfolio, UserProfileProvider } from "@/app/users/features/share
 import { GqlUser } from "@/types/graphql";
 import { GET_CURRENT_USER_PROFILE } from "@/graphql/account/user/client-query";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { notFound } from "next/navigation";
 import { logger } from "@/lib/logging";
 
 interface CurrentUserProfileQueryResult {
@@ -59,10 +58,12 @@ export function ClientLayout({ children, ssrUser }: ClientLayoutProps) {
   }
 
   if (!csrUser) {
-    logger.debug("[AUTH] /users/me ClientLayout: notFound", {
+    // Don't call notFound() here - let RouteGuard handle the redirect to login
+    // This prevents 404 from being shown before RouteGuard can redirect unauthenticated users
+    logger.debug("[AUTH] /users/me ClientLayout: no user, waiting for RouteGuard redirect", {
       component: "ClientLayout",
     });
-    return notFound();
+    return <LoadingIndicator />;
   }
 
   logger.debug("[AUTH] /users/me ClientLayout: rendering with csrUser", {

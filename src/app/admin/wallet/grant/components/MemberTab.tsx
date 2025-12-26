@@ -4,7 +4,7 @@ import React from "react";
 import { GqlMembershipsConnection, GqlUser } from "@/types/graphql";
 import UserInfoCard from "./UserInfoCard";
 import { useMemberWithDidSearch as useMemberSearchFromCredentials } from "@/app/admin/credentials/hooks/useMemberWithDidSearch";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { useTranslations } from "next-intl";
 
@@ -19,12 +19,16 @@ interface MemberTabProps {
 
 export function MemberTab({ members, searchQuery, onSelect, initialConnection }: MemberTabProps) {
   const t = useTranslations();
+  // Use runtime communityId from CommunityConfigContext
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId || "";
+  
   const {
     data: searchMembershipData,
     error,
     loadMoreRef: searchLoadMoreRef,
     isLoadingMore: searchIsLoadingMore,
-  } = useMemberSearchFromCredentials(COMMUNITY_ID, members, {
+  } = useMemberSearchFromCredentials(communityId, members, {
     searchQuery,
     pageSize: 20,
     enablePagination: true,

@@ -6,7 +6,7 @@ import {
 } from "@/types/graphql";
 import { toast } from "react-toastify";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 type UseCancelSlotOptions = {
   onCompleted?: () => void;
@@ -23,6 +23,9 @@ export const useCancelSlot = (
   } = {},
 ) => {
   const track = useAnalytics();
+  // Use runtime communityId from CommunityConfigContext
+  const communityConfig = useCommunityConfig();
+  const runtimeCommunityId = communityConfig?.communityId || "";
 
   const [cancelSlotMutation, { loading }] = useOpportunitySlotSetHostingStatusMutation({
     onCompleted: () => {
@@ -38,7 +41,7 @@ export const useCancelSlot = (
   const handleCancel = async () => {
     const slotId = reservation?.opportunitySlot?.id ?? "";
     const opportunityId = opportunity?.id ?? "";
-    const communityId = opportunity?.community?.id || COMMUNITY_ID;
+    const communityId = opportunity?.community?.id || runtimeCommunityId;
 
     await cancelSlotMutation({
       variables: {

@@ -164,7 +164,9 @@ async function initAuthFull({
       return;
     }
 
-    await evaluateUserRegistrationState(user, ssrPhoneAuthenticated, setState, authStateManager);
+    // Pass runtime communityId from LiffService instead of build-time COMMUNITY_ID
+    const communityId = liffService.getCommunityId();
+    await evaluateUserRegistrationState(user, ssrPhoneAuthenticated, setState, authStateManager, communityId);
   } catch (error) {
     logger.warn("initAuthFull failed", { error });
     finalizeAuthState("unauthenticated", undefined, setState, authStateManager);

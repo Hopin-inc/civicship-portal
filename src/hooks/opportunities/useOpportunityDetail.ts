@@ -1,15 +1,16 @@
 import { presenterActivityDetail, presenterQuestDetail } from "@/components/domains/opportunities/data/presenter";
 import { ActivityDetail, QuestDetail } from "@/components/domains/opportunities/types";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useCommunityId } from "@/contexts/CommunityContext";
 import { GqlOpportunity, GqlOpportunityCategory, GqlOpportunitySlotHostingStatus, GqlSortDirection, useGetOpportunityQuery } from "@/types/graphql";
 import { useMemo } from "react";
 
 // 基本のOpportunity詳細取得のみを担当
 export const useOpportunityDetail = (id: string | undefined) => {
+  const communityId = useCommunityId();
   const { data, loading, error, refetch } = useGetOpportunityQuery({
     variables: {
       id: id ?? "",
-      permission: { communityId: COMMUNITY_ID },
+      permission: { communityId },
       slotSort: { startsAt: GqlSortDirection.Asc },
       slotFilter: { hostingStatus: [GqlOpportunitySlotHostingStatus.Scheduled] },
     },
@@ -39,4 +40,4 @@ export const useOpportunityDetail = (id: string | undefined) => {
     refetch,
     stateCode: data?.opportunity?.place?.city?.state?.code 
   };
-}; 
+};  

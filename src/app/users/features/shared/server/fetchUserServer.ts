@@ -7,12 +7,19 @@ import { GET_PUBLIC_USER_SERVER_QUERY } from "@/graphql/account/user/server";
 import { cookies } from "next/headers";
 
 export async function fetchUserServer(
-  userId: string
+  userId: string,
+  communityId?: string
 ): Promise<GqlUser | null> {
   try {
     const cookieStore = await cookies();
     const cookieHeader = cookieStore.toString();
-    const headers = cookieHeader ? { cookie: cookieHeader } : {};
+    const headers: Record<string, string> = {};
+    if (cookieHeader) {
+      headers.cookie = cookieHeader;
+    }
+    if (communityId) {
+      headers["X-Community-Id"] = communityId;
+    }
 
     const res = await executeServerGraphQLQuery<
       { user: GqlUser | null },

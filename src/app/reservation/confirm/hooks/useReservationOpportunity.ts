@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo } from "react";
 import { GqlOpportunityCategory, useGetOpportunityQuery } from "@/types/graphql";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { presentReservationActivity, presentReservationQuest } from "../presenters/presentReservationConfirm";
 import { findSlotById, parseSlotDateRange } from "../utils/slotUtils";
 import type { ActivityDetail, QuestDetail } from "@/components/domains/opportunities/types";
@@ -15,6 +15,10 @@ export const useReservationOpportunity = ({
   opportunityId: string;
   slotId: string;
 }) => {
+  // Use runtime communityId from CommunityConfigContext
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId || "";
+  
   const {
     data,
     loading,
@@ -23,22 +27,22 @@ export const useReservationOpportunity = ({
   } = useGetOpportunityQuery({
     variables: {
       id: opportunityId,
-      permission: { communityId: COMMUNITY_ID },
+      permission: { communityId: communityId },
     },
-    skip: !opportunityId,
+    skip: !opportunityId || !communityId,
     fetchPolicy: "network-only",
     errorPolicy: "all",
   });
 
   const opportunity: ActivityDetail | QuestDetail | null = useMemo(() => {
     if (data?.opportunity?.category === GqlOpportunityCategory.Activity) {
-      return presentReservationActivity(data.opportunity);
+      return presentReservationActivity(data.opportunity, communityId);
     }
     if (data?.opportunity?.category === GqlOpportunityCategory.Quest) {
-      return presentReservationQuest(data.opportunity);
+      return presentReservationQuest(data.opportunity, communityId);
     }
     return null;
-  }, [data]);
+  }, [data, communityId]);
 
   const selectedSlot = useMemo(() => {
     if (!opportunity) return null;

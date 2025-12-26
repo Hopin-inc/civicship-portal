@@ -20,7 +20,7 @@ import ApprovalSheet from "@/app/admin/reservations/components/ApprovalSheet";
 import AttendanceSheet from "@/app/admin/reservations/components/AttendanceSheet";
 import { useAttendanceState } from "@/app/admin/reservations/hooks/attendance/useAttendanceState";
 import { useSaveAttendances } from "@/app/admin/reservations/hooks/attendance/useSaveAttendances";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { PriceInfo } from "@/app/admin/reservations/types";
 import { isPointsOnlyOpportunity } from "@/utils/opportunity/isPointsOnlyOpportunity";
 import { useOrganizerWallet } from "@/app/admin/reservations/hooks/useOrganizerWallet";
@@ -29,6 +29,10 @@ import { InsufficientBalanceNotice } from "@/app/admin/reservations/[id]/compone
 export default function ReservationPage() {
   const params = useParams();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
+  
+  // Use runtime communityId from CommunityConfigContext
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId || "";
 
   const searchParams = useSearchParams();
   const modeParam = searchParams.get("mode");
@@ -108,7 +112,7 @@ export default function ReservationPage() {
     await saveAttendances(
       participations,
       attendanceData,
-      slot?.opportunity?.community?.id || COMMUNITY_ID,
+      slot?.opportunity?.community?.id || communityId,
     );
   };
 
@@ -116,7 +120,7 @@ export default function ReservationPage() {
 
   const { currentPoint: organizerBalance, loading: balanceLoading } = useOrganizerWallet({
     organizerId: opportunity?.createdByUser?.id,
-    communityId: opportunity?.community?.id || COMMUNITY_ID,
+    communityId: opportunity?.community?.id || communityId,
   });
 
   const { handleAccept, handleReject, acceptLoading, rejectLoading } = useReservationApproval({

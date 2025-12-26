@@ -1,9 +1,8 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
+import { CommunityLink } from "@/components/navigation/CommunityLink";
 import { Button } from "@/components/ui/button";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { useAuthEnvironment } from "@/hooks/useAuthEnvironment";
 import { cn } from "@/lib/utils";
 
@@ -14,7 +13,7 @@ interface OpportunityDetailsFooterProps {
   price: number | null;
   point: number | null;
   pointsRequired?: number | null;
-  communityId: string | undefined;
+  communityId: string;
   disableReason?: DisableReasonType;
 }
 
@@ -34,7 +33,6 @@ export const OpportunityDetailsFooter: React.FC<OpportunityDetailsFooterProps> =
 }) => {
   const query = new URLSearchParams({
     id: opportunityId,
-    community_id: communityId ?? COMMUNITY_ID,
   });
 
   const { isLiffClient } = useAuthEnvironment();
@@ -49,11 +47,11 @@ export const OpportunityDetailsFooter: React.FC<OpportunityDetailsFooterProps> =
     }
 
     return (
-      <Link href={`/reservation/select-date?${query.toString()}`}>
+      <CommunityLink href={`/reservation/select-date?${query.toString()}`}>
         <Button variant="primary" size="lg" className="px-8">
           日付を選択
         </Button>
-      </Link>
+      </CommunityLink>
     );
   };
 

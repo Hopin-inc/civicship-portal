@@ -89,7 +89,8 @@ export default function CredentialsDetailPage({ params }: { params: Promise<{ id
       value: opportunity?.title ?? "",
       showExternalLink: true,
       externalLink: {
-        url: `/activities/${opportunity?.id}?community_id=${opportunity?.community?.id}`,
+        // Link without community_id query param - communityId is now in URL path prefix
+        url: `/activities/${opportunity?.id}`,
         text: "詳細を見る"
       }
     },

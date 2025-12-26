@@ -3,11 +3,11 @@
 import { presentUserProfile, useUserProfileContext } from "@/app/users/features/shared";
 import { UserProfileView } from "@/app/users/features/profile";
 import { useAuth } from "@/contexts/AuthProvider";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useCommunityId } from "@/contexts/CommunityContext";
 import { GqlMembership, GqlRole } from "@/types/graphql";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useMemo } from "react";
-import Link from "next/link";
+import { CommunityLink } from "@/components/navigation/CommunityLink";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import { ArrowLeftRight } from "lucide-react";
@@ -15,27 +15,28 @@ import { ArrowLeftRight } from "lucide-react";
 export default function MyProfilePage() {
   const { gqlUser, isOwner, portfolios } = useUserProfileContext();
   const { user: currentUser } = useAuth();
+  const communityId = useCommunityId();
   const t = useTranslations();
 
   // 管理者権限チェック
   const hasAdminRole = useMemo(() => {
     if (!currentUser?.memberships) return false;
     const membership = currentUser.memberships.find(
-      (m: GqlMembership) => m.community?.id === COMMUNITY_ID,
+      (m: GqlMembership) => m.community?.id === communityId,
     );
     return membership?.role === GqlRole.Owner || membership?.role === GqlRole.Manager;
-  }, [currentUser]);
+  }, [currentUser, communityId]);
 
   // ヘッダー設定
   const headerConfig = useMemo(
     () => ({
       action: hasAdminRole ? (
-        <Link href="/admin">
+        <CommunityLink href="/admin">
           <Button variant="tertiary" size="sm">
             {t("users.profileHeader.adminButton")}
             <ArrowLeftRight className="w-4 h-4 ml-1" />
           </Button>
-        </Link>
+        </CommunityLink>
       ) : undefined,
     }),
     [hasAdminRole, t],

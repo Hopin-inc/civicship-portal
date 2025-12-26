@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { CommunityLink } from "@/components/navigation/CommunityLink";
 import Image from "next/image";
 import React, { useCallback, useState } from "react";
 import { PLACEHOLDER_IMAGE } from "@/utils";
@@ -32,14 +32,15 @@ export const ReservationConfirmationCard = ({
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const handleOpen = useCallback(() => setIsSheetOpen(true), []);
   const handleClose = useCallback(() => setIsSheetOpen(false), []);
+  // Link without community_id query param - communityId is now in URL path prefix
   const link =
     category === GqlOpportunityCategory.Quest
-      ? `/quests/${opportunity.id}?community_id=${opportunity.communityId}`
-      : `/activities/${opportunity.id}?community_id=${opportunity.communityId}`;
+      ? `/quests/${opportunity.id}`
+      : `/activities/${opportunity.id}`;
 
   return (
     <>
-      <Link href={link} className="block">
+      <CommunityLink href={link} className="block">
         <div className="mx-auto max-w-md">
           <div
             className={`flex overflow-hidden rounded-xl bg-background ${
@@ -79,7 +80,7 @@ export const ReservationConfirmationCard = ({
           </div>
           <div className="border-b border-gray-200 my-4"></div>
         </div>
-      </Link>
+      </CommunityLink>
       <div>
         <div className="flex items-center justify-between gap-x-2">
           <div>

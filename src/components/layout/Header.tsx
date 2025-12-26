@@ -11,7 +11,7 @@ import { useHierarchicalNavigation } from "@/hooks/useHierarchicalNavigation";
 import { useAuthEnvironment } from "@/hooks/useAuthEnvironment";
 import { cn } from "@/lib/utils";
 import SearchBox from "@/app/search/components/SearchBox";
-import { currentCommunityConfig } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 interface HeaderProps {
   className?: string;
@@ -24,6 +24,8 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const router = useRouter();
+  // Use runtime community config from context
+  const communityConfig = useCommunityConfig();
 
   const handleBackButton = () => {
     if (config?.backTo) {
@@ -72,7 +74,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
       {config.showLogo && (
         <Link href="/" className="flex items-center space-x-2">
           <Image
-            src={currentCommunityConfig.squareLogoPath}
+            src={communityConfig?.squareLogoPath || "/logo.png"}
             alt="Logo"
             width={88}
             height={72}
@@ -80,7 +82,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
           />
         </Link>
       )}
-      {currentCommunityConfig.enableFeatures.includes("opportunities") && config.showSearchForm && (
+      {communityConfig?.enableFeatures?.includes("opportunities") && config.showSearchForm && (
         <div className="flex-1 ml-4">
           <SearchBox
             location={config.searchParams?.location}

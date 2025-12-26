@@ -1,13 +1,22 @@
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/ja";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import parsePhoneNumberFromString from "libphonenumber-js/min";
 
 dayjs.locale("ja");
 dayjs.extend(relativeTime);
 
-export const PLACEHOLDER_IMAGE = `/communities/${COMMUNITY_ID}/placeholder.jpg`;
+/**
+ * Get placeholder image path for a community
+ * @param communityId - Runtime community ID from context
+ * @returns Placeholder image path
+ */
+export const getPlaceholderImage = (communityId?: string): string => {
+  return `/communities/${communityId || "default"}/placeholder.jpg`;
+};
+
+// Deprecated: Use getPlaceholderImage(communityId) instead
+export const PLACEHOLDER_IMAGE = `/communities/default/placeholder.jpg`;
 
 export const displayRelativeTime = (date: Date | string) => {
   return dayjs(date).fromNow();

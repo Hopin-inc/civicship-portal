@@ -13,8 +13,9 @@ import {
 import { Button } from "@/components/ui/button";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { Info, Search } from "lucide-react";
-import { getCurrentRegionName, currentCommunityConfig } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 interface TicketContentProps {
   ticketClaimLinks: TicketClaimLink[];
@@ -29,6 +30,11 @@ const TicketContent: React.FC<TicketContentProps> = ({
   hasNextPage, 
   loading 
 }) => {
+  // Use runtime community config from context
+  const communityConfig = useCommunityConfig();
+  const t = useTranslations();
+  const regionName = communityConfig?.regionName || t("common.regions.default");
+  
   return (
     <main className="pt-6 px-4">
       <div className="mb-6">
@@ -61,13 +67,13 @@ const TicketContent: React.FC<TicketContentProps> = ({
               <Search className="h-8 w-8" />
             </EmptyMedia>
             <EmptyDescription>
-              {`${getCurrentRegionName()}の素敵な人と関わって\nチケットをもらおう`}
+              {`${regionName}の素敵な人と関わって\nチケットをもらおう`}
             </EmptyDescription>
           </EmptyHeader>
           <EmptyContent>
-            {currentCommunityConfig.enableFeatures.includes("opportunities") ? (
+            {communityConfig?.enableFeatures?.includes("opportunities") ? (
               <Button asChild variant="primary" size="lg" className="px-16">
-                <Link href={currentCommunityConfig.rootPath ?? "/"}>
+                <Link href={communityConfig?.rootPath ?? "/"}>
                   関わりをみつける
                 </Link>
               </Button>

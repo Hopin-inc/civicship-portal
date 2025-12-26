@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import {
   GqlDidIssuanceRequest,
   GqlMembershipsConnection,
@@ -99,7 +99,9 @@ export default function CredentialRecipientSelector({
   setStep,
   initialConnection,
 }: CredentialRecipientSelectorProps) {
-  const communityId = COMMUNITY_ID;
+  // Use runtime communityId from CommunityConfigContext
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId || "";
   const { selectedSlot, setSelectedSlot, participatedUsers } = useSelection();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();

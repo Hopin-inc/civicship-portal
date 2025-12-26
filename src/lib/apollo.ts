@@ -12,6 +12,7 @@ import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
 import { logger } from "@/lib/logging";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { setContext } from "@apollo/client/link/context";
+import { getRuntimeCommunityId } from "@/lib/communities/communityIds";
 
 const httpLink = createUploadLink({
   uri: process.env.NEXT_PUBLIC_API_ENDPOINT,
@@ -40,13 +41,16 @@ const requestLink = setContext(async (operation, prevContext) => {
     }
   }
 
+  // Get communityId at runtime from URL path or cookie (browser) or env var (server)
+  const communityId = getRuntimeCommunityId();
+
   const headers = {
     ...prevContext.headers,
     // Only send Authorization header when we have a token
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     "X-Auth-Mode": authMode,
     "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
-    "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID,
+    "X-Community-Id": communityId,
   };
 
   return { headers };

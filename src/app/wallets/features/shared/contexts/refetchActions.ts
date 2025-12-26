@@ -1,6 +1,7 @@
 "use server";
 
 import { getServerMyWalletWithTransactions } from "@/app/wallets/features/shared/server/getServerMyWalletWithTransactions";
+import { headers, cookies } from "next/headers";
 
 /**
  * Server Action: マイウォレット情報とトランザクションを統合取得
@@ -11,7 +12,12 @@ import { getServerMyWalletWithTransactions } from "@/app/wallets/features/shared
  * @returns wallet情報とtransactionsを含むオブジェクト
  */
 export async function fetchMyWalletWithTransactionsAction(cursor?: string, first: number = 20) {
-  const result = await getServerMyWalletWithTransactions({ first, after: cursor });
+  // Get communityId from request headers (set by middleware) or cookies
+  const headersList = await headers();
+  const cookieStore = await cookies();
+  const communityId = headersList.get("x-community-id") || cookieStore.get("communityId")?.value || "";
+  
+  const result = await getServerMyWalletWithTransactions({ communityId, first, after: cursor });
 
   if (!result.wallet) {
     throw new Error("No wallet found - session may be invalid");
