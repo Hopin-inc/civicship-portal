@@ -77,8 +77,8 @@ const ApprovalSheet: React.FC<ApprovalSheetProps> = ({
       {/* 拒否シート */}
       <Sheet open={isRejectSheetOpen} onOpenChange={setIsRejectSheetOpen}>
         <SheetTrigger asChild>
-          <Button className="w-full !text-destructive" variant="text">
-            申込をお断りする
+          <Button variant="ghost" size={"sm"} className="w-full text-muted-foreground">
+            お断りする場合はこちら
           </Button>
         </SheetTrigger>
         <SheetContent side="bottom" className="rounded-t-3xl max-w-md mx-auto p-8">
