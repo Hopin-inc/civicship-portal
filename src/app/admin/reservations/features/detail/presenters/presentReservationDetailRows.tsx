@@ -21,6 +21,20 @@ interface PresentReservationDetailRowsParams {
   participantCount: number;
 }
 
+// 種別の表示名マッピング
+function getCategoryDisplayName(category: GqlOpportunityCategory): string {
+  switch (category) {
+    case GqlOpportunityCategory.Quest:
+      return "お手伝い";
+    case GqlOpportunityCategory.Activity:
+      return "体験";
+    case GqlOpportunityCategory.Event:
+      return "イベント";
+    default:
+      return category;
+  }
+}
+
 export function presentReservationDetailRows({
   reservation,
   opportunity,
@@ -31,6 +45,15 @@ export function presentReservationDetailRows({
 }: PresentReservationDetailRowsParams): DetailRow[] {
   const rows: DetailRow[] = [];
   const isQuest = opportunity?.category === GqlOpportunityCategory.Quest;
+
+  // 種別
+  if (opportunity?.category) {
+    rows.push({
+      key: "category",
+      label: "種別",
+      value: getCategoryDisplayName(opportunity.category),
+    });
+  }
 
   // 募集タイトル（リンク）
   if (opportunity) {
