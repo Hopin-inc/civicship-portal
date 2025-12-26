@@ -1,7 +1,7 @@
 import { getTermsContent } from "@/lib/communities/terms";
 import { convertMarkdownToHtml } from "@/utils/markdownUtils";
 import TermsPageClient from "./TermsPageClient";
-import { getCommunityConfig } from "@/lib/graphql/getCommunityConfig";
+import { getCommunityConfig } from "@/lib/communities/getCommunityConfig";
 import { handleExternalDocumentRedirect } from "@/lib/communities/documents";
 import { headers, cookies } from "next/headers";
 

@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { DEFAULT_OPEN_GRAPH_IMAGE } from "@/lib/communities/metadata";
-import { getCommunityConfig } from "@/lib/graphql/getCommunityConfig";
+import { getCommunityConfig } from "@/lib/communities/getCommunityConfig";
 import { headers, cookies } from "next/headers";
 
 const fallbackDescription = "体験が始まるその一歩は、ここから。文化と自然、人のあたたかさにふれる募集がそろいました。気になる体験を見つけて、あなただけの時間を過ごしてみませんか。";

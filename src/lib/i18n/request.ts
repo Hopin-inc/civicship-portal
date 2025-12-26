@@ -3,7 +3,7 @@ import { cookies, headers } from 'next/headers';
 import { defaultLocale, locales, type Locale } from './config';
 import { nestMessages } from './nestMessages';
 import { detectPreferredLocale } from './languageDetection';
-import { getCommunityConfig } from '@/lib/graphql/getCommunityConfig';
+import { getCommunityConfig } from '@/lib/communities/getCommunityConfig';
 
 /**
  * メッセージをマージ（メモ化付き）

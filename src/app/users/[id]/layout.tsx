@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { fetchUserServer } from "@/app/users/features/shared/server";
 import { DEFAULT_OPEN_GRAPH_IMAGE } from "@/lib/communities/metadata";
 import { mapGqlPortfolio, UserProfileProvider } from "@/app/users/features/shared";
-import { getCommunityConfig } from "@/lib/graphql/getCommunityConfig";
+import { getCommunityConfig } from "@/lib/communities/getCommunityConfig";
 import { headers, cookies } from "next/headers";
 
 type Props = {

@@ -1,7 +1,7 @@
 // app/admin/metadata.ts
 import { Metadata } from "next";
 import { DEFAULT_OPEN_GRAPH_IMAGE } from "@/lib/communities/metadata";
-import { getCommunityConfig } from "@/lib/graphql/getCommunityConfig";
+import { getCommunityConfig } from "@/lib/communities/getCommunityConfig";
 import { headers, cookies } from "next/headers";
 
 export async function generateMetadata(): Promise<Metadata> {

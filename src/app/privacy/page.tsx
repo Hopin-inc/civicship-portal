@@ -1,5 +1,5 @@
 import { convertMarkdownToHtml } from "@/utils/markdownUtils";
-import { getCommunityConfig } from "@/lib/graphql/getCommunityConfig";
+import { getCommunityConfig } from "@/lib/communities/getCommunityConfig";
 import PrivacyPageClient from "./PrivacyPageClient";
 import { getPrivacyContent } from "@/lib/communities/privacy";
 import { handleExternalDocumentRedirect } from "@/lib/communities/documents";
