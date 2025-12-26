@@ -9,7 +9,7 @@ import { AuthProvider } from "@/contexts/AuthProvider";
 import HeaderProvider from "@/components/providers/HeaderProvider";
 import MainContent from "@/components/layout/MainContent";
 import React from "react";
-import { COMMUNITY_ID, COMMUNITY_BASE_CONFIG } from "@/lib/communities/metadata";
+import { COMMUNITY_BASE_CONFIG } from "@/lib/communities/metadata";
 import { DEFAULT_ASSET_PATHS } from "@/lib/communities/constants";
 import AnalyticsProvider from "@/components/providers/AnalyticsProvider";
 import ClientPolyfills from "@/components/polyfills/ClientPolyfills";
@@ -26,10 +26,10 @@ import { getCommunityConfig, CommunityPortalConfig } from "@/lib/communities/get
 const font = Inter({ subsets: ["latin"] });
 
 export async function generateMetadata(): Promise<Metadata> {
-  // Get communityId from request headers (set by middleware) or cookies or env var
+  // Get communityId from request headers (set by middleware) or cookies
   const headersList = await headers();
   const cookieStore = await cookies();
-  const communityId = headersList.get("x-community-id") || cookieStore.get("communityId")?.value || COMMUNITY_ID;
+  const communityId = headersList.get("x-community-id") || cookieStore.get("communityId")?.value || "default";
   
   // Try to get config from database first, fallback to hardcoded config
   let config = await getCommunityConfig(communityId);
@@ -141,10 +141,10 @@ const RootLayout = async ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
-  // Get communityId early for getUserServer call
+  // Get communityId from request headers (set by middleware) or cookies
   const headersList = await headers();
   const cookieStore = await cookies();
-  const communityId = headersList.get("x-community-id") || cookieStore.get("communityId")?.value || COMMUNITY_ID;
+  const communityId = headersList.get("x-community-id") || cookieStore.get("communityId")?.value || "default";
   
   const { user, lineAuthenticated, phoneAuthenticated } = await getUserServer(communityId);
 
