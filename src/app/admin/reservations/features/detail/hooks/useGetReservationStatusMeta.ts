@@ -59,7 +59,7 @@ const getReservationStatusMeta = (reservation: GqlReservation): StatusMeta => {
   }
 
   if (isAccepted && isScheduled && isFuture) {
-    return { step: "cancellation", label: "承認済み", variant: "secondary" };
+    return { step: "cancellation", label: "承認済み", variant: "success" };
   }
 
   if (isAccepted && isCompleted && isPast) {
