@@ -1,6 +1,5 @@
 import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { ExternalLink } from "lucide-react";
 import { displayPhoneNumber } from "@/utils";
 import { displayDuration } from "@/utils/date";
@@ -9,6 +8,7 @@ import { ActivityCard } from "@/components/domains/opportunities/types";
 import { PriceInfo } from "@/app/admin/reservations/types";
 import { PaymentBreakdown } from "../presenters/presentPaymentBreakdown";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 interface ReservationDetailsProps {
   reservation: GqlReservation;
@@ -37,21 +37,37 @@ const AdminReservationDetails: React.FC<ReservationDetailsProps> = ({
       : `/activities/${opportunity.id}?community_id=${opportunity.community?.id}`
     : "#";
 
+  // バリアントに応じた色クラス
+  const statusColorClass = {
+    primary: "bg-primary",
+    secondary: "bg-secondary",
+    success: "bg-success",
+    warning: "bg-warning",
+    destructive: "bg-destructive",
+    outline: "bg-muted-foreground",
+  }[variant] || "bg-muted-foreground";
+
   return (
     <div>
       {/* ユーザー名とステータス */}
       <dl className="flex justify-between items-center py-5 border-b border-foreground-caption">
-        <div className="flex items-center gap-3 flex-grow min-w-0">
-          <Avatar className="h-8 w-8">
+        <div className="flex items-center gap-2.5 flex-grow min-w-0">
+          <Avatar className="h-6 w-6">
             <AvatarImage src={reservation.createdByUser?.image || ""} />
-            <AvatarFallback>{reservation.createdByUser?.name?.[0] || "U"}</AvatarFallback>
+            <AvatarFallback className="text-xs">
+              {reservation.createdByUser?.name?.[0] || "U"}
+            </AvatarFallback>
           </Avatar>
           <dt className="text-body-md font-bold truncate">
             {reservation.createdByUser?.name || "未設定"}
           </dt>
         </div>
-        <dd className="flex-shrink-0">
-          <Badge variant={variant}>{label}</Badge>
+        <dd className="flex items-center gap-1.5 flex-shrink-0 text-label-sm">
+          <span
+            className={cn("size-2.5 rounded-full", statusColorClass)}
+            aria-label={label}
+          />
+          <span>{label}</span>
         </dd>
       </dl>
 
