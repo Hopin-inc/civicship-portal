@@ -68,9 +68,9 @@ export function presentReservationDetailRows({
       value: (
         <Link
           href={opportunityLink}
-          className="text-primary hover:underline inline-flex items-center gap-1.5 justify-end min-w-0"
+          className="text-primary hover:underline flex items-center gap-1.5 min-w-0 justify-end"
         >
-          <span className="truncate min-w-0">{opportunity.title}</span>
+          <span className="block truncate min-w-0 max-w-full">{opportunity.title}</span>
           <ExternalLink className="h-4 w-4 flex-shrink-0" />
         </Link>
       ),

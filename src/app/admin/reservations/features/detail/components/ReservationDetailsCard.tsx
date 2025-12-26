@@ -32,12 +32,12 @@ export function ReservationDetailsCard({ rows }: ReservationDetailsCardProps) {
           <dl
             key={row.key}
             className={cn(
-              "flex justify-between items-center py-5 px-5",
+              "flex items-center gap-7 py-5 px-5",
               !isLast && "border-b border-foreground-caption",
             )}
           >
-            <dt className="text-label-sm font-bold">{row.label}</dt>
-            <dd className="text-body-sm text-right flex-1 min-w-0 ml-4">{row.value}</dd>
+            <dt className="text-label-sm font-bold shrink-0">{row.label}</dt>
+            <dd className="text-body-sm text-right flex-1 min-w-0">{row.value}</dd>
           </dl>
         );
       })}
