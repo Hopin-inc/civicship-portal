@@ -1,7 +1,7 @@
 import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ExternalLink } from "lucide-react";
-import { displayPhoneNumber } from "@/utils";
+import { Button } from "@/components/ui/button";
+import { ExternalLink, Phone, MessageSquare } from "lucide-react";
 import { displayDuration } from "@/utils/date";
 import { GqlOpportunityCategory, GqlReservation } from "@/types/graphql";
 import { ActivityCard } from "@/components/domains/opportunities/types";
@@ -49,44 +49,61 @@ const AdminReservationDetails: React.FC<ReservationDetailsProps> = ({
 
   return (
     <div>
-      {/* ユーザー名とステータス */}
-      <dl className="flex justify-between items-center py-5 border-b border-foreground-caption">
-        <div className="flex items-center gap-2.5 flex-grow min-w-0">
-          <Avatar className="h-6 w-6">
-            <AvatarImage src={reservation.createdByUser?.image || ""} />
-            <AvatarFallback className="text-xs">
-              {reservation.createdByUser?.name?.[0] || "U"}
-            </AvatarFallback>
-          </Avatar>
-          <dt className="text-body-md font-bold truncate">
-            {reservation.createdByUser?.name || "未設定"}
-          </dt>
-        </div>
-        <dd className="flex items-center gap-1.5 flex-shrink-0 text-label-sm">
-          <span
-            className={cn("size-2.5 rounded-full", statusColorClass)}
-            aria-label={label}
-          />
-          <span>{label}</span>
-        </dd>
-      </dl>
+      {/* ユーザー情報とアクション */}
+      <div className="flex justify-between items-start py-5 border-b border-foreground-caption">
+        {/* 左側：ステータス、アバター、名前（縦並び） */}
+        <div className="flex flex-col gap-2.5 flex-grow min-w-0">
+          {/* ステータス */}
+          <div className="flex items-center gap-1.5 text-label-sm">
+            <span
+              className={cn("size-2.5 rounded-full", statusColorClass)}
+              aria-label={label}
+            />
+            <span>{label}</span>
+          </div>
 
-      {/* 電話番号 */}
-      <dl className="flex justify-between items-center py-5 border-b border-foreground-caption">
-        <dt className="text-label-sm font-bold">電話番号</dt>
-        <dd className="text-body-sm">
-          {reservation.createdByUser?.phoneNumber ? (
-            <a
-              href={`tel:${reservation.createdByUser.phoneNumber}`}
-              className="text-primary hover:underline"
-            >
-              {displayPhoneNumber(reservation.createdByUser.phoneNumber)}
-            </a>
-          ) : (
-            <span className="text-muted-foreground">未設定</span>
+          {/* アバター＋名前 */}
+          <div className="flex items-center gap-2">
+            <Avatar className="h-5 w-5">
+              <AvatarImage src={reservation.createdByUser?.image || ""} />
+              <AvatarFallback className="text-xs">
+                {reservation.createdByUser?.name?.[0] || "U"}
+              </AvatarFallback>
+            </Avatar>
+            <span className="text-label-sm font-bold truncate">
+              {reservation.createdByUser?.name || "未設定"}
+            </span>
+          </div>
+        </div>
+
+        {/* 右側：電話・メッセージボタン */}
+        <div className="flex gap-2 flex-shrink-0">
+          {reservation.createdByUser?.phoneNumber && (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                asChild
+              >
+                <a href={`tel:${reservation.createdByUser.phoneNumber}`}>
+                  <Phone className="h-4 w-4 mr-1.5" />
+                  電話
+                </a>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                asChild
+              >
+                <a href={`sms:${reservation.createdByUser.phoneNumber}`}>
+                  <MessageSquare className="h-4 w-4 mr-1.5" />
+                  メッセージ
+                </a>
+              </Button>
+            </>
           )}
-        </dd>
-      </dl>
+        </div>
+      </div>
 
       {/* 自己紹介 */}
       {reservation.createdByUser?.bio?.trim() && (
