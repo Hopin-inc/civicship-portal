@@ -86,7 +86,7 @@ export class AuthRedirectService {
       return finalRedirect as RawURIComponent;
     }
 
-    const redirectByRole = this.handleRoleRestriction(currentUser, basePath);
+    const redirectByRole = this.handleRoleRestriction(currentUser, basePath, communityId);
     if (redirectByRole) {
       // Add community prefix to redirect path if we have one
       const finalRedirect = communityId
@@ -186,9 +186,11 @@ export class AuthRedirectService {
   private handleRoleRestriction(
     currentUser: GqlUser | null | undefined,
     basePath: string,
+    communityId: string | null,
   ): RawURIComponent | null {
     logger.debug("[AUTH] handleRoleRestriction: start", {
       basePath,
+      communityId,
       userId: currentUser?.id,
       hasMemberships: !!currentUser?.memberships?.length,
       membershipsCount: currentUser?.memberships?.length ?? 0,
@@ -203,16 +205,19 @@ export class AuthRedirectService {
       return null;
     }
 
-    const canAccess = AccessPolicy.canAccessRole(currentUser, basePath);
+    // Use runtime communityId from URL path, fallback to empty string if not available
+    const effectiveCommunityId = communityId || "";
+    const canAccess = AccessPolicy.canAccessRole(currentUser, basePath, effectiveCommunityId);
     logger.debug("[AUTH] handleRoleRestriction: canAccessRole result", {
       basePath,
+      communityId: effectiveCommunityId,
       userId: currentUser.id,
       canAccess,
       component: "AuthRedirectService",
     });
 
     if (!canAccess) {
-      const fallbackPath = AccessPolicy.getFallbackPath(currentUser);
+      const fallbackPath = AccessPolicy.getFallbackPath(currentUser, effectiveCommunityId);
       logger.debug("[AUTH] handleRoleRestriction: redirecting to fallback (master logic)", {
         basePath,
         userId: currentUser.id,

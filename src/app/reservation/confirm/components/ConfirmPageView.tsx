@@ -12,7 +12,6 @@ import { ExpectedPoints } from "@/app/reservation/confirm/components/payment/Exp
 import { PaymentSummary } from "@/app/reservation/confirm/components/payment/PaymentSummary";
 import { ActivityDetail, QuestDetail, isActivityCategory, isQuestCategory } from "@/components/domains/opportunities/types";
 import { AvailableTicket } from "@/app/reservation/confirm/presenters/presentReservationConfirm";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 export interface ConfirmPageViewProps {
   user: GqlCurrentUserPayload["user"] | null;
@@ -135,7 +134,7 @@ export default function ConfirmPageView(props: ConfirmPageViewProps) {
             title: opportunity.title,
             feeRequired,
             category: opportunity.category,
-            communityId: COMMUNITY_ID,
+            communityId: communityId || opportunity.communityId || "",
             images: opportunity.images,
             location: opportunity.place?.name ?? "",
             hasReservableTicket: maxTickets > 0,

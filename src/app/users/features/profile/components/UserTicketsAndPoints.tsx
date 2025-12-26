@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { ChevronRight, Ticket as TicketIcon, Wallet } from "lucide-react";
-import { currentCommunityConfig } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 interface UserTicketsAndPointsProps {
   ticketCount?: number;
@@ -27,6 +27,8 @@ function MaybeLink({ canNavigate, href, children }: MaybeLinkProps) {
 
 export function UserTicketsAndPoints({ ticketCount, pointCount, canNavigate = true }: UserTicketsAndPointsProps) {
   const t = useTranslations();
+  // Use runtime community config from context
+  const communityConfig = useCommunityConfig();
   
   const ticketClass =
     ticketCount && ticketCount > 0
@@ -58,12 +60,12 @@ export function UserTicketsAndPoints({ ticketCount, pointCount, canNavigate = tr
 
   return (
     <div className="space-y-2 mt-2">
-      {currentCommunityConfig.enableFeatures.includes("tickets") && ticketCount !== undefined && (
+      {communityConfig?.enableFeatures?.includes("tickets") && ticketCount !== undefined && (
         <MaybeLink canNavigate={canNavigate} href="/tickets">
           {ticketContent}
         </MaybeLink>
       )}
-      {currentCommunityConfig.enableFeatures.includes("points") && pointCount !== undefined && (
+      {communityConfig?.enableFeatures?.includes("points") && pointCount !== undefined && (
         <MaybeLink canNavigate={canNavigate} href="/wallets/me">
           {pointContent}
         </MaybeLink>

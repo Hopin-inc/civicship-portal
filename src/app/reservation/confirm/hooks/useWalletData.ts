@@ -2,20 +2,24 @@
 
 import { useMemo } from "react";
 import { GqlTicket, GqlWalletType, useGetWalletsWithTicketQuery } from "@/types/graphql";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { toNumberSafe } from "@/utils/bigint";
 
 export function useWalletData(userId?: string) {
+  // Use runtime communityId from CommunityConfigContext
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId || "";
+  
   const { data, loading, error, refetch } = useGetWalletsWithTicketQuery({
     variables: {
       filter: {
         userId: userId,
         type: GqlWalletType.Member,
-        communityId: COMMUNITY_ID,
+        communityId: communityId,
       },
       first: 1,
     },
-    skip: !userId,
+    skip: !userId || !communityId,
     fetchPolicy: "cache-and-network",
   });
 

@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Facebook, Instagram, Twitter } from "lucide-react";
 import { GqlCurrentPrefecture } from "@/types/graphql";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { currentCommunityConfig } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useTranslations } from "next-intl";
 
@@ -48,6 +48,8 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({
   handleSave,
 }) => {
   const t = useTranslations();
+  // Use runtime community config from context
+  const communityConfig = useCommunityConfig();
   return (
     <form onSubmit={handleSave} className="space-y-8">
       <div>
@@ -105,7 +107,7 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({
         </span>
       </div>
 
-      {currentCommunityConfig.enableFeatures.includes("prefectures") && (
+      {communityConfig?.enableFeatures?.includes("prefectures") && (
         <div>
           <Label className="mb-2 flex items-center gap-x-2">
             {t("users.edit.location")}

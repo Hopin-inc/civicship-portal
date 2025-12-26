@@ -3,7 +3,7 @@ import { cookies, headers } from 'next/headers';
 import { defaultLocale, locales, type Locale } from './config';
 import { nestMessages } from './nestMessages';
 import { detectPreferredLocale } from './languageDetection';
-import { currentCommunityConfig } from '@/lib/communities/metadata';
+import { getCommunityConfig } from '@/lib/graphql/getCommunityConfig';
 
 /**
  * メッセージをマージ（メモ化付き）
@@ -35,17 +35,23 @@ async function loadMessages(locale: Locale, namespaces: string[]) {
 
 export default getRequestConfig(async ({ requestLocale }) => {
   const cookieStore = await cookies();
+  const headersList = await headers();
   const savedLocale = cookieStore.get('language')?.value;
+  
+  // Get communityId from request headers (set by middleware) or cookies
+  const communityId = headersList.get("x-community-id") || cookieStore.get("communityId")?.value || "";
+  
+  // Fetch community config from database
+  const communityConfig = await getCommunityConfig(communityId);
   
   let locale: Locale;
   
   if (savedLocale && locales.includes(savedLocale as Locale)) {
     locale = savedLocale as Locale;
   } else {
-    const hasLanguageSwitcher = currentCommunityConfig.enableFeatures?.includes('languageSwitcher');
+    const hasLanguageSwitcher = communityConfig?.enableFeatures?.includes('languageSwitcher');
     
     if (hasLanguageSwitcher) {
-      const headersList = await headers();
       const acceptLanguage = headersList.get('accept-language');
       locale = detectPreferredLocale(acceptLanguage, locales, defaultLocale);
     } else {

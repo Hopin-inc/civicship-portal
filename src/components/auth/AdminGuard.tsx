@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthProvider";
 import { toast } from "react-toastify";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { GqlMembership, GqlRole } from "@/types/graphql";
 import { AuthRedirectService } from "@/lib/auth/service/auth-redirect-service";
 import { logger } from "@/lib/logging";
@@ -19,6 +19,8 @@ interface AdminGuardProps {
 export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
   const { isAuthenticated, loading, user: currentUser } = useAuth();
   const router = useRouter();
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId || "";
 
   const authRedirectService = React.useMemo(() => {
     return AuthRedirectService.getInstance();
@@ -41,9 +43,10 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
 
     const checkAdminAccess = () => {
       const pathname = window.location.pathname;
-      const canAccess = AccessPolicy.canAccessRole(currentUser, pathname);
+      // Use runtime communityId from CommunityConfigContext
+      const canAccess = AccessPolicy.canAccessRole(currentUser, pathname, communityId);
       if (!canAccess) {
-        const redirectPath = AccessPolicy.getFallbackPath(currentUser);
+        const redirectPath = AccessPolicy.getFallbackPath(currentUser, communityId);
         toast.warning("管理者権限がありません");
         router.replace(redirectPath);
         return;
@@ -55,7 +58,7 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
     };
 
     checkAdminAccess();
-  }, [currentUser, isAuthenticated, loading, router, authRedirectService]);
+  }, [currentUser, isAuthenticated, loading, router, authRedirectService, communityId]);
 
   if (loading) {
     return <LoadingIndicator />;
@@ -66,8 +69,9 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
     return null;
   }
 
+  // Use runtime communityId from CommunityConfigContext
   const targetMembership = currentUser.memberships?.find(
-    (m: GqlMembership) => m.community?.id === COMMUNITY_ID,
+    (m: GqlMembership) => m.community?.id === communityId,
   );
   if (!targetMembership) {
     logger.debug("No membership found for community", { component: "AdminGuard" });

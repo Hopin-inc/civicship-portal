@@ -1,18 +1,25 @@
 import { GqlTicketStatus, GqlUser } from "@/types/graphql";
 import { UserProfileViewModel } from "@/app/users/features/profile/types";
 import { AppPortfolio } from "@/app/users/features/shared/types";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { logger } from "@/lib/logging";
 
+/**
+ * Present user profile data for display
+ * @param gqlUser - GraphQL user data
+ * @param isOwner - Whether the current user is the owner of the profile
+ * @param portfolios - User portfolios
+ * @param communityId - Runtime community ID from context
+ */
 export function presentUserProfile(
   gqlUser: GqlUser | null,
   isOwner: boolean = false,
   portfolios?: AppPortfolio[],
+  communityId?: string,
 ): UserProfileViewModel {
-  const wallet = gqlUser?.wallets?.find((w) => w.community?.id === COMMUNITY_ID);
+  const wallet = gqlUser?.wallets?.find((w) => w.community?.id === communityId);
 
   logger.debug("[AUTH] presentUserProfile: wallet selection", {
-    communityId: COMMUNITY_ID,
+    communityId: communityId,
     walletsCount: gqlUser?.wallets?.length ?? 0,
     walletCommunities: (gqlUser?.wallets ?? []).map((w) => w.community?.id),
     selectedWalletId: wallet?.id,

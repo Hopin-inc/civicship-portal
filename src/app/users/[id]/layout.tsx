@@ -2,29 +2,39 @@ import React from "react";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { fetchUserServer } from "@/app/users/features/shared/server";
-import { currentCommunityConfig, DEFAULT_OPEN_GRAPH_IMAGE } from "@/lib/communities/metadata";
+import { DEFAULT_OPEN_GRAPH_IMAGE } from "@/lib/communities/metadata";
 import { mapGqlPortfolio, UserProfileProvider } from "@/app/users/features/shared";
+import { getCommunityConfig } from "@/lib/graphql/getCommunityConfig";
+import { headers, cookies } from "next/headers";
 
 type Props = {
   params: { id: string };
 };
 
-const fallbackMetadata: Metadata = {
-  title: currentCommunityConfig.title,
-  description: currentCommunityConfig.description,
-  openGraph: {
-    images: DEFAULT_OPEN_GRAPH_IMAGE,
-  },
-};
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const user = await fetchUserServer(id);
+  
+  // Get communityId from request headers (set by middleware) or cookies
+  const headersList = await headers();
+  const cookieStore = await cookies();
+  const communityId = headersList.get("x-community-id") || cookieStore.get("communityId")?.value || "";
+  
+  // Fetch community config from database
+  const communityConfig = await getCommunityConfig(communityId);
+  
+  const fallbackMetadata: Metadata = {
+    title: communityConfig?.title || "",
+    description: communityConfig?.description || "",
+    openGraph: {
+      images: DEFAULT_OPEN_GRAPH_IMAGE,
+    },
+  };
 
   if (!user) return fallbackMetadata;
 
   return {
-    title: `${user.name} | ${currentCommunityConfig.title}`,
+    title: `${user.name} | ${communityConfig?.title || ""}`,
     description: user.bio ?? "",
     openGraph: {
       type: "profile",
