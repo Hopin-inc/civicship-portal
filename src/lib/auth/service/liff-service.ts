@@ -24,12 +24,14 @@ export class LiffService {
   private static instances: Map<string, LiffService> = new Map();
   private liffId: string;
   private communityId: string;
+  private firebaseTenantId: string | null;
   private state: LiffState;
   private initializationPromise: Promise<boolean> | null = null;
 
-  private constructor(liffId: string, communityId: string) {
+  private constructor(liffId: string, communityId: string, firebaseTenantId: string | null = null) {
     this.liffId = liffId;
     this.communityId = communityId;
+    this.firebaseTenantId = firebaseTenantId;
     this.state = {
       isInitialized: false,
       isLoggedIn: false,
@@ -50,7 +52,7 @@ export class LiffService {
     return `${baseUrl}?next=${encodedNext}`;
   }
 
-  public static getInstance(liffId?: string, communityId?: string): LiffService {
+  public static getInstance(liffId?: string, communityId?: string, firebaseTenantId?: string | null): LiffService {
     const effectiveCommunityId = communityId || "default";
     
     // If we have an existing instance for this community, check if liffId matches
@@ -60,9 +62,13 @@ export class LiffService {
       // This handles the case where communityConfig loads asynchronously and
       // the correct liffId becomes available after initial render
       if (liffId && existingInstance.liffId !== liffId) {
-        const newInstance = new LiffService(liffId, effectiveCommunityId);
+        const newInstance = new LiffService(liffId, effectiveCommunityId, firebaseTenantId ?? null);
         LiffService.instances.set(effectiveCommunityId, newInstance);
         return newInstance;
+      }
+      // Update firebaseTenantId if it changed (e.g., config loaded after initial render)
+      if (firebaseTenantId !== undefined && existingInstance.firebaseTenantId !== firebaseTenantId) {
+        existingInstance.firebaseTenantId = firebaseTenantId;
       }
       return existingInstance;
     }
@@ -72,7 +78,7 @@ export class LiffService {
       throw new Error("LIFF ID is required for the first initialization");
     }
     
-    const newInstance = new LiffService(liffId, effectiveCommunityId);
+    const newInstance = new LiffService(liffId, effectiveCommunityId, firebaseTenantId ?? null);
     LiffService.instances.set(effectiveCommunityId, newInstance);
     return newInstance;
   }
@@ -241,6 +247,12 @@ export class LiffService {
         }
 
         const { customToken, profile } = await response.json();
+        
+        // Set the Firebase tenant ID dynamically before signing in
+        // This is critical for multi-tenant: the custom token from backend contains
+        // the community's tenant ID, so lineAuth must use the same tenant ID
+        lineAuth.tenantId = this.firebaseTenantId;
+        
         const userCredential = await signInWithCustomToken(lineAuth, customToken);
 
         await Promise.race([
