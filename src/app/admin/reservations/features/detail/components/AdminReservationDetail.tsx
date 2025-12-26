@@ -7,14 +7,16 @@ import { displayDuration } from "@/utils/date";
 import { GqlOpportunityCategory, GqlReservation } from "@/types/graphql";
 import { ActivityCard } from "@/components/domains/opportunities/types";
 import { PriceInfo } from "@/app/admin/reservations/types";
+import { PaymentBreakdown } from "../presenters/presentPaymentBreakdown";
 import Link from "next/link";
 
 interface ReservationDetailsProps {
   reservation: GqlReservation;
   activityCard: ActivityCard;
   label: string;
-  variant: "primary" | "secondary" | "success" | "outline" | "destructive" | "warning";
+  variant: "default" | "primary" | "secondary" | "success" | "outline" | "destructive" | "warning";
   priceInfo: PriceInfo;
+  paymentBreakdown?: PaymentBreakdown;
 }
 
 const AdminReservationDetails: React.FC<ReservationDetailsProps> = ({
@@ -23,6 +25,7 @@ const AdminReservationDetails: React.FC<ReservationDetailsProps> = ({
   label,
   variant,
   priceInfo,
+  paymentBreakdown,
 }) => {
   const {
     participationFee,
@@ -118,29 +121,30 @@ const AdminReservationDetails: React.FC<ReservationDetailsProps> = ({
         <dd className="text-body-sm">{reservation.participations?.length ?? 0}名</dd>
       </dl>
 
-      {/* 料金・ポイント */}
-      {!isQuest && (
+      {/* 料金・ポイント（内訳表示） */}
+      {!isQuest && paymentBreakdown && (
         <>
-          {!isPointsOnly && (
+          {paymentBreakdown.feePayerCount > 0 && (
             <dl className="flex justify-between items-center py-5 border-b border-foreground-caption">
-              <dt className="text-label-sm font-bold">参加費</dt>
+              <dt className="text-label-sm font-bold">参加費（現金）</dt>
               <dd className="text-body-sm">
-                {participationFee.toLocaleString()}円
+                {paymentBreakdown.totalFee.toLocaleString()}円
                 <span className="text-label-sm text-muted-foreground ml-2">
-                  ({reservation.opportunitySlot?.opportunity?.feeRequired?.toLocaleString() ?? 0}円×
-                  {participantCount.toLocaleString()}人)
+                  ({paymentBreakdown.feePerPerson.toLocaleString()}円×
+                  {paymentBreakdown.feePayerCount.toLocaleString()}人)
                 </span>
               </dd>
             </dl>
           )}
 
-          {pointsRequired > 0 && (
+          {paymentBreakdown.pointPayerCount > 0 && (
             <dl className="flex justify-between items-center py-5 border-b border-foreground-caption">
-              <dt className="text-label-sm font-bold">必要ポイント</dt>
+              <dt className="text-label-sm font-bold">参加費（ポイント）</dt>
               <dd className="text-body-sm">
-                {totalPointsRequired.toLocaleString()}pt
+                {paymentBreakdown.totalPoints.toLocaleString()}pt
                 <span className="text-label-sm text-muted-foreground ml-2">
-                  ({pointsRequired.toLocaleString()}pt×{participantCount.toLocaleString()}人)
+                  ({paymentBreakdown.pointsPerPerson.toLocaleString()}pt×
+                  {paymentBreakdown.pointPayerCount.toLocaleString()}人)
                 </span>
               </dd>
             </dl>

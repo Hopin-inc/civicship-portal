@@ -7,6 +7,7 @@ import {
   calculateRequiredPointsForAttendance,
   presentReservationPrice,
 } from "../presenters/presentReservationPrice";
+import { presentPaymentBreakdown } from "../presenters/presentPaymentBreakdown";
 import { useReservationApproval } from "./approval/useReservationApproval";
 import { useCancelSlot } from "./cancellation/useCancelSlot";
 import { useCancelState } from "./cancellation/useCancelState";
@@ -44,6 +45,12 @@ export function useReservationDetail(id: string, mode: ReservationMode | null) {
   const priceInfo = useMemo(() => {
     if (!reservation || !opportunity) return null;
     return presentReservationPrice(reservation, opportunity);
+  }, [reservation, opportunity]);
+
+  // 支払い方法の内訳
+  const paymentBreakdown = useMemo(() => {
+    if (!reservation || !opportunity) return null;
+    return presentPaymentBreakdown(reservation, opportunity);
   }, [reservation, opportunity]);
 
   // キャンセル状態
@@ -141,6 +148,7 @@ export function useReservationDetail(id: string, mode: ReservationMode | null) {
     participations,
     activityCard,
     priceInfo,
+    paymentBreakdown,
     statusMeta,
 
     // ローディング・エラー

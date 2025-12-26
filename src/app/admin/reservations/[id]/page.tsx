@@ -44,6 +44,7 @@ export default function ReservationPage() {
     opportunity,
     activityCard,
     priceInfo,
+    paymentBreakdown,
     statusMeta,
     loading,
     error,
@@ -97,6 +98,7 @@ export default function ReservationPage() {
           reservation={reservation}
           activityCard={activityCard}
           priceInfo={priceInfo}
+          paymentBreakdown={paymentBreakdown}
           label={statusMeta.label}
           variant={statusMeta.variant}
         />
