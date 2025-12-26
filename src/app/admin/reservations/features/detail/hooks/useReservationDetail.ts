@@ -49,7 +49,7 @@ export function useReservationDetail(id: string, mode: ReservationMode | null) {
 
   // 支払い方法の内訳
   const paymentBreakdown = useMemo(() => {
-    if (!reservation || !opportunity) return null;
+    if (!reservation || !opportunity) return undefined;
     return presentPaymentBreakdown(reservation, opportunity);
   }, [reservation, opportunity]);
 

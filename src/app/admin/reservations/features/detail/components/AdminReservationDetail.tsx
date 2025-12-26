@@ -27,16 +27,7 @@ const AdminReservationDetails: React.FC<ReservationDetailsProps> = ({
   priceInfo,
   paymentBreakdown,
 }) => {
-  const {
-    participationFee,
-    participantCount,
-    pointsRequired,
-    totalPointsRequired,
-    isPointsOnly,
-    category,
-    pointsToEarn,
-    totalPointsToEarn,
-  } = priceInfo;
+  const { participantCount, category, pointsToEarn, totalPointsToEarn } = priceInfo;
 
   const isQuest = category === GqlOpportunityCategory.Quest;
   const opportunity = reservation.opportunitySlot?.opportunity;
