@@ -33,22 +33,31 @@ export function UserInfoBlock({ reservation, statusLabel, statusVariant }: UserI
 
   return (
     <div className="space-y-3 rounded-xl border p-4 bg-card">
-      {/* ステータスと連絡ボタン */}
-      <div className="flex items-start justify-between gap-3">
-        {/* ステータス */}
-        <div className="flex items-center gap-1.5 text-label-sm">
-          <span
-            className={cn("size-2.5 rounded-full", statusColorClass)}
-            aria-label={statusLabel}
-          />
-          <span>{statusLabel}</span>
+      {/* アバター・名前・ステータスと連絡ボタン */}
+      <div className="flex items-center justify-between gap-3">
+        {/* 左側：アバター・名前・ステータス */}
+        <div className="flex items-center gap-2.5 flex-1 min-w-0">
+          <Avatar className="h-10 w-10 flex-shrink-0">
+            <AvatarImage src={user?.image || ""} />
+            <AvatarFallback>{user?.name?.[0] || "U"}</AvatarFallback>
+          </Avatar>
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="font-semibold text-body-md truncate">{user?.name || "未設定"}</span>
+            <div className="flex items-center gap-1.5 text-label-sm flex-shrink-0">
+              <span
+                className={cn("size-2.5 rounded-full", statusColorClass)}
+                aria-label={statusLabel}
+              />
+              <span>{statusLabel}</span>
+            </div>
+          </div>
         </div>
 
-        {/* 連絡するボタン */}
+        {/* 右側：連絡するボタン */}
         {hasPhoneNumber && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="tertiary" size="sm">
+              <Button variant="tertiary" size="sm" className="flex-shrink-0">
                 連絡する
                 <ChevronDown className="ml-1 h-4 w-4" />
               </Button>
@@ -71,19 +80,10 @@ export function UserInfoBlock({ reservation, statusLabel, statusVariant }: UserI
         )}
       </div>
 
-      {/* ユーザー情報 */}
-      <div className="flex items-start gap-2.5">
-        <Avatar className="h-10 w-10 flex-shrink-0">
-          <AvatarImage src={user?.image || ""} />
-          <AvatarFallback>{user?.name?.[0] || "U"}</AvatarFallback>
-        </Avatar>
-        <div className="flex-1 min-w-0 space-y-1">
-          <div className="font-semibold text-body-md">{user?.name || "未設定"}</div>
-          {user?.bio?.trim() && (
-            <div className="text-body-sm text-muted-foreground line-clamp-3">{user.bio}</div>
-          )}
-        </div>
-      </div>
+      {/* 自己紹介 */}
+      {user?.bio?.trim() && (
+        <div className="text-body-sm text-muted-foreground line-clamp-3">{user.bio}</div>
+      )}
     </div>
   );
 }
