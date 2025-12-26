@@ -53,9 +53,17 @@ export class LiffService {
   public static getInstance(liffId?: string, communityId?: string): LiffService {
     const effectiveCommunityId = communityId || "default";
     
-    // If we have an existing instance for this community, return it
+    // If we have an existing instance for this community, check if liffId matches
     const existingInstance = LiffService.instances.get(effectiveCommunityId);
     if (existingInstance) {
+      // If liffId is provided and differs from existing, create a new instance
+      // This handles the case where communityConfig loads asynchronously and
+      // the correct liffId becomes available after initial render
+      if (liffId && existingInstance.liffId !== liffId) {
+        const newInstance = new LiffService(liffId, effectiveCommunityId);
+        LiffService.instances.set(effectiveCommunityId, newInstance);
+        return newInstance;
+      }
       return existingInstance;
     }
     
