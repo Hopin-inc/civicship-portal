@@ -8,7 +8,7 @@ import {
 } from "@/types/graphql";
 import { ApolloError } from "@apollo/client";
 import { presentTransaction } from "../data/presenter/transaction";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 type PresentedTransaction = ReturnType<typeof presentTransaction>;
 
@@ -29,6 +29,10 @@ export function useWalletsAndDidIssuanceRequests({
   presentedTransactions: PresentedTransaction[];
   refetch: () => void;
 } {
+  // Use runtime communityId from CommunityConfigContext
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId || "";
+  
   const walletTypeFilter: GqlTransactionFilterInput =
     listType === "grant"
       ? {
@@ -74,7 +78,7 @@ export function useWalletsAndDidIssuanceRequests({
   const { data, error, loading, refetch } = useGetTransactionsQuery({
     variables: {
       filter: {
-        communityId: COMMUNITY_ID,
+        communityId: communityId,
         and: [walletTypeFilter, ...(keywordFilter ? [keywordFilter] : [])],
       },
       first: 100,
@@ -82,6 +86,7 @@ export function useWalletsAndDidIssuanceRequests({
     },
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
+    skip: !communityId,
   });
 
   const allTransactions = useMemo<GqlTransaction[]>(() => {

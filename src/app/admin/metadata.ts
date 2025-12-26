@@ -1,14 +1,27 @@
 // app/admin/metadata.ts
 import { Metadata } from "next";
-import { currentCommunityConfig, DEFAULT_OPEN_GRAPH_IMAGE } from "@/lib/communities/metadata";
+import { DEFAULT_OPEN_GRAPH_IMAGE } from "@/lib/communities/metadata";
+import { getCommunityConfig } from "@/lib/graphql/getCommunityConfig";
+import { headers, cookies } from "next/headers";
 
-export const metadata: Metadata = {
-  title: `管理画面 | ${currentCommunityConfig.title}`,
-  description: `${currentCommunityConfig.title}の管理者用ページです。`,
-  openGraph: {
-    type: "website",
-    title: `管理画面 | ${currentCommunityConfig.title}`,
-    description: `${currentCommunityConfig.title}の管理者用ページです。`,
-    images: DEFAULT_OPEN_GRAPH_IMAGE,
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  // Get communityId from request headers (set by middleware) or cookies
+  const headersList = await headers();
+  const cookieStore = await cookies();
+  const communityId = headersList.get("x-community-id") || cookieStore.get("communityId")?.value || "";
+  
+  // Fetch community config from database
+  const communityConfig = await getCommunityConfig(communityId);
+  const title = communityConfig?.title || "";
+  
+  return {
+    title: `管理画面 | ${title}`,
+    description: `${title}の管理者用ページです。`,
+    openGraph: {
+      type: "website",
+      title: `管理画面 | ${title}`,
+      description: `${title}の管理者用ページです。`,
+      images: DEFAULT_OPEN_GRAPH_IMAGE,
+    },
+  };
+}

@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { ArrowLeftRight, ClipboardList, Ticket, Users, Wallet } from "lucide-react";
-import { currentCommunityConfig, FeaturesType } from "@/lib/communities/metadata";
+import { FeaturesType } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { useAdminRole } from "@/app/admin/context/AdminRoleContext";
 import { GqlRole } from "@/types/graphql";
 import Link from "next/link";
@@ -45,6 +46,8 @@ export default function AdminPage() {
   const router = useRouter();
   const role = useAdminRole();
   const t = useTranslations();
+  // Use runtime community config from context
+  const communityConfig = useCommunityConfig();
 
   const headerConfig = useMemo(
     () => ({
@@ -64,7 +67,7 @@ export default function AdminPage() {
   );
   useHeaderConfig(headerConfig);
 
-  const enabled = currentCommunityConfig.enableFeatures;
+  const enabled = communityConfig?.enableFeatures || [];
 
   const visibleAdminSettings =
     role === GqlRole.Owner

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { COMMUNITY_ID, getCommunityIdFromEnv } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { useAuth } from "@/contexts/AuthProvider";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import WalletCard from "@/components/shared/WalletCard";
@@ -19,7 +19,9 @@ import { useTranslations } from "next-intl";
 
 export default function WalletPage() {
   const t = useTranslations();
-  const communityId = COMMUNITY_ID;
+  // Use runtime communityId from CommunityConfigContext
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId || "";
   const { user: currentUser } = useAuth();
   const currentUserRole = currentUser?.memberships?.find(
     (m: GqlMembership) => m.community?.id === communityId,
@@ -50,12 +52,13 @@ export default function WalletPage() {
     refetch: refetchWallet,
   } = useGetCommunityWalletQuery({
     variables: {
-      communityId: COMMUNITY_ID,
+      communityId: communityId,
     },
+    skip: !communityId,
   });
 
   const wallet: GqlWallet | undefined | null = walletData?.wallets.edges?.find(
-    (w) => w?.node?.community?.id === getCommunityIdFromEnv(),
+    (w) => w?.node?.community?.id === communityId,
   )?.node;
   const walletId = wallet?.id ?? "";
   const currentPointView = wallet?.currentPointView;

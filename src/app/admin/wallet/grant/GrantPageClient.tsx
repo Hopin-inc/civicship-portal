@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { GqlMembershipsConnection, GqlUser } from "@/types/graphql";
 import { useTransactionMutations } from "@/app/admin/wallet/hooks/useTransactionMutations";
 import UserSelectStep from "./components/UserSelectStep";
@@ -29,6 +29,10 @@ export default function GrantPageClient({ initialConnection }: GrantPageClientPr
   const t = useTranslations();
   const router = useRouter();
   const track = useAnalytics();
+  
+  // Use runtime communityId from CommunityConfigContext
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId || "";
 
   const searchParams = useSearchParams();
   const currentPoint = BigInt(searchParams.get("currentPoint") ?? "0");
@@ -58,7 +62,7 @@ export default function GrantPageClient({ initialConnection }: GrantPageClientPr
     try {
       const res = await grantPoint({
         input: { transferPoints: amount, toUserId: selectedUser.id, comment },
-        permission: { communityId: COMMUNITY_ID },
+        permission: { communityId: communityId },
       });
 
       if (res.success) {
