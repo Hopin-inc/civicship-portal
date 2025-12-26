@@ -10,7 +10,7 @@ import { useReservationSearch } from "./features/list/hooks/useReservationSearch
 import { Form } from "@/components/ui/form";
 import SearchForm from "@/app/search/components/SearchForm";
 import { ReservationList } from "./features/list/components/ReservationList";
-import { TABS, isTabType, getReservationFilterFromTab } from "./constants/filters";
+import { getReservationFilterFromTab, isTabType, TABS } from "./constants/filters";
 
 export default function ReservationsPage() {
   const router = useRouter();
@@ -63,7 +63,7 @@ export default function ReservationsPage() {
       </Tabs>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="mb-10 mt-4">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="mt-2 mb-4">
           <SearchForm name="searchQuery" />
         </form>
       </Form>

@@ -31,23 +31,24 @@ export function ReservationItem({ reservation }: ReservationItemProps) {
 
     if (dStart.isSame(dEnd, "date")) {
       // 同じ日付の場合: 01/15 10:00 - 12:00
-      return `${dStart.format("M/D H:mm")} - ${dEnd.format("H:mm")}`;
+      return `${dStart.format("M/D H:mm")}-${dEnd.format("H:mm")}`;
     } else {
       // 日付を跨ぐ場合: 01/15 10:00 - 01/16 12:00
-      return `${dStart.format("M/D H:mm")} - ${dEnd.format("M/D H:mm")}`;
+      return `${dStart.format("M/D H:mm")}-${dEnd.format("M/D H:mm")}`;
     }
   };
 
   // バリアントに応じた色クラス
-  const statusColorClass = {
-    default: "bg-muted-foreground",
-    primary: "bg-primary",
-    secondary: "bg-secondary",
-    success: "bg-success",
-    warning: "bg-warning",
-    destructive: "bg-destructive",
-    outline: "bg-muted-foreground",
-  }[variant] || "bg-muted-foreground";
+  const statusColorClass =
+    {
+      default: "bg-muted-foreground",
+      primary: "bg-primary",
+      secondary: "bg-secondary",
+      success: "bg-success",
+      warning: "bg-warning",
+      destructive: "bg-destructive",
+      outline: "bg-muted-foreground",
+    }[variant] || "bg-muted-foreground";
 
   return (
     <div
@@ -57,10 +58,7 @@ export function ReservationItem({ reservation }: ReservationItemProps) {
       {/* ステータスと作成日時 */}
       <div className="flex items-center justify-between text-xs text-muted-foreground">
         <div className="flex items-center gap-1.5">
-          <span
-            className={cn("size-2.5 rounded-full", statusColorClass)}
-            aria-label={label}
-          />
+          <span className={cn("size-2.5 rounded-full", statusColorClass)} aria-label={label} />
           <span>{label}</span>
         </div>
         <span>{displayRelativeTime(reservation.createdAt ?? "")}</span>
