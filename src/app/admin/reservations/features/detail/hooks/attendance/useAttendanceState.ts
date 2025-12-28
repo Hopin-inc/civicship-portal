@@ -4,13 +4,11 @@ import { GqlEvaluationStatus, GqlParticipation } from "@/types/graphql";
 export const useAttendanceState = (participations: GqlParticipation[]) => {
   const [attendanceData, setAttendanceData] = useState<Record<string, GqlEvaluationStatus>>({});
   const [isSaved, setIsSaved] = useState(false);
-  const [allEvaluated, setAllEvaluated] = useState(false);
   const processedParticipationIds = useRef<Set<string>>(new Set());
 
   // トグル操作ごとに “全員選択完了” を再判定
   useEffect(() => {
     const vals = Object.values(attendanceData);
-    setAllEvaluated(vals.length > 0 && vals.every((s) => s !== GqlEvaluationStatus.Pending));
   }, [attendanceData]);
 
   // 初回マウント or new id 登場時の初期化
@@ -23,7 +21,6 @@ export const useAttendanceState = (participations: GqlParticipation[]) => {
     if (hasNew) {
       setAttendanceData((prev) => ({ ...prev, ...initialAttendance }));
       if (hasAnyEval && allEval) setIsSaved(true);
-      setAllEvaluated(allEval);
     }
   }, [participations]);
 
@@ -35,10 +32,8 @@ export const useAttendanceState = (participations: GqlParticipation[]) => {
   return {
     attendanceData,
     isSaved,
-    allEvaluated,
     handleAttendanceChange,
     setIsSaved,
-    setAllEvaluated,
   };
 };
 

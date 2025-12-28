@@ -148,7 +148,6 @@ export default function ReservationPage() {
           isConfirmDialogOpen={attendanceState.isConfirmDialogOpen}
           setIsConfirmDialogOpen={attendanceState.setIsConfirmDialogOpen}
           handleSaveAllAttendance={attendanceState.handleSaveAllAttendance}
-          allEvaluated={attendanceState.allEvaluated}
           opportunity={opportunity}
           isInsufficientBalance={balanceCheck.isInsufficientBalanceForAttendance}
         />

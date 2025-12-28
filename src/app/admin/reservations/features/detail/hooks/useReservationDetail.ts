@@ -65,7 +65,7 @@ export function useReservationDetail(id: string, mode: ReservationMode | null) {
   // 出席確認状態
   const [isSaving, setIsSaving] = useState(false);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
-  const { attendanceData, isSaved, allEvaluated, handleAttendanceChange, setIsSaved } =
+  const { attendanceData, isSaved, handleAttendanceChange, setIsSaved } =
     useAttendanceState(participations);
 
   const { save: saveAttendances, loading: batchLoading } = useSaveAttendances({
@@ -170,7 +170,6 @@ export function useReservationDetail(id: string, mode: ReservationMode | null) {
     attendanceState: {
       attendanceData,
       isSaved,
-      allEvaluated,
       handleAttendanceChange,
       setIsSaved,
       isSaving,

@@ -1,24 +1,38 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import IconWrapper from "./IconWrapper";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Info } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+type NoticeVariant = "warning" | "info";
 
 interface NoticeCardProps {
   title: string;
   description: string;
+  variant?: NoticeVariant;
 }
 
-export const NoticeCard = ({ title, description }: NoticeCardProps) => {
+export const NoticeCard = ({ title, description, variant = "warning" }: NoticeCardProps) => {
+  const isWarning = variant === "warning";
+
   return (
     <Card>
-      <div className="flex items-start p-4 bg-yellow-50 border border-warning rounded-lg">
-        <IconWrapper color="warning">
-          <AlertCircle size={20} strokeWidth={2.5} />
+      <div
+        className={cn(
+          "flex items-start p-4 rounded-lg border",
+          isWarning ? "bg-yellow-50 border-warning" : "bg-muted border-border",
+        )}
+      >
+        <IconWrapper color={isWarning ? "warning" : "default"}>
+          {isWarning ? (
+            <AlertCircle size={20} strokeWidth={2.5} />
+          ) : (
+            <Info size={20} strokeWidth={2.5} />
+          )}
         </IconWrapper>
+
         <div className="ml-2">
           <p className="text-sm font-bold mt-[2px]">{title}</p>
-          <p className="text-sm pt-2 text-caption">
-            {description}
-          </p>
+          <p className="text-sm pt-2 text-caption">{description}</p>
         </div>
       </div>
     </Card>
