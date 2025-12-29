@@ -1,10 +1,10 @@
 "use client";
 
 import { useMemo } from "react";
+import { useQuery } from "@apollo/client";
 import { ItemContent, ItemTitle } from "@/components/ui/item";
 import { SelectorSheet } from "@/app/admin/opportunities/features/shared/components/SelectorSheet";
-import { useGetPlacesQuery } from "@/types/graphql";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { GET_CITIES } from "../../queries";
 
 interface CitySelectorSheetProps {
   open: boolean;
@@ -24,31 +24,30 @@ export function CitySelectorSheet({
   selectedCityCode,
   onSelectCity,
 }: CitySelectorSheetProps) {
-  // placesクエリから利用可能なcitiesを抽出
-  const { data, loading } = useGetPlacesQuery({
+  // Cityマスタから全citiesを取得
+  const { data, loading } = useQuery(GET_CITIES, {
     variables: {
-      filter: {
-        communityId: COMMUNITY_ID,
-      },
-      first: 100,
+      first: 1000, // 全件取得（日本の市区町村数は約2000なので十分）
+      sort: { code: "ASC" },
     },
     skip: !open,
-    fetchPolicy: "network-only",
+    fetchPolicy: "cache-first",
   });
 
-  // 重複を排除してcitiesリストを作成
+  // citiesリストを作成
   const cities = useMemo<City[]>(() => {
-    const cityMap = new Map<string, string>();
-
-    (data?.places?.edges || []).forEach((edge) => {
-      const city = edge?.node?.city;
-      if (city && city.code && city.name) {
-        cityMap.set(city.code, city.name);
-      }
-    });
-
-    return Array.from(cityMap.entries())
-      .map(([code, name]) => ({ code, name }))
+    return (data?.cities?.edges || [])
+      .map((edge: any) => {
+        const city = edge?.node;
+        if (city && city.code && city.name) {
+          return {
+            code: city.code,
+            name: city.name,
+          };
+        }
+        return null;
+      })
+      .filter((city: City | null): city is City => city !== null)
       .sort((a, b) => a.name.localeCompare(b.name, "ja"));
   }, [data]);
 

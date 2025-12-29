@@ -19,15 +19,24 @@ interface PlaceFormSectionProps {
   onNameChange: (value: string) => void;
   address: string;
   onAddressChange: (value: string) => void;
+
+  // 地図・座標
+  coordinatesConfirmed: boolean;
+  coordinatesNeedReview: boolean;
+  latitude: number | null;
+  longitude: number | null;
+  onMapClick: () => void;
+
+  // 市区町村（条件付き表示）
+  showCitySelector: boolean;
   cityCode: string;
   cityName: string | null;
   onCityClick: () => void;
-  latitude: number | null;
-  longitude: number | null;
-  geocoding: boolean;
+
   errors?: {
     name?: string;
     address?: string;
+    coordinates?: string;
     cityCode?: string;
   };
 }
@@ -37,12 +46,15 @@ export function PlaceFormSection({
   onNameChange,
   address,
   onAddressChange,
+  coordinatesConfirmed,
+  coordinatesNeedReview,
+  latitude,
+  longitude,
+  onMapClick,
+  showCitySelector,
   cityCode,
   cityName,
   onCityClick,
-  latitude,
-  longitude,
-  geocoding,
   errors,
 }: PlaceFormSectionProps) {
   return (
@@ -82,70 +94,104 @@ export function PlaceFormSection({
           className={`min-h-[80px] placeholder:text-sm ${errors?.address ? "border-destructive focus-visible:ring-destructive" : ""}`}
           required
         />
-        {geocoding && (
-          <p className="text-xs text-muted-foreground px-1">座標を取得中...</p>
-        )}
         {errors?.address && (
           <p className="text-xs text-destructive px-1">{errors.address}</p>
         )}
       </div>
 
-      {/* 市区町村・座標 */}
+      {/* 地図・座標 */}
       <div className="space-y-1">
         <ItemGroup className="border rounded-lg">
-          {/* 市区町村 */}
           <Item
             size="sm"
             role="button"
             tabIndex={0}
-            onClick={onCityClick}
+            onClick={onMapClick}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
-                onCityClick();
+                onMapClick();
               }
             }}
-            className={`cursor-pointer ${errors?.cityCode ? "border-destructive" : ""}`}
+            className={`cursor-pointer ${errors?.coordinates ? "border-destructive" : ""}`}
           >
             <ItemContent>
               <ItemTitle>
                 <MapPin className="h-3.5 w-3.5" />
-                市区町村
-                <span className="text-primary text-xs font-bold bg-primary-foreground px-1 py-0.5 rounded">
-                  必須
-                </span>
+                {coordinatesConfirmed && !coordinatesNeedReview ? "地図・座標" : "地図で位置を確認"}
+                {!coordinatesConfirmed && (
+                  <span className="text-primary text-xs font-bold bg-primary-foreground px-1 py-0.5 rounded">
+                    必須
+                  </span>
+                )}
+                {coordinatesNeedReview && (
+                  <span className="text-amber-600 text-xs font-bold bg-amber-50 px-1 py-0.5 rounded">
+                    要再確認
+                  </span>
+                )}
               </ItemTitle>
-              <ItemDescription>{cityName || "未選択"}</ItemDescription>
+              <ItemDescription>
+                {coordinatesConfirmed && latitude !== null && longitude !== null
+                  ? `緯度: ${latitude.toFixed(6)}, 経度: ${longitude.toFixed(6)}`
+                  : "タップして位置を確定してください"}
+              </ItemDescription>
             </ItemContent>
-
             <ItemActions>
               <ChevronRight className="h-4 w-4 text-muted-foreground" />
             </ItemActions>
           </Item>
-
-          <ItemSeparator />
-
-          {/* 座標（読み取り専用） */}
-          <Item size="sm">
-            <ItemContent>
-              <ItemTitle>座標</ItemTitle>
-              <ItemDescription>
-                {latitude !== null && longitude !== null
-                  ? `緯度: ${latitude.toFixed(6)}, 経度: ${longitude.toFixed(6)}`
-                  : "未取得"}
-              </ItemDescription>
-            </ItemContent>
-          </Item>
         </ItemGroup>
-        {errors?.cityCode && (
-          <p className="text-xs text-destructive px-1">{errors.cityCode}</p>
+        {errors?.coordinates && (
+          <p className="text-xs text-destructive px-1">{errors.coordinates}</p>
         )}
       </div>
 
-      {/* 地図プレビュー */}
-      {address && latitude !== null && longitude !== null && (
+      {/* 市区町村（条件付き表示）*/}
+      {showCitySelector && (
+        <div className="space-y-1">
+          <ItemGroup className="border rounded-lg">
+            <Item
+              size="sm"
+              role="button"
+              tabIndex={0}
+              onClick={onCityClick}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  onCityClick();
+                }
+              }}
+              className={`cursor-pointer ${errors?.cityCode ? "border-destructive" : ""}`}
+            >
+              <ItemContent>
+                <ItemTitle>
+                  <MapPin className="h-3.5 w-3.5" />
+                  市区町村
+                  <span className="text-primary text-xs font-bold bg-primary-foreground px-1 py-0.5 rounded">
+                    必須
+                  </span>
+                </ItemTitle>
+                <ItemDescription>
+                  {cityName || "選択してください"}
+                </ItemDescription>
+              </ItemContent>
+              <ItemActions>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              </ItemActions>
+            </Item>
+          </ItemGroup>
+          <p className="text-xs text-muted-foreground px-1">
+            住所から市区町村を特定できませんでした。手動で選択してください。
+          </p>
+          {errors?.cityCode && (
+            <p className="text-xs text-destructive px-1">{errors.cityCode}</p>
+          )}
+        </div>
+      )}
+
+      {/* 地図プレビュー（確定済みで要再確認でない時のみ表示）*/}
+      {coordinatesConfirmed && !coordinatesNeedReview && latitude !== null && longitude !== null && (
         <div className="space-y-1">
           <div className="px-1">
-            <span className="text-sm text-muted-foreground">地図</span>
+            <span className="text-sm text-muted-foreground">地図プレビュー</span>
           </div>
           <AddressMap
             address={address}

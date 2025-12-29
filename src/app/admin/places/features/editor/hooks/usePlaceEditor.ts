@@ -1,13 +1,19 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { PlaceEditorFormState, createInitialFormState } from "../types/form";
 import { usePlaceSave } from "./usePlaceSave";
-import { getCoordinatesFromAddress } from "@/app/places/utils/geocoding";
 import { PlaceFormData } from "../../shared/types/place";
 
 interface UsePlaceEditorOptions {
   placeId?: string;
   initialData?: Partial<PlaceFormData>;
   onSuccess?: (id: string) => void;
+}
+
+interface FormErrors {
+  name?: string;
+  address?: string;
+  coordinates?: string;
+  cityCode?: string;
 }
 
 export const usePlaceEditor = ({
@@ -19,8 +25,17 @@ export const usePlaceEditor = ({
     createInitialFormState(initialData)
   );
   const [saving, setSaving] = useState(false);
-  const [geocoding, setGeocoding] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<FormErrors>({});
+
+  // 座標確定状態
+  const [coordinatesConfirmed, setCoordinatesConfirmed] = useState(
+    !!(initialData?.latitude && initialData?.longitude)
+  );
+  const [coordinatesNeedReview, setCoordinatesNeedReview] = useState(false);
+
+  // UI表示制御
+  const [showCitySelector, setShowCitySelector] = useState(false);
+  const [mapSheetOpen, setMapSheetOpen] = useState(false);
 
   const { handleSave: savePlace } = usePlaceSave({ placeId, onSuccess });
 
@@ -32,41 +47,104 @@ export const usePlaceEditor = ({
     []
   );
 
-  // 住所変更時に座標を自動取得
+  // 住所変更ハンドラ（自動geocodeなし）
   const handleAddressChange = useCallback(
-    async (address: string) => {
+    (address: string) => {
       updateField("address", address);
 
-      if (!address.trim()) {
-        updateField("latitude", null);
-        updateField("longitude", null);
-        return;
+      // 座標が既に確定している場合のみ「要再確認」フラグを立てる
+      if (coordinatesConfirmed) {
+        setCoordinatesNeedReview(true);
       }
 
-      setGeocoding(true);
-      try {
-        const coordinates = await getCoordinatesFromAddress(address);
-        if (coordinates) {
-          updateField("latitude", coordinates.lat);
-          updateField("longitude", coordinates.lng);
-          updateField("isManual", false);
-        } else {
-          updateField("isManual", true);
-        }
-      } catch (error) {
-        console.error("Geocoding error:", error);
-        updateField("isManual", true);
-      } finally {
-        setGeocoding(false);
+      // 座標自体は保持する（nullにしない）
+    },
+    [updateField, coordinatesConfirmed]
+  );
+
+  // 地図確認ハンドラ
+  const handleMapClick = useCallback(() => {
+    setMapSheetOpen(true);
+  }, []);
+
+  // 地図確定ハンドラ
+  const handleMapConfirm = useCallback(
+    (result: {
+      latitude: number;
+      longitude: number;
+      cityCode: string | null;
+    }) => {
+      // 1. 座標を保存
+      updateField("latitude", result.latitude);
+      updateField("longitude", result.longitude);
+      setCoordinatesConfirmed(true);
+      setCoordinatesNeedReview(false);
+
+      // 2. cityCode解決
+      if (result.cityCode) {
+        updateField("cityCode", result.cityCode);
+        setShowCitySelector(false);
+      } else {
+        // 解決失敗時のみ手動選択UI表示
+        setShowCitySelector(true);
       }
+
+      setMapSheetOpen(false);
     },
     [updateField]
   );
+
+  // 市区町村選択ハンドラ
+  const handleCitySelect = useCallback(
+    (code: string) => {
+      updateField("cityCode", code);
+      setShowCitySelector(false);
+    },
+    [updateField]
+  );
+
+  // バリデーション
+  const validateForm = useCallback((): boolean => {
+    const newErrors: FormErrors = {};
+
+    if (!formState.name.trim()) {
+      newErrors.name = "場所名を入力してください";
+    }
+
+    if (!formState.address.trim()) {
+      newErrors.address = "住所を入力してください";
+    }
+
+    // 座標未確定チェック
+    if (!coordinatesConfirmed || formState.latitude === null || formState.longitude === null) {
+      newErrors.coordinates = "地図で位置を確認してください";
+    }
+
+    // 座標要再確認チェック
+    if (coordinatesNeedReview) {
+      newErrors.coordinates = "住所を変更しました。地図で位置を再確認してください";
+    }
+
+    // cityCode必須チェック
+    if (!formState.cityCode) {
+      newErrors.cityCode = "市区町村を選択してください";
+      setShowCitySelector(true);
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }, [formState, coordinatesConfirmed, coordinatesNeedReview]);
 
   // 保存処理
   const handleSave = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
+
+      // バリデーション
+      if (!validateForm()) {
+        return;
+      }
+
       setSaving(true);
       try {
         const result = await savePlace(formState);
@@ -75,16 +153,23 @@ export const usePlaceEditor = ({
         setSaving(false);
       }
     },
-    [formState, savePlace]
+    [formState, savePlace, validateForm]
   );
 
   return {
     formState,
     updateField,
     handleAddressChange,
+    handleMapClick,
+    handleMapConfirm,
+    handleCitySelect,
     handleSave,
     saving,
-    geocoding,
     errors,
+    coordinatesConfirmed,
+    coordinatesNeedReview,
+    showCitySelector,
+    mapSheetOpen,
+    setMapSheetOpen,
   };
 };

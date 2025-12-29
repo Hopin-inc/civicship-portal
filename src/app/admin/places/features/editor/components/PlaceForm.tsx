@@ -26,12 +26,15 @@ export function PlaceForm({
         onNameChange={(value) => editor.updateField("name", value)}
         address={editor.formState.address}
         onAddressChange={editor.handleAddressChange}
+        coordinatesConfirmed={editor.coordinatesConfirmed}
+        coordinatesNeedReview={editor.coordinatesNeedReview}
+        latitude={editor.formState.latitude}
+        longitude={editor.formState.longitude}
+        onMapClick={editor.handleMapClick}
+        showCitySelector={editor.showCitySelector}
         cityCode={editor.formState.cityCode}
         cityName={selectedCityName}
         onCityClick={onCityClick}
-        latitude={editor.formState.latitude}
-        longitude={editor.formState.longitude}
-        geocoding={editor.geocoding}
         errors={editor.errors}
       />
 
