@@ -2,11 +2,14 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
+import { useQuery } from "@apollo/client";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { getCoordinatesFromAddress } from "@/app/places/utils/geocoding";
 import { logger } from "@/lib/logging";
+import { GET_CITIES } from "../../queries";
+import { resolveCityCode } from "../../utils/resolveCityCode";
 
 interface MapConfirmSheetProps {
   open: boolean;
@@ -47,6 +50,15 @@ export function MapConfirmSheet({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
     language: "ja",
     region: "JP",
+  });
+
+  // Cities データ取得（cityCode解決用）
+  const { data: citiesData } = useQuery(GET_CITIES, {
+    variables: {
+      first: 500,
+      sort: { code: "ASC" },
+    },
+    fetchPolicy: "cache-first",
   });
 
   // Sheet表示時に初回geocode実行
@@ -117,17 +129,38 @@ export function MapConfirmSheet({
   }, []);
 
   // 確定ボタンハンドラ
-  const handleConfirm = useCallback(() => {
+  const handleConfirm = useCallback(async () => {
     if (!position) return;
 
-    // TODO: cityCode解決ロジック
-    // 現時点ではnullを返す（Phase7で統合時に実装）
+    let cityCode: string | null = null;
+
+    try {
+      // 1. Reverse geocodingで住所情報を取得
+      const geocoder = new google.maps.Geocoder();
+      const result = await geocoder.geocode({
+        location: { lat: position.lat, lng: position.lng },
+      });
+
+      if (result.results && result.results.length > 0) {
+        // 2. Cities データ準備
+        const cities = citiesData?.cities?.edges
+          ?.map((edge: any) => edge?.node)
+          .filter(Boolean) || [];
+
+        // 3. cityCode解決（都道府県考慮あり）
+        cityCode = resolveCityCode(result.results[0], cities);
+      }
+    } catch (error) {
+      logger.error("Reverse geocoding error:", error);
+      // エラーでもcityCode=nullで続行
+    }
+
     onConfirm({
       latitude: position.lat,
       longitude: position.lng,
-      cityCode: null,
+      cityCode,
     });
-  }, [position, onConfirm]);
+  }, [position, citiesData, onConfirm]);
 
   if (!isLoaded) {
     return null;
