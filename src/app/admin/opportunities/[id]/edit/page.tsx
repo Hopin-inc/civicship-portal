@@ -23,6 +23,7 @@ export default function EditOpportunityPage() {
       id: opportunityId,
       permission: { communityId: COMMUNITY_ID },
     },
+    fetchPolicy: "network-only",
   });
 
   // 初期データ変換
