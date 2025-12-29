@@ -2851,6 +2851,19 @@ export type GqlWalletsConnection = {
   totalCount: Scalars["Int"]["output"];
 };
 
+export type GqlGetStatesQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GqlGetStatesQuery = {
+  __typename?: "Query";
+  states: {
+    __typename?: "StatesConnection";
+    edges: Array<{
+      __typename?: "StateEdge";
+      node?: { __typename?: "State"; code: string; name: string } | null;
+    }>;
+  };
+};
+
 export type GqlGetCitiesQueryVariables = Exact<{
   filter?: InputMaybe<GqlCitiesInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
@@ -6529,6 +6542,68 @@ export const TransactionFieldsFragmentDoc = gql`
     createdAt
   }
 `;
+export const GetStatesDocument = gql`
+  query GetStates {
+    states {
+      edges {
+        node {
+          code
+          name
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetStatesQuery__
+ *
+ * To run a query within a React component, call `useGetStatesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetStatesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetStatesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetStatesQuery(
+  baseOptions?: Apollo.QueryHookOptions<GqlGetStatesQuery, GqlGetStatesQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetStatesQuery, GqlGetStatesQueryVariables>(GetStatesDocument, options);
+}
+export function useGetStatesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<GqlGetStatesQuery, GqlGetStatesQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetStatesQuery, GqlGetStatesQueryVariables>(
+    GetStatesDocument,
+    options,
+  );
+}
+export function useGetStatesSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GqlGetStatesQuery, GqlGetStatesQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetStatesQuery, GqlGetStatesQueryVariables>(
+    GetStatesDocument,
+    options,
+  );
+}
+export type GetStatesQueryHookResult = ReturnType<typeof useGetStatesQuery>;
+export type GetStatesLazyQueryHookResult = ReturnType<typeof useGetStatesLazyQuery>;
+export type GetStatesSuspenseQueryHookResult = ReturnType<typeof useGetStatesSuspenseQuery>;
+export type GetStatesQueryResult = Apollo.QueryResult<
+  GqlGetStatesQuery,
+  GqlGetStatesQueryVariables
+>;
 export const GetCitiesDocument = gql`
   query GetCities($filter: CitiesInput, $first: Int, $cursor: String, $sort: CitiesSortInput) {
     cities(filter: $filter, first: $first, cursor: $cursor, sort: $sort) {
