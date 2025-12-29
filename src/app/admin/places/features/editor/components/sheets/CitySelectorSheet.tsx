@@ -5,8 +5,9 @@ import { useQuery } from "@apollo/client";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Item, ItemContent, ItemTitle } from "@/components/ui/item";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { Check } from "lucide-react";
+import { Check, Search } from "lucide-react";
 import { GET_CITIES } from "../../queries";
 import { GqlSortDirection } from "@/types/graphql";
 
@@ -28,19 +29,33 @@ export function CitySelectorSheet({
   selectedCityCode,
   onSelectCity,
 }: CitySelectorSheetProps) {
-  // 検索テキスト
+  // 検索テキスト（入力中）
   const [searchText, setSearchText] = useState("");
+  // 検索クエリ（実際に検索する値）
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Cityマスタから検索
   const { data, loading } = useQuery(GET_CITIES, {
     variables: {
-      filter: searchText ? { name: searchText } : undefined,
+      filter: searchQuery ? { name: searchQuery } : undefined,
       first: 500, // バックエンド上限
       sort: { code: GqlSortDirection.Asc },
     },
-    skip: !open || !searchText, // 検索テキストがある場合のみクエリ実行
+    skip: !open || !searchQuery, // 検索クエリがある場合のみクエリ実行
     fetchPolicy: "network-only", // 常に最新データを取得
   });
+
+  // 検索実行
+  const handleSearch = () => {
+    setSearchQuery(searchText);
+  };
+
+  // Enterキーで検索
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
 
   // citiesリストを作成
   const cities = useMemo<City[]>(() => {
@@ -75,14 +90,24 @@ export function CitySelectorSheet({
         </SheetHeader>
 
         {/* 検索入力 */}
-        <div className="mb-4">
+        <div className="flex gap-2 mb-4">
           <Input
             placeholder="市区町村名で検索（例: 姫路）"
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
-            className="placeholder:text-sm"
+            onKeyDown={handleKeyDown}
+            className="placeholder:text-sm flex-1"
             autoFocus
           />
+          <Button
+            type="button"
+            onClick={handleSearch}
+            disabled={!searchText || loading}
+            size="sm"
+            variant="secondary"
+          >
+            <Search className="h-4 w-4" />
+          </Button>
         </div>
 
         <div className="space-y-4">
@@ -90,9 +115,9 @@ export function CitySelectorSheet({
 
           {!loading && cities.length === 0 && (
             <div className="text-center py-8 text-muted-foreground text-sm">
-              {searchText
-                ? `「${searchText}」に一致する市区町村が見つかりませんでした`
-                : "市区町村名を入力して検索してください（例: 姫路）"}
+              {searchQuery
+                ? `「${searchQuery}」に一致する市区町村が見つかりませんでした`
+                : "市区町村名を入力して検索ボタンをタップしてください"}
             </div>
           )}
 

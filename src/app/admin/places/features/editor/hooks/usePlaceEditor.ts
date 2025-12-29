@@ -5,6 +5,8 @@ import { usePlaceSave } from "./usePlaceSave";
 import { PlaceFormData } from "../../shared/types/place";
 import { fetchAddressByPostalCode, formatFullAddress } from "../utils/postalCode";
 import { GET_CITIES } from "../queries";
+import { GqlSortDirection } from "@/types/graphql";
+import { toast } from "react-toastify";
 
 interface UsePlaceEditorOptions {
   placeId?: string;
@@ -142,33 +144,49 @@ export const usePlaceEditor = ({
         variables: {
           filter: { name: result.address2 }, // 市区町村名で検索
           first: 10,
+          sort: { code: GqlSortDirection.Asc }, // ソート追加
         },
       });
 
       // 4. city解決（都道府県が一致するものを優先）
       const cities = data?.cities?.edges || [];
       let matchedCity = null;
+      let isPrefectureMatched = false;
 
       // 都道府県が一致するcityを探す
       for (const edge of cities) {
         const city = edge?.node;
         if (city && city.state && city.state.name === result.address1) {
           matchedCity = city;
+          isPrefectureMatched = true;
           break;
         }
       }
 
-      // 都道府県一致がなければ、最初のcityを使用
+      // 都道府県一致がなければ、最初のcityを使用（案B）
       if (!matchedCity && cities.length > 0) {
         matchedCity = cities[0]?.node;
+        isPrefectureMatched = false;
       }
 
       if (matchedCity) {
         updateField("cityCode", matchedCity.code);
         setShowCitySelector(false);
+
+        if (isPrefectureMatched) {
+          // 都道府県が一致した場合：成功メッセージ
+          toast.success(`市区町村「${matchedCity.name}」を自動選択しました`);
+        } else {
+          // 都道府県不一致の場合：警告メッセージ
+          toast.warning(
+            `市区町村「${matchedCity.name}」を選択しました。正しいか確認してください`,
+            { autoClose: 5000 }
+          );
+        }
       } else {
-        // city解決失敗時は手動選択UI表示
+        // 候補が全くない場合：手動選択を促す
         setShowCitySelector(true);
+        toast.warning("市区町村を自動選択できませんでした。手動で選択してください");
       }
     } catch (error) {
       console.error("Postal code search error:", error);
