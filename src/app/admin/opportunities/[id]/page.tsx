@@ -3,7 +3,12 @@
 import { ErrorState } from "@/components/shared";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import NavigationButtons from "@/components/shared/NavigationButtons";
-import { useGetOpportunityQuery, GqlSortDirection, GqlOpportunitySlotHostingStatus } from "@/types/graphql";
+import {
+  GqlOpportunityCategory,
+  GqlOpportunitySlotHostingStatus,
+  GqlSortDirection,
+  useGetOpportunityQuery,
+} from "@/types/graphql";
 import { notFound, useParams } from "next/navigation";
 import { useMemo, useRef } from "react";
 import OpportunityDetailsHeader from "@/app/opportunities/[id]/components/OpportunityDetailsHeader";
@@ -12,8 +17,10 @@ import { AdminOpportunityDetailsFooter } from "@/app/opportunities/[id]/componen
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { isActivityCategory, isQuestCategory } from "@/components/domains/opportunities/types";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { presenterActivityDetail, presenterQuestDetail } from "@/components/domains/opportunities/data/presenter";
-import { GqlOpportunityCategory } from "@/types/graphql";
+import {
+  presenterActivityDetail,
+  presenterQuestDetail,
+} from "@/components/domains/opportunities/data/presenter";
 
 export default function AdminOpportunityDetailPage() {
   const params = useParams();
@@ -32,7 +39,7 @@ export default function AdminOpportunityDetailPage() {
   // 募集データ取得（編集ページと同じパターン）
   const { data, loading, error, refetch } = useGetOpportunityQuery({
     variables: {
-      id: id,
+      id: id ?? "",
       permission: { communityId: COMMUNITY_ID },
       slotSort: { startsAt: GqlSortDirection.Asc },
       slotFilter: { hostingStatus: [GqlOpportunitySlotHostingStatus.Scheduled] },
@@ -80,7 +87,6 @@ export default function AdminOpportunityDetailPage() {
         price={isActivityCategory(opportunity) ? opportunity.feeRequired : null}
         point={isQuestCategory(opportunity) ? opportunity.pointsToEarn : null}
         pointsRequired={isActivityCategory(opportunity) ? opportunity.pointsRequired : null}
-        publishStatus={opportunity.publishStatus}
         refetch={refetch}
       />
     </>
