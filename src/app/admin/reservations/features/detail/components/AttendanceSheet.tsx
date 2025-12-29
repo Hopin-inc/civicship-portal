@@ -10,13 +10,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import {
-  GqlEvaluationStatus,
-  GqlOpportunity,
-  GqlOpportunityCategory,
-  GqlParticipation,
-} from "@/types/graphql";
-import { NoticeCard } from "@/components/shared/NoticeCard";
+import { GqlEvaluationStatus, GqlOpportunity, GqlParticipation } from "@/types/graphql";
 import { cn } from "@/lib/utils";
 
 interface AttendanceListProps {
@@ -49,19 +43,9 @@ const AttendanceList: React.FC<AttendanceListProps> = ({
   return (
     <div>
       <h2 className="text-title-sm font-bold mt-10 mb-1">参加者</h2>
-      <p className="text-body-xs text-muted-foreground mb-2">
+      <p className="text-body-xs text-muted-foreground mb-6">
         <span>当日参加した方を選択してください（未選択は不参加になります）</span>
       </p>
-      <div className={"pb-4"}>
-        <NoticeCard
-          title="保存後の処理について"
-          description={
-            opportunity?.category === GqlOpportunityCategory.Quest
-              ? `参加した方には証明書(VC)が発行され、1人につき${opportunity.pointsToEarn || 0}ptが付与されます。改めて編集することはできません。`
-              : "参加した方には証明書(VC)が発行され、改めて編集することはできません。"
-          }
-        />
-      </div>
 
       {participations.length === 0 ? (
         <p className="text-center text-muted-foreground py-8">参加者が見つかりません</p>

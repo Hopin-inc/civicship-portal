@@ -90,6 +90,8 @@ export default function ReservationPage() {
         requiredPointsForApproval={balanceCheck.requiredPointsForApproval}
         requiredPointsForAttendance={balanceCheck.requiredPointsForAttendance}
         organizerBalance={balanceCheck.organizerBalance}
+        showAttendanceInfo={mode === "attendance"}
+        opportunity={opportunity}
       />
 
       <div>
