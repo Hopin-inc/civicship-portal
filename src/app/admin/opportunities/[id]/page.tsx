@@ -3,12 +3,7 @@
 import { ErrorState } from "@/components/shared";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import NavigationButtons from "@/components/shared/NavigationButtons";
-import {
-  GqlOpportunityCategory,
-  GqlOpportunitySlotHostingStatus,
-  GqlSortDirection,
-  useGetOpportunityQuery,
-} from "@/types/graphql";
+import { GqlOpportunityCategory, useGetOpportunityQuery } from "@/types/graphql";
 import { notFound, useParams } from "next/navigation";
 import { useMemo, useRef } from "react";
 import OpportunityDetailsHeader from "@/app/opportunities/[id]/components/OpportunityDetailsHeader";
@@ -39,12 +34,9 @@ export default function AdminOpportunityDetailPage() {
   // 募集データ取得（編集ページと同じパターン）
   const { data, loading, error, refetch } = useGetOpportunityQuery({
     variables: {
-      id: id ?? "",
+      id: id,
       permission: { communityId: COMMUNITY_ID },
-      slotSort: { startsAt: GqlSortDirection.Asc },
-      slotFilter: { hostingStatus: [GqlOpportunitySlotHostingStatus.Scheduled] },
     },
-    fetchPolicy: "network-only",
   });
 
   // データ整形
