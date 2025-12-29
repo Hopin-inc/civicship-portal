@@ -11,8 +11,8 @@ import {
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "react-toastify";
-// TODO: codegen後にアンコメント
-// import { usePlaceDeleteMutation } from "@/types/graphql";
+import { usePlaceDeleteMutation } from "@/types/graphql";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 interface PlaceCardMenuProps {
   placeId: string;
@@ -23,8 +23,7 @@ interface PlaceCardMenuProps {
 export function PlaceCardMenu({ placeId, placeName, onDelete }: PlaceCardMenuProps) {
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
-  // TODO: codegen後にアンコメント
-  // const [deletePlace] = usePlaceDeleteMutation();
+  const [deletePlace] = usePlaceDeleteMutation();
 
   const handleEdit = () => {
     router.push(`/admin/places/${placeId}`);
@@ -37,14 +36,12 @@ export function PlaceCardMenu({ placeId, placeName, onDelete }: PlaceCardMenuPro
 
     setIsDeleting(true);
     try {
-      // TODO: codegen後に実装
-      // await deletePlace({
-      //   variables: {
-      //     id: placeId,
-      //     permission: { communityId: COMMUNITY_ID },
-      //   },
-      // });
-      console.log("Delete place:", placeId);
+      await deletePlace({
+        variables: {
+          id: placeId,
+          permission: { communityId: COMMUNITY_ID },
+        },
+      });
       toast.success("場所を削除しました");
       onDelete?.();
     } catch (error) {

@@ -1,6 +1,5 @@
 import { useCallback } from "react";
-// TODO: codegen後に型をインポート
-// import { usePlaceCreateMutation, usePlaceUpdateMutation } from "@/types/graphql";
+import { usePlaceCreateMutation, usePlaceUpdateMutation } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { PlaceEditorFormState } from "../types/form";
 import { toast } from "sonner";
@@ -11,9 +10,8 @@ interface UsePlaceSaveOptions {
 }
 
 export const usePlaceSave = ({ placeId, onSuccess }: UsePlaceSaveOptions = {}) => {
-  // TODO: codegen後にアンコメント
-  // const [createPlace] = usePlaceCreateMutation();
-  // const [updatePlace] = usePlaceUpdateMutation();
+  const [createPlace] = usePlaceCreateMutation();
+  const [updatePlace] = usePlaceUpdateMutation();
 
   const handleSave = useCallback(
     async (formState: PlaceEditorFormState) => {
@@ -52,44 +50,33 @@ export const usePlaceSave = ({ placeId, onSuccess }: UsePlaceSaveOptions = {}) =
 
         if (placeId) {
           // 更新
-          // TODO: codegen後に実装
-          // const { data } = await updatePlace({
-          //   variables: {
-          //     id: placeId,
-          //     input: { ...input, id: placeId },
-          //     permission: { communityId: COMMUNITY_ID },
-          //   },
-          // });
-          // const updatedId = data?.placeUpdate?.place?.id;
-          // if (updatedId) {
-          //   toast.success("場所を更新しました");
-          //   onSuccess?.(updatedId);
-          //   return updatedId;
-          // }
-          console.log("Update place:", input);
-          toast.success("場所を更新しました（仮実装）");
-          onSuccess?.(placeId);
-          return placeId;
+          const { data } = await updatePlace({
+            variables: {
+              id: placeId,
+              input: { ...input, id: placeId },
+              permission: { communityId: COMMUNITY_ID },
+            },
+          });
+          const updatedId = data?.placeUpdate?.place?.id;
+          if (updatedId) {
+            toast.success("場所を更新しました");
+            onSuccess?.(updatedId);
+            return updatedId;
+          }
         } else {
           // 新規作成
-          // TODO: codegen後に実装
-          // const { data } = await createPlace({
-          //   variables: {
-          //     input: { ...input, communityId: COMMUNITY_ID },
-          //     permission: { communityId: COMMUNITY_ID },
-          //   },
-          // });
-          // const createdId = data?.placeCreate?.place?.id;
-          // if (createdId) {
-          //   toast.success("場所を作成しました");
-          //   onSuccess?.(createdId);
-          //   return createdId;
-          // }
-          console.log("Create place:", input);
-          const tempId = "temp-" + Date.now();
-          toast.success("場所を作成しました（仮実装）");
-          onSuccess?.(tempId);
-          return tempId;
+          const { data } = await createPlace({
+            variables: {
+              input: { ...input, communityId: COMMUNITY_ID },
+              permission: { communityId: COMMUNITY_ID },
+            },
+          });
+          const createdId = data?.placeCreate?.place?.id;
+          if (createdId) {
+            toast.success("場所を作成しました");
+            onSuccess?.(createdId);
+            return createdId;
+          }
         }
       } catch (error) {
         console.error("Place save failed:", error);
@@ -97,7 +84,7 @@ export const usePlaceSave = ({ placeId, onSuccess }: UsePlaceSaveOptions = {}) =
         return null;
       }
     },
-    [placeId, onSuccess]
+    [placeId, onSuccess, createPlace, updatePlace]
   );
 
   return {
