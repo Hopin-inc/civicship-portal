@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { Check } from "lucide-react";
 import { GET_CITIES } from "../../queries";
+import { GqlSortDirection } from "@/types/graphql";
 
 interface CitySelectorSheetProps {
   open: boolean;
@@ -35,7 +36,7 @@ export function CitySelectorSheet({
     variables: {
       filter: searchText ? { name: searchText } : undefined,
       first: 500, // バックエンド上限
-      sort: { code: "ASC" },
+      sort: { code: GqlSortDirection.Asc },
     },
     skip: !open || !searchText, // 検索テキストがある場合のみクエリ実行
     fetchPolicy: "network-only", // 常に最新データを取得
