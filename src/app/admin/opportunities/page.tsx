@@ -40,7 +40,7 @@ export default function OpportunitiesPage() {
             className="gap-1" // ← アイコンとラベルの距離を詰める
           >
             <Plus className="h-4 w-4" /> {/* ← アイコンを縮小 */}
-            新規作成
+            作成
           </Button>
         </div>
 
