@@ -1,9 +1,12 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useQuery } from "@apollo/client";
-import { ItemContent, ItemTitle } from "@/components/ui/item";
-import { SelectorSheet } from "@/app/admin/opportunities/features/shared/components/SelectorSheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Item, ItemContent, ItemTitle } from "@/components/ui/item";
+import { Input } from "@/components/ui/input";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { Check } from "lucide-react";
 import { GET_CITIES } from "../../queries";
 
 interface CitySelectorSheetProps {
@@ -24,10 +27,14 @@ export function CitySelectorSheet({
   selectedCityCode,
   onSelectCity,
 }: CitySelectorSheetProps) {
-  // Cityマスタから全citiesを取得
+  // 検索テキスト
+  const [searchText, setSearchText] = useState("");
+
+  // Cityマスタから検索
   const { data, loading } = useQuery(GET_CITIES, {
     variables: {
-      first: 1000, // 全件取得（日本の市区町村数は約2000なので十分）
+      filter: searchText ? { name: searchText } : undefined,
+      first: 500, // バックエンド上限
       sort: { code: "ASC" },
     },
     skip: !open,
@@ -53,26 +60,79 @@ export function CitySelectorSheet({
 
   const handleSelect = (city: City) => {
     onSelectCity(city.code, city.name);
+    onOpenChange(false);
   };
 
-  const renderItem = (city: City) => (
-    <ItemContent>
-      <ItemTitle className="text-body-md">{city.name}</ItemTitle>
-    </ItemContent>
-  );
-
   return (
-    <SelectorSheet<City>
-      open={open}
-      onOpenChange={onOpenChange}
-      title="市区町村を選択"
-      emptyMessage="市区町村が登録されていません"
-      items={cities}
-      loading={loading}
-      selectedId={selectedCityCode}
-      onSelect={handleSelect}
-      renderItem={renderItem}
-      getItemKey={(city) => city.code}
-    />
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent
+        side="bottom"
+        className="rounded-t-3xl max-w-md mx-auto p-8 overflow-y-auto max-h-[70vh]"
+      >
+        <SheetHeader className="text-left pb-4 text-title-sm">
+          <SheetTitle className="text-title-sm">市区町村を選択</SheetTitle>
+        </SheetHeader>
+
+        {/* 検索入力 */}
+        <div className="mb-4">
+          <Input
+            placeholder="市区町村名で検索（例: 瀬戸内市）"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            className="placeholder:text-sm"
+          />
+        </div>
+
+        <div className="space-y-4">
+          {loading && <LoadingIndicator />}
+
+          {!loading && cities.length === 0 && (
+            <div className="text-center py-8 text-muted-foreground text-sm">
+              {searchText
+                ? "該当する市区町村が見つかりませんでした"
+                : "市区町村名を入力して検索してください"}
+            </div>
+          )}
+
+          {!loading && cities.length > 0 && (
+            <div className="space-y-2">
+              {cities.map((city) => {
+                const isSelected = selectedCityCode === city.code;
+
+                return (
+                  <Item
+                    key={city.code}
+                    size="sm"
+                    variant={isSelected ? "default" : "outline"}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => handleSelect(city)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        handleSelect(city);
+                      } else if (e.key === "Escape") {
+                        onOpenChange(false);
+                      }
+                    }}
+                    className="cursor-pointer relative"
+                  >
+                    <div className="flex items-center gap-3 w-full">
+                      <ItemContent>
+                        <ItemTitle className="text-body-md">{city.name}</ItemTitle>
+                      </ItemContent>
+                      {isSelected && (
+                        <div className="ml-auto">
+                          <Check className="h-5 w-5 text-primary" />
+                        </div>
+                      )}
+                    </div>
+                  </Item>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 }
