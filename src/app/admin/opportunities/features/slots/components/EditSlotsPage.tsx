@@ -12,11 +12,13 @@ import { SlotData } from "../../shared/types/slot";
 import { SlotPicker } from "./forms/SlotPicker";
 import { SingleSlotForm } from "./forms/SingleSlotForm";
 import { CancelSlotSheet } from "./sheets/CancelSlotSheet";
+import { SlotEditHeader } from "./SlotEditHeader";
 import dayjs from "dayjs";
 import { toast } from "react-toastify";
 import { groupSlotsByMonth, formatMonthHeader } from "../utils/slotGrouping";
 import { useCancelSlotState } from "../hooks/useCancelSlotState";
 import { useSlotReservations } from "../hooks/useSlotReservations";
+import { useUnsavedChangesWarning } from "../hooks/useUnsavedChangesWarning";
 
 interface EditSlotsPageProps {
   slots: SlotData[];
@@ -24,6 +26,9 @@ interface EditSlotsPageProps {
   onUpdateSlot: <K extends keyof SlotData>(index: number, field: K, value: SlotData[K]) => void;
   onRemoveSlot: (index: number) => void;
   onCancelSlot: (index: number, message?: string) => void;
+  onSave: () => Promise<void>;
+  isDirty: boolean;
+  isSubmitting: boolean;
   onClose: () => void;
 }
 
@@ -33,6 +38,9 @@ export function EditSlotsPage({
   onUpdateSlot,
   onRemoveSlot,
   onCancelSlot,
+  onSave,
+  isDirty,
+  isSubmitting,
   onClose,
 }: EditSlotsPageProps) {
   const [startAt, setStartAt] = useState("");
@@ -44,17 +52,24 @@ export function EditSlotsPage({
     cancelState.selectedSlot?.slot.id
   );
 
-  // ヘッダー設定
+  // ヘッダー非表示（カスタムヘッダーを使用）
   const headerConfig = useMemo(
     () => ({
-      title: "開催枠編集",
-      showLogo: false,
-      showBackButton: true,
-      onBackClick: onClose,
+      hideHeader: true,
     }),
-    [onClose],
+    [],
   );
   useHeaderConfig(headerConfig);
+
+  // 未保存変更警告
+  const { confirmNavigation } = useUnsavedChangesWarning({ isDirty, isSubmitting });
+
+  // 閉じる処理（確認ダイアログ付き）
+  const handleClose = () => {
+    if (confirmNavigation()) {
+      onClose();
+    }
+  };
 
   // 月ごとにグルーピング
   const groupedSlots = useMemo(() => groupSlotsByMonth(slots), [slots]);
@@ -90,9 +105,17 @@ export function EditSlotsPage({
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <main className="max-w-md mx-auto">
-        <div className="space-y-6 py-4">
+    <>
+      <SlotEditHeader
+        onClose={handleClose}
+        onSave={onSave}
+        isDirty={isDirty}
+        isSubmitting={isSubmitting}
+      />
+
+      <div className="min-h-screen bg-background">
+        <main className="max-w-md mx-auto pt-14">
+          <div className="space-y-6 py-4">
           {/* 開催枠追加フォーム */}
           <SingleSlotForm
             startAt={startAt}
@@ -153,6 +176,6 @@ export function EditSlotsPage({
           loading={reservationsLoading}
         />
       )}
-    </div>
+    </>
   );
 }
