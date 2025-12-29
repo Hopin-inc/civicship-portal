@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { usePlaceCreateMutation, usePlaceUpdateMutation } from "@/types/graphql";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { PlaceEditorFormState } from "../types/form";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 
 interface UsePlaceSaveOptions {
   placeId?: string;
@@ -84,7 +84,7 @@ export const usePlaceSave = ({ placeId, onSuccess }: UsePlaceSaveOptions = {}) =
         return null;
       }
     },
-    [placeId, onSuccess, createPlace, updatePlace]
+    [placeId, onSuccess, createPlace, updatePlace],
   );
 
   return {

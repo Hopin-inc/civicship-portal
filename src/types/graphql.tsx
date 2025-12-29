@@ -2851,6 +2851,38 @@ export type GqlWalletsConnection = {
   totalCount: Scalars["Int"]["output"];
 };
 
+export type GqlGetCitiesQueryVariables = Exact<{
+  filter?: InputMaybe<GqlCitiesInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  sort?: InputMaybe<GqlCitiesSortInput>;
+}>;
+
+export type GqlGetCitiesQuery = {
+  __typename?: "Query";
+  cities: {
+    __typename?: "CitiesConnection";
+    totalCount: number;
+    pageInfo: {
+      __typename?: "PageInfo";
+      startCursor?: string | null;
+      endCursor?: string | null;
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+    };
+    edges: Array<{
+      __typename?: "CityEdge";
+      cursor: string;
+      node?: {
+        __typename?: "City";
+        code: string;
+        name: string;
+        state?: { __typename?: "State"; code: string; name: string } | null;
+      } | null;
+    }>;
+  };
+};
+
 export type GqlCommunityFieldsFragment = {
   __typename?: "Community";
   id: string;
@@ -6497,6 +6529,84 @@ export const TransactionFieldsFragmentDoc = gql`
     createdAt
   }
 `;
+export const GetCitiesDocument = gql`
+  query GetCities($filter: CitiesInput, $first: Int, $cursor: String, $sort: CitiesSortInput) {
+    cities(filter: $filter, first: $first, cursor: $cursor, sort: $sort) {
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
+      }
+      totalCount
+      edges {
+        cursor
+        node {
+          code
+          name
+          state {
+            code
+            name
+          }
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetCitiesQuery__
+ *
+ * To run a query within a React component, call `useGetCitiesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCitiesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCitiesQuery({
+ *   variables: {
+ *      filter: // value for 'filter'
+ *      first: // value for 'first'
+ *      cursor: // value for 'cursor'
+ *      sort: // value for 'sort'
+ *   },
+ * });
+ */
+export function useGetCitiesQuery(
+  baseOptions?: Apollo.QueryHookOptions<GqlGetCitiesQuery, GqlGetCitiesQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetCitiesQuery, GqlGetCitiesQueryVariables>(GetCitiesDocument, options);
+}
+export function useGetCitiesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<GqlGetCitiesQuery, GqlGetCitiesQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetCitiesQuery, GqlGetCitiesQueryVariables>(
+    GetCitiesDocument,
+    options,
+  );
+}
+export function useGetCitiesSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GqlGetCitiesQuery, GqlGetCitiesQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetCitiesQuery, GqlGetCitiesQueryVariables>(
+    GetCitiesDocument,
+    options,
+  );
+}
+export type GetCitiesQueryHookResult = ReturnType<typeof useGetCitiesQuery>;
+export type GetCitiesLazyQueryHookResult = ReturnType<typeof useGetCitiesLazyQuery>;
+export type GetCitiesSuspenseQueryHookResult = ReturnType<typeof useGetCitiesSuspenseQuery>;
+export type GetCitiesQueryResult = Apollo.QueryResult<
+  GqlGetCitiesQuery,
+  GqlGetCitiesQueryVariables
+>;
 export const GetCommunitiesDocument = gql`
   query GetCommunities {
     communities {
