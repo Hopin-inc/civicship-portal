@@ -45,6 +45,8 @@ export function MapConfirmSheet({
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
+    language: "ja",
+    region: "JP",
   });
 
   // Sheet表示時に初回geocode実行
