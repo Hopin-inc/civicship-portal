@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 export const GET_STATES = gql`
-  query GetStates($sort: StatesSortInput) {
-    states(sort: $sort) {
+  query GetStates {
+    states {
       edges {
         node {
           code
