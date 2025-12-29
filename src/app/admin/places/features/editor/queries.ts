@@ -1,5 +1,18 @@
 import { gql } from "@apollo/client";
 
+export const GET_STATES = gql`
+  query GetStates($sort: StatesSortInput) {
+    states(sort: $sort) {
+      edges {
+        node {
+          code
+          name
+        }
+      }
+    }
+  }
+`;
+
 export const GET_CITIES = gql`
   query GetCities($filter: CitiesInput, $first: Int, $cursor: String, $sort: CitiesSortInput) {
     cities(filter: $filter, first: $first, cursor: $cursor, sort: $sort) {
