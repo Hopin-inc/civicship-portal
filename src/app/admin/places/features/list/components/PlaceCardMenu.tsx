@@ -1,6 +1,6 @@
 "use client";
 
-import { MoreVertical, Edit, Trash2 } from "lucide-react";
+import { Edit, MoreVertical, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -10,10 +10,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 // TODO: codegen後にアンコメント
 // import { usePlaceDeleteMutation } from "@/types/graphql";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 interface PlaceCardMenuProps {
   placeId: string;

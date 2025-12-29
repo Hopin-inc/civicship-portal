@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { usePlaceList } from "./features/list/hooks/usePlaceList";
 import { PlaceCard } from "./features/list/components/PlaceCard";
 import { useRouter } from "next/navigation";
-import { useHeaderConfig } from "@/hooks/useHeaderConfig";
+import useHeaderConfig from "@/hooks/useHeaderConfig";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 
 export default function PlacesPage() {
