@@ -13,16 +13,18 @@ interface NoticeCardProps {
 
 export const NoticeCard = ({ title, description, variant = "warning" }: NoticeCardProps) => {
   const isWarning = variant === "warning";
+  const isInfo = variant === "info";
 
   return (
     <Card>
       <div
         className={cn(
           "flex items-start p-4 rounded-lg border",
-          isWarning ? "bg-yellow-50 border-warning" : "bg-muted border-border",
+          isWarning && "bg-yellow-50 border-warning",
+          isInfo && "bg-blue-50 border-primary",
         )}
       >
-        <IconWrapper color={isWarning ? "warning" : "default"}>
+        <IconWrapper color={isWarning ? "warning" : "primary"}>
           {isWarning ? (
             <AlertCircle size={20} strokeWidth={2.5} />
           ) : (
