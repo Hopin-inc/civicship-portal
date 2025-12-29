@@ -23,6 +23,7 @@ export interface PlaceFormData {
   latitude: number | null;
   longitude: number | null;
   cityCode: string;
+  cityName?: string;
   googlePlaceId?: string;
   isManual: boolean;
   mapLocation?: any;

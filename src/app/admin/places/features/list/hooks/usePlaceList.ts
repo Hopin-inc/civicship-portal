@@ -24,7 +24,7 @@ export const usePlaceList = () => {
         address: place!.address,
         latitude: Number(place!.latitude),
         longitude: Number(place!.longitude),
-        cityCode: place!.city?.id || "",
+        cityCode: place!.city?.code || "",
         cityName: place!.city?.name,
         googlePlaceId: place!.googlePlaceId || undefined,
         isManual: place!.isManual || false,

@@ -1,7 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { usePlaceEditor } from "../hooks/usePlaceEditor";
 import { PlaceForm } from "./PlaceForm";
+import { PlaceEditorLayout } from "./PlaceEditorLayout";
+import { CitySelectorSheet } from "./sheets/CitySelectorSheet";
 import { PlaceFormData } from "../../shared/types/place";
 
 interface PlaceFormEditorProps {
@@ -17,16 +20,34 @@ export function PlaceFormEditor({ placeId, initialData, onSuccess }: PlaceFormEd
     onSuccess,
   });
 
+  // Sheet管理
+  const [citySheetOpen, setCitySheetOpen] = useState(false);
+  const [selectedCityName, setSelectedCityName] = useState<string | null>(
+    initialData?.cityName || null
+  );
+
+  const handleCitySelect = (code: string, name: string) => {
+    editor.updateField("cityCode", code);
+    setSelectedCityName(name);
+    setCitySheetOpen(false);
+  };
+
   return (
-    <div className="max-w-2xl mx-auto p-6">
+    <PlaceEditorLayout>
       <PlaceForm
-        formState={editor.formState}
-        onFieldChange={editor.updateField}
-        onAddressChange={editor.handleAddressChange}
+        editor={editor}
         onSubmit={editor.handleSave}
-        saving={editor.saving}
-        geocoding={editor.geocoding}
+        onCityClick={() => setCitySheetOpen(true)}
+        selectedCityName={selectedCityName}
       />
-    </div>
+
+      {/* 市区町村選択シート */}
+      <CitySelectorSheet
+        open={citySheetOpen}
+        onOpenChange={setCitySheetOpen}
+        selectedCityCode={editor.formState.cityCode}
+        onSelectCity={handleCitySelect}
+      />
+    </PlaceEditorLayout>
   );
 }

@@ -20,6 +20,7 @@ export const usePlaceEditor = ({
   );
   const [saving, setSaving] = useState(false);
   const [geocoding, setGeocoding] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const { handleSave: savePlace } = usePlaceSave({ placeId, onSuccess });
 
@@ -84,5 +85,6 @@ export const usePlaceEditor = ({
     handleSave,
     saving,
     geocoding,
+    errors,
   };
 };

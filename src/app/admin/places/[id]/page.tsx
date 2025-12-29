@@ -6,6 +6,7 @@ import { PlaceFormEditor } from "../features/editor/components/PlaceFormEditor";
 import { useGetPlaceQuery } from "@/types/graphql";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { useMemo } from "react";
+import { presentPlaceForEdit } from "../features/editor/presenters/presentPlaceForEdit";
 
 export default function EditPlacePage() {
   const params = useParams();
@@ -29,20 +30,10 @@ export default function EditPlacePage() {
   );
   useHeaderConfig(headerConfig);
 
+  // 初期データ変換（presenter使用）
   const initialData = useMemo(() => {
     if (!data?.place) return undefined;
-
-    const place = data.place;
-    return {
-      name: place.name,
-      address: place.address,
-      latitude: Number(place.latitude),
-      longitude: Number(place.longitude),
-      cityCode: place.city?.id || "",
-      googlePlaceId: place.googlePlaceId || undefined,
-      isManual: place.isManual || false,
-      mapLocation: place.mapLocation,
-    };
+    return presentPlaceForEdit(data.place);
   }, [data]);
 
   const handleSuccess = () => {
@@ -51,11 +42,7 @@ export default function EditPlacePage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <LoadingIndicator />
-      </div>
-    );
+    return <LoadingIndicator fullScreen />;
   }
 
   if (error || !data?.place) {
@@ -66,9 +53,5 @@ export default function EditPlacePage() {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-background">
-      <PlaceFormEditor placeId={placeId} initialData={initialData} onSuccess={handleSuccess} />
-    </div>
-  );
+  return <PlaceFormEditor placeId={placeId} initialData={initialData} onSuccess={handleSuccess} />;
 }

@@ -24,9 +24,5 @@ export default function NewPlacePage() {
     router.push("/admin/places");
   };
 
-  return (
-    <div className="min-h-screen bg-background">
-      <PlaceFormEditor onSuccess={handleSuccess} />
-    </div>
-  );
+  return <PlaceFormEditor onSuccess={handleSuccess} />;
 }
