@@ -9,9 +9,9 @@ import { ErrorState } from "@/components/shared";
 import { useMemberWithDidSearch } from "../credentials/hooks/useMemberWithDidSearch";
 import SearchForm from "@/components/shared/SearchForm";
 import { MembersList } from "./components/MembersList";
-import { RoleChangeDialog } from "./components/RoleChangeDialog";
-import { useMemberRoleManagement } from "./hooks/useMemberRoleManagement";
-import { GqlMembershipsConnection } from "@/types/graphql";
+import { useMembershipCommand } from "./hooks/useMembershipMutations";
+import { GqlMembershipsConnection, GqlRole } from "@/types/graphql";
+import { toast } from "react-toastify";
 
 interface MembersPageClientProps {
   initialConnection: GqlMembershipsConnection | null;
@@ -54,18 +54,45 @@ export default function MembersPageClient({ initialConnection }: MembersPageClie
     initialConnection,
   });
 
-  const {
-    pendingRoleChange,
-    isLoading: isRoleChangeLoading,
-    requestRoleChange,
-    confirmRoleChange,
-    cancelRoleChange,
-  } = useMemberRoleManagement();
+  const { assignOwner, assignManager, assignMember } = useMembershipCommand();
 
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
     refetchRef.current = refetch;
   }, [refetch]);
+
+  const handleRoleChange = async (userId: string, userName: string, newRole: GqlRole) => {
+    if (currentUserRole !== GqlRole.Owner) {
+      toast.error("この操作を行う権限がありません");
+      return false;
+    }
+
+    const roleMutationMap = {
+      OWNER: assignOwner,
+      MANAGER: assignManager,
+      MEMBER: assignMember,
+    };
+
+    const mutate = roleMutationMap[newRole];
+    if (!mutate) {
+      toast.error("無効な権限です");
+      return false;
+    }
+
+    try {
+      const result = await mutate({ communityId: COMMUNITY_ID, userId });
+      if (!result.success) {
+        toast.error(`権限変更に失敗しました（${result.code ?? "UNKNOWN"}）`);
+        return false;
+      }
+      toast.success("権限を更新しました");
+      window.location.reload();
+      return true;
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "不明なエラーが発生しました");
+      return false;
+    }
+  };
 
   if (loading && members.length === 0) return <LoadingIndicator fullScreen />;
   if (error) return <ErrorState title={"メンバーを読み込めませんでした"} refetchRef={refetchRef} />;
@@ -85,21 +112,8 @@ export default function MembersPageClient({ initialConnection }: MembersPageClie
         hasNextPage={hasNextPage}
         isFetchingMore={isFetchingMore}
         loadMoreRef={loadMoreRef}
-        onRoleChange={(userId, userName, newRole) => {
-          requestRoleChange(userId, userName, newRole, currentUserRole);
-        }}
+        onRoleChange={handleRoleChange}
       />
-
-      {pendingRoleChange && (
-        <RoleChangeDialog
-          isOpen={true}
-          userName={pendingRoleChange.userName}
-          newRole={pendingRoleChange.newRole}
-          isLoading={isRoleChangeLoading}
-          onConfirm={confirmRoleChange}
-          onCancel={cancelRoleChange}
-        />
-      )}
     </div>
   );
 }

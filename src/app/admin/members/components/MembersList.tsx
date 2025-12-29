@@ -19,10 +19,29 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { MoreVertical } from "lucide-react";
 import { presentMember } from "../presenters/presentMember";
 import { PresentedMember } from "../presenters/types";
-import { RoleChangeDialog } from "./RoleChangeDialog";
+
+const ROLE_OPTIONS: { value: GqlRole; label: string }[] = [
+  { value: GqlRole.Owner, label: "管理者" },
+  { value: GqlRole.Manager, label: "運用担当者" },
+  { value: GqlRole.Member, label: "参加者" },
+];
 
 interface MembersListProps {
   members: GqlUser[];
@@ -30,7 +49,7 @@ interface MembersListProps {
   hasNextPage: boolean;
   isFetchingMore: boolean;
   loadMoreRef: React.Ref<HTMLDivElement>;
-  onRoleChange: (userId: string, userName: string, newRole: GqlRole) => void;
+  onRoleChange: (userId: string, userName: string, newRole: GqlRole) => Promise<boolean>;
 }
 
 export function MembersList({
@@ -43,11 +62,33 @@ export function MembersList({
 }: MembersListProps) {
   const router = useRouter();
   const [targetMember, setTargetMember] = useState<PresentedMember | null>(null);
+  const [selectedRole, setSelectedRole] = useState<GqlRole | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // GraphQL → Presented への変換
   const presentedMembers = members.map(presentMember);
 
   const isOwner = currentUserRole === GqlRole.Owner;
+
+  // ダイアログが開いたら現在のロールをセット
+  React.useEffect(() => {
+    if (targetMember) {
+      setSelectedRole(targetMember.roleValue);
+    }
+  }, [targetMember]);
+
+  const handleRoleChangeClick = async () => {
+    if (targetMember && selectedRole && selectedRole !== targetMember.roleValue) {
+      setIsSubmitting(true);
+      const success = await onRoleChange(targetMember.id, targetMember.name, selectedRole);
+      setIsSubmitting(false);
+
+      if (success) {
+        setTargetMember(null);
+        setSelectedRole(null);
+      }
+    }
+  };
 
   return (
     <>
@@ -60,7 +101,6 @@ export function MembersList({
           <TableHeader>
             <TableRow className="hover:bg-transparent">
               <TableHead>名前</TableHead>
-              <TableHead>権限</TableHead>
               <TableHead>ポイント</TableHead>
               <TableHead className="w-12"></TableHead>
             </TableRow>
@@ -69,7 +109,7 @@ export function MembersList({
           <TableBody>
             {presentedMembers.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center text-muted-foreground">
+                <TableCell colSpan={3} className="text-center text-muted-foreground">
                   一致するメンバーが見つかりません
                 </TableCell>
               </TableRow>
@@ -86,12 +126,11 @@ export function MembersList({
                         <AvatarImage src={member.image ?? ""} alt={member.name} />
                         <AvatarFallback>{member.name[0]}</AvatarFallback>
                       </Avatar>
-                      <span className="font-medium">{member.name}</span>
+                      <div className="flex flex-col">
+                        <span className="font-medium">{member.name}</span>
+                        <span className="text-label-xs text-muted-foreground">{member.roleLabel}</span>
+                      </div>
                     </div>
-                  </TableCell>
-
-                  <TableCell>
-                    <span className="text-body-sm">{member.roleLabel}</span>
                   </TableCell>
 
                   <TableCell>
@@ -136,17 +175,52 @@ export function MembersList({
         )}
       </div>
 
-      <RoleChangeDialog
-        member={targetMember}
-        open={!!targetMember}
-        onClose={() => setTargetMember(null)}
-        onConfirm={(newRole) => {
-          if (targetMember) {
-            onRoleChange(targetMember.id, targetMember.name, newRole);
-            setTargetMember(null);
-          }
-        }}
-      />
+      <Dialog open={!!targetMember} onOpenChange={(open) => !open && setTargetMember(null)}>
+        <DialogContent className="w-[90vw] max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle className="text-left">権限を変更</DialogTitle>
+            <DialogDescription className="text-left">
+              {targetMember && (
+                <>
+                  <strong>{targetMember.name}</strong> の権限を変更します
+                </>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="py-4">
+            <label className="text-label-sm font-bold mb-2 block">新しい権限</label>
+            <Select
+              value={selectedRole ?? undefined}
+              onValueChange={(value) => setSelectedRole(value as GqlRole)}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="権限を選択" />
+              </SelectTrigger>
+              <SelectContent>
+                {ROLE_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex gap-2 justify-end">
+            <Button variant="tertiary" onClick={() => setTargetMember(null)} disabled={isSubmitting}>
+              キャンセル
+            </Button>
+            <Button
+              variant="primary"
+              onClick={handleRoleChangeClick}
+              disabled={!selectedRole || selectedRole === targetMember?.roleValue || isSubmitting}
+            >
+              {isSubmitting ? "変更中..." : "変更する"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
