@@ -106,7 +106,7 @@ export function MapConfirmSheet({
           setGeocodeFailed(true);
         }
       } catch (error) {
-        logger.error("Geocoding error:", error);
+        logger.error("Geocoding error:", { error });
         setPosition(TOKYO_STATION);
         setGeocodeFailed(true);
       } finally {
@@ -151,7 +151,7 @@ export function MapConfirmSheet({
         cityCode = resolveCityCode(result.results[0], cities);
       }
     } catch (error) {
-      logger.error("Reverse geocoding error:", error);
+      logger.error("Reverse geocoding error:", { error });
       // エラーでもcityCode=nullで続行
     }
 
@@ -229,7 +229,7 @@ export function MapConfirmSheet({
               <Button
                 onClick={() => onOpenChange(false)}
                 className="w-full"
-                variant="outline"
+                variant="secondary"
                 size="lg"
               >
                 キャンセル

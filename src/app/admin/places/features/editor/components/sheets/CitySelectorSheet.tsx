@@ -55,7 +55,7 @@ export function CitySelectorSheet({
         return null;
       })
       .filter((city: City | null): city is City => city !== null)
-      .sort((a, b) => a.name.localeCompare(b.name, "ja"));
+      .sort((a: City, b: City) => a.name.localeCompare(b.name, "ja"));
   }, [data]);
 
   const handleSelect = (city: City) => {

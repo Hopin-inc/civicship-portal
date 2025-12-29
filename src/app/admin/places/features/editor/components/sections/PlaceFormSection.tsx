@@ -109,7 +109,7 @@ export function PlaceFormSection({
             onClick={onPostalCodeSearch}
             disabled={postalCode.length !== 7 || postalCodeSearching}
             size="sm"
-            variant="outline"
+            variant="secondary"
           >
             {postalCodeSearching ? "検索中..." : "住所検索"}
           </Button>
