@@ -1,19 +1,10 @@
 "use client";
 
 import React from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { useAuthEnvironment } from "@/hooks/useAuthEnvironment";
 import { cn } from "@/lib/utils";
-import { Edit, MoreVertical } from "lucide-react";
-import { GqlPublishStatus } from "@/types/graphql";
+import { Edit } from "lucide-react";
 import { useOpportunityActions } from "@/app/admin/opportunities/features/list/hooks/useOpportunityActions";
 
 interface AdminOpportunityDetailsFooterProps {
@@ -21,7 +12,6 @@ interface AdminOpportunityDetailsFooterProps {
   price: number | null;
   point: number | null;
   pointsRequired?: number | null;
-  publishStatus: GqlPublishStatus;
   refetch?: () => void;
 }
 
@@ -30,17 +20,10 @@ export const AdminOpportunityDetailsFooter: React.FC<AdminOpportunityDetailsFoot
   price,
   point,
   pointsRequired,
-  publishStatus,
   refetch,
 }) => {
-  const router = useRouter();
   const { isLiffClient } = useAuthEnvironment();
-  const { handleEdit, handleBackToDraft, handleCopyUrl, handleDeleteDraft } =
-    useOpportunityActions(refetch);
-
-  const isPublicOrInternal =
-    publishStatus === GqlPublishStatus.Public || publishStatus === GqlPublishStatus.CommunityInternal;
-  const isDraft = publishStatus === GqlPublishStatus.Private;
+  const { handleEdit } = useOpportunityActions(refetch);
 
   return (
     <footer className="fixed bottom-0 left-0 right-0 bg-background border-t z-50">
@@ -72,77 +55,15 @@ export const AdminOpportunityDetailsFooter: React.FC<AdminOpportunityDetailsFoot
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Button
-            variant="primary"
-            size="lg"
-            className="px-6"
-            onClick={() => handleEdit(opportunityId)}
-          >
-            <Edit className="h-4 w-4 mr-2" />
-            編集
-          </Button>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="lg" className="px-3">
-                <MoreVertical className="h-4 w-4" />
-                <span className="sr-only">その他のアクション</span>
-              </Button>
-            </DropdownMenuTrigger>
-
-            <DropdownMenuContent align="end" className="w-44">
-              {isPublicOrInternal && (
-                <>
-                  <DropdownMenuItem
-                    onSelect={(e) => {
-                      e.preventDefault();
-                      handleBackToDraft(opportunityId);
-                    }}
-                  >
-                    下書きに戻す
-                  </DropdownMenuItem>
-
-                  <DropdownMenuSeparator />
-
-                  <DropdownMenuItem
-                    onSelect={(e) => {
-                      e.preventDefault();
-                      handleCopyUrl(opportunityId);
-                    }}
-                  >
-                    URLをコピー
-                  </DropdownMenuItem>
-                </>
-              )}
-
-              {isDraft && (
-                <>
-                  <DropdownMenuItem
-                    onSelect={(e) => {
-                      e.preventDefault();
-                      handleCopyUrl(opportunityId);
-                    }}
-                  >
-                    URLをコピー
-                  </DropdownMenuItem>
-
-                  <DropdownMenuSeparator />
-
-                  <DropdownMenuItem
-                    className="text-destructive"
-                    onSelect={(e) => {
-                      e.preventDefault();
-                      handleDeleteDraft(opportunityId);
-                    }}
-                  >
-                    下書きを削除
-                  </DropdownMenuItem>
-                </>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+        <Button
+          variant="primary"
+          size="lg"
+          className="px-6"
+          onClick={() => handleEdit(opportunityId)}
+        >
+          <Edit className="h-4 w-4 mr-2" />
+          編集
+        </Button>
       </div>
     </footer>
   );
