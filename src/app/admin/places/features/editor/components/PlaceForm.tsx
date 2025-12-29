@@ -24,6 +24,10 @@ export function PlaceForm({
       <PlaceFormSection
         name={editor.formState.name}
         onNameChange={(value) => editor.updateField("name", value)}
+        postalCode={editor.postalCode}
+        onPostalCodeChange={editor.setPostalCode}
+        onPostalCodeSearch={editor.handlePostalCodeSearch}
+        postalCodeSearching={editor.postalCodeSearching}
         address={editor.formState.address}
         onAddressChange={editor.handleAddressChange}
         coordinatesConfirmed={editor.coordinatesConfirmed}

@@ -2,6 +2,7 @@
 
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 import { ChevronRight, MapPin } from "lucide-react";
 import {
   Item,
@@ -17,6 +18,13 @@ import AddressMap from "@/components/shared/AddressMap";
 interface PlaceFormSectionProps {
   name: string;
   onNameChange: (value: string) => void;
+
+  // 郵便番号
+  postalCode: string;
+  onPostalCodeChange: (value: string) => void;
+  onPostalCodeSearch: () => void;
+  postalCodeSearching: boolean;
+
   address: string;
   onAddressChange: (value: string) => void;
 
@@ -44,6 +52,10 @@ interface PlaceFormSectionProps {
 export function PlaceFormSection({
   name,
   onNameChange,
+  postalCode,
+  onPostalCodeChange,
+  onPostalCodeSearch,
+  postalCodeSearching,
   address,
   onAddressChange,
   coordinatesConfirmed,
@@ -77,6 +89,34 @@ export function PlaceFormSection({
         {errors?.name && (
           <p className="text-xs text-destructive px-1">{errors.name}</p>
         )}
+      </div>
+
+      {/* 郵便番号 */}
+      <div className="space-y-1">
+        <div className="flex items-center gap-2 px-1">
+          <span className="text-sm text-muted-foreground">郵便番号</span>
+        </div>
+        <div className="flex gap-2">
+          <Input
+            value={postalCode}
+            onChange={(e) => onPostalCodeChange(e.target.value.replace(/\D/g, ""))}
+            placeholder="例: 7010111"
+            className="placeholder:text-sm"
+            maxLength={7}
+          />
+          <Button
+            type="button"
+            onClick={onPostalCodeSearch}
+            disabled={postalCode.length !== 7 || postalCodeSearching}
+            size="sm"
+            variant="outline"
+          >
+            {postalCodeSearching ? "検索中..." : "住所検索"}
+          </Button>
+        </div>
+        <p className="text-xs text-muted-foreground px-1">
+          郵便番号から都道府県・市区町村・町域を自動入力します
+        </p>
       </div>
 
       {/* 住所 */}

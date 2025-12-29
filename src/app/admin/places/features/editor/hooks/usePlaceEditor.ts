@@ -1,7 +1,10 @@
 import { useState, useCallback } from "react";
+import { useLazyQuery } from "@apollo/client";
 import { PlaceEditorFormState, createInitialFormState } from "../types/form";
 import { usePlaceSave } from "./usePlaceSave";
 import { PlaceFormData } from "../../shared/types/place";
+import { fetchAddressByPostalCode, formatFullAddress } from "../utils/postalCode";
+import { GET_CITIES } from "../queries";
 
 interface UsePlaceEditorOptions {
   placeId?: string;
@@ -27,6 +30,10 @@ export const usePlaceEditor = ({
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
 
+  // 郵便番号
+  const [postalCode, setPostalCode] = useState("");
+  const [postalCodeSearching, setPostalCodeSearching] = useState(false);
+
   // 座標確定状態
   const [coordinatesConfirmed, setCoordinatesConfirmed] = useState(
     !!(initialData?.latitude && initialData?.longitude)
@@ -38,6 +45,11 @@ export const usePlaceEditor = ({
   const [mapSheetOpen, setMapSheetOpen] = useState(false);
 
   const { handleSave: savePlace } = usePlaceSave({ placeId, onSuccess });
+
+  // City検索用のlazy query（郵便番号検索時に使用）
+  const [searchCities] = useLazyQuery(GET_CITIES, {
+    fetchPolicy: "cache-first",
+  });
 
   // フィールド更新
   const updateField = useCallback(
@@ -102,6 +114,69 @@ export const usePlaceEditor = ({
     },
     [updateField]
   );
+
+  // 郵便番号検索ハンドラ（明示的なボタンクリック）
+  const handlePostalCodeSearch = useCallback(async () => {
+    if (postalCode.length !== 7) {
+      return;
+    }
+
+    setPostalCodeSearching(true);
+
+    try {
+      // 1. zipcloud APIで住所を取得
+      const result = await fetchAddressByPostalCode(postalCode);
+
+      if (!result) {
+        alert("郵便番号から住所を取得できませんでした");
+        setPostalCodeSearching(false);
+        return;
+      }
+
+      // 2. 住所を自動入力
+      const fullAddress = formatFullAddress(result);
+      updateField("address", fullAddress);
+
+      // 3. 市区町村を検索（都道府県も考慮）
+      const { data } = await searchCities({
+        variables: {
+          filter: { name: result.address2 }, // 市区町村名で検索
+          first: 10,
+        },
+      });
+
+      // 4. city解決（都道府県が一致するものを優先）
+      const cities = data?.cities?.edges || [];
+      let matchedCity = null;
+
+      // 都道府県が一致するcityを探す
+      for (const edge of cities) {
+        const city = edge?.node;
+        if (city && city.state && city.state.name === result.address1) {
+          matchedCity = city;
+          break;
+        }
+      }
+
+      // 都道府県一致がなければ、最初のcityを使用
+      if (!matchedCity && cities.length > 0) {
+        matchedCity = cities[0]?.node;
+      }
+
+      if (matchedCity) {
+        updateField("cityCode", matchedCity.code);
+        setShowCitySelector(false);
+      } else {
+        // city解決失敗時は手動選択UI表示
+        setShowCitySelector(true);
+      }
+    } catch (error) {
+      console.error("Postal code search error:", error);
+      alert("郵便番号検索中にエラーが発生しました");
+    } finally {
+      setPostalCodeSearching(false);
+    }
+  }, [postalCode, updateField, searchCities]);
 
   // バリデーション
   const validateForm = useCallback((): boolean => {
@@ -171,5 +246,9 @@ export const usePlaceEditor = ({
     showCitySelector,
     mapSheetOpen,
     setMapSheetOpen,
+    postalCode,
+    setPostalCode,
+    postalCodeSearching,
+    handlePostalCodeSearch,
   };
 };
