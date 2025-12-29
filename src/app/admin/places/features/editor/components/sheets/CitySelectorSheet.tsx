@@ -37,8 +37,8 @@ export function CitySelectorSheet({
       first: 500, // バックエンド上限
       sort: { code: "ASC" },
     },
-    skip: !open,
-    fetchPolicy: "cache-first",
+    skip: !open || !searchText, // 検索テキストがある場合のみクエリ実行
+    fetchPolicy: "network-only", // 常に最新データを取得
   });
 
   // citiesリストを作成
@@ -76,10 +76,11 @@ export function CitySelectorSheet({
         {/* 検索入力 */}
         <div className="mb-4">
           <Input
-            placeholder="市区町村名で検索（例: 瀬戸内市）"
+            placeholder="市区町村名で検索（例: 姫路）"
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
             className="placeholder:text-sm"
+            autoFocus
           />
         </div>
 
@@ -89,8 +90,8 @@ export function CitySelectorSheet({
           {!loading && cities.length === 0 && (
             <div className="text-center py-8 text-muted-foreground text-sm">
               {searchText
-                ? "該当する市区町村が見つかりませんでした"
-                : "市区町村名を入力して検索してください"}
+                ? `「${searchText}」に一致する市区町村が見つかりませんでした`
+                : "市区町村名を入力して検索してください（例: 姫路）"}
             </div>
           )}
 
