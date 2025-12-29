@@ -15,7 +15,13 @@ export function SlotEditHeader({ onClose, onSave, isDirty, isSubmitting }: SlotE
     <header className="fixed top-0 left-0 right-0 bg-background border-b z-50">
       <div className="max-w-mobile-l mx-auto px-4 h-14 flex items-center justify-between">
         {/* 左: 閉じるボタン */}
-        <Button variant="ghost" onClick={onClose} disabled={isSubmitting}>
+        <Button
+          variant="ghost"
+          size={"sm"}
+          className={"w-20"}
+          onClick={onClose}
+          disabled={isSubmitting}
+        >
           閉じる
         </Button>
 
@@ -23,7 +29,13 @@ export function SlotEditHeader({ onClose, onSave, isDirty, isSubmitting }: SlotE
         <h1 className="text-body-md font-bold">開催枠編集</h1>
 
         {/* 右: 保存ボタン */}
-        <Button variant="primary" onClick={onSave} disabled={!isDirty || isSubmitting}>
+        <Button
+          variant="primary"
+          size={"sm"}
+          className={"w-20"}
+          onClick={onSave}
+          disabled={!isDirty || isSubmitting}
+        >
           {isSubmitting ? "保存中..." : "保存"}
         </Button>
       </div>
