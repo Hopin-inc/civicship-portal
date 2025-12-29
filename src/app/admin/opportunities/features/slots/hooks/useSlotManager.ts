@@ -24,6 +24,15 @@ export function useSlotManager(initialSlots: SlotData[] = []) {
     setHasChanges(true);
   };
 
+  const updateSlotSilent = <K extends keyof SlotData>(
+    index: number,
+    field: K,
+    value: SlotData[K]
+  ) => {
+    setSlots((prev) => prev.map((slot, i) => (i === index ? { ...slot, [field]: value } : slot)));
+    // Don't set hasChanges for mutation-based operations
+  };
+
   const removeSlot = (index: number) => {
     setSlots((prev) => prev.filter((_, i) => i !== index));
     setHasChanges(true);
@@ -38,6 +47,7 @@ export function useSlotManager(initialSlots: SlotData[] = []) {
     addSlot,
     addSlotsBatch,
     updateSlot,
+    updateSlotSilent,
     removeSlot,
     hasChanges,
     resetChanges,

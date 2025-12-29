@@ -32,6 +32,7 @@ export const useOpportunityEditor = ({
     opportunityId,
     capacity: formState.capacity,
     onSlotUpdate: formState.slotManager.updateSlot,
+    onSlotUpdateSilent: formState.slotManager.updateSlotSilent,
   });
 
   // 開催中止処理

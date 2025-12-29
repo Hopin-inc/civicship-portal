@@ -13,6 +13,7 @@ interface UseSlotActionsOptions {
   opportunityId?: string;
   capacity: number;
   onSlotUpdate: <K extends keyof SlotData>(index: number, field: K, value: SlotData[K]) => void;
+  onSlotUpdateSilent: <K extends keyof SlotData>(index: number, field: K, value: SlotData[K]) => void;
 }
 
 /**
@@ -22,6 +23,7 @@ export const useSlotActions = ({
   opportunityId,
   capacity,
   onSlotUpdate,
+  onSlotUpdateSilent,
 }: UseSlotActionsOptions) => {
   const [setSlotHostingStatus] = useSetOpportunitySlotHostingStatusMutation();
 
@@ -58,8 +60,8 @@ export const useSlotActions = ({
           },
         });
 
-        // ローカルステートを更新
-        onSlotUpdate(index, "hostingStatus", GqlOpportunitySlotHostingStatus.Cancelled);
+        // ローカルステートを更新（変更フラグは立てない）
+        onSlotUpdateSilent(index, "hostingStatus", GqlOpportunitySlotHostingStatus.Cancelled);
         toast.success("開催を中止しました");
       } catch (error) {
         console.error("Slot cancellation failed:", error);
@@ -82,7 +84,7 @@ export const useSlotActions = ({
         }
       }
     },
-    [opportunityId, capacity, setSlotHostingStatus, onSlotUpdate]
+    [opportunityId, capacity, setSlotHostingStatus, onSlotUpdateSilent]
   );
 
   return {
