@@ -2,8 +2,16 @@
 
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ChevronRight } from "lucide-react";
-import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from "@/components/ui/item";
+import { ChevronRight, MapPin } from "lucide-react";
+import {
+  Item,
+  ItemActions,
+  ItemContent,
+  ItemDescription,
+  ItemGroup,
+  ItemSeparator,
+  ItemTitle,
+} from "@/components/ui/item";
 import AddressMap from "@/components/shared/AddressMap";
 
 interface PlaceFormSectionProps {
@@ -38,62 +46,107 @@ export function PlaceFormSection({
   errors,
 }: PlaceFormSectionProps) {
   return (
-    <div className="space-y-4">
+    <section className="space-y-2">
       {/* 場所名 */}
-      <div className="space-y-2">
-        <label className="text-body-md font-bold">
-          場所名 <span className="text-error">*</span>
-        </label>
+      <div className="space-y-1">
+        <div className="flex items-center gap-2 px-1">
+          <span className="text-sm text-muted-foreground">場所名</span>
+          <span className="text-primary text-xs font-bold bg-primary-foreground px-1 py-0.5 rounded">
+            必須
+          </span>
+        </div>
         <Input
           value={name}
           onChange={(e) => onNameChange(e.target.value)}
           placeholder="例: シビックシップラボ"
+          className={`placeholder:text-sm ${errors?.name ? "border-destructive focus-visible:ring-destructive" : ""}`}
+          required
         />
-        {errors?.name && <p className="text-error text-caption-sm">{errors.name}</p>}
+        {errors?.name && (
+          <p className="text-xs text-destructive px-1">{errors.name}</p>
+        )}
       </div>
 
       {/* 住所 */}
-      <div className="space-y-2">
-        <label className="text-body-md font-bold">
-          住所 <span className="text-error">*</span>
-        </label>
+      <div className="space-y-1">
+        <div className="flex items-center gap-2 px-1">
+          <span className="text-sm text-muted-foreground">住所</span>
+          <span className="text-primary text-xs font-bold bg-primary-foreground px-1 py-0.5 rounded">
+            必須
+          </span>
+        </div>
         <Textarea
           value={address}
           onChange={(e) => onAddressChange(e.target.value)}
           placeholder="例: 岡山県瀬戸内市邑久町尾張465-21"
-          rows={3}
+          className={`min-h-[80px] placeholder:text-sm ${errors?.address ? "border-destructive focus-visible:ring-destructive" : ""}`}
+          required
         />
-        {geocoding && <p className="text-caption text-caption-sm">座標を取得中...</p>}
-        {errors?.address && <p className="text-error text-caption-sm">{errors.address}</p>}
+        {geocoding && (
+          <p className="text-xs text-muted-foreground px-1">座標を取得中...</p>
+        )}
+        {errors?.address && (
+          <p className="text-xs text-destructive px-1">{errors.address}</p>
+        )}
       </div>
 
-      {/* 市区町村 - Item */}
-      <Item onClick={onCityClick} className="cursor-pointer">
-        <ItemContent>
-          <ItemTitle>
-            市区町村 <span className="text-error">*</span>
-          </ItemTitle>
-          <ItemDescription>{cityName || "未選択"}</ItemDescription>
-        </ItemContent>
-        <ItemActions>
-          <ChevronRight className="h-5 w-5 text-caption" />
-        </ItemActions>
-      </Item>
-      {errors?.cityCode && <p className="text-error text-caption-sm">{errors.cityCode}</p>}
-
-      {/* 座標表示 */}
+      {/* 市区町村・座標 */}
       <div className="space-y-1">
-        <label className="text-body-md font-bold">座標</label>
-        <div className="space-y-1 text-caption text-caption-sm">
-          <p>緯度: {latitude !== null ? latitude.toFixed(6) : "未取得"}</p>
-          <p>経度: {longitude !== null ? longitude.toFixed(6) : "未取得"}</p>
-        </div>
+        <ItemGroup className="border rounded-lg">
+          {/* 市区町村 */}
+          <Item
+            size="sm"
+            role="button"
+            tabIndex={0}
+            onClick={onCityClick}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                onCityClick();
+              }
+            }}
+            className={`cursor-pointer ${errors?.cityCode ? "border-destructive" : ""}`}
+          >
+            <ItemContent>
+              <ItemTitle>
+                <MapPin className="h-3.5 w-3.5" />
+                市区町村
+                <span className="text-primary text-xs font-bold bg-primary-foreground px-1 py-0.5 rounded">
+                  必須
+                </span>
+              </ItemTitle>
+              <ItemDescription>{cityName || "未選択"}</ItemDescription>
+            </ItemContent>
+
+            <ItemActions>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </ItemActions>
+          </Item>
+
+          <ItemSeparator />
+
+          {/* 座標（読み取り専用） */}
+          <Item size="sm">
+            <ItemContent>
+              <ItemTitle>座標</ItemTitle>
+              <ItemDescription>
+                {latitude !== null && longitude !== null
+                  ? `緯度: ${latitude.toFixed(6)}, 経度: ${longitude.toFixed(6)}`
+                  : "未取得"}
+              </ItemDescription>
+            </ItemContent>
+          </Item>
+        </ItemGroup>
+        {errors?.cityCode && (
+          <p className="text-xs text-destructive px-1">{errors.cityCode}</p>
+        )}
       </div>
 
       {/* 地図プレビュー */}
       {address && latitude !== null && longitude !== null && (
-        <div className="space-y-2">
-          <label className="text-body-md font-bold">地図</label>
+        <div className="space-y-1">
+          <div className="px-1">
+            <span className="text-sm text-muted-foreground">地図</span>
+          </div>
           <AddressMap
             address={address}
             latitude={latitude}
@@ -103,6 +156,6 @@ export function PlaceFormSection({
           />
         </div>
       )}
-    </div>
+    </section>
   );
 }
