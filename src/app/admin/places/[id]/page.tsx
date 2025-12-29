@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useHeaderConfig } from "@/hooks/useHeaderConfig";
+import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { PlaceFormEditor } from "../features/editor/components/PlaceFormEditor";
 import { useGetPlaceQuery } from "@/types/graphql";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
@@ -18,10 +18,16 @@ export default function EditPlacePage() {
     fetchPolicy: "network-only",
   });
 
-  useHeaderConfig({
-    title: "場所を編集",
-    showBackButton: true,
-  });
+  const headerConfig = useMemo(
+    () => ({
+      title: "場所を編集",
+      showLogo: false,
+      showBackButton: true,
+      backTo: "/admin/places",
+    }),
+    []
+  );
+  useHeaderConfig(headerConfig);
 
   const initialData = useMemo(() => {
     if (!data?.place) return undefined;
