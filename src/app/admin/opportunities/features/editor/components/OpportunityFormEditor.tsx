@@ -78,10 +78,11 @@ export const OpportunityFormEditor = ({
     const fakeEvent = { preventDefault: () => {} } as FormEvent;
     const resultId = await editor.handleSave(fakeEvent);
     if (resultId) {
-      // 保存成功後もスロット編集モードに留まる
-      // onSuccess?.(resultId);
+      // 保存成功後に変更フラグをリセットしてフォームモードに戻る
+      editor.resetSlotChanges();
+      exitSlotsMode();
     }
-  }, [editor]);
+  }, [editor, exitSlotsMode]);
 
   // 開催枠編集モードの場合は EditSlotsPage のみ表示
   if (editMode === 'slots') {
@@ -93,7 +94,7 @@ export const OpportunityFormEditor = ({
         onRemoveSlot={editor.removeSlot}
         onCancelSlot={editor.cancelSlot}
         onSave={handleSlotsSave}
-        isDirty={true}
+        isDirty={editor.hasSlotChanges}
         isSubmitting={editor.saving}
         onClose={exitSlotsMode}
       />

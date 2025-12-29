@@ -83,6 +83,8 @@ export const useOpportunityEditor = ({
     updateSlot: formState.slotManager.updateSlot,
     removeSlot: formState.slotManager.removeSlot,
     cancelSlot,
+    hasSlotChanges: formState.slotManager.hasChanges,
+    resetSlotChanges: formState.slotManager.resetChanges,
 
     // 画像（imageManager から直接展開）
     images: formState.imageManager.images,
