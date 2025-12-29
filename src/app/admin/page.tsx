@@ -23,7 +23,7 @@ import { useTranslations } from "next-intl";
 
 const adminSettings = [
   {
-    title: "権限管理",
+    title: "メンバー管理",
     href: "/admin/members",
     icon: Users,
   },
