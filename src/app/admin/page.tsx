@@ -9,6 +9,7 @@ import {
   CalendarCheck,
   ClipboardList,
   Image,
+  MapPin,
   MegaphoneIcon,
   Ticket,
   Users,
@@ -40,6 +41,12 @@ const operatorSettings = [
     title: "募集管理",
     href: "/admin/opportunities",
     icon: MegaphoneIcon,
+    requiredFeature: "opportunities" as FeaturesType,
+  },
+  {
+    title: "場所管理",
+    href: "/admin/places",
+    icon: MapPin,
     requiredFeature: "opportunities" as FeaturesType,
   },
   {
