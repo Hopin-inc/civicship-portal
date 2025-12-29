@@ -164,6 +164,7 @@ export function EditSlotsPage({
           </div>
         </div>
       </main>
+      </div>
 
       {/* 開催中止確認シート */}
       {cancelState.selectedSlot && (
