@@ -5524,6 +5524,81 @@ export type GqlPlaceFieldsFragment = {
   } | null;
 };
 
+export type GqlPlaceCreateMutationVariables = Exact<{
+  input: GqlPlaceCreateInput;
+  permission: GqlCheckCommunityPermissionInput;
+}>;
+
+export type GqlPlaceCreateMutation = {
+  __typename?: "Mutation";
+  placeCreate?: {
+    __typename?: "PlaceCreateSuccess";
+    place: {
+      __typename?: "Place";
+      id: string;
+      name: string;
+      address: string;
+      latitude: any;
+      longitude: any;
+      googlePlaceId?: string | null;
+      isManual?: boolean | null;
+      mapLocation?: any | null;
+      image?: string | null;
+      createdAt?: Date | null;
+      updatedAt?: Date | null;
+      city?: {
+        __typename?: "City";
+        code: string;
+        name: string;
+        state?: { __typename?: "State"; code: string; countryCode: string; name: string } | null;
+      } | null;
+      community?: { __typename?: "Community"; id: string } | null;
+    };
+  } | null;
+};
+
+export type GqlPlaceUpdateMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+  input: GqlPlaceUpdateInput;
+  permission: GqlCheckCommunityPermissionInput;
+}>;
+
+export type GqlPlaceUpdateMutation = {
+  __typename?: "Mutation";
+  placeUpdate?: {
+    __typename?: "PlaceUpdateSuccess";
+    place: {
+      __typename?: "Place";
+      id: string;
+      name: string;
+      address: string;
+      latitude: any;
+      longitude: any;
+      googlePlaceId?: string | null;
+      isManual?: boolean | null;
+      mapLocation?: any | null;
+      image?: string | null;
+      updatedAt?: Date | null;
+      city?: {
+        __typename?: "City";
+        code: string;
+        name: string;
+        state?: { __typename?: "State"; code: string; countryCode: string; name: string } | null;
+      } | null;
+    };
+  } | null;
+};
+
+export type GqlPlaceDeleteMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+  permission: GqlCheckCommunityPermissionInput;
+}>;
+
+export type GqlPlaceDeleteMutation = {
+  __typename?: "Mutation";
+  placeDelete?: { __typename?: "PlaceDeleteSuccess"; id: string } | null;
+};
+
 export type GqlGetPlacesQueryVariables = Exact<{
   filter?: InputMaybe<GqlPlaceFilterInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
@@ -11043,6 +11118,196 @@ export type GetVcIssuanceRequestsByUserSuspenseQueryHookResult = ReturnType<
 export type GetVcIssuanceRequestsByUserQueryResult = Apollo.QueryResult<
   GqlGetVcIssuanceRequestsByUserQuery,
   GqlGetVcIssuanceRequestsByUserQueryVariables
+>;
+export const PlaceCreateDocument = gql`
+  mutation PlaceCreate($input: PlaceCreateInput!, $permission: CheckCommunityPermissionInput!) {
+    placeCreate(input: $input, permission: $permission) {
+      ... on PlaceCreateSuccess {
+        place {
+          id
+          name
+          address
+          latitude
+          longitude
+          googlePlaceId
+          isManual
+          mapLocation
+          image
+          city {
+            code
+            name
+            state {
+              code
+              countryCode
+              name
+            }
+          }
+          community {
+            id
+          }
+          createdAt
+          updatedAt
+        }
+      }
+    }
+  }
+`;
+export type GqlPlaceCreateMutationFn = Apollo.MutationFunction<
+  GqlPlaceCreateMutation,
+  GqlPlaceCreateMutationVariables
+>;
+
+/**
+ * __usePlaceCreateMutation__
+ *
+ * To run a mutation, you first call `usePlaceCreateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePlaceCreateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [placeCreateMutation, { data, loading, error }] = usePlaceCreateMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function usePlaceCreateMutation(
+  baseOptions?: Apollo.MutationHookOptions<GqlPlaceCreateMutation, GqlPlaceCreateMutationVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlPlaceCreateMutation, GqlPlaceCreateMutationVariables>(
+    PlaceCreateDocument,
+    options,
+  );
+}
+export type PlaceCreateMutationHookResult = ReturnType<typeof usePlaceCreateMutation>;
+export type PlaceCreateMutationResult = Apollo.MutationResult<GqlPlaceCreateMutation>;
+export type PlaceCreateMutationOptions = Apollo.BaseMutationOptions<
+  GqlPlaceCreateMutation,
+  GqlPlaceCreateMutationVariables
+>;
+export const PlaceUpdateDocument = gql`
+  mutation PlaceUpdate(
+    $id: ID!
+    $input: PlaceUpdateInput!
+    $permission: CheckCommunityPermissionInput!
+  ) {
+    placeUpdate(id: $id, input: $input, permission: $permission) {
+      ... on PlaceUpdateSuccess {
+        place {
+          id
+          name
+          address
+          latitude
+          longitude
+          googlePlaceId
+          isManual
+          mapLocation
+          image
+          city {
+            code
+            name
+            state {
+              code
+              countryCode
+              name
+            }
+          }
+          updatedAt
+        }
+      }
+    }
+  }
+`;
+export type GqlPlaceUpdateMutationFn = Apollo.MutationFunction<
+  GqlPlaceUpdateMutation,
+  GqlPlaceUpdateMutationVariables
+>;
+
+/**
+ * __usePlaceUpdateMutation__
+ *
+ * To run a mutation, you first call `usePlaceUpdateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePlaceUpdateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [placeUpdateMutation, { data, loading, error }] = usePlaceUpdateMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      input: // value for 'input'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function usePlaceUpdateMutation(
+  baseOptions?: Apollo.MutationHookOptions<GqlPlaceUpdateMutation, GqlPlaceUpdateMutationVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlPlaceUpdateMutation, GqlPlaceUpdateMutationVariables>(
+    PlaceUpdateDocument,
+    options,
+  );
+}
+export type PlaceUpdateMutationHookResult = ReturnType<typeof usePlaceUpdateMutation>;
+export type PlaceUpdateMutationResult = Apollo.MutationResult<GqlPlaceUpdateMutation>;
+export type PlaceUpdateMutationOptions = Apollo.BaseMutationOptions<
+  GqlPlaceUpdateMutation,
+  GqlPlaceUpdateMutationVariables
+>;
+export const PlaceDeleteDocument = gql`
+  mutation PlaceDelete($id: ID!, $permission: CheckCommunityPermissionInput!) {
+    placeDelete(id: $id, permission: $permission) {
+      ... on PlaceDeleteSuccess {
+        id
+      }
+    }
+  }
+`;
+export type GqlPlaceDeleteMutationFn = Apollo.MutationFunction<
+  GqlPlaceDeleteMutation,
+  GqlPlaceDeleteMutationVariables
+>;
+
+/**
+ * __usePlaceDeleteMutation__
+ *
+ * To run a mutation, you first call `usePlaceDeleteMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePlaceDeleteMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [placeDeleteMutation, { data, loading, error }] = usePlaceDeleteMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function usePlaceDeleteMutation(
+  baseOptions?: Apollo.MutationHookOptions<GqlPlaceDeleteMutation, GqlPlaceDeleteMutationVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlPlaceDeleteMutation, GqlPlaceDeleteMutationVariables>(
+    PlaceDeleteDocument,
+    options,
+  );
+}
+export type PlaceDeleteMutationHookResult = ReturnType<typeof usePlaceDeleteMutation>;
+export type PlaceDeleteMutationResult = Apollo.MutationResult<GqlPlaceDeleteMutation>;
+export type PlaceDeleteMutationOptions = Apollo.BaseMutationOptions<
+  GqlPlaceDeleteMutation,
+  GqlPlaceDeleteMutationVariables
 >;
 export const GetPlacesDocument = gql`
   query GetPlaces(
