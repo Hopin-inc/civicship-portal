@@ -2851,7 +2851,9 @@ export type GqlWalletsConnection = {
   totalCount: Scalars["Int"]["output"];
 };
 
-export type GqlGetStatesQueryVariables = Exact<{ [key: string]: never }>;
+export type GqlGetStatesQueryVariables = Exact<{
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+}>;
 
 export type GqlGetStatesQuery = {
   __typename?: "Query";
@@ -6543,8 +6545,8 @@ export const TransactionFieldsFragmentDoc = gql`
   }
 `;
 export const GetStatesDocument = gql`
-  query GetStates {
-    states {
+  query GetStates($first: Int) {
+    states(first: $first) {
       edges {
         node {
           code
@@ -6567,6 +6569,7 @@ export const GetStatesDocument = gql`
  * @example
  * const { data, loading, error } = useGetStatesQuery({
  *   variables: {
+ *      first: // value for 'first'
  *   },
  * });
  */
