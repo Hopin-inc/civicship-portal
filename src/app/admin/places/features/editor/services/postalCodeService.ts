@@ -94,36 +94,49 @@ export async function autoCompleteAddress(
   searchStates: (variables: any) => Promise<any>,
   searchCities: (variables: any) => Promise<any>
 ): Promise<AutoCompleteResult | null> {
+  console.log("[autoCompleteAddress] Start:", postalCode);
+
   // 1. zipcloud APIで住所を取得
   const result = await fetchAddressByPostalCode(postalCode);
 
   if (!result) {
+    console.log("[autoCompleteAddress] No result from zipcloud");
     return null;
   }
+
+  console.log("[autoCompleteAddress] Zipcloud result:", result);
 
   const autoCompleteResult: AutoCompleteResult = {
     streetAddress: result.address3,
   };
 
   // 2. 都道府県を検索
+  console.log("[autoCompleteAddress] Searching states...");
   const statesData = await searchStates({
     variables: { first: 50 },
   });
+  console.log("[autoCompleteAddress] States data:", statesData);
+
   const states: State[] = statesData?.data?.states?.edges
     ?.map((edge: any) => edge?.node)
     .filter(Boolean) || [];
 
+  console.log("[autoCompleteAddress] States count:", states.length);
+
   const matchedState = matchPrefecture(result.address1, states);
 
   if (matchedState) {
+    console.log("[autoCompleteAddress] Matched state:", matchedState);
     autoCompleteResult.stateCode = matchedState.code;
     autoCompleteResult.stateName = matchedState.name;
     toast.success(`都道府県「${matchedState.name}」を自動選択しました`);
   } else {
+    console.log("[autoCompleteAddress] No state matched for:", result.address1);
     toast.warning("都道府県を自動選択できませんでした。手動で選択してください");
   }
 
   // 3. 市区町村を検索
+  console.log("[autoCompleteAddress] Searching cities...");
   const citiesData = await searchCities({
     variables: {
       filter: { name: result.address2 },
@@ -131,14 +144,18 @@ export async function autoCompleteAddress(
       sort: { code: GqlSortDirection.Asc },
     },
   });
+  console.log("[autoCompleteAddress] Cities data:", citiesData);
 
   const cities: City[] = citiesData?.data?.cities?.edges
     ?.map((edge: any) => edge?.node)
     .filter(Boolean) || [];
 
+  console.log("[autoCompleteAddress] Cities count:", cities.length);
+
   const matchResult = matchCity(result.address2, cities, result.address1);
 
   if (matchResult) {
+    console.log("[autoCompleteAddress] Matched city:", matchResult);
     autoCompleteResult.cityCode = matchResult.city.code;
     autoCompleteResult.cityName = matchResult.city.name;
 
@@ -151,8 +168,10 @@ export async function autoCompleteAddress(
       );
     }
   } else {
+    console.log("[autoCompleteAddress] No city matched for:", result.address2);
     toast.warning("市区町村を自動選択できませんでした。手動で選択してください");
   }
 
+  console.log("[autoCompleteAddress] Final result:", autoCompleteResult);
   return autoCompleteResult;
 }
