@@ -33,7 +33,7 @@ export function useImageManager(initialImages: ImageData[] = []) {
     });
   };
 
-  // クリーンアップ
+  // クリーンアップ（コンポーネントアンマウント時のみ実行）
   useEffect(() => {
     return () => {
       images.forEach((img) => {
@@ -42,7 +42,8 @@ export function useImageManager(initialImages: ImageData[] = []) {
         }
       });
     };
-  }, [images]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // 空配列: unmount時のみクリーンアップ
 
   return {
     images,
