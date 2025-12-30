@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/item";
 import { GqlOpportunityCategory } from "@/types/graphql";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { useNumberInput } from "../../hooks/useNumberInput";
 
 interface CategorySettingsSectionProps {
   mode: "create" | "update";
@@ -38,6 +39,25 @@ export function CategorySettingsSection({
 }: CategorySettingsSectionProps) {
   const isActivity = category === GqlOpportunityCategory.Activity;
   const isQuest = category === GqlOpportunityCategory.Quest;
+
+  // 数字入力フックの初期化
+  const feeInput = useNumberInput({
+    value: feeRequired,
+    onChange: onFeeRequiredChange,
+    min: 0,
+  });
+
+  const pointsRequiredInput = useNumberInput({
+    value: pointsRequired,
+    onChange: onPointsRequiredChange,
+    min: 0,
+  });
+
+  const pointsToEarnInput = useNumberInput({
+    value: pointsToEarn,
+    onChange: onPointsToEarnChange,
+    min: 0,
+  });
 
   return (
     <ItemGroup className="border rounded-lg">
@@ -95,8 +115,9 @@ export function CategorySettingsSection({
                 <Input
                   type="number"
                   min="0"
-                  value={feeRequired}
-                  onChange={(e) => onFeeRequiredChange(Number(e.target.value))}
+                  value={feeInput.displayValue}
+                  onChange={feeInput.handleChange}
+                  onBlur={feeInput.handleBlur}
                   className="w-24"
                 />
                 <span className="text-sm text-muted-foreground">円</span>
@@ -119,8 +140,9 @@ export function CategorySettingsSection({
                 <Input
                   type="number"
                   min="0"
-                  value={pointsRequired}
-                  onChange={(e) => onPointsRequiredChange(Number(e.target.value))}
+                  value={pointsRequiredInput.displayValue}
+                  onChange={pointsRequiredInput.handleChange}
+                  onBlur={pointsRequiredInput.handleBlur}
                   className="w-24"
                 />
                 <span className="text-sm text-muted-foreground">pt</span>
@@ -145,8 +167,9 @@ export function CategorySettingsSection({
               <Input
                 type="number"
                 min="0"
-                value={pointsToEarn}
-                onChange={(e) => onPointsToEarnChange(Number(e.target.value))}
+                value={pointsToEarnInput.displayValue}
+                onChange={pointsToEarnInput.handleChange}
+                onBlur={pointsToEarnInput.handleBlur}
                 className="w-24"
               />
               <span className="text-sm text-muted-foreground">pt</span>

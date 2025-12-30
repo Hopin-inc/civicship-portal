@@ -83,7 +83,7 @@ export function RecurrenceSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="bottom"
-        className="rounded-t-3xl max-w-md mx-auto overflow-y-auto max-h-[80vh]"
+        className="rounded-t-3xl w-full max-w-[calc(100%-2rem)] sm:max-w-2xl mx-auto overflow-y-auto max-h-[80vh]"
       >
         <SheetHeader className="text-left pb-6 px-8 pt-8">
           <SheetTitle className="text-title-sm">繰り返し</SheetTitle>

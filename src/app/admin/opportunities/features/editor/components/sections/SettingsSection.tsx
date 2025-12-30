@@ -11,6 +11,7 @@ import {
   ItemSeparator,
   ItemTitle,
 } from "@/components/ui/item";
+import { useNumberInput } from "../../hooks/useNumberInput";
 
 interface SettingsSectionProps {
   selectedHostName: string | null;
@@ -33,6 +34,14 @@ export function SettingsSection({
   onCapacityChange,
   errors,
 }: SettingsSectionProps) {
+  // 定員の数字入力フック（最小値1）
+  const capacityInput = useNumberInput({
+    value: capacity,
+    onChange: onCapacityChange,
+    min: 1,
+    defaultValue: 1,
+  });
+
   return (
     <div className="space-y-1">
       <ItemGroup className="border rounded-lg">
@@ -109,8 +118,9 @@ export function SettingsSection({
               <Input
                 type="number"
                 min="1"
-                value={capacity}
-                onChange={(e) => onCapacityChange(Number(e.target.value))}
+                value={capacityInput.displayValue}
+                onChange={capacityInput.handleChange}
+                onBlur={capacityInput.handleBlur}
                 className="w-24"
               />
               <span className="text-sm text-muted-foreground">名</span>

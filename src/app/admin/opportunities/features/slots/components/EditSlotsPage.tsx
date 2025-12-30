@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   Accordion,
   AccordionContent,
@@ -63,6 +63,11 @@ export function EditSlotsPage({
 
   // 未保存変更警告
   const { confirmNavigation } = useUnsavedChangesWarning({ isDirty, isSubmitting });
+
+  // ページ遷移時にスクロール位置をリセット
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, []);
 
   // 閉じる処理（確認ダイアログ付き）
   const handleClose = () => {
