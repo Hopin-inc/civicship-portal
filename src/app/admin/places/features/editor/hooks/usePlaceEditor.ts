@@ -1,12 +1,15 @@
-import { useState, useCallback, useEffect } from "react";
-import { useLazyQuery } from "@apollo/client";
+/**
+ * Place編集フック（ファサード）
+ * useAddressForm, useCoordinates, usePlaceSaveを統合
+ */
+
+import { useState, useCallback } from "react";
 import { PlaceEditorFormState, createInitialFormState } from "../types/form";
 import { usePlaceSave } from "./usePlaceSave";
+import { useAddressForm } from "./useAddressForm";
+import { useCoordinates } from "./useCoordinates";
 import { PlaceFormData } from "../../shared/types/place";
-import { fetchAddressByPostalCode, formatFullAddress } from "../utils/postalCode";
-import { GET_CITIES, GET_STATES } from "../queries";
-import { GqlSortDirection } from "@/types/graphql";
-import { toast } from "react-toastify";
+import { formatFullAddress } from "../services/addressService";
 
 interface UsePlaceEditorOptions {
   placeId?: string;
@@ -26,253 +29,146 @@ export const usePlaceEditor = ({
   initialData,
   onSuccess,
 }: UsePlaceEditorOptions = {}) => {
-  const [formState, setFormState] = useState<PlaceEditorFormState>(
-    createInitialFormState(initialData)
-  );
+  // 基本フォーム状態（nameのみ）
+  const [name, setName] = useState(initialData?.name || "");
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
 
-  // 郵便番号
-  const [postalCode, setPostalCode] = useState("");
-  const [postalCodeSearching, setPostalCodeSearching] = useState(false);
+  // 住所フォーム
+  const addressForm = useAddressForm({
+    initialState: {
+      stateCode: initialData?.stateCode || "",
+      stateName: initialData?.stateName || "",
+      cityCode: initialData?.cityCode || "",
+      cityName: initialData?.cityName || "",
+      streetAddress: initialData?.streetAddress || "",
+    },
+    onAddressChange: () => {
+      // 住所変更時に座標要再確認フラグを立てる
+      coordinates.markCoordinatesForReview();
+    },
+  });
 
-  // 座標確定状態
-  const [coordinatesConfirmed, setCoordinatesConfirmed] = useState(
-    !!(initialData?.latitude && initialData?.longitude)
-  );
-  const [coordinatesNeedReview, setCoordinatesNeedReview] = useState(false);
+  // 座標管理
+  const coordinates = useCoordinates({
+    initialCoordinates: {
+      latitude: initialData?.latitude ?? null,
+      longitude: initialData?.longitude ?? null,
+    },
+  });
 
-  // UI表示制御
-  const [showStateSelector, setShowStateSelector] = useState(false);
-  const [showCitySelector, setShowCitySelector] = useState(false);
-  const [mapSheetOpen, setMapSheetOpen] = useState(false);
-
+  // 保存処理
   const { handleSave: savePlace } = usePlaceSave({ placeId, onSuccess });
 
-  // City検索用のlazy query（郵便番号検索時に使用）
-  const [searchCities] = useLazyQuery(GET_CITIES, {
-    fetchPolicy: "cache-first",
-  });
-
-  // State検索用のlazy query（郵便番号検索時に使用）
-  const [searchStates] = useLazyQuery(GET_STATES, {
-    fetchPolicy: "cache-first",
-  });
-
-  // フィールド更新
+  // フィールド更新（汎用）
   const updateField = useCallback(
-    <K extends keyof PlaceEditorFormState>(field: K, value: PlaceEditorFormState[K]) => {
-      setFormState((prev) => ({ ...prev, [field]: value }));
-    },
-    []
-  );
-
-  // 番地変更ハンドラ（自動geocodeなし）
-  const handleStreetAddressChange = useCallback(
-    (streetAddress: string) => {
-      updateField("streetAddress", streetAddress);
-
-      // 座標が既に確定している場合のみ「要再確認」フラグを立てる
-      if (coordinatesConfirmed) {
-        setCoordinatesNeedReview(true);
+    <K extends keyof PlaceEditorFormState>(
+      field: K,
+      value: PlaceEditorFormState[K]
+    ) => {
+      // フィールドに応じて適切なハンドラを呼ぶ
+      switch (field) {
+        case "name":
+          setName(value as string);
+          break;
+        case "stateCode":
+          addressForm.updateAddressField("stateCode", value as string);
+          break;
+        case "stateName":
+          addressForm.updateAddressField("stateName", value as string);
+          break;
+        case "cityCode":
+          addressForm.updateAddressField("cityCode", value as string);
+          break;
+        case "cityName":
+          addressForm.updateAddressField("cityName", value as string);
+          break;
+        case "streetAddress":
+          addressForm.updateAddressField("streetAddress", value as string);
+          break;
+        case "latitude":
+          coordinates.updateCoordinates(
+            value as number,
+            coordinates.longitude || 0
+          );
+          break;
+        case "longitude":
+          coordinates.updateCoordinates(
+            coordinates.latitude || 0,
+            value as number
+          );
+          break;
+        default:
+          console.warn(`Unknown field: ${field}`);
       }
-
-      // 座標自体は保持する（nullにしない）
     },
-    [updateField, coordinatesConfirmed]
+    [addressForm, coordinates]
   );
 
-  // 地図確認ハンドラ
-  const handleMapClick = useCallback(() => {
-    setMapSheetOpen(true);
-  }, []);
-
-  // 地図確定ハンドラ
+  // 地図確定ハンドラ（cityCodeも処理）
   const handleMapConfirm = useCallback(
     (result: {
       latitude: number;
       longitude: number;
       cityCode: string | null;
     }) => {
-      // 1. 座標を保存
-      updateField("latitude", result.latitude);
-      updateField("longitude", result.longitude);
-      setCoordinatesConfirmed(true);
-      setCoordinatesNeedReview(false);
+      const returnedCityCode = coordinates.handleMapConfirm(result);
 
-      // 2. cityCode解決
-      if (result.cityCode) {
-        updateField("cityCode", result.cityCode);
-        setShowCitySelector(false);
+      // cityCode解決
+      if (returnedCityCode) {
+        addressForm.updateAddressField("cityCode", returnedCityCode);
+        addressForm.setShowCitySelector?.(false);
       } else {
         // 解決失敗時のみ手動選択UI表示
-        setShowCitySelector(true);
+        addressForm.setShowCitySelector?.(true);
       }
-
-      setMapSheetOpen(false);
     },
-    [updateField]
+    [coordinates, addressForm]
   );
-
-  // 都道府県選択ハンドラ
-  const handleStateSelect = useCallback(
-    (code: string, name: string) => {
-      updateField("stateCode", code);
-      updateField("stateName", name);
-      setShowStateSelector(false);
-      // 都道府県が変更されたら市区町村をリセット
-      updateField("cityCode", "");
-      updateField("cityName", "");
-    },
-    [updateField]
-  );
-
-  // 市区町村選択ハンドラ
-  const handleCitySelect = useCallback(
-    (code: string, name: string) => {
-      updateField("cityCode", code);
-      updateField("cityName", name);
-      setShowCitySelector(false);
-    },
-    [updateField]
-  );
-
-  // 郵便番号検索ハンドラ（明示的なボタンクリック）
-  const handlePostalCodeSearch = useCallback(async () => {
-    if (postalCode.length !== 7) {
-      return;
-    }
-
-    setPostalCodeSearching(true);
-
-    try {
-      // 1. zipcloud APIで住所を取得
-      const result = await fetchAddressByPostalCode(postalCode);
-
-      if (!result) {
-        alert("郵便番号から住所を取得できませんでした");
-        setPostalCodeSearching(false);
-        return;
-      }
-
-      // 2. 都道府県を自動選択
-      const statesData = await searchStates({
-        variables: { first: 50 }, // 全都道府県を取得
-      });
-      const states = statesData?.data?.states?.edges || [];
-      const matchedState = states.find(
-        (edge: any) => edge?.node?.name === result.address1
-      );
-
-      if (matchedState) {
-        updateField("stateCode", matchedState.node.code);
-        updateField("stateName", matchedState.node.name);
-        setShowStateSelector(false);
-        toast.success(`都道府県「${matchedState.node.name}」を自動選択しました`);
-      } else {
-        setShowStateSelector(true);
-        toast.warning("都道府県を自動選択できませんでした。手動で選択してください");
-      }
-
-      // 3. 番地を自動入力
-      updateField("streetAddress", result.address3);
-
-      // 4. 市区町村を検索（都道府県も考慮）
-      const { data } = await searchCities({
-        variables: {
-          filter: { name: result.address2 }, // 市区町村名で検索
-          first: 10,
-          sort: { code: GqlSortDirection.Asc }, // ソート追加
-        },
-      });
-
-      // 5. city解決（都道府県が一致するものを優先）
-      const cities = data?.cities?.edges || [];
-      let matchedCity = null;
-      let isPrefectureMatched = false;
-
-      // 都道府県が一致するcityを探す
-      for (const edge of cities) {
-        const city = edge?.node;
-        if (city && city.state && city.state.name === result.address1) {
-          matchedCity = city;
-          isPrefectureMatched = true;
-          break;
-        }
-      }
-
-      // 都道府県一致がなければ、最初のcityを使用（案B）
-      if (!matchedCity && cities.length > 0) {
-        matchedCity = cities[0]?.node;
-        isPrefectureMatched = false;
-      }
-
-      if (matchedCity) {
-        updateField("cityCode", matchedCity.code);
-        updateField("cityName", matchedCity.name);
-        setShowCitySelector(false);
-
-        if (isPrefectureMatched) {
-          // 都道府県が一致した場合：成功メッセージ
-          toast.success(`市区町村「${matchedCity.name}」を自動選択しました`);
-        } else {
-          // 都道府県不一致の場合：警告メッセージ
-          toast.warning(
-            `市区町村「${matchedCity.name}」を選択しました。正しいか確認してください`,
-            { autoClose: 5000 }
-          );
-        }
-      } else {
-        // 候補が全くない場合：手動選択を促す
-        setShowCitySelector(true);
-        toast.warning("市区町村を自動選択できませんでした。手動で選択してください");
-      }
-    } catch (error) {
-      console.error("Postal code search error:", error);
-      alert("郵便番号検索中にエラーが発生しました");
-    } finally {
-      setPostalCodeSearching(false);
-    }
-  }, [postalCode, updateField, searchCities, searchStates]);
 
   // バリデーション
   const validateForm = useCallback((): boolean => {
     const newErrors: FormErrors = {};
 
-    if (!formState.name.trim()) {
+    if (!name.trim()) {
       newErrors.name = "場所名を入力してください";
     }
 
     // stateCode必須チェック
-    if (!formState.stateCode) {
+    if (!addressForm.stateCode) {
       newErrors.address = "都道府県を選択してください";
-      setShowStateSelector(true);
+      addressForm.setShowStateSelector(true);
     }
 
     // cityCode必須チェック
-    if (!formState.cityCode) {
+    if (!addressForm.cityCode) {
       newErrors.cityCode = "市区町村を選択してください";
-      setShowCitySelector(true);
+      addressForm.setShowCitySelector?.(true);
     }
 
     // streetAddress必須チェック
-    if (!formState.streetAddress.trim()) {
+    if (!addressForm.streetAddress.trim()) {
       newErrors.address = "番地・建物名を入力してください";
     }
 
     // 座標未確定チェック
-    if (!coordinatesConfirmed || formState.latitude === null || formState.longitude === null) {
+    if (
+      !coordinates.coordinatesConfirmed ||
+      coordinates.latitude === null ||
+      coordinates.longitude === null
+    ) {
       newErrors.coordinates = "地図で位置を確認してください";
     }
 
     // 座標要再確認チェック
-    if (coordinatesNeedReview) {
-      newErrors.coordinates = "住所を変更しました。地図で位置を再確認してください";
+    if (coordinates.coordinatesNeedReview) {
+      newErrors.coordinates =
+        "住所を変更しました。地図で位置を再確認してください";
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  }, [formState, coordinatesConfirmed, coordinatesNeedReview]);
+  }, [name, addressForm, coordinates]);
 
   // 保存処理
   const handleSave = useCallback(
@@ -286,44 +182,93 @@ export const usePlaceEditor = ({
 
       setSaving(true);
       try {
-        // 住所フィールドを結合（stateName/cityName/streetAddress → address）
-        const combinedAddress = `${formState.stateName}${formState.cityName}${formState.streetAddress}`;
+        // 住所フィールドを結合
+        const combinedAddress = formatFullAddress(
+          addressForm.stateName,
+          addressForm.cityName,
+          addressForm.streetAddress
+        );
 
-        const combinedFormState = {
-          ...formState,
+        // フォーム状態を作成
+        const formState: PlaceEditorFormState = {
+          name,
+          stateCode: addressForm.stateCode,
+          stateName: addressForm.stateName,
+          cityCode: addressForm.cityCode,
+          cityName: addressForm.cityName,
+          streetAddress: addressForm.streetAddress,
           address: combinedAddress,
+          latitude: coordinates.latitude,
+          longitude: coordinates.longitude,
+          googlePlaceId: initialData?.googlePlaceId,
+          isManual: initialData?.isManual || false,
+          mapLocation: initialData?.mapLocation,
         };
 
-        const result = await savePlace(combinedFormState);
+        const result = await savePlace(formState);
         return result;
       } finally {
         setSaving(false);
       }
     },
-    [formState, savePlace, validateForm]
+    [
+      validateForm,
+      name,
+      addressForm,
+      coordinates,
+      initialData,
+      savePlace,
+    ]
   );
 
+  // formStateの互換性のために統合オブジェクトを返す
+  const formState: PlaceEditorFormState = {
+    name,
+    stateCode: addressForm.stateCode,
+    stateName: addressForm.stateName,
+    cityCode: addressForm.cityCode,
+    cityName: addressForm.cityName,
+    streetAddress: addressForm.streetAddress,
+    address: formatFullAddress(
+      addressForm.stateName,
+      addressForm.cityName,
+      addressForm.streetAddress
+    ),
+    latitude: coordinates.latitude,
+    longitude: coordinates.longitude,
+    googlePlaceId: initialData?.googlePlaceId,
+    isManual: initialData?.isManual || false,
+    mapLocation: initialData?.mapLocation,
+  };
+
   return {
+    // フォーム状態
     formState,
     updateField,
-    handleStreetAddressChange,
-    handleMapClick,
+
+    // 住所関連（addressFormから）
+    postalCode: addressForm.postalCode,
+    setPostalCode: addressForm.setPostalCode,
+    postalCodeSearching: addressForm.postalCodeSearching,
+    handlePostalCodeSearch: addressForm.handlePostalCodeSearch,
+    handleStateSelect: addressForm.handleStateSelect,
+    handleCitySelect: addressForm.handleCitySelect,
+    handleStreetAddressChange: addressForm.handleStreetAddressChange,
+    showStateSelector: addressForm.showStateSelector,
+    setShowStateSelector: addressForm.setShowStateSelector,
+    showCitySelector: addressForm.showCitySelector,
+
+    // 座標関連（coordinatesから）
+    coordinatesConfirmed: coordinates.coordinatesConfirmed,
+    coordinatesNeedReview: coordinates.coordinatesNeedReview,
+    mapSheetOpen: coordinates.mapSheetOpen,
+    setMapSheetOpen: coordinates.setMapSheetOpen,
+    handleMapClick: coordinates.handleMapClick,
     handleMapConfirm,
-    handleStateSelect,
-    handleCitySelect,
+
+    // 保存
     handleSave,
     saving,
     errors,
-    coordinatesConfirmed,
-    coordinatesNeedReview,
-    showStateSelector,
-    setShowStateSelector,
-    showCitySelector,
-    mapSheetOpen,
-    setMapSheetOpen,
-    postalCode,
-    setPostalCode,
-    postalCodeSearching,
-    handlePostalCodeSearch,
   };
 };

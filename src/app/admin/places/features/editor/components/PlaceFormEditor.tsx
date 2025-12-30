@@ -10,6 +10,7 @@ import { CitySelectorSheet } from "./sheets/CitySelectorSheet";
 import { MapConfirmSheet } from "./sheets/MapConfirmSheet";
 import { PlaceFormData } from "../../shared/types/place";
 import { GET_STATES } from "../queries";
+import { parseStreetAddress } from "../services/addressService";
 
 interface PlaceFormEditorProps {
   placeId?: string;
@@ -24,25 +25,19 @@ export function PlaceFormEditor({ placeId, initialData, onSuccess }: PlaceFormEd
     onSuccess,
   });
 
-  // Sheet管理
+  // シート管理
   const [stateSheetOpen, setStateSheetOpen] = useState(false);
-  const [selectedStateName, setSelectedStateName] = useState<string | null>(null);
-
   const [citySheetOpen, setCitySheetOpen] = useState(false);
-  const [selectedCityName, setSelectedCityName] = useState<string | null>(
-    initialData?.cityName || null
-  );
 
   // 都道府県マスタを取得（既存データ解析用）
   const { data: statesData } = useQuery(GET_STATES, {
-    variables: { first: 50 }, // 日本の都道府県は47なので50で十分
+    variables: { first: 50 },
     skip: !initialData?.address || !!initialData?.cityCode === false,
     fetchPolicy: "cache-first",
   });
 
-  // 既存データの住所分割処理（Phase 4）
+  // 既存データの住所分割処理
   useEffect(() => {
-    // 既存データで住所があり、まだstateCodeが設定されていない場合のみ実行
     if (
       initialData?.address &&
       initialData?.cityCode &&
@@ -52,7 +47,7 @@ export function PlaceFormEditor({ placeId, initialData, onSuccess }: PlaceFormEd
       const states = statesData.states.edges;
       const address = initialData.address;
 
-      // 1. 都道府県名を抽出（住所の先頭から都道府県名を検索）
+      // 都道府県名を抽出
       let matchedState = null;
       for (const edge of states) {
         const state = edge?.node;
@@ -62,19 +57,17 @@ export function PlaceFormEditor({ placeId, initialData, onSuccess }: PlaceFormEd
         }
       }
 
-      if (matchedState) {
+      if (matchedState && initialData.cityName) {
         // stateCodeとstateNameを設定
         editor.updateField("stateCode", matchedState.code);
         editor.updateField("stateName", matchedState.name);
-        setSelectedStateName(matchedState.name);
 
-        // 2. streetAddressを抽出（都道府県名と市区町村名を除去）
-        let streetAddress = address.substring(matchedState.name.length);
-
-        // 市区町村名を除去
-        if (initialData.cityName && streetAddress.startsWith(initialData.cityName)) {
-          streetAddress = streetAddress.substring(initialData.cityName.length);
-        }
+        // streetAddressを抽出（addressServiceを使用）
+        const streetAddress = parseStreetAddress(
+          address,
+          matchedState.name,
+          initialData.cityName
+        );
 
         editor.updateField("streetAddress", streetAddress);
       }
@@ -83,13 +76,11 @@ export function PlaceFormEditor({ placeId, initialData, onSuccess }: PlaceFormEd
 
   const handleStateSelect = (code: string, name: string) => {
     editor.handleStateSelect(code, name);
-    setSelectedStateName(name);
     setStateSheetOpen(false);
   };
 
   const handleCitySelect = (code: string, name: string) => {
     editor.handleCitySelect(code, name);
-    setSelectedCityName(name);
     setCitySheetOpen(false);
   };
 
@@ -99,9 +90,9 @@ export function PlaceFormEditor({ placeId, initialData, onSuccess }: PlaceFormEd
         editor={editor}
         onSubmit={editor.handleSave}
         onStateClick={() => setStateSheetOpen(true)}
-        selectedStateName={selectedStateName}
+        selectedStateName={editor.formState.stateName || null}
         onCityClick={() => setCitySheetOpen(true)}
-        selectedCityName={selectedCityName}
+        selectedCityName={editor.formState.cityName || null}
       />
 
       {/* 都道府県選択シート */}
