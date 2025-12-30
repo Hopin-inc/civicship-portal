@@ -35,13 +35,11 @@ export const OpportunityFormEditor = ({
     initialData?.placeName || null
   );
 
-  // 開催枠専用保存フック（更新モードのみ）
-  const slotsBulkSave = mode === "update" && opportunityId
-    ? useSlotsBulkSave({
-        opportunityId,
-        capacity: editor.capacity,
-      })
-    : null;
+  // 開催枠専用保存フック（常に呼び出し、updateモード時のみ使用）
+  const slotsBulkSave = useSlotsBulkSave({
+    opportunityId: opportunityId || "",
+    capacity: editor.capacity,
+  });
 
   // ヘッダー設定（formモード時のみ）
   const headerConfig = useMemo(
@@ -86,7 +84,7 @@ export const OpportunityFormEditor = ({
   // スロット保存ハンドラー
   const handleSlotsSave = useCallback(async () => {
     // 更新モード：開催枠のみサーバーに保存
-    if (mode === "update" && slotsBulkSave) {
+    if (mode === "update" && opportunityId) {
       const success = await slotsBulkSave.handleSave(editor.slots);
       if (success) {
         editor.resetSlotChanges();
@@ -102,13 +100,11 @@ export const OpportunityFormEditor = ({
       toast.success("開催枠を設定しました");
       return;
     }
-  }, [mode, editor, exitSlotsMode, slotsBulkSave]);
+  }, [mode, opportunityId, editor, exitSlotsMode, slotsBulkSave]);
 
   // 開催枠編集モードの場合は EditSlotsPage のみ表示
   if (editMode === 'slots') {
-    const isSaving = mode === "update" && slotsBulkSave
-      ? slotsBulkSave.saving
-      : false;
+    const isSaving = mode === "update" ? slotsBulkSave.saving : false;
 
     return (
       <EditSlotsPage
