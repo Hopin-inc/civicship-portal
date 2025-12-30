@@ -156,7 +156,9 @@ export const usePlaceEditor = ({
       }
 
       // 2. 都道府県を自動選択
-      const statesData = await searchStates();
+      const statesData = await searchStates({
+        variables: { first: 50 }, // 全都道府県を取得
+      });
       const states = statesData?.data?.states?.edges || [];
       const matchedState = states.find(
         (edge: any) => edge?.node?.name === result.address1
