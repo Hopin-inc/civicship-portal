@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState, useCallback, useMemo } from "react";
+import { toast } from "react-toastify";
 import { GqlPublishStatus } from "@/types/graphql";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useOpportunityEditor } from "../hooks/useOpportunityEditor";
@@ -9,6 +10,7 @@ import { OpportunityFormData, FormEditMode } from "../types/form";
 import { EditSlotsPage } from "../../slots/components/EditSlotsPage";
 import { OpportunityForm } from "./OpportunityForm";
 import { OpportunityFormSheets } from "./OpportunityFormSheets";
+import { useSlotsBulkSave } from "../../slots/hooks/useSlotsBulkSave";
 
 interface OpportunityFormEditorProps {
   mode: "create" | "update";
@@ -32,6 +34,14 @@ export const OpportunityFormEditor = ({
   const [selectedPlaceName, setSelectedPlaceName] = useState<string | null>(
     initialData?.placeName || null
   );
+
+  // 開催枠専用保存フック（更新モードのみ）
+  const slotsBulkSave = mode === "update" && opportunityId
+    ? useSlotsBulkSave({
+        opportunityId,
+        capacity: editor.capacity,
+      })
+    : null;
 
   // ヘッダー設定（formモード時のみ）
   const headerConfig = useMemo(
@@ -75,19 +85,34 @@ export const OpportunityFormEditor = ({
 
   // スロット保存ハンドラー
   const handleSlotsSave = useCallback(async () => {
-    const fakeEvent = { preventDefault: () => {} } as FormEvent;
-    const resultId = await editor.handleSave(fakeEvent);
-    if (resultId) {
-      // 保存成功後に変更フラグをリセットしてフォームモードに戻る
+    // 更新モード：開催枠のみサーバーに保存
+    if (mode === "update" && slotsBulkSave) {
+      const success = await slotsBulkSave.handleSave(editor.slots);
+      if (success) {
+        editor.resetSlotChanges();
+        exitSlotsMode();
+      }
+      return;
+    }
+
+    // 作成モード：ローカル状態のみ更新（サーバー保存なし）
+    if (mode === "create") {
       editor.resetSlotChanges();
       exitSlotsMode();
+      toast.success("開催枠を設定しました");
+      return;
     }
-  }, [editor, exitSlotsMode]);
+  }, [mode, editor, exitSlotsMode, slotsBulkSave]);
 
   // 開催枠編集モードの場合は EditSlotsPage のみ表示
   if (editMode === 'slots') {
+    const isSaving = mode === "update" && slotsBulkSave
+      ? slotsBulkSave.saving
+      : false;
+
     return (
       <EditSlotsPage
+        mode={mode}
         slots={editor.slots}
         onAddSlotsBatch={editor.addSlotsBatch}
         onUpdateSlot={editor.updateSlot}
@@ -95,7 +120,7 @@ export const OpportunityFormEditor = ({
         onCancelSlot={editor.cancelSlot}
         onSave={handleSlotsSave}
         isDirty={editor.hasSlotChanges}
-        isSubmitting={editor.saving}
+        isSubmitting={isSaving}
         onClose={exitSlotsMode}
       />
     );

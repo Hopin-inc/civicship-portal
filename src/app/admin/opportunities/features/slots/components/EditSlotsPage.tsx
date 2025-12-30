@@ -21,6 +21,7 @@ import { useSlotReservations } from "../hooks/useSlotReservations";
 import { useUnsavedChangesWarning } from "../hooks/useUnsavedChangesWarning";
 
 interface EditSlotsPageProps {
+  mode: "create" | "update";
   slots: SlotData[];
   onAddSlotsBatch: (slots: SlotData[]) => void;
   onUpdateSlot: <K extends keyof SlotData>(index: number, field: K, value: SlotData[K]) => void;
@@ -33,6 +34,7 @@ interface EditSlotsPageProps {
 }
 
 export function EditSlotsPage({
+  mode,
   slots,
   onAddSlotsBatch,
   onUpdateSlot,
@@ -112,6 +114,7 @@ export function EditSlotsPage({
   return (
     <>
       <SlotEditHeader
+        mode={mode}
         onClose={handleClose}
         onSave={onSave}
         isDirty={isDirty}
