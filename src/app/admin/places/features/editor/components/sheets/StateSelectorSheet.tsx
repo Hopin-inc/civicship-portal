@@ -29,6 +29,7 @@ export function StateSelectorSheet({
 }: StateSelectorSheetProps) {
   // 都道府県マスタを取得
   const { data, loading } = useQuery(GET_STATES, {
+    variables: { first: 50 }, // 日本の都道府県は47なので50で十分
     skip: !open,
     fetchPolicy: "cache-first", // 都道府県は変わらないのでキャッシュ優先
   });

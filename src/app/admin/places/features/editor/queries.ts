@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 export const GET_STATES = gql`
-  query GetStates {
-    states {
+  query GetStates($first: Int) {
+    states(first: $first) {
       edges {
         node {
           code
