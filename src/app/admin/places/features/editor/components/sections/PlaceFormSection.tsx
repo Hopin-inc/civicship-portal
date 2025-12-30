@@ -25,8 +25,19 @@ interface PlaceFormSectionProps {
   onPostalCodeSearch: () => void;
   postalCodeSearching: boolean;
 
-  address: string;
-  onAddressChange: (value: string) => void;
+  // 都道府県（常に表示）
+  stateCode: string;
+  stateName: string | null;
+  onStateClick: () => void;
+
+  // 市区町村（常に表示）
+  cityCode: string;
+  cityName: string | null;
+  onCityClick: () => void;
+
+  // 番地・建物名（常に表示）
+  streetAddress: string;
+  onStreetAddressChange: (value: string) => void;
 
   // 地図・座標
   coordinatesConfirmed: boolean;
@@ -34,12 +45,6 @@ interface PlaceFormSectionProps {
   latitude: number | null;
   longitude: number | null;
   onMapClick: () => void;
-
-  // 市区町村（条件付き表示）
-  showCitySelector: boolean;
-  cityCode: string;
-  cityName: string | null;
-  onCityClick: () => void;
 
   errors?: {
     name?: string;
@@ -56,17 +61,19 @@ export function PlaceFormSection({
   onPostalCodeChange,
   onPostalCodeSearch,
   postalCodeSearching,
-  address,
-  onAddressChange,
+  stateCode,
+  stateName,
+  onStateClick,
+  cityCode,
+  cityName,
+  onCityClick,
+  streetAddress,
+  onStreetAddressChange,
   coordinatesConfirmed,
   coordinatesNeedReview,
   latitude,
   longitude,
   onMapClick,
-  showCitySelector,
-  cityCode,
-  cityName,
-  onCityClick,
   errors,
 }: PlaceFormSectionProps) {
   return (
@@ -119,24 +126,93 @@ export function PlaceFormSection({
         </p>
       </div>
 
-      {/* 住所 */}
+      {/* 都道府県 */}
+      <div className="space-y-1">
+        <ItemGroup className="border rounded-lg">
+          <Item
+            size="sm"
+            role="button"
+            tabIndex={0}
+            onClick={onStateClick}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                onStateClick();
+              }
+            }}
+            className={`cursor-pointer ${errors?.address ? "border-destructive" : ""}`}
+          >
+            <ItemContent>
+              <ItemTitle>
+                都道府県
+                <span className="text-primary text-xs font-bold bg-primary-foreground px-1 py-0.5 rounded">
+                  必須
+                </span>
+              </ItemTitle>
+              <ItemDescription>
+                {stateName || "選択してください"}
+              </ItemDescription>
+            </ItemContent>
+            <ItemActions>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </ItemActions>
+          </Item>
+        </ItemGroup>
+        {errors?.address && (
+          <p className="text-xs text-destructive px-1">{errors.address}</p>
+        )}
+      </div>
+
+      {/* 市区町村 */}
+      <div className="space-y-1">
+        <ItemGroup className="border rounded-lg">
+          <Item
+            size="sm"
+            role="button"
+            tabIndex={0}
+            onClick={onCityClick}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                onCityClick();
+              }
+            }}
+            className={`cursor-pointer ${errors?.cityCode ? "border-destructive" : ""}`}
+          >
+            <ItemContent>
+              <ItemTitle>
+                市区町村
+                <span className="text-primary text-xs font-bold bg-primary-foreground px-1 py-0.5 rounded">
+                  必須
+                </span>
+              </ItemTitle>
+              <ItemDescription>
+                {cityName || "選択してください"}
+              </ItemDescription>
+            </ItemContent>
+            <ItemActions>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </ItemActions>
+          </Item>
+        </ItemGroup>
+        {errors?.cityCode && (
+          <p className="text-xs text-destructive px-1">{errors.cityCode}</p>
+        )}
+      </div>
+
+      {/* 番地・建物名 */}
       <div className="space-y-1">
         <div className="flex items-center gap-2 px-1">
-          <span className="text-sm text-muted-foreground">住所</span>
+          <span className="text-sm text-muted-foreground">番地・建物名</span>
           <span className="text-primary text-xs font-bold bg-primary-foreground px-1 py-0.5 rounded">
             必須
           </span>
         </div>
-        <Textarea
-          value={address}
-          onChange={(e) => onAddressChange(e.target.value)}
-          placeholder="例: 岡山県瀬戸内市邑久町尾張465-21"
-          className={`min-h-[80px] placeholder:text-sm ${errors?.address ? "border-destructive focus-visible:ring-destructive" : ""}`}
+        <Input
+          value={streetAddress}
+          onChange={(e) => onStreetAddressChange(e.target.value)}
+          placeholder="例: 邑久町尾張465-21"
+          className="placeholder:text-sm"
           required
         />
-        {errors?.address && (
-          <p className="text-xs text-destructive px-1">{errors.address}</p>
-        )}
       </div>
 
       {/* 地図・座標 */}
@@ -185,48 +261,6 @@ export function PlaceFormSection({
         )}
       </div>
 
-      {/* 市区町村（条件付き表示）*/}
-      {showCitySelector && (
-        <div className="space-y-1">
-          <ItemGroup className="border rounded-lg">
-            <Item
-              size="sm"
-              role="button"
-              tabIndex={0}
-              onClick={onCityClick}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  onCityClick();
-                }
-              }}
-              className={`cursor-pointer ${errors?.cityCode ? "border-destructive" : ""}`}
-            >
-              <ItemContent>
-                <ItemTitle>
-                  <MapPin className="h-3.5 w-3.5" />
-                  市区町村
-                  <span className="text-primary text-xs font-bold bg-primary-foreground px-1 py-0.5 rounded">
-                    必須
-                  </span>
-                </ItemTitle>
-                <ItemDescription>
-                  {cityName || "選択してください"}
-                </ItemDescription>
-              </ItemContent>
-              <ItemActions>
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
-              </ItemActions>
-            </Item>
-          </ItemGroup>
-          <p className="text-xs text-muted-foreground px-1">
-            住所から市区町村を特定できませんでした。手動で選択してください。
-          </p>
-          {errors?.cityCode && (
-            <p className="text-xs text-destructive px-1">{errors.cityCode}</p>
-          )}
-        </div>
-      )}
-
       {/* 地図プレビュー（確定済みで要再確認でない時のみ表示）*/}
       {coordinatesConfirmed && !coordinatesNeedReview && latitude !== null && longitude !== null && (
         <div className="space-y-1">
@@ -234,7 +268,7 @@ export function PlaceFormSection({
             <span className="text-sm text-muted-foreground">地図プレビュー</span>
           </div>
           <AddressMap
-            address={address}
+            address={`${stateName || ""}${cityName || ""}${streetAddress}`}
             latitude={latitude}
             longitude={longitude}
             placeId=""

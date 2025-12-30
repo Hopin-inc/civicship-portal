@@ -5,7 +5,9 @@ export interface PlaceEditorFormState {
 
   // 住所フィールド（分割）
   stateCode: string;        // 都道府県コード
+  stateName: string;        // 都道府県名（表示・保存用）
   cityCode: string;         // 市区町村コード
+  cityName: string;         // 市区町村名（表示・保存用）
   streetAddress: string;    // 番地・建物名
 
   // 保存用の結合住所（バックエンドに送信）
@@ -21,20 +23,14 @@ export interface PlaceEditorFormState {
 export const createInitialFormState = (
   existingPlace?: Partial<PlaceFormData>
 ): PlaceEditorFormState => {
-  // 既存データがある場合、addressを分割する必要がある
-  // ただし、stateCode/cityCodeがあればそれを優先
-  let stateCode = "";
-  let streetAddress = "";
-
-  // 既存のaddressがある場合、後で分割処理を行う
-  // （Phase 4で実装）
-
   return {
     name: existingPlace?.name ?? "",
-    stateCode: stateCode,
+    stateCode: "",
+    stateName: "",
     cityCode: existingPlace?.cityCode ?? "",
-    streetAddress: streetAddress,
-    address: existingPlace?.address ?? "", // 既存の住所を保持
+    cityName: existingPlace?.cityName ?? "",
+    streetAddress: "",
+    address: existingPlace?.address ?? "", // 既存の住所を保持（Phase 4で分割）
     latitude: existingPlace?.latitude ?? null,
     longitude: existingPlace?.longitude ?? null,
     googlePlaceId: existingPlace?.googlePlaceId,

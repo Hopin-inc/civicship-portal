@@ -1,10 +1,10 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useLazyQuery } from "@apollo/client";
 import { PlaceEditorFormState, createInitialFormState } from "../types/form";
 import { usePlaceSave } from "./usePlaceSave";
 import { PlaceFormData } from "../../shared/types/place";
 import { fetchAddressByPostalCode, formatFullAddress } from "../utils/postalCode";
-import { GET_CITIES } from "../queries";
+import { GET_CITIES, GET_STATES } from "../queries";
 import { GqlSortDirection } from "@/types/graphql";
 import { toast } from "react-toastify";
 
@@ -51,6 +51,11 @@ export const usePlaceEditor = ({
 
   // City検索用のlazy query（郵便番号検索時に使用）
   const [searchCities] = useLazyQuery(GET_CITIES, {
+    fetchPolicy: "cache-first",
+  });
+
+  // State検索用のlazy query（郵便番号検索時に使用）
+  const [searchStates] = useLazyQuery(GET_STATES, {
     fetchPolicy: "cache-first",
   });
 
@@ -111,19 +116,22 @@ export const usePlaceEditor = ({
 
   // 都道府県選択ハンドラ
   const handleStateSelect = useCallback(
-    (code: string) => {
+    (code: string, name: string) => {
       updateField("stateCode", code);
+      updateField("stateName", name);
       setShowStateSelector(false);
       // 都道府県が変更されたら市区町村をリセット
       updateField("cityCode", "");
+      updateField("cityName", "");
     },
     [updateField]
   );
 
   // 市区町村選択ハンドラ
   const handleCitySelect = useCallback(
-    (code: string) => {
+    (code: string, name: string) => {
       updateField("cityCode", code);
+      updateField("cityName", name);
       setShowCitySelector(false);
     },
     [updateField]
@@ -147,11 +155,27 @@ export const usePlaceEditor = ({
         return;
       }
 
-      // 2. 住所を自動入力
-      const fullAddress = formatFullAddress(result);
-      updateField("address", fullAddress);
+      // 2. 都道府県を自動選択
+      const statesData = await searchStates();
+      const states = statesData?.data?.states?.edges || [];
+      const matchedState = states.find(
+        (edge: any) => edge?.node?.name === result.address1
+      );
 
-      // 3. 市区町村を検索（都道府県も考慮）
+      if (matchedState) {
+        updateField("stateCode", matchedState.node.code);
+        updateField("stateName", matchedState.node.name);
+        setShowStateSelector(false);
+        toast.success(`都道府県「${matchedState.node.name}」を自動選択しました`);
+      } else {
+        setShowStateSelector(true);
+        toast.warning("都道府県を自動選択できませんでした。手動で選択してください");
+      }
+
+      // 3. 番地を自動入力
+      updateField("streetAddress", result.address3);
+
+      // 4. 市区町村を検索（都道府県も考慮）
       const { data } = await searchCities({
         variables: {
           filter: { name: result.address2 }, // 市区町村名で検索
@@ -160,7 +184,7 @@ export const usePlaceEditor = ({
         },
       });
 
-      // 4. city解決（都道府県が一致するものを優先）
+      // 5. city解決（都道府県が一致するものを優先）
       const cities = data?.cities?.edges || [];
       let matchedCity = null;
       let isPrefectureMatched = false;
@@ -183,6 +207,7 @@ export const usePlaceEditor = ({
 
       if (matchedCity) {
         updateField("cityCode", matchedCity.code);
+        updateField("cityName", matchedCity.name);
         setShowCitySelector(false);
 
         if (isPrefectureMatched) {
@@ -206,7 +231,7 @@ export const usePlaceEditor = ({
     } finally {
       setPostalCodeSearching(false);
     }
-  }, [postalCode, updateField, searchCities]);
+  }, [postalCode, updateField, searchCities, searchStates]);
 
   // バリデーション
   const validateForm = useCallback((): boolean => {
@@ -214,20 +239,6 @@ export const usePlaceEditor = ({
 
     if (!formState.name.trim()) {
       newErrors.name = "場所名を入力してください";
-    }
-
-    if (!formState.address.trim()) {
-      newErrors.address = "住所を入力してください";
-    }
-
-    // 座標未確定チェック
-    if (!coordinatesConfirmed || formState.latitude === null || formState.longitude === null) {
-      newErrors.coordinates = "地図で位置を確認してください";
-    }
-
-    // 座標要再確認チェック
-    if (coordinatesNeedReview) {
-      newErrors.coordinates = "住所を変更しました。地図で位置を再確認してください";
     }
 
     // stateCode必須チェック
@@ -240,6 +251,21 @@ export const usePlaceEditor = ({
     if (!formState.cityCode) {
       newErrors.cityCode = "市区町村を選択してください";
       setShowCitySelector(true);
+    }
+
+    // streetAddress必須チェック
+    if (!formState.streetAddress.trim()) {
+      newErrors.address = "番地・建物名を入力してください";
+    }
+
+    // 座標未確定チェック
+    if (!coordinatesConfirmed || formState.latitude === null || formState.longitude === null) {
+      newErrors.coordinates = "地図で位置を確認してください";
+    }
+
+    // 座標要再確認チェック
+    if (coordinatesNeedReview) {
+      newErrors.coordinates = "住所を変更しました。地図で位置を再確認してください";
     }
 
     setErrors(newErrors);
@@ -258,12 +284,12 @@ export const usePlaceEditor = ({
 
       setSaving(true);
       try {
-        // 住所フィールドを結合（stateCode/cityCode/streetAddress → address）
-        // TODO: Phase 4で実装（state/city名を取得して結合）
-        // 今は一旦既存のaddressまたはstreetAddressを使用
+        // 住所フィールドを結合（stateName/cityName/streetAddress → address）
+        const combinedAddress = `${formState.stateName}${formState.cityName}${formState.streetAddress}`;
+
         const combinedFormState = {
           ...formState,
-          address: formState.streetAddress || formState.address,
+          address: combinedAddress,
         };
 
         const result = await savePlace(combinedFormState);

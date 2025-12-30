@@ -8,6 +8,8 @@ import { usePlaceEditor } from "../hooks/usePlaceEditor";
 interface PlaceFormProps {
   editor: ReturnType<typeof usePlaceEditor>;
   onSubmit: (e: FormEvent) => void;
+  onStateClick: () => void;
+  selectedStateName: string | null;
   onCityClick: () => void;
   selectedCityName: string | null;
 }
@@ -15,6 +17,8 @@ interface PlaceFormProps {
 export function PlaceForm({
   editor,
   onSubmit,
+  onStateClick,
+  selectedStateName,
   onCityClick,
   selectedCityName,
 }: PlaceFormProps) {
@@ -28,17 +32,19 @@ export function PlaceForm({
         onPostalCodeChange={editor.setPostalCode}
         onPostalCodeSearch={editor.handlePostalCodeSearch}
         postalCodeSearching={editor.postalCodeSearching}
-        address={editor.formState.address}
-        onAddressChange={editor.handleAddressChange}
+        stateCode={editor.formState.stateCode}
+        stateName={selectedStateName}
+        onStateClick={onStateClick}
+        cityCode={editor.formState.cityCode}
+        cityName={selectedCityName}
+        onCityClick={onCityClick}
+        streetAddress={editor.formState.streetAddress}
+        onStreetAddressChange={editor.handleStreetAddressChange}
         coordinatesConfirmed={editor.coordinatesConfirmed}
         coordinatesNeedReview={editor.coordinatesNeedReview}
         latitude={editor.formState.latitude}
         longitude={editor.formState.longitude}
         onMapClick={editor.handleMapClick}
-        showCitySelector={editor.showCitySelector}
-        cityCode={editor.formState.cityCode}
-        cityName={selectedCityName}
-        onCityClick={onCityClick}
         errors={editor.errors}
       />
 
