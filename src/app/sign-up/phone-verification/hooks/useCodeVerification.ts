@@ -25,6 +25,29 @@ interface CodeVerificationResult {
   };
 }
 
+/**
+ * Wait for firebaseUser to be available in the auth store.
+ * This is needed because initAuthFast hydrates firebaseUser asynchronously in the background,
+ * and we need it to be available before making authenticated GraphQL mutations.
+ * 
+ * @param maxWaitMs Maximum time to wait in milliseconds (default: 5000ms)
+ * @param pollIntervalMs Polling interval in milliseconds (default: 100ms)
+ * @returns true if firebaseUser became available, false if timeout
+ */
+async function waitForFirebaseUser(maxWaitMs = 5000, pollIntervalMs = 100): Promise<boolean> {
+  const startTime = Date.now();
+  
+  while (Date.now() - startTime < maxWaitMs) {
+    const { firebaseUser } = useAuthStore.getState().state;
+    if (firebaseUser) {
+      return true;
+    }
+    await new Promise(resolve => setTimeout(resolve, pollIntervalMs));
+  }
+  
+  return false;
+}
+
 export function useCodeVerification(
   phoneAuth: { verifyPhoneCode: (verificationCode: string) => Promise<boolean> },
   nextParam: string,
@@ -97,6 +120,24 @@ export function useCodeVerification(
               type: "invalid-code",
             },
           };
+        }
+
+        // Wait for firebaseUser to be available before making authenticated GraphQL mutation
+        // This is needed because initAuthFast hydrates firebaseUser asynchronously in the background
+        const hasFirebaseUser = await waitForFirebaseUser();
+        
+        logger.debug("[useCodeVerification] Calling identityCheckPhoneUser", {
+          component: "useCodeVerification",
+          phoneUid: phoneUid?.slice(-6),
+          hasFirebaseUser,
+          pathname: typeof window !== "undefined" ? window.location.pathname : "server",
+        });
+
+        if (!hasFirebaseUser) {
+          logger.warn("[useCodeVerification] Firebase user not available after waiting", {
+            component: "useCodeVerification",
+          });
+          // Continue anyway - the mutation might work without auth if backend allows it
         }
 
         const { data } = await identityCheckPhoneUser({
@@ -178,6 +219,25 @@ export function useCodeVerification(
             };
         }
       } catch (error) {
+        // Enhanced error logging to identify the exact failure point
+        const apolloError = error as any;
+        logger.error("[useCodeVerification] Verification failed with exception", {
+          component: "useCodeVerification",
+          errorMessage: apolloError?.message,
+          errorName: apolloError?.name,
+          graphQLErrors: apolloError?.graphQLErrors?.map((e: any) => ({
+            message: e.message,
+            path: e.path,
+            extensions: e.extensions,
+          })),
+          networkError: apolloError?.networkError ? {
+            message: apolloError.networkError.message,
+            statusCode: apolloError.networkError.statusCode,
+            name: apolloError.networkError.name,
+          } : null,
+          communityId: typeof window !== "undefined" ? window.location.pathname : "server",
+        });
+        
         logFirebaseError(
           error,
           "[useCodeVerification] Verification failed",
@@ -193,7 +253,7 @@ export function useCodeVerification(
             type: "verification-failed",
           },
         };
-      }finally {
+      } finally {
         setIsVerifying(false);
       }
     },
