@@ -43,6 +43,7 @@ export const usePlaceEditor = ({
   const [coordinatesNeedReview, setCoordinatesNeedReview] = useState(false);
 
   // UI表示制御
+  const [showStateSelector, setShowStateSelector] = useState(false);
   const [showCitySelector, setShowCitySelector] = useState(false);
   const [mapSheetOpen, setMapSheetOpen] = useState(false);
 
@@ -61,10 +62,10 @@ export const usePlaceEditor = ({
     []
   );
 
-  // 住所変更ハンドラ（自動geocodeなし）
-  const handleAddressChange = useCallback(
-    (address: string) => {
-      updateField("address", address);
+  // 番地変更ハンドラ（自動geocodeなし）
+  const handleStreetAddressChange = useCallback(
+    (streetAddress: string) => {
+      updateField("streetAddress", streetAddress);
 
       // 座標が既に確定している場合のみ「要再確認」フラグを立てる
       if (coordinatesConfirmed) {
@@ -104,6 +105,17 @@ export const usePlaceEditor = ({
       }
 
       setMapSheetOpen(false);
+    },
+    [updateField]
+  );
+
+  // 都道府県選択ハンドラ
+  const handleStateSelect = useCallback(
+    (code: string) => {
+      updateField("stateCode", code);
+      setShowStateSelector(false);
+      // 都道府県が変更されたら市区町村をリセット
+      updateField("cityCode", "");
     },
     [updateField]
   );
@@ -218,6 +230,12 @@ export const usePlaceEditor = ({
       newErrors.coordinates = "住所を変更しました。地図で位置を再確認してください";
     }
 
+    // stateCode必須チェック
+    if (!formState.stateCode) {
+      newErrors.address = "都道府県を選択してください";
+      setShowStateSelector(true);
+    }
+
     // cityCode必須チェック
     if (!formState.cityCode) {
       newErrors.cityCode = "市区町村を選択してください";
@@ -240,7 +258,15 @@ export const usePlaceEditor = ({
 
       setSaving(true);
       try {
-        const result = await savePlace(formState);
+        // 住所フィールドを結合（stateCode/cityCode/streetAddress → address）
+        // TODO: Phase 4で実装（state/city名を取得して結合）
+        // 今は一旦既存のaddressまたはstreetAddressを使用
+        const combinedFormState = {
+          ...formState,
+          address: formState.streetAddress || formState.address,
+        };
+
+        const result = await savePlace(combinedFormState);
         return result;
       } finally {
         setSaving(false);
@@ -252,15 +278,18 @@ export const usePlaceEditor = ({
   return {
     formState,
     updateField,
-    handleAddressChange,
+    handleStreetAddressChange,
     handleMapClick,
     handleMapConfirm,
+    handleStateSelect,
     handleCitySelect,
     handleSave,
     saving,
     errors,
     coordinatesConfirmed,
     coordinatesNeedReview,
+    showStateSelector,
+    setShowStateSelector,
     showCitySelector,
     mapSheetOpen,
     setMapSheetOpen,

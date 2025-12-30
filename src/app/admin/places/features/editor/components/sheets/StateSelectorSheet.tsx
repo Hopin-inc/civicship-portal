@@ -29,9 +29,6 @@ export function StateSelectorSheet({
 }: StateSelectorSheetProps) {
   // 都道府県マスタを取得
   const { data, loading } = useQuery(GET_STATES, {
-    variables: {
-      sort: { code: GqlSortDirection.Asc },
-    },
     skip: !open,
     fetchPolicy: "cache-first", // 都道府県は変わらないのでキャッシュ優先
   });
