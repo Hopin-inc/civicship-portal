@@ -14,6 +14,7 @@ import { RawURIComponent } from "@/utils/path";
 import { logger } from "@/lib/logging";
 import { logFirebaseError } from "@/lib/auth/core/firebase-config";
 import { useTranslations } from "next-intl";
+import { getRuntimeCommunityId } from "@/lib/communities/communityIds";
 
 interface CodeVerificationResult {
   success: boolean;
@@ -126,11 +127,12 @@ export function useCodeVerification(
         // This is needed because initAuthFast hydrates firebaseUser asynchronously in the background
         const hasFirebaseUser = await waitForFirebaseUser();
         
+        const communityId = getRuntimeCommunityId();
         logger.debug("[useCodeVerification] Calling identityCheckPhoneUser", {
           component: "useCodeVerification",
           phoneUid: phoneUid?.slice(-6),
           hasFirebaseUser,
-          pathname: typeof window !== "undefined" ? window.location.pathname : "server",
+          communityId,
         });
 
         if (!hasFirebaseUser) {
@@ -221,6 +223,7 @@ export function useCodeVerification(
       } catch (error) {
         // Enhanced error logging to identify the exact failure point
         const apolloError = error as any;
+        const errorCommunityId = getRuntimeCommunityId();
         logger.error("[useCodeVerification] Verification failed with exception", {
           component: "useCodeVerification",
           errorMessage: apolloError?.message,
@@ -235,7 +238,7 @@ export function useCodeVerification(
             statusCode: apolloError.networkError.statusCode,
             name: apolloError.networkError.name,
           } : null,
-          communityId: typeof window !== "undefined" ? window.location.pathname : "server",
+          communityId: errorCommunityId,
         });
         
         logFirebaseError(

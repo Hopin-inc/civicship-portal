@@ -25,8 +25,7 @@ const httpLink = createUploadLink({
 const requestLink = setContext(async (operation, prevContext) => {
   const isBrowser = typeof window !== "undefined";
   let token: string | null = null;
-  // Browser uses id_token mode only (session mode is SSR-only via executeServerGraphQLQuery)
-  // Server keeps session mode for any server-side Apollo usage
+  // Default: Server uses session mode, browser tries id_token first
   let authMode: "session" | "id_token" = isBrowser ? "id_token" : "session";
 
   if (isBrowser) {
@@ -38,6 +37,18 @@ const requestLink = setContext(async (operation, prevContext) => {
       } catch (error) {
         logger.warn("Failed to get ID token", { error });
       }
+    }
+
+    // IMPORTANT: If we couldn't get a Bearer token in the browser,
+    // fall back to session mode so the server will use the session cookie.
+    // Without this, the server ignores cookies when X-Auth-Mode is "id_token"
+    // (see extractAuthHeaders.ts: idToken = authMode === "session" ? sessionCookie : bearer)
+    if (!token) {
+      authMode = "session";
+      logger.debug("[Apollo] No Bearer token available, falling back to session mode", {
+        hasFirebaseUser: !!firebaseUser,
+        operation: operation.operationName,
+      });
     }
   }
 
