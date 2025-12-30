@@ -10,6 +10,7 @@ import { getCoordinatesFromAddress } from "@/app/places/utils/geocoding";
 import { logger } from "@/lib/logging";
 import { GET_CITIES } from "../../queries";
 import { resolveCityCode } from "../../utils/resolveCityCode";
+import { GqlSortDirection } from "@/types/graphql";
 
 interface MapConfirmSheetProps {
   open: boolean;
@@ -52,7 +53,7 @@ export function MapConfirmSheet({
   const { data: citiesData } = useQuery(GET_CITIES, {
     variables: {
       first: 500,
-      sort: { code: "ASC" },
+      sort: { code: GqlSortDirection.Asc },
     },
     fetchPolicy: "cache-first",
   });
