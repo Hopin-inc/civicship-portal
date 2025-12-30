@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import { useQuery } from "@apollo/client";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -17,11 +17,7 @@ interface MapConfirmSheetProps {
   address: string;
   initialLatitude?: number;
   initialLongitude?: number;
-  onConfirm: (result: {
-    latitude: number;
-    longitude: number;
-    cityCode: string | null;
-  }) => void;
+  onConfirm: (result: { latitude: number; longitude: number; cityCode: string | null }) => void;
 }
 
 // 東京駅をデフォルト位置として使用
@@ -143,9 +139,8 @@ export function MapConfirmSheet({
 
       if (result.results && result.results.length > 0) {
         // 2. Cities データ準備
-        const cities = citiesData?.cities?.edges
-          ?.map((edge: any) => edge?.node)
-          .filter(Boolean) || [];
+        const cities =
+          citiesData?.cities?.edges?.map((edge: any) => edge?.node).filter(Boolean) || [];
 
         // 3. cityCode解決（都道府県考慮あり）
         cityCode = resolveCityCode(result.results[0], cities);
@@ -205,11 +200,7 @@ export function MapConfirmSheet({
                   gestureHandling: "greedy",
                 }}
               >
-                <Marker
-                  position={position}
-                  draggable={true}
-                  onDragEnd={handleMarkerDragEnd}
-                />
+                <Marker position={position} draggable={true} onDragEnd={handleMarkerDragEnd} />
               </GoogleMap>
             )}
           </div>
@@ -221,16 +212,15 @@ export function MapConfirmSheet({
                 onClick={handleConfirm}
                 className="w-full"
                 variant="primary"
-                size="lg"
                 disabled={!position}
               >
-                この位置を使う
+                確定する
               </Button>
               <Button
                 onClick={() => onOpenChange(false)}
                 className="w-full"
-                variant="secondary"
-                size="lg"
+                variant="ghost"
+                size="sm"
               >
                 キャンセル
               </Button>
