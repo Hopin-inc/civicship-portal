@@ -134,7 +134,9 @@ export class AuthRedirectService {
       }
 
       case "phone_authenticated":
-        if (basePath !== "/sign-up") {
+        // Don't redirect if already on sign-up or phone-verification page
+        // User may still be completing the identityCheckPhoneUser flow
+        if (basePath !== "/sign-up" && basePath !== "/sign-up/phone-verification") {
           return `/sign-up${nextParam}` as RawURIComponent; // 電話認証済み → サインアップへ
         }
         return null;
