@@ -26,7 +26,9 @@ export const useOpportunitySave = ({
   formState,
 }: UseOpportunitySaveOptions) => {
   // ========== GraphQL Mutations ==========
-  const [createOpportunity, createResult] = useCreateOpportunityMutation();
+  const [createOpportunity, createResult] = useCreateOpportunityMutation({
+    refetchQueries: ["GetAdminOpportunities"], // 一覧を自動更新
+  });
   const [updateContent, updateContentResult] = useUpdateOpportunityContentMutation();
   const [updateSlots, updateSlotsResult] = useUpdateOpportunitySlotsBulkMutation();
 
