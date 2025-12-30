@@ -1,4 +1,4 @@
-import { useState, useEffect, ChangeEvent } from "react";
+import { useState, ChangeEvent } from "react";
 import { toast } from "react-toastify";
 import { ImageData, isNewImage } from "../types/form";
 import { MAX_IMAGES } from "../constants/form";
@@ -33,17 +33,11 @@ export function useImageManager(initialImages: ImageData[] = []) {
     });
   };
 
-  // クリーンアップ（コンポーネントアンマウント時のみ実行）
-  useEffect(() => {
-    return () => {
-      images.forEach((img) => {
-        if (isNewImage(img)) {
-          URL.revokeObjectURL(img.url);
-        }
-      });
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // 空配列: unmount時のみクリーンアップ
+  // Note: Blob URLのクリーンアップは意図的に実装していません
+  // 理由:
+  // - ページ遷移時に自動解放される
+  // - 編集中の少数の画像による影響は無視できる
+  // - クリーンアップのタイミング制御が複雑化し、バグの原因になる
 
   return {
     images,
