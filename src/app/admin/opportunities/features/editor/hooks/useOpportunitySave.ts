@@ -27,7 +27,13 @@ export const useOpportunitySave = ({
 }: UseOpportunitySaveOptions) => {
   // ========== GraphQL Mutations ==========
   const [createOpportunity, createResult] = useCreateOpportunityMutation({
-    refetchQueries: ["GetAdminOpportunities"], // 一覧を自動更新
+    refetchQueries: ["GetAdminOpportunities"],
+    awaitRefetchQueries: true,
+    onCompleted: () => {
+      // キャッシュを完全にクリアして確実に最新データを取得
+      createResult.client.cache.evict({ fieldName: "opportunities" });
+      createResult.client.cache.gc();
+    },
   });
   const [updateContent, updateContentResult] = useUpdateOpportunityContentMutation();
   const [updateSlots, updateSlotsResult] = useUpdateOpportunitySlotsBulkMutation();
