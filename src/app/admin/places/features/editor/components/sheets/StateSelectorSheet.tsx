@@ -47,8 +47,7 @@ export function StateSelectorSheet({
         }
         return null;
       })
-      .filter((state: State | null): state is State => state !== null)
-      .sort((a: State, b: State) => a.name.localeCompare(b.name, "ja"));
+      .filter((state: State | null): state is State => state !== null);
   }, [data]);
 
   const handleSelect = (state: State) => {
