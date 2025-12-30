@@ -123,7 +123,7 @@ export function PlaceFormEditor({ placeId, initialData, onSuccess }: PlaceFormEd
       <MapConfirmSheet
         open={editor.mapSheetOpen}
         onOpenChange={editor.setMapSheetOpen}
-        address={`${selectedStateName || ""}${selectedCityName || ""}${editor.formState.streetAddress}`}
+        address={`${editor.formState.stateName}${editor.formState.cityName}${editor.formState.streetAddress}`}
         initialLatitude={editor.formState.latitude || undefined}
         initialLongitude={editor.formState.longitude || undefined}
         onConfirm={editor.handleMapConfirm}

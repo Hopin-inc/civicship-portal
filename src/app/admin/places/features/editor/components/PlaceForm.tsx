@@ -33,10 +33,10 @@ export function PlaceForm({
         onPostalCodeSearch={editor.handlePostalCodeSearch}
         postalCodeSearching={editor.postalCodeSearching}
         stateCode={editor.formState.stateCode}
-        stateName={selectedStateName}
+        stateName={editor.formState.stateName || null}
         onStateClick={onStateClick}
         cityCode={editor.formState.cityCode}
-        cityName={selectedCityName}
+        cityName={editor.formState.cityName || null}
         onCityClick={onCityClick}
         streetAddress={editor.formState.streetAddress}
         onStreetAddressChange={editor.handleStreetAddressChange}
