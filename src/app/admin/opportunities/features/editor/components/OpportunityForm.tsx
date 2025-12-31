@@ -71,6 +71,8 @@ export function OpportunityForm({
         onPointsRequiredChange={editor.setPointsRequired}
         pointsToEarn={editor.pointsToEarn}
         onPointsToEarnChange={editor.setPointsToEarn}
+        allowCashPayment={editor.allowCashPayment}
+        onAllowCashPaymentChange={editor.setAllowCashPayment}
       />
 
       {/* === セクション4: 運用・公開設定 === */}

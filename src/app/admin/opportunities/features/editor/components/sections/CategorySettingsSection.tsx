@@ -1,6 +1,7 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import { Coins, Gift, Star } from "lucide-react";
 import {
   Item,
@@ -24,6 +25,8 @@ interface CategorySettingsSectionProps {
   onPointsRequiredChange: (value: number) => void;
   pointsToEarn: number;
   onPointsToEarnChange: (value: number) => void;
+  allowCashPayment: boolean;
+  onAllowCashPaymentChange: (value: boolean) => void;
 }
 
 export function CategorySettingsSection({
@@ -36,6 +39,8 @@ export function CategorySettingsSection({
   onPointsRequiredChange,
   pointsToEarn,
   onPointsToEarnChange,
+  allowCashPayment,
+  onAllowCashPaymentChange,
 }: CategorySettingsSectionProps) {
   const isActivity = category === GqlOpportunityCategory.Activity;
   const isQuest = category === GqlOpportunityCategory.Quest;
@@ -99,34 +104,10 @@ export function CategorySettingsSection({
 
       <ItemSeparator />
 
-      {/* Activity：料金・必要pt */}
+      {/* Activity：必要pt・現地決済・料金 */}
       {isActivity && (
         <>
-          <Item size="sm">
-            <ItemContent>
-              <ItemTitle>
-                <Coins className="h-3.5 w-3.5" />
-                1人あたりの必要料金
-              </ItemTitle>
-            </ItemContent>
-
-            <ItemActions>
-              <div className="flex items-center gap-2">
-                <Input
-                  type="number"
-                  min="0"
-                  value={feeInput.displayValue}
-                  onChange={feeInput.handleChange}
-                  onBlur={feeInput.handleBlur}
-                  className="w-24"
-                />
-                <span className="text-sm text-muted-foreground">円</span>
-              </div>
-            </ItemActions>
-          </Item>
-
-          <ItemSeparator />
-
+          {/* 必要pt（常に表示） */}
           <Item size="sm">
             <ItemContent>
               <ItemTitle>
@@ -149,6 +130,55 @@ export function CategorySettingsSection({
               </div>
             </ItemActions>
           </Item>
+
+          <ItemSeparator />
+
+          {/* 現地決済を許可する Switch */}
+          <Item size="sm">
+            <ItemContent>
+              <ItemTitle>現地決済を許可する</ItemTitle>
+              <p className="text-xs text-muted-foreground mt-1">
+                ONにすると、現金での支払いも可能になります
+              </p>
+            </ItemContent>
+
+            <ItemActions>
+              <Switch
+                checked={allowCashPayment}
+                onCheckedChange={onAllowCashPaymentChange}
+              />
+            </ItemActions>
+          </Item>
+
+          {/* 必要料金（Switch ON時のみ表示） */}
+          {allowCashPayment && (
+            <>
+              <ItemSeparator />
+
+              <Item size="sm">
+                <ItemContent>
+                  <ItemTitle>
+                    <Coins className="h-3.5 w-3.5" />
+                    1人あたりの必要料金
+                  </ItemTitle>
+                </ItemContent>
+
+                <ItemActions>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="number"
+                      min="0"
+                      value={feeInput.displayValue}
+                      onChange={feeInput.handleChange}
+                      onBlur={feeInput.handleBlur}
+                      className="w-24"
+                    />
+                    <span className="text-sm text-muted-foreground">円</span>
+                  </div>
+                </ItemActions>
+              </Item>
+            </>
+          )}
         </>
       )}
 
