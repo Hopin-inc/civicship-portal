@@ -150,7 +150,7 @@ export function RecurrenceSheet({
                 <ItemTitle>終了日</ItemTitle>
               </ItemContent>
 
-              <ItemActions className="min-w-[140px]">
+              <ItemActions>
                 <Select
                   value={hasEndDate ? "specified" : "none"}
                   onValueChange={(v) => setHasEndDate(v === "specified")}
