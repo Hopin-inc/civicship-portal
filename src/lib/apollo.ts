@@ -29,13 +29,32 @@ const requestLink = setContext(async (operation, prevContext) => {
   let authMode: "session" | "id_token" = isBrowser ? "id_token" : "session";
 
   if (isBrowser) {
-    const { firebaseUser } = useAuthStore.getState().state;
+    const { firebaseUser, authenticationState } = useAuthStore.getState().state;
 
+    // Mutation の場合は認証を厳格にチェック
+    const isMutation = operation.query.definitions.some(
+      (def) => def.kind === "OperationDefinition" && def.operation === "mutation"
+    );
+
+    if (isMutation) {
+      if (authenticationState === "loading") {
+        throw new Error("認証情報を読み込み中です。少し待ってから再度お試しください");
+      }
+
+      if (!firebaseUser) {
+        throw new Error("認証情報が取得できませんでした。ページをリロードしてください");
+      }
+    }
+
+    // firebaseUser がある場合はトークンを取得
     if (firebaseUser) {
       try {
         token = await firebaseUser.getIdToken();
       } catch (error) {
         logger.warn("Failed to get ID token", { error });
+        if (isMutation) {
+          throw new Error("認証トークンの取得に失敗しました");
+        }
       }
     }
   }
