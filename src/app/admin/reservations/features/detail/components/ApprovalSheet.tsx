@@ -50,9 +50,7 @@ const ApprovalSheet: React.FC<ApprovalSheetProps> = ({
     <div className="fixed bottom-0 left-0 right-0 max-w-mobile-l mx-auto p-6 bg-background border-t-2 border-b-card space-y-3">
       <Sheet open={isAcceptSheetOpen} onOpenChange={setIsAcceptSheetOpen}>
         <SheetTrigger asChild>
-          <Button className="w-full" variant="primary" size="lg">
-            申込を承認する
-          </Button>
+          <Button className="w-full">申込を承認する</Button>
         </SheetTrigger>
         <SheetContent side="bottom" className="rounded-t-3xl max-w-md mx-auto p-8">
           <SheetHeader className="text-left pb-6">
