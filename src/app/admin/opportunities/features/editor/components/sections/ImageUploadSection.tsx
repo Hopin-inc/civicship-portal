@@ -33,7 +33,8 @@ export const ImageUploadSection = ({
                   <img
                     src={img.url}
                     alt={`画像 ${index + 1}`}
-                    className="aspect-square w-full rounded-md object-cover"
+                    className="aspect-square w-full rounded-md object-cover bg-muted"
+                    loading="lazy"
                   />
 
                   {/* 削除ボタン */}
