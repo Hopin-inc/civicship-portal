@@ -116,15 +116,24 @@ export async function autoCompleteAddress(
   const statesData = await searchStates({
     variables: { first: 50 },
   });
-  logger.debug("[autoCompleteAddress] States data:", statesData);
-  logger.debug("[autoCompleteAddress] States data.data:", statesData?.data);
-  logger.debug("[autoCompleteAddress] States edges:", statesData?.data?.states?.edges);
+  logger.info("[autoCompleteAddress] States query result:", {
+    hasData: !!statesData?.data,
+    hasStates: !!statesData?.data?.states,
+    hasEdges: !!statesData?.data?.states?.edges,
+    edgesLength: statesData?.data?.states?.edges?.length,
+    hasErrors: !!statesData?.errors,
+    errors: statesData?.errors,
+  });
 
   const states: State[] = statesData?.data?.states?.edges
     ?.map((edge: any) => edge?.node)
     .filter(Boolean) || [];
 
-  logger.debug("[autoCompleteAddress] States count:", states.length);
+  logger.info("[autoCompleteAddress] States parsed:", {
+    count: states.length,
+    looking_for: result.address1,
+    sample: states.slice(0, 3).map(s => s.name),
+  });
 
   const matchedState = matchPrefecture(result.address1, states);
 
