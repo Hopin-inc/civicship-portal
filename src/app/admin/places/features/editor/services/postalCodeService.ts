@@ -132,10 +132,10 @@ export async function autoCompleteAddress(
     logger.debug("[autoCompleteAddress] Matched state:", matchedState);
     autoCompleteResult.stateCode = matchedState.code;
     autoCompleteResult.stateName = matchedState.name;
-    logger.info(`都道府県「${matchedState.name}」を自動選択しました`);
+    logger.info(`State auto-selected: ${matchedState.name} (${matchedState.code})`);
     toast.success(`都道府県「${matchedState.name}」を自動選択しました`);
   } else {
-    logger.warn("[autoCompleteAddress] No state matched for:", result.address1);
+    logger.warn(`No state matched for: ${result.address1}`);
     toast.warning("都道府県を自動選択できませんでした。手動で選択してください");
   }
 
@@ -164,11 +164,11 @@ export async function autoCompleteAddress(
     autoCompleteResult.cityName = matchResult.city.name;
 
     if (matchResult.isPrefectureMatched) {
-      logger.info(`市区町村「${matchResult.city.name}」を自動選択しました`);
+      logger.info(`City auto-selected: ${matchResult.city.name} (${matchResult.city.code})`);
       toast.success(`市区町村「${matchResult.city.name}」を自動選択しました`);
     } else {
       logger.warn(
-        `市区町村「${matchResult.city.name}」を選択しました（都道府県不一致）`
+        `City selected without prefecture match: ${matchResult.city.name} (${matchResult.city.code})`
       );
       toast.warning(
         `市区町村「${matchResult.city.name}」を選択しました。正しいか確認してください`,
@@ -176,7 +176,7 @@ export async function autoCompleteAddress(
       );
     }
   } else {
-    logger.warn("[autoCompleteAddress] No city matched for:", result.address2);
+    logger.warn(`No city matched for: ${result.address2}`);
     toast.warning("市区町村を自動選択できませんでした。手動で選択してください");
   }
 
