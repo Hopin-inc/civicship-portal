@@ -68,6 +68,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
       {shouldShowBackButton && (
         isInLine ? (
           <Button onClick={handleBackButton} variant="ghost" size="sm" className="no-underline">
+            <ChevronLeft className="h-5 w-5 mr-1" />
             戻る
           </Button>
         ) : (

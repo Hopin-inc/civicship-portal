@@ -89,7 +89,7 @@ export function PlaceFormSection({
         <Input
           value={name}
           onChange={(e) => onNameChange(e.target.value)}
-          placeholder="例: シビックシップラボ"
+          placeholder="場所を入力して下さい"
           className={`placeholder:text-sm ${errors?.name ? "border-destructive focus-visible:ring-destructive" : ""}`}
           required
         />
