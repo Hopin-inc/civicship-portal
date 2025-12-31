@@ -5,6 +5,7 @@
 import { toast } from "react-toastify";
 import { matchPrefecture, matchCity } from "./addressService";
 import { GqlSortDirection } from "@/types/graphql";
+import { logger } from "@/lib/logging";
 
 export interface PostalCodeResult {
   address1: string; // 都道府県
@@ -94,51 +95,52 @@ export async function autoCompleteAddress(
   searchStates: (variables: any) => Promise<any>,
   searchCities: (variables: any) => Promise<any>
 ): Promise<AutoCompleteResult | null> {
-  console.log("[autoCompleteAddress] Start:", postalCode);
+  logger.debug("[autoCompleteAddress] Start:", postalCode);
 
   // 1. zipcloud APIで住所を取得
   const result = await fetchAddressByPostalCode(postalCode);
 
   if (!result) {
-    console.log("[autoCompleteAddress] No result from zipcloud");
+    logger.debug("[autoCompleteAddress] No result from zipcloud");
     return null;
   }
 
-  console.log("[autoCompleteAddress] Zipcloud result:", result);
+  logger.debug("[autoCompleteAddress] Zipcloud result:", result);
 
   const autoCompleteResult: AutoCompleteResult = {
     streetAddress: result.address3,
   };
 
   // 2. 都道府県を検索
-  console.log("[autoCompleteAddress] Searching states...");
+  logger.debug("[autoCompleteAddress] Searching states...");
   const statesData = await searchStates({
     variables: { first: 50 },
   });
-  console.log("[autoCompleteAddress] States data:", statesData);
-  console.log("[autoCompleteAddress] States data.data:", statesData?.data);
-  console.log("[autoCompleteAddress] States edges:", statesData?.data?.states?.edges);
+  logger.debug("[autoCompleteAddress] States data:", statesData);
+  logger.debug("[autoCompleteAddress] States data.data:", statesData?.data);
+  logger.debug("[autoCompleteAddress] States edges:", statesData?.data?.states?.edges);
 
   const states: State[] = statesData?.data?.states?.edges
     ?.map((edge: any) => edge?.node)
     .filter(Boolean) || [];
 
-  console.log("[autoCompleteAddress] States count:", states.length);
+  logger.debug("[autoCompleteAddress] States count:", states.length);
 
   const matchedState = matchPrefecture(result.address1, states);
 
   if (matchedState) {
-    console.log("[autoCompleteAddress] Matched state:", matchedState);
+    logger.debug("[autoCompleteAddress] Matched state:", matchedState);
     autoCompleteResult.stateCode = matchedState.code;
     autoCompleteResult.stateName = matchedState.name;
+    logger.info(`State auto-selected: ${matchedState.name} (${matchedState.code})`);
     toast.success(`都道府県「${matchedState.name}」を自動選択しました`);
   } else {
-    console.log("[autoCompleteAddress] No state matched for:", result.address1);
+    logger.warn(`No state matched for: ${result.address1}`);
     toast.warning("都道府県を自動選択できませんでした。手動で選択してください");
   }
 
   // 3. 市区町村を検索
-  console.log("[autoCompleteAddress] Searching cities...");
+  logger.debug("[autoCompleteAddress] Searching cities...");
   const citiesData = await searchCities({
     variables: {
       filter: { name: result.address2 },
@@ -146,34 +148,38 @@ export async function autoCompleteAddress(
       sort: { code: GqlSortDirection.Asc },
     },
   });
-  console.log("[autoCompleteAddress] Cities data:", citiesData);
+  logger.debug("[autoCompleteAddress] Cities data:", citiesData);
 
   const cities: City[] = citiesData?.data?.cities?.edges
     ?.map((edge: any) => edge?.node)
     .filter(Boolean) || [];
 
-  console.log("[autoCompleteAddress] Cities count:", cities.length);
+  logger.debug("[autoCompleteAddress] Cities count:", cities.length);
 
   const matchResult = matchCity(result.address2, cities, result.address1);
 
   if (matchResult) {
-    console.log("[autoCompleteAddress] Matched city:", matchResult);
+    logger.debug("[autoCompleteAddress] Matched city:", matchResult);
     autoCompleteResult.cityCode = matchResult.city.code;
     autoCompleteResult.cityName = matchResult.city.name;
 
     if (matchResult.isPrefectureMatched) {
+      logger.info(`City auto-selected: ${matchResult.city.name} (${matchResult.city.code})`);
       toast.success(`市区町村「${matchResult.city.name}」を自動選択しました`);
     } else {
+      logger.warn(
+        `City selected without prefecture match: ${matchResult.city.name} (${matchResult.city.code})`
+      );
       toast.warning(
         `市区町村「${matchResult.city.name}」を選択しました。正しいか確認してください`,
         { autoClose: 5000 }
       );
     }
   } else {
-    console.log("[autoCompleteAddress] No city matched for:", result.address2);
+    logger.warn(`No city matched for: ${result.address2}`);
     toast.warning("市区町村を自動選択できませんでした。手動で選択してください");
   }
 
-  console.log("[autoCompleteAddress] Final result:", autoCompleteResult);
+  logger.debug("[autoCompleteAddress] Final result:", autoCompleteResult);
   return autoCompleteResult;
 }
