@@ -116,6 +116,8 @@ export async function autoCompleteAddress(
     variables: { first: 50 },
   });
   console.log("[autoCompleteAddress] States data:", statesData);
+  console.log("[autoCompleteAddress] States data.data:", statesData?.data);
+  console.log("[autoCompleteAddress] States edges:", statesData?.data?.states?.edges);
 
   const states: State[] = statesData?.data?.states?.edges
     ?.map((edge: any) => edge?.node)
