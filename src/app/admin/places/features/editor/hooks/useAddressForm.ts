@@ -7,6 +7,7 @@ import { useState, useCallback } from "react";
 import { useLazyQuery } from "@apollo/client";
 import { GET_CITIES, GET_STATES } from "../queries";
 import { autoCompleteAddress } from "../services/postalCodeService";
+import { logger } from "@/lib/logging";
 
 interface AddressFormState {
   stateCode: string;
@@ -103,50 +104,50 @@ export const useAddressForm = (options: UseAddressFormOptions = {}) => {
     setPostalCodeSearching(true);
 
     try {
-      console.log("[useAddressForm] Starting postal code search:", postalCode);
+      logger.debug("[useAddressForm] Starting postal code search:", postalCode);
       const result = await autoCompleteAddress(
         postalCode,
         searchStates,
         searchCities
       );
 
-      console.log("[useAddressForm] AutoComplete result:", result);
+      logger.debug("[useAddressForm] AutoComplete result:", result);
 
       if (!result) {
-        console.log("[useAddressForm] No result");
+        logger.debug("[useAddressForm] No result");
         alert("郵便番号から住所を取得できませんでした");
         return;
       }
 
       // 結果を反映
       if (result.stateCode && result.stateName) {
-        console.log("[useAddressForm] Applying state:", result.stateCode, result.stateName);
+        logger.debug("[useAddressForm] Applying state:", result.stateCode, result.stateName);
         updateAddressField("stateCode", result.stateCode);
         updateAddressField("stateName", result.stateName);
         setShowStateSelector(false);
       } else {
-        console.log("[useAddressForm] No state result");
+        logger.debug("[useAddressForm] No state result");
         setShowStateSelector(true);
       }
 
       if (result.cityCode && result.cityName) {
-        console.log("[useAddressForm] Applying city:", result.cityCode, result.cityName);
+        logger.debug("[useAddressForm] Applying city:", result.cityCode, result.cityName);
         updateAddressField("cityCode", result.cityCode);
         updateAddressField("cityName", result.cityName);
         setShowCitySelector(false);
       } else {
-        console.log("[useAddressForm] No city result");
+        logger.debug("[useAddressForm] No city result");
         setShowCitySelector(true);
       }
 
-      console.log("[useAddressForm] Applying street address:", result.streetAddress);
+      logger.debug("[useAddressForm] Applying street address:", result.streetAddress);
       updateAddressField("streetAddress", result.streetAddress);
 
       // 住所変更を通知
       onAddressChange?.();
-      console.log("[useAddressForm] Address change notified");
+      logger.debug("[useAddressForm] Address change notified");
     } catch (error) {
-      console.error("Postal code search error:", error);
+      logger.error("Postal code search error:", error);
       alert("郵便番号検索中にエラーが発生しました");
     } finally {
       setPostalCodeSearching(false);
