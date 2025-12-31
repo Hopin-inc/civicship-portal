@@ -61,6 +61,7 @@ export const useOpportunitySave = ({
         description,
         requireHostApproval,
         publishStatus,
+        allowCashPayment,
       } = formState;
 
       // Tier 1: 必須項目のバリデーション
@@ -112,7 +113,7 @@ export const useOpportunitySave = ({
       const isActivity = category === GqlOpportunityCategory.Activity;
       const categorySpecificInput = isActivity
         ? {
-            feeRequired,
+            feeRequired: allowCashPayment ? feeRequired : 0,
             pointsRequired,
             pointsToEarn: undefined,
           }

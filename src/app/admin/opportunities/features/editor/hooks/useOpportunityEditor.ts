@@ -72,6 +72,8 @@ export const useOpportunityEditor = ({
     setPointsRequired: formState.setPointsRequired,
     pointsToEarn: formState.pointsToEarn,
     setPointsToEarn: formState.setPointsToEarn,
+    allowCashPayment: formState.allowCashPayment,
+    setAllowCashPayment: formState.setAllowCashPayment,
 
     // 公開設定
     publishStatus: formState.publishStatus,

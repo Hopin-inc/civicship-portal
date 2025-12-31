@@ -85,14 +85,14 @@ export function RecurrenceSheet({
         side="bottom"
         className="rounded-t-3xl w-full max-w-[calc(100%-2rem)] sm:max-w-2xl mx-auto overflow-y-auto max-h-[80vh]"
       >
-        <SheetHeader className="text-left pb-6 px-8 pt-8">
+        <SheetHeader className="text-left pb-6 px-4 pt-8">
           <SheetTitle className="text-title-sm">繰り返し</SheetTitle>
           <p className="text-body-sm text-muted-foreground pt-2">
             同じ時間帯の開催枠をまとめて作成します
           </p>
         </SheetHeader>
 
-        <div className="px-8 pb-8">
+        <div className="px-4 pb-8">
           <ItemGroup className="border rounded-lg">
             {/* 繰り返し種別 */}
             <Item size="sm">
@@ -165,6 +165,20 @@ export function RecurrenceSheet({
                 </Select>
               </ItemActions>
             </Item>
+
+            {/* 終了日指定しない場合の補足 */}
+            {!hasEndDate && (
+              <>
+                <ItemSeparator />
+                <Item size="sm" variant="muted">
+                  <ItemContent>
+                    <p className="text-body-sm text-muted-foreground">
+                      ※ 向こう3ヶ月分の開催枠が作成されます
+                    </p>
+                  </ItemContent>
+                </Item>
+              </>
+            )}
 
             {/* 日付入力（指定する場合のみ） */}
             {hasEndDate && (
@@ -241,7 +255,7 @@ export function RecurrenceSheet({
         {/* ボタンエリア */}
         <div className="sticky bottom-0 bg-background border-t p-4 flex gap-3">
           <Button type="button" variant="text" size="md" onClick={handleCancel} className="flex-1">
-            やめる
+            キャンセル
           </Button>
           <Button
             type="button"

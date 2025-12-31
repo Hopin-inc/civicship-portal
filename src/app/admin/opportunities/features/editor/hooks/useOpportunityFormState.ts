@@ -37,6 +37,8 @@ export type OpportunityFormState = {
   setPointsRequired: (value: number) => void;
   pointsToEarn: number;
   setPointsToEarn: (value: number) => void;
+  allowCashPayment: boolean;
+  setAllowCashPayment: (value: boolean) => void;
 
   // 公開設定
   publishStatus: GqlPublishStatus;
@@ -93,6 +95,9 @@ export const useOpportunityFormState = (
   const [feeRequired, setFeeRequired] = useState(initialData?.feeRequired ?? 0);
   const [pointsRequired, setPointsRequired] = useState(initialData?.pointsRequired ?? 0);
   const [pointsToEarn, setPointsToEarn] = useState(initialData?.pointsToEarn ?? 0);
+  const [allowCashPayment, setAllowCashPayment] = useState(
+    (initialData?.feeRequired ?? 0) > 0
+  );
 
   // 公開設定
   const [publishStatus, setPublishStatus] = useState<GqlPublishStatus>(
@@ -127,6 +132,8 @@ export const useOpportunityFormState = (
     setPointsRequired,
     pointsToEarn,
     setPointsToEarn,
+    allowCashPayment,
+    setAllowCashPayment,
 
     // 公開設定
     publishStatus,
