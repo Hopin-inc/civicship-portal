@@ -85,14 +85,14 @@ export function RecurrenceSheet({
         side="bottom"
         className="rounded-t-3xl w-full max-w-[calc(100%-2rem)] sm:max-w-2xl mx-auto overflow-y-auto max-h-[80vh]"
       >
-        <SheetHeader className="text-left pb-6 px-8 pt-8">
+        <SheetHeader className="text-left pb-6 px-4 pt-8">
           <SheetTitle className="text-title-sm">繰り返し</SheetTitle>
           <p className="text-body-sm text-muted-foreground pt-2">
             同じ時間帯の開催枠をまとめて作成します
           </p>
         </SheetHeader>
 
-        <div className="px-8 pb-8">
+        <div className="px-4 pb-8">
           <ItemGroup className="border rounded-lg">
             {/* 繰り返し種別 */}
             <Item size="sm">
