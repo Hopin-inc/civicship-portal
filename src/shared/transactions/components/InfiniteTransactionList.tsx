@@ -37,7 +37,7 @@ export const InfiniteTransactionList = ({
   });
 
   return (
-    <div className="divide-y-8 divide-zinc-100">
+    <div className="timeline-container">
       {transactions.map((transaction) => {
         const image = perspectiveWalletId
           ? getCounterpartyImage(transaction, perspectiveWalletId)
