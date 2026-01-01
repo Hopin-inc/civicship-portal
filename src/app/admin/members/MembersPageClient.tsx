@@ -86,7 +86,7 @@ export default function MembersPageClient({ initialConnection }: MembersPageClie
         return false;
       }
       toast.success("権限を更新しました");
-      window.location.reload();
+      refetch();
       return true;
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "不明なエラーが発生しました");
