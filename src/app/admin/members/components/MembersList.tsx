@@ -30,7 +30,7 @@ interface MembersListProps {
   hasNextPage: boolean;
   isFetchingMore: boolean;
   loadMoreRef: React.Ref<HTMLDivElement>;
-  onRoleChange: (userId: string, userName: string, newRole: GqlRole) => Promise<boolean>;
+  onRoleChange: (userId: string, newRole: GqlRole) => Promise<boolean>;
 }
 
 export function MembersList({
@@ -54,7 +54,7 @@ export function MembersList({
     if (!targetMember) return;
 
     setIsSubmitting(true);
-    const success = await onRoleChange(targetMember.id, targetMember.name, newRole);
+    const success = await onRoleChange(targetMember.id, newRole);
     setIsSubmitting(false);
 
     if (success) {
@@ -152,6 +152,7 @@ export function MembersList({
         open={!!targetMember}
         onClose={() => setTargetMember(null)}
         onConfirm={handleConfirm}
+        isSubmitting={isSubmitting}
       />
     </>
   );

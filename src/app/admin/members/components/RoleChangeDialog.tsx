@@ -32,9 +32,10 @@ interface RoleChangeDialogProps {
   open: boolean;
   onClose: () => void;
   onConfirm: (newRole: GqlRole) => void;
+  isSubmitting?: boolean;
 }
 
-export function RoleChangeDialog({ member, open, onClose, onConfirm }: RoleChangeDialogProps) {
+export function RoleChangeDialog({ member, open, onClose, onConfirm, isSubmitting = false }: RoleChangeDialogProps) {
   const [selectedRole, setSelectedRole] = useState<GqlRole | null>(null);
 
   // member が変わったら初期選択をリセット
@@ -93,10 +94,10 @@ export function RoleChangeDialog({ member, open, onClose, onConfirm }: RoleChang
           <Button
             variant="primary"
             onClick={handleConfirm}
-            disabled={!hasChanged}
+            disabled={!hasChanged || isSubmitting}
             className="w-full py-4"
           >
-            変更する
+            {isSubmitting ? "変更中..." : "変更する"}
           </Button>
         </DialogFooter>
       </DialogContent>
