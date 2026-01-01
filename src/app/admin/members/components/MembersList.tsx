@@ -19,29 +19,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { MoreVertical } from "lucide-react";
 import { presentMember } from "../presenters/presentMember";
 import { PresentedMember } from "../presenters/types";
-
-const ROLE_OPTIONS: { value: GqlRole; label: string }[] = [
-  { value: GqlRole.Owner, label: "管理者" },
-  { value: GqlRole.Manager, label: "運用担当者" },
-  { value: GqlRole.Member, label: "参加者" },
-];
+import { RoleChangeDialog } from "./RoleChangeDialog";
 
 interface MembersListProps {
   members: GqlUser[];
@@ -62,7 +43,6 @@ export function MembersList({
 }: MembersListProps) {
   const router = useRouter();
   const [targetMember, setTargetMember] = useState<PresentedMember | null>(null);
-  const [selectedRole, setSelectedRole] = useState<GqlRole | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // GraphQL → Presented への変換
@@ -70,23 +50,15 @@ export function MembersList({
 
   const isOwner = currentUserRole === GqlRole.Owner;
 
-  // ダイアログが開いたら現在のロールをセット
-  React.useEffect(() => {
-    if (targetMember) {
-      setSelectedRole(targetMember.roleValue);
-    }
-  }, [targetMember]);
+  const handleConfirm = async (newRole: GqlRole) => {
+    if (!targetMember) return;
 
-  const handleRoleChangeClick = async () => {
-    if (targetMember && selectedRole && selectedRole !== targetMember.roleValue) {
-      setIsSubmitting(true);
-      const success = await onRoleChange(targetMember.id, targetMember.name, selectedRole);
-      setIsSubmitting(false);
+    setIsSubmitting(true);
+    const success = await onRoleChange(targetMember.id, targetMember.name, newRole);
+    setIsSubmitting(false);
 
-      if (success) {
-        setTargetMember(null);
-        setSelectedRole(null);
-      }
+    if (success) {
+      setTargetMember(null);
     }
   };
 
@@ -175,52 +147,12 @@ export function MembersList({
         )}
       </div>
 
-      <Dialog open={!!targetMember} onOpenChange={(open) => !open && setTargetMember(null)}>
-        <DialogContent className="w-[90vw] max-w-[400px]">
-          <DialogHeader>
-            <DialogTitle className="text-left">権限を変更</DialogTitle>
-            <DialogDescription className="text-left">
-              {targetMember && (
-                <>
-                  <strong>{targetMember.name}</strong> の権限を変更します
-                </>
-              )}
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="py-4">
-            <label className="text-label-sm font-bold mb-2 block">新しい権限</label>
-            <Select
-              value={selectedRole ?? undefined}
-              onValueChange={(value) => setSelectedRole(value as GqlRole)}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="権限を選択" />
-              </SelectTrigger>
-              <SelectContent>
-                {ROLE_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex gap-2 justify-end">
-            <Button variant="tertiary" onClick={() => setTargetMember(null)} disabled={isSubmitting}>
-              キャンセル
-            </Button>
-            <Button
-              variant="primary"
-              onClick={handleRoleChangeClick}
-              disabled={!selectedRole || selectedRole === targetMember?.roleValue || isSubmitting}
-            >
-              {isSubmitting ? "変更中..." : "変更する"}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <RoleChangeDialog
+        member={targetMember}
+        open={!!targetMember}
+        onClose={() => setTargetMember(null)}
+        onConfirm={handleConfirm}
+      />
     </>
   );
 }
