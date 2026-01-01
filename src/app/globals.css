@@ -531,3 +531,12 @@ li {
   color: hsl(var(--card-foreground));
   border-color: hsl(var(--border));
 }
+
+/* Transaction Timeline Styles */
+.timeline-container .timeline-item:first-child .timeline-rail-top {
+  display: none;
+}
+
+.timeline-container .timeline-item:last-child .timeline-rail-bottom {
+  display: none;
+}

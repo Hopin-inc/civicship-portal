@@ -49,5 +49,14 @@
   "transactions.parts.action.grant.from.received.action": "から支給",
   "transactions.parts.action.payment.from.received.action": "から支払い",
   "transactions.parts.action.return.from.received.action": "から返品",
-  "transactions.parts.action.refund.from.received.action": "から返金"
+  "transactions.parts.action.refund.from.received.action": "から返金",
+  "transactions.timeline.action.ja": "{recipient}に{amount}を{action}",
+  "transactions.timeline.action.en": "{action} {amount} to {recipient}",
+  "transactions.timeline.actionType.donation": "贈りました",
+  "transactions.timeline.actionType.grant": "支給しました",
+  "transactions.timeline.actionType.payment": "支払いました",
+  "transactions.timeline.actionType.return": "返品しました",
+  "transactions.timeline.actionType.refund": "返金しました",
+  "transactions.timeline.special.issued": "{amount}が発行されました",
+  "transactions.timeline.special.onboarding": "{amount}の登録ボーナスを受け取りました"
 }

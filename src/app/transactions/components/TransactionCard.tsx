@@ -3,19 +3,20 @@
 import { GqlTransaction } from "@/types/graphql";
 import { useTranslations, useLocale } from "next-intl";
 import { useLocaleDateTimeFormat } from "@/utils/i18n";
-import { TransactionCardBase } from "@/shared/transactions/components/TransactionCardBase";
-import { formatTransactionDescription, getTransactionInfo } from "@/shared/transactions/utils/format";
+import { getTransactionInfo } from "@/shared/transactions/utils/format";
 import { computeProfileHref } from "@/shared/transactions/utils/navigation";
-import { getStatusLabel } from "@/shared/transactions/utils/statusLabel";
-import { computeCardProps } from "@/shared/transactions/utils/cardProps";
+import { formatActionLabelForTimeline } from "@/shared/transactions/utils/timelineFormat";
+import { formatCurrency } from "@/utils/transaction";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { TransactionTimelineItem } from "@/shared/transactions/components/timeline/TransactionTimelineItem";
+import { TransactionHeader } from "@/shared/transactions/components/timeline/TransactionHeader";
+import { TransactionActionLabel } from "@/shared/transactions/components/timeline/TransactionActionLabel";
+import { TransactionMessageCard } from "@/shared/transactions/components/timeline/TransactionMessageCard";
 
 interface TransactionCardProps {
   transaction: GqlTransaction;
   image?: string;
   perspectiveWalletId?: string;
-  showSignedAmount?: boolean;
-  showDid?: boolean;
-  useReceivedPhrasing?: boolean;
   enableClickNavigation?: boolean;
 }
 
@@ -23,57 +24,63 @@ export const TransactionCard = ({
   transaction,
   image,
   perspectiveWalletId,
-  showSignedAmount = false,
-  showDid = false,
-  useReceivedPhrasing = false,
   enableClickNavigation = false,
 }: TransactionCardProps) => {
   const t = useTranslations();
   const locale = useLocale();
   const formatDateTime = useLocaleDateTimeFormat();
   const info = getTransactionInfo(transaction, perspectiveWalletId);
-  
-  const { displayName, displayAction, to } = formatTransactionDescription(
-    info.reason,
-    info.from,
-    info.to,
-    t,
-    {
-      transaction,
-      perspectiveWalletId,
-      useReceivedPhrasing,
-      locale,
-    },
-  );
 
-  const statusLabelElement = getStatusLabel(info.reason, t);
-  
-  const { hasDestination, amountClassName, formattedAmount, truncatedDidValue } = computeCardProps({
-    transaction,
-    perspectiveWalletId,
-    showSignedAmount,
-    showDid,
-    info,
-    to,
+  // /transactions では perspectiveWalletId が undefined なので、常に fromUser の視点
+  const displayName = info.from;
+  const recipientName = info.to;
+  const formattedAmount = `${formatCurrency(Math.abs(info.amount))}pt`;
+
+  // ActionLabel の生成
+  const actionLabelText = formatActionLabelForTimeline({
+    reason: info.reason,
+    recipientName,
+    amount: formattedAmount,
+    locale,
+    t,
   });
 
   const profileHref = enableClickNavigation
     ? computeProfileHref(transaction, { perspectiveWalletId })
     : null;
 
-  return (
-    <TransactionCardBase
-      image={image}
+  // Avatar コンポーネント
+  const avatarElement = (
+    <Avatar className="h-10 w-10 shrink-0">
+      <AvatarImage src={image} alt={displayName} />
+      <AvatarFallback>U</AvatarFallback>
+    </Avatar>
+  );
+
+  // Header コンポーネント
+  const headerElement = (
+    <TransactionHeader
       displayName={displayName}
-      displayAction={displayAction}
-      amount={formattedAmount}
-      amountClassName={amountClassName}
-      statusLabel={statusLabelElement}
-      hasDestination={hasDestination}
-      destinationName={to}
-      didValue={truncatedDidValue}
-      comment={info.comment}
       formattedDateTime={formatDateTime(info.transferredAt)}
+    />
+  );
+
+  // ActionLabel コンポーネント
+  const actionLabelElement = (
+    <TransactionActionLabel text={actionLabelText} />
+  );
+
+  // MessageCard コンポーネント（コメントがある場合のみ）
+  const messageCardElement = info.comment ? (
+    <TransactionMessageCard comment={info.comment} />
+  ) : undefined;
+
+  return (
+    <TransactionTimelineItem
+      avatar={avatarElement}
+      header={headerElement}
+      actionLabel={actionLabelElement}
+      messageCard={messageCardElement}
       profileHref={profileHref}
     />
   );
