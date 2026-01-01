@@ -44,7 +44,7 @@ const CancelReservationSheet: React.FC<CancelReservationSheetProps> = ({
         <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
           <SheetTrigger asChild>
             <div className="fixed bottom-0 left-0 right-0 max-w-mobile-l mx-auto p-4 bg-background border-t-2 border-b-card space-y-3 min-h-[140px]">
-              <Button className="w-full" size="lg" variant="destructive" disabled={cancelLoading}>
+              <Button className="w-full" variant="destructive" disabled={cancelLoading}>
                 {cancelLoading ? "処理中..." : "開催中止"}
               </Button>
               <p className="text-sm text-muted-foreground text-center">

@@ -94,11 +94,7 @@ const AttendanceList: React.FC<AttendanceListProps> = ({
             <SheetTrigger asChild>
               {participations.length > 0 && !isSaved && (
                 <div className="fixed bottom-0 left-0 right-0 max-w-mobile-l mx-auto p-4 bg-background border-t-2 border-b-card space-y-3 z-50">
-                  <Button
-                    className="w-full py-4"
-                    size="lg"
-                    disabled={isSaving || isInsufficientBalance}
-                  >
+                  <Button className="w-full py-4" disabled={isSaving || isInsufficientBalance}>
                     {isSaving ? "保存中…" : "出欠を保存する"}
                   </Button>
                 </div>

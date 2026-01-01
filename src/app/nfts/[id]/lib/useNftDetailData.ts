@@ -7,7 +7,6 @@ import {
 import {
   detectChain,
   detectChainFromAddress,
-  extractCardanoAssetNameHex,
   getChainDisplayName,
   getExplorerUrl,
 } from "./blockchainExplorer";
@@ -50,7 +49,7 @@ export function useNftDetailData(nftInstance: GqlGetNftInstanceWithDidQuery["nft
     const chain = detectChain(basic.tokenType) || detectChainFromAddress(basic.contractAddress);
     const chainDisplayName = chain ? getChainDisplayName(chain) : undefined;
     const assetNameHex =
-      chain === "cardano" ? extractCardanoAssetNameHex(basic.instanceJson) : undefined;
+      chain === "cardano" && basic.instanceId ? basic.instanceId.split("-")[1] : undefined;
     const explorerUrl =
       chain && basic.contractAddress
         ? getExplorerUrl({

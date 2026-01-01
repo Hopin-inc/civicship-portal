@@ -44,8 +44,8 @@ export function OperationSection({
       <Item size="sm">
         <ItemContent>
           <ItemTitle>承認が必要</ItemTitle>
-          <ItemDescription>
-            オンにすると、参加者の申込みを主催者が承認するまで確定しません
+          <ItemDescription className="text-xs text-muted-foreground">
+            参加者の申込みに、主催者の承認を必要とするかどうかを設定します
           </ItemDescription>
         </ItemContent>
 
@@ -60,7 +60,9 @@ export function OperationSection({
       <Item size="sm">
         <ItemContent>
           <ItemTitle>公開設定</ItemTitle>
-          <ItemDescription>下書きは主催者と運用担当者のみ閲覧できます</ItemDescription>
+          <ItemDescription className="text-xs text-muted-foreground">
+            内容を公開するか、下書きとして非公開にするかを設定します
+          </ItemDescription>
         </ItemContent>
 
         <ItemActions className="min-w-[140px]">

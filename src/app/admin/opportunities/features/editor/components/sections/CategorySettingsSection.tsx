@@ -137,16 +137,11 @@ export function CategorySettingsSection({
           <Item size="sm">
             <ItemContent>
               <ItemTitle>現地決済を許可する</ItemTitle>
-              <p className="text-xs text-muted-foreground mt-1">
-                ONにすると、現金での支払いも可能になります
-              </p>
+              <p className="text-xs text-muted-foreground mt-1">現金での支払いが可能になります</p>
             </ItemContent>
 
             <ItemActions>
-              <Switch
-                checked={allowCashPayment}
-                onCheckedChange={onAllowCashPaymentChange}
-              />
+              <Switch checked={allowCashPayment} onCheckedChange={onAllowCashPaymentChange} />
             </ItemActions>
           </Item>
 
