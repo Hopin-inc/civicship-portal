@@ -23,7 +23,7 @@ export const TransactionTimelineItem = ({
       {/* Timeline Rail - 縦線 + Avatar */}
       <div className="relative flex flex-col items-center">
         {/* 上側の線（CSSで制御） */}
-        <div className="absolute top-0 bottom-1/2 w-px bg-border/30 timeline-rail-top" />
+        <div className="absolute top-0 bottom-1/2 w-0.5 bg-border timeline-rail-top" />
 
         {/* Avatar（z-indexで線の上に表示） */}
         <div className="relative z-10">
@@ -31,7 +31,7 @@ export const TransactionTimelineItem = ({
         </div>
 
         {/* 下側の線（CSSで制御） */}
-        <div className="absolute top-1/2 bottom-0 w-px bg-border/30 timeline-rail-bottom" />
+        <div className="absolute top-1/2 bottom-0 w-0.5 bg-border timeline-rail-bottom" />
       </div>
 
       {/* Content エリア */}
