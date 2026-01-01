@@ -1,7 +1,6 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, MapPin } from "lucide-react";
 import {
@@ -10,7 +9,6 @@ import {
   ItemContent,
   ItemDescription,
   ItemGroup,
-  ItemSeparator,
   ItemTitle,
 } from "@/components/ui/item";
 import AddressMap from "@/components/shared/AddressMap";

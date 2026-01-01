@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react";
 import dayjs from "dayjs";
 import { RecurrenceError, RecurrenceInput, RecurrenceSettings, RecurrenceType } from "../types/recurrence";
-import { SlotData } from "../../shared/types/slot";
 import { generateRecurrenceSlots } from "../utils/recurrenceGenerator";
 
 interface UseRecurrenceStateProps {

@@ -40,7 +40,6 @@ export function MapConfirmSheet({
   const [position, setPosition] = useState<{ lat: number; lng: number } | null>(null);
   const [geocoded, setGeocoded] = useState(false);
   const [geocodeFailed, setGeocodeFailed] = useState(false);
-  const [geocodeResult, setGeocodeResult] = useState<google.maps.GeocoderResult | null>(null);
 
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
@@ -65,7 +64,6 @@ export function MapConfirmSheet({
       setGeocoded(false);
       setGeocodeFailed(false);
       setPosition(null);
-      setGeocodeResult(null);
       return;
     }
 
