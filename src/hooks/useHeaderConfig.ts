@@ -5,12 +5,14 @@ import { useHeader } from '@/components/providers/HeaderProvider';
 
 type HeaderConfig = {
   hideHeader?: boolean;
+  hideFooter?: boolean;
   title?: string;
   showBackButton?: boolean;
   showLogo?: boolean;
   showSearchForm?: boolean;
   action?: React.ReactNode;
   backTo?: string;
+  onBackClick?: () => void;
   searchParams?: {
     location?: string;
     from?: string;

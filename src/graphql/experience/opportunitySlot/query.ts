@@ -93,3 +93,15 @@ export const GET_OPPORTUNITY_SLOT_WITH_PARTICIPATIONS = gql`
   ${SLOT_FRAGMENT}
   ${OPPORTUNITY_FRAGMENT}
 `;
+
+export const GET_SLOT_RESERVATIONS = gql`
+  query GetSlotReservations($slotId: ID!) {
+    opportunitySlot(id: $slotId) {
+      id
+      reservations {
+        id
+        status
+      }
+    }
+  }
+`;
