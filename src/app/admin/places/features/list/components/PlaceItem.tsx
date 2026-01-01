@@ -1,9 +1,8 @@
 "use client";
 
-import { Item, ItemActions, ItemContent, ItemTitle, ItemDescription } from "@/components/ui/item";
+import { Item, ItemContent, ItemTitle, ItemDescription } from "@/components/ui/item";
 import { PlaceData } from "../../shared/types/place";
 import { PlaceCardMenu } from "./PlaceCardMenu";
-import { useRouter } from "next/navigation";
 
 interface PlaceItemProps {
   place: PlaceData;
@@ -11,12 +10,6 @@ interface PlaceItemProps {
 }
 
 export function PlaceItem({ place, refetch }: PlaceItemProps) {
-  const router = useRouter();
-
-  const handleClick = () => {
-    router.push(`/admin/places/${place.id}`);
-  };
-
   return (
     <Item asChild>
       <a href={`/admin/places/${place.id}`} className="flex flex-1 gap-3">

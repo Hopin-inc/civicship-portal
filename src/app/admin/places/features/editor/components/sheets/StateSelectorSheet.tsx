@@ -7,7 +7,6 @@ import { Item, ItemContent, ItemTitle } from "@/components/ui/item";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { Check } from "lucide-react";
 import { GET_STATES } from "../../queries";
-import { GqlSortDirection } from "@/types/graphql";
 
 interface StateSelectorSheetProps {
   open: boolean;

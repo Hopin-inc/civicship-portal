@@ -4,7 +4,7 @@
  */
 
 import { useState, useCallback } from "react";
-import { PlaceEditorFormState, createInitialFormState } from "../types/form";
+import { PlaceEditorFormState } from "../types/form";
 import { usePlaceSave } from "./usePlaceSave";
 import { useAddressForm } from "./useAddressForm";
 import { useCoordinates } from "./useCoordinates";
