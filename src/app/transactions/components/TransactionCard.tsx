@@ -51,7 +51,7 @@ export const TransactionCard = ({
 
   // Avatar コンポーネント
   const avatarElement = (
-    <Avatar className="h-10 w-10 shrink-0">
+    <Avatar className="h-12 w-12 shrink-0">
       <AvatarImage src={image} alt={displayName} />
       <AvatarFallback>U</AvatarFallback>
     </Avatar>
