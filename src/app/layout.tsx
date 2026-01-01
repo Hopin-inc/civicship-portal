@@ -22,6 +22,7 @@ const font = Inter({ subsets: ["latin"] });
 
 export async function generateMetadata(): Promise<Metadata> {
   const metadata = currentCommunityMetadata;
+  const isProduction = process.env.NODE_ENV === "production";
 
   return {
     title: metadata.title,
@@ -29,6 +30,13 @@ export async function generateMetadata(): Promise<Metadata> {
     icons: metadata.icons,
     openGraph: metadata.openGraph,
     alternates: metadata.alternates,
+    // 非本番環境では検索エンジンにインデックスさせない
+    robots: isProduction
+      ? undefined
+      : {
+          index: false,
+          follow: false,
+        },
   };
 }
 
