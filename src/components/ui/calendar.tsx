@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+import { ja, enUS } from "date-fns/locale";
+import { useLocale } from "next-intl";
 import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { DayButton, DayPicker, getDefaultClassNames } from "react-day-picker";
 
@@ -20,9 +22,12 @@ function Calendar({
   buttonVariant?: React.ComponentProps<typeof Button>["variant"];
 }) {
   const defaultClassNames = getDefaultClassNames();
+  const currentLocale = useLocale();
+  const dateFnsLocale = currentLocale === 'ja' ? ja : enUS;
 
   return (
     <DayPicker
+      locale={dateFnsLocale}
       showOutsideDays={showOutsideDays}
       className={cn(
         "bg-background group/calendar p-3 [--cell-size:2rem] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent",
@@ -32,7 +37,7 @@ function Calendar({
       )}
       captionLayout={captionLayout}
       formatters={{
-        formatMonthDropdown: (date) => date.toLocaleString("default", { month: "short" }),
+        formatMonthDropdown: (date) => date.toLocaleString(currentLocale, { month: "short" }),
         ...formatters,
       }}
       classNames={{
