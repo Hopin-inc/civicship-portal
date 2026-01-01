@@ -13,11 +13,11 @@ export default function robots(): MetadataRoute.Robots {
     };
   }
 
-  // 本番環境: すべてを許可
+  // 本番環境: すべてを許可（標準的な記法）
   return {
     rules: {
       userAgent: "*",
-      allow: "/",
+      disallow: "",
     },
   };
 }
