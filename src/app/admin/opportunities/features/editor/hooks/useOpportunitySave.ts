@@ -113,7 +113,7 @@ export const useOpportunitySave = ({
       const isActivity = category === GqlOpportunityCategory.Activity;
       const categorySpecificInput = isActivity
         ? {
-            feeRequired: allowCashPayment ? feeRequired : 0,
+            feeRequired: allowCashPayment ? feeRequired : undefined,
             pointsRequired,
             pointsToEarn: undefined,
           }
