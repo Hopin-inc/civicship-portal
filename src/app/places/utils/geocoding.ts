@@ -8,8 +8,8 @@ const HARDCODED_COORDINATES: Record<string, google.maps.LatLngLiteral> = {
 };
 
 /**
- * DBの緯度経度を優先的に使用するPlace IDのリスト
- * これらのIDはジオコーディングをスキップしてDBの値を使用する
+ * ハードコードされた緯度経度を優先的に使用するPlace IDのリスト
+ * これらのIDはジオコーディングをスキップしてハードコードされた値を使用する
  */
 export const PRIORITIZE_LAT_LNG_PLACE_IDS: string[] = Object.keys(HARDCODED_COORDINATES);
 
