@@ -7,6 +7,12 @@ const HARDCODED_COORDINATES: Record<string, google.maps.LatLngLiteral> = {
   cmahstwr4002rs60n6map2wiu: { lat: 34.178142, lng: 133.818358 }, // 大庄屋
 };
 
+/**
+ * DBの緯度経度を優先的に使用するPlace IDのリスト
+ * これらのIDはジオコーディングをスキップしてDBの値を使用する
+ */
+export const PRIORITIZE_LAT_LNG_PLACE_IDS: string[] = Object.keys(HARDCODED_COORDINATES);
+
 // メモリ内キャッシュ: 住所 -> 緯度経度のマッピング
 const geocodeCache: Record<string, google.maps.LatLngLiteral> = {};
 

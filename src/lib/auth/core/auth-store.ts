@@ -1,12 +1,20 @@
 import { create } from "zustand";
 import { AuthState, AuthStore, LiffState, PhoneAuthState } from "@/types/auth";
-import { detectEnvironment } from "@/lib/auth/core/environment-detector";
+import { AuthEnvironment } from "@/lib/auth/core/environment-detector";
+
+const getInitialEnvironment = (): AuthEnvironment => {
+  if (typeof window === "undefined") {
+    return AuthEnvironment.REGULAR_BROWSER;
+  }
+  const { detectEnvironment } = require("@/lib/auth/core/environment-detector");
+  return detectEnvironment();
+};
 
 const initialAuthState: AuthState = {
   firebaseUser: null,
   currentUser: null,
   authenticationState: "loading",
-  environment: detectEnvironment(),
+  environment: getInitialEnvironment(),
   isAuthenticating: false,
   isAuthInProgress: false,
   lineTokens: {
