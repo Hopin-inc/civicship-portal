@@ -56,6 +56,13 @@ const requestLink = setContext(async (operation, prevContext) => {
           throw new Error("認証トークンの取得に失敗しました");
         }
       }
+    } else {
+      // Query実行時にfirebaseUserがない場合を記録
+      logger.info("GraphQL request without firebase user", {
+        operationName: operation.operationName,
+        isMutation,
+        authenticationState,
+      });
     }
   }
 
