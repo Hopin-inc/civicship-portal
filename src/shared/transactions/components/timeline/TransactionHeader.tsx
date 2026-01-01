@@ -10,13 +10,9 @@ export const TransactionHeader = ({
   formattedDateTime,
 }: TransactionHeaderProps) => {
   return (
-    <div className="flex items-center justify-between gap-2">
-      <span className="text-label-sm font-bold truncate">
-        {displayName}
-      </span>
-      <span className="text-label-xs text-muted-foreground shrink-0">
-        {formattedDateTime}
-      </span>
+    <div className="text-label-sm">
+      <span className="font-bold">{displayName}</span>
+      <span className="text-muted-foreground">・{formattedDateTime}</span>
     </div>
   );
 };

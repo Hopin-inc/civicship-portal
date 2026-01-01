@@ -8,8 +8,8 @@ export const TransactionMessageCard = ({
   comment,
 }: TransactionMessageCardProps) => {
   return (
-    <div className="bg-card border border-border rounded-lg p-3 shadow-sm whitespace-pre-line break-words leading-relaxed text-label-sm">
+    <p className="text-label-sm whitespace-pre-line break-words leading-relaxed">
       {comment}
-    </div>
+    </p>
   );
 };
