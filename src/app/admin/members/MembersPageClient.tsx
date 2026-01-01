@@ -61,7 +61,7 @@ export default function MembersPageClient({ initialConnection }: MembersPageClie
     refetchRef.current = refetch;
   }, [refetch]);
 
-  const handleRoleChange = async (userId: string, userName: string, newRole: GqlRole) => {
+  const handleRoleChange = async (userId: string, newRole: GqlRole) => {
     if (currentUserRole !== GqlRole.Owner) {
       toast.error("この操作を行う権限がありません");
       return false;
