@@ -44,6 +44,7 @@ export const TransactionCard = ({
   const actionLabelText = formatActionLabelForTimeline({
     reason: info.reason,
     recipientName,
+    senderName: displayName,
     amount: formattedAmount,
     locale,
     t,

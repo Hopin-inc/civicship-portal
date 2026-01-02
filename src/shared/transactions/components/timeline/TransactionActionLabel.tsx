@@ -13,7 +13,7 @@ export const TransactionActionLabel = ({
 }: TransactionActionLabelProps) => {
   return (
     <div className="flex items-center justify-between gap-2">
-      <p className="text-xs text-muted-foreground min-w-0">
+      <p className="text-xs text-muted-foreground min-w-0 truncate">
         {text}
       </p>
       {amount && (

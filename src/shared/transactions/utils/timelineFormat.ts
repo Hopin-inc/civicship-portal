@@ -5,6 +5,7 @@ type TransactionActionType = "donation" | "grant" | "payment" | "return" | "refu
 interface TimelineActionLabelOptions {
   reason: GqlTransactionReason;
   recipientName: string;
+  senderName: string;
   amount: string;
   locale: string;
   t: (key: string, values?: Record<string, string>) => string;
@@ -23,6 +24,7 @@ interface TimelineActionLabelOptions {
 export const formatActionLabelForTimeline = ({
   reason,
   recipientName,
+  senderName,
   amount,
   locale,
   t,
@@ -33,7 +35,7 @@ export const formatActionLabelForTimeline = ({
     reason === GqlTransactionReason.Onboarding
   ) {
     const specialNameKey = reason === GqlTransactionReason.PointIssued ? "issued" : "onboarding";
-    return t(`transactions.timeline.special.${specialNameKey}`, { amount });
+    return t(`transactions.timeline.special.${specialNameKey}`, { amount, community: senderName });
   }
 
   // 通常ケース
