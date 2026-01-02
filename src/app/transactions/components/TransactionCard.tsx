@@ -35,11 +35,24 @@ export const TransactionCard = ({
   const formatDateTime = useLocaleDateTimeFormat();
   const info = getTransactionInfo(transaction, perspectiveWalletId);
 
-  // /transactions では perspectiveWalletId が undefined なので、通常は fromUser の視点
-  // ただし、ポイント発行の場合のみ toUser（受け取った人）を表示
-  const displayName = info.reason === GqlTransactionReason.PointIssued ? info.to : info.from;
+  // 表示名の決定
+  let displayName: string;
+  if (perspectiveWalletId) {
+    // ウォレット視点: 常に相手（counterparty）の名前を表示
+    const isOutgoing = transaction.fromWallet?.id === perspectiveWalletId;
+    displayName = isOutgoing ? info.to : info.from;
+  } else {
+    // グローバル視点（/transactions）: 通常は送信者、ポイント発行のみ受信者
+    displayName = info.reason === GqlTransactionReason.PointIssued ? info.to : info.from;
+  }
+
   const recipientName = info.to;
   const formattedAmount = `${formatCurrency(Math.abs(info.amount))}pt`;
+
+  // 受信取引かどうかを判定
+  const isIncoming = perspectiveWalletId
+    ? transaction.fromWallet?.id !== perspectiveWalletId
+    : false;
 
   // ActionLabel の生成
   const actionLabelData = formatActionLabelForTimeline({
@@ -49,6 +62,7 @@ export const TransactionCard = ({
     amount: formattedAmount,
     locale,
     t,
+    isIncoming,
   });
 
   const profileHref = enableClickNavigation

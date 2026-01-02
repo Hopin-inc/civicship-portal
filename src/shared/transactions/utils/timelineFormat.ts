@@ -9,6 +9,7 @@ interface TimelineActionLabelOptions {
   amount: string;
   locale: string;
   t: (key: string, values?: Record<string, string>) => string;
+  isIncoming?: boolean; // ウォレット視点で受信取引かどうか
 }
 
 export interface TimelineActionLabelData {
@@ -39,6 +40,7 @@ export const formatActionLabelForTimeline = ({
   amount,
   locale,
   t,
+  isIncoming = false,
 }: TimelineActionLabelOptions): TimelineActionLabelData => {
   // 特殊ケース: ポイント発行、登録ボーナスなど
   if (
@@ -53,7 +55,16 @@ export const formatActionLabelForTimeline = ({
     };
   }
 
-  // 通常ケース
+  // ウォレット視点で受信取引の場合
+  if (isIncoming) {
+    return {
+      type: "special",
+      locale,
+      text: t(`transactions.timeline.received`, { amount, sender: senderName }),
+    };
+  }
+
+  // 通常ケース（送信 or グローバル視点）
   const actionType = mapReasonToTimelineActionType(reason);
 
   return {
