@@ -23,10 +23,10 @@ export const TransactionTimelineItem = ({
       {/* Timeline Rail - 縦線（アイテム全体の高さをカバー） */}
       <div className="absolute left-0 top-0 bottom-0 w-12 flex items-center justify-center">
         {/* 上側の線 - アイテム上端からAvatar中心（50%）まで */}
-        <div className="absolute left-1/2 top-0 bottom-1/2 w-px -translate-x-1/2 bg-muted-foreground/30 timeline-rail-top" />
+        <div className="absolute left-1/2 top-0 bottom-1/2 w-0.5 -translate-x-1/2 bg-red-500 timeline-rail-top" />
 
         {/* 下側の線 - Avatar中心（50%）からアイテム下端まで */}
-        <div className="absolute left-1/2 top-1/2 bottom-0 w-px -translate-x-1/2 bg-muted-foreground/30 timeline-rail-bottom" />
+        <div className="absolute left-1/2 top-1/2 bottom-0 w-0.5 -translate-x-1/2 bg-red-500 timeline-rail-bottom" />
       </div>
 
       {/* Avatar（z-indexで線の上に表示） */}
