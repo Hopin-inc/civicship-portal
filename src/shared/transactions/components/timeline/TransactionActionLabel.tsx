@@ -13,7 +13,7 @@ export const TransactionActionLabel = ({
   if (data.type === "special") {
     return (
       <div className="flex items-center justify-between gap-2">
-        <p className="text-xs text-muted-foreground min-w-0">
+        <p className="text-sm text-muted-foreground min-w-0">
           {data.text}
         </p>
       </div>
@@ -25,7 +25,7 @@ export const TransactionActionLabel = ({
     // 日本語: 「{recipient}に{amount}を{action}」
     return (
       <div className="flex items-center gap-2">
-        <p className="text-xs min-w-0 flex items-baseline gap-0.5">
+        <p className="text-sm min-w-0 flex items-baseline gap-0.5">
           <span className="truncate text-foreground">{data.recipient}</span>
           <span className="whitespace-nowrap text-muted-foreground">に</span>
           <span className="whitespace-nowrap text-foreground">{data.amount}</span>
@@ -38,7 +38,7 @@ export const TransactionActionLabel = ({
   // 英語: "{action} {amount} to {recipient}"
   return (
     <div className="flex items-center gap-2">
-      <p className="text-xs min-w-0 flex items-baseline gap-1">
+      <p className="text-sm min-w-0 flex items-baseline gap-1">
         <span className="whitespace-nowrap text-muted-foreground">{data.action}</span>
         <span className="whitespace-nowrap text-foreground">{data.amount}</span>
         <span className="whitespace-nowrap text-muted-foreground">to</span>

@@ -62,7 +62,7 @@
   "transactions.timeline.actionType.payment": "Paid",
   "transactions.timeline.actionType.return": "Returned",
   "transactions.timeline.actionType.refund": "Refunded",
-  "transactions.timeline.special.issued": "{amount} issued from {community}",
+  "transactions.timeline.special.issued": "{amount} issued",
   "transactions.timeline.special.onboarding": "Received {amount} welcome bonus from {community}",
   "transactions.timeline.received": "Received {amount} from {sender}"
 }
