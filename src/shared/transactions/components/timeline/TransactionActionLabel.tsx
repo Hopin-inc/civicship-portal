@@ -10,7 +10,7 @@ interface TransactionActionLabelProps {
 export const TransactionActionLabel = ({
   data,
 }: TransactionActionLabelProps) => {
-  // フロー型: 記号 名前 · ポイント
+  // フロー型: 記号 名前 · ポイント or 記号 ポイント
   if (data.type === "flow") {
     const viewMode = data.viewMode || "timeline";
 
@@ -22,6 +22,26 @@ export const TransactionActionLabel = ({
       symbol = data.direction === "outgoing" ? "→" : "←";
     }
 
+    // ウォレット視点: 記号 + ポイントのみ（名前はヘッダーにある）
+    if (viewMode === "wallet") {
+      return (
+        <div className="flex items-center gap-1.5">
+          <span className="text-muted-foreground shrink-0 text-xs">
+            {symbol}
+          </span>
+          <Badge variant="outline" size="sm" className="shrink-0">
+            {data.badge}
+          </Badge>
+          {data.note && (
+            <span className="text-muted-foreground text-xs shrink-0">
+              {data.note}
+            </span>
+          )}
+        </div>
+      );
+    }
+
+    // タイムライン視点: 記号 名前 · ポイント
     return (
       <div className="flex items-center gap-1.5 min-w-0">
         <span className="text-muted-foreground shrink-0 text-xs">
