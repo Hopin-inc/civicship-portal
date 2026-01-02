@@ -533,16 +533,7 @@ li {
 }
 
 @layer components {
-  /* Test: verify CSS is loading */
-  .timeline-container {
-    background-color: #f0f0f0 !important;
-  }
-
   /* Timeline Avatar with pseudo-element rails */
-  .timeline-avatar {
-    background-color: yellow !important;
-  }
-
   .timeline-avatar::before,
   .timeline-avatar::after {
     content: "";
@@ -550,23 +541,20 @@ li {
     left: 50%;
     transform: translateX(-50%);
     width: 2px;
-    background-color: red !important;
-    z-index: 10;
-    pointer-events: none;
+    background-color: hsl(var(--zinc-300));
+    z-index: 0;
   }
 
   /* Top rail - from item top to avatar center */
   .timeline-avatar::before {
-    top: -50px;
-    height: 100px;
-    width: 10px !important;
+    top: 0;
+    height: 24px;
   }
 
   /* Bottom rail - from avatar center to item bottom */
   .timeline-avatar::after {
     top: 24px;
-    height: 100px;
-    width: 10px !important;
+    bottom: -24px; /* Extend into pb-6 spacing */
   }
 
   /* Hide top rail on first item */
