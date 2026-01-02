@@ -20,20 +20,17 @@ export const TransactionTimelineItem = ({
 }: TransactionTimelineItemProps) => {
   const content = (
     <div className="relative flex gap-3 pb-6 timeline-item">
-      {/* Avatar + Timeline Rail */}
-      <div className="relative shrink-0">
-        {/* Timeline Rail - 縦線 */}
-        <div className="absolute left-1/2 top-0 bottom-0 w-0.5 -translate-x-1/2">
-          {/* 上側の線 */}
-          <div className="absolute top-0 bottom-1/2 w-full bg-red-500 timeline-rail-top" />
-          {/* 下側の線 */}
-          <div className="absolute top-1/2 bottom-0 w-full bg-red-500 timeline-rail-bottom" />
-        </div>
+      {/* Timeline Rail - アイテム全体に対してabsolute配置 */}
+      <div className="absolute left-0 top-0 bottom-0 flex items-start justify-center w-12">
+        {/* 上側の線 */}
+        <div className="absolute top-0 h-6 w-0.5 bg-red-500 timeline-rail-top" />
+        {/* 下側の線 */}
+        <div className="absolute top-6 bottom-0 w-0.5 bg-red-500 timeline-rail-bottom" />
+      </div>
 
-        {/* Avatar */}
-        <div className="relative z-10">
-          {avatar}
-        </div>
+      {/* Avatar */}
+      <div className="relative z-10 shrink-0">
+        {avatar}
       </div>
 
       {/* Content エリア */}
