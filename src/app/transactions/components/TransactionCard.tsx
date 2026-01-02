@@ -63,6 +63,7 @@ export const TransactionCard = ({
     locale,
     t,
     isIncoming,
+    viewMode: perspectiveWalletId ? "wallet" : "timeline",
   });
 
   const profileHref = enableClickNavigation

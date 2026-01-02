@@ -1,6 +1,7 @@
 "use client";
 
 import { TimelineActionLabelData } from "@/shared/transactions/utils/timelineFormat";
+import { Badge } from "@/components/ui/badge";
 
 interface TransactionActionLabelProps {
   data: TimelineActionLabelData;
@@ -9,21 +10,30 @@ interface TransactionActionLabelProps {
 export const TransactionActionLabel = ({
   data,
 }: TransactionActionLabelProps) => {
-  // フロー型: 名前 → ポイント or 名前 ← ポイント
+  // フロー型: 記号 名前 · ポイント
   if (data.type === "flow") {
-    const arrow = data.direction === "outgoing" ? "→" : "←";
+    const viewMode = data.viewMode || "timeline";
+
+    // 記号の決定
+    let symbol: string;
+    if (viewMode === "wallet") {
+      symbol = data.direction === "outgoing" ? "-" : "+";
+    } else {
+      symbol = data.direction === "outgoing" ? "→" : "←";
+    }
 
     return (
       <div className="flex items-center gap-1.5 min-w-0">
+        <span className="text-muted-foreground shrink-0 text-xs">
+          {symbol}
+        </span>
         <span className="truncate text-foreground font-bold text-xs">
           {data.name}
         </span>
-        <span className="text-muted-foreground shrink-0 text-xs">
-          {arrow}
-        </span>
-        <span className="bg-zinc-100 text-foreground px-2 py-0.5 rounded-full font-medium text-xs shrink-0">
+        <span className="text-muted-foreground shrink-0 text-xs">·</span>
+        <Badge variant="outline" size="sm" className="shrink-0">
           {data.badge}
-        </span>
+        </Badge>
         {data.note && (
           <span className="text-muted-foreground text-xs shrink-0">
             {data.note}

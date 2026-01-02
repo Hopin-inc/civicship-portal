@@ -10,11 +10,13 @@ interface TimelineActionLabelOptions {
   locale: string;
   t: (key: string, values?: Record<string, string>) => string;
   isIncoming?: boolean; // ウォレット視点で受信取引かどうか
+  viewMode?: "timeline" | "wallet"; // 表示モード
 }
 
 export interface TimelineActionLabelData {
   type: "normal" | "special" | "flow";
   locale: string;
+  viewMode?: "timeline" | "wallet";
   // normal の場合
   recipient?: string;
   amount?: string;
@@ -46,12 +48,14 @@ export const formatActionLabelForTimeline = ({
   locale,
   t,
   isIncoming = false,
+  viewMode = "timeline",
 }: TimelineActionLabelOptions): TimelineActionLabelData => {
   // ポイント発行: 受信フロー
   if (reason === GqlTransactionReason.PointIssued) {
     return {
       type: "flow",
       locale,
+      viewMode,
       name: recipientName,
       direction: "incoming",
       badge: amount,
@@ -63,6 +67,7 @@ export const formatActionLabelForTimeline = ({
     return {
       type: "flow",
       locale,
+      viewMode,
       name: senderName,
       direction: "incoming",
       badge: amount,
@@ -75,6 +80,7 @@ export const formatActionLabelForTimeline = ({
     return {
       type: "flow",
       locale,
+      viewMode,
       name: senderName,
       direction: "incoming",
       badge: amount,
@@ -85,6 +91,7 @@ export const formatActionLabelForTimeline = ({
   return {
     type: "flow",
     locale,
+    viewMode,
     name: recipientName,
     direction: "outgoing",
     badge: amount,
