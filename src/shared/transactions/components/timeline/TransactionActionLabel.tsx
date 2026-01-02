@@ -22,20 +22,29 @@ export const TransactionActionLabel = ({
       symbol = data.direction === "outgoing" ? "→" : "←";
     }
 
-    // ウォレット視点: 色付きバッジに記号とポイント
+    // ウォレット視点: 色付きテキストで符号+数字、ptは小さめ
     if (viewMode === "wallet") {
-      // 薄めの背景 + 枠線 + 色付きテキスト
-      const badgeStyles = data.direction === "outgoing"
-        ? "bg-red-50 border-red-200 text-red-700"
-        : "bg-green-50 border-green-200 text-green-700";
+      const amountColor = data.direction === "outgoing"
+        ? "text-red-600"
+        : "text-green-600";
+
+      // バッジから数字とptを分離（例: "3,131pt" → ["3,131", "pt"]）
+      const amountMatch = data.badge?.match(/^([\d,]+)(pt)$/);
+      const numberPart = amountMatch ? amountMatch[1] : data.badge;
+      const unitPart = amountMatch ? amountMatch[2] : "";
 
       return (
-        <div className="flex items-center gap-1.5">
-          <Badge variant="outline" size="sm" className={`shrink-0 ${badgeStyles}`}>
-            {symbol}{data.badge}
-          </Badge>
+        <div className="flex items-center gap-0.5">
+          <span className={`text-sm font-semibold ${amountColor}`}>
+            {symbol}{numberPart}
+          </span>
+          {unitPart && (
+            <span className="text-xs text-foreground">
+              {unitPart}
+            </span>
+          )}
           {data.note && (
-            <span className="text-muted-foreground text-xs shrink-0">
+            <span className="text-muted-foreground text-xs shrink-0 ml-1">
               {data.note}
             </span>
           )}
