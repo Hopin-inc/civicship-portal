@@ -541,8 +541,14 @@ li {
     left: 50%;
     transform: translateX(-50%);
     width: 2px;
-    background-color: hsl(var(--zinc-300));
-    z-index: 0;
+    background-color: hsl(var(--zinc-200));
+    z-index: -1;
+  }
+
+  /* Ensure avatar appears above rails */
+  .timeline-avatar > * {
+    position: relative;
+    z-index: 1;
   }
 
   /* Top rail - from item top to avatar center */
