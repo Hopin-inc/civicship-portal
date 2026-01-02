@@ -11,6 +11,17 @@ interface TimelineActionLabelOptions {
   t: (key: string, values?: Record<string, string>) => string;
 }
 
+export interface TimelineActionLabelData {
+  type: "normal" | "special";
+  locale: string;
+  // normal の場合
+  recipient?: string;
+  amount?: string;
+  action?: string;
+  // special の場合
+  text?: string;
+}
+
 /**
  * タイムライン用のActionLabel生成
  *
@@ -28,34 +39,30 @@ export const formatActionLabelForTimeline = ({
   amount,
   locale,
   t,
-}: TimelineActionLabelOptions): string => {
+}: TimelineActionLabelOptions): TimelineActionLabelData => {
   // 特殊ケース: ポイント発行、登録ボーナスなど
   if (
     reason === GqlTransactionReason.PointIssued ||
     reason === GqlTransactionReason.Onboarding
   ) {
     const specialNameKey = reason === GqlTransactionReason.PointIssued ? "issued" : "onboarding";
-    return t(`transactions.timeline.special.${specialNameKey}`, { amount, community: senderName });
+    return {
+      type: "special",
+      locale,
+      text: t(`transactions.timeline.special.${specialNameKey}`, { amount, community: senderName }),
+    };
   }
 
   // 通常ケース
   const actionType = mapReasonToTimelineActionType(reason);
 
-  if (locale === "en") {
-    // 英語: "Gifted 3,000pt to 山田太郎"
-    return t(`transactions.timeline.action.en`, {
-      action: t(`transactions.timeline.actionType.${actionType}`),
-      amount,
-      recipient: recipientName,
-    });
-  }
-
-  // 日本語: 「山田太郎に3,000ptを贈りました」
-  return t(`transactions.timeline.action.ja`, {
+  return {
+    type: "normal",
+    locale,
     recipient: recipientName,
     amount,
     action: t(`transactions.timeline.actionType.${actionType}`),
-  });
+  };
 };
 
 /**

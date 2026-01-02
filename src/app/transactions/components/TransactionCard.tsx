@@ -1,6 +1,6 @@
 "use client";
 
-import { GqlTransaction } from "@/types/graphql";
+import { GqlTransaction, GqlTransactionReason } from "@/types/graphql";
 import { useTranslations, useLocale } from "next-intl";
 import { useLocaleDateTimeFormat } from "@/utils/i18n";
 import { getTransactionInfo } from "@/shared/transactions/utils/format";
@@ -36,15 +36,19 @@ export const TransactionCard = ({
   const info = getTransactionInfo(transaction, perspectiveWalletId);
 
   // /transactions では perspectiveWalletId が undefined なので、常に fromUser の視点
-  const displayName = info.from;
+  // ただし、ポイント発行/登録ボーナスの場合は toUser（受け取った人）を表示
+  const isPointIssuance =
+    info.reason === GqlTransactionReason.PointIssued ||
+    info.reason === GqlTransactionReason.Onboarding;
+  const displayName = isPointIssuance ? info.to : info.from;
   const recipientName = info.to;
   const formattedAmount = `${formatCurrency(Math.abs(info.amount))}pt`;
 
   // ActionLabel の生成
-  const actionLabelText = formatActionLabelForTimeline({
+  const actionLabelData = formatActionLabelForTimeline({
     reason: info.reason,
     recipientName,
-    senderName: displayName,
+    senderName: info.from, // 発行の場合はコミュニティ名
     amount: formattedAmount,
     locale,
     t,
@@ -72,7 +76,7 @@ export const TransactionCard = ({
 
   // ActionLabel コンポーネント
   const actionLabelElement = (
-    <TransactionActionLabel text={actionLabelText} />
+    <TransactionActionLabel data={actionLabelData} />
   );
 
   // MessageCard コンポーネント（コメントがある場合のみ）

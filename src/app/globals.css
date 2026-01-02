@@ -560,7 +560,7 @@ li {
   /* Bottom rail - from avatar center to item bottom */
   .timeline-avatar::after {
     top: 24px;
-    bottom: -24px; /* Extend into pb-6 spacing */
+    bottom: -32px; /* Extend into pb-8 spacing */
   }
 
   /* Hide top rail on first item */

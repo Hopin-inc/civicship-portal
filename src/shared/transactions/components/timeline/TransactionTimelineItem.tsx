@@ -29,7 +29,7 @@ export const TransactionTimelineItem = ({
   );
 
   const content = (
-    <div className="relative flex gap-3 pb-6 timeline-item">
+    <div className="relative flex gap-3 pb-8 timeline-item">
       {/* Avatar - 疑似要素で縦線を描画 */}
       <div className={avatarClasses}>
         {avatar}
