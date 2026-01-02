@@ -64,5 +64,6 @@
   "transactions.timeline.actionType.refund": "Refunded",
   "transactions.timeline.special.issued": "{amount} issued",
   "transactions.timeline.special.onboarding": "Received {amount} welcome bonus from {community}",
-  "transactions.timeline.received": "Received {amount} from {sender}"
+  "transactions.timeline.received": "Received {amount} from {sender}",
+  "transactions.timeline.note.onboarding": "Welcome bonus"
 }

@@ -59,5 +59,6 @@
   "transactions.timeline.actionType.refund": "返金しました",
   "transactions.timeline.special.issued": "{amount}が発行されました",
   "transactions.timeline.special.onboarding": "{community}から{amount}の登録ボーナスを受け取りました",
-  "transactions.timeline.received": "{sender}から{amount}を受け取りました"
+  "transactions.timeline.received": "{sender}から{amount}を受け取りました",
+  "transactions.timeline.note.onboarding": "登録ボーナス"
 }

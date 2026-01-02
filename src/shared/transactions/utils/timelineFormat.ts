@@ -13,7 +13,7 @@ interface TimelineActionLabelOptions {
 }
 
 export interface TimelineActionLabelData {
-  type: "normal" | "special";
+  type: "normal" | "special" | "flow";
   locale: string;
   // normal の場合
   recipient?: string;
@@ -21,6 +21,11 @@ export interface TimelineActionLabelData {
   action?: string;
   // special の場合
   text?: string;
+  // flow の場合
+  name?: string;
+  direction?: "outgoing" | "incoming";
+  badge?: string;
+  note?: string; // オプションの補足情報
 }
 
 /**
@@ -42,37 +47,47 @@ export const formatActionLabelForTimeline = ({
   t,
   isIncoming = false,
 }: TimelineActionLabelOptions): TimelineActionLabelData => {
-  // 特殊ケース: ポイント発行、登録ボーナスなど
-  if (
-    reason === GqlTransactionReason.PointIssued ||
-    reason === GqlTransactionReason.Onboarding
-  ) {
-    const specialNameKey = reason === GqlTransactionReason.PointIssued ? "issued" : "onboarding";
+  // ポイント発行: 受信フロー
+  if (reason === GqlTransactionReason.PointIssued) {
     return {
-      type: "special",
+      type: "flow",
       locale,
-      text: t(`transactions.timeline.special.${specialNameKey}`, { amount, community: senderName }),
+      name: recipientName,
+      direction: "incoming",
+      badge: amount,
+    };
+  }
+
+  // 登録ボーナス: 受信フロー
+  if (reason === GqlTransactionReason.Onboarding) {
+    return {
+      type: "flow",
+      locale,
+      name: senderName,
+      direction: "incoming",
+      badge: amount,
+      note: t("transactions.timeline.note.onboarding"),
     };
   }
 
   // ウォレット視点で受信取引の場合
   if (isIncoming) {
     return {
-      type: "special",
+      type: "flow",
       locale,
-      text: t(`transactions.timeline.received`, { amount, sender: senderName }),
+      name: senderName,
+      direction: "incoming",
+      badge: amount,
     };
   }
 
-  // 通常ケース（送信 or グローバル視点）
-  const actionType = mapReasonToTimelineActionType(reason);
-
+  // 通常ケース（送信 or グローバル視点）: 送信フロー
   return {
-    type: "normal",
+    type: "flow",
     locale,
-    recipient: recipientName,
-    amount,
-    action: t(`transactions.timeline.actionType.${actionType}`),
+    name: recipientName,
+    direction: "outgoing",
+    badge: amount,
   };
 };
 
