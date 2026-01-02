@@ -532,11 +532,36 @@ li {
   border-color: hsl(var(--border));
 }
 
-/* Transaction Timeline Styles */
-.timeline-container .timeline-item:first-child .timeline-rail-top {
+/* Timeline Avatar with pseudo-element rails */
+.timeline-avatar::before,
+.timeline-avatar::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  background-color: red;
+  z-index: 0;
+}
+
+/* Top rail - from item top to avatar center */
+.timeline-avatar::before {
+  top: 0;
+  height: 24px;
+}
+
+/* Bottom rail - from avatar center to item bottom */
+.timeline-avatar::after {
+  top: 24px;
+  bottom: -24px; /* Extend into pb-6 spacing */
+}
+
+/* Hide top rail on first item */
+.timeline-container .timeline-item:first-child .timeline-avatar::before {
   display: none;
 }
 
-.timeline-container .timeline-item:last-child .timeline-rail-bottom {
+/* Hide bottom rail on last item */
+.timeline-container .timeline-item:last-child .timeline-avatar::after {
   display: none;
 }

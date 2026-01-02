@@ -20,14 +20,8 @@ export const TransactionTimelineItem = ({
 }: TransactionTimelineItemProps) => {
   const content = (
     <div className="relative flex gap-3 pb-6 timeline-item">
-      {/* Timeline Rail - 上側の線（0-24px） */}
-      <div className="absolute left-6 top-0 h-6 w-0.5 bg-red-500 timeline-rail-top" />
-
-      {/* Timeline Rail - 下側の線（24px-下端） */}
-      <div className="absolute left-6 top-6 bottom-0 w-0.5 bg-red-500 timeline-rail-bottom" />
-
-      {/* Avatar */}
-      <div className="relative z-10 shrink-0">
+      {/* Avatar - 疑似要素で縦線を描画 */}
+      <div className="relative shrink-0 timeline-avatar">
         {avatar}
       </div>
 
