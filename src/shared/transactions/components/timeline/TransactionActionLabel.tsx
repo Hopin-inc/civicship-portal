@@ -24,11 +24,14 @@ export const TransactionActionLabel = ({
 
     // ウォレット視点: 色付きバッジに記号とポイント
     if (viewMode === "wallet") {
-      const badgeVariant = data.direction === "outgoing" ? "destructive" : "success";
+      // 薄めの背景 + 枠線 + 色付きテキスト
+      const badgeStyles = data.direction === "outgoing"
+        ? "bg-red-50 border-red-200 text-red-700"
+        : "bg-green-50 border-green-200 text-green-700";
 
       return (
         <div className="flex items-center gap-1.5">
-          <Badge variant={badgeVariant} size="sm" className="shrink-0">
+          <Badge variant="outline" size="sm" className={`shrink-0 ${badgeStyles}`}>
             {symbol}{data.badge}
           </Badge>
           {data.note && (
