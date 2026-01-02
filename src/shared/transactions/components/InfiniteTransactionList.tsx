@@ -36,10 +36,12 @@ export const InfiniteTransactionList = ({
 
   return (
     <div className="timeline-container">
-      {transactions.map((transaction) => {
+      {transactions.map((transaction, index) => {
         const image = perspectiveWalletId
           ? getCounterpartyImage(transaction, perspectiveWalletId)
           : getFromWalletImage(transaction);
+        const isFirst = index === 0;
+        const isLast = index === transactions.length - 1;
         return (
           <TransactionCard
             key={transaction.id}
@@ -47,6 +49,8 @@ export const InfiniteTransactionList = ({
             image={image}
             perspectiveWalletId={perspectiveWalletId}
             enableClickNavigation={enableClickNavigation}
+            isFirst={isFirst}
+            isLast={isLast}
           />
         );
       })}

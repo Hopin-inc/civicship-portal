@@ -558,12 +558,12 @@ li {
   }
 
   /* Hide top rail on first item */
-  .timeline-container .timeline-item:first-child .timeline-avatar::before {
+  .timeline-avatar-first::before {
     display: none;
   }
 
   /* Hide bottom rail on last item */
-  .timeline-container .timeline-item:last-child .timeline-avatar::after {
+  .timeline-avatar-last::after {
     display: none;
   }
 }

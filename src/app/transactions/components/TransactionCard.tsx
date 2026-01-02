@@ -18,6 +18,8 @@ interface TransactionCardProps {
   image?: string;
   perspectiveWalletId?: string;
   enableClickNavigation?: boolean;
+  isFirst?: boolean;
+  isLast?: boolean;
 }
 
 export const TransactionCard = ({
@@ -25,6 +27,8 @@ export const TransactionCard = ({
   image,
   perspectiveWalletId,
   enableClickNavigation = false,
+  isFirst = false,
+  isLast = false,
 }: TransactionCardProps) => {
   const t = useTranslations();
   const locale = useLocale();
@@ -82,6 +86,8 @@ export const TransactionCard = ({
       actionLabel={actionLabelElement}
       messageCard={messageCardElement}
       profileHref={profileHref}
+      isFirst={isFirst}
+      isLast={isLast}
     />
   );
 };

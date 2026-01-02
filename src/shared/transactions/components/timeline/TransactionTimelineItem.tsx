@@ -9,6 +9,8 @@ interface TransactionTimelineItemProps {
   actionLabel: ReactNode;
   messageCard?: ReactNode;
   profileHref?: string | null;
+  isFirst?: boolean;
+  isLast?: boolean;
 }
 
 export const TransactionTimelineItem = ({
@@ -17,11 +19,19 @@ export const TransactionTimelineItem = ({
   actionLabel,
   messageCard,
   profileHref,
+  isFirst = false,
+  isLast = false,
 }: TransactionTimelineItemProps) => {
+  const avatarClasses = cn(
+    "relative shrink-0 timeline-avatar",
+    isFirst && "timeline-avatar-first",
+    isLast && "timeline-avatar-last"
+  );
+
   const content = (
     <div className="relative flex gap-3 pb-6 timeline-item">
       {/* Avatar - 疑似要素で縦線を描画 */}
-      <div className="relative shrink-0 timeline-avatar">
+      <div className={avatarClasses}>
         {avatar}
       </div>
 
