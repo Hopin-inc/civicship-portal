@@ -1,5 +1,6 @@
 "use client";
 
+import { ArrowRight, ArrowLeft } from "lucide-react";
 import { TimelineActionLabelData } from "@/shared/transactions/utils/timelineFormat";
 
 interface TransactionActionLabelProps {
@@ -48,10 +49,12 @@ export const TransactionActionLabel = ({
   }
 
   // タイムライン視点: 丸囲み矢印アイコン + 名前 + ポイント
+  const ArrowIcon = direction === "outgoing" ? ArrowRight : ArrowLeft;
+
   return (
     <div className="flex items-center min-w-0 text-xs gap-1">
-      <span className="shrink-0 text-foreground text-[10px] border border-foreground rounded-full w-4 h-4 flex items-center justify-center">
-        {symbol}
+      <span className="shrink-0 text-foreground border border-foreground rounded-full w-4 h-4 flex items-center justify-center">
+        <ArrowIcon className="w-2.5 h-2.5" strokeWidth={2.5} />
       </span>
       <span className="truncate text-foreground font-bold">
         {name}
