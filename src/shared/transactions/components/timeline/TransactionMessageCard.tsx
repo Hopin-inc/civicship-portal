@@ -4,6 +4,10 @@ interface TransactionMessageCardProps {
   comment: string;
 }
 
+/**
+ * トランザクションに添付されたメッセージ（コメント）を表示
+ * プレーンテキストで、背景色なし
+ */
 export const TransactionMessageCard = ({
   comment,
 }: TransactionMessageCardProps) => {

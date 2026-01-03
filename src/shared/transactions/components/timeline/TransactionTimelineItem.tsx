@@ -13,6 +13,17 @@ interface TransactionTimelineItemProps {
   isLast?: boolean;
 }
 
+/**
+ * タイムライン形式のトランザクションアイテム
+ *
+ * 構成:
+ * - Avatar: ユーザーアイコン（疑似要素で縦線を描画）
+ * - Header: 名前と日時
+ * - ActionLabel: アクション情報（矢印/符号 + 名前 + ポイント）
+ * - MessageCard: メッセージ（オプション）
+ *
+ * プロフィールリンクが指定された場合、全体をリンクでラップ
+ */
 export const TransactionTimelineItem = ({
   avatar,
   header,
