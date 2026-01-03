@@ -20,16 +20,34 @@ export function MemberTab({ members, searchQuery, onSelect, initialConnection }:
   const t = useTranslations();
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
+  console.log("[MemberTab] Rendering with props:", {
+    membersCount: members.length,
+    searchQuery,
+    hasInitialConnection: !!initialConnection,
+    initialConnectionHasNextPage: initialConnection?.pageInfo?.hasNextPage,
+    initialConnectionEndCursor: initialConnection?.pageInfo?.endCursor,
+  });
+
   const {
     data: searchMembershipData,
     error,
     loadMoreRef: internalLoadMoreRef,
     isLoadingMore: internalIsLoadingMore,
+    hasNextPage,
   } = useMemberSearchFromCredentials(COMMUNITY_ID, members, {
     searchQuery,
     pageSize: 20,
     enablePagination: true,
     initialConnection,
+  });
+
+  console.log("[MemberTab] Hook returned:", {
+    dataCount: searchMembershipData?.length,
+    error: error?.message,
+    hasInternalLoadMoreRef: !!internalLoadMoreRef,
+    internalLoadMoreRefType: typeof internalLoadMoreRef,
+    isLoadingMore: internalIsLoadingMore,
+    hasNextPage,
   });
 
   if (error) {

@@ -39,6 +39,17 @@ export function useMemberWithDidSearch(
   const pageSize = options?.pageSize ?? 20;
   const initialConnection = options?.initialConnection;
 
+  console.log("[useMemberWithDidSearch] Hook called with:", {
+    communityId,
+    membersCount: members.length,
+    searchQuery,
+    enablePagination,
+    pageSize,
+    hasInitialConnection: !!initialConnection,
+    initialConnectionHasNextPage: initialConnection?.pageInfo?.hasNextPage,
+    initialConnectionEndCursor: initialConnection?.pageInfo?.endCursor,
+  });
+
   const membersFallbackConnection = useMemo<GqlMembershipsConnection>(() => {
     const edges = members.map((m) => ({
       cursor: `${m.user.id}_${communityId}`,
@@ -160,8 +171,31 @@ export function useMemberWithDidSearch(
   const hasNextPage = memberships.pageInfo?.hasNextPage ?? false;
   const [isFetchingMore, setIsFetchingMore] = useState(false);
 
+  console.log("[useMemberWithDidSearch] Current state:", {
+    hasLocalConnection: !!localConnection,
+    localConnectionEdgesCount: localConnection?.edges?.length,
+    hasNextPage,
+    endCursor,
+    isLoading,
+    isFetchingMore,
+    enablePagination,
+  });
+
   const handleFetchMore = async () => {
-    if (!hasNextPage || !enablePagination || isFetchingMore) return;
+    console.log("[useMemberWithDidSearch] handleFetchMore called with state:", {
+      hasNextPage,
+      enablePagination,
+      isFetchingMore,
+      endCursor,
+    });
+    if (!hasNextPage || !enablePagination || isFetchingMore) {
+      console.log("[useMemberWithDidSearch] handleFetchMore early return:", {
+        hasNextPage,
+        enablePagination,
+        isFetchingMore,
+      });
+      return;
+    }
 
     if (!endCursor) {
       console.warn("Invalid endCursor:", endCursor);
