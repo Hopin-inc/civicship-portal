@@ -1,122 +1,108 @@
-import { GqlTransactionReason } from "@/types/graphql";
+import { GqlTransaction, GqlTransactionReason } from "@/types/graphql";
 
-type TransactionActionType = "donation" | "grant" | "payment" | "return" | "refund";
+/**
+ * タイムライン表示用のActionLabelデータ
+ * 常にflow形式（矢印/記号 + 名前 + ポイント）で表示
+ */
+export interface TimelineActionLabelData {
+  viewMode: "timeline" | "wallet";
+  name: string;
+  direction: "outgoing" | "incoming";
+  amount: string;
+  note?: string;
+}
 
 interface TimelineActionLabelOptions {
   reason: GqlTransactionReason;
   recipientName: string;
   senderName: string;
   amount: string;
-  locale: string;
-  t: (key: string, values?: Record<string, string>) => string;
-  isIncoming?: boolean; // ウォレット視点で受信取引かどうか
-  viewMode?: "timeline" | "wallet"; // 表示モード
-}
-
-export interface TimelineActionLabelData {
-  type: "normal" | "special" | "flow";
-  locale: string;
-  viewMode?: "timeline" | "wallet";
-  // normal の場合
-  recipient?: string;
-  amount?: string;
-  action?: string;
-  // special の場合
-  text?: string;
-  // flow の場合
-  name?: string;
-  direction?: "outgoing" | "incoming";
-  badge?: string;
-  note?: string; // オプションの補足情報
+  isIncoming: boolean;
+  viewMode: "timeline" | "wallet";
+  onboardingNote?: string;
 }
 
 /**
- * タイムライン用のActionLabel生成
- *
- * 例: 「山田太郎に3,000ptを贈りました」
- *
- * 制約:
- * - 主語（送信者名）を含めない（Header側で表示済み）
- * - 時刻を含めない（Header側で表示済み）
- * - recipient（相手）を主役にする
+ * タイムライン用のActionLabelデータを生成
  */
 export const formatActionLabelForTimeline = ({
   reason,
   recipientName,
   senderName,
   amount,
-  locale,
-  t,
-  isIncoming = false,
-  viewMode = "timeline",
+  isIncoming,
+  viewMode,
+  onboardingNote,
 }: TimelineActionLabelOptions): TimelineActionLabelData => {
   // ポイント発行: 受信フロー
   if (reason === GqlTransactionReason.PointIssued) {
     return {
-      type: "flow",
-      locale,
       viewMode,
       name: recipientName,
       direction: "incoming",
-      badge: amount,
+      amount,
     };
   }
 
   // 登録ボーナス: 受信フロー
   if (reason === GqlTransactionReason.Onboarding) {
     return {
-      type: "flow",
-      locale,
       viewMode,
       name: senderName,
       direction: "incoming",
-      badge: amount,
-      note: t("transactions.timeline.note.onboarding"),
+      amount,
+      note: onboardingNote,
     };
   }
 
   // ウォレット視点で受信取引の場合
   if (isIncoming) {
     return {
-      type: "flow",
-      locale,
       viewMode,
       name: senderName,
       direction: "incoming",
-      badge: amount,
+      amount,
     };
   }
 
   // 通常ケース（送信 or グローバル視点）: 送信フロー
   return {
-    type: "flow",
-    locale,
     viewMode,
     name: recipientName,
     direction: "outgoing",
-    badge: amount,
+    amount,
   };
 };
 
 /**
- * GqlTransactionReason を timeline用の actionType にマッピング
+ * タイムライン表示用の表示名を決定
  */
-const mapReasonToTimelineActionType = (reason: GqlTransactionReason): TransactionActionType => {
-  switch (reason) {
-    case GqlTransactionReason.Donation:
-      return "donation";
-    case GqlTransactionReason.Grant:
-      return "grant";
-    case GqlTransactionReason.PointReward:
-    case GqlTransactionReason.TicketPurchased:
-    case GqlTransactionReason.OpportunityReservationCreated:
-      return "payment";
-    case GqlTransactionReason.TicketRefunded:
-      return "return";
-    case GqlTransactionReason.OpportunityReservationCanceled:
-    case GqlTransactionReason.OpportunityReservationRejected:
-      return "refund";
-    default:
-      return "donation"; // デフォルトは donation として扱う
+export const getTimelineDisplayName = (
+  transaction: GqlTransaction,
+  fromName: string,
+  toName: string,
+  perspectiveWalletId?: string
+): string => {
+  if (perspectiveWalletId) {
+    // ウォレット視点: 常に相手（counterparty）の名前を表示
+    const isOutgoing = transaction.fromWallet?.id === perspectiveWalletId;
+    return isOutgoing ? toName : fromName;
+  } else {
+    // グローバル視点（/transactions）: 通常は送信者、ポイント発行のみ受信者
+    const reason = transaction.reason;
+    return reason === GqlTransactionReason.PointIssued ? toName : fromName;
   }
+};
+
+/**
+ * 受信取引かどうかを判定
+ */
+export const isIncomingTransaction = (
+  transaction: GqlTransaction,
+  perspectiveWalletId?: string
+): boolean => {
+  if (!perspectiveWalletId) {
+    return false;
+  }
+  return transaction.fromWallet?.id !== perspectiveWalletId;
 };

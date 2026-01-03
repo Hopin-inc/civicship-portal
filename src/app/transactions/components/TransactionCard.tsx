@@ -1,11 +1,15 @@
 "use client";
 
-import { GqlTransaction, GqlTransactionReason } from "@/types/graphql";
-import { useTranslations, useLocale } from "next-intl";
+import { GqlTransaction } from "@/types/graphql";
+import { useTranslations } from "next-intl";
 import { useLocaleDateTimeFormat } from "@/utils/i18n";
 import { getTransactionInfo } from "@/shared/transactions/utils/format";
 import { computeProfileHref } from "@/shared/transactions/utils/navigation";
-import { formatActionLabelForTimeline } from "@/shared/transactions/utils/timelineFormat";
+import {
+  formatActionLabelForTimeline,
+  getTimelineDisplayName,
+  isIncomingTransaction,
+} from "@/shared/transactions/utils/timelineFormat";
 import { formatCurrency } from "@/utils/transaction";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { TransactionTimelineItem } from "@/shared/transactions/components/timeline/TransactionTimelineItem";
@@ -22,6 +26,10 @@ interface TransactionCardProps {
   isLast?: boolean;
 }
 
+/**
+ * タイムラインUIのトランザクションカード
+ * グローバル視点（/transactions）とウォレット視点（/wallets/me, /admin/wallet）の両方に対応
+ */
 export const TransactionCard = ({
   transaction,
   image,
@@ -31,77 +39,54 @@ export const TransactionCard = ({
   isLast = false,
 }: TransactionCardProps) => {
   const t = useTranslations();
-  const locale = useLocale();
   const formatDateTime = useLocaleDateTimeFormat();
   const info = getTransactionInfo(transaction, perspectiveWalletId);
 
   // 表示名の決定
-  let displayName: string;
-  if (perspectiveWalletId) {
-    // ウォレット視点: 常に相手（counterparty）の名前を表示
-    const isOutgoing = transaction.fromWallet?.id === perspectiveWalletId;
-    displayName = isOutgoing ? info.to : info.from;
-  } else {
-    // グローバル視点（/transactions）: 通常は送信者、ポイント発行のみ受信者
-    displayName = info.reason === GqlTransactionReason.PointIssued ? info.to : info.from;
-  }
+  const displayName = getTimelineDisplayName(
+    transaction,
+    info.from,
+    info.to,
+    perspectiveWalletId
+  );
 
-  const recipientName = info.to;
+  // 金額のフォーマット
   const formattedAmount = `${formatCurrency(Math.abs(info.amount))}pt`;
 
-  // 受信取引かどうかを判定
-  const isIncoming = perspectiveWalletId
-    ? transaction.fromWallet?.id !== perspectiveWalletId
-    : false;
-
-  // ActionLabel の生成
+  // ActionLabelデータの生成
   const actionLabelData = formatActionLabelForTimeline({
     reason: info.reason,
-    recipientName,
-    senderName: info.from, // 発行の場合はコミュニティ名
+    recipientName: info.to,
+    senderName: info.from,
     amount: formattedAmount,
-    locale,
-    t,
-    isIncoming,
+    isIncoming: isIncomingTransaction(transaction, perspectiveWalletId),
     viewMode: perspectiveWalletId ? "wallet" : "timeline",
+    onboardingNote: t("transactions.timeline.note.onboarding"),
   });
 
+  // プロフィールリンクの計算
   const profileHref = enableClickNavigation
     ? computeProfileHref(transaction, { perspectiveWalletId })
     : null;
 
-  // Avatar コンポーネント
-  const avatarElement = (
-    <Avatar className="h-12 w-12 shrink-0">
-      <AvatarImage src={image} alt={displayName} />
-      <AvatarFallback>U</AvatarFallback>
-    </Avatar>
-  );
-
-  // Header コンポーネント
-  const headerElement = (
-    <TransactionHeader
-      displayName={displayName}
-      formattedDateTime={formatDateTime(info.transferredAt)}
-    />
-  );
-
-  // ActionLabel コンポーネント
-  const actionLabelElement = (
-    <TransactionActionLabel data={actionLabelData} />
-  );
-
-  // MessageCard コンポーネント（コメントがある場合のみ）
-  const messageCardElement = info.comment ? (
-    <TransactionMessageCard comment={info.comment} />
-  ) : undefined;
-
   return (
     <TransactionTimelineItem
-      avatar={avatarElement}
-      header={headerElement}
-      actionLabel={actionLabelElement}
-      messageCard={messageCardElement}
+      avatar={
+        <Avatar className="h-12 w-12 shrink-0">
+          <AvatarImage src={image} alt={displayName} />
+          <AvatarFallback>U</AvatarFallback>
+        </Avatar>
+      }
+      header={
+        <TransactionHeader
+          displayName={displayName}
+          formattedDateTime={formatDateTime(info.transferredAt)}
+        />
+      }
+      actionLabel={<TransactionActionLabel data={actionLabelData} />}
+      messageCard={
+        info.comment ? <TransactionMessageCard comment={info.comment} /> : undefined
+      }
       profileHref={profileHref}
       isFirst={isFirst}
       isLast={isLast}
