@@ -17,17 +17,13 @@ export const TransactionActionLabel = ({
     // 記号の決定
     let symbol: string;
     if (viewMode === "wallet") {
-      symbol = data.direction === "outgoing" ? "- " : "+ ";
+      symbol = data.direction === "outgoing" ? "-" : "+";
     } else {
       symbol = data.direction === "outgoing" ? "→" : "←";
     }
 
-    // ウォレット視点: 色付きテキストで符号+数字、ptは小さめ
+    // ウォレット視点: 符号と数字を一体で表示、ptは小さめ
     if (viewMode === "wallet") {
-      const amountColor = data.direction === "outgoing"
-        ? "text-red-600"
-        : "text-green-600";
-
       // バッジから数字とptを分離（例: "3,131pt" → ["3,131", "pt"]）
       const amountMatch = data.badge?.match(/^([\d,]+)(pt)$/);
       const numberPart = amountMatch ? amountMatch[1] : data.badge;
@@ -35,7 +31,7 @@ export const TransactionActionLabel = ({
 
       return (
         <div className="flex items-center gap-0.5">
-          <span className={`text-sm font-semibold ${amountColor}`}>
+          <span className="text-sm font-semibold text-foreground">
             {symbol}{numberPart}
           </span>
           {unitPart && (
