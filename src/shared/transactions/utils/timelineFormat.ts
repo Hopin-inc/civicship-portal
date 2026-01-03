@@ -102,7 +102,16 @@ export const getTimelineDisplayName = (
   const reason = transaction.reason;
 
   if (perspectiveWalletId) {
-    // ウォレット視点: 常に相手（counterparty）の名前を表示
+    // ポイント発行 & ウォレット視点の特殊ケース
+    // コミュニティ視点（/admin/wallet）では自分（コミュニティ）の名前を表示
+    if (reason === GqlTransactionReason.PointIssued) {
+      const isOutgoing = transaction.fromWallet?.id === perspectiveWalletId;
+      // コミュニティ視点なら fromName（コミュニティ）、ユーザー視点なら fromName（コミュニティ）
+      // どちらもコミュニティ名を表示
+      return fromName;
+    }
+
+    // 通常ケース: 相手（counterparty）の名前を表示
     const isOutgoing = transaction.fromWallet?.id === perspectiveWalletId;
     return isOutgoing ? toName : fromName;
   } else {
