@@ -53,13 +53,25 @@ export const useMemberWallets = (): UseMemberWalletsResult => {
     if (!hasNextPage || isLoadingMore) return;
     setIsLoadingMore(true);
     try {
+      // endCursorをパースしてオブジェクト形式に変換
+      if (!endCursor) {
+        console.warn("Invalid endCursor:", endCursor);
+        return;
+      }
+
+      const cursorParts = endCursor.split("_");
+      if (cursorParts.length !== 2) {
+        console.warn("Invalid endCursor format:", endCursor);
+        return;
+      }
+
       await fetchMore({
         variables: {
+          cursor: { userId: cursorParts[0], communityId: cursorParts[1] },
           filter: {
             communityId: COMMUNITY_ID,
           },
           first: 20,
-          cursor: endCursor,
           withDidIssuanceRequests: true,
         },
         updateQuery: (prev, { fetchMoreResult }) => {
