@@ -48,21 +48,21 @@ export const TransactionActionLabel = ({
       );
     }
 
-    // タイムライン視点: 記号 名前 · ポイント
+    // タイムライン視点: [→]Suzanne Lloyd・3,131pt
     return (
-      <div className="flex items-center gap-1.5 min-w-0">
-        <span className="text-muted-foreground shrink-0 text-xs">
+      <div className="flex items-center min-w-0 text-xs">
+        <span className="shrink-0 text-foreground font-semibold">
           {symbol}
         </span>
-        <span className="truncate text-foreground font-bold text-xs">
+        <span className="truncate text-foreground font-bold">
           {data.name}
         </span>
-        <span className="text-muted-foreground shrink-0 text-xs">·</span>
+        <span className="text-muted-foreground shrink-0">・</span>
         <Badge variant="outline" size="sm" className="shrink-0">
           {data.badge}
         </Badge>
         {data.note && (
-          <span className="text-muted-foreground text-xs shrink-0">
+          <span className="text-muted-foreground shrink-0 ml-1">
             {data.note}
           </span>
         )}
