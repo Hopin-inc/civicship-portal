@@ -55,15 +55,5 @@
   "transactions.parts.action.payment.from.received.action": " paid from",
   "transactions.parts.action.return.from.received.action": " returned from",
   "transactions.parts.action.refund.from.received.action": " refunded from",
-  "transactions.timeline.action.ja": "{recipient}に{amount}を{action}",
-  "transactions.timeline.action.en": "{action} {amount} to {recipient}",
-  "transactions.timeline.actionType.donation": "Gifted",
-  "transactions.timeline.actionType.grant": "Granted",
-  "transactions.timeline.actionType.payment": "Paid",
-  "transactions.timeline.actionType.return": "Returned",
-  "transactions.timeline.actionType.refund": "Refunded",
-  "transactions.timeline.special.issued": "{amount} issued",
-  "transactions.timeline.special.onboarding": "Received {amount} welcome bonus from {community}",
-  "transactions.timeline.received": "Received {amount} from {sender}",
   "transactions.timeline.note.onboarding": "Welcome bonus"
 }
