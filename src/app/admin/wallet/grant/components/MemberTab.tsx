@@ -18,15 +18,13 @@ interface MemberTabProps {
   initialConnection?: GqlMembershipsConnection | null;
 }
 
-export function MemberTab({ members, searchQuery, onSelect, initialConnection }: MemberTabProps) {
+export function MemberTab({ members, searchQuery, onSelect, loadMoreRef, isLoadingMore, initialConnection }: MemberTabProps) {
   const t = useTranslations();
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
   const {
     data: searchMembershipData,
     error,
-    loadMoreRef: searchLoadMoreRef,
-    isLoadingMore: searchIsLoadingMore,
   } = useMemberSearchFromCredentials(COMMUNITY_ID, members, {
     searchQuery,
     pageSize: 20,
@@ -90,8 +88,8 @@ export function MemberTab({ members, searchQuery, onSelect, initialConnection }:
       </Table>
 
       {/* 無限スクロール用のローディング要素 - 常に表示 */}
-      <div ref={searchLoadMoreRef} className="flex justify-center py-8">
-        {searchIsLoadingMore && (
+      <div ref={loadMoreRef} className="flex justify-center py-8">
+        {isLoadingMore && (
           <div className="flex items-center space-x-2">
             <LoadingIndicator fullScreen={false} />
           </div>
