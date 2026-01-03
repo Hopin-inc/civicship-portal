@@ -126,6 +126,7 @@ function TransferInputStep({
                   value={amountInput.displayValue}
                   onChange={amountInput.handleChange}
                   onBlur={amountInput.handleBlur}
+                  onFocus={(e) => e.target.select()}
                   autoFocus
                   className="w-32 text-right"
                 />

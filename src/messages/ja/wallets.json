@@ -30,7 +30,7 @@
   "wallets.shared.transfer.amountLabel": "ポイント数",
   "wallets.shared.transfer.required": "必須",
   "wallets.shared.transfer.balance": "残高",
-  "wallets.shared.transfer.commentLabel": "コメント",
+  "wallets.shared.transfer.commentLabel": "メッセージ",
   "wallets.shared.transfer.commentPlaceholder": "例）草刈り手伝ってくれてありがとう！",
   "wallets.shared.transfer.commentError": "100文字以内で入力してください",
   "wallets.action.donation.to": "{name}にあげた",
