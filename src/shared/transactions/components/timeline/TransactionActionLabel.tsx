@@ -58,9 +58,9 @@ export const TransactionActionLabel = ({
           {data.name}
         </span>
         <span className="text-muted-foreground shrink-0">・</span>
-        <Badge variant="outline" size="sm" className="shrink-0">
+        <span className="shrink-0 text-foreground font-semibold">
           {data.badge}
-        </Badge>
+        </span>
         {data.note && (
           <span className="text-muted-foreground shrink-0 ml-1">
             {data.note}
