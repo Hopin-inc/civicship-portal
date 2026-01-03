@@ -50,8 +50,8 @@ export const TransactionActionLabel = ({
 
     // タイムライン視点: [→]Suzanne Lloyd・3,131pt
     return (
-      <div className="flex items-center min-w-0 text-xs">
-        <span className="shrink-0 text-foreground font-semibold">
+      <div className="flex items-center min-w-0 text-xs gap-1">
+        <span className="shrink-0 text-foreground text-[10px] border border-foreground rounded-full w-4 h-4 flex items-center justify-center">
           {symbol}
         </span>
         <span className="truncate text-foreground font-bold">
