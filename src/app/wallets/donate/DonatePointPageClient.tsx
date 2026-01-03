@@ -78,8 +78,6 @@ export default function DonatePointPageClient() {
         <DonateUserSelect
           members={members}
           onSelect={setSelectedUser}
-          loadMoreRef={loadMoreRef}
-          isLoadingMore={isLoadingMore}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           initialConnection={initialConnection}
