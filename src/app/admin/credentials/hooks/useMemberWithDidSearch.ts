@@ -39,17 +39,6 @@ export function useMemberWithDidSearch(
   const pageSize = options?.pageSize ?? 20;
   const initialConnection = options?.initialConnection;
 
-  console.log("[useMemberWithDidSearch] Hook called with:", {
-    communityId,
-    membersCount: members.length,
-    searchQuery,
-    enablePagination,
-    pageSize,
-    hasInitialConnection: !!initialConnection,
-    initialConnectionHasNextPage: initialConnection?.pageInfo?.hasNextPage,
-    initialConnectionEndCursor: initialConnection?.pageInfo?.endCursor,
-  });
-
   const membersFallbackConnection = useMemo<GqlMembershipsConnection>(() => {
     const edges = members.map((m) => ({
       cursor: `${m.user.id}_${communityId}`,
@@ -171,43 +160,14 @@ export function useMemberWithDidSearch(
   const hasNextPage = memberships.pageInfo?.hasNextPage ?? false;
   const [isFetchingMore, setIsFetchingMore] = useState(false);
 
-  console.log("[useMemberWithDidSearch] Current state:", {
-    hasLocalConnection: !!localConnection,
-    localConnectionEdgesCount: localConnection?.edges?.length,
-    hasNextPage,
-    endCursor,
-    isLoading,
-    isFetchingMore,
-    enablePagination,
-  });
-
   const handleFetchMore = async () => {
-    console.log("[useMemberWithDidSearch] handleFetchMore called with state:", {
-      hasNextPage,
-      enablePagination,
-      isFetchingMore,
-      endCursor,
-    });
-    if (!hasNextPage || !enablePagination || isFetchingMore) {
-      console.log("[useMemberWithDidSearch] handleFetchMore early return:", {
-        hasNextPage,
-        enablePagination,
-        isFetchingMore,
-      });
-      return;
-    }
+    if (!hasNextPage || !enablePagination || isFetchingMore) return;
 
     // Get the last edge's user ID for cursor-based pagination
     // The backend returns opaque endCursor strings, but MembershipCursorInput requires userId and communityId
     const edges = memberships.edges ?? [];
     const lastEdge = edges[edges.length - 1];
     const lastUserId = lastEdge?.node?.user?.id;
-
-    console.log("[useMemberWithDidSearch] Building cursor from last edge:", {
-      lastUserId,
-      communityId,
-      edgesCount: edges.length,
-    });
 
     if (!lastUserId) {
       console.warn("Cannot build cursor: no valid last edge with user ID");
