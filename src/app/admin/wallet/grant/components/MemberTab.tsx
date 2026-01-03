@@ -1,12 +1,13 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { GqlMembershipsConnection, GqlUser } from "@/types/graphql";
-import UserInfoCard from "./UserInfoCard";
 import { useMemberWithDidSearch as useMemberSearchFromCredentials } from "@/app/admin/credentials/hooks/useMemberWithDidSearch";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { useTranslations } from "next-intl";
+import { Table, TableBody } from "@/components/ui/table";
+import { UserPointRow } from "@/components/shared/UserPointRow";
 
 interface MemberTabProps {
   members: { user: GqlUser; wallet: { currentPointView?: { currentPoint: bigint } } }[];
@@ -19,6 +20,8 @@ interface MemberTabProps {
 
 export function MemberTab({ members, searchQuery, onSelect, initialConnection }: MemberTabProps) {
   const t = useTranslations();
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+
   const {
     data: searchMembershipData,
     error,
@@ -51,22 +54,40 @@ export function MemberTab({ members, searchQuery, onSelect, initialConnection }:
     );
   }
 
+  const handleSelect = (user: GqlUser) => {
+    // すでに選択されているユーザーをクリックした場合は選択解除
+    if (selectedUserId === user.id) {
+      setSelectedUserId(null);
+      return;
+    }
+
+    setSelectedUserId(user.id);
+    onSelect(user);
+  };
+
   return (
-    <div className="space-y-3 px-4">
-      {searchMembershipData?.map((m) => {
-        return (
-          <UserInfoCard
-            key={m.id}
-            otherUser={m}
-            label={m.name}
-            point={m.wallet?.currentPointView?.currentPoint ?? BigInt(0)}
-            showPoint={true}
-            showDate={false}
-            didValue={m.didInfo?.didValue ?? undefined}
-            onClick={() => onSelect(m)}
-          />
-        );
-      })}
+    <div className="px-4">
+      <Table className={"max-w-xl"}>
+        <TableBody>
+          {searchMembershipData?.map((m) => (
+            <UserPointRow
+              key={m.id}
+              avatar={m.image || ""}
+              name={m.name || ""}
+              subText={
+                m.didInfo?.didValue
+                  ? `DID: ${m.didInfo.didValue.substring(0, 8)}...`
+                  : m.createdAt
+                    ? new Date(m.createdAt).toLocaleDateString()
+                    : ""
+              }
+              pointValue={Number(m.wallet?.currentPointView?.currentPoint ?? 0)}
+              onClick={() => handleSelect(m)}
+              selected={selectedUserId === m.id}
+            />
+          ))}
+        </TableBody>
+      </Table>
 
       {/* 無限スクロール用のローディング要素 - 常に表示 */}
       <div ref={searchLoadMoreRef} className="flex justify-center py-8">

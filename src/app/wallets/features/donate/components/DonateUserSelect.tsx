@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { GqlUser } from "@/types/graphql";
+import { GqlMembershipsConnection, GqlUser } from "@/types/graphql";
 import UserSelectStep from "@/app/admin/wallet/grant/components/UserSelectStep";
 import { Tabs } from "@/app/admin/wallet/grant/types/tabs";
 import { DonateMember } from "../types";
@@ -14,6 +14,7 @@ interface Props {
   isLoadingMore?: boolean;
   activeTab: Tabs;
   setActiveTab: React.Dispatch<React.SetStateAction<Tabs>>;
+  initialConnection?: GqlMembershipsConnection | null;
 }
 
 export function DonateUserSelect({
@@ -23,6 +24,7 @@ export function DonateUserSelect({
   isLoadingMore,
   activeTab,
   setActiveTab,
+  initialConnection,
 }: Props) {
   const t = useTranslations();
   return (
@@ -35,6 +37,7 @@ export function DonateUserSelect({
       activeTab={activeTab}
       setActiveTab={setActiveTab}
       listType="donate"
+      initialConnection={initialConnection}
     />
   );
 }
