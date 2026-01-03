@@ -6,10 +6,17 @@ import { DonateForm, DonateUserSelect } from "@/app/wallets/features/donate/comp
 import { useDonateFlow } from "@/app/wallets/features/donate/hooks/useDonateFlow";
 import { useDonateMembers } from "@/app/wallets/features/donate/hooks/useDonateMembers";
 import { Tabs } from "@/app/admin/wallet/grant/types/tabs";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";
 import { useTranslations } from "next-intl";
+import {
+  GqlMembershipsConnection,
+  GqlRole,
+  GqlMembershipStatus,
+  GqlMembershipStatusReason,
+} from "@/types/graphql";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 export default function DonatePointPageClient() {
   const t = useTranslations();
@@ -23,17 +30,36 @@ export default function DonatePointPageClient() {
     user?.id,
   );
 
+  // members から initialConnection を作成
+  const initialConnection = useMemo<GqlMembershipsConnection | null>(() => {
+    if (members.length === 0) return null;
+
+    const edges = members.map((m) => ({
+      cursor: `${m.user.id}_${COMMUNITY_ID}`,
+      node: {
+        user: m.user,
+        role: GqlRole.Member,
+        reason: GqlMembershipStatusReason.AcceptedInvitation,
+        status: GqlMembershipStatus.Joined,
+      },
+    }));
+
+    return {
+      edges,
+      pageInfo: {
+        hasNextPage: false,
+        hasPreviousPage: false,
+        startCursor: null,
+        endCursor: null,
+      },
+      totalCount: members.length,
+    };
+  }, [members]);
+
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
     refetchRef.current = refetch;
   }, [refetch]);
-
-  // デバッグ: members の内容を確認
-  useEffect(() => {
-    console.log("DonatePointPageClient - members:", members);
-    console.log("DonatePointPageClient - user?.id:", user?.id);
-    console.log("DonatePointPageClient - members.length:", members.length);
-  }, [members, user?.id]);
 
   const { selectedUser, setSelectedUser, handleDonate, isLoading, isAuthReady } = useDonateFlow(
     user,
@@ -57,6 +83,7 @@ export default function DonatePointPageClient() {
           isLoadingMore={isLoadingMore}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
+          initialConnection={initialConnection}
         />
       ) : (
         <DonateForm
