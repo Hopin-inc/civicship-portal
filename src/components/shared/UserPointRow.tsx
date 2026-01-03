@@ -27,14 +27,16 @@ export function UserPointRow({
       className={`${onClick ? "cursor-pointer hover:bg-muted/50" : ""} ${selected ? "bg-primary/5 border-l-2 border-primary" : ""}`}
       data-state={selected ? "selected" : undefined}
     >
-      <TableCell className="flex items-center gap-3">
-        <Avatar>
-          <AvatarImage src={avatar} />
-          <AvatarFallback>{name[0]}</AvatarFallback>
-        </Avatar>
-        <div className="min-w-0">
-          <div className="truncate whitespace-nowrap overflow-hidden text-ellipsis">{name}</div>
-          <div className="text-sm text-muted-foreground">{subText}</div>
+      <TableCell>
+        <div className="flex items-center gap-3 min-w-0">
+          <Avatar className="flex-shrink-0">
+            <AvatarImage src={avatar} />
+            <AvatarFallback>{name[0]}</AvatarFallback>
+          </Avatar>
+          <div className="flex-1 min-w-0">
+            <div className="truncate whitespace-nowrap overflow-hidden text-ellipsis">{name}</div>
+            <div className="text-sm text-muted-foreground truncate">{subText}</div>
+          </div>
         </div>
       </TableCell>
       <TableCell className="align-middle w-24">
