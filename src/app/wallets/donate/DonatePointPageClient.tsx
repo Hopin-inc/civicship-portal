@@ -33,7 +33,10 @@ export default function DonatePointPageClient() {
     currentPoint,
   );
 
-  if (loading && !isLoadingMore) return <LoadingIndicator />;
+  if (loading) {
+    return <LoadingIndicator />;
+  }
+
   if (error)
     return <ErrorState title={t("wallets.donate.errorMembers")} refetchRef={refetchRef} />;
 
