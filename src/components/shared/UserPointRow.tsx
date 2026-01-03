@@ -3,6 +3,7 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Check } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface UserPointRowProps {
   avatar: string;
@@ -24,14 +25,17 @@ export function UserPointRow({
   return (
     <TableRow
       onClick={onClick}
-      className={`${onClick ? "cursor-pointer hover:bg-muted/50" : ""} ${selected ? "bg-primary/5 border-l-2 border-primary" : ""}`}
+      className={cn(
+        onClick && "cursor-pointer hover:bg-muted/50",
+        selected && "bg-primary/5 border-l-2 border-primary",
+      )}
       data-state={selected ? "selected" : undefined}
     >
       <TableCell className="max-w-0 w-full">
         <div className="flex items-center gap-3 min-w-0">
           <Avatar className="flex-shrink-0">
             <AvatarImage src={avatar} />
-            <AvatarFallback>{name[0]}</AvatarFallback>
+            <AvatarFallback>{name?.[0] ?? "U"}</AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">
             <div className="truncate">{name}</div>
