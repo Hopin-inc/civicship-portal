@@ -74,7 +74,7 @@ export function HistoryTab({ listType, searchQuery, onSelect }: HistoryTabProps)
             const subText = tx.createdAt
               ? new Date(tx.createdAt.toString()).toLocaleDateString()
               : tx.didValue
-                ? `DID: ${tx.didValue.substring(0, 8)}...`
+                ? `${tx.didValue.substring(0, 16)}...`
                 : "";
 
             return (
