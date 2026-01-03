@@ -11,12 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/textarea";
 import { truncateText } from "@/utils/stringUtils";
 import { useTranslations } from "next-intl";
-import {
-  Item,
-  ItemActions,
-  ItemContent,
-  ItemTitle,
-} from "@/components/ui/item";
+import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from "@/components/ui/item";
 import { useNumberInput } from "@/hooks/useNumberInput";
 
 interface Props {
@@ -63,7 +58,9 @@ function TransferInputStep({
   );
   useHeaderConfig(headerConfig);
 
-  const didValue = user.didIssuanceRequests?.find(req => req?.status === GqlDidIssuanceStatus.Completed)?.didValue;
+  const didValue = user.didIssuanceRequests?.find(
+    (req) => req?.status === GqlDidIssuanceStatus.Completed,
+  )?.didValue;
 
   const [amount, setAmount] = useState<number>(0);
   const [comment, setComment] = useState<string>("");
@@ -94,15 +91,17 @@ function TransferInputStep({
       <main className="flex items-center justify-center px-4">
         <div className="flex flex-col space-y-6 max-w-xl w-full">
           {/* 送付相手（確認情報） */}
-          <div className="flex items-center gap-3 w-full">
+          <div className="flex flex-col items-center gap-2 w-full text-center">
             <Avatar className="w-10 h-10 rounded-full border">
               <AvatarImage src={user.image || ""} alt={user.name || ""} />
               <AvatarFallback>{user.name?.[0] ?? "U"}</AvatarFallback>
             </Avatar>
+
             <div className="flex flex-col gap-1">
               <div className="text-sm font-medium">
                 {user.name ?? t("adminWallet.common.notSet")} に送る
               </div>
+
               {didValue && (
                 <div className="text-xs text-muted-foreground">
                   {truncateText(didValue, 20, "middle")}
@@ -113,11 +112,12 @@ function TransferInputStep({
 
           {/* ポイント数（条件） */}
           <div className="space-y-3 w-full">
-            <Item size="sm">
+            <Item size="sm" variant={"outline"}>
               <ItemContent>
-                <ItemTitle>
-                  {amountLabel ?? t("wallets.shared.transfer.amountLabel")}
-                </ItemTitle>
+                <ItemTitle>{amountLabel ?? t("wallets.shared.transfer.amountLabel")}</ItemTitle>
+                <ItemDescription className="text-xs text-muted-foreground">
+                  {t("wallets.shared.transfer.balance")} {currentPoint.toLocaleString()} pt
+                </ItemDescription>
               </ItemContent>
               <ItemActions>
                 <Input
@@ -132,9 +132,6 @@ function TransferInputStep({
                 <span className="text-sm text-muted-foreground">pt</span>
               </ItemActions>
             </Item>
-            <div className="text-sm text-muted-foreground px-4">
-              {t("wallets.shared.transfer.balance")} {currentPoint.toLocaleString()} pt
-            </div>
           </div>
 
           {/* コメント */}
@@ -155,7 +152,7 @@ function TransferInputStep({
                   }
                   setComment(newValue);
                 }}
-                className="focus:outline-none focus:ring-0 shadow-none min-h-[120px] pr-12"
+                className="focus:outline-none focus:ring-0 shadow-none min-h-[160px] pr-12"
               />
               <div className="absolute bottom-2 right-2 text-xs text-muted-foreground">
                 {comment.length}/100
