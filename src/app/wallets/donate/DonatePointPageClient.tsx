@@ -28,6 +28,13 @@ export default function DonatePointPageClient() {
     refetchRef.current = refetch;
   }, [refetch]);
 
+  // デバッグ: members の内容を確認
+  useEffect(() => {
+    console.log("DonatePointPageClient - members:", members);
+    console.log("DonatePointPageClient - user?.id:", user?.id);
+    console.log("DonatePointPageClient - members.length:", members.length);
+  }, [members, user?.id]);
+
   const { selectedUser, setSelectedUser, handleDonate, isLoading, isAuthReady } = useDonateFlow(
     user,
     currentPoint,
