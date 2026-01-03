@@ -62,8 +62,8 @@ export const TransactionActionLabel = ({
   const ArrowIcon = direction === "outgoing" ? ArrowRight : ArrowLeft;
 
   return (
-    <div className="flex items-center min-w-0 text-xs gap-1">
-      <span className="shrink-0 border border-muted-foreground/30 rounded-full w-4 h-4 flex items-center justify-center opacity-60">
+    <div className="flex items-center min-w-0 text-xs">
+      <span className="shrink-0 border border-muted-foreground/30 rounded-full w-4 h-4 flex items-center justify-center opacity-60 mr-1">
         <ArrowIcon className="w-2.5 h-2.5 text-foreground" strokeWidth={2} />
       </span>
       <span className="truncate text-foreground font-bold">
