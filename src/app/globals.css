@@ -541,7 +541,7 @@ li {
     left: 50%;
     transform: translateX(-50%);
     width: 2px;
-    background-color: hsl(var(--zinc-100));
+    background-color: hsl(var(--border));
     z-index: -1;
   }
 
