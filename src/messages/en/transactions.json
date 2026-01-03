@@ -54,5 +54,7 @@
   "transactions.parts.action.grant.from.received.action": " granted from",
   "transactions.parts.action.payment.from.received.action": " paid from",
   "transactions.parts.action.return.from.received.action": " returned from",
-  "transactions.parts.action.refund.from.received.action": " refunded from"
+  "transactions.parts.action.refund.from.received.action": " refunded from",
+  "transactions.timeline.note.onboarding": "Welcome bonus",
+  "transactions.timeline.issued": "Issued"
 }
