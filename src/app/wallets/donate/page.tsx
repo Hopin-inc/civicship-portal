@@ -1,13 +1,23 @@
-"use client";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { getMembershipListServer } from "@/lib/graphql/getMembershipListServer";
+import DonatePointPageClient from "./DonatePointPageClient";
 
-import { useAuth } from "@/contexts/AuthProvider";
-import { useSearchParams } from "next/navigation";
-import { DonatePointContent } from "@/app/wallets/features/donate/components/DonatePointContent";
+export default async function DonatePointPage() {
+  let connection = null;
 
-export default function DonatePointPage() {
-  const { user } = useAuth();
-  const searchParams = useSearchParams();
-  const currentPoint = BigInt(searchParams.get("currentPoint") ?? "0");
+  try {
+    const result = await getMembershipListServer({
+      filter: {
+        communityId: COMMUNITY_ID,
+      },
+      first: 20,
+      withWallets: true,
+      withDidIssuanceRequests: true,
+    });
+    connection = result.connection;
+  } catch (error) {
+    console.error("SSR fetch for DonatePointPage failed:", { error });
+  }
 
-  return <DonatePointContent currentUser={user} currentPoint={currentPoint} />;
+  return <DonatePointPageClient initialConnection={connection} />;
 }

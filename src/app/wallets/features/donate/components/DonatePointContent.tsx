@@ -7,15 +7,17 @@ import { useDonateFlow } from "../hooks/useDonateFlow";
 import { useDonateMembers } from "../hooks/useDonateMembers";
 import { Tabs } from "@/app/admin/wallet/grant/types/tabs";
 import { useEffect, useRef, useState } from "react";
-import { GqlUser } from "@/types/graphql";
+import { GqlMembershipsConnection, GqlUser } from "@/types/graphql";
 import { useTranslations } from "next-intl";
 
 export function DonatePointContent({
   currentUser,
   currentPoint,
+  initialConnection,
 }: {
   currentUser?: GqlUser | null;
   currentPoint: bigint;
+  initialConnection: GqlMembershipsConnection | null;
 }) {
   const t = useTranslations();
   const [activeTab, setActiveTab] = useState<Tabs>(Tabs.History);
@@ -47,6 +49,7 @@ export function DonatePointContent({
           isLoadingMore={isLoadingMore}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
+          initialConnection={initialConnection}
         />
       ) : (
         <DonateForm
