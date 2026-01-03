@@ -13,18 +13,18 @@ interface MemberTabProps {
   members: { user: GqlUser; wallet: { currentPointView?: { currentPoint: bigint } } }[];
   searchQuery: string;
   onSelect: (user: GqlUser) => void;
-  loadMoreRef?: React.RefObject<HTMLDivElement>;
-  isLoadingMore?: boolean;
   initialConnection?: GqlMembershipsConnection | null;
 }
 
-export function MemberTab({ members, searchQuery, onSelect, loadMoreRef, isLoadingMore, initialConnection }: MemberTabProps) {
+export function MemberTab({ members, searchQuery, onSelect, initialConnection }: MemberTabProps) {
   const t = useTranslations();
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
   const {
     data: searchMembershipData,
     error,
+    loadMoreRef: internalLoadMoreRef,
+    isLoadingMore: internalIsLoadingMore,
   } = useMemberSearchFromCredentials(COMMUNITY_ID, members, {
     searchQuery,
     pageSize: 20,
@@ -88,8 +88,8 @@ export function MemberTab({ members, searchQuery, onSelect, loadMoreRef, isLoadi
       </Table>
 
       {/* 無限スクロール用のローディング要素 - 常に表示 */}
-      <div ref={loadMoreRef} className="flex justify-center py-8">
-        {isLoadingMore && (
+      <div ref={internalLoadMoreRef} className="flex justify-center py-8">
+        {internalIsLoadingMore && (
           <div className="flex items-center space-x-2">
             <LoadingIndicator fullScreen={false} />
           </div>

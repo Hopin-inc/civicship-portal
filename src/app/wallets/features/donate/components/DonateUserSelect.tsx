@@ -10,8 +10,6 @@ import { useTranslations } from "next-intl";
 interface Props {
   members: DonateMember[];
   onSelect: (user: GqlUser) => void;
-  loadMoreRef?: React.RefObject<HTMLDivElement>;
-  isLoadingMore?: boolean;
   activeTab: Tabs;
   setActiveTab: React.Dispatch<React.SetStateAction<Tabs>>;
   initialConnection?: GqlMembershipsConnection | null;
@@ -20,8 +18,6 @@ interface Props {
 export function DonateUserSelect({
   members,
   onSelect,
-  loadMoreRef,
-  isLoadingMore,
   activeTab,
   setActiveTab,
   initialConnection,
@@ -32,8 +28,6 @@ export function DonateUserSelect({
       title={t("wallets.donate.selectRecipient")}
       members={members}
       onSelect={onSelect}
-      loadMoreRef={loadMoreRef}
-      isLoadingMore={isLoadingMore}
       activeTab={activeTab}
       setActiveTab={setActiveTab}
       listType="donate"
