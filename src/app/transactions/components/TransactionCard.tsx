@@ -75,7 +75,7 @@ export const TransactionCard = ({
       avatar={
         <Avatar className="h-12 w-12 shrink-0">
           <AvatarImage src={image} alt={displayName} />
-          <AvatarFallback>U</AvatarFallback>
+          <AvatarFallback>{displayName?.[0]?.toUpperCase() ?? "U"}</AvatarFallback>
         </Avatar>
       }
       header={
