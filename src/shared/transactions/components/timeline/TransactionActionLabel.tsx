@@ -27,13 +27,9 @@ export const TransactionActionLabel = ({
     );
   }
 
-  // 記号の決定
-  const symbol = viewMode === "wallet"
-    ? (direction === "outgoing" ? "-" : "+")
-    : (direction === "outgoing" ? "→" : "←");
-
   // ウォレット視点: 符号と数字を一体で表示、ptは小さめ
   if (viewMode === "wallet") {
+    const symbol = direction === "outgoing" ? "-" : "+";
     // 金額から数字とptを分離（例: "3,131pt" → ["3,131", "pt"]）
     const amountMatch = amount.match(/^([\d,]+)(pt)$/);
     const numberPart = amountMatch ? amountMatch[1] : amount;
@@ -66,10 +62,14 @@ export const TransactionActionLabel = ({
       <span className="shrink-0 border border-muted-foreground/30 rounded-full w-4 h-4 flex items-center justify-center opacity-60 mr-1">
         <ArrowIcon className="w-2.5 h-2.5 text-foreground" strokeWidth={2} />
       </span>
-      <span className="truncate text-foreground font-bold">
-        {name}
-      </span>
-      <span className="text-sm text-muted-foreground shrink-0 opacity-50">・</span>
+      {name && (
+        <>
+          <span className="truncate text-foreground font-bold">
+            {name}
+          </span>
+          <span className="text-sm text-muted-foreground shrink-0 opacity-50">・</span>
+        </>
+      )}
       <span className="shrink-0 text-foreground font-semibold">
         {amount}
       </span>
