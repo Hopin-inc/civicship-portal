@@ -26,11 +26,10 @@ export default function DonatePointPageClient() {
   const [activeTab, setActiveTab] = useState<Tabs>(Tabs.History);
 
   // Grant と同じパターン: Client Component でデータ取得
-  const { members, loading, error, refetch, loadMoreRef, isLoadingMore } = useDonateMembers(
-    user?.id,
-  );
+  const { members, loading, error, refetch, loadMoreRef, isLoadingMore, walletsConnection } =
+    useDonateMembers(user?.id);
 
-  // members から initialConnection を作成
+  // members から initialConnection を作成（元のpageInfoを保持）
   const initialConnection = useMemo<GqlMembershipsConnection | null>(() => {
     if (members.length === 0) return null;
 
@@ -46,15 +45,15 @@ export default function DonatePointPageClient() {
 
     return {
       edges,
-      pageInfo: {
+      pageInfo: walletsConnection?.pageInfo ?? {
         hasNextPage: false,
         hasPreviousPage: false,
         startCursor: null,
         endCursor: null,
       },
-      totalCount: members.length,
+      totalCount: walletsConnection?.totalCount ?? members.length,
     };
-  }, [members]);
+  }, [members, walletsConnection]);
 
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
