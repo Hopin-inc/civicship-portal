@@ -34,6 +34,14 @@ export function MemberTab({ members, searchQuery, onSelect, initialConnection }:
     initialConnection,
   });
 
+  // デバッグ
+  console.log("MemberTab - members:", members);
+  console.log("MemberTab - members.length:", members.length);
+  console.log("MemberTab - initialConnection:", initialConnection);
+  console.log("MemberTab - searchQuery:", searchQuery);
+  console.log("MemberTab - searchMembershipData:", searchMembershipData);
+  console.log("MemberTab - searchMembershipData.length:", searchMembershipData.length);
+
   if (error) {
     return (
       <div className="space-y-3 px-4">
