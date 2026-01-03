@@ -50,5 +50,6 @@
   "transactions.parts.action.payment.from.received.action": "から支払い",
   "transactions.parts.action.return.from.received.action": "から返品",
   "transactions.parts.action.refund.from.received.action": "から返金",
-  "transactions.timeline.note.onboarding": "登録ボーナス"
+  "transactions.timeline.note.onboarding": "登録ボーナス",
+  "transactions.timeline.issued": "発行"
 }

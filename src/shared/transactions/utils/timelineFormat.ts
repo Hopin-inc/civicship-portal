@@ -2,14 +2,17 @@ import { GqlTransaction, GqlTransactionReason } from "@/types/graphql";
 
 /**
  * タイムライン表示用のActionLabelデータ
- * 常にflow形式（矢印/記号 + 名前 + ポイント）で表示
+ * 通常: flow形式（矢印/記号 + 名前 + ポイント）
+ * ポイント発行: シンプル形式（ポイント + 発行）
  */
 export interface TimelineActionLabelData {
   viewMode: "timeline" | "wallet";
-  name: string;
+  name?: string;
   direction: "outgoing" | "incoming";
   amount: string;
   note?: string;
+  isPointIssued?: boolean;
+  issuedLabel?: string;
 }
 
 interface TimelineActionLabelOptions {
@@ -20,6 +23,7 @@ interface TimelineActionLabelOptions {
   isIncoming: boolean;
   viewMode: "timeline" | "wallet";
   onboardingNote?: string;
+  issuedLabel?: string;
 }
 
 /**
@@ -33,8 +37,20 @@ export const formatActionLabelForTimeline = ({
   isIncoming,
   viewMode,
   onboardingNote,
+  issuedLabel,
 }: TimelineActionLabelOptions): TimelineActionLabelData => {
-  // ポイント発行: 受信フロー
+  // ポイント発行: シンプル表示（タイムライン視点のみ）
+  if (reason === GqlTransactionReason.PointIssued && viewMode === "timeline") {
+    return {
+      viewMode,
+      direction: "incoming",
+      amount,
+      isPointIssued: true,
+      issuedLabel,
+    };
+  }
+
+  // ポイント発行: ウォレット視点では通常のフロー
   if (reason === GqlTransactionReason.PointIssued) {
     return {
       viewMode,

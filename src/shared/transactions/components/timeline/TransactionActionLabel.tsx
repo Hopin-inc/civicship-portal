@@ -15,7 +15,17 @@ interface TransactionActionLabelProps {
 export const TransactionActionLabel = ({
   data,
 }: TransactionActionLabelProps) => {
-  const { viewMode, direction, name, amount, note } = data;
+  const { viewMode, direction, name, amount, note, isPointIssued, issuedLabel } = data;
+
+  // ポイント発行（タイムライン視点）: シンプル表示
+  if (isPointIssued && viewMode === "timeline") {
+    return (
+      <div className="flex items-center gap-1 text-xs">
+        <span className="text-foreground font-semibold">{amount}</span>
+        <span className="text-muted-foreground">{issuedLabel}</span>
+      </div>
+    );
+  }
 
   // 記号の決定
   const symbol = viewMode === "wallet"
@@ -59,7 +69,7 @@ export const TransactionActionLabel = ({
       <span className="truncate text-foreground font-bold">
         {name}
       </span>
-      <span className="text-sm text-muted-foreground shrink-0 opacity-50 mx-1.5">・</span>
+      <span className="text-sm text-muted-foreground shrink-0 opacity-50">・</span>
       <span className="shrink-0 text-foreground font-semibold">
         {amount}
       </span>

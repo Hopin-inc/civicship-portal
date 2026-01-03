@@ -62,6 +62,7 @@ export const TransactionCard = ({
     isIncoming: isIncomingTransaction(transaction, perspectiveWalletId),
     viewMode: perspectiveWalletId ? "wallet" : "timeline",
     onboardingNote: t("transactions.timeline.note.onboarding"),
+    issuedLabel: t("transactions.timeline.issued"),
   });
 
   // プロフィールリンクの計算
