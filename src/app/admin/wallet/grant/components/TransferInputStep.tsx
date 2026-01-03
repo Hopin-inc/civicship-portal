@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { GqlDidIssuanceStatus, GqlUser } from "@/types/graphql";
@@ -8,11 +8,16 @@ import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { HeaderConfig } from "@/contexts/HeaderContext";
 import { toast } from "react-toastify";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { truncateText } from "@/utils/stringUtils";
 import { useTranslations } from "next-intl";
+import {
+  Item,
+  ItemActions,
+  ItemContent,
+  ItemTitle,
+} from "@/components/ui/item";
+import { useNumberInput } from "@/hooks/useNumberInput";
 
 interface Props {
   user: GqlUser;
@@ -26,7 +31,6 @@ interface Props {
   submitLabel?: string;
   backLabel?: string;
   amountLabel?: string;
-  presetAmounts?: number[];
 }
 
 const INT_LIMIT = 2000000000;
@@ -39,129 +43,140 @@ function TransferInputStep({
   onBack,
   onSubmit,
   title,
-  recipientKey,
   submitLabel,
   backLabel,
   amountLabel,
 }: Props) {
   const t = useTranslations();
-  
-  const finalTitle = title ?? t("adminWallet.grant.title");
-  const finalSubmitLabel = submitLabel ?? t("adminWallet.grant.submit");
-  const finalBackLabel = backLabel ?? t("adminWallet.grant.back");
+
+  const finalTitle = title ?? t("wallets.shared.transfer.pageTitle");
+  const finalSubmitLabel = submitLabel ?? t("wallets.shared.transfer.submitLabel");
+  const finalBackLabel = backLabel ?? t("wallets.shared.transfer.backLabel");
+
   const headerConfig: HeaderConfig = useMemo(
     () => ({
       title: finalTitle,
-      showLogo: true,
-      showBackButton: false,
+      showLogo: false,
+      showBackButton: true,
     }),
     [finalTitle],
   );
   useHeaderConfig(headerConfig);
+
   const didValue = user.didIssuanceRequests?.find(req => req?.status === GqlDidIssuanceStatus.Completed)?.didValue;
 
-  const finalRecipientKey = recipientKey ?? "adminWallet.grant.recipientRich";
-  const recipientDisplay = t.rich(finalRecipientKey, {
-    b: (chunks) => <strong className="text-label-sm font-bold">{chunks}</strong>,
-    name: user.name ?? t("adminWallet.common.notSet"),
-  });
-
-  const [amount, setAmount] = useState<number | null>(null);
-  const [displayValue, setDisplayValue] = useState<string>("");
+  const [amount, setAmount] = useState<number>(0);
   const [comment, setComment] = useState<string>("");
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value;
-    
-    if (raw === "") {
-      setAmount(null);
-      setDisplayValue("");
-      return;
-    }
-    
-    const num = Number(raw);
-    if (isNaN(num)) {
-      return; // 数字以外の入力は無視
-    }
-    
-    if (num > currentPoint) {
-      toast.error(t("wallets.shared.transfer.errorExceedsBalance"));
-      return;
-    }
-    if (num > INT_LIMIT) {
-      toast.error(t("wallets.shared.transfer.errorExceedsLimit"));
-      return;
-    }
-    
-    setAmount(num);
-    setDisplayValue(raw);
-  };
+  // useNumberInput フックを使用
+  const amountInput = useNumberInput({
+    value: amount,
+    onChange: (newValue: number) => {
+      // 残高チェック
+      if (newValue > Number(currentPoint)) {
+        toast.error(t("wallets.shared.transfer.errorExceedsBalance"));
+        return;
+      }
+      // 上限チェック
+      if (newValue > INT_LIMIT) {
+        toast.error(t("wallets.shared.transfer.errorExceedsLimit"));
+        return;
+      }
+      setAmount(newValue);
+    },
+    min: 1,
+    max: Math.min(Number(currentPoint), INT_LIMIT),
+    defaultValue: 0,
+  });
 
   return (
     <>
       <main className="flex items-center justify-center px-4">
-        <div className="flex flex-col items-center space-y-6 max-w-xl w-full">
-          <Card className="items-center gap-3 w-full border p-4">
-            <div className="flex items-center gap-3 w-full">
-              <Avatar className="w-10 h-10 rounded-full border object-cover">
-                <AvatarImage src={user.image || ""} alt={user.name ?? t("adminWallet.common.toConfirm")} />
-                <AvatarFallback>{user.name?.[0] ?? "U"}</AvatarFallback>
-              </Avatar>
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-1 text-label-xs font-bold">
-                  {recipientDisplay}
-                </div>
-                {didValue && <span className="text-label-xs text-caption mt-1">{truncateText(didValue, 20, "middle")}</span>}
+        <div className="flex flex-col space-y-6 max-w-xl w-full">
+          {/* 送付相手（確認情報） */}
+          <div className="flex items-center gap-3 w-full">
+            <Avatar className="w-10 h-10 rounded-full border">
+              <AvatarImage src={user.image || ""} alt={user.name || ""} />
+              <AvatarFallback>{user.name?.[0] ?? "U"}</AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col gap-1">
+              <div className="text-sm font-medium">
+                {user.name ?? t("adminWallet.common.notSet")} に送る
               </div>
+              {didValue && (
+                <div className="text-xs text-muted-foreground">
+                  {truncateText(didValue, 20, "middle")}
+                </div>
+              )}
             </div>
-          </Card>
-          <section className="w-full">
-            <div>
-              <Label className="text-label-md font-medium">{amountLabel ?? t("wallets.shared.transfer.amountLabel")}</Label>
-              <span className="text-label-xs rounded-full px-2 py-[2px] ml-2 bg-primary-foreground text-primary font-bold">
-                {t("wallets.shared.transfer.required")}
-              </span>
-            </div>
-            <Input
-                type="text"
-                inputMode="numeric"
-                placeholder="1000pt"
-                value={displayValue}
-                onChange={handleInputChange}
-                className="mt-3 focus:outline-none focus:ring-0 shadow-none"
-            />
-            <div className="text-sm text-muted-foreground text-left mt-3">
+          </div>
+
+          {/* ポイント数（条件） */}
+          <div className="space-y-3 w-full">
+            <Item size="sm">
+              <ItemContent>
+                <ItemTitle>
+                  {amountLabel ?? t("wallets.shared.transfer.amountLabel")}
+                </ItemTitle>
+              </ItemContent>
+              <ItemActions>
+                <Input
+                  type="number"
+                  min="1"
+                  value={amountInput.displayValue}
+                  onChange={amountInput.handleChange}
+                  onBlur={amountInput.handleBlur}
+                  autoFocus
+                  className="w-32 text-right"
+                />
+                <span className="text-sm text-muted-foreground">pt</span>
+              </ItemActions>
+            </Item>
+            <div className="text-sm text-muted-foreground px-4">
               {t("wallets.shared.transfer.balance")} {currentPoint.toLocaleString()} pt
             </div>
-            <div className="mt-6">
-              <Label className="text-label-md font-medium">{t("wallets.shared.transfer.commentLabel")}</Label>
-              <div className="relative mt-3">
-                <Textarea
-                  maxLength={100}
-                  placeholder={t("wallets.shared.transfer.commentPlaceholder")}
-                  value={comment}
-                  onChange={(e) => {
-                    const newValue = e.target.value;
-                    if (newValue.length > 100) {
-                      toast.error(t("wallets.shared.transfer.commentError"));
-                      return;
-                    }
-                    setComment(newValue);
-                  }}
-                  className="focus:outline-none focus:ring-0 shadow-none min-h-[120px] pr-12"
-                />
-                <div className="absolute bottom-2 right-2 text-xs text-muted-foreground">
-                  {comment.length}/100
-                </div>
+          </div>
+
+          {/* コメント */}
+          <div className="w-full">
+            <div className="text-sm font-medium mb-3">
+              {t("wallets.shared.transfer.commentLabel")}
+            </div>
+            <div className="relative">
+              <Textarea
+                maxLength={100}
+                placeholder={t("wallets.shared.transfer.commentPlaceholder")}
+                value={comment}
+                onChange={(e) => {
+                  const newValue = e.target.value;
+                  if (newValue.length > 100) {
+                    toast.error(t("wallets.shared.transfer.commentError"));
+                    return;
+                  }
+                  setComment(newValue);
+                }}
+                className="focus:outline-none focus:ring-0 shadow-none min-h-[120px] pr-12"
+              />
+              <div className="absolute bottom-2 right-2 text-xs text-muted-foreground">
+                {comment.length}/100
               </div>
             </div>
-          </section>
-          
-          <div className="flex flex-col gap-2 w-full mt-6">
+          </div>
+
+          {/* ボタン */}
+          <div className="flex flex-col gap-2 w-full">
             <Button
-              onClick={() => amount && amount > 0 && amount <= currentPoint && onSubmit(amount, comment.trim() || undefined)}
+              onClick={() => {
+                if (amount > 0 && amount <= Number(currentPoint)) {
+                  onSubmit(amount, comment.trim() || undefined);
+                }
+              }}
               disabled={
-                !amount || amount <= 0 || amount > currentPoint || isLoading || amount > INT_LIMIT || !isAuthReady
+                amount <= 0 ||
+                amount > Number(currentPoint) ||
+                amount > INT_LIMIT ||
+                isLoading ||
+                !isAuthReady
               }
               className="w-full"
             >
