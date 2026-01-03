@@ -76,7 +76,7 @@ export function MemberTab({ members, searchQuery, onSelect, initialConnection }:
               name={m.name || ""}
               subText={
                 m.didInfo?.didValue
-                  ? `DID: ${m.didInfo.didValue.substring(0, 8)}...`
+                  ? `${m.didInfo.didValue.substring(0, 16)}...`
                   : m.createdAt
                     ? new Date(m.createdAt).toLocaleDateString()
                     : ""

@@ -38,13 +38,13 @@ export function UserPointRow({
             <AvatarFallback>{name?.[0] ?? "U"}</AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">
-            <div className="truncate">{name}</div>
-            <div className="text-sm text-muted-foreground truncate">{subText}</div>
+            <div className="truncate font-bold">{name}</div>
+            <div className="text-xs text-muted-foreground truncate">{subText}</div>
           </div>
         </div>
       </TableCell>
       <TableCell className="align-middle w-24">
-        <div className="flex justify-end items-center h-full text-muted-foreground">
+        <div className="flex justify-end items-center h-full">
           {pointValue.toLocaleString()}
           <span className="text-xs ml-0.5">pt</span>
           {selected && <Check className="h-5 w-5 text-primary ml-3" />}
