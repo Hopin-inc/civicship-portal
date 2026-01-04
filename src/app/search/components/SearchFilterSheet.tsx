@@ -156,7 +156,7 @@ const SearchFilterSheets: React.FC<FilterSheetsProps> = ({
                 チケット利用可
               </Label>
               <p className="text-muted-foreground text-sm mt-1 leading-tight">
-                主催者からもらったチケットを使って、
+                主催者から受け取ったチケットを使って、
                 <br />
                 無料で参加することができます。
               </p>
@@ -171,7 +171,7 @@ const SearchFilterSheets: React.FC<FilterSheetsProps> = ({
                 ポイント利用可
               </Label>
               <p className="text-muted-foreground text-sm mt-1 leading-tight">
-                お手伝いでもらったポイントを使って、
+                お手伝いで受け取ったポイントを使って、
                 <br />
                 無料で参加することができます。
               </p>

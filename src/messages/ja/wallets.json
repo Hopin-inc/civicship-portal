@@ -30,7 +30,7 @@
   "wallets.shared.transfer.commentPlaceholder": "例）草刈り手伝ってくれてありがとう！",
   "wallets.shared.transfer.commentError": "100文字以内で入力してください",
   "wallets.action.donation.to": "{name}に送った",
-  "wallets.action.donation.from": "{name}からもらった",
+  "wallets.action.donation.from": "{name}から受け取り",
   "wallets.donate.toast.success": "{amount}ptを送りました",
   "wallets.donate.toast.errorWithCode": "送信失敗: {code}",
   "wallets.donate.toast.genericError": "ポイントを送れませんでした",
