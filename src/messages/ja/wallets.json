@@ -20,6 +20,7 @@
   "wallets.shared.transfer.pageTitle": "ポイントを送る",
   "wallets.shared.transfer.submitLabel": "送る",
   "wallets.shared.transfer.backLabel": "戻る",
+  "wallets.shared.transfer.sendTo": "{name}に送る",
   "wallets.shared.transfer.didPending": "did発行中",
   "wallets.shared.transfer.errorExceedsBalance": "保有ポイントを超えています",
   "wallets.shared.transfer.errorExceedsLimit": "20億以下を指定してください",

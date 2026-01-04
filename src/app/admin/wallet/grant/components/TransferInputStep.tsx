@@ -99,7 +99,7 @@ function TransferInputStep({
 
             <div className="flex flex-col gap-1">
               <div className="text-sm font-medium">
-                {user.name ?? t("adminWallet.common.notSet")} に送る
+                {t("wallets.shared.transfer.sendTo", { name: user.name ?? t("adminWallet.common.notSet") })}
               </div>
 
               {didValue && (

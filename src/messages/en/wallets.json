@@ -20,6 +20,7 @@
   "wallets.shared.transfer.pageTitle": "Send Points",
   "wallets.shared.transfer.submitLabel": "Send",
   "wallets.shared.transfer.backLabel": "Back",
+  "wallets.shared.transfer.sendTo": "Send to {name}",
   "wallets.shared.transfer.didPending": "DID issuance in progress",
   "wallets.shared.transfer.errorExceedsBalance": "Exceeds available balance",
   "wallets.shared.transfer.errorExceedsLimit": "Please specify 2 billion or less",
