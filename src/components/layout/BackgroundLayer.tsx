@@ -6,9 +6,6 @@ export function BackgroundLayer() {
 
       {/* 左右をほんのり沈める */}
       <div className="absolute inset-0 bg-gradient-to-r from-muted via-transparent to-muted" />
-
-      {/* ノイズ */}
-      <div className="absolute inset-0 bg-[url('/noise-light.png')] opacity-[0.2]" />
     </div>
   );
 }
