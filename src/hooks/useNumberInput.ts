@@ -45,13 +45,18 @@ export const useNumberInput = ({
         return;
       }
 
+      // 最大値チェック（入力値を制限）
+      if (max !== undefined && numValue > max) {
+        return;
+      }
+
       // 表示値を更新
       setDisplayValue(inputValue);
 
       // 即座に親に通知（リアルタイム更新）
       onChange(numValue);
     },
-    [onChange]
+    [onChange, max]
   );
 
   // フォーカスアウト時のハンドラ（空の場合デフォルト値を設定）
