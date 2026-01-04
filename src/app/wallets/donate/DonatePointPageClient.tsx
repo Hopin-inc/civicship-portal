@@ -2,7 +2,8 @@
 
 import { useAuth } from "@/contexts/AuthProvider";
 import { useSearchParams } from "next/navigation";
-import { DonateForm, DonateUserSelect } from "@/app/wallets/features/donate/components";
+import { DonateUserSelect } from "@/app/wallets/features/donate/components";
+import TransferInputStep from "@/app/admin/wallet/grant/components/TransferInputStep";
 import { useDonateFlow } from "@/app/wallets/features/donate/hooks/useDonateFlow";
 import { useDonateMembers } from "@/app/wallets/features/donate/hooks/useDonateMembers";
 import { Tabs } from "@/app/admin/wallet/grant/types/tabs";
@@ -83,13 +84,13 @@ export default function DonatePointPageClient() {
           initialConnection={initialConnection}
         />
       ) : (
-        <DonateForm
+        <TransferInputStep
           user={selectedUser}
+          currentPoint={currentPoint}
           isLoading={isLoading}
           isAuthReady={isAuthReady}
           onBack={() => setSelectedUser(null)}
           onSubmit={handleDonate}
-          currentPoint={currentPoint}
         />
       )}
     </div>
