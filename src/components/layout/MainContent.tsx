@@ -56,13 +56,19 @@ const MainContent: React.FC<MainContentProps> = ({ children }) => {
   const showFooter = shouldShowFooter();
 
   return (
-    <div className="min-h-screen flex flex-col max-w-mobile-l mx-auto w-full">
+    <div className="min-h-screen flex flex-col max-w-mobile-l mx-auto w-full bg-background">
       <Header />
-      <main className={`w-full flex-grow ${showHeader ? "pt-16" : ""} ${showFooter ? "pb-16" : ""} overflow-y-auto`}>
+      <main
+        className={`w-full flex-grow ${showHeader ? "pt-16" : ""} ${showFooter ? "pb-16" : ""} overflow-y-auto`}
+      >
         <RouteGuard>{children}</RouteGuard>
       </main>
-      {showFooter && <BottomBar className="fixed bottom-0 left-0 right-0 z-50 max-w-mobile-l mx-auto w-full" />}
-      {showFooter && <AdminBottomBar className="fixed bottom-0 left-0 right-0 z-50 max-w-mobile-l mx-auto w-full" />}
+      {showFooter && (
+        <BottomBar className="fixed bottom-0 left-0 right-0 z-50 max-w-mobile-l mx-auto w-full" />
+      )}
+      {showFooter && (
+        <AdminBottomBar className="fixed bottom-0 left-0 right-0 z-50 max-w-mobile-l mx-auto w-full" />
+      )}
     </div>
   );
 };
