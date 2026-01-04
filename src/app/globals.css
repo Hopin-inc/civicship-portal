@@ -541,6 +541,7 @@ li {
     left: 50%;
     transform: translateX(-50%);
     width: 1px;
+    opacity: 0.4;
     background-color: hsl(var(--border));
     z-index: -1;
   }
@@ -560,7 +561,7 @@ li {
   /* Bottom rail - from avatar center to item bottom */
   .timeline-avatar::after {
     top: 24px;
-    bottom: -32px; /* Extend into pb-8 spacing */
+    bottom: -40px; /* Extend into pb-10 spacing */
   }
 
   /* Hide top rail on first item */
