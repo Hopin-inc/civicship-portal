@@ -44,7 +44,9 @@ export const PortfolioCard = ({ viewModel, isLast, lastRef }: PortfolioCardProps
           ) : (
             viewModel.badge && (
               <div className="absolute top-2 left-2 z-10">
-                <div className={`px-2 py-1 text-label-sm rounded-full font-bold ${viewModel.badge.variantClasses}`}>
+                <div
+                  className={`px-2 py-1 text-label-sm rounded-full font-bold ${viewModel.badge.variantClasses}`}
+                >
                   {t(viewModel.badge.labelKey as any)}
                 </div>
               </div>
@@ -59,14 +61,16 @@ export const PortfolioCard = ({ viewModel, isLast, lastRef }: PortfolioCardProps
           )}
         </div>
         <div className="py-3 space-y-2">
-          <h3 className="text-label-lg line-clamp-2">{viewModel.title}</h3>
+          <h3 className="text-body-sm line-clamp-2 font-bold">{viewModel.title}</h3>
           <div className="space-y-1">
             <div className="flex items-center gap-1 text-body-sm text-caption">
               <Calendar className="w-4 h-4" />
               <span>
                 {viewModel.dateDisplay}
                 {viewModel.showScheduleBadge && (
-                  <span className="bg-ring pl-1.5 pr-2 py-0.5 rounded-lg ml-1">{t("users.portfolio.badge.scheduled")}</span>
+                  <span className="bg-ring pl-1.5 pr-2 py-0.5 rounded-lg ml-1">
+                    {t("users.portfolio.badge.scheduled")}
+                  </span>
                 )}
               </span>
             </div>

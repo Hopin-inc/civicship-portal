@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { JapaneseYenIcon, MapPin } from "lucide-react";
 import React from "react";
+import { cn } from "@/lib/utils";
 
 interface OpportunityVerticalCardProps {
   title: string;
@@ -50,7 +51,7 @@ export default function OpportunityVerticalCard({
       cardClass: "h-[150px]",
       linkClass: "w-[120px]",
       sizes: "120px",
-      titleClass: "text-label-xs",
+      titleClass: "text-label-xs font-bold",
       spacing: "mt-2",
       metaSpacing: "mt-1",
     },
@@ -61,7 +62,9 @@ export default function OpportunityVerticalCard({
     <div className={`relative ${config.containerClass}`}>
       <Card className={`w-full ${config.cardClass} overflow-hidden relative`}>
         {badge && (
-          <div className={`absolute top-2 left-2 bg-primary-foreground text-primary px-2.5 py-1 rounded-xl text-label-xs font-bold z-10`}>
+          <div
+            className={`absolute top-2 left-2 bg-primary-foreground text-primary px-2.5 py-1 rounded-xl text-label-xs font-bold z-10`}
+          >
             {badge}
           </div>
         )}
@@ -109,9 +112,7 @@ export default function OpportunityVerticalCard({
               <span className="bg-primary text-[11px] rounded-full w-4 h-4 flex items-center justify-center font-bold text-white leading-none">
                 P
               </span>
-              <p className="text-body-sm font-bold">
-                {pointsToEarn.toLocaleString()}ptもらえる
-              </p>
+              <p className="text-body-sm font-bold">{pointsToEarn.toLocaleString()}ptもらえる</p>
             </div>
           )}
         </div>
@@ -121,7 +122,15 @@ export default function OpportunityVerticalCard({
 
   if (href) {
     return (
-      <Link href={href} className={`inline-block ${config.linkClass} mt-6`}>
+      <Link
+        href={href}
+        className={cn(
+          "inline-block",
+          config.linkClass,
+          size === "md" && "mt-6",
+          size === "sm" && "mt-2", // or 0
+        )}
+      >
         {CardContent}
       </Link>
     );
