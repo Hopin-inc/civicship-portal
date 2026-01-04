@@ -26,7 +26,7 @@ export const ActiveOpportunitiesSection = ({ opportunities }: ActiveOpportunitie
         <div className="overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide">
           <div className="flex gap-4">
             {opportunities.map((opportunity) => (
-              <OpportunityVerticalCard key={opportunity.id} {...opportunity} />
+              <OpportunityVerticalCard key={opportunity.id} {...opportunity} size="sm" />
             ))}
           </div>
         </div>

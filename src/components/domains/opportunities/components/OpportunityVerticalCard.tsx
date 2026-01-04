@@ -18,6 +18,7 @@ interface OpportunityVerticalCardProps {
   pointsRequired?: number | null;
   href?: string;
   onClick?: () => void;
+  size?: "md" | "sm";
 }
 
 export default function OpportunityVerticalCard({
@@ -31,11 +32,34 @@ export default function OpportunityVerticalCard({
   pointsRequired,
   href,
   onClick,
+  size = "md",
 }: OpportunityVerticalCardProps) {
+  // Size configurations
+  const sizeConfig = {
+    md: {
+      containerClass: "w-[164px]",
+      cardClass: "h-[205px]",
+      linkClass: "w-[164px]",
+      sizes: "164px",
+      titleClass: "text-title-sm",
+      spacing: "mt-3",
+      metaSpacing: "mt-2",
+    },
+    sm: {
+      containerClass: "w-[120px]",
+      cardClass: "h-[150px]",
+      linkClass: "w-[120px]",
+      sizes: "120px",
+      titleClass: "text-label-sm",
+      spacing: "mt-2",
+      metaSpacing: "mt-1",
+    },
+  };
+  const config = sizeConfig[size];
 
   const CardContent = (
-    <div className="relative w-[164px]">
-      <Card className="w-full h-[205px] overflow-hidden relative">
+    <div className={`relative ${config.containerClass}`}>
+      <Card className={`w-full ${config.cardClass} overflow-hidden relative`}>
         {badge && (
           <div className={`absolute top-2 left-2 bg-primary-foreground text-primary px-2.5 py-1 rounded-xl text-label-xs font-bold z-10`}>
             {badge}
@@ -46,7 +70,7 @@ export default function OpportunityVerticalCard({
           alt={imageAlt ?? title}
           width={400}
           height={400}
-          sizes="164px"
+          sizes={config.sizes}
           placeholder={`blur`}
           blurDataURL={PLACEHOLDER_IMAGE}
           loading="lazy"
@@ -57,9 +81,9 @@ export default function OpportunityVerticalCard({
           }}
         />
       </Card>
-      <div className="mt-3">
-        <h3 className="text-title-sm text-foreground line-clamp-2">{title}</h3>
-        <div className="mt-2 flex flex-col">
+      <div className={config.spacing}>
+        <h3 className={`${config.titleClass} text-foreground line-clamp-2`}>{title}</h3>
+        <div className={`${config.metaSpacing} flex flex-col`}>
           {price !== undefined && (
             <div className="text-body-sm text-muted-foreground flex items-center gap-1">
               <JapaneseYenIcon className="w-4 h-4" />
@@ -97,7 +121,7 @@ export default function OpportunityVerticalCard({
 
   if (href) {
     return (
-      <Link href={href} className="inline-block w-[164px] mt-6">
+      <Link href={href} className={`inline-block ${config.linkClass} mt-6`}>
         {CardContent}
       </Link>
     );
