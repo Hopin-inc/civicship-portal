@@ -17,6 +17,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { LiffDeepLinkHandler } from "@/components/liff/LiffDeepLinkHandler";
 import { SwipeBackNavigation } from "@/components/navigation/SwipeBackNavigation";
+import { BackgroundLayer } from "@/components/layout/BackgroundLayer";
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -59,7 +60,7 @@ const RootLayout = async ({
 
   return (
     <html lang={locale}>
-      <body className={`${font.className} bg-muted`}>
+      <body className={`${font.className}`}>
         <ClientPolyfills />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <CookiesProvider>
@@ -74,6 +75,7 @@ const RootLayout = async ({
                   <SwipeBackNavigation>
                     <LoadingProvider>
                       <AnalyticsProvider />
+                      <BackgroundLayer />
                       <MainContent>{children}</MainContent>
                       <Toaster />
                     </LoadingProvider>
