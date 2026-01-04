@@ -59,7 +59,7 @@ const RootLayout = async ({
 
   return (
     <html lang={locale}>
-      <body className={font.className}>
+      <body className={`${font.className} bg-muted`}>
         <ClientPolyfills />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <CookiesProvider>
