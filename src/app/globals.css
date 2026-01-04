@@ -540,7 +540,7 @@ li {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    width: 2px;
+    width: 1px;
     background-color: hsl(var(--border));
     z-index: -1;
   }
