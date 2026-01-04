@@ -140,6 +140,7 @@ export function middleware(request: NextRequest) {
     "https://analytics.google.com",
     "https://region1.google-analytics.com",
     "https://www.googletagmanager.com",
+    "https://zipcloud.ibsnet.co.jp", // 郵便番号検索API
   ].join(" ");
 
   const frameSrc = [

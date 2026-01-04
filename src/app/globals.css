@@ -531,3 +531,46 @@ li {
   color: hsl(var(--card-foreground));
   border-color: hsl(var(--border));
 }
+
+@layer components {
+  /* Timeline Avatar with pseudo-element rails */
+  .timeline-avatar::before,
+  .timeline-avatar::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    opacity: 0.4;
+    background-color: hsl(var(--border));
+    z-index: -1;
+  }
+
+  /* Ensure avatar appears above rails */
+  .timeline-avatar > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Top rail - from item top to avatar center */
+  .timeline-avatar::before {
+    top: 0;
+    height: 24px;
+  }
+
+  /* Bottom rail - from avatar center to item bottom */
+  .timeline-avatar::after {
+    top: 24px;
+    bottom: -40px; /* Extend into pb-10 spacing */
+  }
+
+  /* Hide top rail on first item */
+  .timeline-avatar-first::before {
+    display: none;
+  }
+
+  /* Hide bottom rail on last item */
+  .timeline-avatar-last::after {
+    display: none;
+  }
+}

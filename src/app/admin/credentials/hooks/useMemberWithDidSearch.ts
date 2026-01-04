@@ -164,21 +164,21 @@ export function useMemberWithDidSearch(
   const handleFetchMore = async () => {
     if (!hasNextPage || !enablePagination || isFetchingMore) return;
 
-    if (!endCursor) {
-      console.warn("Invalid endCursor:", endCursor);
-      return;
-    }
+    // Get the last edge's user ID for cursor-based pagination
+    // The backend returns opaque endCursor strings, but MembershipCursorInput requires userId and communityId
+    const edges = memberships.edges ?? [];
+    const lastEdge = edges[edges.length - 1];
+    const lastUserId = lastEdge?.node?.user?.id;
 
-    const cursorParts = endCursor.split("_");
-    if (cursorParts.length !== 2) {
-      console.warn("Invalid endCursor format:", endCursor);
+    if (!lastUserId) {
+      console.warn("Cannot build cursor: no valid last edge with user ID");
       return;
     }
 
     setIsFetchingMore(true);
     try {
       const result = await queryMemberships({
-        cursor: { userId: cursorParts[0], communityId: cursorParts[1] },
+        cursor: { userId: lastUserId, communityId },
         filter: {
           ...(searchQuery && { keyword: searchQuery }),
           communityId,

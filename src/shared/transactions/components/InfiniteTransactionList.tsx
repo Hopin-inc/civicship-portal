@@ -6,7 +6,7 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { useInfiniteTransactions } from "@/hooks/transactions/useInfiniteTransactions";
 import { getServerCommunityTransactionsWithCursor } from "@/hooks/transactions/server-community-transactions";
 import { getServerWalletTransactionsWithCursor } from "@/hooks/transactions/server-wallet-transactions";
-import { getFromWalletImage, getCounterpartyImage } from "@/shared/transactions/utils/images";
+import { getCounterpartyImage, getFromWalletImage } from "@/shared/transactions/utils/images";
 
 interface InfiniteTransactionListProps {
   initialTransactions: GqlTransactionsConnection;
@@ -22,13 +22,11 @@ export const InfiniteTransactionList = ({
   initialTransactions,
   walletId,
   perspectiveWalletId,
-  showSignedAmount = false,
-  showDid = false,
-  useReceivedPhrasing = false,
   enableClickNavigation = false,
 }: InfiniteTransactionListProps) => {
   const fetchMore = walletId
-    ? (cursor?: string, first: number = 20) => getServerWalletTransactionsWithCursor(walletId, cursor, first)
+    ? (cursor?: string, first: number = 20) =>
+        getServerWalletTransactionsWithCursor(walletId, cursor, first)
     : getServerCommunityTransactionsWithCursor;
 
   const { transactions, hasNextPage, loading, loadMoreRef } = useInfiniteTransactions({
@@ -37,21 +35,22 @@ export const InfiniteTransactionList = ({
   });
 
   return (
-    <div className="divide-y-8 divide-zinc-100">
-      {transactions.map((transaction) => {
+    <div className="timeline-container">
+      {transactions.map((transaction, index) => {
         const image = perspectiveWalletId
           ? getCounterpartyImage(transaction, perspectiveWalletId)
           : getFromWalletImage(transaction);
+        const isFirst = index === 0;
+        const isLast = index === transactions.length - 1;
         return (
           <TransactionCard
             key={transaction.id}
             transaction={transaction}
             image={image}
             perspectiveWalletId={perspectiveWalletId}
-            showSignedAmount={showSignedAmount}
-            showDid={showDid}
-            useReceivedPhrasing={useReceivedPhrasing}
             enableClickNavigation={enableClickNavigation}
+            isFirst={isFirst}
+            isLast={isLast}
           />
         );
       })}

@@ -34,14 +34,14 @@ export function TabManager({ activeTab, setActiveTab }: TabManagerProps) {
 
   return (
     <Tabs value={activeTab} onValueChange={handleTabChange}>
-      <TabsList className="gap-2 w-3/5 pl-4">
+      <TabsList className="gap-2 w-3/5 pl-4 bg-transparent p-0">
         <TabsTrigger
           value={TabsEnum.History}
           className={clsx(
             "rounded-full px-6 py-2 font-bold text-sm",
             activeTab === TabsEnum.History
               ? "!bg-blue-600 !text-white border border-blue-600"
-              : "bg-white text-black border border-gray-300"
+              : "bg-white text-black border border-gray-300",
           )}
         >
           {t("wallets.shared.tabs.history")}
@@ -52,7 +52,7 @@ export function TabManager({ activeTab, setActiveTab }: TabManagerProps) {
             "rounded-full px-6 py-2 font-bold text-sm",
             activeTab === TabsEnum.Member
               ? "!bg-blue-600 !text-white border border-blue-600 shadow"
-              : "bg-white text-black border border-gray-300"
+              : "bg-white text-black border border-gray-300",
           )}
         >
           {t("wallets.shared.tabs.member")}
@@ -60,4 +60,4 @@ export function TabManager({ activeTab, setActiveTab }: TabManagerProps) {
       </TabsList>
     </Tabs>
   );
-}   
+}

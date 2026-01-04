@@ -11,6 +11,7 @@ export default function PortfoliosPage() {
       title: t("users.portfolio.pageTitle"),
       showLogo: false,
       showBackButton: true,
+      backTo: "/users/me",
     }),
     [t],
   );

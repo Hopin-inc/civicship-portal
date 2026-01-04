@@ -152,12 +152,11 @@ export type GqlAuthZDirectiveDeepCompositeRulesInput = {
 };
 
 export const GqlAuthZRules = {
-  CanReadPhoneNumber: "CanReadPhoneNumber",
+  CanManageOpportunity: "CanManageOpportunity",
   IsAdmin: "IsAdmin",
   IsCommunityManager: "IsCommunityManager",
   IsCommunityMember: "IsCommunityMember",
   IsCommunityOwner: "IsCommunityOwner",
-  IsOpportunityOwner: "IsOpportunityOwner",
   IsSelf: "IsSelf",
   IsUser: "IsUser",
 } as const;
@@ -885,13 +884,13 @@ export type GqlMutationOpportunityCreateArgs = {
 
 export type GqlMutationOpportunityDeleteArgs = {
   id: Scalars["ID"]["input"];
-  permission: GqlCheckCommunityPermissionInput;
+  permission: GqlCheckOpportunityPermissionInput;
 };
 
 export type GqlMutationOpportunitySetPublishStatusArgs = {
   id: Scalars["ID"]["input"];
   input: GqlOpportunitySetPublishStatusInput;
-  permission: GqlCheckCommunityPermissionInput;
+  permission: GqlCheckOpportunityPermissionInput;
 };
 
 export type GqlMutationOpportunitySlotCreateArgs = {
@@ -914,7 +913,7 @@ export type GqlMutationOpportunitySlotsBulkUpdateArgs = {
 export type GqlMutationOpportunityUpdateContentArgs = {
   id: Scalars["ID"]["input"];
   input: GqlOpportunityUpdateContentInput;
-  permission: GqlCheckCommunityPermissionInput;
+  permission: GqlCheckOpportunityPermissionInput;
 };
 
 export type GqlMutationParticipationBulkCreateArgs = {
@@ -1100,6 +1099,7 @@ export type GqlNftInstanceEdge = GqlEdge & {
 
 export type GqlNftInstanceFilterInput = {
   and?: InputMaybe<Array<GqlNftInstanceFilterInput>>;
+  communityId?: InputMaybe<Scalars["ID"]["input"]>;
   hasDescription?: InputMaybe<Scalars["Boolean"]["input"]>;
   hasImage?: InputMaybe<Scalars["Boolean"]["input"]>;
   hasName?: InputMaybe<Scalars["Boolean"]["input"]>;
@@ -2851,6 +2851,53 @@ export type GqlWalletsConnection = {
   totalCount: Scalars["Int"]["output"];
 };
 
+export type GqlGetStatesQueryVariables = Exact<{
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+}>;
+
+export type GqlGetStatesQuery = {
+  __typename?: "Query";
+  states: {
+    __typename?: "StatesConnection";
+    edges: Array<{
+      __typename?: "StateEdge";
+      node?: { __typename?: "State"; code: string; name: string } | null;
+    }>;
+  };
+};
+
+export type GqlGetCitiesQueryVariables = Exact<{
+  filter?: InputMaybe<GqlCitiesInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  sort?: InputMaybe<GqlCitiesSortInput>;
+}>;
+
+export type GqlGetCitiesQuery = {
+  __typename?: "Query";
+  cities: {
+    __typename?: "CitiesConnection";
+    totalCount: number;
+    pageInfo: {
+      __typename?: "PageInfo";
+      startCursor?: string | null;
+      endCursor?: string | null;
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+    };
+    edges: Array<{
+      __typename?: "CityEdge";
+      cursor: string;
+      node?: {
+        __typename?: "City";
+        code: string;
+        name: string;
+        state?: { __typename?: "State"; code: string; name: string } | null;
+      } | null;
+    }>;
+  };
+};
+
 export type GqlCommunityFieldsFragment = {
   __typename?: "Community";
   id: string;
@@ -4317,6 +4364,185 @@ export type GqlOpportunityFieldsFragment = {
   earliestReservableAt?: Date | null;
 };
 
+export type GqlCreateOpportunityMutationVariables = Exact<{
+  input: GqlOpportunityCreateInput;
+  permission: GqlCheckCommunityPermissionInput;
+}>;
+
+export type GqlCreateOpportunityMutation = {
+  __typename?: "Mutation";
+  opportunityCreate?: {
+    __typename?: "OpportunityCreateSuccess";
+    opportunity: {
+      __typename?: "Opportunity";
+      id: string;
+      title: string;
+      category: GqlOpportunityCategory;
+      description: string;
+      body?: string | null;
+      publishStatus: GqlPublishStatus;
+      images?: Array<string> | null;
+      requireApproval: boolean;
+      feeRequired?: number | null;
+      pointsToEarn?: number | null;
+      pointsRequired?: number | null;
+      createdAt?: Date | null;
+      updatedAt?: Date | null;
+      createdByUser?: { __typename?: "User"; id: string; name: string } | null;
+      place?: { __typename?: "Place"; id: string; name: string } | null;
+      slots?: Array<{
+        __typename?: "OpportunitySlot";
+        id: string;
+        startsAt: Date;
+        endsAt: Date;
+        capacity?: number | null;
+        hostingStatus: GqlOpportunitySlotHostingStatus;
+      }> | null;
+    };
+  } | null;
+};
+
+export type GqlUpdateOpportunityContentMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+  input: GqlOpportunityUpdateContentInput;
+  permission: GqlCheckOpportunityPermissionInput;
+}>;
+
+export type GqlUpdateOpportunityContentMutation = {
+  __typename?: "Mutation";
+  opportunityUpdateContent?: {
+    __typename?: "OpportunityUpdateContentSuccess";
+    opportunity: {
+      __typename?: "Opportunity";
+      id: string;
+      title: string;
+      category: GqlOpportunityCategory;
+      description: string;
+      body?: string | null;
+      publishStatus: GqlPublishStatus;
+      images?: Array<string> | null;
+      requireApproval: boolean;
+      feeRequired?: number | null;
+      pointsToEarn?: number | null;
+      pointsRequired?: number | null;
+      updatedAt?: Date | null;
+      place?: { __typename?: "Place"; id: string; name: string } | null;
+      createdByUser?: { __typename?: "User"; id: string; name: string } | null;
+    };
+  } | null;
+};
+
+export type GqlUpdateOpportunitySlotsBulkMutationVariables = Exact<{
+  input: GqlOpportunitySlotsBulkUpdateInput;
+  permission: GqlCheckOpportunityPermissionInput;
+}>;
+
+export type GqlUpdateOpportunitySlotsBulkMutation = {
+  __typename?: "Mutation";
+  opportunitySlotsBulkUpdate?: {
+    __typename?: "OpportunitySlotsBulkUpdateSuccess";
+    slots: Array<{
+      __typename?: "OpportunitySlot";
+      id: string;
+      startsAt: Date;
+      endsAt: Date;
+      capacity?: number | null;
+      hostingStatus: GqlOpportunitySlotHostingStatus;
+      remainingCapacity?: number | null;
+    }>;
+  } | null;
+};
+
+export type GqlSetPublishStatusMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+  input: GqlOpportunitySetPublishStatusInput;
+  permission: GqlCheckOpportunityPermissionInput;
+}>;
+
+export type GqlSetPublishStatusMutation = {
+  __typename?: "Mutation";
+  opportunitySetPublishStatus?: {
+    __typename?: "OpportunitySetPublishStatusSuccess";
+    opportunity: {
+      __typename?: "Opportunity";
+      id: string;
+      publishStatus: GqlPublishStatus;
+      updatedAt?: Date | null;
+    };
+  } | null;
+};
+
+export type GqlSetOpportunitySlotHostingStatusMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+  input: GqlOpportunitySlotSetHostingStatusInput;
+  permission: GqlCheckOpportunityPermissionInput;
+}>;
+
+export type GqlSetOpportunitySlotHostingStatusMutation = {
+  __typename?: "Mutation";
+  opportunitySlotSetHostingStatus?: {
+    __typename?: "OpportunitySlotSetHostingStatusSuccess";
+    slot: {
+      __typename?: "OpportunitySlot";
+      id: string;
+      startsAt: Date;
+      endsAt: Date;
+      capacity?: number | null;
+      hostingStatus: GqlOpportunitySlotHostingStatus;
+      remainingCapacity?: number | null;
+    };
+  } | null;
+};
+
+export type GqlDeleteOpportunityMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+  permission: GqlCheckOpportunityPermissionInput;
+}>;
+
+export type GqlDeleteOpportunityMutation = {
+  __typename?: "Mutation";
+  opportunityDelete?: { __typename?: "OpportunityDeleteSuccess"; opportunityId: string } | null;
+};
+
+export type GqlGetAdminOpportunitiesQueryVariables = Exact<{
+  filter?: InputMaybe<GqlOpportunityFilterInput>;
+  sort?: InputMaybe<GqlOpportunitySortInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+}>;
+
+export type GqlGetAdminOpportunitiesQuery = {
+  __typename?: "Query";
+  opportunities: {
+    __typename?: "OpportunitiesConnection";
+    totalCount: number;
+    pageInfo: {
+      __typename?: "PageInfo";
+      startCursor?: string | null;
+      endCursor?: string | null;
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+    };
+    edges: Array<{
+      __typename?: "OpportunityEdge";
+      cursor: string;
+      node?: {
+        __typename?: "Opportunity";
+        id: string;
+        title: string;
+        description: string;
+        publishStatus: GqlPublishStatus;
+        category: GqlOpportunityCategory;
+        images?: Array<string> | null;
+        requireApproval: boolean;
+        createdAt?: Date | null;
+        updatedAt?: Date | null;
+        createdByUser?: { __typename?: "User"; id: string; name: string } | null;
+      } | null;
+    }>;
+  };
+};
+
 export type GqlGetOpportunitiesQueryVariables = Exact<{
   filter?: InputMaybe<GqlOpportunityFilterInput>;
   sort?: InputMaybe<GqlOpportunitySortInput>;
@@ -4634,6 +4860,23 @@ export type GqlGetOpportunitySlotWithParticipationsQuery = {
         } | null;
         evaluation?: { __typename?: "Evaluation"; id: string; status: GqlEvaluationStatus } | null;
       }> | null;
+    }> | null;
+  } | null;
+};
+
+export type GqlGetSlotReservationsQueryVariables = Exact<{
+  slotId: Scalars["ID"]["input"];
+}>;
+
+export type GqlGetSlotReservationsQuery = {
+  __typename?: "Query";
+  opportunitySlot?: {
+    __typename?: "OpportunitySlot";
+    id: string;
+    reservations?: Array<{
+      __typename?: "Reservation";
+      id: string;
+      status: GqlReservationStatus;
     }> | null;
   } | null;
 };
@@ -5326,6 +5569,81 @@ export type GqlPlaceFieldsFragment = {
     name: string;
     state?: { __typename?: "State"; code: string; countryCode: string; name: string } | null;
   } | null;
+};
+
+export type GqlPlaceCreateMutationVariables = Exact<{
+  input: GqlPlaceCreateInput;
+  permission: GqlCheckCommunityPermissionInput;
+}>;
+
+export type GqlPlaceCreateMutation = {
+  __typename?: "Mutation";
+  placeCreate?: {
+    __typename?: "PlaceCreateSuccess";
+    place: {
+      __typename?: "Place";
+      id: string;
+      name: string;
+      address: string;
+      latitude: any;
+      longitude: any;
+      googlePlaceId?: string | null;
+      isManual?: boolean | null;
+      mapLocation?: any | null;
+      image?: string | null;
+      createdAt?: Date | null;
+      updatedAt?: Date | null;
+      city?: {
+        __typename?: "City";
+        code: string;
+        name: string;
+        state?: { __typename?: "State"; code: string; countryCode: string; name: string } | null;
+      } | null;
+      community?: { __typename?: "Community"; id: string } | null;
+    };
+  } | null;
+};
+
+export type GqlPlaceUpdateMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+  input: GqlPlaceUpdateInput;
+  permission: GqlCheckCommunityPermissionInput;
+}>;
+
+export type GqlPlaceUpdateMutation = {
+  __typename?: "Mutation";
+  placeUpdate?: {
+    __typename?: "PlaceUpdateSuccess";
+    place: {
+      __typename?: "Place";
+      id: string;
+      name: string;
+      address: string;
+      latitude: any;
+      longitude: any;
+      googlePlaceId?: string | null;
+      isManual?: boolean | null;
+      mapLocation?: any | null;
+      image?: string | null;
+      updatedAt?: Date | null;
+      city?: {
+        __typename?: "City";
+        code: string;
+        name: string;
+        state?: { __typename?: "State"; code: string; countryCode: string; name: string } | null;
+      } | null;
+    };
+  } | null;
+};
+
+export type GqlPlaceDeleteMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+  permission: GqlCheckCommunityPermissionInput;
+}>;
+
+export type GqlPlaceDeleteMutation = {
+  __typename?: "Mutation";
+  placeDelete?: { __typename?: "PlaceDeleteSuccess"; id: string } | null;
 };
 
 export type GqlGetPlacesQueryVariables = Exact<{
@@ -6226,6 +6544,147 @@ export const TransactionFieldsFragmentDoc = gql`
     createdAt
   }
 `;
+export const GetStatesDocument = gql`
+  query GetStates($first: Int) {
+    states(first: $first) {
+      edges {
+        node {
+          code
+          name
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetStatesQuery__
+ *
+ * To run a query within a React component, call `useGetStatesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetStatesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetStatesQuery({
+ *   variables: {
+ *      first: // value for 'first'
+ *   },
+ * });
+ */
+export function useGetStatesQuery(
+  baseOptions?: Apollo.QueryHookOptions<GqlGetStatesQuery, GqlGetStatesQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetStatesQuery, GqlGetStatesQueryVariables>(GetStatesDocument, options);
+}
+export function useGetStatesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<GqlGetStatesQuery, GqlGetStatesQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetStatesQuery, GqlGetStatesQueryVariables>(
+    GetStatesDocument,
+    options,
+  );
+}
+export function useGetStatesSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GqlGetStatesQuery, GqlGetStatesQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetStatesQuery, GqlGetStatesQueryVariables>(
+    GetStatesDocument,
+    options,
+  );
+}
+export type GetStatesQueryHookResult = ReturnType<typeof useGetStatesQuery>;
+export type GetStatesLazyQueryHookResult = ReturnType<typeof useGetStatesLazyQuery>;
+export type GetStatesSuspenseQueryHookResult = ReturnType<typeof useGetStatesSuspenseQuery>;
+export type GetStatesQueryResult = Apollo.QueryResult<
+  GqlGetStatesQuery,
+  GqlGetStatesQueryVariables
+>;
+export const GetCitiesDocument = gql`
+  query GetCities($filter: CitiesInput, $first: Int, $cursor: String, $sort: CitiesSortInput) {
+    cities(filter: $filter, first: $first, cursor: $cursor, sort: $sort) {
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
+      }
+      totalCount
+      edges {
+        cursor
+        node {
+          code
+          name
+          state {
+            code
+            name
+          }
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetCitiesQuery__
+ *
+ * To run a query within a React component, call `useGetCitiesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCitiesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCitiesQuery({
+ *   variables: {
+ *      filter: // value for 'filter'
+ *      first: // value for 'first'
+ *      cursor: // value for 'cursor'
+ *      sort: // value for 'sort'
+ *   },
+ * });
+ */
+export function useGetCitiesQuery(
+  baseOptions?: Apollo.QueryHookOptions<GqlGetCitiesQuery, GqlGetCitiesQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetCitiesQuery, GqlGetCitiesQueryVariables>(GetCitiesDocument, options);
+}
+export function useGetCitiesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<GqlGetCitiesQuery, GqlGetCitiesQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetCitiesQuery, GqlGetCitiesQueryVariables>(
+    GetCitiesDocument,
+    options,
+  );
+}
+export function useGetCitiesSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GqlGetCitiesQuery, GqlGetCitiesQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetCitiesQuery, GqlGetCitiesQueryVariables>(
+    GetCitiesDocument,
+    options,
+  );
+}
+export type GetCitiesQueryHookResult = ReturnType<typeof useGetCitiesQuery>;
+export type GetCitiesLazyQueryHookResult = ReturnType<typeof useGetCitiesLazyQuery>;
+export type GetCitiesSuspenseQueryHookResult = ReturnType<typeof useGetCitiesSuspenseQuery>;
+export type GetCitiesQueryResult = Apollo.QueryResult<
+  GqlGetCitiesQuery,
+  GqlGetCitiesQueryVariables
+>;
 export const GetCommunitiesDocument = gql`
   query GetCommunities {
     communities {
@@ -8690,6 +9149,510 @@ export type GetEvaluationQueryResult = Apollo.QueryResult<
   GqlGetEvaluationQuery,
   GqlGetEvaluationQueryVariables
 >;
+export const CreateOpportunityDocument = gql`
+  mutation CreateOpportunity(
+    $input: OpportunityCreateInput!
+    $permission: CheckCommunityPermissionInput!
+  ) {
+    opportunityCreate(input: $input, permission: $permission) {
+      ... on OpportunityCreateSuccess {
+        opportunity {
+          id
+          title
+          category
+          description
+          body
+          publishStatus
+          images
+          requireApproval
+          feeRequired
+          pointsToEarn
+          pointsRequired
+          createdAt
+          updatedAt
+          createdByUser {
+            id
+            name
+          }
+          place {
+            id
+            name
+          }
+          slots {
+            id
+            startsAt
+            endsAt
+            capacity
+            hostingStatus
+          }
+        }
+      }
+    }
+  }
+`;
+export type GqlCreateOpportunityMutationFn = Apollo.MutationFunction<
+  GqlCreateOpportunityMutation,
+  GqlCreateOpportunityMutationVariables
+>;
+
+/**
+ * __useCreateOpportunityMutation__
+ *
+ * To run a mutation, you first call `useCreateOpportunityMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateOpportunityMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createOpportunityMutation, { data, loading, error }] = useCreateOpportunityMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function useCreateOpportunityMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlCreateOpportunityMutation,
+    GqlCreateOpportunityMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlCreateOpportunityMutation, GqlCreateOpportunityMutationVariables>(
+    CreateOpportunityDocument,
+    options,
+  );
+}
+export type CreateOpportunityMutationHookResult = ReturnType<typeof useCreateOpportunityMutation>;
+export type CreateOpportunityMutationResult = Apollo.MutationResult<GqlCreateOpportunityMutation>;
+export type CreateOpportunityMutationOptions = Apollo.BaseMutationOptions<
+  GqlCreateOpportunityMutation,
+  GqlCreateOpportunityMutationVariables
+>;
+export const UpdateOpportunityContentDocument = gql`
+  mutation UpdateOpportunityContent(
+    $id: ID!
+    $input: OpportunityUpdateContentInput!
+    $permission: CheckOpportunityPermissionInput!
+  ) {
+    opportunityUpdateContent(id: $id, input: $input, permission: $permission) {
+      ... on OpportunityUpdateContentSuccess {
+        opportunity {
+          id
+          title
+          category
+          description
+          body
+          publishStatus
+          images
+          requireApproval
+          feeRequired
+          pointsToEarn
+          pointsRequired
+          updatedAt
+          place {
+            id
+            name
+          }
+          createdByUser {
+            id
+            name
+          }
+        }
+      }
+    }
+  }
+`;
+export type GqlUpdateOpportunityContentMutationFn = Apollo.MutationFunction<
+  GqlUpdateOpportunityContentMutation,
+  GqlUpdateOpportunityContentMutationVariables
+>;
+
+/**
+ * __useUpdateOpportunityContentMutation__
+ *
+ * To run a mutation, you first call `useUpdateOpportunityContentMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateOpportunityContentMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateOpportunityContentMutation, { data, loading, error }] = useUpdateOpportunityContentMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      input: // value for 'input'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function useUpdateOpportunityContentMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlUpdateOpportunityContentMutation,
+    GqlUpdateOpportunityContentMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    GqlUpdateOpportunityContentMutation,
+    GqlUpdateOpportunityContentMutationVariables
+  >(UpdateOpportunityContentDocument, options);
+}
+export type UpdateOpportunityContentMutationHookResult = ReturnType<
+  typeof useUpdateOpportunityContentMutation
+>;
+export type UpdateOpportunityContentMutationResult =
+  Apollo.MutationResult<GqlUpdateOpportunityContentMutation>;
+export type UpdateOpportunityContentMutationOptions = Apollo.BaseMutationOptions<
+  GqlUpdateOpportunityContentMutation,
+  GqlUpdateOpportunityContentMutationVariables
+>;
+export const UpdateOpportunitySlotsBulkDocument = gql`
+  mutation UpdateOpportunitySlotsBulk(
+    $input: OpportunitySlotsBulkUpdateInput!
+    $permission: CheckOpportunityPermissionInput!
+  ) {
+    opportunitySlotsBulkUpdate(input: $input, permission: $permission) {
+      ... on OpportunitySlotsBulkUpdateSuccess {
+        slots {
+          id
+          startsAt
+          endsAt
+          capacity
+          hostingStatus
+          remainingCapacity
+        }
+      }
+    }
+  }
+`;
+export type GqlUpdateOpportunitySlotsBulkMutationFn = Apollo.MutationFunction<
+  GqlUpdateOpportunitySlotsBulkMutation,
+  GqlUpdateOpportunitySlotsBulkMutationVariables
+>;
+
+/**
+ * __useUpdateOpportunitySlotsBulkMutation__
+ *
+ * To run a mutation, you first call `useUpdateOpportunitySlotsBulkMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateOpportunitySlotsBulkMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateOpportunitySlotsBulkMutation, { data, loading, error }] = useUpdateOpportunitySlotsBulkMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function useUpdateOpportunitySlotsBulkMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlUpdateOpportunitySlotsBulkMutation,
+    GqlUpdateOpportunitySlotsBulkMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    GqlUpdateOpportunitySlotsBulkMutation,
+    GqlUpdateOpportunitySlotsBulkMutationVariables
+  >(UpdateOpportunitySlotsBulkDocument, options);
+}
+export type UpdateOpportunitySlotsBulkMutationHookResult = ReturnType<
+  typeof useUpdateOpportunitySlotsBulkMutation
+>;
+export type UpdateOpportunitySlotsBulkMutationResult =
+  Apollo.MutationResult<GqlUpdateOpportunitySlotsBulkMutation>;
+export type UpdateOpportunitySlotsBulkMutationOptions = Apollo.BaseMutationOptions<
+  GqlUpdateOpportunitySlotsBulkMutation,
+  GqlUpdateOpportunitySlotsBulkMutationVariables
+>;
+export const SetPublishStatusDocument = gql`
+  mutation SetPublishStatus(
+    $id: ID!
+    $input: OpportunitySetPublishStatusInput!
+    $permission: CheckOpportunityPermissionInput!
+  ) {
+    opportunitySetPublishStatus(id: $id, input: $input, permission: $permission) {
+      ... on OpportunitySetPublishStatusSuccess {
+        opportunity {
+          id
+          publishStatus
+          updatedAt
+        }
+      }
+    }
+  }
+`;
+export type GqlSetPublishStatusMutationFn = Apollo.MutationFunction<
+  GqlSetPublishStatusMutation,
+  GqlSetPublishStatusMutationVariables
+>;
+
+/**
+ * __useSetPublishStatusMutation__
+ *
+ * To run a mutation, you first call `useSetPublishStatusMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSetPublishStatusMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [setPublishStatusMutation, { data, loading, error }] = useSetPublishStatusMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      input: // value for 'input'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function useSetPublishStatusMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlSetPublishStatusMutation,
+    GqlSetPublishStatusMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlSetPublishStatusMutation, GqlSetPublishStatusMutationVariables>(
+    SetPublishStatusDocument,
+    options,
+  );
+}
+export type SetPublishStatusMutationHookResult = ReturnType<typeof useSetPublishStatusMutation>;
+export type SetPublishStatusMutationResult = Apollo.MutationResult<GqlSetPublishStatusMutation>;
+export type SetPublishStatusMutationOptions = Apollo.BaseMutationOptions<
+  GqlSetPublishStatusMutation,
+  GqlSetPublishStatusMutationVariables
+>;
+export const SetOpportunitySlotHostingStatusDocument = gql`
+  mutation SetOpportunitySlotHostingStatus(
+    $id: ID!
+    $input: OpportunitySlotSetHostingStatusInput!
+    $permission: CheckOpportunityPermissionInput!
+  ) {
+    opportunitySlotSetHostingStatus(id: $id, input: $input, permission: $permission) {
+      ... on OpportunitySlotSetHostingStatusSuccess {
+        slot {
+          id
+          startsAt
+          endsAt
+          capacity
+          hostingStatus
+          remainingCapacity
+        }
+      }
+    }
+  }
+`;
+export type GqlSetOpportunitySlotHostingStatusMutationFn = Apollo.MutationFunction<
+  GqlSetOpportunitySlotHostingStatusMutation,
+  GqlSetOpportunitySlotHostingStatusMutationVariables
+>;
+
+/**
+ * __useSetOpportunitySlotHostingStatusMutation__
+ *
+ * To run a mutation, you first call `useSetOpportunitySlotHostingStatusMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSetOpportunitySlotHostingStatusMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [setOpportunitySlotHostingStatusMutation, { data, loading, error }] = useSetOpportunitySlotHostingStatusMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      input: // value for 'input'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function useSetOpportunitySlotHostingStatusMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlSetOpportunitySlotHostingStatusMutation,
+    GqlSetOpportunitySlotHostingStatusMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    GqlSetOpportunitySlotHostingStatusMutation,
+    GqlSetOpportunitySlotHostingStatusMutationVariables
+  >(SetOpportunitySlotHostingStatusDocument, options);
+}
+export type SetOpportunitySlotHostingStatusMutationHookResult = ReturnType<
+  typeof useSetOpportunitySlotHostingStatusMutation
+>;
+export type SetOpportunitySlotHostingStatusMutationResult =
+  Apollo.MutationResult<GqlSetOpportunitySlotHostingStatusMutation>;
+export type SetOpportunitySlotHostingStatusMutationOptions = Apollo.BaseMutationOptions<
+  GqlSetOpportunitySlotHostingStatusMutation,
+  GqlSetOpportunitySlotHostingStatusMutationVariables
+>;
+export const DeleteOpportunityDocument = gql`
+  mutation DeleteOpportunity($id: ID!, $permission: CheckOpportunityPermissionInput!) {
+    opportunityDelete(id: $id, permission: $permission) {
+      ... on OpportunityDeleteSuccess {
+        opportunityId
+      }
+    }
+  }
+`;
+export type GqlDeleteOpportunityMutationFn = Apollo.MutationFunction<
+  GqlDeleteOpportunityMutation,
+  GqlDeleteOpportunityMutationVariables
+>;
+
+/**
+ * __useDeleteOpportunityMutation__
+ *
+ * To run a mutation, you first call `useDeleteOpportunityMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteOpportunityMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteOpportunityMutation, { data, loading, error }] = useDeleteOpportunityMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function useDeleteOpportunityMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlDeleteOpportunityMutation,
+    GqlDeleteOpportunityMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlDeleteOpportunityMutation, GqlDeleteOpportunityMutationVariables>(
+    DeleteOpportunityDocument,
+    options,
+  );
+}
+export type DeleteOpportunityMutationHookResult = ReturnType<typeof useDeleteOpportunityMutation>;
+export type DeleteOpportunityMutationResult = Apollo.MutationResult<GqlDeleteOpportunityMutation>;
+export type DeleteOpportunityMutationOptions = Apollo.BaseMutationOptions<
+  GqlDeleteOpportunityMutation,
+  GqlDeleteOpportunityMutationVariables
+>;
+export const GetAdminOpportunitiesDocument = gql`
+  query GetAdminOpportunities(
+    $filter: OpportunityFilterInput
+    $sort: OpportunitySortInput
+    $first: Int
+    $cursor: String
+  ) {
+    opportunities(filter: $filter, sort: $sort, first: $first, cursor: $cursor) {
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
+      }
+      totalCount
+      edges {
+        cursor
+        node {
+          id
+          title
+          description
+          publishStatus
+          category
+          images
+          requireApproval
+          createdAt
+          updatedAt
+          createdByUser {
+            id
+            name
+          }
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetAdminOpportunitiesQuery__
+ *
+ * To run a query within a React component, call `useGetAdminOpportunitiesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAdminOpportunitiesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAdminOpportunitiesQuery({
+ *   variables: {
+ *      filter: // value for 'filter'
+ *      sort: // value for 'sort'
+ *      first: // value for 'first'
+ *      cursor: // value for 'cursor'
+ *   },
+ * });
+ */
+export function useGetAdminOpportunitiesQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GqlGetAdminOpportunitiesQuery,
+    GqlGetAdminOpportunitiesQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetAdminOpportunitiesQuery, GqlGetAdminOpportunitiesQueryVariables>(
+    GetAdminOpportunitiesDocument,
+    options,
+  );
+}
+export function useGetAdminOpportunitiesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetAdminOpportunitiesQuery,
+    GqlGetAdminOpportunitiesQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetAdminOpportunitiesQuery, GqlGetAdminOpportunitiesQueryVariables>(
+    GetAdminOpportunitiesDocument,
+    options,
+  );
+}
+export function useGetAdminOpportunitiesSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetAdminOpportunitiesQuery,
+        GqlGetAdminOpportunitiesQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GqlGetAdminOpportunitiesQuery,
+    GqlGetAdminOpportunitiesQueryVariables
+  >(GetAdminOpportunitiesDocument, options);
+}
+export type GetAdminOpportunitiesQueryHookResult = ReturnType<typeof useGetAdminOpportunitiesQuery>;
+export type GetAdminOpportunitiesLazyQueryHookResult = ReturnType<
+  typeof useGetAdminOpportunitiesLazyQuery
+>;
+export type GetAdminOpportunitiesSuspenseQueryHookResult = ReturnType<
+  typeof useGetAdminOpportunitiesSuspenseQuery
+>;
+export type GetAdminOpportunitiesQueryResult = Apollo.QueryResult<
+  GqlGetAdminOpportunitiesQuery,
+  GqlGetAdminOpportunitiesQueryVariables
+>;
 export const GetOpportunitiesDocument = gql`
   query GetOpportunities(
     $filter: OpportunityFilterInput
@@ -9308,6 +10271,85 @@ export type GetOpportunitySlotWithParticipationsSuspenseQueryHookResult = Return
 export type GetOpportunitySlotWithParticipationsQueryResult = Apollo.QueryResult<
   GqlGetOpportunitySlotWithParticipationsQuery,
   GqlGetOpportunitySlotWithParticipationsQueryVariables
+>;
+export const GetSlotReservationsDocument = gql`
+  query GetSlotReservations($slotId: ID!) {
+    opportunitySlot(id: $slotId) {
+      id
+      reservations {
+        id
+        status
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetSlotReservationsQuery__
+ *
+ * To run a query within a React component, call `useGetSlotReservationsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetSlotReservationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetSlotReservationsQuery({
+ *   variables: {
+ *      slotId: // value for 'slotId'
+ *   },
+ * });
+ */
+export function useGetSlotReservationsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GqlGetSlotReservationsQuery,
+    GqlGetSlotReservationsQueryVariables
+  > &
+    ({ variables: GqlGetSlotReservationsQueryVariables; skip?: boolean } | { skip: boolean }),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetSlotReservationsQuery, GqlGetSlotReservationsQueryVariables>(
+    GetSlotReservationsDocument,
+    options,
+  );
+}
+export function useGetSlotReservationsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetSlotReservationsQuery,
+    GqlGetSlotReservationsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetSlotReservationsQuery, GqlGetSlotReservationsQueryVariables>(
+    GetSlotReservationsDocument,
+    options,
+  );
+}
+export function useGetSlotReservationsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetSlotReservationsQuery,
+        GqlGetSlotReservationsQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetSlotReservationsQuery, GqlGetSlotReservationsQueryVariables>(
+    GetSlotReservationsDocument,
+    options,
+  );
+}
+export type GetSlotReservationsQueryHookResult = ReturnType<typeof useGetSlotReservationsQuery>;
+export type GetSlotReservationsLazyQueryHookResult = ReturnType<
+  typeof useGetSlotReservationsLazyQuery
+>;
+export type GetSlotReservationsSuspenseQueryHookResult = ReturnType<
+  typeof useGetSlotReservationsSuspenseQuery
+>;
+export type GetSlotReservationsQueryResult = Apollo.QueryResult<
+  GqlGetSlotReservationsQuery,
+  GqlGetSlotReservationsQueryVariables
 >;
 export const ParticipationBulkCreateDocument = gql`
   mutation ParticipationBulkCreate(
@@ -10264,6 +11306,196 @@ export type GetVcIssuanceRequestsByUserSuspenseQueryHookResult = ReturnType<
 export type GetVcIssuanceRequestsByUserQueryResult = Apollo.QueryResult<
   GqlGetVcIssuanceRequestsByUserQuery,
   GqlGetVcIssuanceRequestsByUserQueryVariables
+>;
+export const PlaceCreateDocument = gql`
+  mutation PlaceCreate($input: PlaceCreateInput!, $permission: CheckCommunityPermissionInput!) {
+    placeCreate(input: $input, permission: $permission) {
+      ... on PlaceCreateSuccess {
+        place {
+          id
+          name
+          address
+          latitude
+          longitude
+          googlePlaceId
+          isManual
+          mapLocation
+          image
+          city {
+            code
+            name
+            state {
+              code
+              countryCode
+              name
+            }
+          }
+          community {
+            id
+          }
+          createdAt
+          updatedAt
+        }
+      }
+    }
+  }
+`;
+export type GqlPlaceCreateMutationFn = Apollo.MutationFunction<
+  GqlPlaceCreateMutation,
+  GqlPlaceCreateMutationVariables
+>;
+
+/**
+ * __usePlaceCreateMutation__
+ *
+ * To run a mutation, you first call `usePlaceCreateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePlaceCreateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [placeCreateMutation, { data, loading, error }] = usePlaceCreateMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function usePlaceCreateMutation(
+  baseOptions?: Apollo.MutationHookOptions<GqlPlaceCreateMutation, GqlPlaceCreateMutationVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlPlaceCreateMutation, GqlPlaceCreateMutationVariables>(
+    PlaceCreateDocument,
+    options,
+  );
+}
+export type PlaceCreateMutationHookResult = ReturnType<typeof usePlaceCreateMutation>;
+export type PlaceCreateMutationResult = Apollo.MutationResult<GqlPlaceCreateMutation>;
+export type PlaceCreateMutationOptions = Apollo.BaseMutationOptions<
+  GqlPlaceCreateMutation,
+  GqlPlaceCreateMutationVariables
+>;
+export const PlaceUpdateDocument = gql`
+  mutation PlaceUpdate(
+    $id: ID!
+    $input: PlaceUpdateInput!
+    $permission: CheckCommunityPermissionInput!
+  ) {
+    placeUpdate(id: $id, input: $input, permission: $permission) {
+      ... on PlaceUpdateSuccess {
+        place {
+          id
+          name
+          address
+          latitude
+          longitude
+          googlePlaceId
+          isManual
+          mapLocation
+          image
+          city {
+            code
+            name
+            state {
+              code
+              countryCode
+              name
+            }
+          }
+          updatedAt
+        }
+      }
+    }
+  }
+`;
+export type GqlPlaceUpdateMutationFn = Apollo.MutationFunction<
+  GqlPlaceUpdateMutation,
+  GqlPlaceUpdateMutationVariables
+>;
+
+/**
+ * __usePlaceUpdateMutation__
+ *
+ * To run a mutation, you first call `usePlaceUpdateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePlaceUpdateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [placeUpdateMutation, { data, loading, error }] = usePlaceUpdateMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      input: // value for 'input'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function usePlaceUpdateMutation(
+  baseOptions?: Apollo.MutationHookOptions<GqlPlaceUpdateMutation, GqlPlaceUpdateMutationVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlPlaceUpdateMutation, GqlPlaceUpdateMutationVariables>(
+    PlaceUpdateDocument,
+    options,
+  );
+}
+export type PlaceUpdateMutationHookResult = ReturnType<typeof usePlaceUpdateMutation>;
+export type PlaceUpdateMutationResult = Apollo.MutationResult<GqlPlaceUpdateMutation>;
+export type PlaceUpdateMutationOptions = Apollo.BaseMutationOptions<
+  GqlPlaceUpdateMutation,
+  GqlPlaceUpdateMutationVariables
+>;
+export const PlaceDeleteDocument = gql`
+  mutation PlaceDelete($id: ID!, $permission: CheckCommunityPermissionInput!) {
+    placeDelete(id: $id, permission: $permission) {
+      ... on PlaceDeleteSuccess {
+        id
+      }
+    }
+  }
+`;
+export type GqlPlaceDeleteMutationFn = Apollo.MutationFunction<
+  GqlPlaceDeleteMutation,
+  GqlPlaceDeleteMutationVariables
+>;
+
+/**
+ * __usePlaceDeleteMutation__
+ *
+ * To run a mutation, you first call `usePlaceDeleteMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePlaceDeleteMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [placeDeleteMutation, { data, loading, error }] = usePlaceDeleteMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function usePlaceDeleteMutation(
+  baseOptions?: Apollo.MutationHookOptions<GqlPlaceDeleteMutation, GqlPlaceDeleteMutationVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlPlaceDeleteMutation, GqlPlaceDeleteMutationVariables>(
+    PlaceDeleteDocument,
+    options,
+  );
+}
+export type PlaceDeleteMutationHookResult = ReturnType<typeof usePlaceDeleteMutation>;
+export type PlaceDeleteMutationResult = Apollo.MutationResult<GqlPlaceDeleteMutation>;
+export type PlaceDeleteMutationOptions = Apollo.BaseMutationOptions<
+  GqlPlaceDeleteMutation,
+  GqlPlaceDeleteMutationVariables
 >;
 export const GetPlacesDocument = gql`
   query GetPlaces(

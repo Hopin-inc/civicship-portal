@@ -8,8 +8,8 @@ const WALLET_ACTION_KEY_MAP = {
     from: "wallets.action.donation.from",
   },
   grant: {
-    to: "wallets.action.grant.to",
-    from: "wallets.action.grant.from",
+    to: "wallets.action.donation.to",  // Unified with donation
+    from: "wallets.action.donation.from",  // Unified with donation
   },
 } as const;
 
@@ -19,8 +19,8 @@ const TRANSACTION_ACTION_KEY_MAP = {
     from: "transactions.action.donation.from",
   },
   grant: {
-    to: "transactions.action.grant.to",
-    from: "transactions.action.grant.from",
+    to: "transactions.action.donation.to",  // Unified with donation
+    from: "transactions.action.donation.from",  // Unified with donation
   },
   payment: {
     to: "transactions.action.payment.to",

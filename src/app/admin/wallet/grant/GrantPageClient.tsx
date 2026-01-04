@@ -129,8 +129,6 @@ export default function GrantPageClient({ initialConnection }: GrantPageClientPr
         <UserSelectStep
           members={members}
           onSelect={setSelectedUser}
-          loadMoreRef={loadMoreRef}
-          isLoadingMore={isLoadingMore}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           listType="grant"

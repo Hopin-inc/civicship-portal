@@ -109,7 +109,7 @@ export const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
     logoPath: "/communities/neo88/logo.jpg",
     squareLogoPath: "/communities/neo88/logo-square.jpg",
     ogImagePath: "https://storage.googleapis.com/prod-civicship-storage-public/asset/neo88/ogp.jpg",
-    enableFeatures: ["opportunities", "points", "articles", "tickets", "prefectures", "quests"],
+    enableFeatures: ["opportunities", "places", "points", "articles", "tickets", "prefectures", "quests"],
     rootPath: "/opportunities",
     adminRootPath: "/admin/reservations",
   },

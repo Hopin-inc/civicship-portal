@@ -1,7 +1,16 @@
-import { presenterActivityDetail, presenterQuestDetail } from "@/components/domains/opportunities/data/presenter";
+import {
+  presenterActivityDetail,
+  presenterQuestDetail,
+} from "@/components/domains/opportunities/data/presenter";
 import { ActivityDetail, QuestDetail } from "@/components/domains/opportunities/types";
 import { useCommunityId } from "@/contexts/CommunityContext";
-import { GqlOpportunity, GqlOpportunityCategory, GqlOpportunitySlotHostingStatus, GqlSortDirection, useGetOpportunityQuery } from "@/types/graphql";
+import {
+  GqlOpportunity,
+  GqlOpportunityCategory,
+  GqlOpportunitySlotHostingStatus,
+  GqlSortDirection,
+  useGetOpportunityQuery,
+} from "@/types/graphql";
 import { useMemo } from "react";
 
 // 基本のOpportunity詳細取得のみを担当
@@ -33,11 +42,11 @@ export const useOpportunityDetail = (id: string | undefined) => {
     return null;
   }, [data?.opportunity]);
 
-  return { 
-    opportunity, 
-    loading, 
-    error, 
+  return {
+    opportunity,
+    loading,
+    error,
     refetch,
-    stateCode: data?.opportunity?.place?.city?.state?.code 
+    stateCode: data?.opportunity?.place?.city?.state?.code,
   };
-};  
+};

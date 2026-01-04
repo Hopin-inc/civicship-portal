@@ -22,6 +22,7 @@ import { CommunityProvider } from "@/contexts/CommunityContext";
 import { CommunityConfigProvider } from "@/contexts/CommunityConfigContext";
 import { headers, cookies } from "next/headers";
 import { getCommunityConfig, CommunityPortalConfig } from "@/lib/communities/getCommunityConfig";
+import { BackgroundLayer } from "@/components/layout/BackgroundLayer";
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -30,6 +31,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const headersList = await headers();
   const cookieStore = await cookies();
   const communityId = headersList.get("x-community-id") || cookieStore.get("communityId")?.value || "default";
+  const isProduction = process.env.NODE_ENV === "production";
   
   // Try to get config from database first, fallback to hardcoded config
   let config = await getCommunityConfig(communityId);
@@ -97,6 +99,13 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: {
       canonical: config.domain,
     },
+    // 非本番環境では検索エンジンにインデックスさせない
+    robots: isProduction
+      ? undefined
+      : {
+          index: false,
+          follow: false,
+        },
   };
 }
 
@@ -173,7 +182,7 @@ const RootLayout = async ({
 
   return (
     <html lang={locale}>
-      <body className={font.className}>
+      <body className={`${font.className}`}>
         <ClientPolyfills />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <CookiesProvider>
@@ -190,6 +199,7 @@ const RootLayout = async ({
                       <SwipeBackNavigation>
                         <LoadingProvider>
                           <AnalyticsProvider />
+                          <BackgroundLayer />
                           <MainContent>{children}</MainContent>
                           <Toaster />
                         </LoadingProvider>

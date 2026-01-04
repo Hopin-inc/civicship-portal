@@ -4,7 +4,17 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { ArrowLeftRight, ClipboardList, Ticket, Users, Wallet } from "lucide-react";
+import {
+  ArrowLeftRight,
+  CalendarCheck,
+  ClipboardList,
+  Image,
+  MapPin,
+  MegaphoneIcon,
+  Ticket,
+  Users,
+  Wallet,
+} from "lucide-react";
 import { FeaturesType } from "@/lib/communities/metadata";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { useAdminRole } from "@/app/admin/context/AdminRoleContext";
@@ -15,7 +25,7 @@ import { useTranslations } from "next-intl";
 
 const adminSettings = [
   {
-    title: "権限管理",
+    title: "メンバー管理",
     href: "/admin/members",
     icon: Users,
   },
@@ -25,15 +35,38 @@ const adminSettings = [
     icon: Wallet,
     requiredFeature: "points" as FeaturesType,
   },
+];
+
+const operatorSettings = [
+  {
+    title: "募集管理",
+    href: "/admin/opportunities",
+    icon: MegaphoneIcon,
+    requiredFeature: "opportunities" as FeaturesType,
+  },
+  {
+    title: "場所管理",
+    href: "/admin/places",
+    icon: MapPin,
+    requiredFeature: "opportunities" as FeaturesType,
+  },
+  {
+    title: "予約管理",
+    href: "/admin/reservations",
+    icon: CalendarCheck,
+    requiredFeature: "opportunities" as FeaturesType,
+  },
   {
     title: "証明書管理",
     href: "/admin/credentials",
     icon: ClipboardList,
     requiredFeature: "credentials" as FeaturesType,
   },
-];
-
-const operatorSettings = [
+  {
+    title: "NFT管理",
+    href: "/admin/nfts",
+    icon: Image,
+  },
   {
     title: "チケット管理",
     href: "/admin/tickets",
