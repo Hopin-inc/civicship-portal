@@ -11,7 +11,7 @@ import {
   ItemSeparator,
   ItemTitle,
 } from "@/components/ui/item";
-import { useNumberInput } from "../../hooks/useNumberInput";
+import { useNumberInput } from "@/hooks/useNumberInput";
 
 interface SettingsSectionProps {
   selectedHostName: string | null;
