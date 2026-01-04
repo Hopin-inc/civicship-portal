@@ -42,7 +42,7 @@
   "transactions.parts.action.refund.to.action": " refunded",
   "transactions.parts.action.refund.from.name": "{name}",
   "transactions.parts.action.refund.from.action": " refunded",
-  "transactions.parts.action.donation.from.received.action": " sent from",
+  "transactions.parts.action.donation.from.received.action": " received from",
   "transactions.parts.action.payment.from.received.action": " paid from",
   "transactions.parts.action.return.from.received.action": " returned from",
   "transactions.parts.action.refund.from.received.action": " refunded from",

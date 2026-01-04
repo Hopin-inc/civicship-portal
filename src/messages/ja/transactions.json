@@ -38,7 +38,7 @@
   "transactions.parts.action.refund.to.action": "に返金",
   "transactions.parts.action.refund.from.name": "{name}",
   "transactions.parts.action.refund.from.action": "が返金",
-  "transactions.parts.action.donation.from.received.action": "から送った",
+  "transactions.parts.action.donation.from.received.action": "から受け取った",
   "transactions.parts.action.payment.from.received.action": "から支払い",
   "transactions.parts.action.return.from.received.action": "から返品",
   "transactions.parts.action.refund.from.received.action": "から返金",

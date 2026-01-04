@@ -22,7 +22,6 @@ interface Props {
   onBack: () => void;
   onSubmit: (amount: number, comment?: string) => void;
   title?: string;
-  recipientKey?: string;
   submitLabel?: string;
   backLabel?: string;
   amountLabel?: string;
@@ -82,8 +81,7 @@ function TransferInputStep({
       setAmount(newValue);
     },
     min: 1,
-    max: Math.min(Number(currentPoint), INT_LIMIT),
-    defaultValue: 0,
+    defaultValue: 1,
   });
 
   return (
