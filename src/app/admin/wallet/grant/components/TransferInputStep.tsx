@@ -68,17 +68,15 @@ function TransferInputStep({
   const amountInput = useNumberInput({
     value: amount,
     onChange: (newValue: number) => {
-      // 残高チェック（max で制限されるが念のため）
-      if (newValue > Number(currentPoint)) {
-        toast.error(t("wallets.shared.transfer.errorExceedsBalance"));
-        return;
-      }
-      // 上限チェック（max で制限されるが念のため）
-      if (newValue > INT_LIMIT) {
-        toast.error(t("wallets.shared.transfer.errorExceedsLimit"));
-        return;
-      }
       setAmount(newValue);
+    },
+    onMaxExceeded: () => {
+      // どちらの制限に引っかかったか判定
+      if (Number(currentPoint) < INT_LIMIT) {
+        toast.error(t("wallets.shared.transfer.errorExceedsBalance"));
+      } else {
+        toast.error(t("wallets.shared.transfer.errorExceedsLimit"));
+      }
     },
     min: 1,
     max: Math.min(Number(currentPoint), INT_LIMIT),

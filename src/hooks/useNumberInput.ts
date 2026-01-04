@@ -11,6 +11,7 @@ interface UseNumberInputOptions {
   min?: number;
   max?: number;
   defaultValue?: number;
+  onMaxExceeded?: () => void;
 }
 
 export const useNumberInput = ({
@@ -19,6 +20,7 @@ export const useNumberInput = ({
   min = 0,
   max,
   defaultValue,
+  onMaxExceeded,
 }: UseNumberInputOptions) => {
   // 表示用の値（空文字列を許容）
   const [displayValue, setDisplayValue] = useState<string>(String(value));
@@ -47,6 +49,7 @@ export const useNumberInput = ({
 
       // 最大値チェック（入力値を制限）
       if (max !== undefined && numValue > max) {
+        onMaxExceeded?.();
         return;
       }
 
@@ -56,7 +59,7 @@ export const useNumberInput = ({
       // 即座に親に通知（リアルタイム更新）
       onChange(numValue);
     },
-    [onChange, max]
+    [onChange, max, onMaxExceeded]
   );
 
   // フォーカスアウト時のハンドラ（空の場合デフォルト値を設定）
