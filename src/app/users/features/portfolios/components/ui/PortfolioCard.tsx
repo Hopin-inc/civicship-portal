@@ -61,7 +61,7 @@ export const PortfolioCard = ({ viewModel, isLast, lastRef }: PortfolioCardProps
         <div className="py-3 space-y-2">
           <h3 className="text-label-lg line-clamp-2">{viewModel.title}</h3>
           <div className="space-y-1">
-            <div className="flex items-center gap-1 text-label-md text-caption">
+            <div className="flex items-center gap-1 text-body-sm text-caption">
               <Calendar className="w-4 h-4" />
               <span>
                 {viewModel.dateDisplay}
@@ -71,7 +71,7 @@ export const PortfolioCard = ({ viewModel, isLast, lastRef }: PortfolioCardProps
               </span>
             </div>
             {viewModel.location && (
-              <div className="flex items-center gap-1 text-label-md text-caption">
+              <div className="flex items-center gap-1 text-body-sm text-caption">
                 <MapPin className="w-4 h-4" />
                 <span>{viewModel.location}</span>
               </div>

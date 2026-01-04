@@ -85,13 +85,13 @@ export default function OpportunityVerticalCard({
         <h3 className={`${config.titleClass} text-foreground line-clamp-2`}>{title}</h3>
         <div className={`${config.metaSpacing} flex flex-col`}>
           {price !== undefined && (
-            <div className="text-label-md text-muted-foreground flex items-center gap-1">
+            <div className="text-body-sm text-muted-foreground flex items-center gap-1">
               <JapaneseYenIcon className="w-4 h-4" />
               <p>{!price ? "参加無料" : `${price.toLocaleString()}円/人~`}</p>
             </div>
           )}
           {price === undefined && pointsRequired != null && pointsRequired > 0 && (
-            <div className="text-label-md text-muted-foreground flex items-center gap-1">
+            <div className="text-body-sm text-muted-foreground flex items-center gap-1">
               <span className="text-[11px] rounded-full w-4 h-4 flex items-center justify-center border border-muted-foreground leading-none">
                 P
               </span>
@@ -99,7 +99,7 @@ export default function OpportunityVerticalCard({
             </div>
           )}
           {location && (
-            <div className="flex items-center text-label-md text-muted-foreground mt-1">
+            <div className="flex items-center text-body-sm text-muted-foreground mt-1">
               <MapPin className="mr-1 h-4 w-4 flex-shrink-0" />
               <p className="line-clamp-1 break-words">{location}</p>
             </div>
@@ -109,7 +109,7 @@ export default function OpportunityVerticalCard({
               <span className="bg-primary text-[11px] rounded-full w-4 h-4 flex items-center justify-center font-bold text-white leading-none">
                 P
               </span>
-              <p className="text-label-md font-bold">
+              <p className="text-body-sm font-bold">
                 {pointsToEarn.toLocaleString()}ptもらえる
               </p>
             </div>
