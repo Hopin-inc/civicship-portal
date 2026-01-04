@@ -39,7 +39,7 @@ export const NftCard = ({ nftInstance, isCarousel = false }: NftCardProps) => {
         />
       </Card>
       <div className="mt-3">
-        <h3 className="text-title-sm text-foreground line-clamp-1">{nftInstance.name}</h3>
+        <h3 className="text-label-lg text-foreground line-clamp-1">{nftInstance.name}</h3>
       </div>
     </Link>
   );

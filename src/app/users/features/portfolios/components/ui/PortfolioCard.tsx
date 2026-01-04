@@ -59,7 +59,7 @@ export const PortfolioCard = ({ viewModel, isLast, lastRef }: PortfolioCardProps
           )}
         </div>
         <div className="py-3 space-y-2">
-          <h3 className="text-title-sm line-clamp-2">{viewModel.title}</h3>
+          <h3 className="text-label-lg line-clamp-2">{viewModel.title}</h3>
           <div className="space-y-1">
             <div className="flex items-center gap-1 text-body-sm text-caption">
               <Calendar className="w-4 h-4" />

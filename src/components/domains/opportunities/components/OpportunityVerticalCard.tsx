@@ -50,7 +50,7 @@ export default function OpportunityVerticalCard({
       cardClass: "h-[150px]",
       linkClass: "w-[120px]",
       sizes: "120px",
-      titleClass: "text-label-sm",
+      titleClass: "text-label-xs",
       spacing: "mt-2",
       metaSpacing: "mt-1",
     },
