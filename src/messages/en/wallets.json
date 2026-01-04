@@ -31,8 +31,6 @@
   "wallets.shared.transfer.commentError": "Please enter within 100 characters",
   "wallets.action.donation.to": "Sent to {name}",
   "wallets.action.donation.from": "Received from {name}",
-  "wallets.action.grant.to": "Sent to {name}",
-  "wallets.action.grant.from": "Received from {name}",
   "wallets.donate.toast.success": "Sent {amount} pt",
   "wallets.donate.toast.errorWithCode": "Transfer failed: {code}",
   "wallets.donate.toast.genericError": "Failed to send points",

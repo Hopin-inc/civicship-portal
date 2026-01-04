@@ -31,8 +31,6 @@
   "wallets.shared.transfer.commentError": "100文字以内で入力してください",
   "wallets.action.donation.to": "{name}に送った",
   "wallets.action.donation.from": "{name}からもらった",
-  "wallets.action.grant.to": "{name}に送った",
-  "wallets.action.grant.from": "{name}から受取",
   "wallets.donate.toast.success": "{amount}ptを送りました",
   "wallets.donate.toast.errorWithCode": "送信失敗: {code}",
   "wallets.donate.toast.genericError": "ポイントを送れませんでした",
