@@ -127,12 +127,32 @@ export class LiffService {
       if (liff.isInClient()) {
         this.state.isLoggedIn = true;
       } else {
-        const redirectUri =
-          typeof window !== "undefined"
-            ? redirectPath
-              ? window.location.origin + redirectPath
-              : window.location.origin
-            : undefined;
+        // IMPORTANT: LINE OAuth only allows fixed registered redirect URLs.
+        // We must use a fixed callback URL (the community's login page) and pass
+        // the actual destination via the `next` query parameter.
+        // This is required for multi-tenant where dynamic paths like /kibotcha/users/me
+        // cannot all be registered in LINE's allowed redirect URLs.
+        let redirectUri: string | undefined;
+        if (typeof window !== "undefined") {
+          // Use the community's login page as the fixed redirect URL
+          // e.g., https://dev.civicship.app/kibotcha/login
+          const communityLoginPath = `/${this.communityId}/login`;
+          const baseRedirectUri = window.location.origin + communityLoginPath;
+          
+          // If there's a destination path, pass it via the `next` query parameter
+          if (redirectPath && redirectPath !== communityLoginPath) {
+            const encodedNext = encodeURIComponent(redirectPath);
+            redirectUri = `${baseRedirectUri}?next=${encodedNext}`;
+          } else {
+            redirectUri = baseRedirectUri;
+          }
+          
+          logger.debug("[LiffService] Using fixed redirect URI for LINE OAuth", {
+            communityId: this.communityId,
+            redirectUri,
+            originalRedirectPath: redirectPath,
+          });
+        }
 
         liff.login({ redirectUri });
         return false; // リダイレクトするのでここには到達しない
