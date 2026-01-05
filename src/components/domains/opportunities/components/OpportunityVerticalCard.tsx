@@ -42,16 +42,18 @@ export default function OpportunityVerticalCard({
       cardClass: "h-[205px]",
       linkClass: "w-[164px]",
       sizes: "164px",
-      titleClass: "text-title-sm",
+      titleClass: "text-title-sm font-bold",
+      titleClamp: "line-clamp-2",
       spacing: "mt-3",
       metaSpacing: "mt-2",
     },
     sm: {
-      containerClass: "w-[120px]",
-      cardClass: "h-[150px]",
-      linkClass: "w-[120px]",
-      sizes: "120px",
-      titleClass: "text-label-xs font-bold",
+      containerClass: "w-[100px]",
+      cardClass: "h-[100px]",
+      linkClass: "w-[100px]",
+      sizes: "100px",
+      titleClass: "!text-label-xs",
+      titleClamp: "line-clamp-1",
       spacing: "mt-2",
       metaSpacing: "mt-1",
     },
@@ -85,7 +87,7 @@ export default function OpportunityVerticalCard({
         />
       </Card>
       <div className={config.spacing}>
-        <h3 className={`${config.titleClass} text-foreground line-clamp-2`}>{title}</h3>
+        <h3 className={cn(config.titleClass, config.titleClamp, "text-foreground")}>{title}</h3>
         <div className={`${config.metaSpacing} flex flex-col`}>
           {price !== undefined && (
             <div className="text-body-sm text-muted-foreground flex items-center gap-1">

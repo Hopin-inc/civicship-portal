@@ -16,8 +16,8 @@ export const ActiveOpportunitiesSection = ({ opportunities }: ActiveOpportunitie
 
   return (
     <div>
-      <div className="flex items-center gap-x-2">
-        <h2 className="text-display-sm font-semibold text-foreground">
+      <div className="flex items-center gap-x-1">
+        <h2 className="text-body-md font-semibold text-foreground">
           {t("users.portfolio.header.activeOpportunities")}
         </h2>
         <span className="bg-primary text-primary-foreground text-xs font-medium px-2 py-0.5 rounded-full">
