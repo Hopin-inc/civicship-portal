@@ -3,6 +3,7 @@
 import { createContext, useContext, ReactNode, useEffect } from "react";
 import { CommunityPortalConfig } from "@/lib/communities/getCommunityConfig";
 import { setCurrentCommunityFirebaseTenantId } from "@/lib/communities/communityIds";
+import { useCommunitySwitch } from "@/hooks/auth/useCommunitySwitch";
 
 interface CommunityConfigContextValue {
   config: CommunityPortalConfig | null;
@@ -36,6 +37,10 @@ interface CommunityConfigProviderProps {
 }
 
 export function CommunityConfigProvider({ children, config, isFromDatabase }: CommunityConfigProviderProps) {
+  // Watch for community changes and reset auth state when switching communities
+  // This ensures each community has isolated auth state
+  useCommunitySwitch();
+
   // Set the current community's Firebase tenant ID for Apollo client to access
   // This is needed because Apollo's requestLink can't use React hooks
   useEffect(() => {
