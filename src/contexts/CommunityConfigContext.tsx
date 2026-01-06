@@ -1,7 +1,8 @@
 "use client";
 
-import { createContext, useContext, ReactNode } from "react";
+import { createContext, useContext, ReactNode, useEffect } from "react";
 import { CommunityPortalConfig } from "@/lib/communities/getCommunityConfig";
+import { setCurrentCommunityFirebaseTenantId } from "@/lib/communities/communityIds";
 
 interface CommunityConfigContextValue {
   config: CommunityPortalConfig | null;
@@ -35,6 +36,12 @@ interface CommunityConfigProviderProps {
 }
 
 export function CommunityConfigProvider({ children, config, isFromDatabase }: CommunityConfigProviderProps) {
+  // Set the current community's Firebase tenant ID for Apollo client to access
+  // This is needed because Apollo's requestLink can't use React hooks
+  useEffect(() => {
+    setCurrentCommunityFirebaseTenantId(config?.firebaseTenantId ?? null);
+  }, [config?.firebaseTenantId]);
+
   return (
     <CommunityConfigContext.Provider value={{ config, isFromDatabase }}>
       {children}

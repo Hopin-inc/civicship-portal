@@ -106,3 +106,18 @@ export function getRuntimeCommunityId(): string {
   // Fallback to environment variable or default
   return process.env.NEXT_PUBLIC_COMMUNITY_ID || "default";
 }
+
+/**
+ * Global store for the current community's Firebase tenant ID.
+ * This is set by CommunityConfigProvider and read by Apollo client.
+ * We need this because Apollo's requestLink can't use React hooks.
+ */
+let currentCommunityFirebaseTenantId: string | null = null;
+
+export function setCurrentCommunityFirebaseTenantId(tenantId: string | null): void {
+  currentCommunityFirebaseTenantId = tenantId;
+}
+
+export function getCurrentCommunityFirebaseTenantId(): string | null {
+  return currentCommunityFirebaseTenantId;
+}

@@ -12,7 +12,7 @@ import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
 import { logger } from "@/lib/logging";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { setContext } from "@apollo/client/link/context";
-import { getRuntimeCommunityId } from "@/lib/communities/communityIds";
+import { getRuntimeCommunityId, getCurrentCommunityFirebaseTenantId } from "@/lib/communities/communityIds";
 
 const httpLink = createUploadLink({
   uri: process.env.NEXT_PUBLIC_API_ENDPOINT,
@@ -47,13 +47,37 @@ const requestLink = setContext(async (operation, prevContext) => {
     }
 
     // firebaseUser がある場合はトークンを取得
+    // IMPORTANT: Only use the token if the Firebase user's tenant matches the current community's tenant.
+    // This prevents cross-community auth bleed where a token from community A is sent to community B.
     if (firebaseUser) {
-      try {
-        token = await firebaseUser.getIdToken();
-      } catch (error) {
-        logger.warn("Failed to get ID token", { error });
+      const currentCommunityTenantId = getCurrentCommunityFirebaseTenantId();
+      const firebaseUserTenantId = firebaseUser.tenantId;
+      
+      // Check if tenant matches (null tenantId means no multi-tenant, which is fine)
+      const tenantMatches = !currentCommunityTenantId || 
+                           !firebaseUserTenantId || 
+                           currentCommunityTenantId === firebaseUserTenantId;
+      
+      if (tenantMatches) {
+        try {
+          token = await firebaseUser.getIdToken();
+        } catch (error) {
+          logger.warn("Failed to get ID token", { error });
+          if (isMutation) {
+            throw new Error("認証トークンの取得に失敗しました");
+          }
+        }
+      } else {
+        // Tenant mismatch - don't use this token for the current community
+        logger.info("[Apollo] Firebase user tenant mismatch, not using token", {
+          operationName: operation.operationName,
+          firebaseUserTenantId,
+          currentCommunityTenantId,
+          isMutation,
+        });
+        
         if (isMutation) {
-          throw new Error("認証トークンの取得に失敗しました");
+          throw new Error("別のコミュニティでログイン中です。このコミュニティで再度ログインしてください");
         }
       }
     } else {
@@ -80,13 +104,17 @@ const requestLink = setContext(async (operation, prevContext) => {
 
   // Get communityId at runtime from URL path or cookie (browser) or env var (server)
   const communityId = getRuntimeCommunityId();
+  
+  // Get the current community's Firebase tenant ID at runtime
+  // This is set by CommunityConfigProvider when the config is loaded
+  const runtimeTenantId = getCurrentCommunityFirebaseTenantId() || process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID;
 
   const headers = {
     ...prevContext.headers,
     // Only send Authorization header when we have a token
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     "X-Auth-Mode": authMode,
-    "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
+    "X-Civicship-Tenant": runtimeTenantId,
     "X-Community-Id": communityId,
   };
 
