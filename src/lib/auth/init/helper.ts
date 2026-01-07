@@ -203,6 +203,13 @@ export function finalizeAuthState(
   setState: ReturnType<typeof useAuthStore.getState>["setState"],
   authStateManager: AuthStateManager,
 ) {
+  // Using warn level temporarily to ensure logs appear in staging/production
+  logger.warn("[AUTH] finalizeAuthState: setting auth state", {
+    newState,
+    hasUser: !!user,
+    userId: user?.id,
+  });
+
   setState({
     isAuthenticating: false,
     isAuthInProgress: false,
@@ -210,4 +217,9 @@ export function finalizeAuthState(
   });
 
   authStateManager.updateState(newState);
+  
+  logger.warn("[AUTH] finalizeAuthState: auth state set complete", {
+    newState,
+    storeState: useAuthStore.getState().state.authenticationState,
+  });
 }

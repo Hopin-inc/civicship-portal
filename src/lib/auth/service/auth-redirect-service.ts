@@ -41,7 +41,8 @@ export class AuthRedirectService {
     // Keep the original pathname (with community prefix) for next param
     const nextParam = next ? this.generateNextParam(next) : this.generateNextParam(pathname);
 
-    logger.debug("[AUTH] AuthRedirectService.getRedirectPath", {
+    // Using warn level temporarily to ensure logs appear in staging/production
+    logger.warn("[AUTH] AuthRedirectService.getRedirectPath: ENTRY", {
       pathname,
       fullBasePath,
       basePath,
@@ -53,7 +54,7 @@ export class AuthRedirectService {
     });
 
     if (authState === "loading" || authState === "authenticating") {
-      logger.debug("[AUTH] AuthRedirectService: skipping (loading/authenticating)");
+      logger.warn("[AUTH] AuthRedirectService: skipping (loading/authenticating)", { authState });
       return null;
     }
 
@@ -121,13 +122,28 @@ export class AuthRedirectService {
     nextParam?: string,
     currentCommunityId?: string | null,
   ): RawURIComponent | null {
-    if (!this.isAuthEntryPath(basePath)) return null;
+    if (!this.isAuthEntryPath(basePath)) {
+      logger.warn("[AUTH] handleAuthEntryFlow: not an auth entry path, skipping", { basePath });
+      return null;
+    }
+
+    logger.warn("[AUTH] handleAuthEntryFlow: ENTRY", {
+      pathname,
+      basePath,
+      authState,
+      currentCommunityId,
+    });
 
     switch (authState) {
       case "unauthenticated":
         if (basePath !== "/login") {
+          logger.warn("[AUTH] handleAuthEntryFlow: unauthenticated, redirecting to login", {
+            from: basePath,
+            to: `/login${nextParam}`,
+          });
           return `/login${nextParam}` as RawURIComponent; // 未ログイン → ログインへ
         }
+        logger.warn("[AUTH] handleAuthEntryFlow: unauthenticated, already on login page", { basePath });
         return null;
 
       case "line_authenticated": {
@@ -138,16 +154,35 @@ export class AuthRedirectService {
         const isAuthenticatedForDifferentCommunity = 
           authenticatedCommunityId && currentCommunityId && authenticatedCommunityId !== currentCommunityId;
         
+        logger.warn("[AUTH] handleAuthEntryFlow: line_authenticated case", {
+          authenticatedCommunityId,
+          currentCommunityId,
+          isAuthenticatedForDifferentCommunity,
+          basePath,
+        });
+        
         if (isAuthenticatedForDifferentCommunity) {
           // LINE authentication is for a different community, stay on login page
           if (basePath !== "/login") {
+            logger.warn("[AUTH] handleAuthEntryFlow: line_authenticated for different community, redirecting to login", {
+              from: basePath,
+              to: `/login${nextParam}`,
+            });
             return `/login${nextParam}` as RawURIComponent;
           }
+          logger.warn("[AUTH] handleAuthEntryFlow: line_authenticated for different community, already on login page", { basePath });
           return null;
         }
         
         const target = `/sign-up/phone-verification${nextParam}`;
-        if (pathname === target || basePath === "/sign-up/phone-verification") return null; // すでに居る場合はリダイレクト不要
+        if (pathname === target || basePath === "/sign-up/phone-verification") {
+          logger.warn("[AUTH] handleAuthEntryFlow: line_authenticated, already on phone-verification page", { basePath });
+          return null; // すでに居る場合はリダイレクト不要
+        }
+        logger.warn("[AUTH] handleAuthEntryFlow: line_authenticated, redirecting to phone-verification", {
+          from: basePath,
+          to: target,
+        });
         return target as RawURIComponent; // LINE認証済み → 電話認証へ
       }
 
