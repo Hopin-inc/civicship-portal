@@ -48,8 +48,16 @@ export function useCommunitySwitch(): void {
 
       // 2. Reset Zustand auth store
       useAuthStore.getState().reset();
+      
+      // 3. Set auth state to unauthenticated so RouteGuard can redirect to login
+      // This is necessary because initAuth won't be called again (hasInitialized.current is already true)
+      useAuthStore.getState().setState({
+        authenticationState: "unauthenticated",
+        isAuthenticating: false,
+        isAuthInProgress: false,
+      });
 
-      // 3. Clear auth cookies for the old community
+      // 4. Clear auth cookies for the old community
       TokenManager.clearAllAuthFlags();
 
       // 4. Sign out from Firebase (async, but we don't need to wait)
