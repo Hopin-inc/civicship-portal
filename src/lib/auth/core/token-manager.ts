@@ -3,26 +3,42 @@
 import { extractCommunityIdFromPath } from "@/lib/communities/communityIds";
 
 export class TokenManager {
-  private static readonly LINE_AUTHENTICATED_KEY = "line_authenticated";
-  private static readonly PHONE_AUTHENTICATED_KEY = "phone_authenticated";
+  // Base cookie names - will be suffixed with community ID for multi-tenant isolation
+  private static readonly LINE_AUTHENTICATED_BASE = "line_authenticated";
+  private static readonly PHONE_AUTHENTICATED_BASE = "phone_authenticated";
   private static readonly PHONE_ACCESS_TOKEN_KEY = "phone_auth_token";
 
-  private static getCommunityPath(): string {
-    if (typeof window === "undefined") return "/";
-    const communityId = extractCommunityIdFromPath(window.location.pathname);
-    return communityId ? `/${communityId}` : "/";
+  private static getCurrentCommunityId(): string | null {
+    if (typeof window === "undefined") return null;
+    return extractCommunityIdFromPath(window.location.pathname);
   }
 
-  static saveLineAuthFlag(isAuthenticated: boolean): void {
-    this.setCookie(this.LINE_AUTHENTICATED_KEY, isAuthenticated.toString());
+  // Get community-specific cookie name
+  // e.g., "line_authenticated_neo88" for neo88 community
+  private static getCommunitySpecificKey(baseKey: string, communityId?: string): string {
+    const effectiveCommunityId = communityId ?? this.getCurrentCommunityId();
+    if (!effectiveCommunityId) return baseKey;
+    return `${baseKey}_${effectiveCommunityId}`;
   }
 
-  static savePhoneAuthFlag(isAuthenticated: boolean): void {
-    this.setCookie(this.PHONE_AUTHENTICATED_KEY, isAuthenticated.toString());
+  static saveLineAuthFlag(isAuthenticated: boolean, communityId?: string): void {
+    const key = this.getCommunitySpecificKey(this.LINE_AUTHENTICATED_BASE, communityId);
+    this.setCookie(key, isAuthenticated.toString());
   }
 
-  static getPhoneAuthFlag(): boolean {
-    return this.getCookie(this.PHONE_AUTHENTICATED_KEY) === "true";
+  static savePhoneAuthFlag(isAuthenticated: boolean, communityId?: string): void {
+    const key = this.getCommunitySpecificKey(this.PHONE_AUTHENTICATED_BASE, communityId);
+    this.setCookie(key, isAuthenticated.toString());
+  }
+
+  static getLineAuthFlag(communityId?: string): boolean {
+    const key = this.getCommunitySpecificKey(this.LINE_AUTHENTICATED_BASE, communityId);
+    return this.getCookie(key) === "true";
+  }
+
+  static getPhoneAuthFlag(communityId?: string): boolean {
+    const key = this.getCommunitySpecificKey(this.PHONE_AUTHENTICATED_BASE, communityId);
+    return this.getCookie(key) === "true";
   }
 
   static phoneVerified(): boolean {
@@ -30,34 +46,40 @@ export class TokenManager {
     return accessToken !== null;
   }
 
-  static clearLineAuthFlag(): void {
-    this.deleteCookie(this.LINE_AUTHENTICATED_KEY);
-    this.deleteCookieAtPath(this.LINE_AUTHENTICATED_KEY, "/");
+  static clearLineAuthFlag(communityId?: string): void {
+    const key = this.getCommunitySpecificKey(this.LINE_AUTHENTICATED_BASE, communityId);
+    this.deleteCookie(key);
+    // Also clear legacy cookies without community suffix
+    this.deleteCookie(this.LINE_AUTHENTICATED_BASE);
+    this.deleteCookieAtPath(this.LINE_AUTHENTICATED_BASE, "/");
   }
 
-  static clearPhoneAuthFlag(): void {
-    this.deleteCookie(this.PHONE_AUTHENTICATED_KEY);
-    this.deleteCookieAtPath(this.PHONE_AUTHENTICATED_KEY, "/");
+  static clearPhoneAuthFlag(communityId?: string): void {
+    const key = this.getCommunitySpecificKey(this.PHONE_AUTHENTICATED_BASE, communityId);
+    this.deleteCookie(key);
+    // Also clear legacy cookies without community suffix
+    this.deleteCookie(this.PHONE_AUTHENTICATED_BASE);
+    this.deleteCookieAtPath(this.PHONE_AUTHENTICATED_BASE, "/");
   }
 
-  static clearAllAuthFlags(): void {
-    this.clearLineAuthFlag();
-    this.clearPhoneAuthFlag();
+  static clearAllAuthFlags(communityId?: string): void {
+    this.clearLineAuthFlag(communityId);
+    this.clearPhoneAuthFlag(communityId);
   }
 
   static clearGlobalAuthFlags(): void {
-    this.deleteCookieAtPath(this.LINE_AUTHENTICATED_KEY, "/");
-    this.deleteCookieAtPath(this.PHONE_AUTHENTICATED_KEY, "/");
+    this.deleteCookieAtPath(this.LINE_AUTHENTICATED_BASE, "/");
+    this.deleteCookieAtPath(this.PHONE_AUTHENTICATED_BASE, "/");
     this.deleteCookieAtPath(this.PHONE_ACCESS_TOKEN_KEY, "/");
   }
 
   private static setCookie(name: string, value: string, days = 30): void {
     if (typeof document === "undefined") return;
 
-    const path = this.getCommunityPath();
     const expires = new Date();
     expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
-    document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=${path};SameSite=Lax`;
+    // Use root path for all cookies since we're using community-specific names
+    document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
   }
 
   private static getCookie(name: string): string | null {
@@ -71,8 +93,7 @@ export class TokenManager {
 
   private static deleteCookie(name: string): void {
     if (typeof document === "undefined") return;
-    const path = this.getCommunityPath();
-    document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=${path};SameSite=Lax`;
+    document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;SameSite=Lax`;
   }
 
   private static deleteCookieAtPath(name: string, path: string): void {

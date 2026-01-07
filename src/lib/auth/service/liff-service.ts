@@ -312,11 +312,12 @@ export class LiffService {
           authenticatedCommunityId: communityId,
         });
 
-        TokenManager.saveLineAuthFlag(true);
+        // Save community-specific auth cookies
+        TokenManager.saveLineAuthFlag(true, communityId);
 
         const isPhoneVerified = TokenManager.phoneVerified();
         if (isPhoneVerified) {
-          TokenManager.savePhoneAuthFlag(true);
+          TokenManager.savePhoneAuthFlag(true, communityId);
         }
 
         authStateManager.updateState("line_authenticated", "signInWithLiffToken");

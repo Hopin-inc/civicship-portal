@@ -67,17 +67,20 @@ export function handleUnauthenticatedBranch(
 
 /**
  * 3️⃣ FirebaseUser からセッションを確立
+ * @param communityId - Runtime community ID from URL path (via LiffService.getCommunityId())
  */
 export async function establishSessionFromFirebaseUser(
   firebaseUser: User,
   setState: ReturnType<typeof useAuthStore.getState>["setState"],
+  communityId?: string,
 ): Promise<boolean> {
   try {
     const idToken = await firebaseUser.getIdToken(true);
     const tokenResult = await firebaseUser.getIdTokenResult();
 
     await createSession(idToken);
-    TokenManager.saveLineAuthFlag(true);
+    // Save community-specific auth cookie
+    TokenManager.saveLineAuthFlag(true, communityId);
 
     setState({
       lineTokens: {
@@ -171,7 +174,8 @@ export async function evaluateUserRegistrationState(
   // If we set it here, it would be overwritten to the current URL's community ID on every navigation
 
   if (isRegistered) {
-    TokenManager.savePhoneAuthFlag(true);
+    // Save community-specific phone auth cookie
+    TokenManager.savePhoneAuthFlag(true, communityId);
     finalizeAuthState("user_registered", user, setState, authStateManager);
     await authStateManager.handleUserRegistrationStateChange(true);
     return true;

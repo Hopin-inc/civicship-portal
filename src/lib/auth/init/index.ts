@@ -118,8 +118,9 @@ async function initAuthFast({
       setState,
       authStateManager,
     );
-    TokenManager.saveLineAuthFlag(true);
-    if (ssrPhoneAuthenticated) TokenManager.savePhoneAuthFlag(true);
+    // Save community-specific auth cookies
+    TokenManager.saveLineAuthFlag(true, currentCommunityId);
+    if (ssrPhoneAuthenticated) TokenManager.savePhoneAuthFlag(true, currentCommunityId);
     await authStateManager.handleUserRegistrationStateChange(
       !!ssrPhoneAuthenticated,
       { ssrMode: true }
@@ -178,7 +179,10 @@ async function initAuthFull({
       return;
     }
 
-    const sessionOk = await establishSessionFromFirebaseUser(firebaseUser, setState);
+    // Get runtime communityId from LiffService for community-specific cookie handling
+    const communityId = liffService.getCommunityId();
+    
+    const sessionOk = await establishSessionFromFirebaseUser(firebaseUser, setState, communityId);
     if (!sessionOk) {
       finalizeAuthState("unauthenticated", undefined, setState, authStateManager);
       return;
@@ -190,8 +194,6 @@ async function initAuthFull({
       return;
     }
 
-    // Pass runtime communityId from LiffService instead of build-time COMMUNITY_ID
-    const communityId = liffService.getCommunityId();
     await evaluateUserRegistrationState(user, ssrPhoneAuthenticated, setState, authStateManager, communityId);
   } catch (error) {
     logger.warn("initAuthFull failed", { error });
