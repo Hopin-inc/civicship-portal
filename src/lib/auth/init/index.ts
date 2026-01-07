@@ -187,11 +187,34 @@ async function initAuthFull({
     // This prevents cross-community authentication bypass where a user logged into Community A
     // could access Community B by having a valid Firebase session from Community A
     const firebaseUserTenantId = firebaseUser.tenantId;
-    if (expectedTenantId && firebaseUserTenantId !== expectedTenantId) {
+    
+    logger.debug("[AUTH] initAuthFull: checking tenant validation", {
+      firebaseUserTenantId,
+      expectedTenantId,
+      communityId,
+    });
+    
+    // Tenant validation logic:
+    // 1. If Firebase user has a tenant ID but we don't have expected tenant ID (config not loaded),
+    //    treat as unauthenticated - we can't verify the user belongs to this community
+    // 2. If Firebase user has a tenant ID that doesn't match expected, treat as unauthenticated
+    // 3. If Firebase user has no tenant ID but we expect one, treat as unauthenticated
+    // 4. If both are null/undefined, allow (legacy case or non-tenant setup)
+    const hasTenantMismatch = 
+      (firebaseUserTenantId && !expectedTenantId) || // User has tenant but we don't know expected
+      (firebaseUserTenantId && expectedTenantId && firebaseUserTenantId !== expectedTenantId) || // Tenant mismatch
+      (!firebaseUserTenantId && expectedTenantId); // We expect tenant but user doesn't have one
+    
+    if (hasTenantMismatch) {
       logger.debug("[AUTH] initAuthFull: Firebase tenant mismatch, treating as unauthenticated", {
         firebaseUserTenantId,
         expectedTenantId,
         communityId,
+        reason: firebaseUserTenantId && !expectedTenantId 
+          ? "user has tenant but expected is unknown" 
+          : firebaseUserTenantId !== expectedTenantId 
+            ? "tenant IDs do not match"
+            : "expected tenant but user has none",
       });
       finalizeAuthState("unauthenticated", undefined, setState, authStateManager);
       return;
