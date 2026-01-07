@@ -61,13 +61,15 @@
   "transactions.detail.type.payment": "Payment",
   "transactions.detail.type.return": "Return",
   "transactions.detail.type.refund": "Refund",
-  "transactions.detail.verification.showButton": "Show Verification Results",
-  "transactions.detail.verification.description": "Display confirmation results and technical information",
+  "transactions.detail.verification.showButton": "View verification status",
+  "transactions.detail.verification.description": "Check whether this exchange content has been altered",
   "transactions.detail.verification.loading": "Verifying...",
   "transactions.detail.verification.error": "Failed to retrieve verification results",
   "transactions.detail.verification.notFound": "Verification results not found",
-  "transactions.detail.verification.notVerified": "This exchange has not been verified yet",
+  "transactions.detail.verification.notVerified": "This exchange is currently awaiting verification (scheduled for the next verification cycle)",
   "transactions.detail.verification.transactionHash": "Transaction Hash",
   "transactions.detail.verification.rootHash": "Root Hash",
-  "transactions.detail.verification.label": "Label"
+  "transactions.detail.verification.result": "This exchange content has not been modified",
+  "transactions.detail.verification.resultDescription": "The content has been verified by cross-checking it with records stored on the blockchain.",
+  "transactions.detail.verification.openExplorer": "View on blockchain"
 }

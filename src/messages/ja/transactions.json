@@ -57,13 +57,15 @@
   "transactions.detail.type.payment": "支払い",
   "transactions.detail.type.return": "返品",
   "transactions.detail.type.refund": "返金",
-  "transactions.detail.verification.showButton": "検証結果を表示",
-  "transactions.detail.verification.description": "記録の確認結果と技術的な情報を表示します",
+  "transactions.detail.verification.showButton": "検証結果を確認する",
+  "transactions.detail.verification.description": "この交換内容が改ざんされていないかどうかを確認できます",
   "transactions.detail.verification.loading": "検証中...",
   "transactions.detail.verification.error": "検証結果の取得に失敗しました",
   "transactions.detail.verification.notFound": "検証結果が見つかりません",
-  "transactions.detail.verification.notVerified": "この交換はまだ検証されていません",
+  "transactions.detail.verification.notVerified": "この交換内容は、現在検証待ちです（次回の検証対象）",
   "transactions.detail.verification.transactionHash": "トランザクションハッシュ",
   "transactions.detail.verification.rootHash": "ルートハッシュ",
-  "transactions.detail.verification.label": "ラベル"
+  "transactions.detail.verification.result": "この交換内容は、後から変更されていません",
+  "transactions.detail.verification.resultDescription": "ブロックチェーン上の記録と照合し、内容が書き換えられていないことを確認しています。",
+  "transactions.detail.verification.openExplorer": "ブロックチェーンで確認"
 }

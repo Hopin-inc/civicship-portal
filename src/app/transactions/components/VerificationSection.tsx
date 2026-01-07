@@ -3,9 +3,10 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { InfoCard } from "@/components/shared";
-import { useVerifyTransactionsQuery, GqlVerificationStatus } from "@/types/graphql";
+import { GqlVerificationStatus, useVerifyTransactionsQuery } from "@/types/graphql";
 import { useTranslations } from "next-intl";
-import { Loader2 } from "lucide-react";
+import { Loader2, ShieldCheck } from "lucide-react";
+import { getCardanoExplorerTxUrl } from "@/app/transactions/[id]/lib/getCardanoExploerTxUrl";
 
 interface VerificationSectionProps {
   transactionId: string;
@@ -26,29 +27,25 @@ export const VerificationSection = ({ transactionId }: VerificationSectionProps)
     setShowVerification(true);
   };
 
-      if (!showVerification || loading) {
-      return (
-        <div className="mt-6 flex flex-col items-center gap-2">
-          <Button 
-            variant="text" 
-            onClick={handleShowVerification}
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {t("transactions.detail.verification.loading")}
-              </>
-            ) : (
-              t("transactions.detail.verification.showButton")
-            )}
-          </Button>
-          <p className="text-label-xs text-muted-foreground text-center">
-            {t("transactions.detail.verification.description")}
-          </p>
-        </div>
-      );
-    }
+  if (!showVerification || loading) {
+    return (
+      <div className="mt-6 flex flex-col items-center gap-2">
+        <Button variant="text" onClick={handleShowVerification} disabled={loading}>
+          {loading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              {t("transactions.detail.verification.loading")}
+            </>
+          ) : (
+            t("transactions.detail.verification.showButton")
+          )}
+        </Button>
+        <p className="text-label-xs text-muted-foreground text-center">
+          {t("transactions.detail.verification.description")}
+        </p>
+      </div>
+    );
+  }
 
   if (error) {
     return (
@@ -66,48 +63,69 @@ export const VerificationSection = ({ transactionId }: VerificationSectionProps)
     );
   }
 
-    const isVerified = verificationResult.status === GqlVerificationStatus.Verified;
+  const isVerified = verificationResult.status === GqlVerificationStatus.Verified;
 
-    if (!isVerified) {
-      return (
-        <div className="mt-6 text-center text-label-sm text-muted-foreground">
-          {t("transactions.detail.verification.notVerified")}
-        </div>
-      );
-    }
-
+  if (!isVerified) {
     return (
-      <div className="mt-6">
-        <div className="grid grid-cols-1 gap-1">
-          {verificationResult.transactionHash && (
-            <InfoCard
-              label={t("transactions.detail.verification.transactionHash")}
-              value={verificationResult.transactionHash}
-              showCopy={true}
-              copyData={verificationResult.transactionHash}
-              truncatePattern="middle"
-              truncateHead={6}
-              truncateTail={4}
-            />
-          )}
-          {verificationResult.rootHash && (
-            <InfoCard
-              label={t("transactions.detail.verification.rootHash")}
-              value={verificationResult.rootHash}
-              showCopy={true}
-              copyData={verificationResult.rootHash}
-              truncatePattern="middle"
-              truncateHead={6}
-              truncateTail={4}
-            />
-          )}
-          {verificationResult.label !== null && verificationResult.label !== undefined && (
-            <InfoCard
-              label={t("transactions.detail.verification.label")}
-              value={String(verificationResult.label)}
-            />
-          )}
-        </div>
+      <div className="pl-6 mt-12 text-center text-label-sm text-muted-foreground">
+        {t("transactions.detail.verification.notVerified")}
       </div>
     );
+  }
+
+  const explorerUrl = verificationResult.transactionHash
+    ? getCardanoExplorerTxUrl(verificationResult.transactionHash)
+    : null;
+
+  return (
+    <div className="mt-12">
+      {/* 検証完了メッセージ */}
+      <div className="pl-6">
+        <div className="mb-1 flex items-center gap-1 text-label-sm text-success">
+          <ShieldCheck className="h-4 w-4" />
+          {t("transactions.detail.verification.result")}
+        </div>
+        <div className="mb-3 text-left text-body-xs text-muted-foreground leading-relaxed">
+          {t("transactions.detail.verification.resultDescription")}
+        </div>
+      </div>
+
+      {/* 検証情報 */}
+      <div className="grid grid-cols-1 gap-1">
+        {verificationResult.transactionHash && (
+          <InfoCard
+            label={t("transactions.detail.verification.transactionHash")}
+            value={verificationResult.transactionHash}
+            showCopy
+            copyData={verificationResult.transactionHash}
+            truncatePattern="middle"
+            truncateHead={6}
+            truncateTail={4}
+          />
+        )}
+        {verificationResult.rootHash && (
+          <InfoCard
+            label={t("transactions.detail.verification.rootHash")}
+            value={verificationResult.rootHash}
+            showCopy
+            copyData={verificationResult.rootHash}
+            truncatePattern="middle"
+            truncateHead={6}
+            truncateTail={4}
+          />
+        )}
+      </div>
+
+      {/* Explorer リンク */}
+      {explorerUrl && (
+        <div className="mt-4 flex justify-center">
+          <Button variant="text" asChild>
+            <a href={explorerUrl} target="_blank" rel="noopener noreferrer">
+              {t("transactions.detail.verification.openExplorer")}
+            </a>
+          </Button>
+        </div>
+      )}
+    </div>
+  );
 };
