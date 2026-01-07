@@ -158,12 +158,26 @@ export class AuthRedirectService {
         }
         return null;
 
-      case "user_registered":
+      case "user_registered": {
+        // Check if the user is registered for the current community
+        const { authenticatedCommunityId } = useAuthStore.getState().state;
+        const isAuthenticatedForCurrentCommunity = 
+          authenticatedCommunityId && currentCommunityId && authenticatedCommunityId === currentCommunityId;
+        
+        if (!isAuthenticatedForCurrentCommunity) {
+          // User is registered for a different community, stay on login page
+          if (basePath !== "/login") {
+            return `/login${nextParam}` as RawURIComponent;
+          }
+          return null;
+        }
+        
         // 登録済みユーザーが sign-up 系や login に来たらトップ or nextへ
         if (next?.startsWith("/") && !next.startsWith("/login") && !next.startsWith("/sign-up")) {
           return next as RawURIComponent;
         }
         return "/" as RawURIComponent;
+      }
 
       default:
         return null;
@@ -214,6 +228,36 @@ export class AuthRedirectService {
           return `/sign-up${nextParam}` as RawURIComponent; // 電話認証済み・未登録 → サインアップへ
         }
         break;
+
+      case "user_registered": {
+        // Check if the user has membership in the current community
+        // If not, redirect to login for the current community
+        const { authenticatedCommunityId } = useAuthStore.getState().state;
+        const isAuthenticatedForCurrentCommunity = 
+          authenticatedCommunityId && currentCommunityId && authenticatedCommunityId === currentCommunityId;
+        
+        if (!isAuthenticatedForCurrentCommunity) {
+          logger.debug("[AUTH] User is registered but for a different community, redirecting to login", {
+            authenticatedCommunityId,
+            currentCommunityId,
+          });
+          return `/login${nextParam}` as RawURIComponent; // 別コミュニティで登録済み → ログインへ
+        }
+        
+        // User is registered for the current community, check membership
+        const hasMembershipInCurrentCommunity = currentUser?.memberships?.some(
+          (m) => m.community?.id === currentCommunityId
+        );
+        
+        if (!hasMembershipInCurrentCommunity) {
+          logger.debug("[AUTH] User is registered but has no membership in current community, redirecting to login", {
+            currentCommunityId,
+            membershipIds: currentUser?.memberships?.map(m => m.community?.id) ?? [],
+          });
+          return `/login${nextParam}` as RawURIComponent; // 現コミュニティにメンバーシップなし → ログインへ
+        }
+        break;
+      }
     }
     return null;
   }
