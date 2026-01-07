@@ -82,20 +82,40 @@ export async function getUserServer(communityId?: string): Promise<{
     const user: GqlUser | null = res.currentUser?.user ?? null;
     const hasPhoneIdentity = !!user?.identities?.some((i) => i.platform?.toUpperCase() === "PHONE");
 
+    // CRITICAL FIX: If user is null despite having a session, the session might be for a different community
+    // In this case, return lineAuthenticated: false to ensure redirect to login instead of phone verification
+    if (!user) {
+      logger.warn("[AUTH] getUserServer: Session exists but no user returned, treating as unauthenticated", {
+        communityId,
+        hasSession: true,
+        lineAuthenticatedCookie,
+      });
+      return {
+        user: null,
+        lineAuthenticated: false,
+        phoneAuthenticated: false,
+      };
+    }
+
     return {
       user,
-      lineAuthenticated: true, // SSR時点でsessionがあればtrue扱い
+      lineAuthenticated: true,
       phoneAuthenticated: hasPhoneIdentity,
     };
   } catch (error) {
-    logger.warn("⚠️ Failed to fetch currentUser:", {
+    // CRITICAL FIX: When GraphQL query fails, return lineAuthenticated: false
+    // This ensures that if the session is for a different community (causing the query to fail),
+    // the user will be redirected to login instead of phone verification.
+    // Previously, returning lineAuthenticated: true caused SSR to render phone verification page
+    // even when the session was invalid for the current community.
+    logger.warn("[AUTH] getUserServer: GraphQL query failed, treating as unauthenticated", {
+      communityId,
       message: (error as Error).message,
-      stack: (error as Error).stack,
     });
     return {
       user: null,
-      lineAuthenticated: true,
-      phoneAuthenticated,
+      lineAuthenticated: false,
+      phoneAuthenticated: false,
     };
   }
 }
