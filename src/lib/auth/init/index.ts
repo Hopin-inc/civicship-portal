@@ -223,6 +223,13 @@ async function initAuthFull({
             ? "tenant IDs do not match"
             : "expected tenant but user has none",
       });
+      
+      // CRITICAL: Clear the community-specific line_authenticated cookie
+      // This ensures that AuthRedirectService.handleAuthEntryFlow will see
+      // lineAuthenticated=false and redirect to login instead of phone verification
+      TokenManager.saveLineAuthFlag(false, communityId);
+      TokenManager.savePhoneAuthFlag(false, communityId);
+      
       finalizeAuthState("unauthenticated", undefined, setState, authStateManager);
       return;
     }
