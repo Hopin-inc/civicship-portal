@@ -169,6 +169,40 @@ async function initAuthFull({
   setState: ReturnType<typeof useAuthStore.getState>["setState"];
 }) {
   try {
+    // CRITICAL FIX: Clear community-specific cookies BEFORE prepareInitialState
+    // This prevents the race condition where RouteGuard sees line_authenticated state
+    // based on stale cookies before tenant validation completes.
+    // 
+    // The issue: prepareInitialState was called, then initializeFirebase (async),
+    // and RouteGuard would see the intermediate auth state based on cookies
+    // before tenant validation could clear them.
+    const communityId = liffService.getCommunityId();
+    const expectedTenantId = liffService.getFirebaseTenantId();
+    
+    // Quick synchronous check: if there's a Firebase user from a different tenant,
+    // clear the cookies immediately before any auth state is set
+    const { lineAuth } = await import("@/lib/auth/core/firebase-config");
+    const currentFirebaseUser = lineAuth.currentUser;
+    
+    if (currentFirebaseUser) {
+      const firebaseUserTenantId = currentFirebaseUser.tenantId;
+      const hasTenantMismatch = 
+        (firebaseUserTenantId && !expectedTenantId) ||
+        (firebaseUserTenantId && expectedTenantId && firebaseUserTenantId !== expectedTenantId) ||
+        (!firebaseUserTenantId && expectedTenantId);
+      
+      if (hasTenantMismatch) {
+        logger.warn("[AUTH] initAuthFull: Early tenant mismatch detected, clearing cookies before prepareInitialState", {
+          firebaseUserTenantId,
+          expectedTenantId,
+          communityId,
+        });
+        // Clear cookies BEFORE prepareInitialState so RouteGuard sees unauthenticated state
+        TokenManager.saveLineAuthFlag(false, communityId);
+        TokenManager.savePhoneAuthFlag(false, communityId);
+      }
+    }
+    
     prepareInitialState(setState);
 
     const firebaseUser = await initializeFirebase(liffService, environment);
@@ -183,17 +217,13 @@ async function initAuthFull({
       return;
     }
 
-    // Get runtime communityId and tenantId from LiffService for community-specific handling
-    const communityId = liffService.getCommunityId();
-    const expectedTenantId = liffService.getFirebaseTenantId();
-    
     // CRITICAL: Validate that the Firebase user's tenant matches the current community's tenant
     // This prevents cross-community authentication bypass where a user logged into Community A
     // could access Community B by having a valid Firebase session from Community A
     const firebaseUserTenantId = firebaseUser.tenantId;
     
     // Using warn level temporarily to ensure logs appear in staging/production
-    logger.warn("[AUTH] initAuthFull: ENTRY - checking tenant validation", {
+    logger.warn("[AUTH] initAuthFull: checking tenant validation after Firebase init", {
       firebaseUserTenantId,
       expectedTenantId,
       communityId,
@@ -206,14 +236,14 @@ async function initAuthFull({
     // 2. If Firebase user has a tenant ID that doesn't match expected, treat as unauthenticated
     // 3. If Firebase user has no tenant ID but we expect one, treat as unauthenticated
     // 4. If both are null/undefined, allow (legacy case or non-tenant setup)
-    const hasTenantMismatch = 
+    const hasTenantMismatchAfterInit = 
       (firebaseUserTenantId && !expectedTenantId) || // User has tenant but we don't know expected
       (firebaseUserTenantId && expectedTenantId && firebaseUserTenantId !== expectedTenantId) || // Tenant mismatch
       (!firebaseUserTenantId && expectedTenantId); // We expect tenant but user doesn't have one
     
-    if (hasTenantMismatch) {
+    if (hasTenantMismatchAfterInit) {
       // Using warn level temporarily to ensure logs appear in staging/production
-      logger.warn("[AUTH] initAuthFull: Firebase tenant mismatch, treating as unauthenticated", {
+      logger.warn("[AUTH] initAuthFull: Firebase tenant mismatch after init, treating as unauthenticated", {
         firebaseUserTenantId,
         expectedTenantId,
         communityId,
