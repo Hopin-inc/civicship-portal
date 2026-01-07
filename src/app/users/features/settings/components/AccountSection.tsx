@@ -87,7 +87,7 @@ export default function AccountSection() {
         {/* LINEアカウント */}
         <div className="flex items-center justify-between py-4 px-4 border-b">
           <div className="flex items-center gap-2">
-            <Image src="/images/line-icon.png" alt="LINE" width={20} height={20} />
+            <Image src="/images/line-icon.png" alt="LINE" width={20} height={20} unoptimized />
             <span className="font-bold text-sm">{t("users.account.lineAccount")}</span>
           </div>
           <span className="text-gray-400">

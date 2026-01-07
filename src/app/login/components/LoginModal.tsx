@@ -111,7 +111,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, nextPath }) =>
               disabled={isLoading || isAuthenticating}
               className="w-full bg-[#06C755] hover:bg-[#05B74B] text-white rounded-full h-14 flex items-center justify-center gap-2"
             >
-              <Image src="/images/line-icon.png" alt="LINE" width={24} height={24} priority />
+              <Image src="/images/line-icon.png" alt="LINE" width={24} height={24} priority unoptimized />
               {isLoading || isAuthenticating ? "ログイン中..." : "LINEでログイン"}
             </Button>
           ) : (

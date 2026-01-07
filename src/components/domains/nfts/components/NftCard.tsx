@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import { SafeImage } from "@/components/ui/safe-image";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { Card } from "@/components/ui/card";
 
@@ -22,20 +22,17 @@ export const NftCard = ({ nftInstance, isCarousel = false }: NftCardProps) => {
       className={`relative w-full flex-shrink-0 ${isCarousel ? "max-w-[150px] sm:max-w-[164px]" : ""}`}
     >
       <Card className="w-full h-[205px] overflow-hidden relative">
-        <Image
+        <SafeImage
           src={nftInstance.imageUrl ?? PLACEHOLDER_IMAGE}
           alt={nftInstance.name ?? ""}
           width={400}
           height={400}
           sizes="164px"
-          placeholder={`blur`}
+          placeholder="blur"
           blurDataURL={PLACEHOLDER_IMAGE}
           loading="lazy"
           className="h-full w-full object-cover"
-          onError={(e) => {
-            const img = e.target as HTMLImageElement;
-            img.src = PLACEHOLDER_IMAGE;
-          }}
+          fallbackSrc={PLACEHOLDER_IMAGE}
         />
       </Card>
       <div className="mt-3">
