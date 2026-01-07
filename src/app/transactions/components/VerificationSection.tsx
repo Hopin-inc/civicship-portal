@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { InfoCard } from "@/components/shared";
 import { GqlVerificationStatus, useVerifyTransactionsQuery } from "@/types/graphql";
 import { useTranslations } from "next-intl";
-import { Loader2, ShieldCheck } from "lucide-react";
+import { ExternalLink, Loader2, ShieldCheck } from "lucide-react";
 import { getCardanoExplorerTxUrl } from "@/app/transactions/[id]/lib/getCardanoExploerTxUrl";
 
 interface VerificationSectionProps {
@@ -119,9 +119,15 @@ export const VerificationSection = ({ transactionId }: VerificationSectionProps)
       {/* Explorer リンク */}
       {explorerUrl && (
         <div className="mt-4 flex justify-center">
-          <Button variant="text" asChild>
-            <a href={explorerUrl} target="_blank" rel="noopener noreferrer">
-              {t("transactions.detail.verification.openExplorer")}
+          <Button variant="text">
+            <a
+              href={explorerUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1"
+            >
+              <span>{t("transactions.detail.verification.openExplorer")}</span>
+              <ExternalLink className="h-3.5 w-3.5" />
             </a>
           </Button>
         </div>
