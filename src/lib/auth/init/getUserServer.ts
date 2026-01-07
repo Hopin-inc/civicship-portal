@@ -18,7 +18,29 @@ export async function getUserServer(communityId?: string): Promise<{
   const hasSession = await hasServerSession();
   const cookieHeader = await getServerCookieHeader();
 
+  // Check for per-community LINE authentication cookie
+  // The line_authenticated cookie is set with path=/${communityId}/ when the user logs in
+  // This ensures each community has isolated authentication state
+  const lineAuthenticatedCookie = cookieStore.get("line_authenticated")?.value === "true";
   const phoneAuthenticated = cookieStore.get("phone_authenticated")?.value === "true";
+
+  logger.debug("[AUTH] getUserServer: checking auth cookies", {
+    communityId,
+    hasSession,
+    lineAuthenticatedCookie,
+    phoneAuthenticated,
+  });
+
+  // If there's no per-community LINE auth cookie, treat as unauthenticated for this community
+  // This ensures that logging into Community A doesn't grant access to Community B
+  if (!lineAuthenticatedCookie) {
+    logger.debug("[AUTH] getUserServer: no line_authenticated cookie for this community, treating as unauthenticated");
+    return {
+      user: null,
+      lineAuthenticated: false,
+      phoneAuthenticated: false,
+    };
+  }
 
   if (!hasSession) {
     return {
