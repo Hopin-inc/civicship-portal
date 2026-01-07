@@ -34,7 +34,8 @@ export async function getUserServer(communityId?: string): Promise<{
   const lineAuthenticatedCookie = cookieStore.get(lineAuthCookieName)?.value === "true";
   const phoneAuthenticated = cookieStore.get(phoneAuthCookieName)?.value === "true";
 
-  logger.debug("[AUTH] getUserServer: checking auth cookies", {
+  // Using warn level temporarily to ensure logs appear in staging/production
+  logger.warn("[AUTH] getUserServer: ENTRY - checking auth cookies", {
     communityId,
     hasSession,
     lineAuthCookieName,

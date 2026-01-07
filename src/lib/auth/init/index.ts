@@ -39,13 +39,16 @@ export async function initAuth(params: InitAuthParams) {
 
   const environment = detectEnvironment();
 
-  logger.debug("[AUTH] initAuth", {
+  // Using warn level temporarily to ensure logs appear in staging/production
+  logger.warn("[AUTH] initAuth: ENTRY", {
     environment,
     ssrCurrentUser: !!ssrCurrentUser,
     ssrCurrentUserId: ssrCurrentUser?.id,
     ssrLineAuthenticated,
     ssrPhoneAuthenticated,
     willUseInitAuthFast: !!(ssrCurrentUser && ssrLineAuthenticated),
+    communityId: liffService.getCommunityId(),
+    firebaseTenantId: liffService.getFirebaseTenantId(),
   });
 
   if (ssrCurrentUser && ssrLineAuthenticated) {
@@ -94,7 +97,8 @@ async function initAuthFast({
       (m) => m.community?.id === currentCommunityId
     );
     
-    logger.debug("[AUTH] initAuthFast: checking membership", {
+    // Using warn level temporarily to ensure logs appear in staging/production
+    logger.warn("[AUTH] initAuthFast: ENTRY - checking membership", {
       currentCommunityId,
       hasMembershipInCurrentCommunity,
       membershipIds: ssrCurrentUser.memberships?.map(m => m.community?.id) ?? [],
@@ -188,10 +192,12 @@ async function initAuthFull({
     // could access Community B by having a valid Firebase session from Community A
     const firebaseUserTenantId = firebaseUser.tenantId;
     
-    logger.debug("[AUTH] initAuthFull: checking tenant validation", {
+    // Using warn level temporarily to ensure logs appear in staging/production
+    logger.warn("[AUTH] initAuthFull: ENTRY - checking tenant validation", {
       firebaseUserTenantId,
       expectedTenantId,
       communityId,
+      firebaseUserUid: firebaseUser.uid,
     });
     
     // Tenant validation logic:
@@ -206,7 +212,8 @@ async function initAuthFull({
       (!firebaseUserTenantId && expectedTenantId); // We expect tenant but user doesn't have one
     
     if (hasTenantMismatch) {
-      logger.debug("[AUTH] initAuthFull: Firebase tenant mismatch, treating as unauthenticated", {
+      // Using warn level temporarily to ensure logs appear in staging/production
+      logger.warn("[AUTH] initAuthFull: Firebase tenant mismatch, treating as unauthenticated", {
         firebaseUserTenantId,
         expectedTenantId,
         communityId,
@@ -219,6 +226,13 @@ async function initAuthFull({
       finalizeAuthState("unauthenticated", undefined, setState, authStateManager);
       return;
     }
+    
+    // Log when tenant validation passes
+    logger.warn("[AUTH] initAuthFull: Tenant validation passed, proceeding with session", {
+      firebaseUserTenantId,
+      expectedTenantId,
+      communityId,
+    });
     
     const sessionOk = await establishSessionFromFirebaseUser(firebaseUser, setState, communityId);
     if (!sessionOk) {
