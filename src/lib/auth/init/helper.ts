@@ -166,6 +166,10 @@ export async function evaluateUserRegistrationState(
   const isPhoneVerified = ssrPhoneAuthenticated || hasPhoneIdentity || TokenManager.phoneVerified();
   const isRegistered = isPhoneVerified && hasMembershipInCurrentCommunity;
 
+  // Store the community ID for which the user is LINE-authenticated
+  // This is used to determine if the LINE authentication is valid for the current community
+  setState({ authenticatedCommunityId: communityId });
+
   if (isRegistered) {
     TokenManager.savePhoneAuthFlag(true);
     finalizeAuthState("user_registered", user, setState, authStateManager);

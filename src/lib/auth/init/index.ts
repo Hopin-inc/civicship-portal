@@ -86,6 +86,11 @@ async function initAuthFast({
   setState: ReturnType<typeof useAuthStore.getState>["setState"];
 }) {
   try {
+    // Store the community ID for which the user is LINE-authenticated
+    // This is used to determine if the LINE authentication is valid for the current community
+    const communityId = liffService.getCommunityId();
+    setState({ authenticatedCommunityId: communityId });
+    
     finalizeAuthState(
       ssrPhoneAuthenticated ? "user_registered" : "line_authenticated",
       ssrCurrentUser,

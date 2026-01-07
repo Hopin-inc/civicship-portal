@@ -307,6 +307,9 @@ export class LiffService {
             refreshToken,
             expiresAt,
           },
+          // Store the community ID for which the user is LINE-authenticated
+          // This is used to determine if the LINE authentication is valid for the current community
+          authenticatedCommunityId: communityId,
         });
 
         TokenManager.saveLineAuthFlag(true);

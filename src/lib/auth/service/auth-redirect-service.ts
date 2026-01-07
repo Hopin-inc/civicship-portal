@@ -9,6 +9,7 @@ import {
   stripCommunityPrefix,
   addCommunityPrefix,
 } from "@/lib/communities/communityIds";
+import { useAuthStore } from "@/lib/auth/core/auth-store";
 
 export class AuthRedirectService {
   private static instance: AuthRedirectService;
@@ -62,6 +63,7 @@ export class AuthRedirectService {
       authState,
       next,
       nextParam,
+      communityId,
     );
     if (redirectFromLogin) {
       // Add community prefix to redirect path if we have one
@@ -74,7 +76,7 @@ export class AuthRedirectService {
       return finalRedirect as RawURIComponent;
     }
 
-    const redirectFromUserPath = this.handleUserPath(basePath, authState, currentUser, nextParam);
+    const redirectFromUserPath = this.handleUserPath(basePath, authState, currentUser, nextParam, communityId);
     if (redirectFromUserPath) {
       // Add community prefix to redirect path if we have one
       const finalRedirect = communityId
@@ -117,6 +119,7 @@ export class AuthRedirectService {
     authState: AuthenticationState,
     next?: string | null,
     nextParam?: string,
+    currentCommunityId?: string | null,
   ): RawURIComponent | null {
     if (!this.isAuthEntryPath(basePath)) return null;
 
@@ -128,6 +131,20 @@ export class AuthRedirectService {
         return null;
 
       case "line_authenticated": {
+        // Check if the LINE authentication is for the current community
+        // If not, treat as unauthenticated and stay on login page
+        const { authenticatedCommunityId } = useAuthStore.getState().state;
+        const isAuthenticatedForCurrentCommunity = 
+          authenticatedCommunityId && currentCommunityId && authenticatedCommunityId === currentCommunityId;
+        
+        if (!isAuthenticatedForCurrentCommunity) {
+          // LINE authentication is for a different community, stay on login page
+          if (basePath !== "/login") {
+            return `/login${nextParam}` as RawURIComponent;
+          }
+          return null;
+        }
+        
         const target = `/sign-up/phone-verification${nextParam}`;
         if (pathname === target || basePath === "/sign-up/phone-verification") return null; // すでに居る場合はリダイレクト不要
         return target as RawURIComponent; // LINE認証済み → 電話認証へ
@@ -163,6 +180,7 @@ export class AuthRedirectService {
     authState: AuthenticationState,
     currentUser: GqlUser | null | undefined,
     nextParam?: string,
+    currentCommunityId?: string | null,
   ): RawURIComponent | null {
     if (!this.isUserPath(basePath)) return null;
 
@@ -170,11 +188,26 @@ export class AuthRedirectService {
       case "unauthenticated":
         return `/login${nextParam}` as RawURIComponent; // 未ログイン → ログインへ
 
-      case "line_authenticated":
+      case "line_authenticated": {
+        // Check if the LINE authentication is for the current community
+        // If not, redirect to login instead of phone verification
+        const { authenticatedCommunityId } = useAuthStore.getState().state;
+        const isAuthenticatedForCurrentCommunity = 
+          authenticatedCommunityId && currentCommunityId && authenticatedCommunityId === currentCommunityId;
+        
+        if (!isAuthenticatedForCurrentCommunity) {
+          logger.debug("[AUTH] LINE authentication is for a different community, redirecting to login", {
+            authenticatedCommunityId,
+            currentCommunityId,
+          });
+          return `/login${nextParam}` as RawURIComponent; // LINE認証が別コミュニティ → ログインへ
+        }
+        
         if (!currentUser) {
           return `/sign-up/phone-verification${nextParam}` as RawURIComponent; // LINE認証済み・未登録 → 電話認証へ
         }
         break;
+      }
 
       case "phone_authenticated":
         if (!currentUser) {

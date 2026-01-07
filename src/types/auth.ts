@@ -25,6 +25,13 @@ export type AuthState = {
     refreshToken: string | null;
     expiresAt: string | null;
   };
+  /**
+   * The community ID for which the user is LINE-authenticated.
+   * This is used to determine if the LINE authentication is valid for the current community.
+   * When navigating between communities, this helps redirect to login instead of phone verification
+   * if the user is not LINE-authenticated for the target community.
+   */
+  authenticatedCommunityId: string | null;
 };
 
 export type AuthenticationState =

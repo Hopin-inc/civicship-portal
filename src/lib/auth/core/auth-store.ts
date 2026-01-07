@@ -22,6 +22,7 @@ const initialAuthState: AuthState = {
     refreshToken: null,
     expiresAt: null,
   },
+  authenticatedCommunityId: null,
 };
 
 const initialPhoneAuthState: PhoneAuthState = {
