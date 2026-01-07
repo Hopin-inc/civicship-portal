@@ -132,12 +132,13 @@ export class AuthRedirectService {
 
       case "line_authenticated": {
         // Check if the LINE authentication is for the current community
-        // If not, treat as unauthenticated and stay on login page
+        // If authenticatedCommunityId is set and doesn't match, redirect to login
+        // If authenticatedCommunityId is null (legacy session), allow access (backward compatibility)
         const { authenticatedCommunityId } = useAuthStore.getState().state;
-        const isAuthenticatedForCurrentCommunity = 
-          authenticatedCommunityId && currentCommunityId && authenticatedCommunityId === currentCommunityId;
+        const isAuthenticatedForDifferentCommunity = 
+          authenticatedCommunityId && currentCommunityId && authenticatedCommunityId !== currentCommunityId;
         
-        if (!isAuthenticatedForCurrentCommunity) {
+        if (isAuthenticatedForDifferentCommunity) {
           // LINE authentication is for a different community, stay on login page
           if (basePath !== "/login") {
             return `/login${nextParam}` as RawURIComponent;
@@ -160,11 +161,13 @@ export class AuthRedirectService {
 
       case "user_registered": {
         // Check if the user is registered for the current community
+        // If authenticatedCommunityId is set and doesn't match, redirect to login
+        // If authenticatedCommunityId is null (legacy session), allow access (backward compatibility)
         const { authenticatedCommunityId } = useAuthStore.getState().state;
-        const isAuthenticatedForCurrentCommunity = 
-          authenticatedCommunityId && currentCommunityId && authenticatedCommunityId === currentCommunityId;
+        const isAuthenticatedForDifferentCommunity = 
+          authenticatedCommunityId && currentCommunityId && authenticatedCommunityId !== currentCommunityId;
         
-        if (!isAuthenticatedForCurrentCommunity) {
+        if (isAuthenticatedForDifferentCommunity) {
           // User is registered for a different community, stay on login page
           if (basePath !== "/login") {
             return `/login${nextParam}` as RawURIComponent;
@@ -204,12 +207,13 @@ export class AuthRedirectService {
 
       case "line_authenticated": {
         // Check if the LINE authentication is for the current community
-        // If not, redirect to login instead of phone verification
+        // If authenticatedCommunityId is set and doesn't match, redirect to login
+        // If authenticatedCommunityId is null (legacy session), allow access (backward compatibility)
         const { authenticatedCommunityId } = useAuthStore.getState().state;
-        const isAuthenticatedForCurrentCommunity = 
-          authenticatedCommunityId && currentCommunityId && authenticatedCommunityId === currentCommunityId;
+        const isAuthenticatedForDifferentCommunity = 
+          authenticatedCommunityId && currentCommunityId && authenticatedCommunityId !== currentCommunityId;
         
-        if (!isAuthenticatedForCurrentCommunity) {
+        if (isAuthenticatedForDifferentCommunity) {
           logger.debug("[AUTH] LINE authentication is for a different community, redirecting to login", {
             authenticatedCommunityId,
             currentCommunityId,
@@ -231,12 +235,13 @@ export class AuthRedirectService {
 
       case "user_registered": {
         // Check if the user has membership in the current community
-        // If not, redirect to login for the current community
+        // If authenticatedCommunityId is set and doesn't match, redirect to login
+        // If authenticatedCommunityId is null (legacy session), check membership only
         const { authenticatedCommunityId } = useAuthStore.getState().state;
-        const isAuthenticatedForCurrentCommunity = 
-          authenticatedCommunityId && currentCommunityId && authenticatedCommunityId === currentCommunityId;
+        const isAuthenticatedForDifferentCommunity = 
+          authenticatedCommunityId && currentCommunityId && authenticatedCommunityId !== currentCommunityId;
         
-        if (!isAuthenticatedForCurrentCommunity) {
+        if (isAuthenticatedForDifferentCommunity) {
           logger.debug("[AUTH] User is registered but for a different community, redirecting to login", {
             authenticatedCommunityId,
             currentCommunityId,
@@ -244,7 +249,7 @@ export class AuthRedirectService {
           return `/login${nextParam}` as RawURIComponent; // 別コミュニティで登録済み → ログインへ
         }
         
-        // User is registered for the current community, check membership
+        // User is registered for the current community (or legacy session), check membership
         const hasMembershipInCurrentCommunity = currentUser?.memberships?.some(
           (m) => m.community?.id === currentCommunityId
         );
