@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { useGetMemberWalletsQuery, GqlGetMemberWalletsQuery } from "@/types/graphql";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { toast } from "react-toastify";
@@ -17,22 +17,30 @@ export interface UseMemberWalletsResult {
   isLoadingMore: boolean;
 }
 
-export const useMemberWallets = (): UseMemberWalletsResult => {
+/**
+ * Hook to fetch member wallets for the current community
+ * @param communityIdOverride - Optional override for communityId (uses CommunityConfigContext if not provided)
+ */
+export const useMemberWallets = (communityIdOverride?: string): UseMemberWalletsResult => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const { state } = useAuthStore();
   const hasFirebaseUser = !!state.firebaseUser;
+  
+  // Use runtime communityId from context, with optional override
+  const communityConfig = useCommunityConfig();
+  const communityId = communityIdOverride || communityConfig?.communityId || "";
 
   const { data, loading, error, refetch, fetchMore } = useGetMemberWalletsQuery({
     variables: {
       filter: {
-        communityId: COMMUNITY_ID,
+        communityId: communityId,
       },
       first: 20,
       withDidIssuanceRequests: true,
     },
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
-    skip: !hasFirebaseUser, // Wait for Firebase auth before querying
+    skip: !hasFirebaseUser || !communityId, // Wait for Firebase auth and communityId before querying
   });
 
   const wallets = data?.wallets || {
@@ -50,13 +58,13 @@ export const useMemberWallets = (): UseMemberWalletsResult => {
   const hasNextPage = wallets.pageInfo?.hasNextPage ?? false;
 
   const handleFetchMore = useCallback(async () => {
-    if (!hasNextPage || isLoadingMore) return;
+    if (!hasNextPage || isLoadingMore || !communityId) return;
     setIsLoadingMore(true);
     try {
       await fetchMore({
         variables: {
           filter: {
-            communityId: COMMUNITY_ID,
+            communityId: communityId,
           },
           first: 20,
           cursor: endCursor,
@@ -89,7 +97,7 @@ export const useMemberWallets = (): UseMemberWalletsResult => {
     } finally {
       setIsLoadingMore(false);
     }
-  }, [hasNextPage, isLoadingMore, endCursor, fetchMore]);
+  }, [hasNextPage, isLoadingMore, endCursor, fetchMore, communityId]);
 
   const loadMoreRef = useInfiniteScroll({
     hasMore: hasNextPage && !isLoadingMore,
@@ -108,4 +116,4 @@ export const useMemberWallets = (): UseMemberWalletsResult => {
     hasNextPage,
     isLoadingMore,
   };
-};  
+};            

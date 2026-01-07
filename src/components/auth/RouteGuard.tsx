@@ -27,12 +27,29 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   const redirectedRef = React.useRef<string | null>(null);
 
   useEffect(() => {
+    // Using warn level temporarily to ensure logs appear in staging/production
+    logger.warn("[AUTH] RouteGuard: useEffect triggered", {
+      pathname,
+      isAuthenticating: authState.isAuthenticating,
+      isAuthInProgress: authState.isAuthInProgress,
+      authenticationState: authState.authenticationState,
+      currentUser: !!currentUser,
+      currentUserId: currentUser?.id,
+    });
+
     if (authState.isAuthenticating || authState.isAuthInProgress) {
+      logger.warn("[AUTH] RouteGuard: waiting for auth (isAuthenticating or isAuthInProgress)", {
+        isAuthenticating: authState.isAuthenticating,
+        isAuthInProgress: authState.isAuthInProgress,
+      });
       setIsReadyToRender(false);
       return;
     }
 
     if (["loading", "authenticating"].includes(authState.authenticationState)) {
+      logger.warn("[AUTH] RouteGuard: waiting for auth (loading or authenticating state)", {
+        authenticationState: authState.authenticationState,
+      });
       setIsReadyToRender(false);
       return;
     }
@@ -55,7 +72,8 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       currentUser,
     );
 
-    logger.debug("[AUTH] RouteGuard redirect check", {
+    // Using warn level temporarily to ensure logs appear in staging/production
+    logger.warn("[AUTH] RouteGuard: redirect check", {
       pathname,
       pathWithParams,
       authenticationState: authState.authenticationState,
@@ -63,15 +81,29 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       currentUserId: currentUser?.id,
       redirectPath,
       willRedirect: !!(redirectPath && redirectPath !== pathWithParams),
+      previousRedirect: redirectedRef.current,
     });
 
     if (redirectPath && redirectPath !== pathWithParams) {
       if (redirectedRef.current !== redirectPath) {
+        logger.warn("[AUTH] RouteGuard: REDIRECTING", {
+          from: pathWithParams,
+          to: redirectPath,
+          authenticationState: authState.authenticationState,
+        });
         redirectedRef.current = redirectPath;
         setIsReadyToRender(false);
         router.replace(redirectPath);
+      } else {
+        logger.warn("[AUTH] RouteGuard: skipping duplicate redirect", {
+          redirectPath,
+        });
       }
     } else {
+      logger.warn("[AUTH] RouteGuard: no redirect needed, rendering page", {
+        pathname,
+        authenticationState: authState.authenticationState,
+      });
       redirectedRef.current = null;
       setIsReadyToRender(true);
     }

@@ -5,7 +5,7 @@ import {
   useReservationAcceptMutation,
 } from "@/types/graphql";
 import { toast } from "react-toastify";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 import { useRouter } from "next/navigation";
 
@@ -22,6 +22,9 @@ export const useReservationApproval = ({
 }) => {
   const track = useAnalytics();
   const router = useRouter();
+  // Use runtime communityId from CommunityConfigContext
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId || "";
 
   const [acceptReservation, { loading: acceptLoading }] = useReservationAcceptMutation({
     onCompleted: () => {
@@ -54,7 +57,7 @@ export const useReservationApproval = ({
         id,
         permission: {
           opportunityId: opportunity.id,
-          communityId: opportunity.community?.id || COMMUNITY_ID,
+          communityId: opportunity.community?.id || communityId,
         },
       },
     });
@@ -89,7 +92,7 @@ export const useReservationApproval = ({
         input: { comment },
         permission: {
           opportunityId: opportunity.id,
-          communityId: COMMUNITY_ID,
+          communityId: opportunity.community?.id || communityId,
         },
       },
     });

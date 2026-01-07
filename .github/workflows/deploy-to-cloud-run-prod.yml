@@ -1,4 +1,4 @@
-name: Build and Deploy for all communities (Prd)
+name: Build and Deploy (Prd) - Multi-tenant
 on:
   push:
     branches:
@@ -8,29 +8,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  read-communities:
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-
-      - name: Read community list from JSON
-        id: set-matrix
-        run: |
-          COMMUNITIES=$(jq -c '.communities' .github/config/community-list.json)
-          echo "matrix=$COMMUNITIES" >> $GITHUB_OUTPUT
-
   build-and-deploy:
-    needs: read-communities
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        community: ${{ fromJson(needs.read-communities.outputs.matrix) }}
-    environment: co-creation-dao-prod-${{ matrix.community }}
+    # Use a single environment for the unified multi-tenant deployment
+    environment: co-creation-dao-prod
     timeout-minutes: 30
-    continue-on-error: true
 
     permissions:
       id-token: write
@@ -41,19 +23,22 @@ jobs:
       SERVICE_ACCOUNT_CREDENTIAL_JSON: ${{ secrets.SERVICE_ACCOUNT_CREDENTIAL_JSON }}
       ARTIFACT_REGISTRY: ${{ secrets.ARTIFACT_REGISTRY }}
       APPLICATION_NAME: ${{ secrets.APPLICATION_NAME }}
-      NEXT_PUBLIC_COMMUNITY_ID: ${{ secrets.NEXT_PUBLIC_COMMUNITY_ID }}
-      NEXT_PUBLIC_LIFF_ID: ${{ secrets.NEXT_PUBLIC_LIFF_ID }}
-      NEXT_PUBLIC_LINE_CLIENT: ${{ secrets.NEXT_PUBLIC_LINE_CLIENT }}
+      # Global configuration (shared across all communities)
       NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
       NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
       NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
       NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
-      NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID }}
       NEXT_PUBLIC_DOMAIN: ${{ secrets.NEXT_PUBLIC_DOMAIN }}
       NEXT_PUBLIC_API_ENDPOINT: ${{ secrets.NEXT_PUBLIC_API_ENDPOINT }}
       NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT: ${{ secrets.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT }}
       NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}
       NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+      # Legacy support (will be removed after Phase 2 - LINE channel unification)
+      # These are used as fallback for the default community
+      NEXT_PUBLIC_COMMUNITY_ID: ${{ secrets.NEXT_PUBLIC_COMMUNITY_ID }}
+      NEXT_PUBLIC_LIFF_ID: ${{ secrets.NEXT_PUBLIC_LIFF_ID }}
+      NEXT_PUBLIC_LINE_CLIENT: ${{ secrets.NEXT_PUBLIC_LINE_CLIENT }}
+      NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID }}
 
     steps:
       - name: Checkout code
@@ -87,29 +72,29 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ env.ARTIFACT_REGISTRY }}/${{ env.APPLICATION_NAME }}-${{ matrix.community }}:latest . \
-            --build-arg NEXT_PUBLIC_COMMUNITY_ID=${{ env.NEXT_PUBLIC_COMMUNITY_ID }} \
-            --build-arg NEXT_PUBLIC_LIFF_ID=${{ env.NEXT_PUBLIC_LIFF_ID }} \
-            --build-arg NEXT_PUBLIC_LINE_CLIENT=${{ env.NEXT_PUBLIC_LINE_CLIENT }} \
+          docker build -t ${{ env.ARTIFACT_REGISTRY }}/${{ env.APPLICATION_NAME }}:latest . \
             --build-arg NEXT_PUBLIC_FIREBASE_PROJECT_ID=${{ env.NEXT_PUBLIC_FIREBASE_PROJECT_ID }} \
             --build-arg NEXT_PUBLIC_FIREBASE_API_KEY=${{ env.NEXT_PUBLIC_FIREBASE_API_KEY }} \
             --build-arg NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=${{ env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }} \
             --build-arg NEXT_PUBLIC_FIREBASE_APP_ID=${{ env.NEXT_PUBLIC_FIREBASE_APP_ID }} \
-            --build-arg NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID=${{ env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID }} \
             --build-arg NEXT_PUBLIC_DOMAIN=${{ env.NEXT_PUBLIC_DOMAIN }} \
             --build-arg NEXT_PUBLIC_API_ENDPOINT=${{ env.NEXT_PUBLIC_API_ENDPOINT }} \
             --build-arg NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT=${{ env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT }} \
-            --build-arg NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=${{ env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}
+            --build-arg NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=${{ env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }} \
+            --build-arg NEXT_PUBLIC_COMMUNITY_ID=${{ env.NEXT_PUBLIC_COMMUNITY_ID }} \
+            --build-arg NEXT_PUBLIC_LIFF_ID=${{ env.NEXT_PUBLIC_LIFF_ID }} \
+            --build-arg NEXT_PUBLIC_LINE_CLIENT=${{ env.NEXT_PUBLIC_LINE_CLIENT }} \
+            --build-arg NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID=${{ env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID }}
 
       - name: Push image to Artifact Registry
         run: |
-          docker push ${{ env.ARTIFACT_REGISTRY }}/${{ env.APPLICATION_NAME }}-${{ matrix.community }}:latest
+          docker push ${{ env.ARTIFACT_REGISTRY }}/${{ env.APPLICATION_NAME }}:latest
 
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v2 # v2.8.1
         with:
-          service: ${{ env.APPLICATION_NAME }}-${{ matrix.community }}
-          image: ${{ env.ARTIFACT_REGISTRY }}/${{ env.APPLICATION_NAME }}-${{ matrix.community }}:latest
+          service: ${{ env.APPLICATION_NAME }}
+          image: ${{ env.ARTIFACT_REGISTRY }}/${{ env.APPLICATION_NAME }}:latest
           region: ${{ env.GCP_REGION }}
           env_vars: |
             NODE_ENV=production

@@ -7,7 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import Link from "next/link";
-import { currentCommunityConfig } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 type Props = {
   isLoading: boolean;
@@ -20,6 +20,7 @@ export function LoginView({ isLoading, isAuthenticating, error, onLogin }: Props
   const t = useTranslations();
   const [agreedTerms, setAgreedTerms] = useState(false);
   const [agreedPrivacy, setAgreedPrivacy] = useState(false);
+  const communityConfig = useCommunityConfig();
 
   return (
     <div className="flex items-center justify-center p-12">
@@ -27,7 +28,7 @@ export function LoginView({ isLoading, isAuthenticating, error, onLogin }: Props
         <div className="space-y-3 mb-10">
           <div className="text-body-md mb-6">
             {t.rich("auth.login.welcomeMessage", {
-              communityName: currentCommunityConfig.title,
+              communityName: communityConfig?.title ?? "",
               b: (chunks) => <strong className="font-bold">{chunks}</strong>,
             })}
           </div>
@@ -74,7 +75,7 @@ export function LoginView({ isLoading, isAuthenticating, error, onLogin }: Props
           disabled={isLoading || isAuthenticating}
           className="w-full bg-[#06C755] hover:bg-[#05B74B] text-white rounded-full h-14 flex items-center justify-center gap-2"
         >
-          <Image src="/images/line-icon.png" alt="LINE" width={24} height={24} priority />
+          <Image src="/images/line-icon.png" alt="LINE" width={24} height={24} priority unoptimized />
           {isLoading || isAuthenticating ? t("auth.login.loggingIn") : t("auth.login.loginButton")}
         </Button>
       </div>

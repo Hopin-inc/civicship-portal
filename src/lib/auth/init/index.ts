@@ -39,13 +39,16 @@ export async function initAuth(params: InitAuthParams) {
 
   const environment = detectEnvironment();
 
-  logger.debug("[AUTH] initAuth", {
+  // Using warn level temporarily to ensure logs appear in staging/production
+  logger.warn("[AUTH] initAuth: ENTRY", {
     environment,
     ssrCurrentUser: !!ssrCurrentUser,
     ssrCurrentUserId: ssrCurrentUser?.id,
     ssrLineAuthenticated,
     ssrPhoneAuthenticated,
     willUseInitAuthFast: !!(ssrCurrentUser && ssrLineAuthenticated),
+    communityId: liffService.getCommunityId(),
+    firebaseTenantId: liffService.getFirebaseTenantId(),
   });
 
   if (ssrCurrentUser && ssrLineAuthenticated) {
@@ -86,14 +89,42 @@ async function initAuthFast({
   setState: ReturnType<typeof useAuthStore.getState>["setState"];
 }) {
   try {
+    // Check if the user has membership in the current community
+    // This is critical for multi-tenant isolation: a user logged into Community A
+    // should not be considered authenticated when navigating to Community B
+    const currentCommunityId = liffService.getCommunityId();
+    const hasMembershipInCurrentCommunity = ssrCurrentUser.memberships?.some(
+      (m) => m.community?.id === currentCommunityId
+    );
+    
+    // Using warn level temporarily to ensure logs appear in staging/production
+    logger.warn("[AUTH] initAuthFast: ENTRY - checking membership", {
+      currentCommunityId,
+      hasMembershipInCurrentCommunity,
+      membershipIds: ssrCurrentUser.memberships?.map(m => m.community?.id) ?? [],
+    });
+    
+    if (!hasMembershipInCurrentCommunity) {
+      // User is authenticated but not for this community
+      // Treat as unauthenticated so they get redirected to login
+      logger.debug("[AUTH] initAuthFast: user has no membership in current community, treating as unauthenticated");
+      finalizeAuthState("unauthenticated", undefined, setState, authStateManager);
+      return;
+    }
+    
+    // User has membership in current community, proceed with normal auth flow
+    // Store the community ID for which the user is authenticated
+    setState({ authenticatedCommunityId: currentCommunityId });
+    
     finalizeAuthState(
       ssrPhoneAuthenticated ? "user_registered" : "line_authenticated",
       ssrCurrentUser,
       setState,
       authStateManager,
     );
-    TokenManager.saveLineAuthFlag(true);
-    if (ssrPhoneAuthenticated) TokenManager.savePhoneAuthFlag(true);
+    // Save community-specific auth cookies
+    TokenManager.saveLineAuthFlag(true, currentCommunityId);
+    if (ssrPhoneAuthenticated) TokenManager.savePhoneAuthFlag(true, currentCommunityId);
     await authStateManager.handleUserRegistrationStateChange(
       !!ssrPhoneAuthenticated,
       { ssrMode: true }
@@ -152,7 +183,65 @@ async function initAuthFull({
       return;
     }
 
-    const sessionOk = await establishSessionFromFirebaseUser(firebaseUser, setState);
+    // Get runtime communityId and tenantId from LiffService for community-specific handling
+    const communityId = liffService.getCommunityId();
+    const expectedTenantId = liffService.getFirebaseTenantId();
+    
+    // CRITICAL: Validate that the Firebase user's tenant matches the current community's tenant
+    // This prevents cross-community authentication bypass where a user logged into Community A
+    // could access Community B by having a valid Firebase session from Community A
+    const firebaseUserTenantId = firebaseUser.tenantId;
+    
+    // Using warn level temporarily to ensure logs appear in staging/production
+    logger.warn("[AUTH] initAuthFull: ENTRY - checking tenant validation", {
+      firebaseUserTenantId,
+      expectedTenantId,
+      communityId,
+      firebaseUserUid: firebaseUser.uid,
+    });
+    
+    // Tenant validation logic:
+    // 1. If Firebase user has a tenant ID but we don't have expected tenant ID (config not loaded),
+    //    treat as unauthenticated - we can't verify the user belongs to this community
+    // 2. If Firebase user has a tenant ID that doesn't match expected, treat as unauthenticated
+    // 3. If Firebase user has no tenant ID but we expect one, treat as unauthenticated
+    // 4. If both are null/undefined, allow (legacy case or non-tenant setup)
+    const hasTenantMismatch = 
+      (firebaseUserTenantId && !expectedTenantId) || // User has tenant but we don't know expected
+      (firebaseUserTenantId && expectedTenantId && firebaseUserTenantId !== expectedTenantId) || // Tenant mismatch
+      (!firebaseUserTenantId && expectedTenantId); // We expect tenant but user doesn't have one
+    
+    if (hasTenantMismatch) {
+      // Using warn level temporarily to ensure logs appear in staging/production
+      logger.warn("[AUTH] initAuthFull: Firebase tenant mismatch, treating as unauthenticated", {
+        firebaseUserTenantId,
+        expectedTenantId,
+        communityId,
+        reason: firebaseUserTenantId && !expectedTenantId 
+          ? "user has tenant but expected is unknown" 
+          : firebaseUserTenantId !== expectedTenantId 
+            ? "tenant IDs do not match"
+            : "expected tenant but user has none",
+      });
+      
+      // CRITICAL: Clear the community-specific line_authenticated cookie
+      // This ensures that AuthRedirectService.handleAuthEntryFlow will see
+      // lineAuthenticated=false and redirect to login instead of phone verification
+      TokenManager.saveLineAuthFlag(false, communityId);
+      TokenManager.savePhoneAuthFlag(false, communityId);
+      
+      finalizeAuthState("unauthenticated", undefined, setState, authStateManager);
+      return;
+    }
+    
+    // Log when tenant validation passes
+    logger.warn("[AUTH] initAuthFull: Tenant validation passed, proceeding with session", {
+      firebaseUserTenantId,
+      expectedTenantId,
+      communityId,
+    });
+    
+    const sessionOk = await establishSessionFromFirebaseUser(firebaseUser, setState, communityId);
     if (!sessionOk) {
       finalizeAuthState("unauthenticated", undefined, setState, authStateManager);
       return;
@@ -164,7 +253,7 @@ async function initAuthFull({
       return;
     }
 
-    await evaluateUserRegistrationState(user, ssrPhoneAuthenticated, setState, authStateManager);
+    await evaluateUserRegistrationState(user, ssrPhoneAuthenticated, setState, authStateManager, communityId);
   } catch (error) {
     logger.warn("initAuthFull failed", { error });
     finalizeAuthState("unauthenticated", undefined, setState, authStateManager);

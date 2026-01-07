@@ -10,6 +10,7 @@ export async function queryMemberships({
   first,
   withWallets,
   withDidIssuanceRequests,
+  communityId,
 }: {
   cursor?: { userId: string; communityId: string };
   filter?: GqlMembershipFilterInput;
@@ -17,6 +18,7 @@ export async function queryMemberships({
   first?: number;
   withWallets?: boolean;
   withDidIssuanceRequests?: boolean;
+  communityId?: string;
 }) {
   return await getMembershipListServer({
     cursor,
@@ -25,5 +27,6 @@ export async function queryMemberships({
     first,
     withWallets,
     withDidIssuanceRequests,
+    communityId,
   });
 }

@@ -8,7 +8,7 @@ import {
   GqlSortDirection,
   useGetUtilitiesQuery,
 } from "@/types/graphql";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useCommunityId } from "@/contexts/CommunityContext";
 import { useAuth } from "@/contexts/AuthProvider";
 import CreateUtilitySheet from "./components/CreateUtilitySheet";
 import OpportunityListSheet from "./components/OpportunityListSheet";
@@ -27,10 +27,11 @@ export default function UtilitiesPage() {
   useHeaderConfig(headerConfig);
 
   const { user } = useAuth();
+  const communityId = useCommunityId();
 
   const { data: utilityData, refetch: refetchUtilities } = useGetUtilitiesQuery({
     variables: {
-      filter: { communityIds: [COMMUNITY_ID], ownerIds: user?.id ? [user.id] : undefined },
+      filter: { communityIds: [communityId], ownerIds: user?.id ? [user.id] : undefined },
       sort: { createdAt: GqlSortDirection.Desc },
       first: 200,
     },

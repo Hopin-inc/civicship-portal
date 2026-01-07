@@ -21,13 +21,17 @@ export type LiffState = {
 };
 
 export class LiffService {
-  private static instance: LiffService;
+  private static instances: Map<string, LiffService> = new Map();
   private liffId: string;
+  private communityId: string;
+  private firebaseTenantId: string | null;
   private state: LiffState;
   private initializationPromise: Promise<boolean> | null = null;
 
-  private constructor(liffId: string) {
+  private constructor(liffId: string, communityId: string, firebaseTenantId: string | null = null) {
     this.liffId = liffId;
+    this.communityId = communityId;
+    this.firebaseTenantId = firebaseTenantId;
     this.state = {
       isInitialized: false,
       isLoggedIn: false,
@@ -48,14 +52,43 @@ export class LiffService {
     return `${baseUrl}?next=${encodedNext}`;
   }
 
-  public static getInstance(liffId?: string): LiffService {
-    if (!LiffService.instance) {
-      if (!liffId) {
-        throw new Error("LIFF ID is required for the first initialization");
+  public static getInstance(liffId?: string, communityId?: string, firebaseTenantId?: string | null): LiffService {
+    const effectiveCommunityId = communityId || "default";
+    
+    // If we have an existing instance for this community, check if liffId matches
+    const existingInstance = LiffService.instances.get(effectiveCommunityId);
+    if (existingInstance) {
+      // If liffId is provided and differs from existing, create a new instance
+      // This handles the case where communityConfig loads asynchronously and
+      // the correct liffId becomes available after initial render
+      if (liffId && existingInstance.liffId !== liffId) {
+        const newInstance = new LiffService(liffId, effectiveCommunityId, firebaseTenantId ?? null);
+        LiffService.instances.set(effectiveCommunityId, newInstance);
+        return newInstance;
       }
-      LiffService.instance = new LiffService(liffId);
+      // Update firebaseTenantId if it changed (e.g., config loaded after initial render)
+      if (firebaseTenantId !== undefined && existingInstance.firebaseTenantId !== firebaseTenantId) {
+        existingInstance.firebaseTenantId = firebaseTenantId;
+      }
+      return existingInstance;
     }
-    return LiffService.instance;
+    
+    // Create new instance if liffId is provided
+    if (!liffId) {
+      throw new Error("LIFF ID is required for the first initialization");
+    }
+    
+    const newInstance = new LiffService(liffId, effectiveCommunityId, firebaseTenantId ?? null);
+    LiffService.instances.set(effectiveCommunityId, newInstance);
+    return newInstance;
+  }
+  
+  public getCommunityId(): string {
+    return this.communityId;
+  }
+
+  public getFirebaseTenantId(): string | null {
+    return this.firebaseTenantId;
   }
 
   public async initialize(): Promise<boolean> {
@@ -98,12 +131,32 @@ export class LiffService {
       if (liff.isInClient()) {
         this.state.isLoggedIn = true;
       } else {
-        const redirectUri =
-          typeof window !== "undefined"
-            ? redirectPath
-              ? window.location.origin + redirectPath
-              : window.location.origin
-            : undefined;
+        // IMPORTANT: LINE OAuth only allows fixed registered redirect URLs.
+        // We must use a fixed callback URL (the community's login page) and pass
+        // the actual destination via the `next` query parameter.
+        // This is required for multi-tenant where dynamic paths like /kibotcha/users/me
+        // cannot all be registered in LINE's allowed redirect URLs.
+        let redirectUri: string | undefined;
+        if (typeof window !== "undefined") {
+          // Use the community's login page as the fixed redirect URL
+          // e.g., https://dev.civicship.app/kibotcha/login
+          const communityLoginPath = `/${this.communityId}/login`;
+          const baseRedirectUri = window.location.origin + communityLoginPath;
+          
+          // If there's a destination path, pass it via the `next` query parameter
+          if (redirectPath && redirectPath !== communityLoginPath) {
+            const encodedNext = encodeURIComponent(redirectPath);
+            redirectUri = `${baseRedirectUri}?next=${encodedNext}`;
+          } else {
+            redirectUri = baseRedirectUri;
+          }
+          
+          logger.debug("[LiffService] Using fixed redirect URI for LINE OAuth", {
+            communityId: this.communityId,
+            redirectUri,
+            originalRedirectPath: redirectPath,
+          });
+        }
 
         liff.login({ redirectUri });
         return false; // リダイレクトするのでここには到達しない
@@ -193,7 +246,8 @@ export class LiffService {
     const accessToken = this.getAccessToken();
     if (!accessToken) return false;
 
-    const communityId = process.env.NEXT_PUBLIC_COMMUNITY_ID;
+    // Use the instance's communityId (set at construction time from CommunityConfigContext)
+    const communityId = this.communityId;
     const endpoint = `${process.env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT}/line/liff-login`;
     const authStateManager = AuthStateManager.getInstance();
 
@@ -204,7 +258,7 @@ export class LiffService {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-Community-Id": communityId ?? "",
+            "X-Community-Id": communityId,
           },
           body: JSON.stringify({ accessToken }),
         });
@@ -217,6 +271,12 @@ export class LiffService {
         }
 
         const { customToken, profile } = await response.json();
+        
+        // Set the Firebase tenant ID dynamically before signing in
+        // This is critical for multi-tenant: the custom token from backend contains
+        // the community's tenant ID, so lineAuth must use the same tenant ID
+        lineAuth.tenantId = this.firebaseTenantId;
+        
         const userCredential = await signInWithCustomToken(lineAuth, customToken);
 
         await Promise.race([
@@ -251,13 +311,17 @@ export class LiffService {
             refreshToken,
             expiresAt,
           },
+          // Store the community ID for which the user is LINE-authenticated
+          // This is used to determine if the LINE authentication is valid for the current community
+          authenticatedCommunityId: communityId,
         });
 
-        TokenManager.saveLineAuthFlag(true);
+        // Save community-specific auth cookies
+        TokenManager.saveLineAuthFlag(true, communityId);
 
         const isPhoneVerified = TokenManager.phoneVerified();
         if (isPhoneVerified) {
-          TokenManager.savePhoneAuthFlag(true);
+          TokenManager.savePhoneAuthFlag(true, communityId);
         }
 
         authStateManager.updateState("line_authenticated", "signInWithLiffToken");

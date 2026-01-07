@@ -8,16 +8,32 @@ import { User } from "firebase/auth";
 import { LiffService } from "@/lib/auth/service/liff-service";
 import { AuthEnvironment } from "@/lib/auth/core/environment-detector";
 import { logger } from "@/lib/logging";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 /**
  * 1️⃣ 認証前の初期状態を設定
+ * 
+ * CRITICAL: Always set isAuthenticating and isAuthInProgress to true
+ * This ensures RouteGuard waits for the full auth initialization to complete,
+ * including tenant validation. Without this, RouteGuard might make redirect
+ * decisions based on stale auth state from a previous session.
+ * 
+ * The previous implementation had a bug where it would return early if
+ * authenticationState !== "loading", which caused RouteGuard to not wait
+ * when the Zustand store had stale state (e.g., "line_authenticated" from
+ * a different community's session).
  */
 export function prepareInitialState(
   setState: ReturnType<typeof useAuthStore.getState>["setState"],
 ) {
   const current = useAuthStore.getState().state.authenticationState;
-  if (current !== "loading") return;
+  
+  logger.warn("[AUTH] prepareInitialState: ENTRY", {
+    currentAuthState: current,
+    willResetToLoading: true,
+  });
+  
+  // CRITICAL: Always reset to loading state and set waiting flags
+  // This ensures RouteGuard waits for the full auth initialization to complete
   setState({
     authenticationState: "loading",
     isAuthenticating: true,
@@ -68,17 +84,22 @@ export function handleUnauthenticatedBranch(
 
 /**
  * 3️⃣ FirebaseUser からセッションを確立
+ * @param communityId - Runtime community ID from URL path (via LiffService.getCommunityId())
  */
 export async function establishSessionFromFirebaseUser(
   firebaseUser: User,
   setState: ReturnType<typeof useAuthStore.getState>["setState"],
+  communityId?: string,
 ): Promise<boolean> {
   try {
     const idToken = await firebaseUser.getIdToken(true);
     const tokenResult = await firebaseUser.getIdTokenResult();
 
-    await createSession(idToken);
-    TokenManager.saveLineAuthFlag(true);
+    // Pass communityId to createSession so backend can set HTTP-only community-specific cookie
+    await createSession(idToken, communityId);
+    // Note: The backend now sets the HTTP-only line_authenticated_{communityId} cookie
+    // We still save a client-side cookie as a fallback for backward compatibility
+    TokenManager.saveLineAuthFlag(true, communityId);
 
     setState({
       lineTokens: {
@@ -94,10 +115,16 @@ export async function establishSessionFromFirebaseUser(
   }
 }
 
-async function createSession(idToken: string) {
+async function createSession(idToken: string, communityId?: string) {
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  // Pass community ID to backend so it can set community-specific HTTP-only cookie
+  if (communityId) {
+    headers["X-Community-Id"] = communityId;
+  }
+  
   const res = await fetch("/api/sessionLogin", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify({ idToken }),
     credentials: "include",
   });
@@ -148,24 +175,32 @@ export async function restoreUserSession(
 
 /**
  * 5️⃣ phone認証 or 登録状態を評価して認証状態を確定
+ * @param communityId - Runtime community ID from URL path (via LiffService.getCommunityId())
  */
 export async function evaluateUserRegistrationState(
   user: GqlUser,
   ssrPhoneAuthenticated: boolean | undefined,
   setState: ReturnType<typeof useAuthStore.getState>["setState"],
   authStateManager: AuthStateManager,
+  communityId: string,
 ): Promise<boolean> {
   const hasPhoneIdentity = !!user.identities?.some((i) => i.platform?.toUpperCase() === "PHONE");
   
+  // Use runtime communityId from URL path instead of build-time COMMUNITY_ID
   const hasMembershipInCurrentCommunity = !!user.memberships?.some(
-    (m) => m.community?.id === COMMUNITY_ID
+    (m) => m.community?.id === communityId
   );
 
   const isPhoneVerified = ssrPhoneAuthenticated || hasPhoneIdentity || TokenManager.phoneVerified();
   const isRegistered = isPhoneVerified && hasMembershipInCurrentCommunity;
 
+  // Note: authenticatedCommunityId is set in LiffService.signInWithLiffToken() when actual LINE auth happens
+  // We don't set it here because evaluateUserRegistrationState is called on page load, not on actual auth
+  // If we set it here, it would be overwritten to the current URL's community ID on every navigation
+
   if (isRegistered) {
-    TokenManager.savePhoneAuthFlag(true);
+    // Save community-specific phone auth cookie
+    TokenManager.savePhoneAuthFlag(true, communityId);
     finalizeAuthState("user_registered", user, setState, authStateManager);
     await authStateManager.handleUserRegistrationStateChange(true);
     return true;
@@ -185,6 +220,13 @@ export function finalizeAuthState(
   setState: ReturnType<typeof useAuthStore.getState>["setState"],
   authStateManager: AuthStateManager,
 ) {
+  // Using warn level temporarily to ensure logs appear in staging/production
+  logger.warn("[AUTH] finalizeAuthState: setting auth state", {
+    newState,
+    hasUser: !!user,
+    userId: user?.id,
+  });
+
   setState({
     isAuthenticating: false,
     isAuthInProgress: false,
@@ -192,4 +234,9 @@ export function finalizeAuthState(
   });
 
   authStateManager.updateState(newState);
+  
+  logger.warn("[AUTH] finalizeAuthState: auth state set complete", {
+    newState,
+    storeState: useAuthStore.getState().state.authenticationState,
+  });
 }

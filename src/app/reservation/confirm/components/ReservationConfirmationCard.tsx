@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import Image from "next/image";
+import { CommunityLink } from "@/components/navigation/CommunityLink";
+import { SafeImage } from "@/components/ui/safe-image";
 import React, { useCallback, useState } from "react";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { GqlOpportunityCategory } from "@/types/graphql";
@@ -32,14 +32,15 @@ export const ReservationConfirmationCard = ({
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const handleOpen = useCallback(() => setIsSheetOpen(true), []);
   const handleClose = useCallback(() => setIsSheetOpen(false), []);
+  // Link without community_id query param - communityId is now in URL path prefix
   const link =
     category === GqlOpportunityCategory.Quest
-      ? `/quests/${opportunity.id}?community_id=${opportunity.communityId}`
-      : `/activities/${opportunity.id}?community_id=${opportunity.communityId}`;
+      ? `/quests/${opportunity.id}`
+      : `/activities/${opportunity.id}`;
 
   return (
     <>
-      <Link href={link} className="block">
+      <CommunityLink href={link} className="block">
         <div className="mx-auto max-w-md">
           <div
             className={`flex overflow-hidden rounded-xl bg-background ${
@@ -47,7 +48,7 @@ export const ReservationConfirmationCard = ({
             }`}
           >
             <div className="relative h-[120px] w-[120px] flex-shrink-0">
-              <Image
+              <SafeImage
                 src={opportunity.images?.[0] ?? PLACEHOLDER_IMAGE}
                 alt={opportunity.title}
                 fill
@@ -55,10 +56,7 @@ export const ReservationConfirmationCard = ({
                 blurDataURL={PLACEHOLDER_IMAGE}
                 loading="lazy"
                 className="object-cover rounded-lg"
-                onError={(e) => {
-                  const img = e.target as HTMLImageElement;
-                  img.src = PLACEHOLDER_IMAGE;
-                }}
+                fallbackSrc={PLACEHOLDER_IMAGE}
               />
             </div>
             <div className="flex-1 px-4 py-3">
@@ -79,7 +77,7 @@ export const ReservationConfirmationCard = ({
           </div>
           <div className="border-b border-gray-200 my-4"></div>
         </div>
-      </Link>
+      </CommunityLink>
       <div>
         <div className="flex items-center justify-between gap-x-2">
           <div>

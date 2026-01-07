@@ -26,7 +26,7 @@ import {
   useTicketIssueMutation,
   GqlSortDirection,
 } from "@/types/graphql";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useCommunityId } from "@/contexts/CommunityContext";
 import { useAuth } from "@/contexts/AuthProvider";
 
 interface CreateTicketSheetProps {
@@ -41,12 +41,13 @@ export default function CreateTicketSheet({ onTicketCreated }: CreateTicketSheet
 
   const router = useRouter();
   const { user } = useAuth();
+  const communityId = useCommunityId();
 
   const [issueTicket] = useTicketIssueMutation();
 
   const { data: utilityData } = useGetUtilitiesQuery({
     variables: {
-      filter: { communityIds: [COMMUNITY_ID], ownerIds: user?.id ? [user.id] : undefined },
+      filter: { communityIds: [communityId], ownerIds: user?.id ? [user.id] : undefined },
       sort: { createdAt: GqlSortDirection.Desc },
       first: 200,
     },
@@ -64,7 +65,7 @@ export default function CreateTicketSheet({ onTicketCreated }: CreateTicketSheet
             utilityId: selectedUtilityId,
             qtyToBeIssued: ticketQty,
           },
-          permission: { communityId: COMMUNITY_ID },
+          permission: { communityId },
         },
       });
 

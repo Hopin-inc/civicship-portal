@@ -1,7 +1,6 @@
 "use client";
 
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import {
@@ -15,12 +14,14 @@ import {
   Users,
   Wallet,
 } from "lucide-react";
-import { currentCommunityConfig, FeaturesType } from "@/lib/communities/metadata";
+import { FeaturesType } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { useAdminRole } from "@/app/admin/context/AdminRoleContext";
 import { GqlRole } from "@/types/graphql";
-import Link from "next/link";
+import { CommunityLink } from "@/components/navigation/CommunityLink";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 
 const adminSettings = [
   {
@@ -75,9 +76,11 @@ const operatorSettings = [
 ];
 
 export default function AdminPage() {
-  const router = useRouter();
+  const { push } = useCommunityRouter();
   const role = useAdminRole();
   const t = useTranslations();
+  // Use runtime community config from context
+  const communityConfig = useCommunityConfig();
 
   const headerConfig = useMemo(
     () => ({
@@ -85,19 +88,19 @@ export default function AdminPage() {
       showBackButton: false,
       showLogo: false,
       action: (
-        <Link href="/users/me">
+        <CommunityLink href="/users/me">
           <Button variant="tertiary" size="sm">
             {t("navigation.adminHeader.toUserScreen")}
             <ArrowLeftRight className="w-4 h-4 ml-1" />
           </Button>
-        </Link>
+        </CommunityLink>
       ),
     }),
     [t],
   );
   useHeaderConfig(headerConfig);
 
-  const enabled = currentCommunityConfig.enableFeatures;
+  const enabled = communityConfig?.enableFeatures || [];
 
   const visibleAdminSettings =
     role === GqlRole.Owner
@@ -122,7 +125,7 @@ export default function AdminPage() {
             visibleAdminSettings.map((item) => (
               <Card
                 key={item.href}
-                onClick={() => router.push(item.href)}
+                onClick={() => push(item.href)}
                 className="cursor-pointer hover:bg-background-hover transition"
               >
                 <CardHeader>
@@ -147,7 +150,7 @@ export default function AdminPage() {
             visibleOperatorSettings.map((item) => (
               <Card
                 key={item.href}
-                onClick={() => router.push(item.href)}
+                onClick={() => push(item.href)}
                 className="cursor-pointer hover:bg-background-hover transition"
               >
                 <CardHeader>

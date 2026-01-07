@@ -4,7 +4,7 @@ import { useCallback, useState } from "react";
 import { GqlRole } from "@/types/graphql";
 import { toast } from "react-toastify";
 import { useMembershipCommand } from "./useMembershipMutations";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 interface PendingRoleChange {
   userId: string;
@@ -13,6 +13,9 @@ interface PendingRoleChange {
 }
 
 export function useMemberRoleManagement() {
+  // Use runtime communityId from CommunityConfigContext
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId || "";
   const [pendingRoleChange, setPendingRoleChange] = useState<PendingRoleChange | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -47,7 +50,7 @@ export function useMemberRoleManagement() {
 
     setIsLoading(true);
     try {
-      const result = await mutate({ communityId: COMMUNITY_ID, userId: pendingRoleChange.userId });
+      const result = await mutate({ communityId: communityId, userId: pendingRoleChange.userId });
       if (!result.success) {
         toast.error(`権限変更に失敗しました（${result.code ?? "UNKNOWN"}）`);
         return;
@@ -60,7 +63,7 @@ export function useMemberRoleManagement() {
       setIsLoading(false);
       setPendingRoleChange(null);
     }
-  }, [pendingRoleChange, assignOwner, assignManager, assignMember]);
+  }, [pendingRoleChange, assignOwner, assignManager, assignMember, communityId]);
 
   const cancelRoleChange = useCallback(() => {
     setPendingRoleChange(null);

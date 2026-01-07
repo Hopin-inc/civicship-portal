@@ -3,13 +3,15 @@ import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Contact, Globe } from "lucide-react";
-import Link from "next/link";
+import { CommunityLink } from "@/components/navigation/CommunityLink";
 import { LocaleSwitcher } from "@/components/shared/LocaleSwitcher";
 import { useTranslations } from "next-intl";
-import { currentCommunityConfig } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 export default function SettingSection() {
   const t = useTranslations();
+  // Use runtime community config from context
+  const communityConfig = useCommunityConfig();
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardContent className="p-0">
@@ -19,7 +21,7 @@ export default function SettingSection() {
             <Contact className="w-5 h-5" />
             <span className="font-bold text-sm">{t("users.settings.profileLabel")}</span>
           </div>
-          <Link
+          <CommunityLink
             href="/users/me/edit"
             className={cn(
               buttonVariants({ variant: "tertiary", size: "sm" }),
@@ -27,11 +29,11 @@ export default function SettingSection() {
             )}
           >
             {t("users.settings.editButton")}
-          </Link>
+          </CommunityLink>
         </div>
 
         {/* 言語切替 */}
-        {currentCommunityConfig.enableFeatures.includes("languageSwitcher") && (
+        {communityConfig?.enableFeatures?.includes("languageSwitcher") && (
           <div className="flex items-center justify-between py-4 px-4">
             <div className="flex items-center gap-2">
               <Globe className="w-5 h-5" />

@@ -6,7 +6,7 @@ import { ActivityDetail, QuestDetail } from "@/components/domains/opportunities/
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { displayDuration } from "@/utils/date";
 import { GqlOpportunityCategory } from "@/types/graphql";
-import Link from "next/link";
+import { CommunityLink } from "@/components/navigation/CommunityLink";
 import { getPointOrFee } from "@/utils/opportunity/displayPointsOrFee";
 import { ArrowRight } from "lucide-react";
 
@@ -43,10 +43,11 @@ const OpportunityInfo: React.FC<OpportunityInfoProps> = ({
     opportunity?.slots[0]?.endsAt ?? "",
     isComplete
   );
+  // Link without community_id query param - communityId is now in URL path prefix
   const link =
     opportunity.category === GqlOpportunityCategory.Quest
-      ? `/quests/${opportunity.id}?community_id=${opportunity.communityId}`
-      : `/activities/${opportunity.id}?community_id=${opportunity.communityId}`;
+      ? `/quests/${opportunity.id}`
+      : `/activities/${opportunity.id}`;
 
   return (
     <div
@@ -56,7 +57,7 @@ const OpportunityInfo: React.FC<OpportunityInfoProps> = ({
           : "mx-6 my-6 rounded-lg"
       }
     >
-      <Link
+      <CommunityLink
         href={link}
         className={isComplete ? "" : "flex justify-between items-center gap-4"}
       >
@@ -98,7 +99,7 @@ const OpportunityInfo: React.FC<OpportunityInfoProps> = ({
             <ArrowRight size={20} className="text-primary flex-shrink-0" />
           </>
         )}
-      </Link>
+      </CommunityLink>
       {dateTimeInfo && (
         <dl className="flex justify-between py-5 mt-2 border-b border-foreground-caption items-center">
           <dt className="text-label-sm font-bold w-24">日時</dt>

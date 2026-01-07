@@ -1,5 +1,5 @@
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { GqlTransactionsConnection, GqlWalletType, useGetTransactionsQuery } from "@/types/graphql";
 
 export interface UseCommunityTransactionsResult {
@@ -22,10 +22,14 @@ const fallbackConnection: GqlTransactionsConnection = {
 };
 
 const useCommunityTransactions = (): UseCommunityTransactionsResult => {
+  // Use runtime communityId from CommunityConfigContext
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId || "";
+  
   const { data, loading, error, fetchMore, refetch } = useGetTransactionsQuery({
     variables: {
       filter: {
-        communityId: COMMUNITY_ID,
+        communityId: communityId,
         or: [
           { fromWalletType: GqlWalletType.Community },
           { toWalletType: GqlWalletType.Community },
@@ -36,6 +40,7 @@ const useCommunityTransactions = (): UseCommunityTransactionsResult => {
     },
     fetchPolicy: "cache-and-network",
     nextFetchPolicy: "cache-first",
+    skip: !communityId,
   });
 
   const connection = data?.transactions ?? fallbackConnection;
@@ -43,12 +48,12 @@ const useCommunityTransactions = (): UseCommunityTransactionsResult => {
   const hasNextPage = connection.pageInfo?.hasNextPage ?? false;
 
   const handleFetchMore = async () => {
-    if (!hasNextPage) return;
+    if (!hasNextPage || !communityId) return;
 
     await fetchMore({
       variables: {
         filter: {
-          communityId: COMMUNITY_ID,
+          communityId: communityId,
           or: [
             { fromWalletType: GqlWalletType.Community },
             { toWalletType: GqlWalletType.Community },

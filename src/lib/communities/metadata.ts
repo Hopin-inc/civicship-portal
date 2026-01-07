@@ -41,7 +41,7 @@ export interface CommunityDocument {
 }
 
 // コミュニティごとのベース設定
-interface CommunityBaseConfig {
+export interface CommunityBaseConfig {
   id: string;
   tokenName: string;
   title: string;
@@ -95,7 +95,7 @@ export function getCommunityIdFromEnv(): string {
   return communityId;
 }
 
-const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
+export const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
   neo88: {
     id: "neo88",
     tokenName: "NEO88",

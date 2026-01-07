@@ -3,10 +3,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Copy, FileKey, Info, LinkIcon, PhoneIcon, AlertCircle } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
+import { CommunityLink } from "@/components/navigation/CommunityLink";
 import { toast } from "react-toastify";
 import { useAuth } from "@/contexts/AuthProvider";
-import { currentCommunityConfig } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { useUserProfileContext } from "@/app/users/features/shared/contexts/UserProfileContext";
 import { GqlDidIssuanceStatus } from "@/types/graphql";
 import { useTranslations } from "next-intl";
@@ -25,6 +25,8 @@ export default function AccountSection() {
   const t = useTranslations();
   const { isAuthenticated, isPhoneVerified, isAuthenticating } = useAuth();
   const { gqlUser } = useUserProfileContext();
+  // Use runtime community config from context
+  const communityConfig = useCommunityConfig();
 
   const completedRequest = gqlUser?.didIssuanceRequests?.find(
     (req) => req?.status === GqlDidIssuanceStatus.Completed,
@@ -61,7 +63,7 @@ export default function AccountSection() {
                     <span className="text-label-sm text-red-500">{t("users.account.didFailed")}</span>
                   </div>
                   <Button variant="outline" size="sm" asChild className="h-6 px-2 text-xs">
-                    <Link href="/users/me/reverify-phone">{t("users.account.reverifyPhone")}</Link>
+                    <CommunityLink href="/users/me/reverify-phone">{t("users.account.reverifyPhone")}</CommunityLink>
                   </Button>
                 </div>
               ) : (
@@ -85,7 +87,7 @@ export default function AccountSection() {
         {/* LINEアカウント */}
         <div className="flex items-center justify-between py-4 px-4 border-b">
           <div className="flex items-center gap-2">
-            <Image src="/images/line-icon.png" alt="LINE" width={20} height={20} />
+            <Image src="/images/line-icon.png" alt="LINE" width={20} height={20} unoptimized />
             <span className="font-bold text-sm">{t("users.account.lineAccount")}</span>
           </div>
           <span className="text-gray-400">
@@ -103,7 +105,7 @@ export default function AccountSection() {
           </span>
         </div>
         {/* JUST DAO IT */}
-        {currentCommunityConfig.enableFeatures.includes("justDaoIt") && (
+        {communityConfig?.enableFeatures?.includes("justDaoIt") && (
           <div className="flex items-center justify-between py-4 px-4">
             <div className="flex items-center gap-2">
               <LinkIcon className="w-4 h-4" />

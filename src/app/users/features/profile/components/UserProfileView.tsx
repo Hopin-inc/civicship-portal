@@ -1,8 +1,9 @@
+"use client";
 import { UserProfileViewModel } from "@/app/users/features/profile/types";
 import { UserProfileHeader } from "./UserProfileHeader";
 import { UserTicketsAndPoints } from "./UserTicketsAndPoints";
 import { UserPortfolioSection } from "@/app/users/features/portfolios";
-import { currentCommunityConfig } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { NftCard } from "@/components/domains/nfts/components";
 import { CardCarousel } from "@/components/shared/CardCarousel";
 import { useTranslations } from "next-intl";
@@ -14,9 +15,11 @@ interface UserProfileViewProps {
 
 export function UserProfileView({ viewModel, isOwner }: UserProfileViewProps) {
   const t = useTranslations();
+  // Use runtime community config from context
+  const communityConfig = useCommunityConfig();
   const targetFeatures = ["opportunities", "credentials"] as const;
   const shouldShowOpportunities = targetFeatures.some((feature) =>
-    currentCommunityConfig.enableFeatures.includes(feature),
+    communityConfig?.enableFeatures?.includes(feature),
   );
 
   return (
