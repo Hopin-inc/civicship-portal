@@ -166,9 +166,9 @@ export async function evaluateUserRegistrationState(
   const isPhoneVerified = ssrPhoneAuthenticated || hasPhoneIdentity || TokenManager.phoneVerified();
   const isRegistered = isPhoneVerified && hasMembershipInCurrentCommunity;
 
-  // Store the community ID for which the user is LINE-authenticated
-  // This is used to determine if the LINE authentication is valid for the current community
-  setState({ authenticatedCommunityId: communityId });
+  // Note: authenticatedCommunityId is set in LiffService.signInWithLiffToken() when actual LINE auth happens
+  // We don't set it here because evaluateUserRegistrationState is called on page load, not on actual auth
+  // If we set it here, it would be overwritten to the current URL's community ID on every navigation
 
   if (isRegistered) {
     TokenManager.savePhoneAuthFlag(true);
