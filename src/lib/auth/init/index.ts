@@ -179,8 +179,23 @@ async function initAuthFull({
       return;
     }
 
-    // Get runtime communityId from LiffService for community-specific cookie handling
+    // Get runtime communityId and tenantId from LiffService for community-specific handling
     const communityId = liffService.getCommunityId();
+    const expectedTenantId = liffService.getFirebaseTenantId();
+    
+    // CRITICAL: Validate that the Firebase user's tenant matches the current community's tenant
+    // This prevents cross-community authentication bypass where a user logged into Community A
+    // could access Community B by having a valid Firebase session from Community A
+    const firebaseUserTenantId = firebaseUser.tenantId;
+    if (expectedTenantId && firebaseUserTenantId !== expectedTenantId) {
+      logger.debug("[AUTH] initAuthFull: Firebase tenant mismatch, treating as unauthenticated", {
+        firebaseUserTenantId,
+        expectedTenantId,
+        communityId,
+      });
+      finalizeAuthState("unauthenticated", undefined, setState, authStateManager);
+      return;
+    }
     
     const sessionOk = await establishSessionFromFirebaseUser(firebaseUser, setState, communityId);
     if (!sessionOk) {

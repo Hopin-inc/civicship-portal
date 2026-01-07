@@ -87,6 +87,10 @@ export class LiffService {
     return this.communityId;
   }
 
+  public getFirebaseTenantId(): string | null {
+    return this.firebaseTenantId;
+  }
+
   public async initialize(): Promise<boolean> {
     if (this.state.isInitialized) {
       return true;

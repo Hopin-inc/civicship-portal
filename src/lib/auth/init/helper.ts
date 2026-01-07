@@ -78,8 +78,10 @@ export async function establishSessionFromFirebaseUser(
     const idToken = await firebaseUser.getIdToken(true);
     const tokenResult = await firebaseUser.getIdTokenResult();
 
-    await createSession(idToken);
-    // Save community-specific auth cookie
+    // Pass communityId to createSession so backend can set HTTP-only community-specific cookie
+    await createSession(idToken, communityId);
+    // Note: The backend now sets the HTTP-only line_authenticated_{communityId} cookie
+    // We still save a client-side cookie as a fallback for backward compatibility
     TokenManager.saveLineAuthFlag(true, communityId);
 
     setState({
@@ -96,10 +98,16 @@ export async function establishSessionFromFirebaseUser(
   }
 }
 
-async function createSession(idToken: string) {
+async function createSession(idToken: string, communityId?: string) {
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  // Pass community ID to backend so it can set community-specific HTTP-only cookie
+  if (communityId) {
+    headers["X-Community-Id"] = communityId;
+  }
+  
   const res = await fetch("/api/sessionLogin", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify({ idToken }),
     credentials: "include",
   });
