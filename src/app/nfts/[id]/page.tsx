@@ -8,6 +8,7 @@ import Image from "next/image";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { Button } from "@/components/ui/button";
 import { useNftDetailData } from "./lib/useNftDetailData";
+import { ExternalLink } from "lucide-react";
 
 export default function NftPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -63,14 +64,22 @@ export default function NftPage({ params }: { params: Promise<{ id: string }> })
       truncateHead: 6,
       truncateTail: 4,
     },
-    ...(blockchain.chainDisplayName ? [{
-      label: "チェーン",
-      value: blockchain.chainDisplayName,
-    }] : []),
-    ...(basic.tokenType ? [{
-      label: "規格",
-      value: basic.tokenType,
-    }] : []),
+    ...(blockchain.chainDisplayName
+      ? [
+          {
+            label: "チェーン",
+            value: blockchain.chainDisplayName,
+          },
+        ]
+      : []),
+    ...(basic.tokenType
+      ? [
+          {
+            label: "規格",
+            value: basic.tokenType,
+          },
+        ]
+      : []),
   ];
 
   return (
@@ -97,9 +106,15 @@ export default function NftPage({ params }: { params: Promise<{ id: string }> })
         </div>
         {blockchain.explorerUrl && (
           <div className="mt-4 flex justify-center">
-            <Button variant="text" asChild>
-              <a href={blockchain.explorerUrl} target="_blank" rel="noopener noreferrer">
-                証明を検証する
+            <Button variant="text">
+              <a
+                href={blockchain.explorerUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1"
+              >
+                <span>証明を検証する</span>
+                <ExternalLink className="h-3.5 w-3.5" />
               </a>
             </Button>
           </div>
