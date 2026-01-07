@@ -86,9 +86,31 @@ async function initAuthFast({
   setState: ReturnType<typeof useAuthStore.getState>["setState"];
 }) {
   try {
-    // Note: authenticatedCommunityId is set in LiffService.signInWithLiffToken() when actual LINE auth happens
-    // We don't set it here because initAuthFast is called on page load, not on actual auth
-    // If we set it here, it would be overwritten to the current URL's community ID on every navigation
+    // Check if the user has membership in the current community
+    // This is critical for multi-tenant isolation: a user logged into Community A
+    // should not be considered authenticated when navigating to Community B
+    const currentCommunityId = liffService.getCommunityId();
+    const hasMembershipInCurrentCommunity = ssrCurrentUser.memberships?.some(
+      (m) => m.community?.id === currentCommunityId
+    );
+    
+    logger.debug("[AUTH] initAuthFast: checking membership", {
+      currentCommunityId,
+      hasMembershipInCurrentCommunity,
+      membershipIds: ssrCurrentUser.memberships?.map(m => m.community?.id) ?? [],
+    });
+    
+    if (!hasMembershipInCurrentCommunity) {
+      // User is authenticated but not for this community
+      // Treat as unauthenticated so they get redirected to login
+      logger.debug("[AUTH] initAuthFast: user has no membership in current community, treating as unauthenticated");
+      finalizeAuthState("unauthenticated", undefined, setState, authStateManager);
+      return;
+    }
+    
+    // User has membership in current community, proceed with normal auth flow
+    // Store the community ID for which the user is authenticated
+    setState({ authenticatedCommunityId: currentCommunityId });
     
     finalizeAuthState(
       ssrPhoneAuthenticated ? "user_registered" : "line_authenticated",
