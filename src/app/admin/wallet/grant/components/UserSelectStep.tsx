@@ -13,8 +13,6 @@ import { useTranslations } from "next-intl";
 interface Props {
   members: { user: GqlUser; wallet: { currentPointView?: { currentPoint: bigint } } }[];
   onSelect: (user: GqlUser) => void;
-  loadMoreRef?: React.RefObject<HTMLDivElement>;
-  isLoadingMore?: boolean;
   title?: string;
   activeTab: TabsEnum;
   setActiveTab: React.Dispatch<React.SetStateAction<TabsEnum>>;
@@ -25,8 +23,6 @@ interface Props {
 function UserSelectStep({
   members,
   onSelect,
-  loadMoreRef,
-  isLoadingMore,
   title,
   activeTab,
   setActiveTab,
@@ -61,8 +57,6 @@ function UserSelectStep({
           members={members}
           searchQuery={searchQuery}
           onSelect={onSelect}
-          loadMoreRef={loadMoreRef}
-          isLoadingMore={isLoadingMore}
           initialConnection={initialConnection}
         />
       )}

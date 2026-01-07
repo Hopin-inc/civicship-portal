@@ -26,7 +26,9 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
   const router = useRouter();
 
   const handleBackButton = () => {
-    if (config?.backTo) {
+    if (config?.onBackClick) {
+      config.onBackClick();
+    } else if (config?.backTo) {
       router.push(config.backTo);
     } else if (pathname === "/search/result") {
       // When on search results page, preserve all search parameters when going back to search page
@@ -41,11 +43,10 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
     return null;
   }
 
-  // LIFF/LINEブラウザ環境では戻るボタンを非表示にする
+  // 戻るボタンの表示判定（LIFF環境でもテキストボタンとして表示）
   const shouldShowBackButton =
     config.showBackButton &&
-    pathname !== "/" &&
-    !isInLine;
+    pathname !== "/";
 
   // レイアウト意図ベースの判定（LIFF環境でも戻るボタンの意図がある場合は左スロットとして扱う）
   const hasLeftSlotForLayout = config.showLogo || (config.showBackButton && pathname !== "/");
@@ -65,9 +66,16 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
       )}
     >
       {shouldShowBackButton && (
-        <Button onClick={handleBackButton} variant="icon-only" size="sm" aria-label="戻る">
-          <ChevronLeft className="h-6 w-6 text-caption" />
-        </Button>
+        isInLine ? (
+          <Button onClick={handleBackButton} variant="ghost" size="sm" className="no-underline">
+            <ChevronLeft className="h-5 w-5" />
+            戻る
+          </Button>
+        ) : (
+          <Button onClick={handleBackButton} variant="icon-only" size="sm" aria-label="戻る">
+            <ChevronLeft className="h-6 w-6 text-caption" />
+          </Button>
+        )
       )}
       {config.showLogo && (
         <Link href="/" className="flex items-center space-x-2">

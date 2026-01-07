@@ -25,7 +25,7 @@ export function TransactionList({ walletId, initialTransactions }: TransactionLi
           {t("transactions.list.communityHistoryLink")}
         </Link>
       </div>
-      <div className="mt-2">
+      <div className="mt-6">
         {initialTransactions.edges?.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center pt-6">
             {t("transactions.list.emptyState")}

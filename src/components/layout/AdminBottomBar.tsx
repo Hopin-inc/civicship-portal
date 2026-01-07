@@ -23,6 +23,7 @@ const AdminBottomBar: React.FC<AdminBottomBarProps> = ({ className }) => {
     pathname.startsWith("/admin/reservations/") ||
     pathname.startsWith("/admin/credentials/") ||
     pathname.startsWith("/admin/tickets/") ||
+    pathname.startsWith("/admin/opportunities/") ||
     pathname.startsWith("/admin/members") ||
     pathname.startsWith("/admin/wallet/")
   ) {

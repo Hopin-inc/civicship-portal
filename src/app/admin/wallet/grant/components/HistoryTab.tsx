@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { GqlUser } from "@/types/graphql";
-import UserInfoCard from "./UserInfoCard";
 import { useWalletsAndDidIssuanceRequests } from "../hooks/useWalletsAndDidIssuanceRequests";
 import { useAuth } from "@/contexts/AuthProvider";
 import Loading from "@/components/layout/Loading";
 import { useTranslations } from "next-intl";
+import { Table, TableBody } from "@/components/ui/table";
+import { UserPointRow } from "@/components/shared/UserPointRow";
 
 interface HistoryTabProps {
   listType: "donate" | "grant";
@@ -17,6 +18,8 @@ interface HistoryTabProps {
 export function HistoryTab({ listType, searchQuery, onSelect }: HistoryTabProps) {
   const t = useTranslations();
   const { user } = useAuth();
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+
   const { error, presentedTransactions, loading, refetch } = useWalletsAndDidIssuanceRequests({
     currentUserId: user?.id,
     listType,
@@ -50,26 +53,46 @@ export function HistoryTab({ listType, searchQuery, onSelect }: HistoryTabProps)
 
   if (loading) return <Loading />;
 
+  const handleSelect = (user: GqlUser) => {
+    // すでに選択されているユーザーをクリックした場合は選択解除
+    if (selectedUserId === user.id) {
+      setSelectedUserId(null);
+      return;
+    }
+
+    setSelectedUserId(user.id);
+    onSelect(user);
+  };
+
   return (
-    <div className="space-y-3 px-4">
-      {presentedTransactions.map((tx, index) => (
-        <UserInfoCard
-          key={`${tx.otherUser?.id}-${index}`}
-          otherUser={tx.otherUser}
-          otherName={tx.otherName}
-          actionType={tx.actionType}
-          isReceive={tx.isReceive}
-          point={BigInt(tx.point)}
-          sign={tx.sign}
-          pointColor={tx.pointColor}
-          didValue={tx.didValue ?? undefined}
-          createdAt={tx.createdAt}
-          onClick={() => {
-            if (tx.otherUser) onSelect(tx.otherUser);
-          }}
-          comment={tx.comment ?? undefined}
-        />
-      ))}
+    <div className="px-4">
+      <Table className={"max-w-xl"}>
+        <TableBody>
+          {presentedTransactions.map((tx, index) => {
+            if (!tx.otherUser) return null;
+
+            const subText = tx.createdAt
+              ? new Date(tx.createdAt.toString()).toLocaleDateString()
+              : tx.didValue
+                ? `${tx.didValue.substring(0, 16)}...`
+                : "";
+
+            return (
+              <UserPointRow
+                key={`${tx.otherUser.id}-${index}`}
+                avatar={tx.otherUser.image || ""}
+                name={tx.otherUser.name || tx.otherName || ""}
+                subText={subText}
+                pointValue={Number(tx.point || 0)}
+                onClick={() => {
+                  if (tx.otherUser) handleSelect(tx.otherUser);
+                }}
+                selected={selectedUserId === tx.otherUser.id}
+              />
+            );
+          })}
+        </TableBody>
+      </Table>
     </div>
   );
 }

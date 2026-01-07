@@ -1,5 +1,42 @@
 import { gql } from "@apollo/client";
 
+export const GET_ADMIN_OPPORTUNITIES = gql`
+  query GetAdminOpportunities(
+    $filter: OpportunityFilterInput
+    $sort: OpportunitySortInput
+    $first: Int
+    $cursor: String
+  ) {
+    opportunities(filter: $filter, sort: $sort, first: $first, cursor: $cursor) {
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
+      }
+      totalCount
+      edges {
+        cursor
+        node {
+          id
+          title
+          description
+          publishStatus
+          category
+          images
+          requireApproval
+          createdAt
+          updatedAt
+          createdByUser {
+            id
+            name
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const GET_OPPORTUNITIES = gql`
   query GetOpportunities(
     $filter: OpportunityFilterInput

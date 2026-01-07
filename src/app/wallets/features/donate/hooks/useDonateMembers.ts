@@ -13,9 +13,9 @@ export function useDonateMembers(currentUserId?: string) {
         const wallet = edge?.node;
         const user = wallet?.user;
         const pointStr = wallet?.currentPointView?.currentPoint;
-        
+
         if (!user || user.id === currentUserId) return null;
-        
+
         const currentPoint = pointStr ? BigInt(pointStr) : BigInt(0);
 
         return {
@@ -38,5 +38,6 @@ export function useDonateMembers(currentUserId?: string) {
     loadMoreRef,
     hasNextPage,
     isLoadingMore,
+    walletsConnection: data?.wallets, // 元のconnection情報を返す
   };
 }
