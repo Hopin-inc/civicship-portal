@@ -11,12 +11,29 @@ import { logger } from "@/lib/logging";
 
 /**
  * 1️⃣ 認証前の初期状態を設定
+ * 
+ * CRITICAL: Always set isAuthenticating and isAuthInProgress to true
+ * This ensures RouteGuard waits for the full auth initialization to complete,
+ * including tenant validation. Without this, RouteGuard might make redirect
+ * decisions based on stale auth state from a previous session.
+ * 
+ * The previous implementation had a bug where it would return early if
+ * authenticationState !== "loading", which caused RouteGuard to not wait
+ * when the Zustand store had stale state (e.g., "line_authenticated" from
+ * a different community's session).
  */
 export function prepareInitialState(
   setState: ReturnType<typeof useAuthStore.getState>["setState"],
 ) {
   const current = useAuthStore.getState().state.authenticationState;
-  if (current !== "loading") return;
+  
+  logger.warn("[AUTH] prepareInitialState: ENTRY", {
+    currentAuthState: current,
+    willResetToLoading: true,
+  });
+  
+  // CRITICAL: Always reset to loading state and set waiting flags
+  // This ensures RouteGuard waits for the full auth initialization to complete
   setState({
     authenticationState: "loading",
     isAuthenticating: true,
