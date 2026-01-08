@@ -24,9 +24,11 @@ const httpLink = createUploadLink({
 const requestLink = setContext(async (operation, prevContext) => {
   const isBrowser = typeof window !== "undefined";
   let token: string | null = null;
-  // Browser uses id_token mode only (session mode is SSR-only via executeServerGraphQLQuery)
-  // Server keeps session mode for any server-side Apollo usage
-  let authMode: "session" | "id_token" = isBrowser ? "id_token" : "session";
+  // Determine auth mode based on firebaseUser availability:
+  // - Browser with firebaseUser: use id_token mode with Authorization header
+  // - Browser without firebaseUser: fallback to session mode (use session cookie)
+  // - Server: always use session mode
+  let authMode: "session" | "id_token" = "session";
 
   if (isBrowser) {
     const { firebaseUser, authenticationState } = useAuthStore.getState().state;
@@ -50,19 +52,23 @@ const requestLink = setContext(async (operation, prevContext) => {
     if (firebaseUser) {
       try {
         token = await firebaseUser.getIdToken();
+        authMode = "id_token"; // Use id_token mode when Firebase user is available
       } catch (error) {
         logger.warn("Failed to get ID token", { error });
         if (isMutation) {
           throw new Error("認証トークンの取得に失敗しました");
         }
+        // Fallback to session mode if token retrieval fails
+        authMode = "session";
       }
     } else {
-      // Query実行時にfirebaseUserがない場合を記録
-      logger.info("GraphQL request without firebase user", {
+      // Query実行時にfirebaseUserがない場合、sessionモードにフォールバック
+      logger.info("GraphQL request without firebase user, using session mode", {
         operationName: operation.operationName,
         isMutation,
         authenticationState,
       });
+      authMode = "session"; // Fallback to session mode (will use session cookie)
     }
   }
 
