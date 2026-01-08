@@ -1759,6 +1759,14 @@ export type GqlQuery = {
   utility?: Maybe<GqlUtility>;
   vcIssuanceRequest?: Maybe<GqlVcIssuanceRequest>;
   vcIssuanceRequests: GqlVcIssuanceRequestsConnection;
+  /**
+   * Verify transactions against the Cardano blockchain.
+   * - Retrieves Merkle proofs for specified transactions
+   * - Recalculates root hash using proofs
+   * - Compares with Cardano blockchain metadata
+   * - Returns data integrity verification results
+   */
+  verifyTransactions: Array<GqlTransactionVerificationResult>;
   wallet?: Maybe<GqlWallet>;
   wallets: GqlWalletsConnection;
 };
@@ -2015,6 +2023,10 @@ export type GqlQueryVcIssuanceRequestsArgs = {
   filter?: InputMaybe<GqlVcIssuanceRequestFilterInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   sort?: InputMaybe<GqlVcIssuanceRequestSortInput>;
+};
+
+export type GqlQueryVerifyTransactionsArgs = {
+  txIds: Array<Scalars["ID"]["input"]>;
 };
 
 export type GqlQueryWalletArgs = {
@@ -2534,6 +2546,15 @@ export type GqlTransactionSortInput = {
   createdAt?: InputMaybe<GqlSortDirection>;
 };
 
+export type GqlTransactionVerificationResult = {
+  __typename?: "TransactionVerificationResult";
+  label: Scalars["Int"]["output"];
+  rootHash: Scalars["String"]["output"];
+  status: GqlVerificationStatus;
+  transactionHash: Scalars["String"]["output"];
+  txId: Scalars["ID"]["output"];
+};
+
 export type GqlTransactionsConnection = {
   __typename?: "TransactionsConnection";
   edges?: Maybe<Array<Maybe<GqlTransactionEdge>>>;
@@ -2801,6 +2822,15 @@ export const GqlVcIssuanceStatus = {
 } as const;
 
 export type GqlVcIssuanceStatus = (typeof GqlVcIssuanceStatus)[keyof typeof GqlVcIssuanceStatus];
+export const GqlVerificationStatus = {
+  Error: "ERROR",
+  NotVerified: "NOT_VERIFIED",
+  Pending: "PENDING",
+  Verified: "VERIFIED",
+} as const;
+
+export type GqlVerificationStatus =
+  (typeof GqlVerificationStatus)[keyof typeof GqlVerificationStatus];
 export type GqlWallet = {
   __typename?: "Wallet";
   accumulatedPointView?: Maybe<GqlAccumulatedPointView>;
@@ -6329,6 +6359,63 @@ export type GqlGetTransactionQueryVariables = Exact<{
 export type GqlGetTransactionQuery = {
   __typename?: "Query";
   transaction?: { __typename?: "Transaction"; id: string } | null;
+};
+
+export type GqlGetTransactionDetailQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type GqlGetTransactionDetailQuery = {
+  __typename?: "Query";
+  transaction?: {
+    __typename?: "Transaction";
+    id: string;
+    reason: GqlTransactionReason;
+    comment?: string | null;
+    fromPointChange?: number | null;
+    toPointChange?: number | null;
+    createdAt?: Date | null;
+    fromWallet?: {
+      __typename?: "Wallet";
+      id: string;
+      type: GqlWalletType;
+      user?: { __typename?: "User"; id: string; name: string; image?: string | null } | null;
+      community?: {
+        __typename?: "Community";
+        id: string;
+        name?: string | null;
+        image?: string | null;
+      } | null;
+    } | null;
+    toWallet?: {
+      __typename?: "Wallet";
+      id: string;
+      type: GqlWalletType;
+      user?: { __typename?: "User"; id: string; name: string; image?: string | null } | null;
+      community?: {
+        __typename?: "Community";
+        id: string;
+        name?: string | null;
+        image?: string | null;
+      } | null;
+    } | null;
+  } | null;
+};
+
+export type GqlVerifyTransactionsQueryVariables = Exact<{
+  txIds: Array<Scalars["ID"]["input"]> | Scalars["ID"]["input"];
+}>;
+
+export type GqlVerifyTransactionsQuery = {
+  __typename?: "Query";
+  verifyTransactions: Array<{
+    __typename?: "TransactionVerificationResult";
+    txId: string;
+    status: GqlVerificationStatus;
+    transactionHash: string;
+    rootHash: string;
+    label: number;
+  }>;
 };
 
 export const CommunityFieldsFragmentDoc = gql`
@@ -12750,4 +12837,187 @@ export type GetTransactionSuspenseQueryHookResult = ReturnType<
 export type GetTransactionQueryResult = Apollo.QueryResult<
   GqlGetTransactionQuery,
   GqlGetTransactionQueryVariables
+>;
+export const GetTransactionDetailDocument = gql`
+  query GetTransactionDetail($id: ID!) {
+    transaction(id: $id) {
+      ...TransactionFields
+      fromWallet {
+        id
+        type
+        user {
+          id
+          name
+          image
+        }
+        community {
+          id
+          name
+          image
+        }
+      }
+      toWallet {
+        id
+        type
+        user {
+          id
+          name
+          image
+        }
+        community {
+          id
+          name
+          image
+        }
+      }
+    }
+  }
+  ${TransactionFieldsFragmentDoc}
+`;
+
+/**
+ * __useGetTransactionDetailQuery__
+ *
+ * To run a query within a React component, call `useGetTransactionDetailQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetTransactionDetailQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetTransactionDetailQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetTransactionDetailQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GqlGetTransactionDetailQuery,
+    GqlGetTransactionDetailQueryVariables
+  > &
+    ({ variables: GqlGetTransactionDetailQueryVariables; skip?: boolean } | { skip: boolean }),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetTransactionDetailQuery, GqlGetTransactionDetailQueryVariables>(
+    GetTransactionDetailDocument,
+    options,
+  );
+}
+export function useGetTransactionDetailLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetTransactionDetailQuery,
+    GqlGetTransactionDetailQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetTransactionDetailQuery, GqlGetTransactionDetailQueryVariables>(
+    GetTransactionDetailDocument,
+    options,
+  );
+}
+export function useGetTransactionDetailSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetTransactionDetailQuery,
+        GqlGetTransactionDetailQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GqlGetTransactionDetailQuery,
+    GqlGetTransactionDetailQueryVariables
+  >(GetTransactionDetailDocument, options);
+}
+export type GetTransactionDetailQueryHookResult = ReturnType<typeof useGetTransactionDetailQuery>;
+export type GetTransactionDetailLazyQueryHookResult = ReturnType<
+  typeof useGetTransactionDetailLazyQuery
+>;
+export type GetTransactionDetailSuspenseQueryHookResult = ReturnType<
+  typeof useGetTransactionDetailSuspenseQuery
+>;
+export type GetTransactionDetailQueryResult = Apollo.QueryResult<
+  GqlGetTransactionDetailQuery,
+  GqlGetTransactionDetailQueryVariables
+>;
+export const VerifyTransactionsDocument = gql`
+  query VerifyTransactions($txIds: [ID!]!) {
+    verifyTransactions(txIds: $txIds) {
+      txId
+      status
+      transactionHash
+      rootHash
+      label
+    }
+  }
+`;
+
+/**
+ * __useVerifyTransactionsQuery__
+ *
+ * To run a query within a React component, call `useVerifyTransactionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useVerifyTransactionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useVerifyTransactionsQuery({
+ *   variables: {
+ *      txIds: // value for 'txIds'
+ *   },
+ * });
+ */
+export function useVerifyTransactionsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GqlVerifyTransactionsQuery,
+    GqlVerifyTransactionsQueryVariables
+  > &
+    ({ variables: GqlVerifyTransactionsQueryVariables; skip?: boolean } | { skip: boolean }),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlVerifyTransactionsQuery, GqlVerifyTransactionsQueryVariables>(
+    VerifyTransactionsDocument,
+    options,
+  );
+}
+export function useVerifyTransactionsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlVerifyTransactionsQuery,
+    GqlVerifyTransactionsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlVerifyTransactionsQuery, GqlVerifyTransactionsQueryVariables>(
+    VerifyTransactionsDocument,
+    options,
+  );
+}
+export function useVerifyTransactionsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlVerifyTransactionsQuery,
+        GqlVerifyTransactionsQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlVerifyTransactionsQuery, GqlVerifyTransactionsQueryVariables>(
+    VerifyTransactionsDocument,
+    options,
+  );
+}
+export type VerifyTransactionsQueryHookResult = ReturnType<typeof useVerifyTransactionsQuery>;
+export type VerifyTransactionsLazyQueryHookResult = ReturnType<
+  typeof useVerifyTransactionsLazyQuery
+>;
+export type VerifyTransactionsSuspenseQueryHookResult = ReturnType<
+  typeof useVerifyTransactionsSuspenseQuery
+>;
+export type VerifyTransactionsQueryResult = Apollo.QueryResult<
+  GqlVerifyTransactionsQuery,
+  GqlVerifyTransactionsQueryVariables
 >;

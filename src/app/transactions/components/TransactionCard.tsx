@@ -3,8 +3,8 @@
 import { GqlTransaction } from "@/types/graphql";
 import { useTranslations } from "next-intl";
 import { useLocaleDateTimeFormat } from "@/utils/i18n";
-import { getTransactionInfo } from "@/shared/transactions/utils/format";
-import { computeProfileHref } from "@/shared/transactions/utils/navigation";
+import {  getTransactionInfo } from "@/shared/transactions/utils/format";
+import { computeTransactionHref } from "@/shared/transactions/utils/navigation";
 import {
   formatActionLabelForTimeline,
   getTimelineDisplayName,
@@ -65,9 +65,8 @@ export const TransactionCard = ({
     issuedLabel: t("transactions.timeline.issued"),
   });
 
-  // プロフィールリンクの計算
-  const profileHref = enableClickNavigation
-    ? computeProfileHref(transaction, { perspectiveWalletId })
+  const transactionHref = enableClickNavigation
+    ? computeTransactionHref(transaction.id)
     : null;
 
   return (
@@ -88,7 +87,7 @@ export const TransactionCard = ({
       messageCard={
         info.comment ? <TransactionMessageCard comment={info.comment} /> : undefined
       }
-      profileHref={profileHref}
+      href={transactionHref}
       isFirst={isFirst}
       isLast={isLast}
     />

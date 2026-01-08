@@ -8,7 +8,7 @@ interface TransactionTimelineItemProps {
   header: ReactNode;
   actionLabel: ReactNode;
   messageCard?: ReactNode;
-  profileHref?: string | null;
+  href?: string | null;
   isFirst?: boolean;
   isLast?: boolean;
 }
@@ -22,14 +22,14 @@ interface TransactionTimelineItemProps {
  * - ActionLabel: アクション情報（矢印/符号 + 名前 + ポイント）
  * - MessageCard: メッセージ（オプション）
  *
- * プロフィールリンクが指定された場合、全体をリンクでラップ
+ * リンクが指定された場合、全体をリンクでラップ
  */
 export const TransactionTimelineItem = ({
   avatar,
   header,
   actionLabel,
   messageCard,
-  profileHref,
+  href,
   isFirst = false,
   isLast = false,
 }: TransactionTimelineItemProps) => {
@@ -53,10 +53,10 @@ export const TransactionTimelineItem = ({
     </div>
   );
 
-  if (profileHref) {
+  if (href) {
     return (
       <a
-        href={profileHref}
+        href={href}
         className={cn(
           "block cursor-pointer rounded-lg transition-colors",
           "hover:bg-zinc-50 dark:hover:bg-zinc-800/50",
