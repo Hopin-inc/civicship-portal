@@ -64,6 +64,9 @@ export const FETCH_PROFILE_SERVER_QUERY = `
               name
               imageUrl
               createdAt
+              community {
+                id
+              }
             }
           }
         }
@@ -165,6 +168,9 @@ export const GET_PUBLIC_USER_SERVER_QUERY = `
             name
             imageUrl
             createdAt
+            community {
+              id
+            }
           }
         }
       }

@@ -11,6 +11,7 @@ export interface NftItemData {
   name?: string | null;
   imageUrl?: string | null;
   instanceId?: string | null;
+  communityId?: string | null;
   createdAt: string;
   nftWallet?: {
     user: {
@@ -24,7 +25,7 @@ interface NftItemProps {
 }
 
 export function NftItem({ nftInstance }: NftItemProps) {
-  const imageUrl = getNftImageUrl(nftInstance.imageUrl, nftInstance.instanceId);
+  const imageUrl = getNftImageUrl(nftInstance.imageUrl, nftInstance.instanceId, nftInstance.communityId);
   const userName = nftInstance.nftWallet?.user?.name || "不明";
 
   // 配布日をフォーマット (YYYY/MM/DD形式)

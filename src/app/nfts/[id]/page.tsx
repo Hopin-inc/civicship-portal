@@ -79,7 +79,7 @@ export default function NftPage({ params }: { params: Promise<{ id: string }> })
       <div className="flex justify-center mt-10">
         <div>
           <Image
-            src={getNftImageUrl(basic.imageUrl, basic.instanceId)}
+            src={getNftImageUrl(basic.imageUrl, basic.instanceId, basic.communityId)}
             alt={basic.instanceName ?? "証明書"}
             width={120}
             height={120}

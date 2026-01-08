@@ -1079,6 +1079,7 @@ export type GqlNestedPlacesBulkUpdateInput = {
 
 export type GqlNftInstance = {
   __typename?: "NftInstance";
+  community?: Maybe<GqlCommunity>;
   createdAt: Scalars["Datetime"]["output"];
   description?: Maybe<Scalars["String"]["output"]>;
   id: Scalars["ID"]["output"];
@@ -3262,6 +3263,7 @@ export type GqlGetNftInstancesQuery = {
             }> | null;
           };
         } | null;
+        community?: { __typename?: "Community"; id: string } | null;
         nftToken?: {
           __typename?: "NftToken";
           id: string;
@@ -3293,6 +3295,7 @@ export type GqlGetNftInstanceWithDidQuery = {
     json?: any | null;
     createdAt: Date;
     updatedAt?: Date | null;
+    community?: { __typename?: "Community"; id: string } | null;
     nftToken?: {
       __typename?: "NftToken";
       id: string;
@@ -3400,6 +3403,7 @@ export type GqlGetCurrentUserProfileQuery = {
             name?: string | null;
             imageUrl?: string | null;
             createdAt: Date;
+            community?: { __typename?: "Community"; id: string } | null;
           };
         }>;
       } | null;
@@ -3598,6 +3602,7 @@ export type GqlGetUserFlexibleQuery = {
           imageUrl?: string | null;
           name?: string | null;
           createdAt: Date;
+          community?: { __typename?: "Community"; id: string } | null;
         };
       }>;
     } | null;
@@ -7602,6 +7607,9 @@ export const GetNftInstancesDocument = gql`
           }
           description
           imageUrl
+          community {
+            id
+          }
           nftToken {
             id
             address
@@ -7692,6 +7700,9 @@ export const GetNftInstanceWithDidDocument = gql`
       json
       createdAt
       updatedAt
+      community {
+        id
+      }
       nftToken {
         id
         address
@@ -7806,6 +7817,9 @@ export const GetCurrentUserProfileDocument = gql`
               name
               imageUrl
               createdAt
+              community {
+                id
+              }
             }
           }
         }
@@ -8003,6 +8017,9 @@ export const GetUserFlexibleDocument = gql`
             imageUrl
             name
             createdAt
+            community {
+              id
+            }
           }
         }
       }
