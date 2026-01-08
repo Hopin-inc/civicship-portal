@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import {
   GqlGetTransactionDetailQuery,
   GqlTransactionReason,
+  GqlWallet,
   GqlWalletType,
 } from "@/types/graphql";
 import { getNameFromWallet, mapReasonToAction } from "@/utils/transaction";
@@ -10,10 +11,16 @@ type TransactionDetailData = {
   transactionType: string;
   dateTime: string;
   fromName: string;
+  fromUserId: string | null;
   pointAmount: number;
   toName: string;
+  toUserId: string | null;
   comment: string | null;
 };
+
+function getUserIdFromWallet(wallet: GqlWallet | null | undefined): string | null {
+  return wallet?.type === GqlWalletType.Member ? wallet.user?.id ?? null : null;
+}
 
 export function useTransactionDetailData(
   transaction: GqlGetTransactionDetailQuery["transaction"],
@@ -42,12 +49,17 @@ export function useTransactionDetailData(
       ? new Date(transaction.createdAt).toISOString()
       : "";
 
+    const fromUserId = getUserIdFromWallet(transaction.fromWallet);
+    const toUserId = getUserIdFromWallet(transaction.toWallet);
+
     return {
       transactionType,
       dateTime,
       fromName,
+      fromUserId,
       pointAmount,
       toName,
+      toUserId,
       comment: transaction.comment ?? null,
     };
   }, [transaction, t]);
