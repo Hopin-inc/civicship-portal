@@ -1766,7 +1766,7 @@ export type GqlQuery = {
    * - Compares with Cardano blockchain metadata
    * - Returns data integrity verification results
    */
-  verifyTransactions: Array<GqlTransactionVerificationResult>;
+  verifyTransactions?: Maybe<Array<GqlTransactionVerificationResult>>;
   wallet?: Maybe<GqlWallet>;
   wallets: GqlWalletsConnection;
 };
@@ -6408,14 +6408,14 @@ export type GqlVerifyTransactionsQueryVariables = Exact<{
 
 export type GqlVerifyTransactionsQuery = {
   __typename?: "Query";
-  verifyTransactions: Array<{
+  verifyTransactions?: Array<{
     __typename?: "TransactionVerificationResult";
     txId: string;
     status: GqlVerificationStatus;
     transactionHash: string;
     rootHash: string;
     label: number;
-  }>;
+  }> | null;
 };
 
 export const CommunityFieldsFragmentDoc = gql`
