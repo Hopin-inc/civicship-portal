@@ -37,4 +37,5 @@ export interface InfoCardProps {
   truncateTail?: number;
   valueAlign?: 'left' | 'right';
   layout?: 'horizontal' | 'vertical';
+  fallbackText?: string;
 }

@@ -87,7 +87,7 @@ export const TransactionCard = ({
       messageCard={
         info.comment ? <TransactionMessageCard comment={info.comment} /> : undefined
       }
-      profileHref={transactionHref}
+      href={transactionHref}
       isFirst={isFirst}
       isLast={isLast}
     />

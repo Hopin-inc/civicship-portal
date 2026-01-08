@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { truncateText, shortenMiddle } from "@/utils/stringUtils";
 import { InfoCardProps } from "@/types";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 const copyToClipboard = async (text: string, label: string) => {
   try {
@@ -24,11 +25,11 @@ const WarningDisplay = ({ warningText }: { warningText: string }) => (
   </div>
 );
 
-const ActionButtons = ({ 
-  showCopy, 
-  copyData, 
-  label, 
-  secondaryLabel 
+const ActionButtons = ({
+  showCopy,
+  copyData,
+  label,
+  secondaryLabel
 }: {
   showCopy?: boolean;
   copyData?: string;
@@ -48,10 +49,10 @@ const ActionButtons = ({
   </>
 );
 
-const ExternalLinkButton = ({ 
-  externalLink, 
-  label, 
-  secondaryLabel 
+const ExternalLinkButton = ({
+  externalLink,
+  label,
+  secondaryLabel
 }: {
   externalLink?: { url: string; text: string };
   label: string;
@@ -72,11 +73,11 @@ const ExternalLinkButton = ({
   </>
 );
 
-export const InfoCard = ({ 
-  label, 
-  value, 
-  showCopy = false, 
-  copyData, 
+export const InfoCard = ({
+  label,
+  value,
+  showCopy = false,
+  copyData,
   externalLink,
   isWarning = false,
   secondaryValue,
@@ -87,49 +88,52 @@ export const InfoCard = ({
   truncateHead,
   truncateTail,
   valueAlign = 'right',
-  layout = 'horizontal'
+  layout = 'horizontal',
+  fallbackText
 }: InfoCardProps) => {
+  const t = useTranslations();
+
   if (!label) {
     console.warn('InfoCard: label is required');
     return null;
   }
 
   const hasSecondaryContent = secondaryValue || warningText;
-  
-    let displayValue = value;
-    if (showTruncate && value) {
-      if (truncatePattern === 'middle' && truncateHead !== undefined && truncateTail !== undefined) {
-        displayValue = shortenMiddle(value, truncateHead, truncateTail);
-      } else {
-        displayValue = truncateText(value, 15, truncatePattern);
-      }
-    }
 
-    if (layout === 'vertical') {
-      return (
-        <Card className="rounded-2xl border border-gray-200 bg-card shadow-none">
-          <CardHeader className="flex flex-col gap-1 py-4 px-6">
-            <div className="text-gray-400 text-xs">
-              {label}
-            </div>
-            <div className="text-sm text-black font-bold whitespace-pre-wrap break-words text-left">
-              {displayValue?.length === 0 ? "データが存在しません" : displayValue}
-            </div>
-          </CardHeader>
-        </Card>
-      );
+  let displayValue = value;
+  if (showTruncate && value) {
+    if (truncatePattern === 'middle' && truncateHead !== undefined && truncateTail !== undefined) {
+      displayValue = shortenMiddle(value, truncateHead, truncateTail);
+    } else {
+      displayValue = truncateText(value, 15, truncatePattern);
     }
+  }
 
-      return (
-        <Card className="rounded-2xl border border-gray-200 bg-card shadow-none">
-          <CardHeader className="flex flex-row items-center gap-4 py-4 px-6">
-          <div className="text-gray-400 text-xs whitespace-pre-wrap shrink-0">
+  if (layout === 'vertical') {
+    return (
+      <Card className="rounded-2xl border border-gray-200 bg-card shadow-none">
+        <CardHeader className="flex flex-col gap-1 py-4 px-6">
+          <div className="text-gray-400 text-xs">
             {label}
           </div>
-                                                                {hasSecondaryContent ? (
-                                                                  <div className={`flex-1 flex flex-col break-words ${valueAlign === 'left' ? 'items-start text-left' : 'items-end text-right'}`}>
-                                    <div className="text-sm text-black font-bold flex items-center">
-                                      {displayValue}
+          <div className="text-sm text-black font-bold whitespace-pre-wrap break-words text-left">
+            {displayValue == null || displayValue === '' ? (fallbackText ?? t('common.noData')) : displayValue}
+          </div>
+        </CardHeader>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="rounded-2xl border border-gray-200 bg-card shadow-none">
+      <CardHeader className="flex flex-row items-center gap-4 py-4 px-6">
+        <div className="text-gray-400 text-xs whitespace-pre-wrap shrink-0">
+          {label}
+        </div>
+        {hasSecondaryContent ? (
+          <div className={`flex-1 flex flex-col break-words ${valueAlign === 'left' ? 'items-start text-left' : 'items-end text-right'}`}>
+            <div className="text-sm text-black font-bold flex items-center">
+              {displayValue}
               <ExternalLinkButton
                 externalLink={externalLink}
                 label={label}
@@ -149,26 +153,26 @@ export const InfoCard = ({
               )}
             </div>
           </div>
-                                ) : (
-                                  <div className={`flex-1 flex items-center text-gray-400 text-sm ${valueAlign === 'left' ? 'justify-start text-left' : 'justify-end text-right'}`}>
-                    {isWarning && warningText && <WarningDisplay warningText={warningText} />}
-                    <ActionButtons
-                      showCopy={showCopy}
-                      copyData={copyData}
-                      label={label}
-                      secondaryLabel={secondaryLabel}
-                    />
-                    <span className={`break-words ${isWarning ? "text-gray-400" : "font-bold text-black"}`}>
-                      {displayValue?.length === 0 ? "データが存在しません" : displayValue}
-                    </span>
-                    <ExternalLinkButton
-                      externalLink={externalLink}
-                      label={label}
-                      secondaryLabel={secondaryLabel}
-                    />
-                  </div>
-                )}
+        ) : (
+          <div className={`flex-1 flex items-center text-gray-400 text-sm ${valueAlign === 'left' ? 'justify-start text-left' : 'justify-end text-right'}`}>
+            {isWarning && warningText && <WarningDisplay warningText={warningText} />}
+            <ActionButtons
+              showCopy={showCopy}
+              copyData={copyData}
+              label={label}
+              secondaryLabel={secondaryLabel}
+            />
+            <span className={`break-words ${isWarning ? "text-gray-400" : "font-bold text-black"}`}>
+              {displayValue == null || displayValue === '' ? (fallbackText ?? t('common.noData')) : displayValue}
+            </span>
+            <ExternalLinkButton
+              externalLink={externalLink}
+              label={label}
+              secondaryLabel={secondaryLabel}
+            />
+          </div>
+        )}
       </CardHeader>
     </Card>
   );
-};                                        
+};
