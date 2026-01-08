@@ -2,11 +2,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { Card } from "@/components/ui/card";
+import { getNftImageUrl } from "@/lib/nfts/image-helper";
 
 export type NftCardData = {
   id: string;
   name?: string | null;
   imageUrl?: string | null;
+  instanceId?: string | null;
 };
 
 interface NftCardProps {
@@ -23,7 +25,7 @@ export const NftCard = ({ nftInstance, isCarousel = false }: NftCardProps) => {
     >
       <Card className="w-full h-[100px] overflow-hidden relative">
         <Image
-          src={nftInstance.imageUrl ?? PLACEHOLDER_IMAGE}
+          src={getNftImageUrl(nftInstance.imageUrl, nftInstance.instanceId)}
           alt={nftInstance.name ?? ""}
           width={400}
           height={400}

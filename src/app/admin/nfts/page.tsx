@@ -37,6 +37,7 @@ export default function AdminNftsPage() {
         id: node.id,
         name: node.name,
         imageUrl: node.imageUrl,
+        instanceId: node.instanceId,
         createdAt: node.createdAt.toString(),
         nftWallet: node.nftWallet
           ? {
