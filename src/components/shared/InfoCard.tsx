@@ -79,6 +79,7 @@ export const InfoCard = ({
   showCopy = false,
   copyData,
   externalLink,
+  internalLink,
   isWarning = false,
   secondaryValue,
   secondaryLabel,
@@ -109,7 +110,19 @@ export const InfoCard = ({
     }
   }
 
+  const renderValue = (content: React.ReactNode, className?: string) => {
+    if (internalLink && displayValue) {
+      return (
+        <Link href={internalLink} className={`hover:underline ${className || ''}`}>
+          {content}
+        </Link>
+      );
+    }
+    return <span className={className}>{content}</span>;
+  };
+
   if (layout === 'vertical') {
+    const content = displayValue == null || displayValue === '' ? (fallbackText ?? t('common.noData')) : displayValue;
     return (
       <Card className="rounded-2xl border border-gray-200 bg-card shadow-none">
         <CardHeader className="flex flex-col gap-1 py-4 px-6">
@@ -117,7 +130,7 @@ export const InfoCard = ({
             {label}
           </div>
           <div className="text-sm text-black font-bold whitespace-pre-wrap break-words text-left">
-            {displayValue == null || displayValue === '' ? (fallbackText ?? t('common.noData')) : displayValue}
+            {renderValue(content)}
           </div>
         </CardHeader>
       </Card>
@@ -133,7 +146,7 @@ export const InfoCard = ({
         {hasSecondaryContent ? (
           <div className={`flex-1 flex flex-col break-words ${valueAlign === 'left' ? 'items-start text-left' : 'items-end text-right'}`}>
             <div className="text-sm text-black font-bold flex items-center">
-              {displayValue}
+              {renderValue(displayValue)}
               <ExternalLinkButton
                 externalLink={externalLink}
                 label={label}
@@ -162,9 +175,10 @@ export const InfoCard = ({
               label={label}
               secondaryLabel={secondaryLabel}
             />
-            <span className={`break-words ${isWarning ? "text-gray-400" : "font-bold text-black"}`}>
-              {displayValue == null || displayValue === '' ? (fallbackText ?? t('common.noData')) : displayValue}
-            </span>
+            {renderValue(
+              displayValue == null || displayValue === '' ? (fallbackText ?? t('common.noData')) : displayValue,
+              `break-words ${isWarning ? "text-gray-400" : "font-bold text-black"}`
+            )}
             <ExternalLinkButton
               externalLink={externalLink}
               label={label}

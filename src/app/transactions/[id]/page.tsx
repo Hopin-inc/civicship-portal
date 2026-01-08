@@ -52,10 +52,12 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
     {
       label: t("transactions.detail.from"),
       value: detail.fromName,
+      ...(detail.fromUserId && { internalLink: `/users/${detail.fromUserId}` }),
     },
     {
       label: t("transactions.detail.to"),
       value: detail.toName,
+      ...(detail.toUserId && { internalLink: `/users/${detail.toUserId}` }),
     },
     {
       label: t("transactions.detail.pointAmount"),

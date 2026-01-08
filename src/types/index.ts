@@ -27,6 +27,7 @@ export interface InfoCardProps {
     url: string;
     text: string;
   };
+  internalLink?: string;
   isWarning?: boolean;
   warningText?: string;
   secondaryValue?: string;

@@ -10,8 +10,10 @@ type TransactionDetailData = {
   transactionType: string;
   dateTime: string;
   fromName: string;
+  fromUserId: string | null;
   pointAmount: number;
   toName: string;
+  toUserId: string | null;
   comment: string | null;
 };
 
@@ -42,12 +44,26 @@ export function useTransactionDetailData(
       ? new Date(transaction.createdAt).toISOString()
       : "";
 
+    const fromUserId =
+      transaction.fromWallet?.type === GqlWalletType.Member &&
+      transaction.fromWallet.user?.id
+        ? transaction.fromWallet.user.id
+        : null;
+
+    const toUserId =
+      transaction.toWallet?.type === GqlWalletType.Member &&
+      transaction.toWallet.user?.id
+        ? transaction.toWallet.user.id
+        : null;
+
     return {
       transactionType,
       dateTime,
       fromName,
+      fromUserId,
       pointAmount,
       toName,
+      toUserId,
       comment: transaction.comment ?? null,
     };
   }, [transaction, t]);
