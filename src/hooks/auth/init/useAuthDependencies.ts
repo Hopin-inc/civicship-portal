@@ -6,9 +6,11 @@ import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 export function useAuthDependencies() {
   const communityConfig = useCommunityConfig();
-  // Get LIFF ID from DB config, fallback to env var for backward compatibility
-  const liffId = communityConfig?.liffId || process.env.NEXT_PUBLIC_LIFF_ID || "";
-  const liffService = useMemo(() => LiffService.getInstance(liffId), [liffId]);
+  // Get LIFF App ID from DB config for liff.init(), fallback to env var for backward compatibility
+  // liffAppId is the full LIFF app ID (e.g., '1234567890-xxxxxxxx') used for liff.init()
+  // liffId is the channel ID used for token verification
+  const liffAppId = communityConfig?.liffAppId || process.env.NEXT_PUBLIC_LIFF_ID || "";
+  const liffService = useMemo(() => LiffService.getInstance(liffAppId), [liffAppId]);
   const phoneAuthService = useMemo(() => PhoneAuthService.getInstance(), []);
   const authStateManager = useMemo(() => {
     if (typeof window === "undefined") return null;

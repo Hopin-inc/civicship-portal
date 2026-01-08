@@ -23,6 +23,7 @@ export interface CommunityPortalConfig {
   regionName: string | null;
   regionKey: string | null;
   liffId: string | null;
+  liffAppId: string | null;
   liffBaseUrl: string | null;
   firebaseTenantId: string | null;
 }
@@ -82,6 +83,7 @@ const COMMUNITY_PORTAL_CONFIG_QUERY = `
       regionName
       regionKey
       liffId
+      liffAppId
       liffBaseUrl
       firebaseTenantId
     }
