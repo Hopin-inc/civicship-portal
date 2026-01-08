@@ -543,7 +543,7 @@ li {
     width: 1px;
     opacity: 0.4;
     background-color: hsl(var(--border));
-    z-index: -1;
+    z-index: 0;
   }
 
   /* Ensure avatar appears above rails */
