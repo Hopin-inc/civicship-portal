@@ -47,6 +47,8 @@ export type UserProfileViewModel = {
     id: string;
     name: string;
     imageUrl?: string;
+    instanceId?: string;
+    communityId?: string;
   }>;
 
   showOpportunities: boolean;

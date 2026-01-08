@@ -9,6 +9,7 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { Button } from "@/components/ui/button";
 import { useNftDetailData } from "./lib/useNftDetailData";
 import { ExternalLink } from "lucide-react";
+import { getNftImageUrl } from "@/lib/nfts/image-helper";
 
 export default function NftPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -87,7 +88,7 @@ export default function NftPage({ params }: { params: Promise<{ id: string }> })
       <div className="flex justify-center mt-10">
         <div>
           <Image
-            src={basic.imageUrl ?? ""}
+            src={getNftImageUrl(basic.imageUrl, basic.instanceId, basic.communityId)}
             alt={basic.instanceName ?? "証明書"}
             width={120}
             height={120}
