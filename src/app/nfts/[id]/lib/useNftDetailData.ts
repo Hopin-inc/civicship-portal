@@ -23,12 +23,14 @@ export function useNftDetailData(nftInstance: GqlGetNftInstanceWithDidQuery["nft
         tokenType: undefined,
         username: undefined,
         didValue: undefined,
+        communityId: undefined,
       };
     }
 
     const { instanceId, imageUrl, name: instanceName, json: instanceJson } = nftInstance;
     const { address: contractAddress, type: tokenType } = nftInstance.nftToken ?? {};
     const { name: username } = nftInstance.nftWallet?.user ?? {};
+    const communityId = nftInstance.community?.id;
     const didValue = nftInstance.nftWallet?.user?.didIssuanceRequests?.find(
       (request: GqlDidIssuanceRequest) => request.status === GqlDidIssuanceStatus.Completed,
     )?.didValue;
@@ -42,6 +44,7 @@ export function useNftDetailData(nftInstance: GqlGetNftInstanceWithDidQuery["nft
       tokenType,
       username,
       didValue,
+      communityId,
     };
   }, [nftInstance]);
 

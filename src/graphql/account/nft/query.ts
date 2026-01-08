@@ -27,6 +27,9 @@ export const GET_NFT_INSTANCES = gql`
         }
           description
           imageUrl
+          community {
+            id
+          }
           nftToken {
             id
             address
@@ -57,6 +60,9 @@ query GetNftInstanceWithDid($id: ID!) {
     json
     createdAt
     updatedAt
+    community {
+      id
+    }
     nftToken {
       id
       address

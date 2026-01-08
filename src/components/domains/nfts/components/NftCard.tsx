@@ -9,6 +9,7 @@ export type NftCardData = {
   name?: string | null;
   imageUrl?: string | null;
   instanceId?: string | null;
+  communityId?: string | null;
 };
 
 interface NftCardProps {
@@ -25,7 +26,7 @@ export const NftCard = ({ nftInstance, isCarousel = false }: NftCardProps) => {
     >
       <Card className="w-full h-[100px] overflow-hidden relative">
         <Image
-          src={getNftImageUrl(nftInstance.imageUrl, nftInstance.instanceId)}
+          src={getNftImageUrl(nftInstance.imageUrl, nftInstance.instanceId, nftInstance.communityId)}
           alt={nftInstance.name ?? ""}
           width={400}
           height={400}

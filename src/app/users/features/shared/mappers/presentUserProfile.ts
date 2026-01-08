@@ -39,6 +39,7 @@ export function presentUserProfile(
     name: edge.node.name ?? "",
     imageUrl: edge.node.imageUrl ?? undefined,
     instanceId: edge.node.instanceId ?? undefined,
+    communityId: edge.node.community?.id ?? undefined,
   }));
 
   return {
