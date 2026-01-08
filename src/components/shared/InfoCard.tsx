@@ -111,7 +111,7 @@ export const InfoCard = ({
   }
 
   const renderValue = (content: React.ReactNode, className?: string) => {
-    if (internalLink && displayValue) {
+    if (internalLink) {
       return (
         <Link href={internalLink} className={`hover:underline ${className || ''}`}>
           {content}
