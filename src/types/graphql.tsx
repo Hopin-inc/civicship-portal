@@ -1079,6 +1079,7 @@ export type GqlNestedPlacesBulkUpdateInput = {
 
 export type GqlNftInstance = {
   __typename?: "NftInstance";
+  community?: Maybe<GqlCommunity>;
   createdAt: Scalars["Datetime"]["output"];
   description?: Maybe<Scalars["String"]["output"]>;
   id: Scalars["ID"]["output"];
