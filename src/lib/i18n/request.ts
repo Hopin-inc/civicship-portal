@@ -3,7 +3,7 @@ import { cookies, headers } from 'next/headers';
 import { defaultLocale, locales, type Locale } from './config';
 import { nestMessages } from './nestMessages';
 import { detectPreferredLocale } from './languageDetection';
-import { getEnabledFeaturesFromEnv } from '@/lib/communities/config';
+import { getEnabledFeaturesFromEnv } from '@/lib/communities/config-env';
 
 /**
  * メッセージをマージ（メモ化付き）

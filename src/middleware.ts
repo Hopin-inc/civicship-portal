@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getEnabledFeaturesFromEnv, getRootPathFromEnv } from "@/lib/communities/config";
+import { getEnabledFeaturesFromEnv, getRootPathFromEnv } from "@/lib/communities/config-env";
 import { detectPreferredLocale } from "@/lib/i18n/languageDetection";
 import { locales, defaultLocale } from "@/lib/i18n/config";
 
