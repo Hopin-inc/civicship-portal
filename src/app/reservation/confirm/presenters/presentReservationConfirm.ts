@@ -18,7 +18,7 @@ import {
   presenterActivitySlot,
   presenterOpportunityHost,
 } from "@/components/domains/opportunities/data/presenter";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { getCommunityIdFromEnv } from "@/lib/communities/config";
 import { QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
 import { isDateReservable } from "@/app/reservation/data/presenter/opportunitySlot";
 
@@ -54,15 +54,16 @@ export interface ReservationWallet {
  * @param data - GraphQL query result for opportunity (includes __typename fields)
  * @returns ActivityDetail object or null if data is invalid
  */
-export function presentReservationActivity(data: any): ActivityDetail | null {
+export function presentReservationActivity(data: any, communityId?: string): ActivityDetail | null {
   if (!data) return null;
 
   const { images, place, slots, articles, createdByUser } = data;
   const activitySlots = presenterActivitySlot(slots, data.id, data.feeRequired);
   const isReservable = activitySlots.some((slot) => slot.isReservable);
+  const resolvedCommunityId = communityId ?? getCommunityIdFromEnv();
 
   return {
-    communityId: COMMUNITY_ID || "",
+    communityId: resolvedCommunityId || "",
     id: data.id || "",
     title: data.title || "",
     description: data.description || "",
@@ -92,15 +93,16 @@ export function presentReservationActivity(data: any): ActivityDetail | null {
  * @param data - GraphQL query result for opportunity (includes __typename fields)
  * @returns QuestDetail object or null if data is invalid
  */
-export function presentReservationQuest(data: any): QuestDetail | null {
+export function presentReservationQuest(data: any, communityId?: string): QuestDetail | null {
   if (!data) return null;
 
   const { images, place, slots, articles, createdByUser } = data;
   const questSlots = presentQuestSlotsLocal(slots, data.id);
   const isReservable = questSlots.some((slot: QuestSlot) => slot.isReservable);
+  const resolvedCommunityId = communityId ?? getCommunityIdFromEnv();
 
   return {
-    communityId: COMMUNITY_ID || "",
+    communityId: resolvedCommunityId || "",
     id: data.id || "",
     title: data.title || "",
     description: data.description || "",

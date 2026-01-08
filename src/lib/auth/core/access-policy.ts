@@ -1,5 +1,5 @@
 import { GqlRole, GqlUser } from "@/types/graphql";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { getCommunityIdFromEnv } from "@/lib/communities/config";
 import { matchPaths } from "@/utils/path";
 import { logger } from "@/lib/logging";
 
@@ -9,7 +9,8 @@ const MANAGER_PATHS = ["/admin", "/admin/*"];
 export class AccessPolicy {
   private static getMembership(user: GqlUser | null | undefined) {
     if (!user?.memberships?.length) return null;
-    return user.memberships.find((m) => m.community?.id === COMMUNITY_ID) ?? null;
+    const communityId = getCommunityIdFromEnv();
+    return user.memberships.find((m) => m.community?.id === communityId) ?? null;
   }
 
   public static isAdminPath(pathname: string): boolean {
@@ -29,12 +30,13 @@ export class AccessPolicy {
   }
 
   public static canAccessRole(user: GqlUser | null | undefined, pathname: string): boolean {
+    const communityId = getCommunityIdFromEnv();
     logger.debug("[AUTH] AccessPolicy.canAccessRole: start", {
       pathname,
       userId: user?.id,
       hasMemberships: !!user?.memberships?.length,
       membershipsCount: user?.memberships?.length ?? 0,
-      currentCommunityId: COMMUNITY_ID,
+      currentCommunityId: communityId,
       component: "AccessPolicy",
     });
 
@@ -54,7 +56,7 @@ export class AccessPolicy {
       hasMembership: !!membership,
       membershipCommunityId: membership?.community?.id,
       membershipRole: membership?.role,
-      currentCommunityId: COMMUNITY_ID,
+      currentCommunityId: communityId,
       allMembershipIds: user.memberships?.map(m => m.community?.id) ?? [],
       component: "AccessPolicy",
     });
@@ -63,7 +65,7 @@ export class AccessPolicy {
       logger.debug("[AUTH] AccessPolicy.canAccessRole: no membership for current community", {
         pathname,
         userId: user.id,
-        currentCommunityId: COMMUNITY_ID,
+        currentCommunityId: communityId,
         result: false,
         component: "AccessPolicy",
       });
@@ -107,11 +109,12 @@ export class AccessPolicy {
   public static getFallbackPath(user: GqlUser | null | undefined): string {
     if (!user) return "/login";
     const membership = this.getMembership(user);
+    const communityId = getCommunityIdFromEnv();
     
     if (!membership) {
       logger.warn("[AUTH] user_registered but no membership", {
         userId: user.id,
-        communityId: COMMUNITY_ID,
+        communityId: communityId,
         membershipIds: user.memberships?.map(m => m.community?.id) ?? [],
         component: "AccessPolicy",
       });

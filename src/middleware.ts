@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { FeaturesType, currentCommunityConfig } from "@/lib/communities/metadata";
+import { getEnabledFeaturesFromEnv, getRootPathFromEnv } from "@/lib/communities/config";
 import { detectPreferredLocale } from "@/lib/i18n/languageDetection";
 import { locales, defaultLocale } from "@/lib/i18n/config";
+
+// Feature types for route gating
+type FeaturesType = "places" | "opportunities" | "points" | "tickets" | "articles" | "languageSwitcher";
 
 // Map features to their corresponding route paths
 const featureToRoutesMap: Partial<Record<FeaturesType, string[]>> = {
@@ -16,8 +19,8 @@ const featureToRoutesMap: Partial<Record<FeaturesType, string[]>> = {
 export function middleware(request: NextRequest) {
   const isDev = process.env.NODE_ENV !== "production";
   const pathname = request.nextUrl.pathname;
-  const enabledFeatures = currentCommunityConfig.enableFeatures || [];
-  const rootPath = currentCommunityConfig.rootPath || "/";
+  const enabledFeatures = getEnabledFeaturesFromEnv();
+  const rootPath = getRootPathFromEnv();
 
   // liff.state がある場合はrootPathへのリダイレクトをスキップ（LIFFのルーティングバグ対策）
   const hasLiffState = request.nextUrl.searchParams.get("liff.state");

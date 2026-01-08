@@ -7,11 +7,17 @@ import {
   GqlPlace,
   GqlPublishStatus,
 } from "@/types/graphql";
-import {
-  fallbackMetadata,
-  DEFAULT_OPEN_GRAPH_IMAGE,
-  currentCommunityConfig,
-} from "@/lib/communities/metadata";
+import { getCommunityConfig, getCommunityIdFromEnv } from "@/lib/communities/config";
+import { DEFAULT_ASSET_PATHS } from "@/lib/communities/constants";
+
+const DEFAULT_OPEN_GRAPH_IMAGE = [
+  {
+    url: DEFAULT_ASSET_PATHS.OG_IMAGE,
+    width: 1200,
+    height: 630,
+    alt: "Civicship",
+  },
+];
 
 export const generateMetadata = async ({
   params,
@@ -19,19 +25,30 @@ export const generateMetadata = async ({
   params: { id: string };
 }): Promise<Metadata> => {
   const id = params.id;
+  const communityId = getCommunityIdFromEnv();
+  const communityConfig = await getCommunityConfig(communityId);
   const place = await fetchPlace(id);
+  
+  const fallbackMetadata: Metadata = {
+    title: communityConfig?.title ?? "Civicship",
+    description: communityConfig?.description ?? "",
+    openGraph: {
+      images: DEFAULT_OPEN_GRAPH_IMAGE,
+    },
+  };
+  
   if (!place) return fallbackMetadata;
 
   const placeDetail = presenterPlaceDetailForMetadata(place);
 
   return {
-    title: `${placeDetail.name} | ${currentCommunityConfig.title}`,
+    title: `${placeDetail.name} | ${communityConfig?.title ?? "Civicship"}`,
     description: placeDetail.bio,
     openGraph: {
       title: placeDetail.name,
       description: placeDetail.bio,
       type: "article",
-      url: `${currentCommunityConfig.domain}/places/${id}`,
+      url: `${communityConfig?.domain ?? ""}/places/${id}`,
       images: placeDetail.images.length
         ? placeDetail.images.map((url) => ({
             url,
@@ -42,7 +59,7 @@ export const generateMetadata = async ({
         : DEFAULT_OPEN_GRAPH_IMAGE,
     },
     alternates: {
-      canonical: `${currentCommunityConfig.domain}/places/${id}`,
+      canonical: `${communityConfig?.domain ?? ""}/places/${id}`,
     },
   };
 };

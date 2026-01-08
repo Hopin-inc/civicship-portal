@@ -1,24 +1,32 @@
 import { Metadata } from "next";
-import { DEFAULT_OPEN_GRAPH_IMAGE, currentCommunityConfig } from "@/lib/communities/metadata";
+import { getCommunityConfigFromEnv, getDefaultOgImage } from "@/lib/communities/config";
 
-export const metadata: Metadata = {
-  title: `${currentCommunityConfig.title} - ログイン`,
-  description: "ログインして、あなただけの" + currentCommunityConfig.title + "を。",
-  openGraph: {
-    title: `${currentCommunityConfig.title} - ログイン`,
-    description: "ログインして、あなただけの" + currentCommunityConfig.title + "を。",
-    url: `${currentCommunityConfig.domain}/login`,
-    type: "website",
-    locale: "ja_JP",
-    images: DEFAULT_OPEN_GRAPH_IMAGE,
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: `${currentCommunityConfig.title} - ログイン`,
-    description: "ログインして、あなただけの" + currentCommunityConfig.title + "を。",
-    images: DEFAULT_OPEN_GRAPH_IMAGE,
-  },
-  alternates: {
-    canonical: `${currentCommunityConfig.domain}/login`,
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const config = await getCommunityConfigFromEnv();
+  
+  const title = config?.title || "";
+  const domain = config?.domain || "";
+  const ogImages = getDefaultOgImage(config);
+  
+  return {
+    title: `${title} - ログイン`,
+    description: `ログインして、あなただけの${title}を。`,
+    openGraph: {
+      title: `${title} - ログイン`,
+      description: `ログインして、あなただけの${title}を。`,
+      url: `${domain}/login`,
+      type: "website",
+      locale: "ja_JP",
+      images: ogImages,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${title} - ログイン`,
+      description: `ログインして、あなただけの${title}を。`,
+      images: ogImages,
+    },
+    alternates: {
+      canonical: `${domain}/login`,
+    },
+  };
+}

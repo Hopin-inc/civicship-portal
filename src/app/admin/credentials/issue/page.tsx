@@ -1,13 +1,14 @@
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { getCommunityIdFromEnv } from "@/lib/communities/config";
 import { getMembershipListServer } from "@/lib/graphql/getMembershipListServer";
 import OpportunitySelector from "../components/CredentialIssuanceWizard";
 
 export default async function SelectOpportunity() {
   let connection = null;
+  const communityId = getCommunityIdFromEnv();
 
   try {
     const result = await getMembershipListServer({
-      filter: { communityId: COMMUNITY_ID },
+      filter: { communityId },
       first: 20,
       withWallets: true,
       withDidIssuanceRequests: true,

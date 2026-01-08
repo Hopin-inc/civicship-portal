@@ -1,4 +1,5 @@
 import { cache } from "react";
+import { executeServerGraphQLQuery } from "@/lib/graphql/server";
 
 /**
  * Community portal configuration fetched from the database
@@ -39,102 +40,139 @@ export interface CommonDocumentOverridesConfig {
   privacy?: CommunityDocumentConfig;
 }
 
-/**
- * Fetch community portal config from the API
- * Uses React cache for request deduplication
- */
-export const fetchCommunityPortalConfig = cache(
-  async (communityId: string): Promise<CommunityPortalConfig | null> => {
-    const apiEndpoint = process.env.NEXT_PUBLIC_API_ENDPOINT;
-
-    if (!apiEndpoint) {
-      console.warn("NEXT_PUBLIC_API_ENDPOINT is not set");
-      return null;
+const COMMUNITY_PORTAL_CONFIG_QUERY = `
+  query CommunityPortalConfig($communityId: String!) {
+    communityPortalConfig(communityId: $communityId) {
+      communityId
+      tokenName
+      title
+      description
+      shortDescription
+      domain
+      faviconPrefix
+      logoPath
+      squareLogoPath
+      ogImagePath
+      enableFeatures
+      rootPath
+      adminRootPath
+      documents {
+        id
+        title
+        path
+        type
+        order
+      }
+      commonDocumentOverrides {
+        terms {
+          id
+          title
+          path
+          type
+          order
+        }
+        privacy {
+          id
+          title
+          path
+          type
+          order
+        }
+      }
+      regionName
+      regionKey
+      liffId
+      liffBaseUrl
+      firebaseTenantId
     }
+  }
+`;
 
+interface CommunityPortalConfigResponse {
+  communityPortalConfig: CommunityPortalConfig | null;
+}
+
+/**
+ * Get community portal config from the database
+ * Uses React cache for request deduplication within a single request
+ */
+export const getCommunityConfig = cache(
+  async (communityId: string): Promise<CommunityPortalConfig | null> => {
     try {
-      const response = await fetch(`${apiEndpoint}/graphql`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const data = await executeServerGraphQLQuery<CommunityPortalConfigResponse>(
+        COMMUNITY_PORTAL_CONFIG_QUERY,
+        { communityId },
+        {
+          "X-Community-Id": communityId,
         },
-        body: JSON.stringify({
-          query: `
-            query GetCommunityPortalConfig($communityId: String!) {
-              communityPortalConfig(communityId: $communityId) {
-                communityId
-                tokenName
-                title
-                description
-                shortDescription
-                domain
-                faviconPrefix
-                logoPath
-                squareLogoPath
-                ogImagePath
-                enableFeatures
-                rootPath
-                adminRootPath
-                documents {
-                  id
-                  title
-                  path
-                  type
-                  order
-                }
-                commonDocumentOverrides {
-                  terms {
-                    id
-                    title
-                    path
-                    type
-                  }
-                  privacy {
-                    id
-                    title
-                    path
-                    type
-                  }
-                }
-                regionName
-                regionKey
-                liffId
-                liffBaseUrl
-                firebaseTenantId
-              }
-            }
-          `,
-          variables: { communityId },
-        }),
-        next: { revalidate: 60 }, // Cache for 60 seconds
-      });
+      );
 
-      if (!response.ok) {
-        console.warn(`Failed to fetch community portal config: ${response.status}`);
-        return null;
-      }
-
-      const result = await response.json();
-
-      if (result.errors) {
-        console.warn("GraphQL errors:", result.errors);
-        return null;
-      }
-
-      return result.data?.communityPortalConfig ?? null;
+      return data.communityPortalConfig;
     } catch (error) {
-      console.warn("Error fetching community portal config:", error);
+      console.error(`Failed to fetch community config for ${communityId}:`, error);
       return null;
     }
   },
 );
 
 /**
- * Get community portal config with fallback to null
- * This is a server-side function that should be called in Server Components or API routes
+ * Get community portal config or throw an error if not found
  */
-export async function getCommunityPortalConfig(
-  communityId: string,
-): Promise<CommunityPortalConfig | null> {
-  return fetchCommunityPortalConfig(communityId);
+export async function getCommunityConfigOrThrow(communityId: string): Promise<CommunityPortalConfig> {
+  const config = await getCommunityConfig(communityId);
+  if (!config) {
+    throw new Error(`Community config not found for ${communityId}`);
+  }
+  return config;
+}
+
+/**
+ * Get community ID from environment variable
+ */
+export function getCommunityIdFromEnv(): string {
+  const communityId = process.env.NEXT_PUBLIC_COMMUNITY_ID;
+  if (!communityId) {
+    console.warn("NEXT_PUBLIC_COMMUNITY_ID is not set, using 'default'");
+    return "default";
+  }
+  return communityId;
+}
+
+/**
+ * Get enabled features from environment variable
+ * Used in middleware and i18n where React context is not available
+ */
+export function getEnabledFeaturesFromEnv(): string[] {
+  const features = process.env.NEXT_PUBLIC_ENABLE_FEATURES;
+  if (!features) {
+    return [];
+  }
+  return features.split(",").map((f) => f.trim()).filter(Boolean);
+}
+
+/**
+ * Get root path from environment variable
+ * Used in middleware where React context is not available
+ */
+export function getRootPathFromEnv(): string {
+  return process.env.NEXT_PUBLIC_ROOT_PATH || "/";
+}
+
+/**
+ * Get default OG image for a community config
+ */
+export function getDefaultOgImage(config: CommunityPortalConfig | null): string[] {
+  if (!config) {
+    return [];
+  }
+  return config.ogImagePath ? [config.ogImagePath] : [];
+}
+
+/**
+ * Get community config using the environment variable community ID
+ * Convenience function for server components
+ */
+export async function getCommunityConfigFromEnv(): Promise<CommunityPortalConfig | null> {
+  const communityId = getCommunityIdFromEnv();
+  return getCommunityConfig(communityId);
 }

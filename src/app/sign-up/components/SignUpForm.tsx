@@ -22,7 +22,7 @@ import { toast } from "react-toastify";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { logger } from "@/lib/logging";
-import { currentCommunityConfig } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { useCreateUser } from "@/hooks/auth/actions/useCreateUser";
 
@@ -41,6 +41,7 @@ export function SignUpForm() {
   const t = useTranslations();
   const { isAuthenticated, isPhoneVerified, loading } = useAuth();
   const createUser = useCreateUser();
+  const communityConfig = useCommunityConfig();
 
   const [isLoading, setIsLoading] = useState(false);
   const firebaseUser = useAuthStore((s) => s.state.firebaseUser);
@@ -120,7 +121,7 @@ export function SignUpForm() {
             )}
           />
 
-          {currentCommunityConfig.enableFeatures.includes("prefectures") && (
+          {communityConfig?.enableFeatures?.includes("prefectures") && (
             <FormField
               control={form.control}
               name="prefecture"

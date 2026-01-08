@@ -1,24 +1,32 @@
 import { Metadata } from "next";
-import { DEFAULT_OPEN_GRAPH_IMAGE, currentCommunityConfig } from "@/lib/communities/metadata";
+import { getCommunityConfigFromEnv, getDefaultOgImage } from "@/lib/communities/config";
 
-export const metadata: Metadata = {
-  title: `${currentCommunityConfig.title} - チケット`,
-  description: "これからの体験で使えるチケットを、こちらで確認できます。",
-  openGraph: {
-    title: `${currentCommunityConfig.title} - チケット`,
+export async function generateMetadata(): Promise<Metadata> {
+  const config = await getCommunityConfigFromEnv();
+  
+  const title = config?.title || "";
+  const domain = config?.domain || "";
+  const ogImages = getDefaultOgImage(config);
+  
+  return {
+    title: `${title} - チケット`,
     description: "これからの体験で使えるチケットを、こちらで確認できます。",
-    url: `${currentCommunityConfig.domain}/tickets`,
-    type: "website",
-    locale: "ja_JP",
-    images: DEFAULT_OPEN_GRAPH_IMAGE,
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: `${currentCommunityConfig.title} - チケット`,
-    description: "これからの体験で使えるチケットを、こちらで確認できます。",
-    images: DEFAULT_OPEN_GRAPH_IMAGE,
-  },
-  alternates: {
-    canonical: `${currentCommunityConfig.domain}/tickets`,
-  },
-};
+    openGraph: {
+      title: `${title} - チケット`,
+      description: "これからの体験で使えるチケットを、こちらで確認できます。",
+      url: `${domain}/tickets`,
+      type: "website",
+      locale: "ja_JP",
+      images: ogImages,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${title} - チケット`,
+      description: "これからの体験で使えるチケットを、こちらで確認できます。",
+      images: ogImages,
+    },
+    alternates: {
+      canonical: `${domain}/tickets`,
+    },
+  };
+}
