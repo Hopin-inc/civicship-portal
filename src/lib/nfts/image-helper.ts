@@ -1,5 +1,9 @@
 import { PLACEHOLDER_IMAGE } from "@/utils";
 
+const IZU_COMMUNITY_ID = "izu";
+const IZU_NFT_ID_RANGE_START = 0;
+const IZU_NFT_ID_RANGE_END = 80;
+
 /**
  * NFT画像のURLを取得する
  * izuコミュニティのNFTの場合、instanceIdが0-80の範囲ならローカル画像を使用
@@ -10,11 +14,11 @@ export function getNftImageUrl(
   instanceId: string | null | undefined,
   communityId: string | null | undefined,
 ): string {
-  if (communityId === "izu" && instanceId !== null && instanceId !== undefined) {
+  if (communityId === IZU_COMMUNITY_ID && instanceId) {
     const imageNumber = parseInt(instanceId, 10);
     // 0-80の範囲ならローカル画像を使用 (1.jpg - 81.jpg)
-    if (!isNaN(imageNumber) && imageNumber >= 0 && imageNumber <= 80) {
-      return `/communities/izu/nfts/${imageNumber + 1}.jpg`;
+    if (!isNaN(imageNumber) && imageNumber >= IZU_NFT_ID_RANGE_START && imageNumber <= IZU_NFT_ID_RANGE_END) {
+      return `/communities/${IZU_COMMUNITY_ID}/nfts/${imageNumber + 1}.jpg`;
     }
   }
   // それ以外は元のimageUrlを使用
