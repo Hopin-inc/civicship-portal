@@ -50,6 +50,7 @@ export default function SignupBonusSettingsPage() {
       title: t("adminWallet.settings.title"),
       showBackButton: true,
       backTo: "/admin/wallet",
+      showLogo: false,
     }),
     [t]
   );
@@ -88,7 +89,7 @@ export default function SignupBonusSettingsPage() {
                       points: config?.bonusPoint ?? 0,
                     })}
                   </span>
-                  <Badge variant={config?.isEnabled ? "default" : "secondary"}>
+                  <Badge variant={config?.isEnabled ? "secondary" : "primary"}>
                     {config?.isEnabled
                       ? t("adminWallet.settings.signupBonus.statusEnabled")
                       : t("adminWallet.settings.signupBonus.statusDisabled")}

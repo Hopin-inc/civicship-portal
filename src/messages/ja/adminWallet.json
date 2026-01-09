@@ -28,7 +28,7 @@
 
   "adminWallet.buttons.settings": "特典設定",
 
-  "adminWallet.settings.title": "おもてなし設定",
+  "adminWallet.settings.title": "特典設定",
   "adminWallet.settings.signupBonus.title": "新規加入特典",
   "adminWallet.settings.signupBonus.points": "{points} pt",
   "adminWallet.settings.signupBonus.statusEnabled": "自動配布中",

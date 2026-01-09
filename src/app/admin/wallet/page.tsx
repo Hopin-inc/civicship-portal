@@ -37,13 +37,13 @@ export default function WalletPage() {
       backTo: "/admin",
       action: (
         <Button
-          variant="ghost"
-          size="icon"
+          variant="tertiary"
+          size="sm"
           onClick={() => router.push("/admin/wallet/settings")}
-          className="rounded-full"
           disabled={currentUserRole !== GqlRole.Owner}
         >
-          <Settings className="w-5 h-5" />
+          <Settings className="w-4 h-4" />
+          {t("adminWallet.buttons.settings")}
         </Button>
       ),
     }),
