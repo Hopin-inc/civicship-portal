@@ -4,7 +4,7 @@ import Link from "next/link";
 import { RefObject } from "react";
 import { ParticipantsList } from "@/components/shared/ParticipantsList";
 import { PortfolioCardViewModel } from "../../presenters/viewModels";
-import { PLACEHOLDER_IMAGE } from "@/utils";
+import { PLACEHOLDER_IMAGE, FALLBACK_IMAGE } from "@/utils";
 import { useTranslations } from "next-intl";
 
 type PortfolioCardProps = {
@@ -32,7 +32,7 @@ export const PortfolioCard = ({ viewModel, isLast, lastRef }: PortfolioCardProps
             sizes="(min-width: 640px) 50vw, 100vw"
             onError={(e) => {
               const img = e.target as HTMLImageElement;
-              img.src = PLACEHOLDER_IMAGE;
+              img.src = FALLBACK_IMAGE;
             }}
           />
           {viewModel.showShield ? (

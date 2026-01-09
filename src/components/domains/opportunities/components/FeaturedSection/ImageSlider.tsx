@@ -3,7 +3,7 @@
 import useEmblaCarousel from "embla-carousel-react";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
-import { PLACEHOLDER_IMAGE } from "@/utils";
+import { PLACEHOLDER_IMAGE, FALLBACK_IMAGE } from "@/utils";
 
 type Props = {
   images: string[];
@@ -84,7 +84,7 @@ export default function OpportunityImageSlider({
                 className="object-cover"
                 onError={(e) => {
                   const img = e.target as HTMLImageElement;
-                  img.src = PLACEHOLDER_IMAGE;
+                  img.src = FALLBACK_IMAGE;
                 }}
               />
             </div>

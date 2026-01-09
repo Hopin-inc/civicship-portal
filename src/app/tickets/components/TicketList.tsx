@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Ticket as TicketIcon } from "lucide-react";
 import { TicketClaimLink } from "@/app/tickets/data/type";
 import React from "react";
-import { PLACEHOLDER_IMAGE } from "@/utils";
+import { PLACEHOLDER_IMAGE, FALLBACK_IMAGE } from "@/utils";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -30,7 +30,7 @@ export default function TicketList({ tickets }: TicketListProps) {
                   className="object-cover"
                   onError={ (e) => {
                     const img = e.target as HTMLImageElement;
-                    img.src = PLACEHOLDER_IMAGE;
+                    img.src = FALLBACK_IMAGE;
                   } }
                 />
               </div>

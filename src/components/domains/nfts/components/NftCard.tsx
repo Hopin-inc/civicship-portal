@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { PLACEHOLDER_IMAGE } from "@/utils";
+import { PLACEHOLDER_IMAGE, FALLBACK_IMAGE } from "@/utils";
 import { Card } from "@/components/ui/card";
 import { getNftImageUrl } from "@/lib/nfts/image-helper";
 
@@ -37,7 +37,7 @@ export const NftCard = ({ nftInstance, isCarousel = false }: NftCardProps) => {
           className="h-full w-full object-cover"
           onError={(e) => {
             const img = e.target as HTMLImageElement;
-            img.src = PLACEHOLDER_IMAGE;
+            img.src = FALLBACK_IMAGE;
           }}
         />
       </Card>

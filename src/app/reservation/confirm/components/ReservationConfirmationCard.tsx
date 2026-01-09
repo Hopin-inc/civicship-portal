@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import React, { useCallback, useState } from "react";
-import { PLACEHOLDER_IMAGE } from "@/utils";
+import { PLACEHOLDER_IMAGE, FALLBACK_IMAGE } from "@/utils";
 import { GqlOpportunityCategory } from "@/types/graphql";
 import { displayDuration } from "@/utils/date";
 import { Button } from "@/components/ui/button";
@@ -57,7 +57,7 @@ export const ReservationConfirmationCard = ({
                 className="object-cover rounded-lg"
                 onError={(e) => {
                   const img = e.target as HTMLImageElement;
-                  img.src = PLACEHOLDER_IMAGE;
+                  img.src = FALLBACK_IMAGE;
                 }}
               />
             </div>

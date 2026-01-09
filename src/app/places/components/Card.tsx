@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
-import { PLACEHOLDER_IMAGE } from "@/utils";
+import { PLACEHOLDER_IMAGE, FALLBACK_IMAGE } from "@/utils";
 import { MapPin, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { IPlaceCard } from "@/app/places/data/type";
@@ -31,7 +31,7 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place, selected, buttonVariant = 
           sizes="(max-width: 768px) 100vw, 320px"
           onError={(e) => {
             const img = e.target as HTMLImageElement;
-            img.src = PLACEHOLDER_IMAGE;
+            img.src = FALLBACK_IMAGE;
           }}
         />
       </div>

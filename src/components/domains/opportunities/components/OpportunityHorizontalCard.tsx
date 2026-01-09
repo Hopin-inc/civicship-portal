@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { JapaneseYenIcon, MapPin } from "lucide-react";
 import React from "react";
-import { PLACEHOLDER_IMAGE } from "@/utils";
+import { PLACEHOLDER_IMAGE, FALLBACK_IMAGE } from "@/utils";
 
 type Props = {
   title: string;
@@ -43,7 +43,7 @@ function OpportunityHorizontalCard({ title, image, imageAlt, badge, price, locat
               className="object-cover rounded-lg"
               onError={(e) => {
                 const img = e.target as HTMLImageElement;
-                img.src = PLACEHOLDER_IMAGE;
+                img.src = FALLBACK_IMAGE;
               }}
             />
           </div>

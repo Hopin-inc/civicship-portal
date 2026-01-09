@@ -7,7 +7,7 @@ import { TArticleCard, TArticleWithAuthor } from "@/app/articles/data/type";
 import { Card } from "@/components/ui/card";
 import CategoryBadge from "@/app/articles/components/CategoryBadge";
 import { Calendar } from "lucide-react";
-import { PLACEHOLDER_IMAGE } from "@/utils";
+import { PLACEHOLDER_IMAGE, FALLBACK_IMAGE } from "@/utils";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 
@@ -37,7 +37,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, showCategory, showUs
               className="object-cover rounded-t-lg"
               onError={(e) => {
                 const img = e.target as HTMLImageElement;
-                img.src = PLACEHOLDER_IMAGE;
+                img.src = FALLBACK_IMAGE;
               }}
             />
           </div>

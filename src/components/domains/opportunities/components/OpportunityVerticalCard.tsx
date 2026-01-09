@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
-import { PLACEHOLDER_IMAGE } from "@/utils";
+import { PLACEHOLDER_IMAGE, FALLBACK_IMAGE } from "@/utils";
 import { JapaneseYenIcon, MapPin } from "lucide-react";
 import React from "react";
 import { cn } from "@/lib/utils";
@@ -82,7 +82,7 @@ export default function OpportunityVerticalCard({
           className="h-full w-full object-cover"
           onError={(e) => {
             const img = e.target as HTMLImageElement;
-            img.src = PLACEHOLDER_IMAGE;
+            img.src = FALLBACK_IMAGE;
           }}
         />
       </Card>
