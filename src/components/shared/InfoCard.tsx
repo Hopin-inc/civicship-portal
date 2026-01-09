@@ -1,5 +1,5 @@
 import { Card, CardHeader } from "@/components/ui/card";
-import { Copy, Info, ExternalLink } from "lucide-react";
+import { Copy, Info, ExternalLink, ChevronRight } from "lucide-react";
 import { toast } from "react-toastify";
 import { truncateText, shortenMiddle } from "@/utils/stringUtils";
 import { InfoCardProps } from "@/types";
@@ -113,8 +113,9 @@ export const InfoCard = ({
   const renderValue = (content: React.ReactNode, className?: string) => {
     if (internalLink) {
       return (
-        <Link href={internalLink} className={`hover:underline ${className || ''}`}>
+        <Link href={internalLink} className={`flex items-center gap-1 hover:underline ${className || ''}`}>
           {content}
+          <ChevronRight className="w-4 h-4 flex-shrink-0" />
         </Link>
       );
     }
