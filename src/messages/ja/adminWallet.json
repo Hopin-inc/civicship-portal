@@ -24,5 +24,21 @@
   "adminWallet.issue.success": "ポイントを発行しました",
 
   "adminWallet.common.notSet": "未設定",
-  "adminWallet.common.toConfirm": "要確認"
+  "adminWallet.common.toConfirm": "要確認",
+
+  "adminWallet.buttons.settings": "特典設定",
+
+  "adminWallet.settings.title": "おもてなし設定",
+  "adminWallet.settings.signupBonus.title": "新規加入特典",
+  "adminWallet.settings.signupBonus.points": "{points} pt",
+  "adminWallet.settings.signupBonus.statusEnabled": "自動配布中",
+  "adminWallet.settings.signupBonus.statusDisabled": "停止中",
+  "adminWallet.settings.signupBonus.edit": "編集",
+
+  "adminWallet.settings.signupBonus.form.title": "新規加入特典の編集",
+  "adminWallet.settings.signupBonus.form.pointsLabel": "贈呈ポイント数",
+  "adminWallet.settings.signupBonus.form.messageLabel": "ウェルカムメッセージ（LINE通知）",
+  "adminWallet.settings.signupBonus.form.enabledLabel": "自動配布を有効にする",
+  "adminWallet.settings.signupBonus.form.submit": "保存する",
+  "adminWallet.settings.signupBonus.form.success": "設定を保存しました"
 }

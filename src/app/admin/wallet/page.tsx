@@ -7,7 +7,7 @@ import { useAuth } from "@/contexts/AuthProvider";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import WalletCard from "@/components/shared/WalletCard";
 import { GqlMembership, GqlRole, GqlWallet, useGetCommunityWalletQuery } from "@/types/graphql";
-import { Coins, Gift } from "lucide-react";
+import { Coins, Gift, Settings } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
 import useCommunityTransactions from "@/app/admin/wallet/hooks/useCommunityTransactions";
@@ -25,6 +25,7 @@ export default function WalletPage() {
     (m: GqlMembership) => m.community?.id === communityId,
   )?.role;
 
+  const router = useRouter();
   const searchParams = useSearchParams();
   const shouldRefresh = searchParams.get("refresh") === "true";
 
@@ -34,12 +35,21 @@ export default function WalletPage() {
       showLogo: false,
       showBackButton: true,
       backTo: "/admin",
+      action: (
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => router.push("/admin/wallet/settings")}
+          className="rounded-full"
+          disabled={currentUserRole !== GqlRole.Owner}
+        >
+          <Settings className="w-5 h-5" />
+        </Button>
+      ),
     }),
-    [t],
+    [t, router, currentUserRole],
   );
   useHeaderConfig(headerConfig);
-
-  const router = useRouter();
   const handleNavigateToIssue = () => router.push("/admin/wallet/issue");
   const handleNavigateToGrant = () =>
     router.push(`/admin/wallet/grant?currentPoint=${currentPoint}&tab=history`);

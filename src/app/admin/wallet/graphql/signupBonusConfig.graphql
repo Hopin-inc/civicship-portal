@@ -1,0 +1,20 @@
+query GetSignupBonusConfig($communityId: ID!) {
+  community(id: $communityId) {
+    id
+    config {
+      signupBonusConfig {
+        bonusPoint
+        isEnabled
+        message
+      }
+    }
+  }
+}
+
+mutation UpdateSignupBonusConfig($input: UpdateSignupBonusConfigInput!) {
+  updateSignupBonusConfig(input: $input) {
+    bonusPoint
+    isEnabled
+    message
+  }
+}
