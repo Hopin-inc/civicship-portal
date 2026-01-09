@@ -2,10 +2,10 @@
 
 import { ActivityCard, QuestCard } from "@/components/domains/opportunities/types";
 import Link from "next/link";
-import Image from "next/image";
+import { SafeImage } from "@/components/ui/safe-image";
 import { JapaneseYenIcon, MapPin } from "lucide-react";
 import React from "react";
-import { PLACEHOLDER_IMAGE, FALLBACK_IMAGE } from "@/utils";
+import { PLACEHOLDER_IMAGE } from "@/utils";
 
 type Props = {
   title: string;
@@ -33,7 +33,7 @@ function OpportunityHorizontalCard({ title, image, imageAlt, badge, price, locat
           }`}
         >
           <div className="relative h-[108px] w-[88px] flex-shrink-0">
-            <Image
+            <SafeImage
               src={image ?? PLACEHOLDER_IMAGE}
               alt={imageAlt ?? title}
               fill
@@ -41,10 +41,7 @@ function OpportunityHorizontalCard({ title, image, imageAlt, badge, price, locat
               blurDataURL={PLACEHOLDER_IMAGE}
               loading="lazy"
               className="object-cover rounded-lg"
-              onError={(e) => {
-                const img = e.target as HTMLImageElement;
-                img.src = FALLBACK_IMAGE;
-              }}
+              fallbackSrc={PLACEHOLDER_IMAGE}
             />
           </div>
           <div className="flex-1 px-4 py-3">

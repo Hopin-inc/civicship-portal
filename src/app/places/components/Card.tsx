@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardTitle } from "@/components/ui/card";
-import Image from "next/image";
-import { PLACEHOLDER_IMAGE, FALLBACK_IMAGE } from "@/utils";
+import { SafeImage } from "@/components/ui/safe-image";
+import { PLACEHOLDER_IMAGE } from "@/utils";
 import { MapPin, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { IPlaceCard } from "@/app/places/data/type";
@@ -21,18 +21,15 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place, selected, buttonVariant = 
       }`}
     >
       <div className="relative h-32 rounded-t-lg overflow-hidden">
-        <Image
+        <SafeImage
           src={place.image ?? PLACEHOLDER_IMAGE}
           alt={place.headline}
           className="object-cover"
           fill
-          placeholder={`blur`}
+          placeholder="blur"
           blurDataURL={PLACEHOLDER_IMAGE}
           sizes="(max-width: 768px) 100vw, 320px"
-          onError={(e) => {
-            const img = e.target as HTMLImageElement;
-            img.src = FALLBACK_IMAGE;
-          }}
+          fallbackSrc={PLACEHOLDER_IMAGE}
         />
       </div>
       <CardContent className="flex flex-col px-4 py-3 w-full">

@@ -1,9 +1,9 @@
 "use client";
 
 import useEmblaCarousel from "embla-carousel-react";
-import Image from "next/image";
+import { SafeImage } from "@/components/ui/safe-image";
 import { useCallback, useEffect, useState } from "react";
-import { PLACEHOLDER_IMAGE, FALLBACK_IMAGE } from "@/utils";
+import { PLACEHOLDER_IMAGE } from "@/utils";
 
 type Props = {
   images: string[];
@@ -72,7 +72,7 @@ export default function OpportunityImageSlider({
         <div className="embla__container h-full">
           {slides.map((img, i) => (
             <div key={i} className="embla__slide relative w-full aspect-[3/2] flex-[0_0_100%]">
-              <Image
+              <SafeImage
                 src={img ?? PLACEHOLDER_IMAGE}
                 alt={`${title} - ${i + 1}`}
                 fill
@@ -82,10 +82,7 @@ export default function OpportunityImageSlider({
                 placeholder="blur"
                 blurDataURL={PLACEHOLDER_IMAGE}
                 className="object-cover"
-                onError={(e) => {
-                  const img = e.target as HTMLImageElement;
-                  img.src = FALLBACK_IMAGE;
-                }}
+                fallbackSrc={PLACEHOLDER_IMAGE}
               />
             </div>
           ))}
