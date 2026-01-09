@@ -38,6 +38,8 @@ export default function AdminNftsPage() {
         id: node.id,
         name: node.name,
         imageUrl: node.imageUrl,
+        instanceId: node.instanceId,
+        communityId: node.community?.id,
         createdAt: node.createdAt.toString(),
         nftWallet: node.nftWallet
           ? {

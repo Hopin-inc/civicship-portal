@@ -21,6 +21,9 @@ export const GET_CURRENT_USER_PROFILE = gql`
               name
               imageUrl
               createdAt
+              community {
+                id
+              }
             }
           }
         }

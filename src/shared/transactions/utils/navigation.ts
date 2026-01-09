@@ -63,3 +63,11 @@ export const computeProfileHref = (
 
   return null;
 };
+
+/**
+ * Computes the transaction detail href for a transaction card click.
+ * Returns /transactions/{transactionId}.
+ */
+export const computeTransactionHref = (transactionId: string): string => {
+  return `/transactions/${transactionId}`;
+};

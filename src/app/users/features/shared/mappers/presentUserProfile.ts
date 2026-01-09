@@ -40,6 +40,8 @@ export function presentUserProfile(
     id: edge.node.id,
     name: edge.node.name ?? "",
     imageUrl: edge.node.imageUrl ?? undefined,
+    instanceId: edge.node.instanceId ?? undefined,
+    communityId: edge.node.community?.id,
   }));
 
   return {

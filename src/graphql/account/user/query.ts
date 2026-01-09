@@ -42,6 +42,9 @@ export const GET_USER_FLEXIBLE = gql`
             imageUrl
             name
             createdAt
+            community {
+              id
+            }
           }
         }
       }

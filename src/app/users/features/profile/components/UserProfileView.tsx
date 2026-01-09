@@ -46,10 +46,10 @@ export function UserProfileView({ viewModel, isOwner }: UserProfileViewProps) {
 
       {viewModel.nftInstances && viewModel.nftInstances.length > 0 && (
         <section className="py-6 mt-0">
-          <h2 className="text-display-sm font-semibold text-foreground pt-4 pb-1">
+          <h2 className="text-body-md font-semibold text-foreground pt-4">
             {t("users.profileView.certificatesTitle")}
           </h2>
-          <div className="mt-4">
+          <div className="mt-2">
             <CardCarousel>
               {viewModel.nftInstances.map((nft) => (
                 <NftCard key={nft.id} nftInstance={nft} isCarousel />

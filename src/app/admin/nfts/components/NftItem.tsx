@@ -4,11 +4,14 @@ import { Item, ItemContent, ItemFooter, ItemTitle } from "@/components/ui/item";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { PLACEHOLDER_IMAGE } from "@/utils";
+import { getNftImageUrl } from "@/lib/nfts/image-helper";
 
 export interface NftItemData {
   id: string;
   name?: string | null;
   imageUrl?: string | null;
+  instanceId?: string | null;
+  communityId?: string | null;
   createdAt: string;
   nftWallet?: {
     user: {
@@ -22,8 +25,7 @@ interface NftItemProps {
 }
 
 export function NftItem({ nftInstance }: NftItemProps) {
-  const hasImage = !!nftInstance.imageUrl;
-  const imageUrl = hasImage ? nftInstance.imageUrl : PLACEHOLDER_IMAGE;
+  const imageUrl = getNftImageUrl(nftInstance.imageUrl, nftInstance.instanceId, nftInstance.communityId);
   const userName = nftInstance.nftWallet?.user?.name || "不明";
 
   // 配布日をフォーマット (YYYY/MM/DD形式)

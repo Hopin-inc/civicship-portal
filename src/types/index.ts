@@ -27,6 +27,7 @@ export interface InfoCardProps {
     url: string;
     text: string;
   };
+  internalLink?: string;
   isWarning?: boolean;
   warningText?: string;
   secondaryValue?: string;
@@ -35,4 +36,7 @@ export interface InfoCardProps {
   truncatePattern?: 'middle' | 'end';
   truncateHead?: number;
   truncateTail?: number;
+  valueAlign?: 'left' | 'right';
+  layout?: 'horizontal' | 'vertical';
+  fallbackText?: string;
 }

@@ -16,17 +16,19 @@ export const ActiveOpportunitiesSection = ({ opportunities }: ActiveOpportunitie
 
   return (
     <div>
-      <div className="flex items-center gap-x-2">
-        <h2 className="text-display-sm font-semibold text-foreground">{t("users.portfolio.header.activeOpportunities")}</h2>
+      <div className="flex items-center gap-x-1">
+        <h2 className="text-body-md font-semibold text-foreground">
+          {t("users.portfolio.header.activeOpportunities")}
+        </h2>
         <span className="bg-primary text-primary-foreground text-xs font-medium px-2 py-0.5 rounded-full">
           {opportunities.length}
         </span>
       </div>
       <div className="relative">
-        <div className="overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide">
+        <div className="overflow-x-auto -mx-4 px-4 scrollbar-hide">
           <div className="flex gap-4">
             {opportunities.map((opportunity) => (
-              <OpportunityVerticalCard key={opportunity.id} {...opportunity} />
+              <OpportunityVerticalCard key={opportunity.id} {...opportunity} size="sm" />
             ))}
           </div>
         </div>
