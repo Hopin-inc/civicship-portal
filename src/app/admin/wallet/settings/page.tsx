@@ -82,20 +82,18 @@ export default function SignupBonusSettingsPage() {
                 <ItemTitle className="text-base font-bold">
                   {t("adminWallet.settings.signupBonus.title")}
                 </ItemTitle>
-                <ItemDescription>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-2xl font-display font-bold">
-                      {t("adminWallet.settings.signupBonus.points", {
-                        points: config?.bonusPoint ?? 0,
-                      })}
-                    </span>
-                    <Badge variant={config?.isEnabled ? "default" : "secondary"}>
-                      {config?.isEnabled
-                        ? t("adminWallet.settings.signupBonus.statusEnabled")
-                        : t("adminWallet.settings.signupBonus.statusDisabled")}
-                    </Badge>
-                  </div>
-                </ItemDescription>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-2xl font-display font-bold">
+                    {t("adminWallet.settings.signupBonus.points", {
+                      points: config?.bonusPoint ?? 0,
+                    })}
+                  </span>
+                  <Badge variant={config?.isEnabled ? "default" : "secondary"}>
+                    {config?.isEnabled
+                      ? t("adminWallet.settings.signupBonus.statusEnabled")
+                      : t("adminWallet.settings.signupBonus.statusDisabled")}
+                  </Badge>
+                </div>
               </ItemContent>
               <ItemActions>
                 <EditBonusSheet currentConfig={config} onSave={() => refetch()} />

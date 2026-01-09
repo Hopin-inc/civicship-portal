@@ -75,7 +75,7 @@ export default function EditBonusSheet({ currentConfig, onSave }: EditBonusSheet
           {t("adminWallet.settings.signupBonus.edit")}
         </Button>
       </SheetTrigger>
-      <SheetContent side="bottom" className="rounded-t-3xl p-6 max-h-[80vh] overflow-y-auto">
+      <SheetContent side="bottom" className="rounded-t-3xl p-6 max-h-[80vh] overflow-y-auto w-full max-w-full">
         <SheetHeader>
           <SheetTitle>{t("adminWallet.settings.signupBonus.form.title")}</SheetTitle>
         </SheetHeader>
