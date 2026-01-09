@@ -37,6 +37,16 @@ export function handleUnauthenticatedBranch(
   const liffState = liffService.getState();
 
   if (environment === AuthEnvironment.LIFF) {
+    // LIFF initialization failed → finalize as unauthenticated
+    // This prevents infinite loading when LIFF ID is invalid or LIFF init fails
+    if (liffState.error) {
+      logger.warn("LIFF initialization failed, finalizing as unauthenticated", {
+        error: liffState.error.message,
+      });
+      finalizeAuthState("unauthenticated", undefined, setState, authStateManager);
+      return false; // 終了
+    }
+
     // 未初期化 → 継続待ち
     if (!liffState.isInitialized) {
       setState({
