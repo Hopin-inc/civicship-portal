@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getEnabledFeaturesFromEnv, getRootPathFromEnv } from "@/lib/communities/config-env";
+import { getCommunityIdFromEnv, fetchCommunityConfigForEdge } from "@/lib/communities/config-env";
 import { detectPreferredLocale } from "@/lib/i18n/languageDetection";
 import { locales, defaultLocale } from "@/lib/i18n/config";
 
@@ -16,11 +16,15 @@ const featureToRoutesMap: Partial<Record<FeaturesType, string[]>> = {
   articles: ["/articles"],
 };
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const isDev = process.env.NODE_ENV !== "production";
   const pathname = request.nextUrl.pathname;
-  const enabledFeatures = getEnabledFeaturesFromEnv();
-  const rootPath = getRootPathFromEnv();
+  
+  // Fetch config from server-side API
+  const communityId = getCommunityIdFromEnv();
+  const config = await fetchCommunityConfigForEdge(communityId);
+  const enabledFeatures = config?.enableFeatures || [];
+  const rootPath = config?.rootPath || "/";
 
   // liff.state がある場合はrootPathへのリダイレクトをスキップ（LIFFのルーティングバグ対策）
   const hasLiffState = request.nextUrl.searchParams.get("liff.state");

@@ -130,35 +130,9 @@ export async function getCommunityConfigOrThrow(communityId: string): Promise<Co
 
 /**
  * Get community ID from environment variable
+ * Re-exported from config-env.ts for convenience
  */
-export function getCommunityIdFromEnv(): string {
-  const communityId = process.env.NEXT_PUBLIC_COMMUNITY_ID;
-  if (!communityId) {
-    console.warn("NEXT_PUBLIC_COMMUNITY_ID is not set, using 'default'");
-    return "default";
-  }
-  return communityId;
-}
-
-/**
- * Get enabled features from environment variable
- * Used in middleware and i18n where React context is not available
- */
-export function getEnabledFeaturesFromEnv(): string[] {
-  const features = process.env.NEXT_PUBLIC_ENABLE_FEATURES;
-  if (!features) {
-    return [];
-  }
-  return features.split(",").map((f) => f.trim()).filter(Boolean);
-}
-
-/**
- * Get root path from environment variable
- * Used in middleware where React context is not available
- */
-export function getRootPathFromEnv(): string {
-  return process.env.NEXT_PUBLIC_ROOT_PATH || "/";
-}
+export { getCommunityIdFromEnv } from "./config-env";
 
 /**
  * Get default OG image for a community config
