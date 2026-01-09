@@ -96,7 +96,7 @@ const RootLayout = async ({
   children: React.ReactNode;
 }>) => {
   const communityId = getCommunityIdFromEnv();
-  const { user, lineAuthenticated, phoneAuthenticated } = await getUserServer();
+  const { user, lineAuthenticated, phoneAuthenticated } = await getUserServer(communityId);
 
   const locale = await getLocale();
   const messages = await getMessages();
