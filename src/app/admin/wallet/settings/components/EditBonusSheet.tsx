@@ -2,25 +2,13 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import {
-  ItemGroup,
-  Item,
-  ItemContent,
-  ItemTitle,
-  ItemActions,
-} from "@/components/ui/item";
+import { Item, ItemActions, ItemContent, ItemGroup, ItemTitle } from "@/components/ui/item";
 import { GqlCommunitySignupBonusConfig } from "@/types/graphql";
 import { gql, useMutation } from "@apollo/client";
 import { toast } from "react-toastify";
@@ -71,11 +59,14 @@ export default function EditBonusSheet({ currentConfig, onSave }: EditBonusSheet
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="outline" size="sm">
+        <Button variant="tertiary" size="sm">
           {t("adminWallet.settings.signupBonus.edit")}
         </Button>
       </SheetTrigger>
-      <SheetContent side="bottom" className="rounded-t-3xl max-w-md mx-auto p-6 max-h-[80vh] overflow-y-auto">
+      <SheetContent
+        side="bottom"
+        className="rounded-t-3xl max-w-md mx-auto p-6 max-h-[80vh] overflow-y-auto"
+      >
         <SheetHeader>
           <SheetTitle>{t("adminWallet.settings.signupBonus.form.title")}</SheetTitle>
         </SheetHeader>
