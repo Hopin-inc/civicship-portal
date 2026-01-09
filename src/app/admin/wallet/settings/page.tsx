@@ -2,21 +2,13 @@
 
 import React, { useMemo } from "react";
 import { useTranslations } from "next-intl";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import {
-  ItemGroup,
-  Item,
-  ItemContent,
-  ItemTitle,
-  ItemDescription,
-  ItemActions,
-} from "@/components/ui/item";
+import { Item, ItemContent, ItemTitle, ItemFooter } from "@/components/ui/item";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { gql, useQuery } from "@apollo/client";
 import EditBonusSheet from "./components/EditBonusSheet";
 import { GqlCommunitySignupBonusConfig } from "@/types/graphql";
+import { cn } from "@/lib/utils";
 
 const GET_SIGNUP_BONUS_CONFIG = gql`
   query GetSignupBonusConfig($communityId: ID!) {
@@ -74,35 +66,48 @@ export default function SignupBonusSettingsPage() {
   }
 
   return (
-    <div className="space-y-8 px-4 mt-6 max-w-xl mx-auto">
-      <section className="space-y-4">
-        <Card className="p-2">
-          <ItemGroup>
-            <Item size="sm">
-              <ItemContent>
-                <ItemTitle className="text-base font-bold">
-                  {t("adminWallet.settings.signupBonus.title")}
-                </ItemTitle>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-2xl font-display font-bold">
-                    {t("adminWallet.settings.signupBonus.points", {
-                      points: config?.bonusPoint ?? 0,
-                    })}
-                  </span>
-                  <Badge variant={config?.isEnabled ? "secondary" : "primary"}>
-                    {config?.isEnabled
-                      ? t("adminWallet.settings.signupBonus.statusEnabled")
-                      : t("adminWallet.settings.signupBonus.statusDisabled")}
-                  </Badge>
-                </div>
-              </ItemContent>
-              <ItemActions>
-                <EditBonusSheet currentConfig={config} onSave={() => refetch()} />
-              </ItemActions>
-            </Item>
-          </ItemGroup>
-        </Card>
-      </section>
+    <div className="p-4 max-w-2xl mx-auto">
+      <div className="flex flex-col">
+        <Item>
+          <div className="flex flex-1 flex-col min-w-0">
+            <ItemContent>
+              <ItemTitle className="font-bold text-base leading-snug">
+                {t("adminWallet.settings.signupBonus.title")}
+              </ItemTitle>
+            </ItemContent>
+
+            <ItemFooter className="mt-2">
+              <div className="text-xs text-muted-foreground flex items-center gap-2 truncate">
+                <span className="flex items-center gap-1">
+                  <span
+                    className={cn(
+                      "size-2.5 rounded-full",
+                      config?.isEnabled ? "bg-green-500" : "bg-muted-foreground"
+                    )}
+                    aria-label={
+                      config?.isEnabled
+                        ? t("adminWallet.settings.signupBonus.statusEnabled")
+                        : t("adminWallet.settings.signupBonus.statusDisabled")
+                    }
+                  />
+                  {config?.isEnabled
+                    ? t("adminWallet.settings.signupBonus.statusEnabled")
+                    : t("adminWallet.settings.signupBonus.statusDisabled")}
+                  ・
+                  {t("adminWallet.settings.signupBonus.points", {
+                    points: config?.bonusPoint ?? 0,
+                  })}
+                </span>
+              </div>
+            </ItemFooter>
+          </div>
+
+          {/* 右端の編集ボタン */}
+          <div className="shrink-0 flex items-center">
+            <EditBonusSheet currentConfig={config} onSave={() => refetch()} />
+          </div>
+        </Item>
+      </div>
     </div>
   );
 }
