@@ -5,6 +5,7 @@ import { truncateText, shortenMiddle } from "@/utils/stringUtils";
 import { InfoCardProps } from "@/types";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { cn } from "@/lib/utils";
 
 const copyToClipboard = async (text: string, label: string) => {
   try {
@@ -113,7 +114,11 @@ export const InfoCard = ({
   const renderValue = (content: React.ReactNode, className?: string) => {
     if (internalLink) {
       return (
-        <Link href={internalLink} className={`flex items-center gap-1 hover:underline ${className || ''}`}>
+        <Link
+          href={internalLink}
+          className={cn('flex items-center gap-1 hover:underline', className)}
+          aria-label={`${label}の詳細ページへ移動`}
+        >
           {content}
           <ChevronRight className="w-4 h-4 flex-shrink-0" />
         </Link>
