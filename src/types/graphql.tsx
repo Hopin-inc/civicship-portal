@@ -242,6 +242,7 @@ export type GqlCommunityConfig = {
   __typename?: "CommunityConfig";
   firebaseConfig?: Maybe<GqlCommunityFirebaseConfig>;
   lineConfig?: Maybe<GqlCommunityLineConfig>;
+  signupBonusConfig?: Maybe<GqlCommunitySignupBonusConfig>;
 };
 
 export type GqlCommunityConfigInput = {
@@ -324,6 +325,13 @@ export type GqlCommunityLineRichMenuConfig = {
 export type GqlCommunityLineRichMenuConfigInput = {
   richMenuId: Scalars["String"]["input"];
   type: GqlLineRichMenuType;
+};
+
+export type GqlCommunitySignupBonusConfig = {
+  __typename?: "CommunitySignupBonusConfig";
+  bonusPoint: Scalars["Int"]["output"];
+  isEnabled: Scalars["Boolean"]["output"];
+  message?: Maybe<Scalars["String"]["output"]>;
 };
 
 export type GqlCommunitySortInput = {
@@ -568,6 +576,30 @@ export type GqlImageInput = {
   file?: InputMaybe<Scalars["Upload"]["input"]>;
 };
 
+export const GqlIncentiveGrantFailureCode = {
+  DatabaseError: "DATABASE_ERROR",
+  InsufficientFunds: "INSUFFICIENT_FUNDS",
+  Timeout: "TIMEOUT",
+  Unknown: "UNKNOWN",
+  WalletNotFound: "WALLET_NOT_FOUND",
+} as const;
+
+export type GqlIncentiveGrantFailureCode =
+  (typeof GqlIncentiveGrantFailureCode)[keyof typeof GqlIncentiveGrantFailureCode];
+export const GqlIncentiveGrantStatus = {
+  Completed: "COMPLETED",
+  Failed: "FAILED",
+  Pending: "PENDING",
+} as const;
+
+export type GqlIncentiveGrantStatus =
+  (typeof GqlIncentiveGrantStatus)[keyof typeof GqlIncentiveGrantStatus];
+export const GqlIncentiveGrantType = {
+  Signup: "SIGNUP",
+} as const;
+
+export type GqlIncentiveGrantType =
+  (typeof GqlIncentiveGrantType)[keyof typeof GqlIncentiveGrantType];
 export const GqlLanguage = {
   En: "EN",
   Ja: "JA",
@@ -769,6 +801,11 @@ export type GqlMutation = {
   reservationCreate?: Maybe<GqlReservationCreatePayload>;
   reservationJoin?: Maybe<GqlReservationSetStatusPayload>;
   reservationReject?: Maybe<GqlReservationSetStatusPayload>;
+  /**
+   * Retry failed signup bonus grant (admin only).
+   * Automatically derives walletId, bonusPoint, message from grant and config.
+   */
+  retrySignupBonusGrant: GqlTransaction;
   storePhoneAuthToken?: Maybe<GqlStorePhoneAuthTokenPayload>;
   ticketClaim?: Maybe<GqlTicketClaimPayload>;
   ticketIssue?: Maybe<GqlTicketIssuePayload>;
@@ -778,6 +815,8 @@ export type GqlMutation = {
   transactionDonateSelfPoint?: Maybe<GqlTransactionDonateSelfPointPayload>;
   transactionGrantCommunityPoint?: Maybe<GqlTransactionGrantCommunityPointPayload>;
   transactionIssueCommunityPoint?: Maybe<GqlTransactionIssueCommunityPointPayload>;
+  /** Update signup bonus config (OWNER/MANAGER only). */
+  updateSignupBonusConfig: GqlCommunitySignupBonusConfig;
   userDeleteMe?: Maybe<GqlUserDeletePayload>;
   userSignUp?: Maybe<GqlCurrentUserPayload>;
   userUpdateMyProfile?: Maybe<GqlUserUpdateProfilePayload>;
@@ -971,6 +1010,10 @@ export type GqlMutationReservationRejectArgs = {
   permission: GqlCheckOpportunityPermissionInput;
 };
 
+export type GqlMutationRetrySignupBonusGrantArgs = {
+  grantId: Scalars["ID"]["input"];
+};
+
 export type GqlMutationStorePhoneAuthTokenArgs = {
   input: GqlStorePhoneAuthTokenInput;
   permission: GqlCheckIsSelfPermissionInput;
@@ -1014,6 +1057,10 @@ export type GqlMutationTransactionGrantCommunityPointArgs = {
 export type GqlMutationTransactionIssueCommunityPointArgs = {
   input: GqlTransactionIssueCommunityPointInput;
   permission: GqlCheckCommunityPermissionInput;
+};
+
+export type GqlMutationUpdateSignupBonusConfigArgs = {
+  input: GqlUpdateSignupBonusConfigInput;
 };
 
 export type GqlMutationUserDeleteMeArgs = {
@@ -2560,6 +2607,12 @@ export type GqlTransactionsConnection = {
   edges?: Maybe<Array<Maybe<GqlTransactionEdge>>>;
   pageInfo: GqlPageInfo;
   totalCount: Scalars["Int"]["output"];
+};
+
+export type GqlUpdateSignupBonusConfigInput = {
+  bonusPoint: Scalars["Int"]["input"];
+  isEnabled: Scalars["Boolean"]["input"];
+  message: Scalars["String"]["input"];
 };
 
 export type GqlUser = {
