@@ -59,6 +59,27 @@ export async function getUserServer(communityId?: string): Promise<{
       };
     }
 
+    // Check if user has membership in the current community
+    // If communityId is provided and user has no membership in that community,
+    // treat as unauthenticated for this community
+    if (communityId) {
+      const hasMembershipInCommunity = user.memberships?.some(
+        (m) => m.community?.id === communityId
+      );
+      if (!hasMembershipInCommunity) {
+        logger.warn("[AUTH] getUserServer: User has no membership in current community, treating as unauthenticated", {
+          communityId,
+          userId: user.id,
+          userMemberships: user.memberships?.map((m) => m.community?.id),
+        });
+        return {
+          user: null,
+          lineAuthenticated: false,
+          phoneAuthenticated: false,
+        };
+      }
+    }
+
     return {
       user,
       lineAuthenticated: true,
