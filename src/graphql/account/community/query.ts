@@ -21,4 +21,19 @@ export const GET_COMMUNITY = gql`
       name
     }
   }
+`;
+
+export const GET_SIGNUP_BONUS_CONFIG = gql`
+  query GetSignupBonusConfig($communityId: ID!) {
+    community(id: $communityId) {
+      id
+      config {
+        signupBonusConfig {
+          bonusPoint
+          isEnabled
+          message
+        }
+      }
+    }
+  }
 `; 

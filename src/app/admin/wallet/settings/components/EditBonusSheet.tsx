@@ -10,18 +10,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Item, ItemActions, ItemContent, ItemGroup, ItemTitle } from "@/components/ui/item";
 import { GqlCommunitySignupBonusConfig } from "@/types/graphql";
-import { gql, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { toast } from "react-toastify";
-
-const UPDATE_SIGNUP_BONUS_CONFIG = gql`
-  mutation UpdateSignupBonusConfig($input: UpdateSignupBonusConfigInput!) {
-    updateSignupBonusConfig(input: $input) {
-      bonusPoint
-      isEnabled
-      message
-    }
-  }
-`;
+import { UPDATE_SIGNUP_BONUS_CONFIG } from "@/graphql/account/community/mutation";
 
 interface EditBonusSheetProps {
   currentConfig?: GqlCommunitySignupBonusConfig | null;

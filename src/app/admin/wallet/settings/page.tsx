@@ -5,25 +5,11 @@ import { useTranslations } from "next-intl";
 import { Item, ItemContent, ItemTitle, ItemFooter } from "@/components/ui/item";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { gql, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import EditBonusSheet from "./components/EditBonusSheet";
 import { GqlCommunitySignupBonusConfig } from "@/types/graphql";
 import { cn } from "@/lib/utils";
-
-const GET_SIGNUP_BONUS_CONFIG = gql`
-  query GetSignupBonusConfig($communityId: ID!) {
-    community(id: $communityId) {
-      id
-      config {
-        signupBonusConfig {
-          bonusPoint
-          isEnabled
-          message
-        }
-      }
-    }
-  }
-`;
+import { GET_SIGNUP_BONUS_CONFIG } from "@/graphql/account/community/query";
 
 interface GetSignupBonusConfigData {
   community: {
