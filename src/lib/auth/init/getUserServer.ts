@@ -66,16 +66,16 @@ export async function getUserServer(communityId?: string): Promise<{
     const user: GqlUser | null = res.currentUser?.user ?? null;
     const hasPhoneIdentity = !!user?.identities?.some((i) => i.platform?.toUpperCase() === "PHONE");
 
-    // If user is null despite having a session, the session might be for a different community
-    // In this case, return lineAuthenticated: false to ensure redirect to login instead of phone verification
+    // If user is null despite having a session, the user is new and needs to sign up
+    // Return lineAuthenticated: true to allow the signup flow to proceed
     if (!user) {
-      logger.warn("[AUTH] getUserServer: Session exists but no user returned, treating as unauthenticated", {
+      logger.debug("[AUTH] getUserServer: Session exists but no user returned, user needs to sign up", {
         communityId,
         hasSession: true,
       });
       return {
         user: null,
-        lineAuthenticated: false,
+        lineAuthenticated: true,
         phoneAuthenticated: false,
       };
     }
