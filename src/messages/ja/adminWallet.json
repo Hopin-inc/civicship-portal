@@ -40,5 +40,20 @@
   "adminWallet.settings.signupBonus.form.messageLabel": "ウェルカムメッセージ（LINE通知）",
   "adminWallet.settings.signupBonus.form.enabledLabel": "自動配布を有効にする",
   "adminWallet.settings.signupBonus.form.submit": "保存する",
-  "adminWallet.settings.signupBonus.form.success": "設定を保存しました"
+  "adminWallet.settings.signupBonus.form.success": "設定を保存しました",
+
+  "adminWallet.settings.signupBonus.alert": "要確認",
+  "adminWallet.settings.signupBonus.details.allGood": "問題なく付与できています",
+  "adminWallet.settings.signupBonus.details.seeTransactions": "詳細はウォレット管理のトランザクションをご覧ください",
+
+  "adminWallet.settings.pending.title": "未完了のおもてなし",
+  "adminWallet.settings.pending.count": "{count}件",
+  "adminWallet.settings.pending.description": "残高不足等で特典が届いていないメンバーです",
+  "adminWallet.settings.pending.retry": "再試行",
+  "adminWallet.settings.pending.retrySuccess": "特典を再送しました",
+  "adminWallet.settings.pending.retryError": "再送に失敗しました",
+
+  "adminWallet.settings.pending.failureReason.INSUFFICIENT_BALANCE": "残高不足",
+  "adminWallet.settings.pending.failureReason.WALLET_NOT_FOUND": "ウォレット未作成",
+  "adminWallet.settings.pending.failureReason.unknown": "不明なエラー"
 }
