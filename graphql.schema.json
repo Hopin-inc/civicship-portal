@@ -16359,19 +16359,15 @@
               }
             ],
             "type": {
-              "kind": "NON_NULL",
+              "kind": "LIST",
               "name": null,
               "ofType": {
-                "kind": "LIST",
+                "kind": "NON_NULL",
                 "name": null,
                 "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "OBJECT",
-                    "name": "SignupBonus",
-                    "ofType": null
-                  }
+                  "kind": "OBJECT",
+                  "name": "SignupBonus",
+                  "ofType": null
                 }
               }
             },
@@ -18833,7 +18829,7 @@
               "name": null,
               "ofType": {
                 "kind": "ENUM",
-                "name": "SortOrder",
+                "name": "SortDirection",
                 "ofType": null
               }
             },
@@ -18864,30 +18860,6 @@
           {
             "name": "desc",
             "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "possibleTypes": null
-      },
-      {
-        "kind": "ENUM",
-        "name": "SortOrder",
-        "description": "Sort order",
-        "isOneOf": null,
-        "fields": null,
-        "inputFields": null,
-        "interfaces": null,
-        "enumValues": [
-          {
-            "name": "ASC",
-            "description": "Ascending order",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "DESC",
-            "description": "Descending order",
             "isDeprecated": false,
             "deprecationReason": null
           }

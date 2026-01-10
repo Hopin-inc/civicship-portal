@@ -1799,7 +1799,7 @@ export type GqlQuery = {
    * Get signup bonus grants for a community (OWNER/MANAGER only).
    * Supports filtering and sorting.
    */
-  signupBonuses: Array<GqlSignupBonus>;
+  signupBonuses?: Maybe<Array<GqlSignupBonus>>;
   states: GqlStatesConnection;
   ticket?: Maybe<GqlTicket>;
   ticketClaimLink?: Maybe<GqlTicketClaimLink>;
@@ -2303,7 +2303,7 @@ export type GqlSignupBonusSortInput = {
   /** Sort field */
   field: GqlSignupBonusSortField;
   /** Sort order */
-  order: GqlSortOrder;
+  order: GqlSortDirection;
 };
 
 export const GqlSortDirection = {
@@ -2312,15 +2312,6 @@ export const GqlSortDirection = {
 } as const;
 
 export type GqlSortDirection = (typeof GqlSortDirection)[keyof typeof GqlSortDirection];
-/** Sort order */
-export const GqlSortOrder = {
-  /** Ascending order */
-  Asc: "ASC",
-  /** Descending order */
-  Desc: "DESC",
-} as const;
-
-export type GqlSortOrder = (typeof GqlSortOrder)[keyof typeof GqlSortOrder];
 export const GqlSource = {
   External: "EXTERNAL",
   Internal: "INTERNAL",
