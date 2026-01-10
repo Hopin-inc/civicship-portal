@@ -119,8 +119,10 @@ export default function SignupBonusDetailPage() {
             <div className="text-xs text-muted-foreground">
               {t("adminWallet.settings.signupBonus.details.seeTransactions")}
             </div>
-            <Button variant="text" size="sm">
-              <Link href="/admin/wallet">ウォレット管理を見る</Link>
+            <Button variant="text" size="sm" asChild>
+              <Link href="/admin/wallet">
+                {t("adminWallet.settings.signupBonus.details.viewWallet")}
+              </Link>
             </Button>
           </div>
         </div>

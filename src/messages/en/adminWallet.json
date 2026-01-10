@@ -20,5 +20,37 @@
   "adminWallet.issue.validation.max": "Please specify 2 billion or less",
   "adminWallet.issue.success": "Points issued successfully",
   "adminWallet.common.notSet": "Not set",
-  "adminWallet.common.toConfirm": "To confirm"
+  "adminWallet.common.toConfirm": "To confirm",
+
+  "adminWallet.buttons.settings": "Bonus Settings",
+
+  "adminWallet.settings.title": "Bonus Settings",
+  "adminWallet.settings.signupBonus.title": "Sign-up Bonus",
+  "adminWallet.settings.signupBonus.points": "{points} pt granted",
+  "adminWallet.settings.signupBonus.statusEnabled": "Auto-distribution enabled",
+  "adminWallet.settings.signupBonus.statusDisabled": "Paused",
+  "adminWallet.settings.signupBonus.edit": "Edit",
+
+  "adminWallet.settings.signupBonus.form.title": "Edit Sign-up Bonus",
+  "adminWallet.settings.signupBonus.form.pointsLabel": "Points to grant",
+  "adminWallet.settings.signupBonus.form.messageLabel": "Welcome message (LINE notification)",
+  "adminWallet.settings.signupBonus.form.enabledLabel": "Enable auto-distribution",
+  "adminWallet.settings.signupBonus.form.submit": "Save",
+  "adminWallet.settings.signupBonus.form.success": "Settings saved successfully",
+
+  "adminWallet.settings.signupBonus.alert": "Attention required",
+  "adminWallet.settings.signupBonus.details.allGood": "All bonuses have been granted successfully",
+  "adminWallet.settings.signupBonus.details.seeTransactions": "Please check the transaction history",
+  "adminWallet.settings.signupBonus.details.viewWallet": "View transaction history",
+
+  "adminWallet.settings.pending.title": "Pending Bonuses",
+  "adminWallet.settings.pending.count": "{count} items",
+  "adminWallet.settings.pending.description": "Members who have not received bonuses due to insufficient balance or other reasons",
+  "adminWallet.settings.pending.retry": "Retry",
+  "adminWallet.settings.pending.retrySuccess": "Bonus resent successfully",
+  "adminWallet.settings.pending.retryError": "Failed to resend bonus",
+
+  "adminWallet.settings.pending.failureReason.INSUFFICIENT_BALANCE": "Insufficient balance",
+  "adminWallet.settings.pending.failureReason.WALLET_NOT_FOUND": "Wallet not created",
+  "adminWallet.settings.pending.failureReason.unknown": "Unknown error"
 }
