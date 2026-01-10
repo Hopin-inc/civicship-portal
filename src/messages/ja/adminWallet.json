@@ -30,7 +30,7 @@
 
   "adminWallet.settings.title": "特典設定",
   "adminWallet.settings.signupBonus.title": "新規加入特典",
-  "adminWallet.settings.signupBonus.points": "{points} pt",
+  "adminWallet.settings.signupBonus.points": "{points} pt支給",
   "adminWallet.settings.signupBonus.statusEnabled": "自動配布中",
   "adminWallet.settings.signupBonus.statusDisabled": "停止中",
   "adminWallet.settings.signupBonus.edit": "編集",
