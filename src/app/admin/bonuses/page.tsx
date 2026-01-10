@@ -1,50 +1,98 @@
 "use client";
 
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { useRouter } from "next/navigation";
-import { useMemo } from "react";
+import React, { useMemo } from "react";
+import { useTranslations } from "next-intl";
+import { Item, ItemContent, ItemTitle, ItemFooter } from "@/components/ui/item";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { Gift } from "lucide-react";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useQuery } from "@apollo/client";
+import EditBonusSheet from "./components/EditBonusSheet";
+import { GqlCommunitySignupBonusConfig } from "@/types/graphql";
+import { cn } from "@/lib/utils";
+import { GET_SIGNUP_BONUS_CONFIG } from "@/graphql/account/community/query";
 
-const bonusSettings = [
-  {
-    title: "新規加入特典",
-    href: "/admin/bonuses/signup",
-    icon: Gift,
-  },
-];
+interface GetSignupBonusConfigData {
+  community: {
+    id: string;
+    config: {
+      signupBonusConfig: GqlCommunitySignupBonusConfig | null;
+    } | null;
+  } | null;
+}
 
 export default function BonusesPage() {
-  const router = useRouter();
+  const t = useTranslations();
 
   const headerConfig = useMemo(
     () => ({
       title: "特典管理",
-      showLogo: false,
       showBackButton: true,
       backTo: "/admin",
+      showLogo: false,
     }),
-    [],
+    []
   );
   useHeaderConfig(headerConfig);
 
+  const { data, loading, refetch } = useQuery<GetSignupBonusConfigData>(
+    GET_SIGNUP_BONUS_CONFIG,
+    {
+      variables: { communityId: COMMUNITY_ID },
+    }
+  );
+
+  const config = data?.community?.config?.signupBonusConfig;
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-sm text-muted-foreground">読み込み中...</div>
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-xl mx-auto mt-8 space-y-6 px-4">
-      <div className="space-y-2">
-        {bonusSettings.map((item) => (
-          <Card
-            key={item.href}
-            onClick={() => router.push(item.href)}
-            className="cursor-pointer hover:bg-background-hover transition"
-          >
-            <CardHeader>
-              <CardTitle className="text-body-sm font-bold flex items-center space-x-2">
-                <item.icon className="w-4 h-4" />
-                <span>{item.title}</span>
-              </CardTitle>
-            </CardHeader>
-          </Card>
-        ))}
+    <div className="p-4 max-w-2xl mx-auto">
+      <div className="flex flex-col">
+        <Item>
+          <div className="flex flex-1 flex-col min-w-0">
+            <ItemContent>
+              <ItemTitle className="font-bold text-base leading-snug">
+                {t("adminWallet.settings.signupBonus.title")}
+              </ItemTitle>
+            </ItemContent>
+
+            <ItemFooter className="mt-2">
+              <div className="text-xs text-muted-foreground flex items-center gap-2 truncate">
+                <span className="flex items-center gap-1">
+                  <span
+                    className={cn(
+                      "size-2.5 rounded-full",
+                      config?.isEnabled ? "bg-green-500" : "bg-muted-foreground"
+                    )}
+                    aria-label={
+                      config?.isEnabled
+                        ? t("adminWallet.settings.signupBonus.statusEnabled")
+                        : t("adminWallet.settings.signupBonus.statusDisabled")
+                    }
+                  />
+                  {config?.isEnabled
+                    ? t("adminWallet.settings.signupBonus.statusEnabled")
+                    : t("adminWallet.settings.signupBonus.statusDisabled")}
+                  ・
+                  {t("adminWallet.settings.signupBonus.points", {
+                    points: config?.bonusPoint ?? 0,
+                  })}
+                </span>
+              </div>
+            </ItemFooter>
+          </div>
+
+          {/* 右端の編集ボタン */}
+          <div className="shrink-0 flex items-center">
+            <EditBonusSheet currentConfig={config} onSave={() => refetch()} />
+          </div>
+        </Item>
       </div>
     </div>
   );
