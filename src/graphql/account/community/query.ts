@@ -36,4 +36,25 @@ export const GET_SIGNUP_BONUS_CONFIG = gql`
       }
     }
   }
+`;
+
+export const GET_FAILED_SIGNUP_BONUSES = gql`
+  query GetFailedSignupBonuses($communityId: ID!) {
+    signupBonuses(
+      communityId: $communityId
+      filter: { status: FAILED }
+      sort: { field: LAST_ATTEMPTED_AT, order: DESC }
+    ) {
+      id
+      user {
+        id
+        name
+        image
+      }
+      failureCode
+      lastError
+      attemptCount
+      lastAttemptedAt
+    }
+  }
 `; 

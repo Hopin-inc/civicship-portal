@@ -9,3 +9,15 @@ export const UPDATE_SIGNUP_BONUS_CONFIG = gql`
     }
   }
 `;
+
+export const RETRY_SIGNUP_BONUS_GRANT = gql`
+  mutation RetrySignupBonusGrant($grantId: ID!) {
+    retrySignupBonusGrant(grantId: $grantId) {
+      success
+      error
+      transaction {
+        id
+      }
+    }
+  }
+`;
