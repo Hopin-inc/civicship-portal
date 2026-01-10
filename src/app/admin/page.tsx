@@ -37,7 +37,7 @@ const adminSettings = [
   },
   {
     title: "特典管理",
-    href: "/admin/bonuses/signup",
+    href: "/admin/bonuses",
     icon: Gift,
     requiredFeature: "points" as FeaturesType,
   },

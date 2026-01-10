@@ -20,17 +20,17 @@ interface GetSignupBonusConfigData {
   } | null;
 }
 
-export default function SignupBonusSettingsPage() {
+export default function BonusesPage() {
   const t = useTranslations();
 
   const headerConfig = useMemo(
     () => ({
-      title: t("adminWallet.settings.title"),
+      title: "特典管理",
       showBackButton: true,
       backTo: "/admin",
       showLogo: false,
     }),
-    [t]
+    []
   );
   useHeaderConfig(headerConfig);
 
