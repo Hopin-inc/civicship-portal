@@ -78,7 +78,7 @@ export default function SignupBonusDetailPage() {
       {/* Configuration Display */}
       <Item>
         <div className="flex flex-1 items-center justify-between min-w-0 gap-4">
-          <div className="text-xs text-muted-foreground flex items-center gap-2 truncate">
+          <div className="text-sm text-foreground flex items-center gap-2 truncate">
             <span className="flex items-center gap-1">
               <span
                 className={cn(
