@@ -86,7 +86,7 @@ export default function EditBonusSheet({ currentConfig, onSave }: EditBonusSheet
                 min={0}
                 className="text-2xl font-bold bg-transparent border-none focus-visible:ring-0 p-0 h-auto"
               />
-              <span className="font-bold">pt</span>
+              <span className="text-label-md">pt</span>
             </div>
           </div>
 
