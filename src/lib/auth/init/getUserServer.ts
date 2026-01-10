@@ -9,7 +9,7 @@ import { logger } from "@/lib/logging";
 import { GET_CURRENT_USER_SERVER_QUERY } from "@/graphql/account/user/server";
 import { hasServerSession, getServerCookieHeader } from "@/lib/auth/server/session";
 
-export async function getUserServer(communityId?: string): Promise<{
+export async function getUserServer(): Promise<{
   user: GqlUser | null;
   lineAuthenticated: boolean;
   phoneAuthenticated: boolean;
@@ -18,28 +18,7 @@ export async function getUserServer(communityId?: string): Promise<{
   const hasSession = await hasServerSession();
   const cookieHeader = await getServerCookieHeader();
 
-  // Check for LINE authentication cookie
-  // Note: Cookies are already isolated by subdomain (each community has its own subdomain)
-  // so community-specific cookie names are not needed
-  const lineAuthenticatedCookie = cookieStore.get("line_authenticated")?.value === "true";
   const phoneAuthenticated = cookieStore.get("phone_authenticated")?.value === "true";
-
-  logger.debug("[AUTH] getUserServer: checking auth cookies", {
-    communityId,
-    hasSession,
-    lineAuthenticatedCookie,
-    phoneAuthenticated,
-  });
-
-  // If there's no LINE auth cookie, treat as unauthenticated
-  if (!lineAuthenticatedCookie) {
-    logger.debug("[AUTH] getUserServer: no line_authenticated cookie, treating as unauthenticated");
-    return {
-      user: null,
-      lineAuthenticated: false,
-      phoneAuthenticated: false,
-    };
-  }
 
   if (!hasSession) {
     return {
@@ -49,75 +28,29 @@ export async function getUserServer(communityId?: string): Promise<{
     };
   }
 
-  const headers: Record<string, string> = {};
-  if (cookieHeader) {
-    headers.cookie = cookieHeader;
-  }
-  if (communityId) {
-    headers["X-Community-Id"] = communityId;
-  }
-
   try {
     const res = await executeServerGraphQLQuery<
       GqlCurrentUserServerQuery,
       GqlCurrentUserServerQueryVariables
-    >(GET_CURRENT_USER_SERVER_QUERY, {}, headers);
+    >(GET_CURRENT_USER_SERVER_QUERY, {}, cookieHeader ? { cookie: cookieHeader } : {});
 
     const user: GqlUser | null = res.currentUser?.user ?? null;
     const hasPhoneIdentity = !!user?.identities?.some((i) => i.platform?.toUpperCase() === "PHONE");
 
-    // If user is null despite having a session, the user is new and needs to sign up
-    // Return lineAuthenticated: true to allow the signup flow to proceed
-    if (!user) {
-      logger.debug("[AUTH] getUserServer: Session exists but no user returned, user needs to sign up", {
-        communityId,
-        hasSession: true,
-      });
-      return {
-        user: null,
-        lineAuthenticated: true,
-        phoneAuthenticated: false,
-      };
-    }
-
-    // Check if user has membership in the current community
-    // If communityId is provided and user has no membership in that community,
-    // treat as unauthenticated for this community
-    if (communityId) {
-      const hasMembershipInCommunity = user.memberships?.some(
-        (m) => m.community?.id === communityId
-      );
-      if (!hasMembershipInCommunity) {
-        logger.warn("[AUTH] getUserServer: User has no membership in current community, treating as unauthenticated", {
-          communityId,
-          userId: user.id,
-          userMemberships: user.memberships?.map((m) => m.community?.id),
-        });
-        return {
-          user: null,
-          lineAuthenticated: false,
-          phoneAuthenticated: false,
-        };
-      }
-    }
-
     return {
       user,
-      lineAuthenticated: true,
+      lineAuthenticated: true, // SSR時点でsessionがあればtrue扱い
       phoneAuthenticated: hasPhoneIdentity,
     };
   } catch (error) {
-    // When GraphQL query fails, return lineAuthenticated: false
-    // This ensures that if the session is for a different community (causing the query to fail),
-    // the user will be redirected to login instead of phone verification.
-    logger.warn("[AUTH] getUserServer: GraphQL query failed, treating as unauthenticated", {
-      communityId,
+    logger.warn("⚠️ Failed to fetch currentUser:", {
       message: (error as Error).message,
+      stack: (error as Error).stack,
     });
     return {
       user: null,
-      lineAuthenticated: false,
-      phoneAuthenticated: false,
+      lineAuthenticated: true,
+      phoneAuthenticated,
     };
   }
 }
