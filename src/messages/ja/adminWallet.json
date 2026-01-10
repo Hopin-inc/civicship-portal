@@ -44,8 +44,8 @@
 
   "adminWallet.settings.signupBonus.alert": "要確認",
   "adminWallet.settings.signupBonus.details.allGood": "問題なく付与できています",
-  "adminWallet.settings.signupBonus.details.seeTransactions": "交換履歴を見て下さい",
-  "adminWallet.settings.signupBonus.details.viewWallet": "交換履歴を見る",
+  "adminWallet.settings.signupBonus.details.seeTransactions": "付与の詳細はウォレット管理で確認できます",
+  "adminWallet.settings.signupBonus.details.viewWallet": "確認する",
 
   "adminWallet.settings.pending.title": "未完了のおもてなし",
   "adminWallet.settings.pending.count": "{count}件",

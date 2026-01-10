@@ -40,8 +40,8 @@
 
   "adminWallet.settings.signupBonus.alert": "Attention required",
   "adminWallet.settings.signupBonus.details.allGood": "All bonuses have been granted successfully",
-  "adminWallet.settings.signupBonus.details.seeTransactions": "Please check the transaction history",
-  "adminWallet.settings.signupBonus.details.viewWallet": "View transaction history",
+  "adminWallet.settings.signupBonus.details.seeTransactions": "Grant details can be checked in wallet management",
+  "adminWallet.settings.signupBonus.details.viewWallet": "Check",
 
   "adminWallet.settings.pending.title": "Pending Bonuses",
   "adminWallet.settings.pending.count": "{count} items",
