@@ -3,6 +3,7 @@
 import React, { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { Item, ItemContent, ItemTitle, ItemFooter } from "@/components/ui/item";
+import { Button } from "@/components/ui/button";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { useQuery } from "@apollo/client";
@@ -25,7 +26,7 @@ export default function BonusesPage() {
 
   const headerConfig = useMemo(
     () => ({
-      title: "特典管理",
+      title: "特典一覧",
       showBackButton: true,
       backTo: "/admin",
       showLogo: false,
@@ -54,6 +55,7 @@ export default function BonusesPage() {
   return (
     <div className="p-4 max-w-2xl mx-auto">
       <div className="flex flex-col">
+        {/* 新規加入特典 */}
         <Item>
           <div className="flex flex-1 flex-col min-w-0">
             <ItemContent>
@@ -91,6 +93,38 @@ export default function BonusesPage() {
           {/* 右端の編集ボタン */}
           <div className="shrink-0 flex items-center">
             <EditBonusSheet currentConfig={config} onSave={() => refetch()} />
+          </div>
+        </Item>
+
+        {/* 区切り線 */}
+        <hr className="border-muted" />
+
+        {/* 累計獲得pt特典（将来機能） */}
+        <Item>
+          <div className="flex flex-1 flex-col min-w-0">
+            <ItemContent>
+              <ItemTitle className="font-bold text-base leading-snug">
+                累計獲得pt特典
+              </ItemTitle>
+            </ItemContent>
+
+            <ItemFooter className="mt-2">
+              <div className="text-xs text-muted-foreground flex items-center gap-2 truncate">
+                <span className="flex items-center gap-1">
+                  {/* ステータス表示は将来実装予定 */}
+                  {/* <span className={cn("size-2.5 rounded-full", "bg-green-500")} /> */}
+                  {/* 有効 ・ */}
+                  1SBT支給
+                </span>
+              </div>
+            </ItemFooter>
+          </div>
+
+          {/* 右端の編集ボタン（準備中） */}
+          <div className="shrink-0 flex items-center">
+            <Button variant="outline" size="sm" disabled>
+              準備中
+            </Button>
           </div>
         </Item>
       </div>
