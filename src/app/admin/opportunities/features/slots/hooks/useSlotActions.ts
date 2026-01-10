@@ -5,7 +5,7 @@ import {
   GqlOpportunitySlotHostingStatus,
   useSetOpportunitySlotHostingStatusMutation,
 } from "@/types/graphql";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { SlotData } from "../../shared/types/slot";
 import { convertSlotToDates } from "../../shared/utils/dateFormat";
 
@@ -25,6 +25,7 @@ export const useSlotActions = ({
   onSlotUpdate,
   onSlotUpdateSilent,
 }: UseSlotActionsOptions) => {
+  const { communityId } = useCommunityConfig();
   const [setSlotHostingStatus] = useSetOpportunitySlotHostingStatusMutation();
 
   /**
@@ -54,7 +55,7 @@ export const useSlotActions = ({
               // cancellationMessage: message,
             },
             permission: {
-              communityId: COMMUNITY_ID,
+              communityId,
               opportunityId,
             },
           },
@@ -84,7 +85,7 @@ export const useSlotActions = ({
         }
       }
     },
-    [opportunityId, capacity, setSlotHostingStatus, onSlotUpdateSilent]
+    [opportunityId, communityId, capacity, setSlotHostingStatus, onSlotUpdateSilent]
   );
 
   return {

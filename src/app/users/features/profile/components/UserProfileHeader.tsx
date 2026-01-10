@@ -5,7 +5,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Facebook, Home, Instagram, Twitter } from "lucide-react";
 import { useReadMore } from "@/hooks/useReadMore";
 import { cn } from "@/lib/utils";
-import { currentCommunityConfig } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useTranslations } from "next-intl";
 import { getPrefectureKey } from "@/lib/i18n/prefectures";
@@ -35,6 +35,7 @@ export function UserProfileHeader({
   socialUrl,
 }: UserProfileHeaderProps) {
   const t = useTranslations();
+  const communityConfig = useCommunityConfig();
   const socialButtonClasses =
     "rounded-full border border-input w-10 h-10 flex items-center justify-center";
 
@@ -67,7 +68,7 @@ export function UserProfileHeader({
           <div>
             <h1 className="text-title-md mb-2">{name}</h1>
 
-            {currentCommunityConfig.enableFeatures.includes("prefectures") && currentPrefecture && (
+            {communityConfig?.enableFeatures?.includes("prefectures") && currentPrefecture && (
               <div className="flex items-center text-label-md text-caption mb-3">
                 <Home className="w-4 h-4 mr-1" />
                 <span>

@@ -1,16 +1,19 @@
 "use client";
 
 import { useMemo } from "react";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { GqlOpportunity, useGetOpportunitiesQuery } from "@/types/graphql";
 import { presenterActivityCard } from "@/components/domains/opportunities/data/presenter";
 import { ActivityCard, QuestCard } from "@/components/domains/opportunities/types";
 
 export const useSameStateOpportunities = (opportunityId: string, stateCode: string) => {
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId ?? "";
+  
   const { data, loading, error, refetch } = useGetOpportunitiesQuery({
     variables: {
       filter: {
-        communityIds: [COMMUNITY_ID],
+        communityIds: [communityId],
         stateCodes: [stateCode],
       },
     },

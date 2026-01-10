@@ -5,14 +5,15 @@ import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
-import { currentCommunityConfig } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { useTranslations } from "next-intl";
 
 export default function OpenInBrowser() {
   const t = useTranslations();
   const searchParams = useSearchParams();
+  const communityConfig = useCommunityConfig();
   const nextParam = searchParams.get("next");
-  const baseUrl = `${currentCommunityConfig.domain}/sign-up/phone-verification`;
+  const baseUrl = `${communityConfig?.domain ?? ""}/sign-up/phone-verification`;
   const COPY_URL = nextParam ? `${baseUrl}?next=${nextParam}` : baseUrl;
 
   useEffect(() => {

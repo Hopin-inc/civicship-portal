@@ -6,21 +6,23 @@ import {
   GqlWalletType,
 } from "@/types/graphql";
 import type { AppTransaction, TransactionDescriptionData } from "@/app/wallets/features/shared/type";
-import { currentCommunityConfig, getSquareLogoPath } from "@/lib/communities/metadata";
 import { PLACEHOLDER_IMAGE } from "@/utils";
+import { CommunityPortalConfig } from "@/lib/communities/config";
 
 export const formatCurrency = (amount: number): string => {
   return new Intl.NumberFormat("ja-JP").format(amount);
 };
 
-export const getNameFromWallet = (wallet: GqlWallet | null | undefined): string => {
+export const getNameFromWallet = (
+  wallet: GqlWallet | null | undefined,
+  communityTitle: string,
+): string => {
   if (!wallet) return "";
-  const communityName = currentCommunityConfig.title;
   switch (wallet.type) {
     case GqlWalletType.Member:
       return wallet.user?.name ?? "";
     case GqlWalletType.Community:
-      return communityName;
+      return communityTitle;
     default:
       return "";
   }
@@ -103,10 +105,14 @@ const formatTransactionDescription = (
 export const presenterTransaction = (
   node: GqlTransaction | null | undefined,
   walletId: string,
+  communityConfig: CommunityPortalConfig | null,
 ): AppTransaction | null => {
   if (!node) return null;
-  const from = getNameFromWallet(node.fromWallet);
-  const to = getNameFromWallet(node.toWallet);
+  const communityTitle = communityConfig?.title ?? "";
+  const squareLogoPath = communityConfig?.squareLogoPath ?? "";
+  
+  const from = getNameFromWallet(node.fromWallet, communityTitle);
+  const to = getNameFromWallet(node.toWallet, communityTitle);
   const rawPoint = node.fromPointChange ?? 0;
   const isOutgoing = node.fromWallet?.id === walletId;
   const signedPoint = isOutgoing ? -Math.abs(rawPoint) : Math.abs(rawPoint);
@@ -114,9 +120,9 @@ export const presenterTransaction = (
   const counterparty = isOutgoing ? node.toWallet : node.fromWallet;
   const image =
     node.reason === GqlTransactionReason.PointIssued
-      ? getSquareLogoPath()
+      ? squareLogoPath
       : counterparty?.type === GqlWalletType.Community
-        ? getSquareLogoPath()
+        ? squareLogoPath
         : (counterparty?.user?.image ?? PLACEHOLDER_IMAGE);
 
   const descriptionData = formatTransactionDescription(node.reason, from, to, signedPoint);

@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { GqlMembershipStatus, GqlRole, useGetMembershipListQuery } from "@/types/graphql";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { ItemContent } from "@/components/ui/item";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { SelectorSheet } from "../../../shared/components/SelectorSheet";
@@ -28,11 +28,13 @@ export function HostSelectorSheet({
   selectedHostId,
   onSelectHost,
 }: HostSelectorSheetProps) {
+  const { communityId } = useCommunityConfig();
+  
   // クエリはSheetが開いている時のみ実行
   const { data, loading } = useGetMembershipListQuery({
     variables: {
       filter: {
-        communityId: COMMUNITY_ID,
+        communityId,
         status: GqlMembershipStatus.Joined,
         role: [GqlRole.Manager, GqlRole.Owner],
       },

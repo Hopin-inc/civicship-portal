@@ -12,7 +12,7 @@ import { ActivityCard, ActivityDetail, OpportunityHost, QuestCard, QuestDetail }
 import { presenterArticleCard } from "@/app/articles/data/presenter";
 import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
 import { presenterPlace } from "@/app/places/data/presenter";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { getCommunityIdFromEnv } from "@/lib/communities/config";
 import { isDateReservable } from "@/app/reservation/data/presenter/opportunitySlot";
 import { format, isAfter } from "date-fns";
 import { getCrossDayLabel } from "@/utils/date";
@@ -61,7 +61,7 @@ export const presenterActivityCard = (node: Partial<GqlOpportunity>): ActivityCa
     feeRequired: node?.feeRequired ?? null,
     location: node?.place?.name || "場所未定",
     images: node?.images || [],
-    communityId: COMMUNITY_ID || "",
+    communityId: getCommunityIdFromEnv(),
     hasReservableTicket: node?.isReservableWithTicket || false,
     pointsRequired: node?.pointsRequired ?? null,
     slots: node?.slots ?? [],
@@ -75,7 +75,7 @@ export const presenterQuestCard = (node: Partial<GqlOpportunity>): QuestCard => 
     category: node?.category || GqlOpportunityCategory.Quest,
     location: node?.place?.name || "場所未定",
     images: node?.images || [],
-    communityId: COMMUNITY_ID || "",
+    communityId: getCommunityIdFromEnv(),
     hasReservableTicket: node?.isReservableWithTicket || false,
     pointsToEarn: node?.pointsToEarn ?? 0,
     slots: node?.slots ?? [],
@@ -90,7 +90,7 @@ export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail =>
   const isReservable = activitySlots.some((slot) => slot.isReservable);
 
   return {
-    communityId: COMMUNITY_ID || "",
+    communityId: getCommunityIdFromEnv(),
     id: data.id,
     title: data.title,
     description: data.description || "",
@@ -122,7 +122,7 @@ export const presenterQuestDetail = (data: GqlOpportunity): QuestDetail => {
   const isReservable = activitySlots.some((slot) => slot.isReservable);
 
   return {
-    communityId: COMMUNITY_ID || "",
+    communityId: getCommunityIdFromEnv(),
     id: data.id,
     title: data.title,
     description: data.description || "",

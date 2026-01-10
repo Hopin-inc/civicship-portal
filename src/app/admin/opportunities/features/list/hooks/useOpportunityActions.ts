@@ -10,7 +10,7 @@ import {
   useDeleteOpportunityMutation,
   useSetPublishStatusMutation,
 } from "@/types/graphql";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 interface UseOpportunityActionsReturn {
   handleEdit: (opportunityId: string) => void;
@@ -22,6 +22,7 @@ interface UseOpportunityActionsReturn {
 
 export function useOpportunityActions(refetch?: () => void): UseOpportunityActionsReturn {
   const router = useRouter();
+  const { communityId } = useCommunityConfig();
   const [setPublishStatus] = useSetPublishStatusMutation();
   const [deleteOpportunity] = useDeleteOpportunityMutation();
 
@@ -71,7 +72,7 @@ export function useOpportunityActions(refetch?: () => void): UseOpportunityActio
           variables: {
             id: opportunityId,
             input: { publishStatus: GqlPublishStatus.Private },
-            permission: { communityId: COMMUNITY_ID, opportunityId },
+            permission: { communityId, opportunityId },
           },
         });
         toast.success("下書きに戻しました");
@@ -81,7 +82,7 @@ export function useOpportunityActions(refetch?: () => void): UseOpportunityActio
         toast.error("下書きに戻せませんでした");
       }
     },
-    [setPublishStatus, refetch],
+    [communityId, setPublishStatus, refetch],
   );
 
   /**
@@ -98,7 +99,7 @@ export function useOpportunityActions(refetch?: () => void): UseOpportunityActio
         await deleteOpportunity({
           variables: {
             id: opportunityId,
-            permission: { communityId: COMMUNITY_ID, opportunityId },
+            permission: { communityId, opportunityId },
           },
         });
         toast.success("下書きを削除しました");
@@ -108,7 +109,7 @@ export function useOpportunityActions(refetch?: () => void): UseOpportunityActio
         toast.error("下書きの削除に失敗しました");
       }
     },
-    [deleteOpportunity, refetch],
+    [communityId, deleteOpportunity, refetch],
   );
 
   return {

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo } from "react";
 import { GqlOpportunityCategory, useGetOpportunityQuery } from "@/types/graphql";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { presentReservationActivity, presentReservationQuest } from "../presenters/presentReservationConfirm";
 import { findSlotById, parseSlotDateRange } from "../utils/slotUtils";
 import type { ActivityDetail, QuestDetail } from "@/components/domains/opportunities/types";
@@ -15,6 +15,8 @@ export const useReservationOpportunity = ({
   opportunityId: string;
   slotId: string;
 }) => {
+  const { communityId } = useCommunityConfig();
+  
   const {
     data,
     loading,
@@ -23,7 +25,7 @@ export const useReservationOpportunity = ({
   } = useGetOpportunityQuery({
     variables: {
       id: opportunityId,
-      permission: { communityId: COMMUNITY_ID },
+      permission: { communityId },
     },
     skip: !opportunityId,
     fetchPolicy: "network-only",

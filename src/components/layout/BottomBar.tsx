@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { matchPaths } from "@/utils/path";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
 import { useAuthEnvironment } from "@/hooks/useAuthEnvironment";
-import { currentCommunityConfig } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { useTranslations } from "next-intl";
 
 interface HeaderProps {
@@ -20,16 +20,17 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const placeId = searchParams.get("placeId");
+  const communityConfig = useCommunityConfig();
 
   const { isLiffClient } = useAuthEnvironment();
 
   const { isVisible } = useScrollDirection({ threshold: 20 });
 
   const hasOppOrQuest =
-    currentCommunityConfig.enableFeatures.includes("opportunities") ||
-    currentCommunityConfig.enableFeatures.includes("quests");
+    communityConfig?.enableFeatures?.includes("opportunities") ||
+    communityConfig?.enableFeatures?.includes("quests");
 
-  if (currentCommunityConfig.enableFeatures.length < 2) {
+  if ((communityConfig?.enableFeatures?.length ?? 0) < 2) {
     return null;
   }
 
@@ -86,7 +87,7 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
               <span className="text-xs mt-1">{t("navigation.bottomBar.timeline")}</span>
             </Link>
           )}
-          {currentCommunityConfig.enableFeatures.includes("places") && (
+          {communityConfig?.enableFeatures?.includes("places") && (
             <Link href="/places" className={cn(getLinkStyle("/places", "/places/*"), "flex-grow")}>
               <Globe size={24} />
               <span className="text-xs mt-1">{t("navigation.bottomBar.places")}</span>

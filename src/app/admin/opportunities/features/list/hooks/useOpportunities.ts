@@ -9,7 +9,7 @@ import {
 import { presentOpportunityList } from "../presenters/presentOpportunityList";
 import { useMemo, useState } from "react";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 const fallbackConnection: GqlOpportunitiesConnection = {
   edges: [],
@@ -42,17 +42,18 @@ interface UseOpportunitiesReturn {
 
 export function useOpportunities(options?: UseOpportunitiesOptions): UseOpportunitiesReturn {
   const { publishStatus = "all" } = options || {};
+  const { communityId } = useCommunityConfig();
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   // GraphQLフィルタの構築
   const filter = useMemo((): GqlOpportunityFilterInput => {
     if (publishStatus === "all")
       return {
-        communityIds: [COMMUNITY_ID],
+        communityIds: [communityId],
       };
 
-    return { publishStatus: [publishStatus], communityIds: [COMMUNITY_ID] };
-  }, [publishStatus]);
+    return { publishStatus: [publishStatus], communityIds: [communityId] };
+  }, [publishStatus, communityId]);
 
   // useQueryを直接使用
   const { data, loading, error, fetchMore, refetch } = useGetAdminOpportunitiesQuery({

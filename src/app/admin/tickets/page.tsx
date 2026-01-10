@@ -7,7 +7,7 @@ import {
   GqlSortDirection,
   useGetUtilitiesQuery,
 } from "@/types/graphql";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { useAuth } from "@/contexts/AuthProvider";
 import { TicketIssueCard } from "@/app/admin/tickets/components/IssuerCard";
 import CreateUtilitySheet from "@/app/admin/tickets/utilities/components/CreateUtilitySheet";
@@ -19,10 +19,11 @@ export default function TicketsPage() {
   const headerConfig = useMemo(() => ({ title: "チケット管理", showLogo: false }), []);
   useHeaderConfig(headerConfig);
   const { user } = useAuth();
+  const { communityId } = useCommunityConfig();
 
   const { data: utilityData, loading: utilitiesLoading, refetch: refetchUtilities } = useGetUtilitiesQuery({
     variables: {
-      filter: { communityIds: [COMMUNITY_ID], ownerIds: user?.id ? [user.id] : undefined },
+      filter: { communityIds: [communityId], ownerIds: user?.id ? [user.id] : undefined },
       sort: { createdAt: GqlSortDirection.Desc },
       first: 20,
     },

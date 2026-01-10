@@ -7,7 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import Link from "next/link";
-import { currentCommunityConfig } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 type Props = {
   isLoading: boolean;
@@ -18,6 +18,7 @@ type Props = {
 
 export function LoginView({ isLoading, isAuthenticating, error, onLogin }: Props) {
   const t = useTranslations();
+  const communityConfig = useCommunityConfig();
   const [agreedTerms, setAgreedTerms] = useState(false);
   const [agreedPrivacy, setAgreedPrivacy] = useState(false);
 
@@ -27,7 +28,7 @@ export function LoginView({ isLoading, isAuthenticating, error, onLogin }: Props
         <div className="space-y-3 mb-10">
           <div className="text-body-md mb-6">
             {t.rich("auth.login.welcomeMessage", {
-              communityName: currentCommunityConfig.title,
+              communityName: communityConfig?.title ?? "",
               b: (chunks) => <strong className="font-bold">{chunks}</strong>,
             })}
           </div>

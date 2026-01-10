@@ -1,14 +1,16 @@
 "use client";
 
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { useGetArticleQuery } from "@/types/graphql";
 
 export const useArticleQuery = (id: string) => {
+  const { communityId } = useCommunityConfig();
+  
   return useGetArticleQuery({
     variables: {
       id,
       permission: {
-        communityId: COMMUNITY_ID ?? "",
+        communityId: communityId ?? "",
       },
     },
     skip: !id,

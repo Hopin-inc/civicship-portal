@@ -16,7 +16,7 @@ import { OpportunityDetailsContent } from "@/app/opportunities/[id]/components/O
 import { AdminOpportunityDetailsFooter } from "@/app/opportunities/[id]/components/AdminOpportunityDetailsFooter";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { isActivityCategory, isQuestCategory } from "@/components/domains/opportunities/types";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import {
   presenterActivityDetail,
   presenterQuestDetail,
@@ -24,6 +24,7 @@ import {
 
 export default function AdminOpportunityDetailPage() {
   const params = useParams();
+  const { communityId } = useCommunityConfig();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
 
   const headerConfig = useMemo(
@@ -40,7 +41,7 @@ export default function AdminOpportunityDetailPage() {
   const { data, loading, error, refetch } = useGetOpportunityQuery({
     variables: {
       id: id ?? "",
-      permission: { communityId: COMMUNITY_ID },
+      permission: { communityId },
       slotSort: { startsAt: GqlSortDirection.Asc },
       slotFilter: { hostingStatus: [GqlOpportunitySlotHostingStatus.Scheduled] },
     },

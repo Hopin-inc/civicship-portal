@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import React from "react";
 import { cn } from "@/lib/utils";
 import { matchPaths } from "@/utils/path";
-import { currentCommunityConfig } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { useTranslations } from "next-intl";
 
 interface AdminBottomBarProps {
@@ -16,7 +16,8 @@ interface AdminBottomBarProps {
 const AdminBottomBar: React.FC<AdminBottomBarProps> = ({ className }) => {
   const t = useTranslations();
   const pathname = usePathname();
-  const enabledFeatures = currentCommunityConfig.enableFeatures;
+  const communityConfig = useCommunityConfig();
+  const enabledFeatures = communityConfig?.enableFeatures ?? [];
 
   if (
     !pathname.startsWith("/admin") ||

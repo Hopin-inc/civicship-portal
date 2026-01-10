@@ -9,7 +9,6 @@ import { AuthProvider } from "@/contexts/AuthProvider";
 import HeaderProvider from "@/components/providers/HeaderProvider";
 import MainContent from "@/components/layout/MainContent";
 import React from "react";
-import { currentCommunityMetadata } from "@/lib/communities/metadata";
 import AnalyticsProvider from "@/components/providers/AnalyticsProvider";
 import ClientPolyfills from "@/components/polyfills/ClientPolyfills";
 import { getUserServer } from "@/lib/auth/init/getUserServer";
@@ -18,20 +17,63 @@ import { getLocale, getMessages } from "next-intl/server";
 import { LiffDeepLinkHandler } from "@/components/liff/LiffDeepLinkHandler";
 import { SwipeBackNavigation } from "@/components/navigation/SwipeBackNavigation";
 import { BackgroundLayer } from "@/components/layout/BackgroundLayer";
+import { CommunityConfigProvider } from "@/contexts/CommunityConfigContext";
+import { getCommunityConfig, getCommunityIdFromEnv, CommunityPortalConfig } from "@/lib/communities/config";
+import { DEFAULT_ASSET_PATHS } from "@/lib/communities/constants";
 
 const font = Inter({ subsets: ["latin"] });
 
 export async function generateMetadata(): Promise<Metadata> {
-  const metadata = currentCommunityMetadata;
+  const communityId = getCommunityIdFromEnv();
+  const config = await getCommunityConfig(communityId);
   const isProduction = process.env.NODE_ENV === "production";
 
+  if (!config) {
+    return {
+      title: "Civicship",
+      description: "Community platform",
+      robots: isProduction ? undefined : { index: false, follow: false },
+    };
+  }
+
   return {
-    title: metadata.title,
-    description: metadata.description,
-    icons: metadata.icons,
-    openGraph: metadata.openGraph,
-    alternates: metadata.alternates,
-    // 非本番環境では検索エンジンにインデックスさせない
+    title: config.title,
+    description: config.description,
+    icons: {
+      icon: [
+        {
+          url: config.faviconPrefix
+            ? `${config.faviconPrefix}/favicon.ico`
+            : DEFAULT_ASSET_PATHS.FAVICON,
+        },
+      ],
+      apple: [
+        {
+          url: config.faviconPrefix
+            ? `${config.faviconPrefix}/apple-touch-icon.png`
+            : DEFAULT_ASSET_PATHS.APPLE_TOUCH_ICON,
+        },
+      ],
+    },
+    openGraph: {
+      title: config.title,
+      description: config.description,
+      url: config.domain,
+      siteName: config.title,
+      locale: "ja_JP",
+      type: "website",
+      images: [
+        {
+          url: config.ogImagePath,
+          width: 1200,
+          height: 630,
+          alt: config.title,
+        },
+      ],
+    },
+    alternates: {
+      canonical: config.domain,
+    },
     robots: isProduction
       ? undefined
       : {
@@ -53,10 +95,24 @@ const RootLayout = async ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
+  const communityId = getCommunityIdFromEnv();
   const { user, lineAuthenticated, phoneAuthenticated } = await getUserServer();
 
   const locale = await getLocale();
   const messages = await getMessages();
+
+  // Fetch community config from database
+  let communityConfig: CommunityPortalConfig | null = null;
+  let isFromDatabase = false;
+
+  try {
+    communityConfig = await getCommunityConfig(communityId);
+    if (communityConfig) {
+      isFromDatabase = true;
+    }
+  } catch (error) {
+    console.error(`[CommunityConfig] Failed to fetch config for ${communityId} from database:`, error);
+  }
 
   return (
     <html lang={locale}>
@@ -64,25 +120,27 @@ const RootLayout = async ({
         <ClientPolyfills />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <CookiesProvider>
-            <ApolloProvider>
-              <AuthProvider
-                ssrCurrentUser={user}
-                ssrLineAuthenticated={lineAuthenticated}
-                ssrPhoneAuthenticated={phoneAuthenticated}
-              >
-                <LiffDeepLinkHandler />
-                <HeaderProvider>
-                  <SwipeBackNavigation>
-                    <LoadingProvider>
-                      <AnalyticsProvider />
-                      <BackgroundLayer />
-                      <MainContent>{children}</MainContent>
-                      <Toaster />
-                    </LoadingProvider>
-                  </SwipeBackNavigation>
-                </HeaderProvider>
-              </AuthProvider>
-            </ApolloProvider>
+            <CommunityConfigProvider config={communityConfig} isFromDatabase={isFromDatabase}>
+              <ApolloProvider>
+                <AuthProvider
+                  ssrCurrentUser={user}
+                  ssrLineAuthenticated={lineAuthenticated}
+                  ssrPhoneAuthenticated={phoneAuthenticated}
+                >
+                  <LiffDeepLinkHandler />
+                  <HeaderProvider>
+                    <SwipeBackNavigation>
+                      <LoadingProvider>
+                        <AnalyticsProvider />
+                        <BackgroundLayer />
+                        <MainContent>{children}</MainContent>
+                        <Toaster />
+                      </LoadingProvider>
+                    </SwipeBackNavigation>
+                  </HeaderProvider>
+                </AuthProvider>
+              </ApolloProvider>
+            </CommunityConfigProvider>
           </CookiesProvider>
         </NextIntlClientProvider>
       </body>
