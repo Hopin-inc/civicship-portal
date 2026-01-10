@@ -27,7 +27,7 @@ export default function SignupBonusSettingsPage() {
     () => ({
       title: t("adminWallet.settings.title"),
       showBackButton: true,
-      backTo: "/admin/wallet",
+      backTo: "/admin/bonuses",
       showLogo: false,
     }),
     [t]

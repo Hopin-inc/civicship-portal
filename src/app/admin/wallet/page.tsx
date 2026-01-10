@@ -7,7 +7,7 @@ import { useAuth } from "@/contexts/AuthProvider";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import WalletCard from "@/components/shared/WalletCard";
 import { GqlMembership, GqlRole, GqlWallet, useGetCommunityWalletQuery } from "@/types/graphql";
-import { Coins, Gift, Settings } from "lucide-react";
+import { Coins, Gift } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
 import useCommunityTransactions from "@/app/admin/wallet/hooks/useCommunityTransactions";
@@ -35,19 +35,8 @@ export default function WalletPage() {
       showLogo: false,
       showBackButton: true,
       backTo: "/admin",
-      action: (
-        <Button
-          variant="tertiary"
-          size="sm"
-          onClick={() => router.push("/admin/wallet/settings")}
-          disabled={currentUserRole !== GqlRole.Owner}
-        >
-          <Settings className="w-4 h-4" />
-          {t("adminWallet.buttons.settings")}
-        </Button>
-      ),
     }),
-    [t, router, currentUserRole],
+    [t],
   );
   useHeaderConfig(headerConfig);
   const handleNavigateToIssue = () => router.push("/admin/wallet/issue");
