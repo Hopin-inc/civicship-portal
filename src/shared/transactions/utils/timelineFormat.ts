@@ -60,12 +60,24 @@ export const formatActionLabelForTimeline = ({
     };
   }
 
-  // 登録ボーナス: 受信フロー
+  // 新規加入特典: 視点によって表示を変える
   if (reason === GqlTransactionReason.Onboarding) {
+    // ウォレット視点: ユーザーが受け取った（+表示、送信元を表示）
+    if (viewMode === "wallet") {
+      return {
+        viewMode,
+        name: senderName,
+        direction: "incoming",
+        amount,
+        note: onboardingNote,
+      };
+    }
+
+    // タイムライン視点: CommunityからUserへの送信（→表示、送信先を表示）
     return {
       viewMode,
-      name: senderName,
-      direction: "incoming",
+      name: recipientName,
+      direction: "outgoing",
       amount,
       note: onboardingNote,
     };
