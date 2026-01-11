@@ -15,12 +15,12 @@ export const formatCurrency = (amount: number): string => {
 
 export const getNameFromWallet = (wallet: GqlWallet | null | undefined): string => {
   if (!wallet) return "";
-  const communityName = currentCommunityConfig.title;
   switch (wallet.type) {
     case GqlWalletType.Member:
       return wallet.user?.name ?? "";
     case GqlWalletType.Community:
-      return communityName;
+      // wallet.community.nameを使用し、なければcurrentCommunityConfigにフォールバック
+      return wallet.community?.name ?? currentCommunityConfig.title;
     default:
       return "";
   }
