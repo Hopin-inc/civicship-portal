@@ -9,18 +9,37 @@ const ALLOWED_BUCKETS = [
 export async function GET(request: NextRequest) {
   const url = request.nextUrl.searchParams.get('url');
 
-  if (!url || !url.startsWith('https://storage.googleapis.com/')) {
+  if (!url) {
     return NextResponse.json({ error: 'Invalid URL' }, { status: 400 });
   }
 
-  const bucketMatch = url.match(/^https:\/\/storage\.googleapis\.com\/([^\/]+)/);
-  if (!bucketMatch || !ALLOWED_BUCKETS.includes(bucketMatch[1])) {
-    serverLogger.warn('Rejected image-proxy request for disallowed bucket', { url });
-    return NextResponse.json({ error: 'Bucket not allowed' }, { status: 403 });
+  let safeUrl: string;
+  try {
+    const parsed = new URL(url);
+
+    if (parsed.protocol !== 'https:' || parsed.hostname !== 'storage.googleapis.com') {
+      return NextResponse.json({ error: 'Invalid URL' }, { status: 400 });
+    }
+
+    // Extract bucket name from first path segment and validate against allow-list
+    const pathSegments = parsed.pathname.split('/').filter(Boolean);
+    const bucketName = pathSegments[0];
+
+    if (!bucketName || !ALLOWED_BUCKETS.includes(bucketName)) {
+      serverLogger.warn('Rejected image-proxy request for disallowed bucket', { url });
+      return NextResponse.json({ error: 'Bucket not allowed' }, { status: 403 });
+    }
+
+    const objectPath = pathSegments.slice(1).join('/');
+    const normalizedPath = objectPath ? `/${bucketName}/${objectPath}` : `/${bucketName}`;
+
+    safeUrl = `https://storage.googleapis.com${normalizedPath}${parsed.search}`;
+  } catch {
+    return NextResponse.json({ error: 'Invalid URL' }, { status: 400 });
   }
 
   try {
-    const response = await fetch(url, {
+    const response = await fetch(safeUrl, {
       headers: {
         'Origin': process.env.NEXT_PUBLIC_SITE_URL || 'https://www.neo88.app',
       },
