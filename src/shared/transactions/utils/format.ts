@@ -80,6 +80,17 @@ export const formatTransactionDescription = (
 };
 
 export const getTransactionInfo = (transaction: GqlTransaction, perspectiveWalletId?: string) => {
+  // デバッグ: Onboardingの場合にfromWalletの構造を確認
+  if (transaction.reason === 'ONBOARDING') {
+    console.log('[DEBUG] Onboarding transaction:', {
+      id: transaction.id,
+      fromWallet: transaction.fromWallet,
+      fromWalletType: transaction.fromWallet?.type,
+      fromWalletCommunity: transaction.fromWallet?.community,
+      fromWalletCommunityName: transaction.fromWallet?.community?.name,
+    });
+  }
+
   const from = getNameFromWallet(transaction.fromWallet);
   const to = getNameFromWallet(transaction.toWallet);
   const rawAmount = Math.abs(transaction.fromPointChange ?? 0);

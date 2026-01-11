@@ -20,7 +20,15 @@ export const getNameFromWallet = (wallet: GqlWallet | null | undefined): string 
       return wallet.user?.name ?? "";
     case GqlWalletType.Community:
       // wallet.community.nameを使用し、なければcurrentCommunityConfigにフォールバック
-      return wallet.community?.name ?? currentCommunityConfig.title;
+      const communityName = wallet.community?.name ?? currentCommunityConfig.title;
+      console.log('[DEBUG] getNameFromWallet for Community:', {
+        walletId: wallet.id,
+        communityData: wallet.community,
+        communityName: wallet.community?.name,
+        fallbackName: currentCommunityConfig.title,
+        result: communityName,
+      });
+      return communityName;
     default:
       return "";
   }
