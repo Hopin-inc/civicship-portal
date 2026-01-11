@@ -1,13 +1,12 @@
 "use client";
 
-import Link from "next/link";
-
 interface TransactionMessageCardProps {
   comment: string;
 }
 
 /**
  * テキスト内のURLを検出してリンク化する
+ * Note: <a>タグのネストを避けるため、spanとonClickで実装
  */
 const linkifyText = (text: string) => {
   // URL検出用の正規表現（http, https, www で始まるURL）
@@ -20,15 +19,26 @@ const linkifyText = (text: string) => {
       // www. で始まる場合は https:// を付ける
       const href = part.startsWith('www.') ? `https://${part}` : part;
       return (
-        <Link
+        <span
           key={index}
-          href={href}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-primary underline hover:text-primary/80"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            window.open(href, '_blank', 'noopener,noreferrer');
+          }}
+          className="text-primary underline hover:text-primary/80 cursor-pointer"
+          role="link"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              e.stopPropagation();
+              window.open(href, '_blank', 'noopener,noreferrer');
+            }
+          }}
         >
           {part}
-        </Link>
+        </span>
       );
     }
     // 通常のテキストの場合
