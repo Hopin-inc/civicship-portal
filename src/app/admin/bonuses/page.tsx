@@ -2,7 +2,7 @@
 
 import React, { useMemo } from "react";
 import { useTranslations } from "next-intl";
-import { Item, ItemContent, ItemTitle, ItemFooter } from "@/components/ui/item";
+import { Item, ItemContent, ItemFooter, ItemTitle } from "@/components/ui/item";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
@@ -10,7 +10,10 @@ import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { useQuery } from "@apollo/client";
 import { GqlCommunitySignupBonusConfig, GqlSignupBonus } from "@/types/graphql";
 import { cn } from "@/lib/utils";
-import { GET_SIGNUP_BONUS_CONFIG, GET_FAILED_SIGNUP_BONUSES } from "@/graphql/account/community/query";
+import {
+  GET_FAILED_SIGNUP_BONUSES,
+  GET_SIGNUP_BONUS_CONFIG,
+} from "@/graphql/account/community/query";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 
@@ -37,30 +40,25 @@ export default function BonusesPage() {
       backTo: "/admin",
       showLogo: false,
     }),
-    []
+    [],
   );
   useHeaderConfig(headerConfig);
 
-  const { data, loading } = useQuery<GetSignupBonusConfigData>(
-    GET_SIGNUP_BONUS_CONFIG,
-    {
-      variables: { communityId: COMMUNITY_ID },
-    }
-  );
+  const { data, loading } = useQuery<GetSignupBonusConfigData>(GET_SIGNUP_BONUS_CONFIG, {
+    variables: { communityId: COMMUNITY_ID },
+  });
 
-  const { data: failedData } = useQuery<GetFailedSignupBonusesData>(
-    GET_FAILED_SIGNUP_BONUSES,
-    {
-      variables: { communityId: COMMUNITY_ID },
-      // user が null のアイテムがある場合でも、エラーを無視して利用可能なデータを返す
-      errorPolicy: "all",
-    }
-  );
+  const { data: failedData } = useQuery<GetFailedSignupBonusesData>(GET_FAILED_SIGNUP_BONUSES, {
+    variables: { communityId: COMMUNITY_ID },
+    // user が null のアイテムがある場合でも、エラーを無視して利用可能なデータを返す
+    errorPolicy: "all",
+  });
+  console.log(failedData);
 
   const config = data?.community?.config?.signupBonusConfig;
   // user が null のアイテムをフィルタリングしてカウント
   const failedCount = (failedData?.signupBonuses ?? []).filter(
-    (bonus) => bonus.user !== null && bonus.user !== undefined
+    (bonus) => bonus.user !== null && bonus.user !== undefined,
   ).length;
 
   if (loading) {
@@ -95,7 +93,7 @@ export default function BonusesPage() {
                     <span
                       className={cn(
                         "size-2.5 rounded-full",
-                        config?.isEnabled ? "bg-green-500" : "bg-muted-foreground"
+                        config?.isEnabled ? "bg-green-500" : "bg-muted-foreground",
                       )}
                       aria-label={
                         config?.isEnabled
@@ -129,9 +127,7 @@ export default function BonusesPage() {
         <Item>
           <div className="flex flex-1 flex-col min-w-0">
             <ItemContent>
-              <ItemTitle className="font-bold text-base leading-snug">
-                累計獲得pt特典
-              </ItemTitle>
+              <ItemTitle className="font-bold text-base leading-snug">累計獲得pt特典</ItemTitle>
             </ItemContent>
 
             <ItemFooter className="mt-2">
@@ -148,7 +144,7 @@ export default function BonusesPage() {
 
           {/* 右端の編集ボタン（準備中） */}
           <div className="shrink-0 flex items-center">
-            <Button variant="outline" size="sm" disabled>
+            <Button variant="tertiary" size="sm" disabled>
               準備中
             </Button>
           </div>

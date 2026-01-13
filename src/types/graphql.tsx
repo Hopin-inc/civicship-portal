@@ -1990,7 +1990,7 @@ export type GqlQueryReservationsArgs = {
 
 export type GqlQuerySignupBonusesArgs = {
   filter?: InputMaybe<GqlSignupBonusFilterInput>;
-  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
+  permission: GqlCheckCommunityPermissionInput;
   sort?: InputMaybe<GqlSignupBonusSortInput>;
 };
 
@@ -2260,7 +2260,7 @@ export type GqlSignupBonus = {
   /** Granted transaction (if completed) */
   transaction?: Maybe<GqlTransaction>;
   /** User who received/should receive the bonus */
-  user: GqlUser;
+  user?: Maybe<GqlUser>;
 };
 
 /** Filter input for signup bonuses */
@@ -3159,7 +3159,7 @@ export type GqlGetFailedSignupBonusesQuery = {
     lastError?: string | null;
     attemptCount: number;
     lastAttemptedAt: Date;
-    user: { __typename?: "User"; id: string; name: string; image?: string | null };
+    user?: { __typename?: "User"; id: string; name: string; image?: string | null } | null;
   }> | null;
 };
 
