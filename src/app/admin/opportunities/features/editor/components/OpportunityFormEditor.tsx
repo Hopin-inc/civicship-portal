@@ -38,7 +38,6 @@ export const OpportunityFormEditor = ({
   // 開催枠専用保存フック（常に呼び出し、updateモード時のみ使用）
   const slotsBulkSave = useSlotsBulkSave({
     opportunityId: opportunityId || "",
-    capacity: editor.capacity,
   });
 
   // ヘッダー設定（formモード時のみ）
@@ -85,7 +84,7 @@ export const OpportunityFormEditor = ({
   const handleSlotsSave = useCallback(async () => {
     // 更新モード：開催枠のみサーバーに保存
     if (mode === "update" && opportunityId) {
-      const success = await slotsBulkSave.handleSave(editor.slots);
+      const success = await slotsBulkSave.handleSave(editor.slots, editor.capacity);
       if (success) {
         editor.resetSlotChanges();
         exitSlotsMode();
