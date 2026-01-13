@@ -43,7 +43,7 @@ export const GET_FAILED_SIGNUP_BONUSES = gql`
     signupBonuses(
       communityId: $communityId
       filter: { status: FAILED }
-      sort: { field: LAST_ATTEMPTED_AT, order: DESC }
+      sort: { field: LAST_ATTEMPTED_AT, order: desc }
     ) {
       id
       user {
