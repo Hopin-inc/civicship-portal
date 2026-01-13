@@ -1018,6 +1018,7 @@ export type GqlMutationRetrySignupBonusGrantArgs = {
 
 export type GqlMutationSignupBonusRetryArgs = {
   grantId: Scalars["ID"]["input"];
+  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlMutationStorePhoneAuthTokenArgs = {
@@ -3090,6 +3091,7 @@ export type GqlUpdateSignupBonusConfigMutation = {
 
 export type GqlRetrySignupBonusGrantMutationVariables = Exact<{
   grantId: Scalars["ID"]["input"];
+  communityId: Scalars["ID"]["input"];
 }>;
 
 export type GqlRetrySignupBonusGrantMutation = {
@@ -7034,8 +7036,8 @@ export type UpdateSignupBonusConfigMutationOptions = Apollo.BaseMutationOptions<
   GqlUpdateSignupBonusConfigMutationVariables
 >;
 export const RetrySignupBonusGrantDocument = gql`
-  mutation RetrySignupBonusGrant($grantId: ID!) {
-    signupBonusRetry(grantId: $grantId) {
+  mutation RetrySignupBonusGrant($grantId: ID!, $communityId: ID!) {
+    signupBonusRetry(grantId: $grantId, permission: { communityId: $communityId }) {
       ... on SignupBonusRetryPayload {
         success
         transaction {
@@ -7065,6 +7067,7 @@ export type GqlRetrySignupBonusGrantMutationFn = Apollo.MutationFunction<
  * const [retrySignupBonusGrantMutation, { data, loading, error }] = useRetrySignupBonusGrantMutation({
  *   variables: {
  *      grantId: // value for 'grantId'
+ *      communityId: // value for 'communityId'
  *   },
  * });
  */
