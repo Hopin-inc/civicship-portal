@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Item, ItemContent, ItemTitle, ItemFooter, ItemActions } from "@/components/ui/item";
+import { Item, ItemActions, ItemContent, ItemFooter, ItemTitle } from "@/components/ui/item";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { GqlSignupBonus } from "@/types/graphql";
@@ -33,8 +33,7 @@ export default function FailedBonusItem({ bonus, onRetrySuccess }: FailedBonusIt
         onRetrySuccess();
       } else {
         toast.error(
-          data?.retrySignupBonusGrant?.error ||
-            t("adminWallet.settings.pending.retryError")
+          data?.retrySignupBonusGrant?.error || t("adminWallet.settings.pending.retryError"),
         );
       }
     } catch (e) {
@@ -76,7 +75,7 @@ export default function FailedBonusItem({ bonus, onRetrySuccess }: FailedBonusIt
           </ItemContent>
 
           <ItemFooter className="mt-1">
-            <div className="text-xs text-muted-foreground flex items-center gap-2 truncate">
+            <div className="text-xs text-muted-foreground flex items-center truncate">
               <span>{getFailureReasonText(bonus.failureCode)}</span>
               <span>・</span>
               <span>{bonus.attemptCount || 0}回試行</span>
@@ -86,12 +85,7 @@ export default function FailedBonusItem({ bonus, onRetrySuccess }: FailedBonusIt
       </div>
 
       <ItemActions>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleRetry}
-          disabled={retrying}
-        >
+        <Button variant="primary" size="sm" onClick={handleRetry} disabled={retrying}>
           {retrying ? "再試行中..." : t("adminWallet.settings.pending.retry")}
         </Button>
       </ItemActions>

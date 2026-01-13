@@ -53,7 +53,6 @@ export default function BonusesPage() {
     // user が null のアイテムがある場合でも、エラーを無視して利用可能なデータを返す
     errorPolicy: "all",
   });
-  console.log(failedData);
 
   const config = data?.community?.config?.signupBonusConfig;
   // user が null のアイテムをフィルタリングしてカウント
