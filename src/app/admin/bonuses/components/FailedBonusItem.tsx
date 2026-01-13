@@ -9,6 +9,7 @@ import { GqlSignupBonus } from "@/types/graphql";
 import { useMutation } from "@apollo/client";
 import { toast } from "react-toastify";
 import { RETRY_SIGNUP_BONUS_GRANT } from "@/graphql/account/community/mutation";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 interface FailedBonusItemProps {
   bonus: GqlSignupBonus;
@@ -25,7 +26,7 @@ export default function FailedBonusItem({ bonus, onRetrySuccess }: FailedBonusIt
     setRetrying(true);
     try {
       const { data } = await retryGrant({
-        variables: { grantId: bonus.id },
+        variables: { grantId: bonus.id, communityId: COMMUNITY_ID },
       });
 
       if (data?.retrySignupBonusGrant?.success) {
@@ -75,7 +76,7 @@ export default function FailedBonusItem({ bonus, onRetrySuccess }: FailedBonusIt
           </ItemContent>
 
           <ItemFooter className="mt-1">
-            <div className="text-xs flex items-center gap-2 truncate">
+            <div className="text-xs flex items-center truncate">
               <span className="text-destructive font-medium">
                 {getFailureReasonText(bonus.failureCode)}
               </span>
