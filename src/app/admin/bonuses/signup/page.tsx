@@ -42,11 +42,16 @@ export default function SignupBonusDetailPage() {
     GET_FAILED_SIGNUP_BONUSES,
     {
       variables: { communityId: COMMUNITY_ID },
+      // user が null のアイテムがある場合でも、エラーを無視して利用可能なデータを返す
+      errorPolicy: "all",
     },
   );
 
   const config = data?.community?.config?.signupBonusConfig;
-  const failedBonuses = failedData?.signupBonuses ?? [];
+  // user が null のアイテムをフィルタリング
+  const failedBonuses = (failedData?.signupBonuses ?? []).filter(
+    (bonus) => bonus.user !== null && bonus.user !== undefined
+  );
 
   const headerConfig = useMemo(
     () => ({

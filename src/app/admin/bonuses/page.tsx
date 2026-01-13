@@ -52,11 +52,16 @@ export default function BonusesPage() {
     GET_FAILED_SIGNUP_BONUSES,
     {
       variables: { communityId: COMMUNITY_ID },
+      // user が null のアイテムがある場合でも、エラーを無視して利用可能なデータを返す
+      errorPolicy: "all",
     }
   );
 
   const config = data?.community?.config?.signupBonusConfig;
-  const failedCount = failedData?.signupBonuses?.length ?? 0;
+  // user が null のアイテムをフィルタリングしてカウント
+  const failedCount = (failedData?.signupBonuses ?? []).filter(
+    (bonus) => bonus.user !== null && bonus.user !== undefined
+  ).length;
 
   if (loading) {
     return (
