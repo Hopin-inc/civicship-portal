@@ -16318,27 +16318,23 @@
             "description": "Get signup bonus grants for a community (OWNER/MANAGER only).\nSupports filtering and sorting.",
             "args": [
               {
-                "name": "communityId",
+                "name": "filter",
                 "description": null,
                 "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "ID",
-                    "ofType": null
-                  }
+                  "kind": "INPUT_OBJECT",
+                  "name": "SignupBonusFilterInput",
+                  "ofType": null
                 },
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
               },
               {
-                "name": "filter",
+                "name": "permission",
                 "description": null,
                 "type": {
                   "kind": "INPUT_OBJECT",
-                  "name": "SignupBonusFilterInput",
+                  "name": "CheckCommunityPermissionInput",
                   "ofType": null
                 },
                 "defaultValue": null,

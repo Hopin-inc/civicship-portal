@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql } from "@apollo/client";
 
 export const GET_COMMUNITIES = gql`
   query GetCommunities {
@@ -41,7 +41,7 @@ export const GET_SIGNUP_BONUS_CONFIG = gql`
 export const GET_FAILED_SIGNUP_BONUSES = gql`
   query GetFailedSignupBonuses($communityId: ID!) {
     signupBonuses(
-      communityId: $communityId
+      permission: { communityId: $communityId }
       filter: { status: FAILED }
       sort: { field: LAST_ATTEMPTED_AT, order: desc }
     ) {
@@ -57,4 +57,4 @@ export const GET_FAILED_SIGNUP_BONUSES = gql`
       lastAttemptedAt
     }
   }
-`; 
+`;

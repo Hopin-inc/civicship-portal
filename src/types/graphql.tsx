@@ -1989,8 +1989,8 @@ export type GqlQueryReservationsArgs = {
 };
 
 export type GqlQuerySignupBonusesArgs = {
-  communityId: Scalars["ID"]["input"];
   filter?: InputMaybe<GqlSignupBonusFilterInput>;
+  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
   sort?: InputMaybe<GqlSignupBonusSortInput>;
 };
 
@@ -3088,6 +3088,20 @@ export type GqlUpdateSignupBonusConfigMutation = {
   };
 };
 
+export type GqlRetrySignupBonusGrantMutationVariables = Exact<{
+  grantId: Scalars["ID"]["input"];
+}>;
+
+export type GqlRetrySignupBonusGrantMutation = {
+  __typename?: "Mutation";
+  signupBonusRetry: {
+    __typename?: "SignupBonusRetryPayload";
+    success: boolean;
+    error?: string | null;
+    transaction?: { __typename?: "Transaction"; id: string } | null;
+  };
+};
+
 export type GqlGetCommunitiesQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GqlGetCommunitiesQuery = {
@@ -3130,6 +3144,23 @@ export type GqlGetSignupBonusConfigQuery = {
       } | null;
     } | null;
   } | null;
+};
+
+export type GqlGetFailedSignupBonusesQueryVariables = Exact<{
+  communityId: Scalars["ID"]["input"];
+}>;
+
+export type GqlGetFailedSignupBonusesQuery = {
+  __typename?: "Query";
+  signupBonuses?: Array<{
+    __typename?: "SignupBonus";
+    id: string;
+    failureCode?: GqlIncentiveGrantFailureCode | null;
+    lastError?: string | null;
+    attemptCount: number;
+    lastAttemptedAt: Date;
+    user: { __typename?: "User"; id: string; name: string; image?: string | null };
+  }> | null;
 };
 
 export type GqlIdentityFieldsFragment = {
@@ -7002,6 +7033,62 @@ export type UpdateSignupBonusConfigMutationOptions = Apollo.BaseMutationOptions<
   GqlUpdateSignupBonusConfigMutation,
   GqlUpdateSignupBonusConfigMutationVariables
 >;
+export const RetrySignupBonusGrantDocument = gql`
+  mutation RetrySignupBonusGrant($grantId: ID!) {
+    signupBonusRetry(grantId: $grantId) {
+      ... on SignupBonusRetryPayload {
+        success
+        transaction {
+          id
+        }
+        error
+      }
+    }
+  }
+`;
+export type GqlRetrySignupBonusGrantMutationFn = Apollo.MutationFunction<
+  GqlRetrySignupBonusGrantMutation,
+  GqlRetrySignupBonusGrantMutationVariables
+>;
+
+/**
+ * __useRetrySignupBonusGrantMutation__
+ *
+ * To run a mutation, you first call `useRetrySignupBonusGrantMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRetrySignupBonusGrantMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [retrySignupBonusGrantMutation, { data, loading, error }] = useRetrySignupBonusGrantMutation({
+ *   variables: {
+ *      grantId: // value for 'grantId'
+ *   },
+ * });
+ */
+export function useRetrySignupBonusGrantMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlRetrySignupBonusGrantMutation,
+    GqlRetrySignupBonusGrantMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    GqlRetrySignupBonusGrantMutation,
+    GqlRetrySignupBonusGrantMutationVariables
+  >(RetrySignupBonusGrantDocument, options);
+}
+export type RetrySignupBonusGrantMutationHookResult = ReturnType<
+  typeof useRetrySignupBonusGrantMutation
+>;
+export type RetrySignupBonusGrantMutationResult =
+  Apollo.MutationResult<GqlRetrySignupBonusGrantMutation>;
+export type RetrySignupBonusGrantMutationOptions = Apollo.BaseMutationOptions<
+  GqlRetrySignupBonusGrantMutation,
+  GqlRetrySignupBonusGrantMutationVariables
+>;
 export const GetCommunitiesDocument = gql`
   query GetCommunities {
     communities {
@@ -7217,6 +7304,96 @@ export type GetSignupBonusConfigSuspenseQueryHookResult = ReturnType<
 export type GetSignupBonusConfigQueryResult = Apollo.QueryResult<
   GqlGetSignupBonusConfigQuery,
   GqlGetSignupBonusConfigQueryVariables
+>;
+export const GetFailedSignupBonusesDocument = gql`
+  query GetFailedSignupBonuses($communityId: ID!) {
+    signupBonuses(
+      permission: { communityId: $communityId }
+      filter: { status: FAILED }
+      sort: { field: LAST_ATTEMPTED_AT, order: desc }
+    ) {
+      id
+      user {
+        id
+        name
+        image
+      }
+      failureCode
+      lastError
+      attemptCount
+      lastAttemptedAt
+    }
+  }
+`;
+
+/**
+ * __useGetFailedSignupBonusesQuery__
+ *
+ * To run a query within a React component, call `useGetFailedSignupBonusesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetFailedSignupBonusesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetFailedSignupBonusesQuery({
+ *   variables: {
+ *      communityId: // value for 'communityId'
+ *   },
+ * });
+ */
+export function useGetFailedSignupBonusesQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GqlGetFailedSignupBonusesQuery,
+    GqlGetFailedSignupBonusesQueryVariables
+  > &
+    ({ variables: GqlGetFailedSignupBonusesQueryVariables; skip?: boolean } | { skip: boolean }),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetFailedSignupBonusesQuery, GqlGetFailedSignupBonusesQueryVariables>(
+    GetFailedSignupBonusesDocument,
+    options,
+  );
+}
+export function useGetFailedSignupBonusesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetFailedSignupBonusesQuery,
+    GqlGetFailedSignupBonusesQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GqlGetFailedSignupBonusesQuery,
+    GqlGetFailedSignupBonusesQueryVariables
+  >(GetFailedSignupBonusesDocument, options);
+}
+export function useGetFailedSignupBonusesSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetFailedSignupBonusesQuery,
+        GqlGetFailedSignupBonusesQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GqlGetFailedSignupBonusesQuery,
+    GqlGetFailedSignupBonusesQueryVariables
+  >(GetFailedSignupBonusesDocument, options);
+}
+export type GetFailedSignupBonusesQueryHookResult = ReturnType<
+  typeof useGetFailedSignupBonusesQuery
+>;
+export type GetFailedSignupBonusesLazyQueryHookResult = ReturnType<
+  typeof useGetFailedSignupBonusesLazyQuery
+>;
+export type GetFailedSignupBonusesSuspenseQueryHookResult = ReturnType<
+  typeof useGetFailedSignupBonusesSuspenseQuery
+>;
+export type GetFailedSignupBonusesQueryResult = Apollo.QueryResult<
+  GqlGetFailedSignupBonusesQuery,
+  GqlGetFailedSignupBonusesQueryVariables
 >;
 export const UserSignUpDocument = gql`
   mutation userSignUp($input: UserSignUpInput!) {
