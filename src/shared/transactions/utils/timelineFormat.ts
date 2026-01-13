@@ -62,12 +62,12 @@ export const formatActionLabelForTimeline = ({
 
   // 新規加入特典: 視点によって表示を変える
   if (reason === GqlTransactionReason.Onboarding) {
-    // ウォレット視点: ユーザーが受け取った（+表示、送信元を表示）
+    // ウォレット視点: 送信/受信を判定
     if (viewMode === "wallet") {
       return {
         viewMode,
-        name: senderName,
-        direction: "incoming",
+        name: isIncoming ? senderName : recipientName,
+        direction: isIncoming ? "incoming" : "outgoing",
         amount,
         note: onboardingNote,
       };

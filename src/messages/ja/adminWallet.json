@@ -47,7 +47,7 @@
   "adminWallet.settings.signupBonus.details.seeTransactions": "付与の詳細はウォレット管理で確認できます",
   "adminWallet.settings.signupBonus.details.viewWallet": "確認する",
 
-  "adminWallet.settings.pending.title": "未完了のおもてなし",
+  "adminWallet.settings.pending.title": "付与失敗一覧",
   "adminWallet.settings.pending.count": "{count}件",
   "adminWallet.settings.pending.description": "残高不足等で特典が届いていないメンバーです",
   "adminWallet.settings.pending.retry": "再試行",

@@ -75,10 +75,12 @@ export default function FailedBonusItem({ bonus, onRetrySuccess }: FailedBonusIt
           </ItemContent>
 
           <ItemFooter className="mt-1">
-            <div className="text-xs text-muted-foreground flex items-center truncate">
-              <span>{getFailureReasonText(bonus.failureCode)}</span>
-              <span>・</span>
-              <span>{bonus.attemptCount || 0}回試行</span>
+            <div className="text-xs flex items-center gap-2 truncate">
+              <span className="text-destructive font-medium">
+                {getFailureReasonText(bonus.failureCode)}
+              </span>
+              <span className="text-muted-foreground">・</span>
+              <span className="text-muted-foreground">{bonus.attemptCount || 0}回試行</span>
             </div>
           </ItemFooter>
         </div>
