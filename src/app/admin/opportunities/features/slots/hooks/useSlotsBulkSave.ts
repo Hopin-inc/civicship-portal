@@ -7,7 +7,6 @@ import { convertSlotToDates } from "../../shared/utils/dateFormat";
 
 interface UseSlotsBulkSaveOptions {
   opportunityId: string;
-  capacity: number;
 }
 
 /**
@@ -16,12 +15,11 @@ interface UseSlotsBulkSaveOptions {
  */
 export const useSlotsBulkSave = ({
   opportunityId,
-  capacity,
 }: UseSlotsBulkSaveOptions) => {
   const [updateSlots, { loading }] = useUpdateOpportunitySlotsBulkMutation();
 
   const handleSave = useCallback(
-    async (slots: SlotData[]) => {
+    async (slots: SlotData[], capacity: number) => {
       // 新規作成スロット（idなし）
       const slotsToCreate = slots
         .filter((slot) => !slot.id)
@@ -61,7 +59,7 @@ export const useSlotsBulkSave = ({
         return false;
       }
     },
-    [opportunityId, capacity, updateSlots]
+    [opportunityId, updateSlots]
   );
 
   return {
