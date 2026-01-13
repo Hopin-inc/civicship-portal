@@ -51,6 +51,7 @@
   "adminWallet.settings.pending.retryError": "Failed to resend bonus",
 
   "adminWallet.settings.pending.failureReason.INSUFFICIENT_BALANCE": "Insufficient balance",
+  "adminWallet.settings.pending.failureReason.INSUFFICIENT_FUNDS": "Insufficient balance",
   "adminWallet.settings.pending.failureReason.WALLET_NOT_FOUND": "Wallet not created",
   "adminWallet.settings.pending.failureReason.unknown": "Unknown error"
 }

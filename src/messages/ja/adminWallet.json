@@ -55,6 +55,7 @@
   "adminWallet.settings.pending.retryError": "再送に失敗しました",
 
   "adminWallet.settings.pending.failureReason.INSUFFICIENT_BALANCE": "残高不足",
+  "adminWallet.settings.pending.failureReason.INSUFFICIENT_FUNDS": "残高不足",
   "adminWallet.settings.pending.failureReason.WALLET_NOT_FOUND": "ウォレット未作成",
   "adminWallet.settings.pending.failureReason.unknown": "不明なエラー"
 }
