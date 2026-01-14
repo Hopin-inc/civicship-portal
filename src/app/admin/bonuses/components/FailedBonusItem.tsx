@@ -29,12 +29,12 @@ export default function FailedBonusItem({ bonus, onRetrySuccess }: FailedBonusIt
         variables: { grantId: bonus.id, communityId: COMMUNITY_ID },
       });
 
-      if (data?.retrySignupBonusGrant?.success) {
+      if (data?.signupBonusRetry?.success) {
         toast.success(t("adminWallet.settings.pending.retrySuccess"));
         onRetrySuccess();
       } else {
         toast.error(
-          data?.retrySignupBonusGrant?.error || t("adminWallet.settings.pending.retryError"),
+          data?.signupBonusRetry?.error || t("adminWallet.settings.pending.retryError"),
         );
       }
     } catch (e) {
