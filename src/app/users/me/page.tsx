@@ -15,7 +15,8 @@ import { ArrowLeftRight } from "lucide-react";
 export default function MyProfilePage() {
   const { gqlUser, isOwner, portfolios } = useUserProfileContext();
   const { user: currentUser } = useAuth();
-  const { communityId } = useCommunityConfig();
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId;
   const t = useTranslations();
 
   // 管理者権限チェック
