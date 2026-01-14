@@ -50,10 +50,16 @@ export class LiffService {
 
   public static getInstance(liffId?: string): LiffService {
     if (!LiffService.instance) {
+      // Use empty string if liffId is not provided - initialization will fail gracefully
+      // and the error will be captured in the state for proper handling
+      LiffService.instance = new LiffService(liffId || "");
       if (!liffId) {
-        throw new Error("LIFF ID is required for the first initialization");
+        // Set error state immediately if LIFF ID is missing
+        LiffService.instance.state.error = new Error("LIFF ID is not configured");
+        logger.warn("LiffService initialized without LIFF ID - LIFF features will be disabled", {
+          component: "LiffService",
+        });
       }
-      LiffService.instance = new LiffService(liffId);
     }
     return LiffService.instance;
   }

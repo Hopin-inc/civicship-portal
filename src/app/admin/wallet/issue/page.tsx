@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "react-toastify";
 import { useTransactionMutations } from "@/app/admin/wallet/hooks/useTransactionMutations";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 import { useTranslations } from "next-intl";
@@ -17,7 +17,7 @@ const INT_LIMIT = 2000000000;
 
 export default function IssuePointPage() {
   const t = useTranslations();
-  const communityId = COMMUNITY_ID;
+  const { communityId } = useCommunityConfig();
   const router = useRouter();
 
   const headerConfig = useMemo(

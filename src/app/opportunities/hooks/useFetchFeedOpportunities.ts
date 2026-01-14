@@ -7,7 +7,7 @@ import {
 } from "@/types/graphql";
 import { mapOpportunityCards, sliceOpportunitiesBySection } from "@/components/domains/opportunities/data/presenter";
 import { useFeatureCheck } from "@/hooks/useFeatureCheck";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 
 const fallbackConnection: GqlOpportunitiesConnection = {
@@ -23,12 +23,13 @@ const fallbackConnection: GqlOpportunitiesConnection = {
 
 export function useFetchFeedOpportunities() {
   const shouldShowQuests = useFeatureCheck("quests");
+  const { communityId } = useCommunityConfig();
 
   const { data, loading, fetchMore, refetch, error } = useGetOpportunitiesQuery({
     variables: {
       includeSlot: true,
       filter: {
-        communityIds: [COMMUNITY_ID],
+        communityIds: [communityId],
         or: [
           {
             category: GqlOpportunityCategory.Activity,
@@ -62,7 +63,7 @@ export function useFetchFeedOpportunities() {
     await fetchMore({
       variables: {
         filter: {
-          communityIds: [COMMUNITY_ID],
+          communityIds: [communityId],
           category: GqlOpportunityCategory.Activity,
           publishStatus: [GqlPublishStatus.Public],
         },

@@ -6,6 +6,7 @@ import { useWalletActions } from "./useWalletActions";
 import { AppTransaction } from "../type";
 import { GqlTransactionsConnection } from "@/types/graphql";
 import { presenterTransaction } from "@/utils/transaction";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 export interface WalletProviderProps {
   children: ReactNode;
@@ -22,11 +23,12 @@ export function WalletProvider({
   initialCurrentPoint,
   initialTransactions,
 }: WalletProviderProps) {
+  const communityConfig = useCommunityConfig();
   const [currentPoint, setCurrentPoint] = useState(initialCurrentPoint);
   const [transactions, setTransactions] = useState<AppTransaction[]>(() => {
     const edges = initialTransactions.edges ?? [];
     return edges
-      .map((edge) => presenterTransaction(edge?.node, walletId))
+      .map((edge) => presenterTransaction(edge?.node, walletId, communityConfig))
       .filter((tx): tx is AppTransaction => tx !== null);
   });
   const [hasNextPage, setHasNextPage] = useState(
