@@ -56,6 +56,7 @@ export async function generateMetadata(): Promise<Metadata> {
       regionName: null,
       regionKey: null,
       liffId: null,
+      liffAppId: null,
       liffBaseUrl: null,
       firebaseTenantId: null,
     };
@@ -140,6 +141,7 @@ function convertToPortalConfig(communityId: string): CommunityPortalConfig | nul
     regionName: null,
     regionKey: null,
     liffId: null,
+    liffAppId: null,
     liffBaseUrl: null,
     firebaseTenantId: null,
   };
