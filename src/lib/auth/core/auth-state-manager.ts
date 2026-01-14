@@ -1,5 +1,6 @@
 import { AuthenticationState } from "@/types/auth";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
+import { logger } from "@/lib/logging";
 
 export class AuthStateManager {
   private static instance: AuthStateManager;
@@ -42,7 +43,16 @@ export class AuthStateManager {
   }
 
   public updateState(newState: AuthenticationState, reason?: string): void {
-    if (this.isUpdating) return;
+    logger.warn("[DEBUG] AuthStateManager.updateState called", {
+      newState,
+      reason,
+      isUpdating: this.isUpdating,
+    });
+
+    if (this.isUpdating) {
+      logger.warn("[DEBUG] AuthStateManager.updateState: BLOCKED - isUpdating is true");
+      return;
+    }
     this.isUpdating = true;
 
     try {
@@ -50,15 +60,42 @@ export class AuthStateManager {
       const current = state.authenticationState;
       const allowed = this.ALLOWED_TRANSITIONS[current] ?? [];
 
+      logger.warn("[DEBUG] AuthStateManager.updateState: Checking transition", {
+        current,
+        newState,
+        allowed,
+        pendingState: this.pendingState,
+      });
+
       if (newState === current || this.pendingState === newState) {
+        logger.warn("[DEBUG] AuthStateManager.updateState: BLOCKED - same state or pending");
         return;
       }
 
       const downgradeBlocked =
         !["unauthenticated", "loading"].includes(current) && newState === "unauthenticated";
-      if (downgradeBlocked) return;
+      if (downgradeBlocked) {
+        logger.warn("[DEBUG] AuthStateManager.updateState: BLOCKED - downgrade blocked", {
+          current,
+          newState,
+        });
+        return;
+      }
 
-      if (!allowed.includes(newState)) return;
+      if (!allowed.includes(newState)) {
+        logger.warn("[DEBUG] AuthStateManager.updateState: BLOCKED - transition not allowed", {
+          current,
+          newState,
+          allowed,
+        });
+        return;
+      }
+
+      logger.warn("[DEBUG] AuthStateManager.updateState: ALLOWED - updating state", {
+        from: current,
+        to: newState,
+        reason,
+      });
 
       this.pendingState = newState;
       setState({ authenticationState: newState });
