@@ -1,7 +1,7 @@
 "use client";
 
 import { getApps, initializeApp } from "firebase/app";
-import { Auth, getAuth } from "firebase/auth";
+import { Auth, getAuth, setPersistence, browserLocalPersistence } from "firebase/auth";
 import { Analytics, getAnalytics, isSupported } from "firebase/analytics";
 import { logger } from "@/lib/logging";
 
@@ -20,6 +20,16 @@ export const defaultApp = initializeApp(firebaseConfigWithAppId);
 export const lineApp = initializeApp(firebaseConfig, "line-auth-app");
 export const lineAuth: Auth = getAuth(lineApp);
 lineAuth.tenantId = process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID ?? null;
+
+// Use localStorage instead of IndexedDB for persistence
+// IndexedDB can hang in LIFF WebView environments (WKWebView on iOS, WebView on Android)
+// See: https://github.com/firebase/firebase-js-sdk/issues/6791
+setPersistence(lineAuth, browserLocalPersistence).catch((error) => {
+  logger.warn("Failed to set Firebase persistence to localStorage", {
+    error: error instanceof Error ? error.message : String(error),
+    component: "FirebaseConfig",
+  });
+});
 
 export const getPhoneAuth = (): Auth => {
   const app =
