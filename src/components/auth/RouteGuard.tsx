@@ -26,37 +26,13 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   const [isReadyToRender, setIsReadyToRender] = useState(false);
   const redirectedRef = React.useRef<string | null>(null);
 
-  logger.warn("[DEBUG] RouteGuard: RENDER", {
-    authenticationState: authState.authenticationState,
-    isAuthenticating: authState.isAuthenticating,
-    isAuthInProgress: authState.isAuthInProgress,
-    currentUser: !!currentUser,
-    currentUserId: currentUser?.id,
-    isReadyToRender,
-    pathname,
-  });
-
   useEffect(() => {
-    logger.warn("[DEBUG] RouteGuard: useEffect triggered", {
-      authenticationState: authState.authenticationState,
-      isAuthenticating: authState.isAuthenticating,
-      isAuthInProgress: authState.isAuthInProgress,
-      currentUser: !!currentUser,
-    });
-
     if (authState.isAuthenticating || authState.isAuthInProgress) {
-      logger.warn("[DEBUG] RouteGuard: Blocking - isAuthenticating or isAuthInProgress", {
-        isAuthenticating: authState.isAuthenticating,
-        isAuthInProgress: authState.isAuthInProgress,
-      });
       setIsReadyToRender(false);
       return;
     }
 
     if (["loading", "authenticating"].includes(authState.authenticationState)) {
-      logger.warn("[DEBUG] RouteGuard: Blocking - authenticationState is loading/authenticating", {
-        authenticationState: authState.authenticationState,
-      });
       setIsReadyToRender(false);
       return;
     }
@@ -65,15 +41,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       const urlParams = new URLSearchParams(window.location.search);
       const isReturnFromLineAuth =
         urlParams.has("code") && urlParams.has("state") && urlParams.has("liffClientId");
-      logger.warn("[DEBUG] RouteGuard: LINE auth return check", {
-        pathname,
-        hasCode: urlParams.has("code"),
-        hasState: urlParams.has("state"),
-        hasLiffClientId: urlParams.has("liffClientId"),
-        isReturnFromLineAuth,
-      });
       if (isReturnFromLineAuth) {
-        logger.warn("[DEBUG] RouteGuard: Blocking - isReturnFromLineAuth");
         setIsReadyToRender(false);
         return;
       }
@@ -87,7 +55,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       currentUser,
     );
 
-    logger.warn("[DEBUG] RouteGuard: redirect check", {
+    logger.debug("[AUTH] RouteGuard redirect check", {
       pathname,
       pathWithParams,
       authenticationState: authState.authenticationState,
@@ -99,20 +67,11 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
 
     if (redirectPath && redirectPath !== pathWithParams) {
       if (redirectedRef.current !== redirectPath) {
-        logger.warn("[DEBUG] RouteGuard: Redirecting", {
-          from: pathWithParams,
-          to: redirectPath,
-        });
         redirectedRef.current = redirectPath;
         setIsReadyToRender(false);
         router.replace(redirectPath);
-      } else {
-        logger.warn("[DEBUG] RouteGuard: Already redirected to this path, skipping", {
-          redirectPath,
-        });
       }
     } else {
-      logger.warn("[DEBUG] RouteGuard: No redirect needed, setting isReadyToRender to TRUE");
       redirectedRef.current = null;
       setIsReadyToRender(true);
     }

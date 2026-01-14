@@ -185,26 +185,11 @@ export function finalizeAuthState(
   setState: ReturnType<typeof useAuthStore.getState>["setState"],
   authStateManager: AuthStateManager,
 ) {
-  logger.warn("[DEBUG] finalizeAuthState: CALLED", {
-    newState,
-    user: !!user,
-    userId: user?.id,
-    beforeState: useAuthStore.getState().state,
-  });
-
   setState({
     isAuthenticating: false,
     isAuthInProgress: false,
     currentUser: user ?? null,
   });
 
-  logger.warn("[DEBUG] finalizeAuthState: After setState", {
-    afterState: useAuthStore.getState().state,
-  });
-
   authStateManager.updateState(newState);
-
-  logger.warn("[DEBUG] finalizeAuthState: After authStateManager.updateState", {
-    finalState: useAuthStore.getState().state,
-  });
 }
