@@ -1,4 +1,4 @@
-import { AppPortfolio } from "@/app/users/features/shared/types";
+import { AppPortfolio } from "@/app/[communityId]/users/features/shared/types";
 
 export function parsePortfolioDate(dateISO: string): Date {
   return new Date(dateISO);

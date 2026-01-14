@@ -10,15 +10,15 @@ import { ErrorState } from "@/components/shared";
 import { errorMessages } from "@/utils/errorMessage";
 import { logger } from "@/lib/logging";
 import { RawURIComponent } from "@/utils/path";
-import { useReservationOpportunity } from "@/app/reservation/confirm/hooks/useReservationOpportunity";
-import { useReservationWallet } from "@/app/reservation/confirm/hooks/useReservationWallet";
-import { useReservationParams } from "@/app/reservation/confirm/hooks/useReservationParams";
-import { useReservationUIState } from "@/app/reservation/confirm/hooks/useReservationUIState";
-import { useReservationCommand } from "@/app/reservation/confirm/hooks/useReservationAction";
-import { useTicketCounter } from "@/app/reservation/confirm/hooks/useTicketCounter";
-import { calculateReservationDetails } from "@/app/reservation/confirm/utils/reservationCalculations";
-import { validateReservation } from "@/app/reservation/confirm/utils/reservationValidation";
-import ConfirmPageView from "@/app/reservation/confirm/components/ConfirmPageView";
+import { useReservationOpportunity } from "@/app/[communityId]/reservation/confirm/hooks/useReservationOpportunity";
+import { useReservationWallet } from "@/app/[communityId]/reservation/confirm/hooks/useReservationWallet";
+import { useReservationParams } from "@/app/[communityId]/reservation/confirm/hooks/useReservationParams";
+import { useReservationUIState } from "@/app/[communityId]/reservation/confirm/hooks/useReservationUIState";
+import { useReservationCommand } from "@/app/[communityId]/reservation/confirm/hooks/useReservationAction";
+import { useTicketCounter } from "@/app/[communityId]/reservation/confirm/hooks/useTicketCounter";
+import { calculateReservationDetails } from "@/app/[communityId]/reservation/confirm/utils/reservationCalculations";
+import { validateReservation } from "@/app/[communityId]/reservation/confirm/utils/reservationValidation";
+import ConfirmPageView from "@/app/[communityId]/reservation/confirm/components/ConfirmPageView";
 
 export default function ConfirmPage() {
   const headerConfig: HeaderConfig = useMemo(

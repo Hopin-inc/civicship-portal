@@ -11,14 +11,14 @@ import {
   GqlSortDirection,
   useGetOpportunitiesQuery,
 } from "@/types/graphql";
-import { groupCardsByDate, SearchParams } from "@/app/search/data/presenter";
+import { groupCardsByDate, SearchParams } from "@/app/[communityId]/search/data/presenter";
 import { toast } from "react-toastify";
 import { ActivityCard, QuestCard } from "@/components/domains/opportunities/types";
 import {
   presenterActivityCards,
   presenterQuestCards,
 } from "@/components/domains/opportunities/data/presenter";
-import { IPrefectureCodeMap } from "@/app/search/data/type";
+import { IPrefectureCodeMap } from "@/app/[communityId]/search/data/type";
 import { logger } from "@/lib/logging";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";

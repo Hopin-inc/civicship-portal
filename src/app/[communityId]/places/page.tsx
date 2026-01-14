@@ -1,13 +1,13 @@
 "use client";
 
-import PlaceMapView from "@/app/places/components/map/PlaceMapView";
-import usePlacePins from "@/app/places/hooks/usePlacePins";
-import usePlaceCards from "@/app/places/hooks/usePlaceCards";
+import PlaceMapView from "@/app/[communityId]/places/components/map/PlaceMapView";
+import usePlacePins from "@/app/[communityId]/places/hooks/usePlacePins";
+import usePlaceCards from "@/app/[communityId]/places/hooks/usePlaceCards";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { useEffect, useRef } from "react";
-import { usePlaceQueryValues } from "@/app/places/hooks/usePlaceQueryValues";
-import { usePlaceQueryActions } from "@/app/places/hooks/usePlaceQueryActions";
-import PlaceListPage from "@/app/places/components/list/ListPage";
+import { usePlaceQueryValues } from "@/app/[communityId]/places/hooks/usePlaceQueryValues";
+import { usePlaceQueryActions } from "@/app/[communityId]/places/hooks/usePlaceQueryActions";
+import PlaceListPage from "@/app/[communityId]/places/components/list/ListPage";
 import EmptyState from "@/components/shared/EmptyState";
 import { ErrorState } from '@/components/shared'
 

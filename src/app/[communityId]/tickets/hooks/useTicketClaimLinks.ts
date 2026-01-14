@@ -2,8 +2,8 @@
 
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import React from "react";
-import { transformTicketClaimLinks } from "@/app/tickets/data/presenter";
-import { TicketClaimLink } from "@/app/tickets/data/type";
+import { transformTicketClaimLinks } from "@/app/[communityId]/tickets/data/presenter";
+import { TicketClaimLink } from "@/app/[communityId]/tickets/data/type";
 import {
   GqlSortDirection,
   GqlTicketClaimLinksQuery,

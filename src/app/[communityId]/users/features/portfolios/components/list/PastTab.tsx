@@ -1,7 +1,7 @@
 "use client";
 import { useRef } from "react";
 import { groupByDate } from "./date-grouping";
-import { useUserProfileContext } from "@/app/users/features/shared/contexts/UserProfileContext";
+import { useUserProfileContext } from "@/app/[communityId]/users/features/shared/contexts/UserProfileContext";
 import { PortfoliosByDateSection } from "./PortfoliosByDateSection";
 import { filterPastPortfolios } from "../../lib";
 

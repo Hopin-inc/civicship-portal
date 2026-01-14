@@ -8,15 +8,15 @@ import {
 } from "@/types/graphql";
 import { ActivityCard, OpportunityPlace } from "@/components/domains/opportunities/types";
 import { PLACEHOLDER_IMAGE } from "@/utils";
-import { IPlaceCard, IPlaceDetail, IPlaceHost, IPlacePin } from "@/app/places/data/type";
-import { presenterArticleWithAuthor } from "@/app/articles/data/presenter";
+import { IPlaceCard, IPlaceDetail, IPlaceHost, IPlacePin } from "@/app/[communityId]/places/data/type";
+import { presenterArticleWithAuthor } from "@/app/[communityId]/articles/data/presenter";
 import { presenterActivityCard } from "@/components/domains/opportunities/data/presenter";
-import { TArticleWithAuthor } from "@/app/articles/data/type";
+import { TArticleWithAuthor } from "@/app/[communityId]/articles/data/type";
 import {
   getPrimaryOpportunity,
   orderOpportunities,
   pickPrimaryArticleByPlaceId,
-} from "@/app/places/data/hardOrder";
+} from "@/app/[communityId]/places/data/hardOrder";
 
 export const presenterPlacePins = (edges: GqlPlaceEdge[]): IPlacePin[] => {
   return edges

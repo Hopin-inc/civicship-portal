@@ -1,4 +1,4 @@
-import { useTicketClaimController } from "@/app/tickets/receive/hooks/useTicketClaimController";
+import { useTicketClaimController } from "@/app/[communityId]/tickets/receive/hooks/useTicketClaimController";
 import { GqlClaimLinkStatus } from "@/types/graphql";
 
 export interface TicketClaimData {

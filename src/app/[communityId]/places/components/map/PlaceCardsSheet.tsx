@@ -1,9 +1,9 @@
 "use client";
 
 import React, { FC, useEffect, useMemo, useRef } from "react";
-import { IPlaceCard } from "@/app/places/data/type";
+import { IPlaceCard } from "@/app/[communityId]/places/data/type";
 import useEmblaCarousel from "embla-carousel-react";
-import PlaceCard from "@/app/places/components/Card";
+import PlaceCard from "@/app/[communityId]/places/components/Card";
 
 interface PlaceCardsSheetProps {
   places: IPlaceCard[];

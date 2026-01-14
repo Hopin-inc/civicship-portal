@@ -1,6 +1,6 @@
 "use server";
 
-import { getServerMyWalletWithTransactions } from "@/app/wallets/features/shared/server/getServerMyWalletWithTransactions";
+import { getServerMyWalletWithTransactions } from "@/app/[communityId]/wallets/features/shared/server/getServerMyWalletWithTransactions";
 
 /**
  * Server Action: マイウォレット情報とトランザクションを統合取得

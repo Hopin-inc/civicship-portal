@@ -1,4 +1,4 @@
-import { Header } from "@/app/transactions/components/Header";
+import { Header } from "@/app/[communityId]/transactions/components/Header";
 import { getServerCommunityTransactions } from "@/hooks/transactions/server";
 import { InfiniteTransactionList } from "@/shared/transactions/components/InfiniteTransactionList";
 import { getTranslations } from "next-intl/server";

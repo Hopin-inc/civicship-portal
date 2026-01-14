@@ -10,7 +10,7 @@ import { useHeader } from "@/components/providers/HeaderProvider";
 import { useHierarchicalNavigation } from "@/hooks/useHierarchicalNavigation";
 import { useAuthEnvironment } from "@/hooks/useAuthEnvironment";
 import { cn } from "@/lib/utils";
-import SearchBox from "@/app/search/components/SearchBox";
+import SearchBox from "@/app/[communityId]/search/components/SearchBox";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 interface HeaderProps {

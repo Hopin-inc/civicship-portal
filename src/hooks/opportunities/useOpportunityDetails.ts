@@ -1,6 +1,6 @@
 import { GqlUser, Maybe } from "@/types/graphql";
 import { useSameStateOpportunities } from "./useSameStateOpportunities";
-import { useAvailableTickets } from "@/app/tickets/hooks/useAvailableTickets";
+import { useAvailableTickets } from "@/app/[communityId]/tickets/hooks/useAvailableTickets";
 import { useFilterFutureSlots } from "./useFilterFutureSlots";
 import { useSortedSlotsByStartsAt } from "./useSortedSlotsByStartsAt";
 import { useOpportunityDetail } from "./useOpportunityDetail";

@@ -1,8 +1,8 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthProvider";
-import { transformTickets } from "@/app/tickets/data/presenter";
-import { TTicket } from "@/app/tickets/data/type";
+import { transformTickets } from "@/app/[communityId]/tickets/data/presenter";
+import { TTicket } from "@/app/[communityId]/tickets/data/type";
 import { GqlTicketStatus, useGetTicketsQuery } from "@/types/graphql";
 
 export interface UseTicketsResult {

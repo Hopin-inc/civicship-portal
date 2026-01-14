@@ -11,7 +11,7 @@ import {
 } from "@/types/graphql";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { queryMemberships } from "@/app/admin/members/actions";
+import { queryMemberships } from "@/app/[communityId]/admin/members/actions";
 
 const fallbackConnection = {
   edges: [],

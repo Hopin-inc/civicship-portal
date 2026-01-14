@@ -12,9 +12,9 @@ import {
   ActivityField,
   QuestField,
   ReservationDetail,
-} from "@/app/reservation/data/type/reservation";
-import { TArticleWithAuthor } from "@/app/articles/data/type";
-import { presenterPlace } from "@/app/places/data/presenter";
+} from "@/app/[communityId]/reservation/data/type/reservation";
+import { TArticleWithAuthor } from "@/app/[communityId]/articles/data/type";
+import { presenterPlace } from "@/app/[communityId]/places/data/presenter";
 import { presenterOpportunityHost } from "@/components/domains/opportunities/data/presenter";
 import { getCommunityIdFromEnv } from "@/lib/communities/config";
 

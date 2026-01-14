@@ -9,7 +9,7 @@ import {
   OpportunityPlace,
 } from "@/components/domains/opportunities/types";
 import { ParticipationStatus, ParticipationStatusReason } from "@/types/participationStatus";
-import { TArticleWithAuthor } from "@/app/articles/data/type";
+import { TArticleWithAuthor } from "@/app/[communityId]/articles/data/type";
 
 export type ParticipationInfo = PublicParticipationInfo & Partial<PrivateParticipationInfo>;
 

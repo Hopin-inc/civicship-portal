@@ -4,8 +4,8 @@ import React, { useEffect, useMemo } from "react";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useLoading } from "@/hooks/useLoading";
 import { GqlSortDirection as SortDirection, useGetArticlesQuery } from "@/types/graphql";
-import { presenterArticleWithAuthorList } from "@/app/articles/data/presenter";
-import { TArticleWithAuthor } from "@/app/articles/data/type";
+import { presenterArticleWithAuthorList } from "@/app/[communityId]/articles/data/presenter";
+import { TArticleWithAuthor } from "@/app/[communityId]/articles/data/type";
 
 export const ARTICLES_PER_PAGE = 10;
 

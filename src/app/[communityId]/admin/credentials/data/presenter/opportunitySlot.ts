@@ -1,7 +1,7 @@
 "use client";
 import { GqlOpportunitySlot, GqlOpportunitySlotEdge } from "@/types/graphql";
-import { ActivitySlot, ActivitySlotGroup } from "@/app/reservation/data/type/opportunitySlot";
-import { isDateReservable } from "@/app/reservation/data/presenter/opportunitySlot";
+import { ActivitySlot, ActivitySlotGroup } from "@/app/[communityId]/reservation/data/type/opportunitySlot";
+import { isDateReservable } from "@/app/[communityId]/reservation/data/presenter/opportunitySlot";
 
 export const presenterOpportunitySlots = (
   edges: (GqlOpportunitySlotEdge | null | undefined)[] | null | undefined,

@@ -5,7 +5,7 @@ import { GqlTransactionsConnection } from "@/types/graphql";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { useInfiniteTransactions } from "@/hooks/transactions/useInfiniteTransactions";
 import { getServerCommunityTransactionsWithCursor } from "@/hooks/transactions/server-community-transactions";
-import { getFromWalletImage } from "@/app/admin/wallet/data/presenter";
+import { getFromWalletImage } from "@/app/[communityId]/admin/wallet/data/presenter";
 
 interface InfiniteTransactionListProps {
   initialTransactions: GqlTransactionsConnection;

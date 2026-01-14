@@ -1,4 +1,4 @@
-import ArticleCard from "@/app/articles/components/Card";
+import ArticleCard from "@/app/[communityId]/articles/components/Card";
 import { OpportunityHost } from "@/components/domains/opportunities/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PLACEHOLDER_IMAGE } from "@/utils";

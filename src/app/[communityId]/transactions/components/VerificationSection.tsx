@@ -6,7 +6,7 @@ import { InfoCard } from "@/components/shared";
 import { GqlVerificationStatus, useVerifyTransactionsQuery } from "@/types/graphql";
 import { useTranslations } from "next-intl";
 import { ExternalLink, Loader2, ShieldCheck } from "lucide-react";
-import { getCardanoExplorerTxUrl } from "@/app/transactions/[id]/lib/getCardanoExploerTxUrl";
+import { getCardanoExplorerTxUrl } from "@/app/[communityId]/transactions/[id]/lib/getCardanoExploerTxUrl";
 
 interface VerificationSectionProps {
   transactionId: string;

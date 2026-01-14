@@ -11,7 +11,7 @@ import {
 } from "@/types/graphql";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
-import { useAdminRole } from "@/app/admin/context/AdminRoleContext";
+import { useAdminRole } from "@/app/[communityId]/admin/context/AdminRoleContext";
 
 export interface UseReservationsResult {
   reservations: GqlReservationsConnection;

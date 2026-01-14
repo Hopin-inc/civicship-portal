@@ -1,9 +1,9 @@
 "use client";
 
 import { FC, useEffect, useRef } from "react";
-import { usePlaceDetail } from "@/app/places/[id]/hooks/usePlaceDetail";
-import PlaceOpportunities from "@/app/places/[id]/components/PlaceOpportunities";
-import PlaceFeaturedArticle from "@/app/places/[id]/components/PlaceFeaturedArticle";
+import { usePlaceDetail } from "@/app/[communityId]/places/[id]/hooks/usePlaceDetail";
+import PlaceOpportunities from "@/app/[communityId]/places/[id]/components/PlaceOpportunities";
+import PlaceFeaturedArticle from "@/app/[communityId]/places/[id]/components/PlaceFeaturedArticle";
 import { ErrorState } from '@/components/shared'
 import ImagesCarousel from "@/components/ui/images-carousel";
 import PlaceOverview from "./components/PlaceOverview";

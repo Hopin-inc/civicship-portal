@@ -1,4 +1,4 @@
-import { ActivitySlotGroup } from "@/app/reservation/data/type/opportunitySlot";
+import { ActivitySlotGroup } from "@/app/[communityId]/reservation/data/type/opportunitySlot";
 
 export type ActivitySlotGroupWithOpportunityId = ActivitySlotGroup & {
   opportunityId: string;

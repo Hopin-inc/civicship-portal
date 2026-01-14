@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useTransactionMutations } from "@/app/admin/wallet/hooks/useTransactionMutations";
+import { useTransactionMutations } from "@/app/[communityId]/admin/wallet/hooks/useTransactionMutations";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 interface DonatePointInput {

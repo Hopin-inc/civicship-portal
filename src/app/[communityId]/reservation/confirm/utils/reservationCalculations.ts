@@ -1,7 +1,7 @@
 import { GqlOpportunityCategory } from "@/types/graphql";
 import { ActivityDetail, QuestDetail } from "@/components/domains/opportunities/types";
 import { isPointsOnlyOpportunity } from "@/utils/opportunity/isPointsOnlyOpportunity";
-import { ReservationWallet } from "@/app/reservation/confirm/presenters/presentReservationConfirm";
+import { ReservationWallet } from "@/app/[communityId]/reservation/confirm/presenters/presentReservationConfirm";
 
 /**
  * 予約確認画面で使用する計算済みデータ

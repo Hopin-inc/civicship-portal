@@ -4,11 +4,11 @@ import {
   DangerSection,
   PromiseSection,
   SettingSection,
-} from "@/app/users/features/settings";
+} from "@/app/[communityId]/users/features/settings";
 import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useTranslations } from "next-intl";
-import UpdateSection from "@/app/users/features/settings/components/UpdateSection";
+import UpdateSection from "@/app/[communityId]/users/features/settings/components/UpdateSection";
 
 export default function SettingPage() {
   const t = useTranslations();

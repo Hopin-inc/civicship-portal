@@ -6,7 +6,7 @@ import { useQuery } from "@apollo/client";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { getCoordinatesFromAddress } from "@/app/places/utils/geocoding";
+import { getCoordinatesFromAddress } from "@/app/[communityId]/places/utils/geocoding";
 import { logger } from "@/lib/logging";
 import { GET_CITIES } from "../../queries";
 import { resolveCityCode } from "../../utils/resolveCityCode";

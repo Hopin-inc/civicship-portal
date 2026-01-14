@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useAuthEnvironment } from "@/hooks/useAuthEnvironment";
 import { cn } from "@/lib/utils";
 import { Edit } from "lucide-react";
-import { useOpportunityActions } from "@/app/admin/opportunities/features/list/hooks/useOpportunityActions";
+import { useOpportunityActions } from "@/app/[communityId]/admin/opportunities/features/list/hooks/useOpportunityActions";
 
 interface AdminOpportunityDetailsFooterProps {
   opportunityId: string;

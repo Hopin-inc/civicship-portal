@@ -11,9 +11,9 @@ import {
 } from "@/types/graphql";
 import { notFound, useParams } from "next/navigation";
 import { useMemo, useRef } from "react";
-import OpportunityDetailsHeader from "@/app/opportunities/[id]/components/OpportunityDetailsHeader";
-import { OpportunityDetailsContent } from "@/app/opportunities/[id]/components/OpportunityDetailsContent";
-import { AdminOpportunityDetailsFooter } from "@/app/opportunities/[id]/components/AdminOpportunityDetailsFooter";
+import OpportunityDetailsHeader from "@/app/[communityId]/opportunities/[id]/components/OpportunityDetailsHeader";
+import { OpportunityDetailsContent } from "@/app/[communityId]/opportunities/[id]/components/OpportunityDetailsContent";
+import { AdminOpportunityDetailsFooter } from "@/app/[communityId]/opportunities/[id]/components/AdminOpportunityDetailsFooter";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { isActivityCategory, isQuestCategory } from "@/components/domains/opportunities/types";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";

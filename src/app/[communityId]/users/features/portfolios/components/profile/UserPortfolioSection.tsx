@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { useRouter } from "next/navigation";
-import { AppPortfolio } from "@/app/users/features/shared/types";
+import { AppPortfolio } from "@/app/[communityId]/users/features/shared/types";
 import { ActiveOpportunitiesSection } from "./ActiveOpportunitiesSection";
 import { PortfolioGrid } from "../ui/PortfolioGrid";
 import { PortfolioEmptyState } from "../ui/PortfolioEmptyState";

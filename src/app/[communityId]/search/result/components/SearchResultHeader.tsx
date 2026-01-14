@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useHeader } from "@/components/providers/HeaderProvider";
-import { SearchParams } from "@/app/search/data/presenter";
+import { SearchParams } from "@/app/[communityId]/search/data/presenter";
 
 const useSearchResultHeader = (searchParams: SearchParams) => {
   const { updateConfig } = useHeader();

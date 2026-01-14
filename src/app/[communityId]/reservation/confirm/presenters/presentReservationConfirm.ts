@@ -13,14 +13,14 @@ import {
 } from "@/types/graphql";
 import { ActivityDetail, QuestDetail } from "@/components/domains/opportunities/types";
 import { toNumberSafe } from "../utils/paymentCalculations";
-import { presenterPlace } from "@/app/places/data/presenter";
+import { presenterPlace } from "@/app/[communityId]/places/data/presenter";
 import {
   presenterActivitySlot,
   presenterOpportunityHost,
 } from "@/components/domains/opportunities/data/presenter";
 import { getCommunityIdFromEnv } from "@/lib/communities/config";
-import { QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
-import { isDateReservable } from "@/app/reservation/data/presenter/opportunitySlot";
+import { QuestSlot } from "@/app/[communityId]/reservation/data/type/opportunitySlot";
+import { isDateReservable } from "@/app/[communityId]/reservation/data/presenter/opportunitySlot";
 
 /**
  * 利用可能なチケット情報

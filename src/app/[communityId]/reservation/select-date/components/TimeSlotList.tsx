@@ -1,9 +1,9 @@
 import React, { useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { ActivitySlot, ActivitySlotGroup } from "@/app/reservation/data/type/opportunitySlot";
+import { ActivitySlot, ActivitySlotGroup } from "@/app/[communityId]/reservation/data/type/opportunitySlot";
 import { formatTimeRange, getCrossDayLabel } from "@/utils/date";
 import { isBefore } from "date-fns";
-import { isDateReservable } from "@/app/reservation/data/presenter/opportunitySlot";
+import { isDateReservable } from "@/app/[communityId]/reservation/data/presenter/opportunitySlot";
 import { GqlOpportunityCategory } from "@/types/graphql";
 
 interface TimeSlotListProps {

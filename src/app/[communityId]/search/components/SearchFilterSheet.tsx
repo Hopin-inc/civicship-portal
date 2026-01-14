@@ -7,8 +7,8 @@ import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { DateRange } from "react-day-picker";
-import { SearchFilterType } from "@/app/search/hooks/useSearch";
-import { IPrefecture } from "@/app/search/data/type";
+import { SearchFilterType } from "@/app/[communityId]/search/hooks/useSearch";
+import { IPrefecture } from "@/app/[communityId]/search/data/type";
 import { Checkbox } from "@/components/ui/checkbox";
 
 interface FilterSheetsProps {

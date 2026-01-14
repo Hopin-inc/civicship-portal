@@ -1,5 +1,5 @@
 "use client";
-import { PortfoliosPage as PortfoliosPageComponent } from "@/app/users/features/portfolios";
+import { PortfoliosPage as PortfoliosPageComponent } from "@/app/[communityId]/users/features/portfolios";
 import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useTranslations } from "next-intl";

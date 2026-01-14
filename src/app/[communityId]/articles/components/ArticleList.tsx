@@ -1,11 +1,11 @@
 "use client";
 
 import React from "react";
-import { TArticleWithAuthor } from "@/app/articles/data/type";
-import ArticleCard from "@/app/articles/components/Card";
+import { TArticleWithAuthor } from "@/app/[communityId]/articles/data/type";
+import ArticleCard from "@/app/[communityId]/articles/components/Card";
 import { Form } from "@/components/ui/form";
-import SearchForm from "@/app/search/components/SearchForm";
-import { useArticleSearch } from "@/app/articles/hooks/useArticleSearch";
+import SearchForm from "@/app/[communityId]/search/components/SearchForm";
+import { useArticleSearch } from "@/app/[communityId]/articles/hooks/useArticleSearch";
 
 interface ArticleListProps {
   articles: TArticleWithAuthor[];

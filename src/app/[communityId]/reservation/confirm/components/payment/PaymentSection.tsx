@@ -1,7 +1,7 @@
 import React, { memo, useCallback, useEffect, useState } from "react";
 import { TicketsToggle } from "./TicketsToggle";
 import { PointsToggle } from "./PointsToggle";
-import { AvailableTicket } from "@/app/reservation/confirm/presenters/presentReservationConfirm";
+import { AvailableTicket } from "@/app/[communityId]/reservation/confirm/presenters/presentReservationConfirm";
 import { isPointsOnlyOpportunity } from "@/utils/opportunity/isPointsOnlyOpportunity";
 
 interface PaymentSectionProps {

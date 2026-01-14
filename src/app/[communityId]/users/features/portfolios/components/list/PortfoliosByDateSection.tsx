@@ -1,4 +1,4 @@
-import { AppPortfolio } from "@/app/users/features/shared/types";
+import { AppPortfolio } from "@/app/[communityId]/users/features/shared/types";
 import { PortfolioGrid } from "../ui/PortfolioGrid";
 import { presentPortfolioCard } from "../../presenters/presentPortfolioCard";
 import { presentDateHeading } from "../../presenters/presentDateHeading";

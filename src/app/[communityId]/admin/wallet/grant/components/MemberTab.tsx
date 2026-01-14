@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { GqlMembershipsConnection, GqlUser } from "@/types/graphql";
-import { useMemberWithDidSearch as useMemberSearchFromCredentials } from "@/app/admin/credentials/hooks/useMemberWithDidSearch";
+import { useMemberWithDidSearch as useMemberSearchFromCredentials } from "@/app/[communityId]/admin/credentials/hooks/useMemberWithDidSearch";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { useTranslations } from "next-intl";

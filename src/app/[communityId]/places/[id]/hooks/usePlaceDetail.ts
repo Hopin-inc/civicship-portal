@@ -3,8 +3,8 @@
 import { useEffect, useMemo } from "react";
 import { useLoading } from "@/hooks/useLoading";
 import { useGetPlaceQuery } from "@/types/graphql";
-import { IPlaceDetail } from "@/app/places/data/type";
-import { presenterPlaceDetail } from "@/app/places/data/presenter";
+import { IPlaceDetail } from "@/app/[communityId]/places/data/type";
+import { presenterPlaceDetail } from "@/app/[communityId]/places/data/presenter";
 
 export interface UsePlaceDetailResult {
   place: IPlaceDetail | null;

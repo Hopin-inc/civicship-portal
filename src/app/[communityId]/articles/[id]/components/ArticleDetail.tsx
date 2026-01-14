@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { convertMarkdownToHtml } from "@/utils/markdownUtils";
 import CategoryBadge from "../../components/CategoryBadge";
 import ArticleRecommendations from "./ArticleRecommendations";
-import { TArticleDetail, TArticleWithAuthor } from "@/app/articles/data/type";
+import { TArticleDetail, TArticleWithAuthor } from "@/app/[communityId]/articles/data/type";
 import { ActivitiesCarouselSection } from "./ActivitiesCarouselSection";
 import { Calendar } from "lucide-react";
 import { logger } from "@/lib/logging";

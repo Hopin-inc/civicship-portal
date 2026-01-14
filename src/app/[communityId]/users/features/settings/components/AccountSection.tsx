@@ -7,7 +7,7 @@ import Link from "next/link";
 import { toast } from "react-toastify";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
-import { useUserProfileContext } from "@/app/users/features/shared/contexts/UserProfileContext";
+import { useUserProfileContext } from "@/app/[communityId]/users/features/shared/contexts/UserProfileContext";
 import { GqlDidIssuanceStatus } from "@/types/graphql";
 import { useTranslations } from "next-intl";
 

@@ -4,7 +4,7 @@ import {
   presenterReservationDateTimeInfo,
 } from "@/components/domains/opportunities/data/presenter";
 import { useCompletePageDataRaw } from "./useCompletePageDataRaw";
-import { presenterArticleCard } from "@/app/articles/data/presenter";
+import { presenterArticleCard } from "@/app/[communityId]/articles/data/presenter";
 
 export function useCompletePageViewModel(
   opportunityId: string | null,

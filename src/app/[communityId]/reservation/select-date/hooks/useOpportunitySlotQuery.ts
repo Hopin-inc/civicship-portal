@@ -6,12 +6,12 @@ import {
   useGetOpportunitySlotsLazyQuery,
   useGetOpportunitySlotsQuery,
 } from "@/types/graphql";
-import { ActivitySlotGroup } from "@/app/reservation/data/type/opportunitySlot";
+import { ActivitySlotGroup } from "@/app/[communityId]/reservation/data/type/opportunitySlot";
 import { ActivityDetail, QuestDetail } from "@/components/domains/opportunities/types";
 import {
   groupActivitySlotsByDate,
   presenterOpportunitySlots,
-} from "@/app/reservation/data/presenter/opportunitySlot";
+} from "@/app/[communityId]/reservation/data/presenter/opportunitySlot";
 import { presenterActivityDetail, presenterQuestDetail } from "@/components/domains/opportunities/data/presenter";
 
 interface UseReservationDateLoaderProps {

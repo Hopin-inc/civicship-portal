@@ -2,8 +2,8 @@
 
 import { useMemo } from "react";
 import { ErrorState } from "@/components/shared";
-import ArticleList from "@/app/articles/components/ArticleList";
-import { useArticles } from "@/app/articles/hooks/useArticles";
+import ArticleList from "@/app/[communityId]/articles/components/ArticleList";
+import { useArticles } from "@/app/[communityId]/articles/hooks/useArticles";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 

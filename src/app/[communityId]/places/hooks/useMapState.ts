@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useReducer } from "react";
-import { IPlacePin } from "@/app/places/data/type";
+import { IPlacePin } from "@/app/[communityId]/places/data/type";
 import { logger } from "@/lib/logging";
 
 const INITIAL_CENTER_COORDINATE = { lat: 33.0, lng: 133.5 };

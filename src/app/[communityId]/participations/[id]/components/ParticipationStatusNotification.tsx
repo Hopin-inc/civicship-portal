@@ -3,7 +3,7 @@
 import React from "react";
 import { AlertCircle, Check } from "lucide-react";
 import { GqlReservationStatus } from "@/types/graphql";
-import { ParticipationUIStatus } from "@/app/participations/[id]/page";
+import { ParticipationUIStatus } from "@/app/[communityId]/participations/[id]/page";
 
 interface StatusProps {
   status: ParticipationUIStatus;

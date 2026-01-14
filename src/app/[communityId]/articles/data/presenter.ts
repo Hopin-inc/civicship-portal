@@ -6,7 +6,7 @@ import {
   TArticleDetail,
   TArticleRelatedUser,
   TArticleWithAuthor,
-} from "@/app/articles/data/type";
+} from "@/app/[communityId]/articles/data/type";
 import { presenterActivityCard } from "@/components/domains/opportunities/data/presenter";
 
 export const presenterArticleCards = (

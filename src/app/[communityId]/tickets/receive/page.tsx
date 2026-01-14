@@ -3,10 +3,10 @@
 import React, { useState, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthProvider";
-import LoginModal from "@/app/login/components/LoginModal";
+import LoginModal from "@/app/[communityId]/login/components/LoginModal";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { useTicketClaim } from "@/app/tickets/receive/hooks/useTicketClaim";
-import TicketReceiveContent from "@/app/tickets/receive/components/TicketReceiveContent";
+import { useTicketClaim } from "@/app/[communityId]/tickets/receive/hooks/useTicketClaim";
+import TicketReceiveContent from "@/app/[communityId]/tickets/receive/components/TicketReceiveContent";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { ErrorState } from '@/components/shared'
 import { toast } from "react-toastify";

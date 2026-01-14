@@ -1,7 +1,7 @@
 "use client";
 
-import { presentUserProfile, useUserProfileContext } from "@/app/users/features/shared";
-import { UserProfileView } from "@/app/users/features/profile";
+import { presentUserProfile, useUserProfileContext } from "@/app/[communityId]/users/features/shared";
+import { UserProfileView } from "@/app/[communityId]/users/features/profile";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { GqlMembership, GqlRole } from "@/types/graphql";

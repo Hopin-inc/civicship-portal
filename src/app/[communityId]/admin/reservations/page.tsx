@@ -8,7 +8,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GqlReservation } from "@/types/graphql";
 import { useReservationSearch } from "./features/list/hooks/useReservationSearch";
 import { Form } from "@/components/ui/form";
-import SearchForm from "@/app/search/components/SearchForm";
+import SearchForm from "@/app/[communityId]/search/components/SearchForm";
 import { ReservationList } from "./features/list/components/ReservationList";
 import { getReservationFilterFromTab, isTabType, TABS } from "./constants/filters";
 

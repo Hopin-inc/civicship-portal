@@ -2,11 +2,11 @@
 
 import { useAuth } from "@/contexts/AuthProvider";
 import { useSearchParams } from "next/navigation";
-import { DonateUserSelect } from "@/app/wallets/features/donate/components";
-import TransferInputStep from "@/app/admin/wallet/grant/components/TransferInputStep";
-import { useDonateFlow } from "@/app/wallets/features/donate/hooks/useDonateFlow";
-import { useDonateMembers } from "@/app/wallets/features/donate/hooks/useDonateMembers";
-import { Tabs } from "@/app/admin/wallet/grant/types/tabs";
+import { DonateUserSelect } from "@/app/[communityId]/wallets/features/donate/components";
+import TransferInputStep from "@/app/[communityId]/admin/wallet/grant/components/TransferInputStep";
+import { useDonateFlow } from "@/app/[communityId]/wallets/features/donate/hooks/useDonateFlow";
+import { useDonateMembers } from "@/app/[communityId]/wallets/features/donate/hooks/useDonateMembers";
+import { Tabs } from "@/app/[communityId]/admin/wallet/grant/types/tabs";
 import { useEffect, useMemo, useRef, useState } from "react";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";

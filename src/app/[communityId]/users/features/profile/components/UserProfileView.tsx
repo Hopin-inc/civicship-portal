@@ -1,9 +1,9 @@
 "use client";
 
-import { UserProfileViewModel } from "@/app/users/features/profile/types";
+import { UserProfileViewModel } from "@/app/[communityId]/users/features/profile/types";
 import { UserProfileHeader } from "./UserProfileHeader";
 import { UserTicketsAndPoints } from "./UserTicketsAndPoints";
-import { UserPortfolioSection } from "@/app/users/features/portfolios";
+import { UserPortfolioSection } from "@/app/[communityId]/users/features/portfolios";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { NftCard } from "@/components/domains/nfts/components";
 import { CardCarousel } from "@/components/shared/CardCarousel";

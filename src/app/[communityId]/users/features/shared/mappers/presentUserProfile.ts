@@ -1,6 +1,6 @@
 import { GqlTicketStatus, GqlUser } from "@/types/graphql";
-import { UserProfileViewModel } from "@/app/users/features/profile/types";
-import { AppPortfolio } from "@/app/users/features/shared/types";
+import { UserProfileViewModel } from "@/app/[communityId]/users/features/profile/types";
+import { AppPortfolio } from "@/app/[communityId]/users/features/shared/types";
 import { getCommunityIdFromEnv } from "@/lib/communities/config";
 import { logger } from "@/lib/logging";
 

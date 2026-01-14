@@ -1,5 +1,5 @@
 "use client";
-import { IPlaceDetail } from "@/app/places/data/type";
+import { IPlaceDetail } from "@/app/[communityId]/places/data/type";
 import AddressMap from "@/components/shared/AddressMap";
 
 const PlaceAddress = ({ detail }: { detail: IPlaceDetail }) => {

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo } from "react";
-import { useProfileEdit, UserProfileEdit } from "@/app/users/features/edit";
+import { useProfileEdit, UserProfileEdit } from "@/app/[communityId]/users/features/edit";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";
 import useHeaderConfig from "@/hooks/useHeaderConfig";

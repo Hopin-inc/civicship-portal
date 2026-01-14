@@ -4,7 +4,7 @@ import { SafeImage } from "@/components/ui/safe-image";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { MapPin, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { IPlaceCard } from "@/app/places/data/type";
+import { IPlaceCard } from "@/app/[communityId]/places/data/type";
 import Link from "next/link";
 
 interface PlaceCardProps {

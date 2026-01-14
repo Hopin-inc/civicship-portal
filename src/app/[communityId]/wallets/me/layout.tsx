@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
-import { WalletProvider } from "@/app/wallets/features/shared/contexts/WalletProvider";
-import { getServerMyWalletWithTransactions } from "@/app/wallets/features/shared/server/getServerMyWalletWithTransactions";
+import { WalletProvider } from "@/app/[communityId]/wallets/features/shared/contexts/WalletProvider";
+import { getServerMyWalletWithTransactions } from "@/app/[communityId]/wallets/features/shared/server/getServerMyWalletWithTransactions";
 import { toPointNumber } from "@/utils/bigint";
 import { logger } from "@/lib/logging";
 

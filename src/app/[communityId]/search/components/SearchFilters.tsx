@@ -4,10 +4,10 @@ import React from "react";
 import { useFormContext } from "react-hook-form";
 import { MapPin, Calendar as CalendarIcon, Users, Tags, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SearchFilterType } from "@/app/search/hooks/useSearch";
+import { SearchFilterType } from "@/app/[communityId]/search/hooks/useSearch";
 import { DateRange } from "react-day-picker";
 import { FormItem, FormField, FormControl } from "@/components/ui/form";
-import FilterButton from "@/app/search/components/Button";
+import FilterButton from "@/app/[communityId]/search/components/Button";
 
 interface SearchFiltersProps {
   onFilterClick: (filter: SearchFilterType) => void;

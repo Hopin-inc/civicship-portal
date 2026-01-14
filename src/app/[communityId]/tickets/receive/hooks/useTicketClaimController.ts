@@ -1,4 +1,4 @@
-import { useTicketClaimQuery } from "@/app/tickets/receive/hooks/useTicketClaimQuery";
+import { useTicketClaimQuery } from "@/app/[communityId]/tickets/receive/hooks/useTicketClaimQuery";
 import { useEffect, useState } from "react";
 import { GqlClaimLinkStatus } from "@/types/graphql";
 import { toast } from "react-toastify";

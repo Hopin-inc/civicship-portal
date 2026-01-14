@@ -1,6 +1,6 @@
 import { ClientLayout } from "./ClientLayout";
-import { fetchPrivateUserServer } from "@/app/users/features/shared/server";
-import { mapGqlPortfolio, UserProfileProvider } from "@/app/users/features/shared";
+import { fetchPrivateUserServer } from "@/app/[communityId]/users/features/shared/server";
+import { mapGqlPortfolio, UserProfileProvider } from "@/app/[communityId]/users/features/shared";
 import { logger } from "@/lib/logging";
 import { headers, cookies } from "next/headers";
 

@@ -1,4 +1,4 @@
-import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
+import { ActivitySlot, QuestSlot } from "@/app/[communityId]/reservation/data/type/opportunitySlot";
 import { parseDateTime } from "@/utils/date";
 
 /**

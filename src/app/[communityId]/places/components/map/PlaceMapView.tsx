@@ -5,7 +5,7 @@ import PlaceToggleButton from "../ToggleButton";
 import PlaceCardsSheet from "./PlaceCardsSheet";
 import MapComponent from "./MapComponent";
 import { AnimatePresence, motion } from "framer-motion";
-import { IPlaceCard, IPlacePin } from "@/app/places/data/type";
+import { IPlaceCard, IPlacePin } from "@/app/[communityId]/places/data/type";
 
 interface PlaceMapViewProps {
   selectedPlaceId: string | null;

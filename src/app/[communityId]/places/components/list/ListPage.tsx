@@ -1,9 +1,9 @@
 "use client";
 
 import React from "react";
-import PlaceToggleButton from "@/app/places/components/ToggleButton";
-import PlaceCard from "@/app/places/components/Card";
-import { IPlaceCard } from "@/app/places/data/type";
+import PlaceToggleButton from "@/app/[communityId]/places/components/ToggleButton";
+import PlaceCard from "@/app/[communityId]/places/components/Card";
+import { IPlaceCard } from "@/app/[communityId]/places/data/type";
 
 interface PlaceListSheetProps {
   places: IPlaceCard[];

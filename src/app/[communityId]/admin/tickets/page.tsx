@@ -9,9 +9,9 @@ import {
 } from "@/types/graphql";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { useAuth } from "@/contexts/AuthProvider";
-import { TicketIssueCard } from "@/app/admin/tickets/components/IssuerCard";
-import CreateUtilitySheet from "@/app/admin/tickets/utilities/components/CreateUtilitySheet";
-import CreateTicketSheet from "@/app/admin/tickets/components/CreateTicketSheet";
+import { TicketIssueCard } from "@/app/[communityId]/admin/tickets/components/IssuerCard";
+import CreateUtilitySheet from "@/app/[communityId]/admin/tickets/utilities/components/CreateUtilitySheet";
+import CreateTicketSheet from "@/app/[communityId]/admin/tickets/components/CreateTicketSheet";
 import Link from "next/link";
 import { useTicketIssuers } from "./hooks/useTicketIssuers";
 

@@ -4,11 +4,11 @@ import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { GqlCurrentPrefecture, useUpdateMyProfileMutation } from "@/types/graphql";
-import { GeneralUserProfile } from "@/app/users/features/shared/types";
-import { mapGqlUserToProfile } from "@/app/users/features/shared/mappers";
+import { GeneralUserProfile } from "@/app/[communityId]/users/features/shared/types";
+import { mapGqlUserToProfile } from "@/app/[communityId]/users/features/shared/mappers";
 import { prefectureOptions as prefectureEnumValues } from "@/shared/prefectures/constants";
 import { logger } from "@/lib/logging";
-import { useUserProfileContext } from "@/app/users/features/shared/contexts/UserProfileContext";
+import { useUserProfileContext } from "@/app/[communityId]/users/features/shared/contexts/UserProfileContext";
 import { useTranslations, useLocale } from "next-intl";
 import { getPrefectureKey } from "@/lib/i18n/prefectures";
 

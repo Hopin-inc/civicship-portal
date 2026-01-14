@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@apollo/client";
-import { mapGqlPortfolio, UserProfileProvider } from "@/app/users/features/shared";
+import { mapGqlPortfolio, UserProfileProvider } from "@/app/[communityId]/users/features/shared";
 import { GqlUser } from "@/types/graphql";
 import { GET_CURRENT_USER_PROFILE } from "@/graphql/account/user/client-query";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";

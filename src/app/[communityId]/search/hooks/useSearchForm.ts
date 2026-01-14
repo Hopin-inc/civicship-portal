@@ -1,7 +1,7 @@
 "use client";
 
 import { useFormContext } from "react-hook-form";
-import { SearchFilterType } from "@/app/search/hooks/useSearch";
+import { SearchFilterType } from "@/app/[communityId]/search/hooks/useSearch";
 import { DateRange } from "react-day-picker";
 
 export function useSearchForm() {

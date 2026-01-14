@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
-import { useDonatePoint } from "@/app/wallets/features/donate/hooks";
+import { useDonatePoint } from "@/app/[communityId]/wallets/features/donate/hooks";
 import { toast } from "react-toastify";
 import { GqlUser } from "@/types/graphql";
 import { useTranslations } from "next-intl";

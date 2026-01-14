@@ -9,7 +9,7 @@ import {
   QuestCard,
   QuestDetail,
 } from "@/components/domains/opportunities/types";
-import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
+import { ActivitySlot, QuestSlot } from "@/app/[communityId]/reservation/data/type/opportunitySlot";
 import { SimilarOpportunities } from "./SimilarOpportunitiesList";
 import { OpportunityBodySection } from "./OpportunityContent/OpportunityBodySection";
 import { HostInfoSection } from "./OpportunityContent/HostInfoSection";

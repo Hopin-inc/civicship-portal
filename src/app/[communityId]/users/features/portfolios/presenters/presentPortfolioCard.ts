@@ -1,7 +1,7 @@
-import { AppPortfolio } from "@/app/users/features/shared/types";
+import { AppPortfolio } from "@/app/[communityId]/users/features/shared/types";
 import { GqlEvaluationStatus, GqlReservationStatus } from "@/types/graphql";
 import { PLACEHOLDER_IMAGE } from "@/utils";
-import { parsePortfolioDate, formatPortfolioDate } from "@/app/users/features/portfolios/lib";
+import { parsePortfolioDate, formatPortfolioDate } from "@/app/[communityId]/users/features/portfolios/lib";
 import { PortfolioCardViewModel } from "./viewModels";
 
 function getCategoryLabelKey(

@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getStatusInfo } from "@/app/participations/[id]/data/presenter";
-import type { ParticipationDetail } from "@/app/participations/[id]/data/type";
+import { getStatusInfo } from "@/app/[communityId]/participations/[id]/data/presenter";
+import type { ParticipationDetail } from "@/app/[communityId]/participations/[id]/data/type";
 import { ReservationStatus } from "@/types/participationStatus";
 
 interface UseParticipationStateProps {

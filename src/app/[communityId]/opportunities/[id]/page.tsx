@@ -1,7 +1,7 @@
 "use client";
 
-import { DisableReasonType } from "@/app/opportunities/[id]/types";
-import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
+import { DisableReasonType } from "@/app/[communityId]/opportunities/[id]/types";
+import { ActivitySlot, QuestSlot } from "@/app/[communityId]/reservation/data/type/opportunitySlot";
 import { ErrorState } from "@/components/shared";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import NavigationButtons from "@/components/shared/NavigationButtons";

@@ -9,11 +9,11 @@ import {
   Maybe,
 } from "@/types/graphql";
 import { ActivityCard, ActivityDetail, OpportunityHost, QuestCard, QuestDetail } from "@/components/domains/opportunities/types";
-import { presenterArticleCard } from "@/app/articles/data/presenter";
-import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
-import { presenterPlace } from "@/app/places/data/presenter";
+import { presenterArticleCard } from "@/app/[communityId]/articles/data/presenter";
+import { ActivitySlot, QuestSlot } from "@/app/[communityId]/reservation/data/type/opportunitySlot";
+import { presenterPlace } from "@/app/[communityId]/places/data/presenter";
 import { getCommunityIdFromEnv } from "@/lib/communities/config";
-import { isDateReservable } from "@/app/reservation/data/presenter/opportunitySlot";
+import { isDateReservable } from "@/app/[communityId]/reservation/data/presenter/opportunitySlot";
 import { format, isAfter } from "date-fns";
 import { getCrossDayLabel } from "@/utils/date";
 import { ja } from "date-fns/locale";

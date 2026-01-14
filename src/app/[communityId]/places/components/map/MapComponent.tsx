@@ -1,9 +1,9 @@
 import React from "react";
 import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
-import { useMapState } from "@/app/places/hooks/useMapState";
+import { useMapState } from "@/app/[communityId]/places/hooks/useMapState";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { usePreloadImages } from "@/app/places/hooks/usePreloadImages";
-import { IPlacePin } from "@/app/places/data/type";
+import { usePreloadImages } from "@/app/[communityId]/places/hooks/usePreloadImages";
+import { IPlacePin } from "@/app/[communityId]/places/data/type";
 import CustomMarker from "./CustomMarker";
 
 const containerStyle = {

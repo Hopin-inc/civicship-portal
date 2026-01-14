@@ -16,7 +16,7 @@ import {
   Wallet,
 } from "lucide-react";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
-import { useAdminRole } from "@/app/admin/context/AdminRoleContext";
+import { useAdminRole } from "@/app/[communityId]/admin/context/AdminRoleContext";
 import { GqlRole } from "@/types/graphql";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";

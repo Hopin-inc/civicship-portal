@@ -2,7 +2,7 @@
 
 import React from "react";
 import TicketList from "./TicketList";
-import { TicketClaimLink } from "@/app/tickets/data/type";
+import { TicketClaimLink } from "@/app/[communityId]/tickets/data/type";
 import {
   Empty,
   EmptyHeader,

@@ -1,4 +1,4 @@
-import { AppPortfolio } from "@/app/users/features/shared/types";
+import { AppPortfolio } from "@/app/[communityId]/users/features/shared/types";
 import { GqlCurrentPrefecture, GqlOpportunityCategory, GqlOpportunitySlot } from "@/types/graphql";
 
 /**

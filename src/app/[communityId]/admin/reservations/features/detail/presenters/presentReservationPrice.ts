@@ -1,6 +1,6 @@
 import { GqlOpportunity, GqlReservation } from "@/types/graphql";
 import { isPointsOnlyOpportunity } from "@/utils/opportunity/isPointsOnlyOpportunity";
-import { PriceInfo } from "@/app/admin/reservations/types";
+import { PriceInfo } from "@/app/[communityId]/admin/reservations/types";
 
 /**
  * 予約の料金情報を計算

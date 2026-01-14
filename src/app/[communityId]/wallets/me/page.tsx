@@ -1,6 +1,6 @@
-import { WalletOverview } from "@/app/wallets/features/overview/WalletOverview";
-import { TransactionList } from "@/app/wallets/features/transactions/TransactionList";
-import { getServerMyWalletWithTransactions } from "@/app/wallets/features/shared/server/getServerMyWalletWithTransactions";
+import { WalletOverview } from "@/app/[communityId]/wallets/features/overview/WalletOverview";
+import { TransactionList } from "@/app/[communityId]/wallets/features/transactions/TransactionList";
+import { getServerMyWalletWithTransactions } from "@/app/[communityId]/wallets/features/shared/server/getServerMyWalletWithTransactions";
 import { redirect } from "next/navigation";
 
 export default async function WalletMePage() {

@@ -13,9 +13,9 @@ import {
   ParticipationInfo,
   ParticipationOptionalInfo,
   QuestField,
-} from "@/app/participations/[id]/data/type";
+} from "@/app/[communityId]/participations/[id]/data/type";
 import { ReservationStatus } from "@/types/participationStatus";
-import { presenterPlace } from "@/app/places/data/presenter";
+import { presenterPlace } from "@/app/[communityId]/places/data/presenter";
 import { presenterOpportunityHost } from "@/components/domains/opportunities/data/presenter";
 import { subDays } from "date-fns";
 import { DEFAULT_CANCELLATION_DEADLINE_DAYS } from "@/config/activityBookingConfig";

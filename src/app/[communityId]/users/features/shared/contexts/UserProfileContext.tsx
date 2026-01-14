@@ -2,7 +2,7 @@
 
 import { createContext, ReactNode, useContext } from "react";
 import { GqlUser } from "@/types/graphql";
-import { AppPortfolio } from "@/app/users/features/shared/types";
+import { AppPortfolio } from "@/app/[communityId]/users/features/shared/types";
 
 export interface UserProfileContextValue {
   userId?: string;

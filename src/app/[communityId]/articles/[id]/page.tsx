@@ -1,7 +1,7 @@
 "use client";
 
-import ArticleDetail from "@/app/articles/[id]/components/ArticleDetail";
-import { useArticle } from "@/app/articles/hooks/useArticle";
+import ArticleDetail from "@/app/[communityId]/articles/[id]/components/ArticleDetail";
+import { useArticle } from "@/app/[communityId]/articles/hooks/useArticle";
 import { useEffect, useMemo, useRef } from "react";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import useHeaderConfig from "@/hooks/useHeaderConfig";

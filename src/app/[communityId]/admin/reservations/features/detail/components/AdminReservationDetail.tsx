@@ -1,6 +1,6 @@
 import React from "react";
 import { GqlReservation } from "@/types/graphql";
-import { PriceInfo } from "@/app/admin/reservations/types";
+import { PriceInfo } from "@/app/[communityId]/admin/reservations/types";
 import { PaymentBreakdown } from "../presenters/presentPaymentBreakdown";
 import { UserInfoBlock } from "./UserInfoBlock";
 import { ReservationDetailsCard } from "./ReservationDetailsCard";

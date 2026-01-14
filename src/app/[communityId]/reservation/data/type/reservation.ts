@@ -5,7 +5,7 @@ import {
   OpportunityHost,
   OpportunityPlace,
 } from "@/components/domains/opportunities/types";
-import { TArticleWithAuthor } from "@/app/articles/data/type";
+import { TArticleWithAuthor } from "@/app/[communityId]/articles/data/type";
 
 // ---------------------------------------------
 // 📌 カテゴリ

@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter, useSearchParams } from "next/navigation";
-import { TArticleWithAuthor } from "@/app/articles/data/type";
+import { TArticleWithAuthor } from "@/app/[communityId]/articles/data/type";
 
 export type SearchFormValues = {
   searchQuery: string;

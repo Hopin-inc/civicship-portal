@@ -5,7 +5,7 @@ import {
 } from "@/types/graphql";
 import { formatDateTime } from "@/utils/date";
 import Image from "next/image";
-import { CredentialRole, renderStatusCard } from "@/app/admin/credentials/[id]/data/presenter";
+import { CredentialRole, renderStatusCard } from "@/app/[communityId]/admin/credentials/[id]/data/presenter";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import React, { useEffect, useRef } from "react";
