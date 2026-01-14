@@ -1,5 +1,6 @@
 import { cache } from "react";
 import { executeServerGraphQLQuery } from "@/lib/graphql/server";
+import { getCommunityIdFromEnv } from "./config-env";
 
 /**
  * Community portal configuration fetched from the database
