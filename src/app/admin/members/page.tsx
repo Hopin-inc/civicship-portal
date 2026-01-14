@@ -1,14 +1,15 @@
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { getCommunityIdFromEnv } from "@/lib/communities/config";
 import { getMembershipListServer } from "@/lib/graphql/getMembershipListServer";
 import MembersPageClient from "./MembersPageClient";
 
 export default async function MembersPage() {
   let connection = null;
+  const communityId = getCommunityIdFromEnv();
 
   try {
     const result = await getMembershipListServer({
       filter: {
-        communityId: COMMUNITY_ID,
+        communityId,
       },
       first: 20,
       withWallets: true,

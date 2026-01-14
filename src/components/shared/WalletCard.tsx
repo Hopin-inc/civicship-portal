@@ -5,7 +5,7 @@ import Image from "next/image";
 import { RotateCcw } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
-import { currentCommunityConfig } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 interface WalletCardProps {
   currentPoint: number;
@@ -21,12 +21,13 @@ const WalletCard: React.FC<WalletCardProps> = ({
   showRefreshButton = true,
 }) => {
   const t = useTranslations();
+  const communityConfig = useCommunityConfig();
   
   return (
     <div className="bg-background rounded-[32px] px-12 py-8 shadow-[0_2px_20px_rgba(0,0,0,0.08)] mt-8 mb-8">
       <div className="flex flex-col items-center mb-12">
         <div className="text-sm text-muted-foreground mb-2">
-          {currentCommunityConfig.tokenName} {t("wallets.card.balanceLabel")}
+          {communityConfig?.tokenName ?? ""} {t("wallets.card.balanceLabel")}
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-baseline">
@@ -39,13 +40,15 @@ const WalletCard: React.FC<WalletCardProps> = ({
       </div>
 
       <div className="flex justify-between items-center">
-        <Image
-          src={currentCommunityConfig.logoPath}
-          alt="Logo"
-          width={80}
-          height={24}
-          className="opacity-60"
-        />
+        {communityConfig?.logoPath && (
+          <Image
+            src={communityConfig.logoPath}
+            alt="Logo"
+            width={80}
+            height={24}
+            className="opacity-60"
+          />
+        )}
         {onRefetch && showRefreshButton && (
           <Button
             onClick={onRefetch}
