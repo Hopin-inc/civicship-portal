@@ -18,26 +18,20 @@ export default async function MyPageLayout({ children }: { children: React.React
     component: "MyPageLayout",
   });
 
-  if (gqlUser) {
-    const portfolios = (gqlUser.portfolios ?? []).map(mapGqlPortfolio);
+  const portfolios = gqlUser ? (gqlUser.portfolios ?? []).map(mapGqlPortfolio) : [];
 
-    return (
-      <UserProfileProvider
-        value={{
-          userId: gqlUser.id,
-          isOwner: true,
-          gqlUser,
-          portfolios,
-        }}
-      >
-        <ClientLayout ssrUser={gqlUser}>{children}</ClientLayout>
-      </UserProfileProvider>
-    );
-  }
-
-  logger.debug("[AUTH] /users/me layout: no SSR user, using ClientLayout with null", {
-    component: "MyPageLayout",
-  });
-
-  return <ClientLayout ssrUser={null}>{children}</ClientLayout>;
+  // Always wrap children in UserProfileProvider to prevent useUserProfileContext from throwing during SSR
+  // When gqlUser is null, ClientLayout will handle fetching the user client-side
+  return (
+    <UserProfileProvider
+      value={{
+        userId: gqlUser?.id,
+        isOwner: true,
+        gqlUser: gqlUser,
+        portfolios,
+      }}
+    >
+      <ClientLayout ssrUser={gqlUser}>{children}</ClientLayout>
+    </UserProfileProvider>
+  );
 }
