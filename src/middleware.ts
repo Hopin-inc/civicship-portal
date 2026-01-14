@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getCommunityIdFromEnv, fetchCommunityConfigForEdge } from "@/lib/communities/config-env";
+import { fetchCommunityConfigForEdge } from "@/lib/communities/config-env";
 import { detectPreferredLocale } from "@/lib/i18n/languageDetection";
 import { locales, defaultLocale } from "@/lib/i18n/config";
 
 // Feature types for route gating
 type FeaturesType = "places" | "opportunities" | "points" | "tickets" | "articles" | "languageSwitcher";
 
-// Map features to their corresponding route paths
+// Map features to their corresponding route paths (relative to communityId)
 const featureToRoutesMap: Partial<Record<FeaturesType, string[]>> = {
   places: ["/places"],
   opportunities: ["/activities", "/search"],
@@ -16,41 +16,111 @@ const featureToRoutesMap: Partial<Record<FeaturesType, string[]>> = {
   articles: ["/articles"],
 };
 
+// Extract communityId from URL path (first segment after /)
+function extractCommunityIdFromPath(pathname: string): string | null {
+  const segments = pathname.split("/").filter(Boolean);
+  if (segments.length === 0) {
+    return null;
+  }
+  const firstSegment = segments[0];
+  // Skip if it's a known non-community path
+  if (["api", "_next", "favicon.ico"].includes(firstSegment)) {
+    return null;
+  }
+  return firstSegment;
+}
+
+// Get path without communityId prefix
+function getPathWithoutCommunityId(pathname: string, communityId: string): string {
+  const prefix = `/${communityId}`;
+  if (pathname.startsWith(prefix)) {
+    const remaining = pathname.slice(prefix.length);
+    return remaining || "/";
+  }
+  return pathname;
+}
+
 export async function middleware(request: NextRequest) {
   const isDev = process.env.NODE_ENV !== "production";
   const pathname = request.nextUrl.pathname;
   
-  // Fetch config from server-side API
-  const communityId = getCommunityIdFromEnv();
+  // Extract communityId from URL path
+  const communityId = extractCommunityIdFromPath(pathname);
+  
+  // If no communityId in path and accessing root, show loading page (for LIFF deep-link handling)
+  if (!communityId && pathname === "/") {
+    const res = NextResponse.next();
+    return addSecurityHeaders(res, isDev);
+  }
+  
+  // If no communityId found, continue without community context
+  if (!communityId) {
+    const res = NextResponse.next();
+    return addSecurityHeaders(res, isDev);
+  }
+  
+  // Fetch config from server-side API using communityId from URL
   const config = await fetchCommunityConfigForEdge(communityId);
   const enabledFeatures = config?.enableFeatures || [];
-  const rootPath = config?.rootPath || "/";
+  const rootPath = config?.rootPath || "/activities";
+
+  // Get path relative to communityId
+  const relativePath = getPathWithoutCommunityId(pathname, communityId);
 
   // liff.state がある場合はrootPathへのリダイレクトをスキップ（LIFFのルーティングバグ対策）
   const hasLiffState = request.nextUrl.searchParams.get("liff.state");
 
   // ルートページへのアクセスを処理（liff.stateがない場合、またはliff.stateが/の場合のみrootPathにリダイレクト）
-  if (pathname === "/" && rootPath !== "/" && (!hasLiffState || hasLiffState === "/")) {
-    return NextResponse.redirect(new URL(rootPath, request.url));
+  if (relativePath === "/" && rootPath !== "/" && (!hasLiffState || hasLiffState === "/")) {
+    return NextResponse.redirect(new URL(`/${communityId}${rootPath}`, request.url));
   }
 
   for (const [feature, routes] of Object.entries(featureToRoutesMap)) {
     if (!enabledFeatures.includes(feature as FeaturesType)) {
       for (const route of routes) {
-        if (feature === "opportunities" && /^\/activities\/[^/]+$/.test(pathname)) {
+        if (feature === "opportunities" && /^\/activities\/[^/]+$/.test(relativePath)) {
           continue;
         }
 
-        if (pathname === route || pathname.startsWith(`${route}/`)) {
+        if (relativePath === route || relativePath.startsWith(`${route}/`)) {
           if (isDev) {
-            console.log(`Redirecting from disabled feature path: ${pathname} to ${rootPath}`);
+            console.log(`Redirecting from disabled feature path: ${pathname} to /${communityId}${rootPath}`);
           }
-          return NextResponse.redirect(new URL(rootPath, request.url));
+          return NextResponse.redirect(new URL(`/${communityId}${rootPath}`, request.url));
         }
       }
     }
   }
 
+  const res = NextResponse.next();
+  
+  // Add x-community-id header for backend requests
+  res.headers.set("x-community-id", communityId);
+  
+  // Add security headers
+  addSecurityHeaders(res, isDev);
+
+  const hasLanguageSwitcher = enabledFeatures.includes("languageSwitcher");
+  const languageCookie = request.cookies.get('language');
+  
+  if (hasLanguageSwitcher && !languageCookie) {
+    const detectedLanguage = detectPreferredLocale(
+      request.headers.get('accept-language'),
+      locales,
+      defaultLocale
+    );
+    res.cookies.set('language', detectedLanguage, {
+      path: '/',
+      maxAge: 60 * 60 * 24 * 365,
+      sameSite: 'lax',
+    });
+  }
+
+  return res;
+}
+
+// Helper function to add security headers
+function addSecurityHeaders(res: NextResponse, isDev: boolean): NextResponse {
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
 
   const scriptSrc = [
@@ -109,7 +179,6 @@ export async function middleware(request: NextRequest) {
       : []),
   ].join(" ");
 
-  const res = NextResponse.next();
   res.headers.set("x-nonce", nonce);
 
   const csp = [
@@ -131,23 +200,7 @@ export async function middleware(request: NextRequest) {
   res.headers.set("Content-Security-Policy", csp);
   res.headers.set("X-Content-Type-Options", "nosniff");
   res.headers.set("Referrer-Policy", "no-referrer");
-
-  const hasLanguageSwitcher = enabledFeatures.includes("languageSwitcher");
-  const languageCookie = request.cookies.get('language');
   
-  if (hasLanguageSwitcher && !languageCookie) {
-    const detectedLanguage = detectPreferredLocale(
-      request.headers.get('accept-language'),
-      locales,
-      defaultLocale
-    );
-    res.cookies.set('language', detectedLanguage, {
-      path: '/',
-      maxAge: 60 * 60 * 24 * 365,
-      sameSite: 'lax',
-    });
-  }
-
   return res;
 }
 
