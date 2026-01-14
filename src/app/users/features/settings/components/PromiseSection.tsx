@@ -2,23 +2,22 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { FileIcon } from "lucide-react";
 import Link from "next/link";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
+import { currentCommunityConfig } from "@/lib/communities/metadata";
 import { useTranslations, useLocale } from "next-intl";
 import { resolveLocalePath } from "@/utils/i18n";
 
 export default function PromiseSection() {
-  const communityConfig = useCommunityConfig();
   const defaultCommonDocuments = [
     { id: "terms", title: "users.promise.termsOfService", path: "/terms", type: "internal" as const },
     { id: "privacy", title: "users.promise.privacyPolicy", path: "/privacy", type: "internal" as const },
   ];
 
   const commonDocuments = defaultCommonDocuments.map((doc) => {
-    const override = communityConfig?.commonDocumentOverrides?.[doc.id as "terms" | "privacy"];
+    const override = currentCommunityConfig.commonDocumentOverrides?.[doc.id as "terms" | "privacy"];
     return override || doc;
   });
 
-  const communityDocuments = communityConfig?.documents || [];
+  const communityDocuments = currentCommunityConfig.documents || [];
 
   const sortedCommunityDocuments = [...communityDocuments].sort((a, b) => {
     const orderA = a.order ?? 999;

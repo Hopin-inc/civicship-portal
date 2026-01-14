@@ -1,6 +1,6 @@
 import { executeServerGraphQLQuery } from "@/lib/graphql/server";
 import { GET_TRANSACTIONS_SERVER_QUERY } from "@/graphql/account/transaction/query";
-import { getCommunityIdFromEnv } from "@/lib/communities/config";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import {
   GqlGetTransactionsQuery,
   GqlGetTransactionsQueryVariables,
@@ -31,12 +31,11 @@ export async function getServerCommunityTransactions(
   params: ServerCommunityTransactionsParams = {},
 ): Promise<GqlTransactionsConnection> {
   const { first = 20, after, withDidIssuanceRequests = true } = params;
-  const communityId = getCommunityIdFromEnv();
 
   try {
     const variables: GqlGetTransactionsQueryVariables = {
       filter: {
-        communityId,
+        communityId: COMMUNITY_ID,
       },
       first,
       cursor: after,

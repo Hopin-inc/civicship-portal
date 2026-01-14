@@ -8,7 +8,7 @@ import { User } from "firebase/auth";
 import { LiffService } from "@/lib/auth/service/liff-service";
 import { AuthEnvironment } from "@/lib/auth/core/environment-detector";
 import { logger } from "@/lib/logging";
-import { getCommunityIdFromEnv } from "@/lib/communities/config";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 /**
  * 1️⃣ 認証前の初期状態を設定
@@ -37,16 +37,6 @@ export function handleUnauthenticatedBranch(
   const liffState = liffService.getState();
 
   if (environment === AuthEnvironment.LIFF) {
-    // LIFF initialization failed → finalize as unauthenticated
-    // This prevents infinite loading when LIFF ID is invalid or LIFF init fails
-    if (liffState.error) {
-      logger.warn("LIFF initialization failed, finalizing as unauthenticated", {
-        error: liffState.error.message,
-      });
-      finalizeAuthState("unauthenticated", undefined, setState, authStateManager);
-      return false; // 終了
-    }
-
     // 未初期化 → 継続待ち
     if (!liffState.isInitialized) {
       setState({
@@ -166,10 +156,9 @@ export async function evaluateUserRegistrationState(
   authStateManager: AuthStateManager,
 ): Promise<boolean> {
   const hasPhoneIdentity = !!user.identities?.some((i) => i.platform?.toUpperCase() === "PHONE");
-  const communityId = getCommunityIdFromEnv();
   
   const hasMembershipInCurrentCommunity = !!user.memberships?.some(
-    (m) => m.community?.id === communityId
+    (m) => m.community?.id === COMMUNITY_ID
   );
 
   const isPhoneVerified = ssrPhoneAuthenticated || hasPhoneIdentity || TokenManager.phoneVerified();

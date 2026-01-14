@@ -1,36 +1,29 @@
 import { Metadata } from "next";
-import { getCommunityConfigFromEnv, getDefaultOgImage } from "@/lib/communities/config";
+import { DEFAULT_OPEN_GRAPH_IMAGE, currentCommunityConfig } from "@/lib/communities/metadata";
 import { getTranslations } from "next-intl/server";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const [t, config] = await Promise.all([
-    getTranslations(),
-    getCommunityConfigFromEnv(),
-  ]);
-  
-  const communityName = config?.title || "";
-  const domain = config?.domain || "";
-  const ogImages = getDefaultOgImage(config);
+  const t = await getTranslations();
   
   return {
-    title: t("wallets.meta.title", { communityName }),
+    title: t("wallets.meta.title", { communityName: currentCommunityConfig.title }),
     description: t("wallets.meta.description"),
     openGraph: {
-      title: t("wallets.meta.title", { communityName }),
+      title: t("wallets.meta.title", { communityName: currentCommunityConfig.title }),
       description: t("wallets.meta.description"),
-      url: `${domain}/wallets`,
+      url: `${currentCommunityConfig.domain}/wallets`,
       type: "website",
       locale: "ja_JP",
-      images: ogImages,
+      images: DEFAULT_OPEN_GRAPH_IMAGE,
     },
     twitter: {
       card: "summary_large_image",
-      title: t("wallets.meta.title", { communityName }),
+      title: t("wallets.meta.title", { communityName: currentCommunityConfig.title }),
       description: t("wallets.meta.description"),
-      images: ogImages,
+      images: DEFAULT_OPEN_GRAPH_IMAGE,
     },
     alternates: {
-      canonical: `${domain}/wallets`,
+      canonical: `${currentCommunityConfig.domain}/wallets`,
     },
   };
 }

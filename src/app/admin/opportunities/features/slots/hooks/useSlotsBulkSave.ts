@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { toast } from "react-toastify";
 import { useUpdateOpportunitySlotsBulkMutation } from "@/types/graphql";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { SlotData } from "../../shared/types/slot";
 import { convertSlotToDates } from "../../shared/utils/dateFormat";
 
@@ -16,7 +16,6 @@ interface UseSlotsBulkSaveOptions {
 export const useSlotsBulkSave = ({
   opportunityId,
 }: UseSlotsBulkSaveOptions) => {
-  const { communityId } = useCommunityConfig();
   const [updateSlots, { loading }] = useUpdateOpportunitySlotsBulkMutation();
 
   const handleSave = useCallback(
@@ -46,7 +45,7 @@ export const useSlotsBulkSave = ({
               update: slotsToUpdate.length > 0 ? slotsToUpdate : undefined,
             },
             permission: {
-              communityId,
+              communityId: COMMUNITY_ID,
               opportunityId,
             },
           },
@@ -60,7 +59,7 @@ export const useSlotsBulkSave = ({
         return false;
       }
     },
-    [opportunityId, communityId, capacity, updateSlots]
+    [opportunityId, updateSlots]
   );
 
   return {

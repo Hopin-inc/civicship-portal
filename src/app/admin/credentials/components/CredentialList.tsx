@@ -6,7 +6,7 @@ import { GqlEvaluationStatus, GqlVcIssuanceStatus, useGetEvaluationsQuery } from
 import { useRouter } from "next/navigation";
 import { AlertTriangle } from "lucide-react";
 import { useMemo } from "react";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 function getIssuanceStats(evaluations: any[]) {
   const allRequests = evaluations.flatMap((ev) => {
@@ -28,10 +28,9 @@ function getIssuanceStats(evaluations: any[]) {
 
 export default function CredentialList() {
   const router = useRouter();
-  const { communityId } = useCommunityConfig();
   const { data, loading, error } = useGetEvaluationsQuery({
     variables: { 
-      filter: { communityId },
+      filter: { communityId: COMMUNITY_ID },
       first: 100
     },
   });

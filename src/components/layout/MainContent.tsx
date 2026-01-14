@@ -7,7 +7,7 @@ import Header from "@/components/layout/Header";
 import BottomBar from "@/components/layout/BottomBar";
 import { RouteGuard } from "@/components/auth/RouteGuard";
 import AdminBottomBar from "@/components/layout/AdminBottomBar";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
+import { currentCommunityConfig } from "@/lib/communities/metadata";
 
 interface MainContentProps {
   children: React.ReactNode;
@@ -18,7 +18,6 @@ const MainContent: React.FC<MainContentProps> = ({ children }) => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const placeId = searchParams.get("placeId");
-  const communityConfig = useCommunityConfig();
 
   const showHeader = !config?.hideHeader;
 
@@ -30,7 +29,7 @@ const MainContent: React.FC<MainContentProps> = ({ children }) => {
     }
 
     // BottomBar の非表示条件をチェック
-    if ((communityConfig?.enableFeatures?.length ?? 0) < 2) {
+    if (currentCommunityConfig.enableFeatures.length < 2) {
       return false;
     }
 

@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { usePlaceCreateMutation, usePlaceUpdateMutation } from "@/types/graphql";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { PlaceEditorFormState } from "../types/form";
 import { toast } from "react-toastify";
 
@@ -10,7 +10,6 @@ interface UsePlaceSaveOptions {
 }
 
 export const usePlaceSave = ({ placeId, onSuccess }: UsePlaceSaveOptions = {}) => {
-  const { communityId } = useCommunityConfig();
   const [createPlace] = usePlaceCreateMutation();
   const [updatePlace] = usePlaceUpdateMutation();
 
@@ -55,7 +54,7 @@ export const usePlaceSave = ({ placeId, onSuccess }: UsePlaceSaveOptions = {}) =
             variables: {
               id: placeId,
               input: { ...input, id: placeId },
-              permission: { communityId },
+              permission: { communityId: COMMUNITY_ID },
             },
           });
           const updatedId = data?.placeUpdate?.place?.id;
@@ -68,8 +67,8 @@ export const usePlaceSave = ({ placeId, onSuccess }: UsePlaceSaveOptions = {}) =
           // 新規作成
           const { data } = await createPlace({
             variables: {
-              input: { ...input, communityId },
-              permission: { communityId },
+              input: { ...input, communityId: COMMUNITY_ID },
+              permission: { communityId: COMMUNITY_ID },
             },
           });
           const createdId = data?.placeCreate?.place?.id;
@@ -85,7 +84,7 @@ export const usePlaceSave = ({ placeId, onSuccess }: UsePlaceSaveOptions = {}) =
         return null;
       }
     },
-    [placeId, communityId, onSuccess, createPlace, updatePlace],
+    [placeId, onSuccess, createPlace, updatePlace],
   );
 
   return {

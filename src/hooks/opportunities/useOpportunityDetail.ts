@@ -3,7 +3,7 @@ import {
   presenterQuestDetail,
 } from "@/components/domains/opportunities/data/presenter";
 import { ActivityDetail, QuestDetail } from "@/components/domains/opportunities/types";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import {
   GqlOpportunity,
   GqlOpportunityCategory,
@@ -15,13 +15,10 @@ import { useMemo } from "react";
 
 // 基本のOpportunity詳細取得のみを担当
 export const useOpportunityDetail = (id: string | undefined) => {
-  const communityConfig = useCommunityConfig();
-  const communityId = communityConfig?.communityId ?? "";
-  
   const { data, loading, error, refetch } = useGetOpportunityQuery({
     variables: {
       id: id ?? "",
-      permission: { communityId },
+      permission: { communityId: COMMUNITY_ID },
       slotSort: { startsAt: GqlSortDirection.Asc },
       slotFilter: { hostingStatus: [GqlOpportunitySlotHostingStatus.Scheduled] },
     },

@@ -2,41 +2,29 @@ import React from "react";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { fetchUserServer } from "@/app/users/features/shared/server";
-import { getCommunityConfig, getCommunityIdFromEnv } from "@/lib/communities/config";
-import { DEFAULT_ASSET_PATHS } from "@/lib/communities/constants";
+import { currentCommunityConfig, DEFAULT_OPEN_GRAPH_IMAGE } from "@/lib/communities/metadata";
 import { mapGqlPortfolio, UserProfileProvider } from "@/app/users/features/shared";
 
 type Props = {
   params: { id: string };
 };
 
-const DEFAULT_OPEN_GRAPH_IMAGE = [
-  {
-    url: DEFAULT_ASSET_PATHS.OG_IMAGE,
-    width: 1200,
-    height: 630,
-    alt: "Civicship",
+const fallbackMetadata: Metadata = {
+  title: currentCommunityConfig.title,
+  description: currentCommunityConfig.description,
+  openGraph: {
+    images: DEFAULT_OPEN_GRAPH_IMAGE,
   },
-];
+};
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const communityId = getCommunityIdFromEnv();
-  const communityConfig = await getCommunityConfig(communityId);
   const user = await fetchUserServer(id);
-
-  const fallbackMetadata: Metadata = {
-    title: communityConfig?.title ?? "Civicship",
-    description: communityConfig?.description ?? "",
-    openGraph: {
-      images: DEFAULT_OPEN_GRAPH_IMAGE,
-    },
-  };
 
   if (!user) return fallbackMetadata;
 
   return {
-    title: `${user.name} | ${communityConfig?.title ?? "Civicship"}`,
+    title: `${user.name} | ${currentCommunityConfig.title}`,
     description: user.bio ?? "",
     openGraph: {
       type: "profile",

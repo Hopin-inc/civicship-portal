@@ -19,7 +19,7 @@ import {
   useGetOpportunitiesQuery,
   GqlSortDirection,
 } from "@/types/graphql";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { useAuth } from "@/contexts/AuthProvider";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CheckedState } from "@radix-ui/react-checkbox";
@@ -41,13 +41,12 @@ export default function CreateUtilitySheet({ buttonLabel, onUtilityCreated }: Cr
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { user } = useAuth();
-  const { communityId } = useCommunityConfig();
   const [createUtility] = useCreateUtilityMutation();
 
   const { data: opportunityData, loading: opportunitiesLoading } = useGetOpportunitiesQuery({
     variables: {
       filter: {
-        communityIds: [communityId],
+        communityIds: [COMMUNITY_ID],
         createdByUserIds: [user?.id ?? ""],
       },
       sort: { createdAt: GqlSortDirection.Desc },
@@ -75,7 +74,7 @@ export default function CreateUtilitySheet({ buttonLabel, onUtilityCreated }: Cr
             images: [],
             requiredForOpportunityIds: selectedOpportunityIds.length > 0 ? selectedOpportunityIds : undefined,
           },
-          permission: { communityId },
+          permission: { communityId: COMMUNITY_ID },
         },
       });
       const id = res.data?.utilityCreate?.utility?.id;

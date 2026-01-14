@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { useGetMemberWalletsQuery, GqlGetMemberWalletsQuery } from "@/types/graphql";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { toast } from "react-toastify";
@@ -21,13 +21,11 @@ export const useMemberWallets = (): UseMemberWalletsResult => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const { state } = useAuthStore();
   const hasFirebaseUser = !!state.firebaseUser;
-  const communityConfig = useCommunityConfig();
-  const communityId = communityConfig?.communityId ?? "";
 
   const { data, loading, error, refetch, fetchMore } = useGetMemberWalletsQuery({
     variables: {
       filter: {
-        communityId,
+        communityId: COMMUNITY_ID,
       },
       first: 20,
       withDidIssuanceRequests: true,
@@ -58,7 +56,7 @@ export const useMemberWallets = (): UseMemberWalletsResult => {
       await fetchMore({
         variables: {
           filter: {
-            communityId,
+            communityId: COMMUNITY_ID,
           },
           first: 20,
           cursor: endCursor,
@@ -91,7 +89,7 @@ export const useMemberWallets = (): UseMemberWalletsResult => {
     } finally {
       setIsLoadingMore(false);
     }
-  }, [hasNextPage, isLoadingMore, endCursor, fetchMore, communityId]);
+  }, [hasNextPage, isLoadingMore, endCursor, fetchMore]);
 
   const loadMoreRef = useInfiniteScroll({
     hasMore: hasNextPage && !isLoadingMore,
@@ -110,4 +108,4 @@ export const useMemberWallets = (): UseMemberWalletsResult => {
     hasNextPage,
     isLoadingMore,
   };
-};            
+};  

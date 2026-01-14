@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { useAuthEnvironment } from "@/hooks/useAuthEnvironment";
 import { cn } from "@/lib/utils";
 
@@ -32,10 +32,9 @@ export const OpportunityDetailsFooter: React.FC<OpportunityDetailsFooterProps> =
   communityId,
   disableReason,
 }) => {
-  const { communityId: configCommunityId } = useCommunityConfig();
   const query = new URLSearchParams({
     id: opportunityId,
-    community_id: communityId ?? configCommunityId,
+    community_id: communityId ?? COMMUNITY_ID,
   });
 
   const { isLiffClient } = useAuthEnvironment();

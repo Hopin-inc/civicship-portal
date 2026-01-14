@@ -10,7 +10,7 @@ import {
   useGetReservationsQuery,
 } from "@/types/graphql";
 import { useAuth } from "@/contexts/AuthProvider";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { useAdminRole } from "@/app/admin/context/AdminRoleContext";
 
 export interface UseReservationsResult {
@@ -34,17 +34,16 @@ const fallbackConnection: GqlReservationsConnection = {
 
 const useReservations = (filter: GqlReservationFilterInput): UseReservationsResult => {
   const { user } = useAuth();
-  const { communityId } = useCommunityConfig();
   const role = useAdminRole();
 
   const mergedFilter = React.useMemo(
     () => ({
       ...filter,
-      communityId,
+      communityId: COMMUNITY_ID,
       // ownerの場合は全ての予約を表示、それ以外は自分が主催する予約のみ
       ...(role !== GqlRole.Owner && { opportunityOwnerId: user?.id ?? undefined }),
     }),
-    [filter, communityId, user?.id, role],
+    [filter, user?.id, role],
   );
 
   const { data, loading, error, fetchMore, refetch } = useGetReservationsQuery({

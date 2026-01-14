@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { Info, Search } from "lucide-react";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
+import { getCurrentRegionName, currentCommunityConfig } from "@/lib/communities/metadata";
 import Link from "next/link";
 
 interface TicketContentProps {
@@ -29,9 +29,6 @@ const TicketContent: React.FC<TicketContentProps> = ({
   hasNextPage, 
   loading 
 }) => {
-  const communityConfig = useCommunityConfig();
-  const regionName = communityConfig?.regionName ?? "";
-  
   return (
     <main className="pt-6 px-4">
       <div className="mb-6">
@@ -64,13 +61,13 @@ const TicketContent: React.FC<TicketContentProps> = ({
               <Search className="h-8 w-8" />
             </EmptyMedia>
             <EmptyDescription>
-              {`${regionName}の素敵な人と関わって\nチケットをもらおう`}
+              {`${getCurrentRegionName()}の素敵な人と関わって\nチケットをもらおう`}
             </EmptyDescription>
           </EmptyHeader>
           <EmptyContent>
-            {communityConfig?.enableFeatures?.includes("opportunities") ? (
+            {currentCommunityConfig.enableFeatures.includes("opportunities") ? (
               <Button asChild variant="primary" size="lg" className="px-16">
-                <Link href={communityConfig?.rootPath ?? "/"}>
+                <Link href={currentCommunityConfig.rootPath ?? "/"}>
                   関わりをみつける
                 </Link>
               </Button>
