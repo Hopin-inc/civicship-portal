@@ -4,15 +4,17 @@
 
 import { useMemo } from "react";
 import { useGetPlacesQuery } from "@/types/graphql";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { PlaceData } from "../../shared/types/place";
 import { transformPlaceFromGraphQL } from "../services/placeTransformer";
 
 export const usePlaceList = () => {
+  const { communityId } = useCommunityConfig();
+  
   const { data, loading, error, refetch } = useGetPlacesQuery({
     variables: {
       filter: {
-        communityId: COMMUNITY_ID,
+        communityId,
       },
       first: 100,
     },

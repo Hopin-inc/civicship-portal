@@ -6,7 +6,7 @@ import {
 import { formatDateTime } from "@/utils/date";
 import Image from "next/image";
 import { CredentialRole, renderStatusCard } from "@/app/admin/credentials/[id]/data/presenter";
-import { getLogoPath } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import React, { useEffect, useRef } from "react";
 import { ErrorState, InfoCard } from "@/components/shared";
@@ -23,6 +23,7 @@ interface OpportunityListProps {
 
 export default function CredentialList(props: OpportunityListProps) {
   const { vcData, loading, error, refetch, data } = props;
+  const { logoPath } = useCommunityConfig();
 
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
@@ -43,8 +44,6 @@ export default function CredentialList(props: OpportunityListProps) {
     data?.participation?.evaluation?.participation?.user?.didIssuanceRequests?.find(
       (req) => req?.status === GqlDidIssuanceStatus.Completed,
     )?.didValue;
-
-  const logoPath = getLogoPath();
 
   const infoCardsValueList: InfoCardProps[] = [
     {

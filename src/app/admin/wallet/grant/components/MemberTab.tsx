@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { GqlMembershipsConnection, GqlUser } from "@/types/graphql";
 import { useMemberWithDidSearch as useMemberSearchFromCredentials } from "@/app/admin/credentials/hooks/useMemberWithDidSearch";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { useTranslations } from "next-intl";
 import { Table, TableBody } from "@/components/ui/table";
@@ -18,6 +18,7 @@ interface MemberTabProps {
 
 export function MemberTab({ members, searchQuery, onSelect, initialConnection }: MemberTabProps) {
   const t = useTranslations();
+  const { communityId } = useCommunityConfig();
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
   const {
@@ -25,7 +26,7 @@ export function MemberTab({ members, searchQuery, onSelect, initialConnection }:
     error,
     loadMoreRef: internalLoadMoreRef,
     isLoadingMore: internalIsLoadingMore,
-  } = useMemberSearchFromCredentials(COMMUNITY_ID, members, {
+  } = useMemberSearchFromCredentials(communityId, members, {
     searchQuery,
     pageSize: 20,
     enablePagination: true,
