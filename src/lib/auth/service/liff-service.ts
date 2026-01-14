@@ -190,8 +190,12 @@ export class LiffService {
   }
 
   public async signInWithLiffToken(): Promise<boolean> {
+    logger.warn("[DEBUG] signInWithLiffToken: START");
     const accessToken = this.getAccessToken();
-    if (!accessToken) return false;
+    if (!accessToken) {
+      logger.warn("[DEBUG] signInWithLiffToken: No access token, returning false");
+      return false;
+    }
 
     const communityId = process.env.NEXT_PUBLIC_COMMUNITY_ID;
     const endpoint = `${process.env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT}/line/liff-login`;
@@ -200,6 +204,7 @@ export class LiffService {
     // 最大3回まで（token切れ or transient errorのみリトライ）
     for (let attempt = 1; attempt <= 3; attempt++) {
       try {
+        logger.warn("[DEBUG] signInWithLiffToken: Attempt", { attempt });
         const response = await fetch(endpoint, {
           method: "POST",
           headers: {
@@ -207,6 +212,11 @@ export class LiffService {
             "X-Community-Id": communityId ?? "",
           },
           body: JSON.stringify({ accessToken }),
+        });
+
+        logger.warn("[DEBUG] signInWithLiffToken: Fetch completed", {
+          status: response.status,
+          ok: response.ok,
         });
 
         if (!response.ok) {
@@ -217,12 +227,18 @@ export class LiffService {
         }
 
         const { customToken, profile } = await response.json();
+        logger.warn("[DEBUG] signInWithLiffToken: Got customToken, calling signInWithCustomToken");
         const userCredential = await signInWithCustomToken(lineAuth, customToken);
+        logger.warn("[DEBUG] signInWithLiffToken: signInWithCustomToken completed", {
+          uid: userCredential.user.uid,
+        });
 
+        logger.warn("[DEBUG] signInWithLiffToken: Waiting for onAuthStateChanged");
         await Promise.race([
           new Promise<void>((resolve) => {
             const unsub = lineAuth.onAuthStateChanged((u) => {
               if (u) {
+                logger.warn("[DEBUG] signInWithLiffToken: onAuthStateChanged resolved");
                 unsub();
                 resolve();
               }
@@ -230,6 +246,7 @@ export class LiffService {
           }),
           new Promise<void>((resolve) => {
             setTimeout(() => {
+              logger.warn("[DEBUG] signInWithLiffToken: onAuthStateChanged timed out after 5s");
               resolve();
             }, 5000);
           }),
@@ -265,9 +282,14 @@ export class LiffService {
           isAuthenticating: false,
         });
 
+        logger.warn("[DEBUG] signInWithLiffToken: SUCCESS - returning true");
         return true;
       } catch (error) {
         const processedError = error instanceof Error ? error : new Error(String(error));
+        logger.warn("[DEBUG] signInWithLiffToken: Error in attempt", {
+          attempt,
+          error: processedError.message,
+        });
 
         if (processedError.message.includes("401") || processedError.message.includes("network") || processedError.message.includes("fetch")) {
           await new Promise((r) => setTimeout(r, attempt * 1000)); // 1s,2s,3s
@@ -277,6 +299,7 @@ export class LiffService {
       }
     }
 
+    logger.warn("[DEBUG] signInWithLiffToken: FAILED - returning false");
     return false;
   }
 

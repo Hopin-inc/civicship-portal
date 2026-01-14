@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { LiffService } from "@/lib/auth/service/liff-service";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
+import { logger } from "@/lib/logging";
 
 interface UseLineAuthRedirectDetectionProps {
   liffService: LiffService;
@@ -37,6 +38,13 @@ export const useLineAuthRedirectDetection = ({
 
     if (!stateChanged && !liffStateChanged) return;
 
+    logger.warn("[DEBUG] useLineAuthRedirectDetection: State changed", {
+      authState,
+      liffState,
+      prevAuthState: prevStateRef.current,
+      prevLiffState: prevLiffStateRef.current,
+    });
+
     prevStateRef.current = authState;
     prevLiffStateRef.current = liffState;
 
@@ -47,11 +55,22 @@ export const useLineAuthRedirectDetection = ({
       !["unauthenticated", "loading"].includes(authenticationState) || // 認証不要状態
       (liffState.isInitialized && !liffState.isLoggedIn); // LIFF初期化済みだがログイン未実施
 
+    logger.warn("[DEBUG] useLineAuthRedirectDetection: Skip evaluation", {
+      shouldSkip,
+      reasons: {
+        isSSR: typeof window === "undefined",
+        isAuthenticating,
+        authStateNotInList: !["unauthenticated", "loading"].includes(authenticationState),
+        liffInitializedButNotLoggedIn: liffState.isInitialized && !liffState.isLoggedIn,
+      },
+    });
+
     if (shouldSkip) {
       setShouldProcessRedirect(false);
       return;
     }
 
+    logger.warn("[DEBUG] useLineAuthRedirectDetection: Setting shouldProcessRedirect to TRUE");
     setShouldProcessRedirect(true);
   }, [authenticationState, isAuthenticating, liffService]);
 

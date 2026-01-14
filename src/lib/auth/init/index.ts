@@ -138,35 +138,80 @@ async function initAuthFull({
   setState: ReturnType<typeof useAuthStore.getState>["setState"];
 }) {
   try {
+    logger.warn("[DEBUG] initAuthFull: START", {
+      environment,
+      ssrCurrentUser: !!ssrCurrentUser,
+      ssrPhoneAuthenticated,
+      currentState: useAuthStore.getState().state,
+    });
+
     prepareInitialState(setState);
 
+    logger.warn("[DEBUG] initAuthFull: After prepareInitialState", {
+      currentState: useAuthStore.getState().state,
+    });
+
     const firebaseUser = await initializeFirebase(liffService, environment);
+    logger.warn("[DEBUG] initAuthFull: After initializeFirebase", {
+      firebaseUser: !!firebaseUser,
+      firebaseUid: firebaseUser?.uid,
+      liffState: liffService.getState(),
+    });
+
     if (!firebaseUser) {
+      logger.warn("[DEBUG] initAuthFull: No firebaseUser, calling handleUnauthenticatedBranch");
       const shouldContinue = handleUnauthenticatedBranch(
         liffService,
         environment,
         setState,
         authStateManager,
       );
+      logger.warn("[DEBUG] initAuthFull: handleUnauthenticatedBranch returned", {
+        shouldContinue,
+        currentState: useAuthStore.getState().state,
+      });
       if (!shouldContinue) return;
       return;
     }
 
     const sessionOk = await establishSessionFromFirebaseUser(firebaseUser, setState);
+    logger.warn("[DEBUG] initAuthFull: After establishSessionFromFirebaseUser", {
+      sessionOk,
+      currentState: useAuthStore.getState().state,
+    });
+
     if (!sessionOk) {
+      logger.warn("[DEBUG] initAuthFull: Session failed, setting unauthenticated");
       finalizeAuthState("unauthenticated", undefined, setState, authStateManager);
       return;
     }
 
     const user = await restoreUserSession(ssrCurrentUser, firebaseUser, setState);
+    logger.warn("[DEBUG] initAuthFull: After restoreUserSession", {
+      user: !!user,
+      userId: user?.id,
+      currentState: useAuthStore.getState().state,
+    });
+
     if (!user) {
+      logger.warn("[DEBUG] initAuthFull: No user found in DB, setting unauthenticated", {
+        firebaseUid: firebaseUser.uid,
+        beforeState: useAuthStore.getState().state,
+      });
       finalizeAuthState("unauthenticated", undefined, setState, authStateManager);
+      logger.warn("[DEBUG] initAuthFull: COMPLETE (no user path)", {
+        finalState: useAuthStore.getState().state,
+      });
       return;
     }
 
+    logger.warn("[DEBUG] initAuthFull: User found, evaluating registration state");
     await evaluateUserRegistrationState(user, ssrPhoneAuthenticated, setState, authStateManager);
+    logger.warn("[DEBUG] initAuthFull: COMPLETE (user found path)", {
+      finalState: useAuthStore.getState().state,
+    });
   } catch (error) {
-    logger.warn("initAuthFull failed", { error });
+    logger.warn("[DEBUG] initAuthFull: FAILED with error", { error });
     finalizeAuthState("unauthenticated", undefined, setState, authStateManager);
   }
 }

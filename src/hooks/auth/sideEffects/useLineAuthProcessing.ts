@@ -29,10 +29,18 @@ export const useLineAuthProcessing = ({
   const setState = useAuthStore((s) => s.setState);
 
   useEffect(() => {
+    logger.warn("[DEBUG] useLineAuthProcessing: useEffect check", {
+      shouldProcessRedirect,
+      processedRef: processedRef.current,
+      hasAuthStateManager: !!authStateManager,
+      hasFullAuth,
+    });
+
     if (!shouldProcessRedirect || processedRef.current || !authStateManager) return;
 
     const handleLineAuthRedirect = async () => {
       processedRef.current = true;
+      logger.warn("[DEBUG] useLineAuthProcessing: handleLineAuthRedirect START");
 
       // SSR で user/line/phone そろってるなら、LIFF 初期化も含めて全てスキップ
       if (hasFullAuth) {
@@ -43,6 +51,7 @@ export const useLineAuthProcessing = ({
         return;
       }
 
+      logger.warn("[DEBUG] useLineAuthProcessing: Setting isAuthenticating: true");
       setState({ isAuthenticating: true });
 
       try {
