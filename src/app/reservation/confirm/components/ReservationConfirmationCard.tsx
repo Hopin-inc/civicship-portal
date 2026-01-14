@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { SafeImage } from "@/components/ui/safe-image";
+import Image from "next/image";
 import React, { useCallback, useState } from "react";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { GqlOpportunityCategory } from "@/types/graphql";
@@ -47,7 +47,7 @@ export const ReservationConfirmationCard = ({
             }`}
           >
             <div className="relative h-[120px] w-[120px] flex-shrink-0">
-              <SafeImage
+              <Image
                 src={opportunity.images?.[0] ?? PLACEHOLDER_IMAGE}
                 alt={opportunity.title}
                 fill
@@ -55,7 +55,10 @@ export const ReservationConfirmationCard = ({
                 blurDataURL={PLACEHOLDER_IMAGE}
                 loading="lazy"
                 className="object-cover rounded-lg"
-                fallbackSrc={PLACEHOLDER_IMAGE}
+                onError={(e) => {
+                  const img = e.target as HTMLImageElement;
+                  img.src = PLACEHOLDER_IMAGE;
+                }}
               />
             </div>
             <div className="flex-1 px-4 py-3">

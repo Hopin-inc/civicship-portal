@@ -12,11 +12,9 @@ import {
   EmptyDescription,
   EmptyContent,
 } from "@/components/ui/empty";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
+import { currentCommunityConfig } from "@/lib/communities/metadata";
 
 export default function NotFound() {
-  const communityConfig = useCommunityConfig();
-  
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
@@ -24,7 +22,7 @@ export default function NotFound() {
     };
   }, []);
 
-  const rootPath = communityConfig?.rootPath ?? "/";
+  const rootPath = currentCommunityConfig.rootPath ?? "/";
 
   return (
     <div className="flex items-center justify-center p-12">

@@ -1,6 +1,6 @@
 "use client";
 
-import { SafeImage } from "@/components/ui/safe-image";
+import Image from "next/image";
 import { Ticket as TicketIcon } from "lucide-react";
 import { TicketClaimLink } from "@/app/tickets/data/type";
 import React from "react";
@@ -21,14 +21,17 @@ export default function TicketList({ tickets }: TicketListProps) {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="relative w-12 h-12 rounded-full overflow-hidden">
-                <SafeImage
+                <Image
                   src={ ticket.hostImage ?? PLACEHOLDER_IMAGE }
                   alt={ ticket.hostName }
                   fill
-                  placeholder="blur"
+                  placeholder={ `blur` }
                   blurDataURL={ PLACEHOLDER_IMAGE }
                   className="object-cover"
-                  fallbackSrc={ PLACEHOLDER_IMAGE }
+                  onError={ (e) => {
+                    const img = e.target as HTMLImageElement;
+                    img.src = PLACEHOLDER_IMAGE;
+                  } }
                 />
               </div>
               <div>

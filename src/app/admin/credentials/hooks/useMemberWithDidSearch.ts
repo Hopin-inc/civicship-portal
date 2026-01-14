@@ -10,6 +10,7 @@ import {
   GqlUser,
 } from "@/types/graphql";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { queryMemberships } from "@/app/admin/members/actions";
 
@@ -260,7 +261,7 @@ export function useMemberWithDidSearch(
         (req) => req?.status === GqlDidIssuanceStatus.Completed,
       );
 
-      const gqlWallet = user.wallets?.find((w) => w?.community?.id === communityId);
+      const gqlWallet = user.wallets?.find((w) => w?.community?.id === COMMUNITY_ID);
       const fallbackWallet = members.find((m) => m.user.id === user.id)?.wallet;
       const wallet = {
         currentPointView: {

@@ -8,14 +8,13 @@ import {
   GqlSortDirection,
   useGetUtilitiesQuery,
 } from "@/types/graphql";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { useAuth } from "@/contexts/AuthProvider";
 import CreateUtilitySheet from "./components/CreateUtilitySheet";
 import OpportunityListSheet from "./components/OpportunityListSheet";
 import { Coins, MessageSquareText, Tickets } from "lucide-react";
 
 export default function UtilitiesPage() {
-  const { communityId } = useCommunityConfig();
   const headerConfig = useMemo(
     () => ({
       title: "チケットの種類",
@@ -31,7 +30,7 @@ export default function UtilitiesPage() {
 
   const { data: utilityData, refetch: refetchUtilities } = useGetUtilitiesQuery({
     variables: {
-      filter: { communityIds: [communityId], ownerIds: user?.id ? [user.id] : undefined },
+      filter: { communityIds: [COMMUNITY_ID], ownerIds: user?.id ? [user.id] : undefined },
       sort: { createdAt: GqlSortDirection.Desc },
       first: 200,
     },

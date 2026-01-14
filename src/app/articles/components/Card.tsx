@@ -3,7 +3,6 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { SafeImage } from "@/components/ui/safe-image";
 import { TArticleCard, TArticleWithAuthor } from "@/app/articles/data/type";
 import { Card } from "@/components/ui/card";
 import CategoryBadge from "@/app/articles/components/CategoryBadge";
@@ -29,14 +28,17 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, showCategory, showUs
                 <CategoryBadge category={article.category} />
               </div>
             )}
-            <SafeImage
+            <Image
               src={article.thumbnail || PLACEHOLDER_IMAGE}
               alt={article.title}
               fill
-              placeholder="blur"
+              placeholder={`blur`}
               blurDataURL={PLACEHOLDER_IMAGE}
               className="object-cover rounded-t-lg"
-              fallbackSrc={PLACEHOLDER_IMAGE}
+              onError={(e) => {
+                const img = e.target as HTMLImageElement;
+                img.src = PLACEHOLDER_IMAGE;
+              }}
             />
           </div>
         )}

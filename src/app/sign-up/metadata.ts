@@ -1,19 +1,12 @@
 import { Metadata } from "next";
-import { getCommunityConfigFromEnv, getDefaultOgImage } from "@/lib/communities/config";
+import { DEFAULT_OPEN_GRAPH_IMAGE, currentCommunityConfig } from "@/lib/communities/metadata";
 import { getTranslations } from "next-intl/server";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const [t, config] = await Promise.all([
-    getTranslations("auth.signup.metadata"),
-    getCommunityConfigFromEnv(),
-  ]);
+  const t = await getTranslations("auth.signup.metadata");
 
-  const communityTitle = config?.title || "";
-  const domain = config?.domain || "";
-  const ogImages = getDefaultOgImage(config);
-
-  const title = t("title", { communityTitle });
-  const description = t("description", { communityTitle });
+  const title = t("title", { communityTitle: currentCommunityConfig.title });
+  const description = t("description", { communityTitle: currentCommunityConfig.title });
 
   return {
     title,
@@ -21,18 +14,18 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       title,
       description,
-      url: `${domain}/sign-up`,
+      url: `${currentCommunityConfig.domain}/sign-up`,
       type: "website",
-      images: ogImages,
+      images: DEFAULT_OPEN_GRAPH_IMAGE,
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: ogImages,
+      images: DEFAULT_OPEN_GRAPH_IMAGE,
     },
     alternates: {
-      canonical: `${domain}/sign-up`,
+      canonical: `${currentCommunityConfig.domain}/sign-up`,
     },
   };
 }

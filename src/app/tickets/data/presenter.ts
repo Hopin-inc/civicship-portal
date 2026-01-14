@@ -2,7 +2,7 @@
 
 import { Ticket, TicketClaimLink } from "@/app/tickets/data/type";
 import { PLACEHOLDER_IMAGE } from "@/utils";
-import { getCommunityIdFromEnv } from "@/lib/communities/config";
+import { getCommunityIdFromEnv } from "@/lib/communities/metadata";
 import { GqlWallet } from "@/types/graphql";
 
 export const transformTickets = (data: any): Ticket[] => {

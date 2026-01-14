@@ -16,7 +16,7 @@ import {
 import { TArticleWithAuthor } from "@/app/articles/data/type";
 import { presenterPlace } from "@/app/places/data/presenter";
 import { presenterOpportunityHost } from "@/components/domains/opportunities/data/presenter";
-import { getCommunityIdFromEnv } from "@/lib/communities/config";
+import { getCommunityIdFromEnv } from "@/lib/communities/metadata";
 
 export const getTicketIds = (
   wallets: GqlWallet[] | null,

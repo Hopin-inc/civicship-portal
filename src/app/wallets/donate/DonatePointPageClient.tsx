@@ -17,12 +17,11 @@ import {
   GqlMembershipStatus,
   GqlMembershipStatusReason,
 } from "@/types/graphql";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 export default function DonatePointPageClient() {
   const t = useTranslations();
   const { user } = useAuth();
-  const { communityId } = useCommunityConfig();
   const searchParams = useSearchParams();
   const currentPoint = BigInt(searchParams.get("currentPoint") ?? "0");
   const [activeTab, setActiveTab] = useState<Tabs>(Tabs.History);
@@ -36,7 +35,7 @@ export default function DonatePointPageClient() {
     if (members.length === 0) return null;
 
     const edges = members.map((m) => ({
-      cursor: `${m.user.id}_${communityId}`,
+      cursor: `${m.user.id}_${COMMUNITY_ID}`,
       node: {
         user: m.user,
         role: GqlRole.Member,
@@ -55,7 +54,7 @@ export default function DonatePointPageClient() {
       },
       totalCount: walletsConnection?.totalCount ?? members.length,
     };
-  }, [members, communityId, walletsConnection]);
+  }, [members, walletsConnection]);
 
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {

@@ -1,5 +1,5 @@
 import { Calendar, MapPin, ShieldCheck } from "lucide-react";
-import { SafeImage } from "@/components/ui/safe-image";
+import Image from "next/image";
 import Link from "next/link";
 import { RefObject } from "react";
 import { ParticipantsList } from "@/components/shared/ParticipantsList";
@@ -22,15 +22,18 @@ export const PortfolioCard = ({ viewModel, isLast, lastRef }: PortfolioCardProps
         className="rounded-lg overflow-hidden hover:opacity-90 transition-opacity"
       >
         <div className="relative w-full aspect-[164/205]">
-          <SafeImage
+          <Image
             src={viewModel.image}
             alt={viewModel.title}
             fill
             className="object-cover"
-            placeholder="blur"
+            placeholder={"blur"}
             blurDataURL={PLACEHOLDER_IMAGE}
             sizes="(min-width: 640px) 50vw, 100vw"
-            fallbackSrc={PLACEHOLDER_IMAGE}
+            onError={(e) => {
+              const img = e.target as HTMLImageElement;
+              img.src = PLACEHOLDER_IMAGE;
+            }}
           />
           {viewModel.showShield ? (
             <div className="absolute top-2 left-2 z-10">

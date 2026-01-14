@@ -1,6 +1,6 @@
 "use client";
 
-import { SafeImage } from "@/components/ui/safe-image";
+import Image from "next/image";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { PLACEHOLDER_IMAGE } from "@/utils";
@@ -70,17 +70,20 @@ export default function OpportunityVerticalCard({
             {badge}
           </div>
         )}
-        <SafeImage
+        <Image
           src={image ?? PLACEHOLDER_IMAGE}
           alt={imageAlt ?? title}
           width={400}
           height={400}
           sizes={config.sizes}
-          placeholder="blur"
+          placeholder={`blur`}
           blurDataURL={PLACEHOLDER_IMAGE}
           loading="lazy"
           className="h-full w-full object-cover"
-          fallbackSrc={PLACEHOLDER_IMAGE}
+          onError={(e) => {
+            const img = e.target as HTMLImageElement;
+            img.src = PLACEHOLDER_IMAGE;
+          }}
         />
       </Card>
       <div className={config.spacing}>

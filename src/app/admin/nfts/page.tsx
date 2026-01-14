@@ -3,12 +3,11 @@
 import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useGetNftInstancesQuery } from "@/types/graphql";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { NftList } from "./components/NftList";
 import { NftItemData } from "./components/NftItem";
 
 export default function AdminNftsPage() {
-  const { communityId } = useCommunityConfig();
   const headerConfig = useMemo(
     () => ({
       title: "NFT一覧",
@@ -24,7 +23,7 @@ export default function AdminNftsPage() {
     variables: {
       first: 100,
       filter: {
-        communityId,
+        communityId: COMMUNITY_ID,
       },
     },
     fetchPolicy: "network-only",

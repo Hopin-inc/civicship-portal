@@ -5,7 +5,7 @@ import { useMemo, useRef } from "react";
 import { useGetOpportunityQuery } from "@/types/graphql";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { OpportunityFormEditor } from "../../features/editor/components/OpportunityFormEditor";
 import { OpportunityEditorLayout } from "../../features/editor/components/OpportunityEditorLayout";
 import { presentOpportunityForEdit } from "../../features/editor/presenters/presentOpportunityForEdit";
@@ -13,7 +13,6 @@ import { presentOpportunityForEdit } from "../../features/editor/presenters/pres
 export default function EditOpportunityPage() {
   const params = useParams();
   const router = useRouter();
-  const { communityId } = useCommunityConfig();
   const opportunityId = params.id as string;
 
   const refetchRef = useRef<(() => void) | null>(null);
@@ -22,7 +21,7 @@ export default function EditOpportunityPage() {
   const { data, loading, error } = useGetOpportunityQuery({
     variables: {
       id: opportunityId,
-      permission: { communityId },
+      permission: { communityId: COMMUNITY_ID },
     },
     fetchPolicy: "network-only",
   });

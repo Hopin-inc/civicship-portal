@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { toast } from "react-toastify";
 import { useAuth } from "@/contexts/AuthProvider";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
+import { currentCommunityConfig } from "@/lib/communities/metadata";
 import { useUserProfileContext } from "@/app/users/features/shared/contexts/UserProfileContext";
 import { GqlDidIssuanceStatus } from "@/types/graphql";
 import { useTranslations } from "next-intl";
@@ -25,7 +25,6 @@ export default function AccountSection() {
   const t = useTranslations();
   const { isAuthenticated, isPhoneVerified, isAuthenticating } = useAuth();
   const { gqlUser } = useUserProfileContext();
-  const communityConfig = useCommunityConfig();
 
   const completedRequest = gqlUser?.didIssuanceRequests?.find(
     (req) => req?.status === GqlDidIssuanceStatus.Completed,
@@ -104,7 +103,7 @@ export default function AccountSection() {
           </span>
         </div>
         {/* JUST DAO IT */}
-        {communityConfig?.enableFeatures?.includes("justDaoIt") && (
+        {currentCommunityConfig.enableFeatures.includes("justDaoIt") && (
           <div className="flex items-center justify-between py-4 px-4">
             <div className="flex items-center gap-2">
               <LinkIcon className="w-4 h-4" />

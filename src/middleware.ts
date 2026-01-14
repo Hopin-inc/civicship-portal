@@ -1,11 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getCommunityIdFromEnv, fetchCommunityConfigForEdge } from "@/lib/communities/config-env";
+import { FeaturesType, currentCommunityConfig } from "@/lib/communities/metadata";
 import { detectPreferredLocale } from "@/lib/i18n/languageDetection";
 import { locales, defaultLocale } from "@/lib/i18n/config";
-
-// Feature types for route gating
-type FeaturesType = "places" | "opportunities" | "points" | "tickets" | "articles" | "languageSwitcher";
 
 // Map features to their corresponding route paths
 const featureToRoutesMap: Partial<Record<FeaturesType, string[]>> = {
@@ -16,15 +13,11 @@ const featureToRoutesMap: Partial<Record<FeaturesType, string[]>> = {
   articles: ["/articles"],
 };
 
-export async function middleware(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const isDev = process.env.NODE_ENV !== "production";
   const pathname = request.nextUrl.pathname;
-  
-  // Fetch config from server-side API
-  const communityId = getCommunityIdFromEnv();
-  const config = await fetchCommunityConfigForEdge(communityId);
-  const enabledFeatures = config?.enableFeatures || [];
-  const rootPath = config?.rootPath || "/";
+  const enabledFeatures = currentCommunityConfig.enableFeatures || [];
+  const rootPath = currentCommunityConfig.rootPath || "/";
 
   // liff.state がある場合はrootPathへのリダイレクトをスキップ（LIFFのルーティングバグ対策）
   const hasLiffState = request.nextUrl.searchParams.get("liff.state");

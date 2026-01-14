@@ -1,5 +1,3 @@
-"use client";
-
 import {
   Empty,
   EmptyHeader,
@@ -9,7 +7,7 @@ import {
 } from "@/components/ui/empty";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
+import { getCurrentRegionName, currentCommunityConfig, getCurrentRegionKey } from "@/lib/communities/metadata";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 
@@ -19,8 +17,6 @@ type PortfolioEmptyStateProps = {
 
 export const PortfolioEmptyState = ({ isOwner }: PortfolioEmptyStateProps) => {
   const t = useTranslations();
-  const communityConfig = useCommunityConfig();
-  const regionKey = communityConfig?.regionKey ? `common.regions.${communityConfig.regionKey}` : "common.regions.default";
   
   return (
     <Empty className="mt-8">
@@ -30,14 +26,14 @@ export const PortfolioEmptyState = ({ isOwner }: PortfolioEmptyStateProps) => {
         </EmptyMedia>
         <EmptyDescription>
           {isOwner
-            ? t("users.portfolio.emptyStateOwner", { regionName: t(regionKey) })
+            ? t("users.portfolio.emptyStateOwner", { regionName: t(getCurrentRegionKey()) })
             : t("users.portfolio.emptyStateNonOwner")}
         </EmptyDescription>
       </EmptyHeader>
       {isOwner && (
         <EmptyContent>
           <Button asChild variant="primary" size="lg" className="px-16">
-            <Link href={communityConfig?.rootPath ?? "/"}>
+            <Link href={currentCommunityConfig.rootPath ?? "/"}>
               {t("users.portfolio.searchEngagements")}
             </Link>
           </Button>

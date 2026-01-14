@@ -3,7 +3,6 @@ import { toPointNumber } from "@/utils/bigint";
 import { logger } from "@/lib/logging";
 import { presenterTransaction } from "@/utils/transaction";
 import { AppTransaction } from "@/app/wallets/features/shared/type";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 interface WalletActionDeps {
   walletId: string;
@@ -32,8 +31,6 @@ export function useWalletActions({
   hasNextPage,
   endCursor,
 }: WalletActionDeps) {
-  const communityConfig = useCommunityConfig();
-  
   const refresh = useCallback(async () => {
     setIsLoadingWallet(true);
     setError(null);
@@ -45,7 +42,7 @@ export function useWalletActions({
       setCurrentPoint(toPointNumber(result.wallet.currentPoint, 0));
 
       const newTransactions = (result.transactions.edges ?? [])
-        .map((edge) => presenterTransaction(edge?.node, walletId, communityConfig))
+        .map((edge) => presenterTransaction(edge?.node, walletId))
         .filter((tx): tx is AppTransaction => tx !== null);
 
       setTransactions(newTransactions);
@@ -65,7 +62,6 @@ export function useWalletActions({
     setIsLoadingWallet,
     setTransactions,
     walletId,
-    communityConfig,
   ]);
 
   const loadMore = useCallback(async () => {
@@ -77,7 +73,7 @@ export function useWalletActions({
       const result = await fetchMyWalletWithTransactionsAction(endCursor, 20);
 
       const newTransactions = (result.transactions.edges ?? [])
-        .map((edge) => presenterTransaction(edge?.node, walletId, communityConfig))
+        .map((edge) => presenterTransaction(edge?.node, walletId))
         .filter((tx): tx is AppTransaction => tx !== null);
 
       setTransactions((prev) => {
@@ -104,7 +100,6 @@ export function useWalletActions({
     setHasNextPage,
     setEndCursor,
     walletId,
-    communityConfig,
   ]);
 
   return { refresh, loadMore };

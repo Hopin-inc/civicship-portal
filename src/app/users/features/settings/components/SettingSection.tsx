@@ -6,11 +6,10 @@ import { Contact, Globe } from "lucide-react";
 import Link from "next/link";
 import { LocaleSwitcher } from "@/components/shared/LocaleSwitcher";
 import { useTranslations } from "next-intl";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
+import { currentCommunityConfig } from "@/lib/communities/metadata";
 
 export default function SettingSection() {
   const t = useTranslations();
-  const communityConfig = useCommunityConfig();
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardContent className="p-0">
@@ -32,7 +31,7 @@ export default function SettingSection() {
         </div>
 
         {/* 言語切替 */}
-        {communityConfig?.enableFeatures?.includes("languageSwitcher") && (
+        {currentCommunityConfig.enableFeatures.includes("languageSwitcher") && (
           <div className="flex items-center justify-between py-4 px-4">
             <div className="flex items-center gap-2">
               <Globe className="w-5 h-5" />

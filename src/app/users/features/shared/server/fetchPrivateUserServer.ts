@@ -10,7 +10,7 @@ type FetchProfileServerResult = {
   currentUser?: { user?: GqlUser | null } | null;
 };
 
-export async function fetchPrivateUserServer(communityId?: string): Promise<GqlUser | null> {
+export async function fetchPrivateUserServer(): Promise<GqlUser | null> {
   const hasSession = await hasServerSession();
   const cookieHeader = await getServerCookieHeader();
 
@@ -26,19 +26,11 @@ export async function fetchPrivateUserServer(communityId?: string): Promise<GqlU
     return null;
   }
 
-  const headers: Record<string, string> = {};
-  if (cookieHeader) {
-    headers.cookie = cookieHeader;
-  }
-  if (communityId) {
-    headers["X-Community-Id"] = communityId;
-  }
-
   try {
     const res = await executeServerGraphQLQuery<
       FetchProfileServerResult,
       GqlCurrentUserServerQueryVariables
-    >(FETCH_PROFILE_SERVER_QUERY, {}, headers);
+    >(FETCH_PROFILE_SERVER_QUERY, {}, cookieHeader ? { cookie: cookieHeader } : {});
 
     const user = res.currentUser?.user ?? null;
 

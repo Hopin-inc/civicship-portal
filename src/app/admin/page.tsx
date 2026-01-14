@@ -15,14 +15,12 @@ import {
   Users,
   Wallet,
 } from "lucide-react";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
+import { currentCommunityConfig, FeaturesType } from "@/lib/communities/metadata";
 import { useAdminRole } from "@/app/admin/context/AdminRoleContext";
 import { GqlRole } from "@/types/graphql";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
-
-type FeaturesType = string;
 
 const adminSettings = [
   {
@@ -80,7 +78,6 @@ export default function AdminPage() {
   const router = useRouter();
   const role = useAdminRole();
   const t = useTranslations();
-  const communityConfig = useCommunityConfig();
 
   const headerConfig = useMemo(
     () => ({
@@ -100,7 +97,7 @@ export default function AdminPage() {
   );
   useHeaderConfig(headerConfig);
 
-  const enabled = communityConfig?.enableFeatures ?? [];
+  const enabled = currentCommunityConfig.enableFeatures;
 
   const visibleAdminSettings =
     role === GqlRole.Owner
