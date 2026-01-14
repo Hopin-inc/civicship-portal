@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { DEFAULT_ASSET_PATHS } from "./constants";
 import {
-  getCommunityPortalConfig,
+  getCommunityConfig,
   type CommunityPortalConfig,
   type CommunityDocumentConfig,
 } from "./config";
@@ -504,7 +504,7 @@ export async function getCommunityConfigFromDB(): Promise<CommunityBaseConfig> {
   const communityId = getCommunityIdFromEnv();
 
   // Try to fetch from DB first
-  const portalConfig = await getCommunityPortalConfig(communityId);
+  const portalConfig = await getCommunityConfig(communityId);
 
   if (portalConfig) {
     return convertPortalConfigToBaseConfig(portalConfig);
@@ -519,7 +519,7 @@ export async function getCommunityConfigFromDB(): Promise<CommunityBaseConfig> {
  */
 export async function getRegionNameFromDB(): Promise<string> {
   const communityId = getCommunityIdFromEnv();
-  const portalConfig = await getCommunityPortalConfig(communityId);
+  const portalConfig = await getCommunityConfig(communityId);
 
   if (portalConfig?.regionName) {
     return portalConfig.regionName;
@@ -534,7 +534,7 @@ export async function getRegionNameFromDB(): Promise<string> {
  */
 export async function getRegionKeyFromDB(): Promise<string> {
   const communityId = getCommunityIdFromEnv();
-  const portalConfig = await getCommunityPortalConfig(communityId);
+  const portalConfig = await getCommunityConfig(communityId);
 
   if (portalConfig?.regionKey) {
     return portalConfig.regionKey;

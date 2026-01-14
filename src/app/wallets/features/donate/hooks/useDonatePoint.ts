@@ -13,7 +13,8 @@ interface DonatePointInput {
 
 export function useDonatePoint() {
   const [isLoading, setIsLoading] = useState(false);
-  const { communityId } = useCommunityConfig();
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId ?? "";
   const { donatePoint, isAuthReady } = useTransactionMutations();
 
   const donate = async ({ toUserId, amount, comment, fromUserId }: DonatePointInput) => {

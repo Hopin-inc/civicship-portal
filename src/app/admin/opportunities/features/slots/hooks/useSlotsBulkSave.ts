@@ -60,7 +60,7 @@ export const useSlotsBulkSave = ({
         return false;
       }
     },
-    [opportunityId, communityId, capacity, updateSlots]
+    [opportunityId, communityId, updateSlots]
   );
 
   return {

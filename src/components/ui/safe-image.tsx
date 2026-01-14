@@ -1,8 +1,8 @@
 "use client";
 
 import Image, { ImageProps } from "next/image";
-import { useState, useCallback } from "react";
-import { PLACEHOLDER_IMAGE } from "@/utils";
+import { useState, useCallback, useEffect } from "react";
+import { PLACEHOLDER_IMAGE, FALLBACK_IMAGE } from "@/utils";
 
 export interface SafeImageProps extends Omit<ImageProps, "onError"> {
   fallbackSrc?: string;
@@ -16,6 +16,11 @@ export interface SafeImageProps extends Omit<ImageProps, "onError"> {
  * This solves the issue where Next.js Image component's onError handler
  * setting img.src directly doesn't prevent infinite retries because
  * the component re-renders and tries to fetch the original URL again.
+ *
+ * Implements multi-stage fallback:
+ * 1. Original src
+ * 2. fallbackSrc (default: PLACEHOLDER_IMAGE)
+ * 3. FALLBACK_IMAGE (data URI) as final fallback
  */
 export function SafeImage({
   src,
@@ -23,25 +28,25 @@ export function SafeImage({
   alt,
   ...props
 }: SafeImageProps) {
-  const [hasError, setHasError] = useState(false);
-  const [currentSrc, setCurrentSrc] = useState(src);
+  const [imgSrc, setImgSrc] = useState(src);
+
+  useEffect(() => {
+    setImgSrc(src);
+  }, [src]);
 
   const handleError = useCallback(() => {
-    if (!hasError) {
-      setHasError(true);
-      setCurrentSrc(fallbackSrc);
-    }
-  }, [hasError, fallbackSrc]);
-
-  // Reset error state when src changes
-  if (src !== currentSrc && !hasError) {
-    setCurrentSrc(src);
-  }
+    setImgSrc((prevSrc) => {
+      if (prevSrc === src) {
+        return fallbackSrc;
+      }
+      return FALLBACK_IMAGE;
+    });
+  }, [src, fallbackSrc]);
 
   return (
     <Image
       {...props}
-      src={hasError ? fallbackSrc : currentSrc}
+      src={imgSrc || FALLBACK_IMAGE}
       alt={alt}
       onError={handleError}
     />
