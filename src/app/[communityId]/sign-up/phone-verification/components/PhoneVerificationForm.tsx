@@ -3,7 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthProvider";
 import { toast } from "react-toastify";
-import { useRouter, useSearchParams, useParams } from "next/navigation";
+import { useSearchParams, useParams } from "next/navigation";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { VerificationStep } from "../types";
 import { isValidPhoneNumber } from "../utils/validatePhoneNumber";
@@ -21,7 +22,7 @@ import { useAuthDependencies } from "@/hooks/auth/init/useAuthDependencies";
 
 export function PhoneVerificationForm() {
   const t = useTranslations();
-  const router = useRouter();
+  const router = useCommunityRouter();
   const searchParams = useSearchParams();
   const params = useParams<{ communityId: string }>();
   const communityId = params.communityId;

@@ -1,12 +1,13 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import { useEffect, useRef } from "react";
 import { PhoneVerificationForm } from "./components/PhoneVerificationForm";
 import { useAuthEnvironment } from "@/hooks/useAuthEnvironment";
 
 export default function PhoneVerificationPage() {
-  const router = useRouter();
+  const router = useCommunityRouter();
   const hasRedirected = useRef(false);
   const { isLineBrowser } = useAuthEnvironment();
 

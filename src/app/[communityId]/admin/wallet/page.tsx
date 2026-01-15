@@ -8,7 +8,8 @@ import useHeaderConfig from "@/hooks/useHeaderConfig";
 import WalletCard from "@/components/shared/WalletCard";
 import { GqlMembership, GqlRole, GqlWallet, useGetCommunityWalletQuery } from "@/types/graphql";
 import { Coins, Gift } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import { toast } from "react-toastify";
 import useCommunityTransactions from "@/app/[communityId]/admin/wallet/hooks/useCommunityTransactions";
 import { InfiniteTransactionList } from "@/shared/transactions/components/InfiniteTransactionList";
@@ -19,7 +20,8 @@ import { useTranslations } from "next-intl";
 
 export default function WalletPage() {
   const t = useTranslations();
-  const { communityId } = useCommunityConfig();
+  const config = useCommunityConfig();
+  const communityId = config?.communityId ?? "";
   const { user: currentUser } = useAuth();
   const currentUserRole = currentUser?.memberships?.find(
     (m: GqlMembership) => m.community?.id === communityId,
@@ -39,7 +41,7 @@ export default function WalletPage() {
   );
   useHeaderConfig(headerConfig);
 
-  const router = useRouter();
+  const router = useCommunityRouter();
   const handleNavigateToIssue = () => router.push("/admin/wallet/issue");
   const handleNavigateToGrant = () =>
     router.push(`/admin/wallet/grant?currentPoint=${currentPoint}&tab=history`);
@@ -61,7 +63,7 @@ export default function WalletPage() {
   const currentPointView = wallet?.currentPointView;
   const currentPoint = toPointNumber(currentPointView?.currentPoint, 0);
 
-  const { connection, loadMoreRef, refetch: refetchTransactions } = useCommunityTransactions();
+  const { connection, refetch: refetchTransactions } = useCommunityTransactions();
 
   // 操作完了後のリダイレクトでrefreshパラメータがある場合、データを更新
   useEffect(() => {

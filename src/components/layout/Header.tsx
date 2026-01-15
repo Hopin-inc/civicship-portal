@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import CommunityLink from "@/components/navigation/CommunityLink";
 import Image from "next/image";
 import { ChevronLeft } from "lucide-react";
@@ -23,7 +24,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
   const { isInLine } = useAuthEnvironment();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const router = useRouter();
+  const router = useCommunityRouter();
   const communityConfig = useCommunityConfig();
 
   const handleBackButton = () => {

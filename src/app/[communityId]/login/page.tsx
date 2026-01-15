@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useSearchParams, useRouter, useParams } from "next/navigation";
+import { useSearchParams, useParams } from "next/navigation";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import { decodeURIComponentWithType, EncodedURIComponent } from "@/utils/path";
 import { getLiffLoginErrorMessage } from "@/app/[communityId]/login/utils/getLiffLoginErrorMessage";
 import { toast } from "react-toastify";
@@ -16,7 +17,7 @@ import { useAuthDependencies } from "@/hooks/auth/init/useAuthDependencies";
 type LoginStep = "login" | "phone-input" | "registration";
 
 export default function LoginPage() {
-  const router = useRouter();
+  const router = useCommunityRouter();
   const params = useParams();
   const communityId = params?.communityId as string;
   const searchParams = useSearchParams();
@@ -101,7 +102,7 @@ export default function LoginPage() {
       }
 
       if (result.success) {
-        const redirectPath = nextPath || `/${communityId}/activities`;
+        const redirectPath = nextPath || "/activities";
         router.push(redirectPath);
         return;
       }
@@ -135,7 +136,7 @@ export default function LoginPage() {
       const result = await response.json();
 
       if (result.success) {
-        const redirectPath = nextPath || `/${communityId}/activities`;
+        const redirectPath = nextPath || "/activities";
         router.push(redirectPath);
         return;
       }
