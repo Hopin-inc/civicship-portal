@@ -9,6 +9,7 @@
   "common.prefectures.outsideShikoku": "四国以外",
   "common.prefectures.unknown": "不明",
   "common.noData": "データが存在しません",
+  "common.loading": "読み込み中...",
   "common.errorState.defaultTitle": "ページを読み込めませんでした",
   "common.errorState.description": "以下のボタンから再読み込みをお試しください。再試行しても改善しない場合は、時間をおいて再度アクセスするか、トップページにお戻りください。",
   "common.errorState.retryButton": "再度読み込み",

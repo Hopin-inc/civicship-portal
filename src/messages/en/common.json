@@ -9,6 +9,7 @@
   "common.prefectures.outsideShikoku": "Outside Shikoku",
   "common.prefectures.unknown": "Unknown",
   "common.noData": "No data available",
+  "common.loading": "Loading...",
   "common.errorState.defaultTitle": "Failed to load page",
   "common.errorState.description": "Please try reloading using the button below. If the issue persists after retrying, please wait a moment and try again, or return to the top page.",
   "common.errorState.retryButton": "Reload",

@@ -7,6 +7,7 @@ interface TransactionMessageCardProps {
 /**
  * テキスト内のURLを検出してリンク化する
  * Note: <a>タグのネストを避けるため、spanとonClickで実装
+ * セキュリティ: http/https スキームのみ許可
  */
 const linkifyText = (text: string) => {
   // URL検出用の正規表現（http, https, www で始まるURL）
@@ -16,30 +17,43 @@ const linkifyText = (text: string) => {
   return parts.map((part, index) => {
     // URLの場合
     if (part.match(urlRegex)) {
-      // www. で始まる場合は https:// を付ける
-      const href = part.startsWith('www.') ? `https://${part}` : part;
-      return (
-        <span
-          key={index}
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            window.open(href, '_blank', 'noopener,noreferrer');
-          }}
-          className="text-primary underline hover:text-primary/80 cursor-pointer"
-          role="link"
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
+      // スキーム検証: http または https のみ許可
+      const normalizedHref = part.startsWith('www.') ? `https://${part}` : part;
+
+      try {
+        const url = new URL(normalizedHref);
+        // http または https 以外は拒否（XSS対策）
+        if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+          return part; // 危険なスキーム（javascript:, data:等）はテキストのまま
+        }
+
+        const href = url.toString();
+        return (
+          <span
+            key={index}
+            onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               window.open(href, '_blank', 'noopener,noreferrer');
-            }
-          }}
-        >
-          {part}
-        </span>
-      );
+            }}
+            className="text-primary underline hover:text-primary/80 cursor-pointer"
+            role="link"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                e.stopPropagation();
+                window.open(href, '_blank', 'noopener,noreferrer');
+              }
+            }}
+          >
+            {part}
+          </span>
+        );
+      } catch {
+        // 不正な URL はテキストのまま
+        return part;
+      }
     }
     // 通常のテキストの場合
     return part;

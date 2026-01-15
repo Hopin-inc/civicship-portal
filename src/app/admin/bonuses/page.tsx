@@ -35,12 +35,12 @@ export default function BonusesPage() {
 
   const headerConfig = useMemo(
     () => ({
-      title: "特典一覧",
+      title: t("adminBonuses.page.title"),
       showBackButton: true,
       backTo: "/admin",
       showLogo: false,
     }),
-    [],
+    [t],
   );
   useHeaderConfig(headerConfig);
 
@@ -63,7 +63,7 @@ export default function BonusesPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-sm text-muted-foreground">読み込み中...</div>
+        <div className="text-sm text-muted-foreground">{t("common.loading")}</div>
       </div>
     );
   }
@@ -126,7 +126,9 @@ export default function BonusesPage() {
         <Item>
           <div className="flex flex-1 flex-col min-w-0">
             <ItemContent>
-              <ItemTitle className="font-bold text-base leading-snug">累計獲得pt特典</ItemTitle>
+              <ItemTitle className="font-bold text-base leading-snug">
+                {t("adminBonuses.cumulative.title")}
+              </ItemTitle>
             </ItemContent>
 
             <ItemFooter className="mt-2">
@@ -135,7 +137,7 @@ export default function BonusesPage() {
                   {/* ステータス表示は将来実装予定 */}
                   {/* <span className={cn("size-2.5 rounded-full", "bg-green-500")} /> */}
                   {/* 有効 ・ */}
-                  1SBT支給
+                  {t("adminBonuses.cumulative.reward")}
                 </span>
               </div>
             </ItemFooter>
@@ -144,7 +146,7 @@ export default function BonusesPage() {
           {/* 右端の編集ボタン（準備中） */}
           <div className="shrink-0 flex items-center">
             <Button variant="tertiary" size="sm" disabled>
-              準備中
+              {t("adminBonuses.cumulative.preparing")}
             </Button>
           </div>
         </Item>

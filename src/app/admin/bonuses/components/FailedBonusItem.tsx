@@ -81,7 +81,9 @@ export default function FailedBonusItem({ bonus, onRetrySuccess }: FailedBonusIt
                 {getFailureReasonText(bonus.failureCode)}
               </span>
               <span className="text-muted-foreground">・</span>
-              <span className="text-muted-foreground">{bonus.attemptCount || 0}回試行</span>
+              <span className="text-muted-foreground">
+                {t("adminWallet.settings.pending.attempts", { count: bonus.attemptCount || 0 })}
+              </span>
             </div>
           </ItemFooter>
         </div>
@@ -89,7 +91,9 @@ export default function FailedBonusItem({ bonus, onRetrySuccess }: FailedBonusIt
 
       <ItemActions>
         <Button variant="primary" size="sm" onClick={handleRetry} disabled={retrying}>
-          {retrying ? "再試行中..." : t("adminWallet.settings.pending.retry")}
+          {retrying
+            ? t("adminWallet.settings.pending.retrying")
+            : t("adminWallet.settings.pending.retry")}
         </Button>
       </ItemActions>
     </Item>

@@ -51,6 +51,8 @@
   "adminWallet.settings.pending.count": "{count}件",
   "adminWallet.settings.pending.description": "残高不足等で特典が届いていないメンバーです",
   "adminWallet.settings.pending.retry": "再試行",
+  "adminWallet.settings.pending.retrying": "再試行中...",
+  "adminWallet.settings.pending.attempts": "{count}回試行",
   "adminWallet.settings.pending.retrySuccess": "特典を再送しました",
   "adminWallet.settings.pending.retryError": "再送に失敗しました",
 

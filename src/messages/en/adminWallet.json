@@ -47,6 +47,8 @@
   "adminWallet.settings.pending.count": "{count} items",
   "adminWallet.settings.pending.description": "Members who have not received bonuses due to insufficient balance or other reasons",
   "adminWallet.settings.pending.retry": "Retry",
+  "adminWallet.settings.pending.retrying": "Retrying...",
+  "adminWallet.settings.pending.attempts": "{count} attempts",
   "adminWallet.settings.pending.retrySuccess": "Bonus resent successfully",
   "adminWallet.settings.pending.retryError": "Failed to resend bonus",
 

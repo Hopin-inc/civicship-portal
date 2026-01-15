@@ -72,7 +72,7 @@ export default function SignupBonusDetailPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-sm text-muted-foreground">読み込み中...</div>
+        <div className="text-sm text-muted-foreground">{t("common.loading")}</div>
       </div>
     );
   }
