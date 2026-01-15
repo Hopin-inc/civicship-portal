@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthProvider";
 import { toast } from "react-toastify";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, useParams } from "next/navigation";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { VerificationStep } from "../types";
 import { isValidPhoneNumber } from "../utils/validatePhoneNumber";
@@ -23,6 +23,8 @@ export function PhoneVerificationForm() {
   const t = useTranslations();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const params = useParams<{ communityId: string }>();
+  const communityId = params.communityId;
   const next = searchParams.get("next");
   const nextParam = next ? `?next=${encodeURIComponent(next)}` : "";
   const { isAuthenticated, loading, updateAuthState } = useAuth();
@@ -69,6 +71,7 @@ export function PhoneVerificationForm() {
     },
     nextParam,
     updateAuthState,
+    communityId,
   );
 
   const isPhoneValid = isValidPhoneNumber(phoneNumber);

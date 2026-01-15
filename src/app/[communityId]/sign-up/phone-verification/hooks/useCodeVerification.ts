@@ -29,6 +29,7 @@ export function useCodeVerification(
   phoneAuth: { verifyPhoneCode: (verificationCode: string) => Promise<boolean> },
   nextParam: string,
   updateAuthState: () => Promise<any>,
+  communityId?: string,
 ) {
   const t = useTranslations();
   const [isVerifying, setIsVerifying] = useState(false);
@@ -140,6 +141,7 @@ export function useCodeVerification(
               "/" as RawURIComponent,
               nextParam as RawURIComponent,
               updatedUser,
+              communityId,
             );
             return {
               success: true,
@@ -160,6 +162,7 @@ export function useCodeVerification(
               "/" as RawURIComponent,
               nextParam as RawURIComponent,
               updatedUserCross,
+              communityId,
             );
             return {
               success: true,
@@ -205,6 +208,7 @@ export function useCodeVerification(
       nextParam,
       updateAuthState,
       isVerifying,
+      communityId,
     ],
   );
 

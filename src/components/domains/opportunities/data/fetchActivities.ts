@@ -8,10 +8,8 @@ import {
   GqlSortDirection,
 } from "@/types/graphql";
 import { mapOpportunityCards, sliceActivitiesBySection } from "./presenter";
-import { getCommunityIdFromEnv } from "@/lib/communities/config";
 
-export async function fetchFeaturedAndCarousel() {
-  const communityId = getCommunityIdFromEnv();
+export async function fetchFeaturedAndCarousel(communityId: string) {
   const { data, loading } = await apolloClient.query<
     GqlGetOpportunitiesQuery,
     GqlGetOpportunitiesQueryVariables

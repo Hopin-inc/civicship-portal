@@ -24,6 +24,7 @@ export class AuthRedirectService {
     pathname: RawURIComponent,
     next?: RawURIComponent | null,
     currentUser?: GqlUser | null,
+    communityId?: string,
   ): RawURIComponent | null {
     const authState = this.authStateManager.getState();
     const basePath = pathname.split("?")[0];
@@ -65,7 +66,7 @@ export class AuthRedirectService {
       return redirectFromUserPath;
     }
 
-    const redirectByRole = this.handleRoleRestriction(currentUser, basePath);
+    const redirectByRole = this.handleRoleRestriction(currentUser, basePath, communityId);
     if (redirectByRole) {
       logger.debug("[AUTH] AuthRedirectService: redirect from handleRoleRestriction", {
         redirectPath: redirectByRole,
@@ -161,6 +162,7 @@ export class AuthRedirectService {
   private handleRoleRestriction(
     currentUser: GqlUser | null | undefined,
     basePath: string,
+    communityId?: string,
   ): RawURIComponent | null {
     logger.debug("[AUTH] handleRoleRestriction: start", {
       basePath,
@@ -168,17 +170,18 @@ export class AuthRedirectService {
       hasMemberships: !!currentUser?.memberships?.length,
       membershipsCount: currentUser?.memberships?.length ?? 0,
       membershipIds: currentUser?.memberships?.map(m => m.community?.id) ?? [],
+      communityId,
       component: "AuthRedirectService",
     });
 
-    if (!currentUser) {
-      logger.debug("[AUTH] handleRoleRestriction: no currentUser", {
+    if (!currentUser || !communityId) {
+      logger.debug("[AUTH] handleRoleRestriction: no currentUser or communityId", {
         component: "AuthRedirectService",
       });
       return null;
     }
 
-    const canAccess = AccessPolicy.canAccessRole(currentUser, basePath);
+    const canAccess = AccessPolicy.canAccessRole(currentUser, basePath, communityId);
     logger.debug("[AUTH] handleRoleRestriction: canAccessRole result", {
       basePath,
       userId: currentUser.id,
@@ -187,7 +190,7 @@ export class AuthRedirectService {
     });
 
     if (!canAccess) {
-      const fallbackPath = AccessPolicy.getFallbackPath(currentUser);
+      const fallbackPath = AccessPolicy.getFallbackPath(currentUser, communityId);
       logger.debug("[AUTH] handleRoleRestriction: redirecting to fallback (master logic)", {
         basePath,
         userId: currentUser.id,

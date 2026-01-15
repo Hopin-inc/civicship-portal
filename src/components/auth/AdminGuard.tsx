@@ -43,9 +43,15 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
 
     const checkAdminAccess = () => {
       const pathname = window.location.pathname;
-      const canAccess = AccessPolicy.canAccessRole(currentUser, pathname);
+      if (!communityId) {
+        logger.debug("No communityId found. Cannot check admin access", {
+          component: "AdminGuard",
+        });
+        return;
+      }
+      const canAccess = AccessPolicy.canAccessRole(currentUser, pathname, communityId);
       if (!canAccess) {
-        const redirectPath = AccessPolicy.getFallbackPath(currentUser);
+        const redirectPath = AccessPolicy.getFallbackPath(currentUser, communityId);
         toast.warning("管理者権限がありません");
         router.replace(redirectPath);
         return;
@@ -57,7 +63,7 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
     };
 
     checkAdminAccess();
-  }, [currentUser, isAuthenticated, loading, router, authRedirectService]);
+  }, [currentUser, isAuthenticated, loading, router, authRedirectService, communityId]);
 
   if (loading) {
     return <LoadingIndicator />;

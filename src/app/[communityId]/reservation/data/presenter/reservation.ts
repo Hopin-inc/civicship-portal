@@ -16,16 +16,16 @@ import {
 import { TArticleWithAuthor } from "@/app/[communityId]/articles/data/type";
 import { presenterPlace } from "@/app/[communityId]/places/data/presenter";
 import { presenterOpportunityHost } from "@/components/domains/opportunities/data/presenter";
-import { getCommunityIdFromEnv } from "@/lib/communities/config";
 
 export const getTicketIds = (
   wallets: GqlWallet[] | null,
   requiredUtilities: RequiredUtility[] | undefined,
   ticketCount: number,
+  communityId: string,
 ) => {
   return (
     wallets
-      ?.find((w) => w.community?.id === getCommunityIdFromEnv())
+      ?.find((w) => w.community?.id === communityId)
       ?.tickets?.filter((edge: GqlTicket) => {
         if (!requiredUtilities?.length) return true;
         const utilityId = edge?.utility?.id;

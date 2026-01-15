@@ -1,5 +1,6 @@
 "use client";
 
+import { useParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthProvider";
 import { transformTickets } from "@/app/[communityId]/tickets/data/presenter";
 import { TTicket } from "@/app/[communityId]/tickets/data/type";
@@ -13,6 +14,8 @@ export interface UseTicketsResult {
 }
 
 export const useTickets = (): UseTicketsResult => {
+  const params = useParams<{ communityId: string }>();
+  const communityId = params.communityId;
   const { user } = useAuth();
 
   const { data, loading, error, refetch } = useGetTicketsQuery({
@@ -20,7 +23,7 @@ export const useTickets = (): UseTicketsResult => {
     skip: !user?.id,
   });
 
-  const tickets = transformTickets(data);
+  const tickets = transformTickets(data, communityId);
 
   return {
     tickets,

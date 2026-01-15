@@ -1,10 +1,13 @@
-import { getCommunityIdFromEnv } from "@/lib/communities/config";
 import { getMembershipListServer } from "@/lib/graphql/getMembershipListServer";
 import OpportunitySelector from "../components/CredentialIssuanceWizard";
 
-export default async function SelectOpportunity() {
+interface PageProps {
+  params: Promise<{ communityId: string }>;
+}
+
+export default async function SelectOpportunity({ params }: PageProps) {
   let connection = null;
-  const communityId = getCommunityIdFromEnv();
+  const { communityId } = await params;
 
   try {
     const result = await getMembershipListServer({

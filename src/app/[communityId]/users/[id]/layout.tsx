@@ -2,12 +2,12 @@ import React from "react";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { fetchUserServer } from "@/app/[communityId]/users/features/shared/server";
-import { getCommunityConfig, getCommunityIdFromEnv } from "@/lib/communities/config";
+import { getCommunityConfig } from "@/lib/communities/config";
 import { DEFAULT_ASSET_PATHS } from "@/lib/communities/constants";
 import { mapGqlPortfolio, UserProfileProvider } from "@/app/[communityId]/users/features/shared";
 
 type Props = {
-  params: { id: string };
+  params: Promise<{ communityId: string; id: string }>;
 };
 
 const DEFAULT_OPEN_GRAPH_IMAGE = [
@@ -20,8 +20,7 @@ const DEFAULT_OPEN_GRAPH_IMAGE = [
 ];
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id } = await params;
-  const communityId = getCommunityIdFromEnv();
+  const { communityId, id } = await params;
   const communityConfig = await getCommunityConfig(communityId);
   const user = await fetchUserServer(id);
 
@@ -61,7 +60,7 @@ export default async function Layout({
   params,
 }: {
   children: React.ReactNode;
-  params: { id: string };
+  params: Promise<{ communityId: string; id: string }>;
 }) {
   const { id } = await params;
   const gqlUser = await fetchUserServer(id);

@@ -1,10 +1,13 @@
-import { getCommunityIdFromEnv } from "@/lib/communities/config";
 import { getMembershipListServer } from "@/lib/graphql/getMembershipListServer";
 import MembersPageClient from "./MembersPageClient";
 
-export default async function MembersPage() {
+interface PageProps {
+  params: Promise<{ communityId: string }>;
+}
+
+export default async function MembersPage({ params }: PageProps) {
   let connection = null;
-  const communityId = getCommunityIdFromEnv();
+  const { communityId } = await params;
 
   try {
     const result = await getMembershipListServer({

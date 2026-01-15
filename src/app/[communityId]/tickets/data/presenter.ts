@@ -2,12 +2,11 @@
 
 import { Ticket, TicketClaimLink } from "@/app/[communityId]/tickets/data/type";
 import { PLACEHOLDER_IMAGE } from "@/utils";
-import { getCommunityIdFromEnv } from "@/lib/communities/config";
 import { GqlWallet } from "@/types/graphql";
 
-export const transformTickets = (data: any): Ticket[] => {
+export const transformTickets = (data: any, communityId: string): Ticket[] => {
   return (
-    data?.user?.wallets?.edges?.find((w: GqlWallet) => w.community?.id === getCommunityIdFromEnv())?.node?.tickets?.edges?.map((edge: any) => ({
+    data?.user?.wallets?.edges?.find((w: GqlWallet) => w.community?.id === communityId)?.node?.tickets?.edges?.map((edge: any) => ({
       id: edge?.node?.id,
       status: edge?.node?.status,
       hostName: edge?.node?.ticketStatusHistories?.edges?.[0]?.node?.createdByUser?.name || "不明",

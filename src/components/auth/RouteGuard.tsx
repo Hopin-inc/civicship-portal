@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams, useParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthProvider";
 import { AuthRedirectService } from "@/lib/auth/service/auth-redirect-service";
 import { decodeURIComponentWithType, EncodedURIComponent, RawURIComponent } from "@/utils/path";
@@ -20,6 +20,8 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const params = useParams<{ communityId?: string }>();
+  const communityId = params.communityId;
   const nextParam = searchParams.get("next") as EncodedURIComponent;
 
   const authRedirectService = React.useMemo(() => AuthRedirectService.getInstance(), []);
@@ -53,6 +55,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       pathWithParams as RawURIComponent,
       decodeURIComponentWithType(nextParam),
       currentUser,
+      communityId,
     );
 
     logger.debug("[AUTH] RouteGuard redirect check", {
@@ -75,7 +78,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       redirectedRef.current = null;
       setIsReadyToRender(true);
     }
-  }, [pathname, authState, currentUser, loading, router, authRedirectService, nextParam, searchParams]);
+  }, [pathname, authState, currentUser, loading, router, authRedirectService, nextParam, searchParams, communityId]);
 
   // --- 未確定中は描画しない（チラつき防止） ---
   if (!isReadyToRender) {

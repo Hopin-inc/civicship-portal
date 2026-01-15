@@ -1,11 +1,15 @@
 import { convertMarkdownToHtml } from "@/utils/markdownUtils";
-import { getCommunityConfig, getCommunityIdFromEnv } from "@/lib/communities/config";
+import { getCommunityConfig } from "@/lib/communities/config";
 import PrivacyPageClient from "./PrivacyPageClient";
 import { getPrivacyContent } from "@/lib/communities/privacy";
 import { handleExternalDocumentRedirect } from "@/lib/communities/documents";
 
-export default async function PrivacyPage() {
-  const communityId = getCommunityIdFromEnv();
+interface PageProps {
+  params: Promise<{ communityId: string }>;
+}
+
+export default async function PrivacyPage({ params }: PageProps) {
+  const { communityId } = await params;
   const communityConfig = await getCommunityConfig(communityId);
   
   await handleExternalDocumentRedirect(

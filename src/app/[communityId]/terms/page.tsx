@@ -1,11 +1,15 @@
 import { getTermsContent } from "@/lib/communities/terms";
 import { convertMarkdownToHtml } from "@/utils/markdownUtils";
 import TermsPageClient from "./TermsPageClient";
-import { getCommunityConfig, getCommunityIdFromEnv } from "@/lib/communities/config";
+import { getCommunityConfig } from "@/lib/communities/config";
 import { handleExternalDocumentRedirect } from "@/lib/communities/documents";
 
-export default async function TermsPage() {
-  const communityId = getCommunityIdFromEnv();
+interface PageProps {
+  params: Promise<{ communityId: string }>;
+}
+
+export default async function TermsPage({ params }: PageProps) {
+  const { communityId } = await params;
   const communityConfig = await getCommunityConfig(communityId);
   
   await handleExternalDocumentRedirect(
