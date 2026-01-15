@@ -17,9 +17,9 @@ import { getLocale, getMessages } from "next-intl/server";
 import { LiffDeepLinkHandler } from "@/components/liff/LiffDeepLinkHandler";
 import { SwipeBackNavigation } from "@/components/navigation/SwipeBackNavigation";
 import { BackgroundLayer } from "@/components/layout/BackgroundLayer";
-import { CommunityConfigProvider } from "@/contexts/CommunityConfigContext";
-import { getCommunityConfig, getCommunityIdFromEnv, CommunityPortalConfig } from "@/lib/communities/config";
+import { getCommunityConfig, getCommunityIdFromEnv } from "@/lib/communities/config";
 import { DEFAULT_ASSET_PATHS } from "@/lib/communities/constants";
+import type { CommunityPortalConfig } from "@/lib/communities/config";
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -95,24 +95,10 @@ const RootLayout = async ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
-  const communityId = getCommunityIdFromEnv();
   const { user, lineAuthenticated, phoneAuthenticated } = await getUserServer();
 
   const locale = await getLocale();
   const messages = await getMessages();
-
-  // Fetch community config from database
-  let communityConfig: CommunityPortalConfig | null = null;
-  let isFromDatabase = false;
-
-  try {
-    communityConfig = await getCommunityConfig(communityId);
-    if (communityConfig) {
-      isFromDatabase = true;
-    }
-  } catch (error) {
-    console.error(`[CommunityConfig] Failed to fetch config for ${communityId} from database:`, error);
-  }
 
   return (
     <html lang={locale}>
@@ -120,27 +106,25 @@ const RootLayout = async ({
         <ClientPolyfills />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <CookiesProvider>
-            <CommunityConfigProvider config={communityConfig} isFromDatabase={isFromDatabase}>
-              <ApolloProvider>
-                <AuthProvider
-                  ssrCurrentUser={user}
-                  ssrLineAuthenticated={lineAuthenticated}
-                  ssrPhoneAuthenticated={phoneAuthenticated}
-                >
-                  <LiffDeepLinkHandler />
-                  <HeaderProvider>
-                    <SwipeBackNavigation>
-                      <LoadingProvider>
-                        <AnalyticsProvider />
-                        <BackgroundLayer />
-                        <MainContent>{children}</MainContent>
-                        <Toaster />
-                      </LoadingProvider>
-                    </SwipeBackNavigation>
-                  </HeaderProvider>
-                </AuthProvider>
-              </ApolloProvider>
-            </CommunityConfigProvider>
+            <ApolloProvider>
+              <AuthProvider
+                ssrCurrentUser={user}
+                ssrLineAuthenticated={lineAuthenticated}
+                ssrPhoneAuthenticated={phoneAuthenticated}
+              >
+                <LiffDeepLinkHandler />
+                <HeaderProvider>
+                  <SwipeBackNavigation>
+                    <LoadingProvider>
+                      <AnalyticsProvider />
+                      <BackgroundLayer />
+                      <MainContent>{children}</MainContent>
+                      <Toaster />
+                    </LoadingProvider>
+                  </SwipeBackNavigation>
+                </HeaderProvider>
+              </AuthProvider>
+            </ApolloProvider>
           </CookiesProvider>
         </NextIntlClientProvider>
       </body>
