@@ -91,7 +91,6 @@ const requestLink = setContext(async (operation, prevContext) => {
     // Only send Authorization header when we have a token
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     "X-Auth-Mode": authMode,
-    "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
     // Use dynamic communityId from URL path for multi-tenant routing
     ...(communityId ? { "X-Community-Id": communityId } : {}),
   };

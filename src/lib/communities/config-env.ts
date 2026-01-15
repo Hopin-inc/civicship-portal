@@ -6,11 +6,15 @@
 
 /**
  * Get community ID from environment variable
+ * @deprecated Use URL path-based routing instead. In multi-tenant architecture,
+ * communityId should be extracted from the URL path (e.g., /neo88/opportunities -> "neo88")
+ * For client-side: use useParams() or extract from window.location.pathname
+ * For server-side: pass communityId as a parameter from route params
  */
 export function getCommunityIdFromEnv(): string {
   const communityId = process.env.NEXT_PUBLIC_COMMUNITY_ID;
   if (!communityId) {
-    console.warn("NEXT_PUBLIC_COMMUNITY_ID is not set, using 'default'");
+    console.warn("NEXT_PUBLIC_COMMUNITY_ID is not set, using 'default'. Consider using URL path-based routing instead.");
     return "default";
   }
   return communityId;

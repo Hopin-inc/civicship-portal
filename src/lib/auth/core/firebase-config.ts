@@ -19,7 +19,8 @@ export const defaultApp = initializeApp(firebaseConfigWithAppId);
 
 export const lineApp = initializeApp(firebaseConfig, "line-auth-app");
 export const lineAuth: Auth = getAuth(lineApp);
-lineAuth.tenantId = process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID ?? null;
+// Tenant ID is no longer used in multi-tenant architecture
+lineAuth.tenantId = null;
 
 // Use localStorage instead of IndexedDB for persistence
 // IndexedDB can hang in LIFF WebView environments (WKWebView on iOS, WebView on Android)
