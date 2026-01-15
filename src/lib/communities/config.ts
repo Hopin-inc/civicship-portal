@@ -129,6 +129,19 @@ export async function getCommunityConfigOrThrow(communityId: string): Promise<Co
 }
 
 /**
+ * Get community config from environment variable
+ * Uses NEXT_PUBLIC_COMMUNITY_ID to determine the community
+ */
+export async function getCommunityConfigFromEnv(): Promise<CommunityPortalConfig | null> {
+  const communityId = process.env.NEXT_PUBLIC_COMMUNITY_ID;
+  if (!communityId) {
+    console.warn("NEXT_PUBLIC_COMMUNITY_ID is not set");
+    return null;
+  }
+  return getCommunityConfig(communityId);
+}
+
+/**
  * Get default OG image for a community config
  */
 export function getDefaultOgImage(config: CommunityPortalConfig | null): string[] {

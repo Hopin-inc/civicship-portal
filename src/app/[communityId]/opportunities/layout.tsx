@@ -1,6 +1,6 @@
-import { metadata } from "./metadata";
+import { generateMetadata } from "./metadata";
 
-export { metadata };
+export { generateMetadata };
 
 export default function OpportunitiesLayout({ children }: { children: React.ReactNode }) {
   return <>{children}</>;

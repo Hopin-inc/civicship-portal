@@ -1,11 +1,16 @@
 import { Metadata } from "next";
-import { getCommunityConfigFromEnv, getDefaultOgImage } from "@/lib/communities/config";
+import { getCommunityConfig, getDefaultOgImage } from "@/lib/communities/config";
 import { getTranslations } from "next-intl/server";
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ communityId: string }>;
+}): Promise<Metadata> {
+  const { communityId } = await params;
   const [t, config] = await Promise.all([
     getTranslations("auth.signup.metadata"),
-    getCommunityConfigFromEnv(),
+    getCommunityConfig(communityId),
   ]);
 
   const communityTitle = config?.title || "";

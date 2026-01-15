@@ -1,7 +1,7 @@
 import { AdminGuard } from "@/components/auth/AdminGuard";
-import { metadata } from "./metadata";
+import { generateMetadata } from "./metadata";
 
-export { metadata };
+export { generateMetadata };
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (

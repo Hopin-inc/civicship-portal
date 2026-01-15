@@ -1,7 +1,7 @@
 import React from "react";
-import { metadata } from "./metadata";
+import { generateMetadata } from "./metadata";
 
-export { metadata };
+export { generateMetadata };
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
