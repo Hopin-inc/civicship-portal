@@ -1,7 +1,6 @@
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/ja";
-import { getCommunityIdFromEnv } from "@/lib/communities/config";
 import parsePhoneNumberFromString from "libphonenumber-js/min";
 
 dayjs.locale("ja");
@@ -11,10 +10,19 @@ dayjs.extend(relativeTime);
 // This prevents infinite reload loops when community-specific placeholder doesn't exist
 const PLACEHOLDER_DATA_URL = "data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==";
 
-export const PLACEHOLDER_IMAGE = `/communities/${getCommunityIdFromEnv()}/placeholder.jpg`;
-
 // Use this for error fallback to avoid infinite reload when placeholder doesn't exist
 export const FALLBACK_IMAGE = PLACEHOLDER_DATA_URL;
+
+/**
+ * Get placeholder image path for a specific community
+ * @param communityId - Community ID from URL path parameter
+ */
+export const getPlaceholderImage = (communityId: string) => `/communities/${communityId}/placeholder.jpg`;
+
+/**
+ * @deprecated Use getPlaceholderImage(communityId) instead for multi-tenant support
+ */
+export const PLACEHOLDER_IMAGE = PLACEHOLDER_DATA_URL;
 
 export const displayRelativeTime = (date: Date | string) => {
   return dayjs(date).fromNow();

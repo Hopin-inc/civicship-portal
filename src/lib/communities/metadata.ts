@@ -333,24 +333,59 @@ const COMMUNITY_BASE_CONFIG: Record<string, CommunityBaseConfig> = {
   },
 };
 
-export const COMMUNITY_ID = getCommunityIdFromEnv();
+/**
+ * @deprecated Use URL path-based routing instead. This constant is kept for backward compatibility.
+ */
+export const COMMUNITY_ID = "default";
 
-export function getCurrentRegionName(): string {
-  if (COMMUNITY_ID === "neo88") return "四国";
-  if (COMMUNITY_ID === "kibotcha") return "東松島";
-  if (COMMUNITY_ID === "dais") return "四国";
+/**
+ * Get region name for a specific community
+ * @param communityId - Community ID from URL path parameter
+ */
+export function getRegionName(communityId: string): string {
+  if (communityId === "neo88") return "四国";
+  if (communityId === "kibotcha") return "東松島";
+  if (communityId === "dais") return "四国";
   return "地域";
 }
 
-export function getCurrentRegionKey(): string {
-  if (COMMUNITY_ID === "neo88") return "common.regions.shikoku";
-  if (COMMUNITY_ID === "kibotcha") return "common.regions.higashimatsushima";
-  if (COMMUNITY_ID === "dais") return "common.regions.shikoku";
+/**
+ * @deprecated Use getRegionName(communityId) instead for multi-tenant support
+ */
+export function getCurrentRegionName(): string {
+  return "地域";
+}
+
+/**
+ * Get region key for a specific community
+ * @param communityId - Community ID from URL path parameter
+ */
+export function getRegionKey(communityId: string): string {
+  if (communityId === "neo88") return "common.regions.shikoku";
+  if (communityId === "kibotcha") return "common.regions.higashimatsushima";
+  if (communityId === "dais") return "common.regions.shikoku";
   return "common.regions.default";
 }
 
-// 現在のコミュニティの設定
-export const currentCommunityConfig = COMMUNITY_BASE_CONFIG[COMMUNITY_ID];
+/**
+ * @deprecated Use getRegionKey(communityId) instead for multi-tenant support
+ */
+export function getCurrentRegionKey(): string {
+  return "common.regions.default";
+}
+
+/**
+ * Get community base config for a specific community
+ * @param communityId - Community ID from URL path parameter
+ */
+export function getCommunityBaseConfig(communityId: string): CommunityBaseConfig {
+  return COMMUNITY_BASE_CONFIG[communityId] || COMMUNITY_BASE_CONFIG.default;
+}
+
+/**
+ * @deprecated Use getCommunityBaseConfig(communityId) instead for multi-tenant support
+ */
+export const currentCommunityConfig = COMMUNITY_BASE_CONFIG.default;
 
 // デフォルトのOGP画像
 export const DEFAULT_OPEN_GRAPH_IMAGE = [
@@ -506,10 +541,9 @@ function convertPortalConfigToBaseConfig(
 /**
  * Get community config from DB with fallback to hardcoded config
  * This is an async function that should be called in Server Components
+ * @param communityId - Community ID from URL path parameter (required for multi-tenant routing)
  */
-export async function getCommunityConfigFromDB(): Promise<CommunityBaseConfig> {
-  const communityId = getCommunityIdFromEnv();
-
+export async function getCommunityConfigFromDB(communityId: string): Promise<CommunityBaseConfig> {
   // Try to fetch from DB first
   const portalConfig = await getCommunityConfig(communityId);
 
@@ -523,9 +557,9 @@ export async function getCommunityConfigFromDB(): Promise<CommunityBaseConfig> {
 
 /**
  * Get region name from DB config or fallback to hardcoded logic
+ * @param communityId - Community ID from URL path parameter (required for multi-tenant routing)
  */
-export async function getRegionNameFromDB(): Promise<string> {
-  const communityId = getCommunityIdFromEnv();
+export async function getRegionNameFromDB(communityId: string): Promise<string> {
   const portalConfig = await getCommunityConfig(communityId);
 
   if (portalConfig?.regionName) {
@@ -533,14 +567,14 @@ export async function getRegionNameFromDB(): Promise<string> {
   }
 
   // Fallback to hardcoded logic
-  return getCurrentRegionName();
+  return getRegionName(communityId);
 }
 
 /**
  * Get region key from DB config or fallback to hardcoded logic
+ * @param communityId - Community ID from URL path parameter (required for multi-tenant routing)
  */
-export async function getRegionKeyFromDB(): Promise<string> {
-  const communityId = getCommunityIdFromEnv();
+export async function getRegionKeyFromDB(communityId: string): Promise<string> {
   const portalConfig = await getCommunityConfig(communityId);
 
   if (portalConfig?.regionKey) {
@@ -548,15 +582,16 @@ export async function getRegionKeyFromDB(): Promise<string> {
   }
 
   // Fallback to hardcoded logic
-  return getCurrentRegionKey();
+  return getRegionKey(communityId);
 }
 
 /**
  * Get community metadata from DB with fallback to hardcoded config
  * This is an async function that should be called in Server Components
+ * @param communityId - Community ID from URL path parameter (required for multi-tenant routing)
  */
-export async function getCommunityMetadataFromDB(): Promise<CommunityMetadata> {
-  const config = await getCommunityConfigFromDB();
+export async function getCommunityMetadataFromDB(communityId: string): Promise<CommunityMetadata> {
+  const config = await getCommunityConfigFromDB(communityId);
   return {
     title: config.title,
     description: config.description,

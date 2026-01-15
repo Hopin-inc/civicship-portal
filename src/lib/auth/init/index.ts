@@ -122,6 +122,20 @@ async function initAuthFast({
   }
 }
 
+// Extract communityId from URL path (first segment after /)
+function extractCommunityIdFromPath(pathname: string): string | null {
+  const segments = pathname.split("/").filter(Boolean);
+  if (segments.length === 0) {
+    return null;
+  }
+  const firstSegment = segments[0];
+  // Skip if it's a known non-community path
+  if (["api", "_next", "favicon.ico", "login", "sign-up"].includes(firstSegment)) {
+    return null;
+  }
+  return firstSegment;
+}
+
 async function initAuthFull({
   liffService,
   authStateManager,
@@ -164,7 +178,18 @@ async function initAuthFull({
       return;
     }
 
-    await evaluateUserRegistrationState(user, ssrPhoneAuthenticated, setState, authStateManager);
+    // Extract communityId from URL path for multi-tenant routing
+    const communityId = typeof window !== "undefined" 
+      ? extractCommunityIdFromPath(window.location.pathname) 
+      : null;
+    
+    if (!communityId) {
+      logger.warn("[AUTH] initAuthFull: No communityId found in URL path");
+      finalizeAuthState("line_authenticated", user, setState, authStateManager);
+      return;
+    }
+
+    await evaluateUserRegistrationState(user, ssrPhoneAuthenticated, setState, authStateManager, communityId);
   } catch (error) {
     logger.warn("initAuthFull failed", { error });
     finalizeAuthState("unauthenticated", undefined, setState, authStateManager);

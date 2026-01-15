@@ -1,5 +1,3 @@
-import { getCommunityIdFromEnv } from "./metadata";
-
 interface CommunityContent {
   termsFile: string;
   noticeItems: string[];
@@ -35,9 +33,11 @@ export const COMMUNITY_CONTENT: Record<string, CommunityContent> = {
   },
 };
 
-// 現在のコミュニティの注意事項を取得する関数
-export function getNoticeItems(): string[] {
-  const communityId = getCommunityIdFromEnv();
+/**
+ * Get notice items for a specific community
+ * @param communityId - Community ID from URL path parameter (required for multi-tenant routing)
+ */
+export function getNoticeItems(communityId: string): string[] {
   const content = COMMUNITY_CONTENT[communityId];
 
   if (!content || !content.noticeItems) {

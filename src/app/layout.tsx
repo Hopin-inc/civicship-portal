@@ -16,72 +16,15 @@ import { getLocale, getMessages } from "next-intl/server";
 import { LiffDeepLinkHandler } from "@/components/liff/LiffDeepLinkHandler";
 import { SwipeBackNavigation } from "@/components/navigation/SwipeBackNavigation";
 import { BackgroundLayer } from "@/components/layout/BackgroundLayer";
-import { getCommunityConfig, getCommunityIdFromEnv } from "@/lib/communities/config";
-import { DEFAULT_ASSET_PATHS } from "@/lib/communities/constants";
-import type { CommunityPortalConfig } from "@/lib/communities/config";
 import { CommunityConfigProvider } from "@/contexts/CommunityConfigContext";
 
 const font = Inter({ subsets: ["latin"] });
 
-export async function generateMetadata(): Promise<Metadata> {
-  const communityId = getCommunityIdFromEnv();
-  const config = await getCommunityConfig(communityId);
-  const isProduction = process.env.NODE_ENV === "production";
-
-  if (!config) {
-    return {
-      title: "Civicship",
-      description: "Community platform",
-      robots: isProduction ? undefined : { index: false, follow: false },
-    };
-  }
-
-  return {
-    title: config.title,
-    description: config.description,
-    icons: {
-      icon: [
-        {
-          url: config.faviconPrefix
-            ? `${config.faviconPrefix}/favicon.ico`
-            : DEFAULT_ASSET_PATHS.FAVICON,
-        },
-      ],
-      apple: [
-        {
-          url: config.faviconPrefix
-            ? `${config.faviconPrefix}/apple-touch-icon.png`
-            : DEFAULT_ASSET_PATHS.APPLE_TOUCH_ICON,
-        },
-      ],
-    },
-    openGraph: {
-      title: config.title,
-      description: config.description,
-      url: config.domain,
-      siteName: config.title,
-      locale: "ja_JP",
-      type: "website",
-      images: [
-        {
-          url: config.ogImagePath,
-          width: 1200,
-          height: 630,
-          alt: config.title,
-        },
-      ],
-    },
-    alternates: {
-      canonical: config.domain,
-    },
-    robots: isProduction
-      ? undefined
-      : {
-          index: false,
-          follow: false,
-        },
-  };
-}
+// Root layout uses generic metadata - community-specific metadata is generated in [communityId]/layout.tsx
+export const metadata: Metadata = {
+  title: "Civicship",
+  description: "Community platform",
+};
 
 export const viewport: Viewport = {
   width: "device-width",

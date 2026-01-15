@@ -1,10 +1,12 @@
 import fs from "fs";
 import path from "path";
-import { getCommunityIdFromEnv } from "./metadata";
 import { COMMUNITY_CONTENT } from "./content";
 
-export function getTermsContent(): string {
-  const communityId = getCommunityIdFromEnv();
+/**
+ * Get terms content for a specific community
+ * @param communityId - Community ID from URL path parameter (required for multi-tenant routing)
+ */
+export function getTermsContent(communityId: string): string {
   const content = COMMUNITY_CONTENT[communityId];
 
   const termsFile = content?.termsFile || COMMUNITY_CONTENT.default.termsFile;
