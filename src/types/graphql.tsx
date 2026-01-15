@@ -210,6 +210,12 @@ export const GqlClaimLinkStatus = {
 } as const;
 
 export type GqlClaimLinkStatus = (typeof GqlClaimLinkStatus)[keyof typeof GqlClaimLinkStatus];
+export type GqlCommonDocumentOverrides = {
+  __typename?: "CommonDocumentOverrides";
+  privacy?: Maybe<GqlCommunityDocument>;
+  terms?: Maybe<GqlCommunityDocument>;
+};
+
 export type GqlCommunitiesConnection = {
   __typename?: "CommunitiesConnection";
   edges?: Maybe<Array<GqlCommunityEdge>>;
@@ -275,6 +281,15 @@ export type GqlCommunityDeleteSuccess = {
   communityId: Scalars["String"]["output"];
 };
 
+export type GqlCommunityDocument = {
+  __typename?: "CommunityDocument";
+  id: Scalars["String"]["output"];
+  order?: Maybe<Scalars["Int"]["output"]>;
+  path: Scalars["String"]["output"];
+  title: Scalars["String"]["output"];
+  type: Scalars["String"]["output"];
+};
+
 export type GqlCommunityEdge = GqlEdge & {
   __typename?: "CommunityEdge";
   cursor: Scalars["String"]["output"];
@@ -301,6 +316,7 @@ export type GqlCommunityLineConfig = {
   accessToken?: Maybe<Scalars["String"]["output"]>;
   channelId?: Maybe<Scalars["String"]["output"]>;
   channelSecret?: Maybe<Scalars["String"]["output"]>;
+  liffAppId?: Maybe<Scalars["String"]["output"]>;
   liffBaseUrl?: Maybe<Scalars["String"]["output"]>;
   liffId?: Maybe<Scalars["String"]["output"]>;
   richMenus?: Maybe<Array<GqlCommunityLineRichMenuConfig>>;
@@ -324,6 +340,31 @@ export type GqlCommunityLineRichMenuConfig = {
 export type GqlCommunityLineRichMenuConfigInput = {
   richMenuId: Scalars["String"]["input"];
   type: GqlLineRichMenuType;
+};
+
+export type GqlCommunityPortalConfig = {
+  __typename?: "CommunityPortalConfig";
+  adminRootPath: Scalars["String"]["output"];
+  commonDocumentOverrides?: Maybe<GqlCommonDocumentOverrides>;
+  communityId: Scalars["String"]["output"];
+  description: Scalars["String"]["output"];
+  documents?: Maybe<Array<GqlCommunityDocument>>;
+  domain: Scalars["String"]["output"];
+  enableFeatures: Array<Scalars["String"]["output"]>;
+  faviconPrefix: Scalars["String"]["output"];
+  firebaseTenantId?: Maybe<Scalars["String"]["output"]>;
+  liffAppId?: Maybe<Scalars["String"]["output"]>;
+  liffBaseUrl?: Maybe<Scalars["String"]["output"]>;
+  liffId?: Maybe<Scalars["String"]["output"]>;
+  logoPath: Scalars["String"]["output"];
+  ogImagePath: Scalars["String"]["output"];
+  regionKey?: Maybe<Scalars["String"]["output"]>;
+  regionName?: Maybe<Scalars["String"]["output"]>;
+  rootPath: Scalars["String"]["output"];
+  shortDescription?: Maybe<Scalars["String"]["output"]>;
+  squareLogoPath: Scalars["String"]["output"];
+  title: Scalars["String"]["output"];
+  tokenName: Scalars["String"]["output"];
 };
 
 export type GqlCommunitySortInput = {
@@ -1716,6 +1757,7 @@ export type GqlQuery = {
   cities: GqlCitiesConnection;
   communities: GqlCommunitiesConnection;
   community?: Maybe<GqlCommunity>;
+  communityPortalConfig?: Maybe<GqlCommunityPortalConfig>;
   currentUser?: Maybe<GqlCurrentUserPayload>;
   echo: Scalars["String"]["output"];
   evaluation?: Maybe<GqlEvaluation>;
@@ -1799,6 +1841,10 @@ export type GqlQueryCommunitiesArgs = {
 
 export type GqlQueryCommunityArgs = {
   id: Scalars["ID"]["input"];
+};
+
+export type GqlQueryCommunityPortalConfigArgs = {
+  communityId: Scalars["String"]["input"];
 };
 
 export type GqlQueryEvaluationArgs = {
@@ -2957,6 +3003,60 @@ export type GqlGetCommunityQueryVariables = Exact<{
 export type GqlGetCommunityQuery = {
   __typename?: "Query";
   community?: { __typename?: "Community"; id: string; name?: string | null } | null;
+};
+
+export type GqlGetCommunityPortalConfigQueryVariables = Exact<{
+  communityId: Scalars["String"]["input"];
+}>;
+
+export type GqlGetCommunityPortalConfigQuery = {
+  __typename?: "Query";
+  communityPortalConfig?: {
+    __typename?: "CommunityPortalConfig";
+    communityId: string;
+    tokenName: string;
+    title: string;
+    description: string;
+    shortDescription?: string | null;
+    domain: string;
+    faviconPrefix: string;
+    logoPath: string;
+    squareLogoPath: string;
+    ogImagePath: string;
+    enableFeatures: Array<string>;
+    rootPath: string;
+    adminRootPath: string;
+    regionName?: string | null;
+    regionKey?: string | null;
+    liffId?: string | null;
+    liffBaseUrl?: string | null;
+    firebaseTenantId?: string | null;
+    documents?: Array<{
+      __typename?: "CommunityDocument";
+      id: string;
+      title: string;
+      path: string;
+      type: string;
+      order?: number | null;
+    }> | null;
+    commonDocumentOverrides?: {
+      __typename?: "CommonDocumentOverrides";
+      terms?: {
+        __typename?: "CommunityDocument";
+        id: string;
+        title: string;
+        path: string;
+        type: string;
+      } | null;
+      privacy?: {
+        __typename?: "CommunityDocument";
+        id: string;
+        title: string;
+        path: string;
+        type: string;
+      } | null;
+    } | null;
+  } | null;
 };
 
 export type GqlIdentityFieldsFragment = {
@@ -6910,6 +7010,121 @@ export type GetCommunitySuspenseQueryHookResult = ReturnType<typeof useGetCommun
 export type GetCommunityQueryResult = Apollo.QueryResult<
   GqlGetCommunityQuery,
   GqlGetCommunityQueryVariables
+>;
+export const GetCommunityPortalConfigDocument = gql`
+  query GetCommunityPortalConfig($communityId: String!) {
+    communityPortalConfig(communityId: $communityId) {
+      communityId
+      tokenName
+      title
+      description
+      shortDescription
+      domain
+      faviconPrefix
+      logoPath
+      squareLogoPath
+      ogImagePath
+      enableFeatures
+      rootPath
+      adminRootPath
+      documents {
+        id
+        title
+        path
+        type
+        order
+      }
+      commonDocumentOverrides {
+        terms {
+          id
+          title
+          path
+          type
+        }
+        privacy {
+          id
+          title
+          path
+          type
+        }
+      }
+      regionName
+      regionKey
+      liffId
+      liffBaseUrl
+      firebaseTenantId
+    }
+  }
+`;
+
+/**
+ * __useGetCommunityPortalConfigQuery__
+ *
+ * To run a query within a React component, call `useGetCommunityPortalConfigQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCommunityPortalConfigQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCommunityPortalConfigQuery({
+ *   variables: {
+ *      communityId: // value for 'communityId'
+ *   },
+ * });
+ */
+export function useGetCommunityPortalConfigQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GqlGetCommunityPortalConfigQuery,
+    GqlGetCommunityPortalConfigQueryVariables
+  > &
+    ({ variables: GqlGetCommunityPortalConfigQueryVariables; skip?: boolean } | { skip: boolean }),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GqlGetCommunityPortalConfigQuery,
+    GqlGetCommunityPortalConfigQueryVariables
+  >(GetCommunityPortalConfigDocument, options);
+}
+export function useGetCommunityPortalConfigLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetCommunityPortalConfigQuery,
+    GqlGetCommunityPortalConfigQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GqlGetCommunityPortalConfigQuery,
+    GqlGetCommunityPortalConfigQueryVariables
+  >(GetCommunityPortalConfigDocument, options);
+}
+export function useGetCommunityPortalConfigSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetCommunityPortalConfigQuery,
+        GqlGetCommunityPortalConfigQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GqlGetCommunityPortalConfigQuery,
+    GqlGetCommunityPortalConfigQueryVariables
+  >(GetCommunityPortalConfigDocument, options);
+}
+export type GetCommunityPortalConfigQueryHookResult = ReturnType<
+  typeof useGetCommunityPortalConfigQuery
+>;
+export type GetCommunityPortalConfigLazyQueryHookResult = ReturnType<
+  typeof useGetCommunityPortalConfigLazyQuery
+>;
+export type GetCommunityPortalConfigSuspenseQueryHookResult = ReturnType<
+  typeof useGetCommunityPortalConfigSuspenseQuery
+>;
+export type GetCommunityPortalConfigQueryResult = Apollo.QueryResult<
+  GqlGetCommunityPortalConfigQuery,
+  GqlGetCommunityPortalConfigQueryVariables
 >;
 export const UserSignUpDocument = gql`
   mutation userSignUp($input: UserSignUpInput!) {
