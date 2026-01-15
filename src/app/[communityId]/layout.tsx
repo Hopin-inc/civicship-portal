@@ -2,6 +2,7 @@ import React from "react";
 import { CommunityConfigProvider } from "@/contexts/CommunityConfigContext";
 import { getCommunityConfig } from "@/lib/communities/config";
 import type { CommunityPortalConfig } from "@/lib/communities/config";
+import MainContent from "@/components/layout/MainContent";
 
 interface CommunityLayoutProps {
   children: React.ReactNode;
@@ -25,7 +26,7 @@ export default async function CommunityLayout({ children, params }: CommunityLay
 
   return (
     <CommunityConfigProvider config={communityConfig} isFromDatabase={isFromDatabase}>
-      {children}
+      <MainContent>{children}</MainContent>
     </CommunityConfigProvider>
   );
 }

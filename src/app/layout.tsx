@@ -7,7 +7,6 @@ import { Toaster } from "@/components/ui/toast";
 import LoadingProvider from "@/components/providers/LoadingProvider";
 import { AuthProvider } from "@/contexts/AuthProvider";
 import HeaderProvider from "@/components/providers/HeaderProvider";
-import MainContent from "@/components/layout/MainContent";
 import React from "react";
 import AnalyticsProvider from "@/components/providers/AnalyticsProvider";
 import ClientPolyfills from "@/components/polyfills/ClientPolyfills";
@@ -120,7 +119,7 @@ const RootLayout = async ({
                       <LoadingProvider>
                         <AnalyticsProvider />
                         <BackgroundLayer />
-                        <MainContent>{children}</MainContent>
+                        {children}
                         <Toaster />
                       </LoadingProvider>
                     </SwipeBackNavigation>
