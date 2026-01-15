@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { GqlSignupBonus } from "@/types/graphql";
 import { useMutation } from "@apollo/client";
 import { toast } from "react-toastify";
-import { RETRY_SIGNUP_BONUS_GRANT } from "@/graphql/account/community/mutation";
+import { SIGNUP_BONUS_RETRY } from "@/graphql/account/community/mutation";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 interface FailedBonusItemProps {
@@ -20,7 +20,7 @@ export default function FailedBonusItem({ bonus, onRetrySuccess }: FailedBonusIt
   const t = useTranslations();
   const [retrying, setRetrying] = useState(false);
 
-  const [retryGrant] = useMutation(RETRY_SIGNUP_BONUS_GRANT);
+  const [retryGrant] = useMutation(SIGNUP_BONUS_RETRY);
 
   const handleRetry = async () => {
     setRetrying(true);
