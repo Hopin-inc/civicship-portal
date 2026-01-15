@@ -20,6 +20,7 @@ import { BackgroundLayer } from "@/components/layout/BackgroundLayer";
 import { getCommunityConfig, getCommunityIdFromEnv } from "@/lib/communities/config";
 import { DEFAULT_ASSET_PATHS } from "@/lib/communities/constants";
 import type { CommunityPortalConfig } from "@/lib/communities/config";
+import { CommunityConfigProvider } from "@/contexts/CommunityConfigContext";
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -106,25 +107,27 @@ const RootLayout = async ({
         <ClientPolyfills />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <CookiesProvider>
-            <ApolloProvider>
-              <AuthProvider
-                ssrCurrentUser={user}
-                ssrLineAuthenticated={lineAuthenticated}
-                ssrPhoneAuthenticated={phoneAuthenticated}
-              >
-                <LiffDeepLinkHandler />
-                <HeaderProvider>
-                  <SwipeBackNavigation>
-                    <LoadingProvider>
-                      <AnalyticsProvider />
-                      <BackgroundLayer />
-                      <MainContent>{children}</MainContent>
-                      <Toaster />
-                    </LoadingProvider>
-                  </SwipeBackNavigation>
-                </HeaderProvider>
-              </AuthProvider>
-            </ApolloProvider>
+            <CommunityConfigProvider config={null} isFromDatabase={false}>
+              <ApolloProvider>
+                <AuthProvider
+                  ssrCurrentUser={user}
+                  ssrLineAuthenticated={lineAuthenticated}
+                  ssrPhoneAuthenticated={phoneAuthenticated}
+                >
+                  <LiffDeepLinkHandler />
+                  <HeaderProvider>
+                    <SwipeBackNavigation>
+                      <LoadingProvider>
+                        <AnalyticsProvider />
+                        <BackgroundLayer />
+                        <MainContent>{children}</MainContent>
+                        <Toaster />
+                      </LoadingProvider>
+                    </SwipeBackNavigation>
+                  </HeaderProvider>
+                </AuthProvider>
+              </ApolloProvider>
+            </CommunityConfigProvider>
           </CookiesProvider>
         </NextIntlClientProvider>
       </body>
