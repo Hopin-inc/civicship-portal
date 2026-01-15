@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import CommunityLink from "@/components/navigation/CommunityLink";
 import { SafeImage } from "@/components/ui/safe-image";
 import React, { useCallback, useState } from "react";
 import { PLACEHOLDER_IMAGE } from "@/utils";
@@ -39,7 +39,7 @@ export const ReservationConfirmationCard = ({
 
   return (
     <>
-      <Link href={link} className="block">
+      <CommunityLink href={link} className="block">
         <div className="mx-auto max-w-md">
           <div
             className={`flex overflow-hidden rounded-xl bg-background ${
@@ -76,7 +76,7 @@ export const ReservationConfirmationCard = ({
           </div>
           <div className="border-b border-gray-200 my-4"></div>
         </div>
-      </Link>
+      </CommunityLink>
       <div>
         <div className="flex items-center justify-between gap-x-2">
           <div>

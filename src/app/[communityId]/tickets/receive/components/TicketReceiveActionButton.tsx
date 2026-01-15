@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Button, buttonVariants } from "@/components/ui/button";
-import Link from "next/link";
+import CommunityLink from "@/components/navigation/CommunityLink";
 import { Loader2 } from "lucide-react";
 
 interface TicketReceiveActionButtonProps {
@@ -43,12 +43,12 @@ const TicketReceiveActionButton: React.FC<TicketReceiveActionButtonProps> = ({
     );
   } else {
     return (
-      <Link
+      <CommunityLink
         href={`/search/result?type=activity&q=${encodeURIComponent(ownerName)}&useTicket=true`}
         className={buttonVariants({ variant: "secondary", size: "lg" })}
       >
         体験を探す
-      </Link>
+      </CommunityLink>
     );
   }
 };

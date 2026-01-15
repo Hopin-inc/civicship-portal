@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import CommunityLink from "@/components/navigation/CommunityLink";
 import { Button } from "@/components/ui/button";
 import { Home, AlertCircle } from "lucide-react";
 import React, { useEffect } from "react";
@@ -40,10 +40,10 @@ export default function NotFound() {
         </EmptyHeader>
         <EmptyContent>
           <Button asChild className="w-full">
-            <Link href={rootPath}>
+            <CommunityLink href={rootPath}>
               <Home className="mr-2 h-4 w-4" />
               トップに戻る
-            </Link>
+            </CommunityLink>
           </Button>
         </EmptyContent>
       </Empty>

@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Copy, FileKey, Info, LinkIcon, PhoneIcon, AlertCircle } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
+import CommunityLink from "@/components/navigation/CommunityLink";
 import { toast } from "react-toastify";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
@@ -62,7 +62,7 @@ export default function AccountSection() {
                     <span className="text-label-sm text-red-500">{t("users.account.didFailed")}</span>
                   </div>
                   <Button variant="outline" size="sm" asChild className="h-6 px-2 text-xs">
-                    <Link href="/users/me/reverify-phone">{t("users.account.reverifyPhone")}</Link>
+                    <CommunityLink href="/users/me/reverify-phone">{t("users.account.reverifyPhone")}</CommunityLink>
                   </Button>
                 </div>
               ) : (

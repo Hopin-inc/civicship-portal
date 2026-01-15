@@ -1,7 +1,7 @@
 "use client";
 
 import { SafeImage } from "@/components/ui/safe-image";
-import Link from "next/link";
+import CommunityLink from "@/components/navigation/CommunityLink";
 import { Card } from "@/components/ui/card";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { JapaneseYenIcon, MapPin } from "lucide-react";
@@ -121,7 +121,7 @@ export default function OpportunityVerticalCard({
 
   if (href) {
     return (
-      <Link
+      <CommunityLink
         href={href}
         className={cn(
           "inline-block",
@@ -131,7 +131,7 @@ export default function OpportunityVerticalCard({
         )}
       >
         {CardContent}
-      </Link>
+      </CommunityLink>
     );
   }
 

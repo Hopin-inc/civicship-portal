@@ -5,7 +5,7 @@ import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthProvider";
 import Image from "next/image";
-import Link from "next/link";
+import CommunityLink from "@/components/navigation/CommunityLink";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
@@ -79,9 +79,9 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, nextPath }) =>
                 onCheckedChange={(checked) => setAgreedTerms(!!checked)}
               />
               <Label htmlFor="agree-terms" className="text-label-md text-muted-foreground">
-                <Link href="/terms" className="underline">
+                <CommunityLink href="/terms" className="underline">
                   利用規約
-                </Link>
+                </CommunityLink>
                 <span className="text-label-sm">に同意する</span>
               </Label>
             </div>
@@ -95,9 +95,9 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, nextPath }) =>
                 onCheckedChange={(checked) => setAgreedPrivacy(!!checked)}
               />
               <Label htmlFor="agree-privacy" className="text-label-md text-muted-foreground">
-                <Link href="/privacy" className="underline">
+                <CommunityLink href="/privacy" className="underline">
                   プライバシーポリシー
-                </Link>
+                </CommunityLink>
                 <span className="text-label-sm">に同意する</span>
               </Label>
             </div>
@@ -115,12 +115,12 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, nextPath }) =>
               {isLoading || isAuthenticating ? "ログイン中..." : "LINEでログイン"}
             </Button>
           ) : (
-            <Link
+            <CommunityLink
               href={`/sign-up/phone-verification?next=${encodeURIComponentWithType(nextPath ?? null)}`}
               className={cn(buttonVariants({ variant: "primary", size: "lg" }), "w-full")}
             >
               ユーザー登録に進む
-            </Link>
+            </CommunityLink>
           )}
         </div>
       </SheetContent>

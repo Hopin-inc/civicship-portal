@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
+import CommunityLink from "@/components/navigation/CommunityLink";
 import { Button } from "@/components/ui/button";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { useAuthEnvironment } from "@/hooks/useAuthEnvironment";
@@ -50,11 +50,11 @@ export const OpportunityDetailsFooter: React.FC<OpportunityDetailsFooterProps> =
     }
 
     return (
-      <Link href={`/reservation/select-date?${query.toString()}`}>
+      <CommunityLink href={`/reservation/select-date?${query.toString()}`}>
         <Button variant="primary" size="lg" className="px-8">
           日付を選択
         </Button>
-      </Link>
+      </CommunityLink>
     );
   };
 

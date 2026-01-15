@@ -1,7 +1,8 @@
 import { ActivitySlot, QuestSlot } from "@/app/[communityId]/reservation/data/type/opportunitySlot";
 import { getAdvanceBookingText } from "@/config/activityBookingConfig";
 import { GqlOpportunitySlotHostingStatus } from "@/types/graphql";
-import { Link, CalendarX } from "lucide-react";
+import { Link as LinkIcon, CalendarX } from "lucide-react";
+import CommunityLink from "@/components/navigation/CommunityLink";
 import { useMemo } from "react";
 import { OpportunityScheduleCard } from "../OpportunityScheduleCard";
 import { Button } from "@/components/ui/button";
@@ -60,11 +61,11 @@ export const ScheduleSection = ({
                 ))}
               </div>
               {visibleSlots.length > 2 && (
-                <Link href={`/reservation/select-date?${query.toString()}`}>
+                <CommunityLink href={`/reservation/select-date?${query.toString()}`}>
                   <Button variant="secondary" size="md" className="w-full">
                     参加できる日程を探す
                   </Button>
-                </Link>
+                </CommunityLink>
               )}
             </>
           ) : (

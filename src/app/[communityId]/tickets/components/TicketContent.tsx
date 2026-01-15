@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { Info, Search } from "lucide-react";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
-import Link from "next/link";
+import CommunityLink from "@/components/navigation/CommunityLink";
 
 interface TicketContentProps {
   ticketClaimLinks: TicketClaimLink[];
@@ -70,9 +70,9 @@ const TicketContent: React.FC<TicketContentProps> = ({
           <EmptyContent>
             {communityConfig?.enableFeatures?.includes("opportunities") ? (
               <Button asChild variant="primary" size="lg" className="px-16">
-                <Link href={communityConfig?.rootPath ?? "/"}>
+                <CommunityLink href={communityConfig?.rootPath ?? "/"}>
                   関わりをみつける
-                </Link>
+                </CommunityLink>
               </Button>
             ) : (
               <Button variant="tertiary" disabled size="lg" className="px-16">

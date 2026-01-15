@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
+import CommunityLink from "@/components/navigation/CommunityLink";
 import Image from "next/image";
 import { SafeImage } from "@/components/ui/safe-image";
 import { TArticleCard, TArticleWithAuthor } from "@/app/[communityId]/articles/data/type";
@@ -20,7 +20,7 @@ interface ArticleCardProps {
 
 const ArticleCard: React.FC<ArticleCardProps> = ({ article, showCategory, showUser }) => {
   return (
-    <Link href={`/articles/${article.id}`} className="block">
+    <CommunityLink href={`/articles/${article.id}`} className="block">
       <Card className="bg-white">
         {article.thumbnail && (
           <div className="relative w-full h-48">
@@ -69,7 +69,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, showCategory, showUs
           )}
         </div>
       </Card>
-    </Link>
+    </CommunityLink>
   );
 };
 

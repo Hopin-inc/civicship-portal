@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
-import Link from "next/link";
+import CommunityLink from "@/components/navigation/CommunityLink";
 import { useTranslations } from "next-intl";
 
 type PortfolioEmptyStateProps = {
@@ -37,9 +37,9 @@ export const PortfolioEmptyState = ({ isOwner }: PortfolioEmptyStateProps) => {
       {isOwner && (
         <EmptyContent>
           <Button asChild variant="primary" size="lg" className="px-16">
-            <Link href={communityConfig?.rootPath ?? "/"}>
+            <CommunityLink href={communityConfig?.rootPath ?? "/"}>
               {t("users.portfolio.searchEngagements")}
-            </Link>
+            </CommunityLink>
           </Button>
         </EmptyContent>
       )}

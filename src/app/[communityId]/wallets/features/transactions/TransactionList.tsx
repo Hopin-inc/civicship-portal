@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useTranslations } from "next-intl";
-import Link from "next/link";
+import CommunityLink from "@/components/navigation/CommunityLink";
 import { InfiniteTransactionList } from "@/shared/transactions/components/InfiniteTransactionList";
 import { GqlTransactionsConnection } from "@/types/graphql";
 
@@ -18,12 +18,12 @@ export function TransactionList({ walletId, initialTransactions }: TransactionLi
     <div className="pt-10">
       <div className="flex justify-between items-center">
         <h2 className="text-display-sm">{t("transactions.list.title")}</h2>
-        <Link
+        <CommunityLink
           href="/transactions"
           className="text-sm border-b-[1px] border-black cursor-pointer bg-transparent p-0"
         >
           {t("transactions.list.communityHistoryLink")}
-        </Link>
+        </CommunityLink>
       </div>
       <div className="mt-6">
         {initialTransactions.edges?.length === 0 ? (

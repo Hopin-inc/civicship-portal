@@ -5,7 +5,7 @@ import { PLACEHOLDER_IMAGE } from "@/utils";
 import { MapPin, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { IPlaceCard } from "@/app/[communityId]/places/data/type";
-import Link from "next/link";
+import CommunityLink from "@/components/navigation/CommunityLink";
 
 interface PlaceCardProps {
   place: IPlaceCard;
@@ -14,7 +14,7 @@ interface PlaceCardProps {
 }
 
 const PlaceCard: React.FC<PlaceCardProps> = ({ place, selected, buttonVariant = "tertiary" }) => (
-  <Link href={`/places/${place.id}`}>
+  <CommunityLink href={`/places/${place.id}`}>
     <Card
       className={`w-full overflow-hidden transition-transform duration-200 ${
         selected ? "scale-[1.02]" : "scale-100"
@@ -78,7 +78,7 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place, selected, buttonVariant = 
         </CardFooter>
       </CardContent>
     </Card>
-  </Link>
+  </CommunityLink>
 );
 
 export default PlaceCard;

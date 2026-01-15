@@ -2,7 +2,7 @@ import { GqlOpportunity, GqlOpportunityCategory, GqlReservation } from "@/types/
 import { displayDuration } from "@/utils/date";
 import { PaymentBreakdown } from "./presentPaymentBreakdown";
 import { ExternalLink } from "lucide-react";
-import Link from "next/link";
+import CommunityLink from "@/components/navigation/CommunityLink";
 import React from "react";
 
 export interface DetailRow {
@@ -66,13 +66,13 @@ export function presentReservationDetailRows({
       key: "opportunity",
       label: "募集",
       value: (
-        <Link
+        <CommunityLink
           href={opportunityLink}
           className="text-primary hover:underline flex items-center gap-1.5 min-w-0 justify-end"
         >
           <span className="block truncate min-w-0 max-w-full">{opportunity.title}</span>
           <ExternalLink className="h-4 w-4 flex-shrink-0" />
-        </Link>
+        </CommunityLink>
       ),
     });
   }

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
+import CommunityLink from "@/components/navigation/CommunityLink";
 import { useTranslations } from "next-intl";
 import { ChevronRight, Ticket as TicketIcon, Wallet } from "lucide-react";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
@@ -20,7 +20,7 @@ interface MaybeLinkProps {
 
 function MaybeLink({ canNavigate, href, children }: MaybeLinkProps) {
   if (canNavigate) {
-    return <Link href={href}>{children}</Link>;
+    return <CommunityLink href={href}>{children}</CommunityLink>;
   }
   return <>{children}</>;
 }

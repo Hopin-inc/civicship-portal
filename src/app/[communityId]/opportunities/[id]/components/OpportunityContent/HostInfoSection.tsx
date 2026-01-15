@@ -2,7 +2,7 @@ import ArticleCard from "@/app/[communityId]/articles/components/Card";
 import { OpportunityHost } from "@/components/domains/opportunities/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PLACEHOLDER_IMAGE } from "@/utils";
-import Link from "next/link";
+import CommunityLink from "@/components/navigation/CommunityLink";
 
 export const HostInfoSection = ({ host, hostLabel }: { host: OpportunityHost, hostLabel: string }) => {
     if (!host) return null;
@@ -13,12 +13,12 @@ export const HostInfoSection = ({ host, hostLabel }: { host: OpportunityHost, ho
         <div className="rounded-xl flex flex-col gap-4">
           <div className="flex items-center gap-4">
             {host.id ? (
-              <Link href={`/users/${host.id}`} className="flex-shrink-0">
+              <CommunityLink href={`/users/${host.id}`} className="flex-shrink-0">
                 <Avatar className="w-16 h-16 mt-1">
                   <AvatarImage src={host.image ?? PLACEHOLDER_IMAGE} alt={host.name || "案内人"} />
                   <AvatarFallback>{host.name?.[0] || "U"}</AvatarFallback>
                 </Avatar>
-              </Link>
+              </CommunityLink>
             ) : (
               <div className="flex-shrink-0">
                 <Avatar className="w-16 h-16 mt-1">

@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import Link from "next/link";
+import CommunityLink from "@/components/navigation/CommunityLink";
 import { formatDate } from "@/utils/date";
 import { GqlClaimLinkStatus } from "@/types/graphql";
 
@@ -49,5 +49,5 @@ export function TicketIssueCard({
     </Card>
   );
 
-  return href ? <Link href={ href }>{ content }</Link> : content;
+  return href ? <CommunityLink href={ href }>{ content }</CommunityLink> : content;
 }

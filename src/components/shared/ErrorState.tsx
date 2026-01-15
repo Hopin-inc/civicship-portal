@@ -2,7 +2,7 @@
 
 import React, { useEffect } from "react";
 import { Home, RefreshCcw } from "lucide-react";
-import Link from "next/link";
+import CommunityLink from "@/components/navigation/CommunityLink";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 
@@ -51,12 +51,12 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
             </Button>
           )}
 
-          <Link href="/" passHref>
+          <CommunityLink href="/" passHref>
             <Button className="w-full flex justify-center" size="sm" variant="text">
               <Home className="h-4 w-4" />
               {t("common.errorState.homeButton")}
             </Button>
-          </Link>
+          </CommunityLink>
         </div>
       </div>
     </div>
