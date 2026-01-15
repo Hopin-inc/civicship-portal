@@ -11,7 +11,8 @@ interface TransactionMessageCardProps {
  */
 const linkifyText = (text: string) => {
   // URL検出用の正規表現（http, https, www で始まるURL）
-  const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
+  // 末尾の句読点を除外してURLの境界をより正確に検出
+  const urlRegex = /(https?:\/\/[^"'`()\[\]{}<>,;.!?\s]+|www\.[^"'`()\[\]{}<>,;.!?\s]+)/g;
   const parts = text.split(urlRegex);
 
   return parts.map((part, index) => {

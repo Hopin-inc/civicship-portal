@@ -29,12 +29,18 @@ export default function EditBonusSheet({ currentConfig, onSave }: EditBonusSheet
   const [updateConfig, { loading }] = useMutation(UPDATE_SIGNUP_BONUS_CONFIG);
 
   const handleSave = async () => {
+    const pointValue = Number(bonusPoint);
+    if (isNaN(pointValue) || !Number.isInteger(pointValue) || pointValue < 0) {
+      toast.error(t("adminWallet.settings.signupBonus.form.invalidPoints"));
+      return;
+    }
+
     try {
       await updateConfig({
         variables: {
           input: {
             isEnabled,
-            bonusPoint: Number(bonusPoint),
+            bonusPoint: pointValue,
             message,
           },
         },

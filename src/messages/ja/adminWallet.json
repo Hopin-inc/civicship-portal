@@ -41,6 +41,7 @@
   "adminWallet.settings.signupBonus.form.enabledLabel": "自動配布を有効にする",
   "adminWallet.settings.signupBonus.form.submit": "保存する",
   "adminWallet.settings.signupBonus.form.success": "設定を保存しました",
+  "adminWallet.settings.signupBonus.form.invalidPoints": "0以上の整数を入力してください",
 
   "adminWallet.settings.signupBonus.alert": "要確認",
   "adminWallet.settings.signupBonus.details.allGood": "問題なく付与できています",
