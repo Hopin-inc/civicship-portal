@@ -21,12 +21,32 @@ const httpLink = createUploadLink({
   },
 });
 
+// Extract communityId from URL path (first segment after /)
+function extractCommunityIdFromPath(pathname: string): string | null {
+  const segments = pathname.split("/").filter(Boolean);
+  if (segments.length === 0) {
+    return null;
+  }
+  const firstSegment = segments[0];
+  // Skip if it's a known non-community path
+  if (["api", "_next", "favicon.ico"].includes(firstSegment)) {
+    return null;
+  }
+  return firstSegment;
+}
+
 const requestLink = setContext(async (operation, prevContext) => {
   const isBrowser = typeof window !== "undefined";
   let token: string | null = null;
   // Browser uses id_token mode only (session mode is SSR-only via executeServerGraphQLQuery)
   // Server keeps session mode for any server-side Apollo usage
   let authMode: "session" | "id_token" = isBrowser ? "id_token" : "session";
+  
+  // Extract communityId from current URL path (dynamic multi-tenant routing)
+  let communityId: string | null = null;
+  if (isBrowser) {
+    communityId = extractCommunityIdFromPath(window.location.pathname);
+  }
 
   if (isBrowser) {
     const { firebaseUser, authenticationState } = useAuthStore.getState().state;
@@ -72,7 +92,8 @@ const requestLink = setContext(async (operation, prevContext) => {
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     "X-Auth-Mode": authMode,
     "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
-    "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID,
+    // Use dynamic communityId from URL path for multi-tenant routing
+    ...(communityId ? { "X-Community-Id": communityId } : {}),
   };
 
   return { headers };
