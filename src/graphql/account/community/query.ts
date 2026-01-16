@@ -58,3 +58,51 @@ export const GET_FAILED_SIGNUP_BONUSES = gql`
     }
   }
 `;
+
+`;
+
+export const GET_COMMUNITY_PORTAL_CONFIG = gql`
+  query GetCommunityPortalConfig($communityId: String!) {
+    communityPortalConfig(communityId: $communityId) {
+      communityId
+      tokenName
+      title
+      description
+      shortDescription
+      domain
+      faviconPrefix
+      logoPath
+      squareLogoPath
+      ogImagePath
+      enableFeatures
+      rootPath
+      adminRootPath
+      documents {
+        id
+        title
+        path
+        type
+        order
+      }
+      commonDocumentOverrides {
+        terms {
+          id
+          title
+          path
+          type
+        }
+        privacy {
+          id
+          title
+          path
+          type
+        }
+      }
+      regionName
+      regionKey
+      liffId
+      liffBaseUrl
+      firebaseTenantId
+    }
+  }
+`;

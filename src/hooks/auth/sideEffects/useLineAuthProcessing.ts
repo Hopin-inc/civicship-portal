@@ -8,7 +8,7 @@ import { GqlUser } from "@/types/graphql";
 import { AuthStateManager } from "@/lib/auth/core/auth-state-manager";
 import { TokenManager } from "@/lib/auth/core/token-manager";
 import { lineAuth } from "@/lib/auth/core/firebase-config";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 interface UseLineAuthProcessingProps {
   shouldProcessRedirect: boolean;
@@ -27,6 +27,8 @@ export const useLineAuthProcessing = ({
 }: UseLineAuthProcessingProps) => {
   const processedRef = useRef(false);
   const setState = useAuthStore((s) => s.setState);
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId;
 
   useEffect(() => {
     if (!shouldProcessRedirect || processedRef.current || !authStateManager) return;
@@ -93,7 +95,7 @@ export const useLineAuthProcessing = ({
         const hasPhoneIdentity = !!user.identities?.some(
           (i) => i.platform?.toUpperCase() === "PHONE",
         );
-        const hasMembership = !!user.memberships?.some((m) => m.community?.id === COMMUNITY_ID);
+        const hasMembership = !!user.memberships?.some((m) => m.community?.id === communityId);
 
         if (hasPhoneIdentity || TokenManager.phoneVerified()) {
           TokenManager.savePhoneAuthFlag(true);
@@ -152,5 +154,5 @@ export const useLineAuthProcessing = ({
     };
 
     handleLineAuthRedirect();
-  }, [shouldProcessRedirect, refetchUser, setState, liffService, authStateManager, hasFullAuth]);
+  }, [shouldProcessRedirect, refetchUser, setState, liffService, authStateManager, hasFullAuth, communityId]);
 };

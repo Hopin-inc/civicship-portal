@@ -1,18 +1,24 @@
 import { Metadata } from "next";
-import { currentCommunityConfig, DEFAULT_OPEN_GRAPH_IMAGE } from "@/lib/communities/metadata";
+import { getCommunityConfigFromEnv, getDefaultOgImage } from "@/lib/communities/config";
 import { getTranslations } from "next-intl/server";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations();
+  const [t, config] = await Promise.all([
+    getTranslations(),
+    getCommunityConfigFromEnv(),
+  ]);
+  
+  const communityName = config?.title || "";
+  const ogImages = getDefaultOgImage(config);
   
   return {
-    title: t("users.me.meta.title", { communityName: currentCommunityConfig.title }),
+    title: t("users.me.meta.title", { communityName }),
     description: t("users.me.meta.description"),
     openGraph: {
       type: "website",
-      title: t("users.me.meta.ogTitle", { communityName: currentCommunityConfig.title }),
+      title: t("users.me.meta.ogTitle", { communityName }),
       description: t("users.me.meta.ogDescription"),
-      images: DEFAULT_OPEN_GRAPH_IMAGE,
+      images: ogImages,
     },
   };
 }

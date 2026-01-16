@@ -1,5 +1,5 @@
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { GqlTransactionsConnection, GqlWalletType, useGetTransactionsQuery } from "@/types/graphql";
 
 export interface UseCommunityTransactionsResult {
@@ -22,10 +22,11 @@ const fallbackConnection: GqlTransactionsConnection = {
 };
 
 const useCommunityTransactions = (): UseCommunityTransactionsResult => {
+  const { communityId } = useCommunityConfig();
   const { data, loading, error, fetchMore, refetch } = useGetTransactionsQuery({
     variables: {
       filter: {
-        communityId: COMMUNITY_ID,
+        communityId,
         or: [
           { fromWalletType: GqlWalletType.Community },
           { toWalletType: GqlWalletType.Community },
@@ -48,7 +49,7 @@ const useCommunityTransactions = (): UseCommunityTransactionsResult => {
     await fetchMore({
       variables: {
         filter: {
-          communityId: COMMUNITY_ID,
+          communityId,
           or: [
             { fromWalletType: GqlWalletType.Community },
             { toWalletType: GqlWalletType.Community },

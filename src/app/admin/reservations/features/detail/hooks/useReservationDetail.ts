@@ -4,7 +4,7 @@ import {
   GqlOpportunityCategory,
   useGetReservationQuery,
 } from "@/types/graphql";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { presentReservationDetail } from "../presenters/presentReservationDetail";
 import {
   calculateRequiredPointsForApproval,
@@ -26,6 +26,8 @@ import type { ReservationMode } from "../types/mode";
  * 予約詳細ページのロジックを統合したhook
  */
 export function useReservationDetail(id: string, mode: ReservationMode | null) {
+  const { communityId } = useCommunityConfig();
+  
   // データ取得
   const { data, loading, error, refetch } = useGetReservationQuery({
     variables: { id: id ?? "" },
@@ -85,7 +87,7 @@ export function useReservationDetail(id: string, mode: ReservationMode | null) {
     await saveAttendances(
       participations,
       attendanceData,
-      reservation?.opportunitySlot?.opportunity?.community?.id || COMMUNITY_ID,
+      reservation?.opportunitySlot?.opportunity?.community?.id || communityId,
     );
   };
 
@@ -95,7 +97,7 @@ export function useReservationDetail(id: string, mode: ReservationMode | null) {
   // 主催者ウォレット
   const { currentPoint: organizerBalance, loading: balanceLoading } = useOrganizerWallet({
     organizerId: opportunity?.createdByUser?.id,
-    communityId: opportunity?.community?.id || COMMUNITY_ID,
+    communityId: opportunity?.community?.id || communityId,
   });
 
   // 承認処理

@@ -8,7 +8,7 @@ import {
   useUpdateOpportunityContentMutation,
   useUpdateOpportunitySlotsBulkMutation,
 } from "@/types/graphql";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { isNewImage } from "../types/form";
 import { MIN_IMAGES, MAX_IMAGES } from "../constants/form";
 import { convertSlotToDates } from "../../shared/utils/dateFormat";
@@ -25,6 +25,8 @@ export const useOpportunitySave = ({
   opportunityId,
   formState,
 }: UseOpportunitySaveOptions) => {
+  const { communityId } = useCommunityConfig();
+  
   // ========== GraphQL Mutations ==========
   const [createOpportunity, createResult] = useCreateOpportunityMutation({
     refetchQueries: ["GetAdminOpportunities"],
@@ -143,7 +145,7 @@ export const useOpportunitySave = ({
               ...categorySpecificInput,
               slots: slotsInputForCreate,
             },
-            permission: { communityId: COMMUNITY_ID },
+            permission: { communityId },
           },
         });
 
@@ -159,7 +161,7 @@ export const useOpportunitySave = ({
               ...categorySpecificInput,
             },
             permission: {
-              communityId: COMMUNITY_ID,
+              communityId,
               opportunityId: opportunityId!,
             },
           },
@@ -174,7 +176,7 @@ export const useOpportunitySave = ({
               update: slotsInputForUpdate.length > 0 ? slotsInputForUpdate : undefined,
             },
             permission: {
-              communityId: COMMUNITY_ID,
+              communityId,
               opportunityId: opportunityId!,
             },
           },
@@ -193,6 +195,7 @@ export const useOpportunitySave = ({
       mode,
       opportunityId,
       formState,
+      communityId,
       createOpportunity,
       updateContent,
       updateSlots,

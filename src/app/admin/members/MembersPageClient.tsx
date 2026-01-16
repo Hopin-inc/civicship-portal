@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@/contexts/AuthProvider";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";
@@ -21,11 +21,12 @@ const EMPTY_MEMBERS: [] = [];
 
 export default function MembersPageClient({ initialConnection }: MembersPageClientProps) {
   const { user: currentUser } = useAuth();
+  const { communityId } = useCommunityConfig();
   const [searchQuery, setSearchQuery] = useState("");
   const [input, setInput] = useState("");
 
   const currentUserRole = currentUser?.memberships?.find(
-    (m) => m.community?.id === COMMUNITY_ID,
+    (m) => m.community?.id === communityId,
   )?.role;
 
   const headerConfig = useMemo(
@@ -47,7 +48,7 @@ export default function MembersPageClient({ initialConnection }: MembersPageClie
     isFetchingMore,
     loadMoreRef,
     refetch,
-  } = useMemberWithDidSearch(COMMUNITY_ID, EMPTY_MEMBERS, {
+  } = useMemberWithDidSearch(communityId, EMPTY_MEMBERS, {
     searchQuery,
     pageSize: 20,
     enablePagination: true,
@@ -80,7 +81,7 @@ export default function MembersPageClient({ initialConnection }: MembersPageClie
     }
 
     try {
-      const result = await mutate({ communityId: COMMUNITY_ID, userId });
+      const result = await mutate({ communityId, userId });
       if (!result.success) {
         toast.error(`権限変更に失敗しました（${result.code ?? "UNKNOWN"}）`);
         return false;

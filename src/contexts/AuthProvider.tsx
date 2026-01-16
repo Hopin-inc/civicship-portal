@@ -25,10 +25,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
   const hasFullAuth = Boolean(ssrCurrentUser && ssrLineAuthenticated && ssrPhoneAuthenticated);
 
   useEffect(() => {
+    // Only skip if already initialized AND authStateManager is available
+    // This ensures we don't skip initialization when authStateManager becomes available after hydration
+    if (!authStateManager) return;
     if (hasInitialized.current) return;
     hasInitialized.current = true;
-
-    if (!authStateManager) return;
 
     logger.debug("[AUTH] AuthProvider initialization", {
       hasFullAuth,
