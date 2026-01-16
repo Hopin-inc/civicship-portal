@@ -7,7 +7,7 @@ import {
 import { toast } from "react-toastify";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
-import { useRouter } from "next/navigation";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 
 export const useReservationApproval = ({
   id,
@@ -21,7 +21,7 @@ export const useReservationApproval = ({
   refetch: () => void;
 }) => {
   const track = useAnalytics();
-  const router = useRouter();
+  const router = useCommunityRouter();
   const { communityId } = useCommunityConfig();
 
   const [acceptReservation, { loading: acceptLoading }] = useReservationAcceptMutation({

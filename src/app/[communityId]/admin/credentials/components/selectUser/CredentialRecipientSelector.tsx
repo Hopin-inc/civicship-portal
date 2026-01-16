@@ -12,7 +12,7 @@ import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { Button } from "@/components/ui/button";
 import { useSelection } from "../../context/SelectionContext";
 import { useEvaluationBulkCreate } from "../../hooks/useEvaluationBulkCreate";
-import { useRouter } from "next/navigation";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import { logger } from "@/lib/logging";
 import { useMemberWithDidSearch } from "../../hooks/useMemberWithDidSearch";
 import SearchResultList from "./SearchResultList";
@@ -102,7 +102,7 @@ export default function CredentialRecipientSelector({
   const { communityId } = useCommunityConfig();
   const { selectedSlot, setSelectedSlot, participatedUsers } = useSelection();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const router = useRouter();
+  const router = useCommunityRouter();
   const [input, setInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const selectedUserIds = selectedSlot?.userIds ?? [];

@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useMemo } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import useReservations from "./features/list/hooks/useReservations";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -13,7 +14,7 @@ import { ReservationList } from "./features/list/components/ReservationList";
 import { getReservationFilterFromTab, isTabType, TABS } from "./constants/filters";
 
 export default function ReservationsPage() {
-  const router = useRouter();
+  const router = useCommunityRouter();
   const headerConfig = useMemo(
     () => ({
       title: "予約管理",

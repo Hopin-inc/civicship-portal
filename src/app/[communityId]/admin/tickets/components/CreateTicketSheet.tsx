@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -39,7 +39,7 @@ export default function CreateTicketSheet({ onTicketCreated }: CreateTicketSheet
   const [ticketQty, setTicketQty] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const router = useRouter();
+  const router = useCommunityRouter();
   const { user } = useAuth();
   const { communityId } = useCommunityConfig();
 

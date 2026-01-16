@@ -1,12 +1,12 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { PlaceFormEditor } from "../features/editor/components/PlaceFormEditor";
 import { useMemo } from "react";
 
 export default function NewPlacePage() {
-  const router = useRouter();
+  const router = useCommunityRouter();
 
   const headerConfig = useMemo(
     () => ({

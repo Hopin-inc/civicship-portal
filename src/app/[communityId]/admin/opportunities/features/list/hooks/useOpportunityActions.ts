@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import { useCallback } from "react";
 import { toast } from "react-toastify";
 import {
@@ -21,7 +21,7 @@ interface UseOpportunityActionsReturn {
 }
 
 export function useOpportunityActions(refetch?: () => void): UseOpportunityActionsReturn {
-  const router = useRouter();
+  const router = useCommunityRouter();
   const { communityId } = useCommunityConfig();
   const [setPublishStatus] = useSetPublishStatusMutation();
   const [deleteOpportunity] = useDeleteOpportunityMutation();

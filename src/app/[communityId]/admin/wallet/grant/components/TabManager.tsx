@@ -3,7 +3,8 @@
 import React, { useEffect } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tabs as TabsEnum } from "../types/tabs";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
 
@@ -14,7 +15,7 @@ interface TabManagerProps {
 
 export function TabManager({ activeTab, setActiveTab }: TabManagerProps) {
   const t = useTranslations();
-  const router = useRouter();
+  const router = useCommunityRouter();
   const searchParams = useSearchParams();
 
   useEffect(() => {

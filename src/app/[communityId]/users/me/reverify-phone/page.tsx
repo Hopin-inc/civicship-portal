@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import { useAuth } from "@/contexts/AuthProvider";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ReverifyPhoneForm } from "./components/ReverifyPhoneForm";
 
 export default function ReverifyPhonePage() {
-  const router = useRouter();
+  const router = useCommunityRouter();
   const { isAuthenticated, loading } = useAuth();
 
   useEffect(() => {

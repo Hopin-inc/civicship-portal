@@ -4,7 +4,7 @@ import React, { useMemo } from "react";
 import TimeSlotList from "./TimeSlotList";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { STEPS } from "../CredentialIssuanceWizard";
-import { useRouter } from "next/navigation";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 
 const STEP_NUMBERS = {
@@ -19,7 +19,7 @@ const STEP_COLORS = {
 
 export default function TimeSlotSelector({ setStep }: { setStep: (step: number) => void }) {
   const { selectedSlot, setSelectedSlot } = useSelection();
-  const router = useRouter();
+  const router = useCommunityRouter();
 
   const headerConfig = useMemo(
     () => ({

@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from "react";
 import { useForm } from "react-hook-form";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import { TArticleWithAuthor } from "@/app/[communityId]/articles/data/type";
 
 export type SearchFormValues = {
@@ -8,7 +9,7 @@ export type SearchFormValues = {
 };
 
 export const useArticleSearch = (articles: TArticleWithAuthor[]) => {
-  const router = useRouter();
+  const router = useCommunityRouter();
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get("q") || "";
 

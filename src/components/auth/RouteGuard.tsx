@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { usePathname, useRouter, useSearchParams, useParams } from "next/navigation";
+import { usePathname, useSearchParams, useParams } from "next/navigation";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import { useAuth } from "@/contexts/AuthProvider";
 import { AuthRedirectService } from "@/lib/auth/service/auth-redirect-service";
 import { decodeURIComponentWithType, EncodedURIComponent, RawURIComponent } from "@/utils/path";
@@ -17,7 +18,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   const { loading } = useAuth();
   const authState = useAuthStore((s) => s.state);
   const currentUser = useAuthStore((s) => s.state.currentUser);
-  const router = useRouter();
+  const router = useCommunityRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const params = useParams<{ communityId?: string }>();

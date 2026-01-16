@@ -3,7 +3,7 @@
 import { MapPin } from "lucide-react";
 import { PlaceData } from "../../shared/types/place";
 import { PlaceCardMenu } from "./PlaceCardMenu";
-import { useRouter } from "next/navigation";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 
 interface PlaceCardProps {
   place: PlaceData;
@@ -11,7 +11,7 @@ interface PlaceCardProps {
 }
 
 export function PlaceCard({ place, onDelete }: PlaceCardProps) {
-  const router = useRouter();
+  const router = useCommunityRouter();
 
   const handleCardClick = (e: React.MouseEvent) => {
     // メニューボタンのクリックは無視

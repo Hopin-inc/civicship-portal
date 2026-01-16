@@ -8,7 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useRouter } from "next/navigation";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { usePlaceDeleteMutation } from "@/types/graphql";
@@ -21,7 +21,7 @@ interface PlaceCardMenuProps {
 }
 
 export function PlaceCardMenu({ placeId, placeName, onDelete }: PlaceCardMenuProps) {
-  const router = useRouter();
+  const router = useCommunityRouter();
   const { communityId } = useCommunityConfig();
   const [isDeleting, setIsDeleting] = useState(false);
   const [deletePlace] = usePlaceDeleteMutation();

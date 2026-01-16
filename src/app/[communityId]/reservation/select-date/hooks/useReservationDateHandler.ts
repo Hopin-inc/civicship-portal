@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import { ActivitySlot } from "@/app/[communityId]/reservation/data/type/opportunitySlot";
 import { buildReservationParams } from "@/app/[communityId]/reservation/data/presenter/opportunitySlot";
 
@@ -16,7 +16,7 @@ export const useReservationDateHandler = ({
   selectedGuests: number;
   setSelectedDate: (value: string) => void;
 }) => {
-  const router = useRouter();
+  const router = useCommunityRouter();
 
   const handleReservation = useCallback(
     (slot: ActivitySlot) => {

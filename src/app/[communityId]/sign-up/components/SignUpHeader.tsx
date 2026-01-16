@@ -5,7 +5,7 @@ import CommunityLink from "@/components/navigation/CommunityLink";
 import { ChevronLeft } from "lucide-react";
 import { lineAuth as auth } from "@/lib/auth/core/firebase-config";
 import { useCookies } from "next-client-cookies";
-import { useRouter } from "next/navigation";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import { useTranslations } from "next-intl";
 
 /**
@@ -13,7 +13,7 @@ import { useTranslations } from "next-intl";
  */
 const SignUpHeader: React.FC = () => {
   const t = useTranslations();
-  const router = useRouter();
+  const router = useCommunityRouter();
   const cookies = useCookies();
 
   const handleCancel = async (e: React.MouseEvent) => {

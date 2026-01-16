@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import { useTranslations } from "next-intl";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import WalletCard from "@/components/shared/WalletCard";
@@ -13,7 +13,7 @@ import { ErrorState } from "@/components/shared";
 import { useWalletContext } from "@/app/[communityId]/wallets/features/shared/contexts/WalletContext";
 
 export function WalletOverview() {
-  const router = useRouter();
+  const router = useCommunityRouter();
   const t = useTranslations();
   const { currentPoint, isLoadingWallet, error, refresh } = useWalletContext();
 

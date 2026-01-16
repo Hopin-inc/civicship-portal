@@ -1,5 +1,5 @@
 import { useFormContext } from "react-hook-form";
-import { useRouter } from "next/navigation";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import { buildSearchResultParams, formatDateRange } from "@/app/[communityId]/search/data/presenter";
 import { useState } from "react";
 // import { SearchTabType } from "@/app/[communityId]/search/components/Tabs";
@@ -7,7 +7,7 @@ import { useState } from "react";
 export type SearchFilterType = "location" | "date" | "guests" | "other" | null;
 
 export const useSearch = () => {
-  const router = useRouter();
+  const router = useCommunityRouter();
   const { getValues, setValue } = useFormContext(); // ← ここ重要
 
   // const [selectedTab, setSelectedTab] = useState<SearchTabType>("activity");

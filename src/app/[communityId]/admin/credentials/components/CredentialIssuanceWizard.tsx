@@ -3,7 +3,8 @@
 import OpportunityList from "./opportunity/OpportunityList";
 import TimeSlotSelector from "./selectDate/TimeSlotSelector";
 import CredentialRecipientSelector from "./selectUser/CredentialRecipientSelector";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import { GqlMembershipsConnection } from "@/types/graphql";
 
 export const STEPS = {
@@ -20,7 +21,7 @@ export default function CredentialIssuanceWizard({
   initialConnection,
 }: CredentialIssuanceWizardProps) {
   const searchParams = useSearchParams();
-  const router = useRouter();
+  const router = useCommunityRouter();
 
   const stepParam = Number(searchParams.get("step") ?? "1");
 

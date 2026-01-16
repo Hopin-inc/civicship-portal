@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import { useAuth } from "@/contexts/AuthProvider";
 import { toast } from "react-toastify";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
@@ -18,7 +18,7 @@ interface AdminGuardProps {
 
 export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
   const { isAuthenticated, loading, user: currentUser } = useAuth();
-  const router = useRouter();
+  const router = useCommunityRouter();
   const communityConfig = useCommunityConfig();
   const communityId = communityConfig?.communityId;
 

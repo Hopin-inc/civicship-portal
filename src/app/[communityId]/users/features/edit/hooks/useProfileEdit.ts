@@ -1,7 +1,7 @@
 "use client";
 
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import { toast } from "react-toastify";
 import { GqlCurrentPrefecture, useUpdateMyProfileMutation } from "@/types/graphql";
 import { GeneralUserProfile } from "@/app/[communityId]/users/features/shared/types";
@@ -15,7 +15,7 @@ import { getPrefectureKey } from "@/lib/i18n/prefectures";
 const useProfileEdit = () => {
   const t = useTranslations();
   const locale = useLocale();
-  const router = useRouter();
+  const router = useCommunityRouter();
   const { gqlUser, userId } = useUserProfileContext();
 
   const [profile, setProfile] = useState<GeneralUserProfile>(() => mapGqlUserToProfile(gqlUser));

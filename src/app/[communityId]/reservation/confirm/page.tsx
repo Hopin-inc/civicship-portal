@@ -1,6 +1,7 @@
 "use client";
 import { useMemo, useRef, useEffect, useState } from "react";
-import { notFound, useRouter } from "next/navigation";
+import { notFound } from "next/navigation";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import { toast } from "react-toastify";
 import { useAuth } from "@/contexts/AuthProvider";
 import { HeaderConfig } from "@/contexts/HeaderContext";
@@ -32,7 +33,7 @@ export default function ConfirmPage() {
   useHeaderConfig(headerConfig);
 
   const { user, isAuthenticated } = useAuth();
-  const router = useRouter();
+  const router = useCommunityRouter();
   const { opportunityId, slotId, participantCount: initialParticipantCount, communityId } = useReservationParams();
 
   const [participantCount, setParticipantCount] = useState<number>(initialParticipantCount);

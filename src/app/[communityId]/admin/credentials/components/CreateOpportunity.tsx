@@ -2,10 +2,10 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 
 export default function CreateOpportunitySheet() {
-  const router = useRouter();
+  const router = useCommunityRouter();
 
   const handleClick = () => {
       router.push("/admin/credentials/issue?step=1");

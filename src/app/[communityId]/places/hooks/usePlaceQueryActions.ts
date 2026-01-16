@@ -1,8 +1,9 @@
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 
 export function usePlaceQueryActions() {
   const searchParams = useSearchParams();
-  const router = useRouter();
+  const router = useCommunityRouter();
 
   const updateParams = (updater: (params: URLSearchParams) => void) => {
     const params = new URLSearchParams(searchParams.toString());

@@ -6,7 +6,8 @@ import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { GqlMembershipsConnection, GqlUser } from "@/types/graphql";
 import { useTransactionMutations } from "@/app/[communityId]/admin/wallet/hooks/useTransactionMutations";
 import UserSelectStep from "./components/UserSelectStep";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import TransferInputStep from "@/app/[communityId]/admin/wallet/grant/components/TransferInputStep";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
@@ -27,7 +28,7 @@ interface GrantPageClientProps {
 
 export default function GrantPageClient({ initialConnection }: GrantPageClientProps) {
   const t = useTranslations();
-  const router = useRouter();
+  const router = useCommunityRouter();
   const track = useAnalytics();
   const { communityId } = useCommunityConfig();
 

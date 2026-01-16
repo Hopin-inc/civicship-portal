@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthProvider";
 import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { isValidPhoneNumber } from "@/app/[communityId]/sign-up/phone-verification/utils/validatePhoneNumber";
 import { useResendTimer } from "@/app/[communityId]/sign-up/phone-verification/hooks/useResendTimer";
@@ -23,7 +23,7 @@ type VerificationStep = "phone" | "code";
 
 export function ReverifyPhoneForm() {
   const t = useTranslations();
-  const router = useRouter();
+  const router = useCommunityRouter();
   const { loading, user } = useAuth();
   const [phoneNumber, setPhoneNumber] = useState<string | undefined>(undefined);
   const [verificationCode, setVerificationCode] = useState("");

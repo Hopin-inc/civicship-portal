@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 import { useDonatePoint } from "@/app/[communityId]/wallets/features/donate/hooks";
 import { toast } from "react-toastify";
@@ -11,7 +11,7 @@ import { errorMessages } from "@/utils/errorMessage";
 
 export function useDonateFlow(currentUser?: GqlUser | null, currentPoint?: bigint) {
   const t = useTranslations();
-  const router = useRouter();
+  const router = useCommunityRouter();
   const track = useAnalytics();
   const { donate, isLoading, isAuthReady } = useDonatePoint();
   const [selectedUser, setSelectedUser] = useState<GqlUser | null>(null);
