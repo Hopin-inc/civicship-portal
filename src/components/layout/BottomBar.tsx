@@ -2,7 +2,7 @@
 
 import CommunityLink from "@/components/navigation/CommunityLink";
 import { Globe, Home, Search, User } from "lucide-react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams, useParams } from "next/navigation";
 import React from "react";
 import { cn } from "@/lib/utils";
 import { matchPaths } from "@/utils/path";
@@ -18,6 +18,8 @@ interface HeaderProps {
 const BottomBar: React.FC<HeaderProps> = ({ className }) => {
   const t = useTranslations();
   const pathname = usePathname();
+  const params = useParams();
+  const communityId = params?.communityId as string | undefined;
   const searchParams = useSearchParams();
   const placeId = searchParams.get("placeId");
   const communityConfig = useCommunityConfig();
@@ -52,7 +54,13 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
   }
 
   const getLinkStyle = (...paths: string[]) => {
-    const isActive = matchPaths(pathname, ...paths);
+    // communityId がある場合は pathname からプレフィックスを除去してマッチングさせる
+    const normalizedPathname =
+      communityId && pathname.startsWith(`/${communityId}`)
+        ? pathname.replace(`/${communityId}`, "") || "/"
+        : pathname;
+
+    const isActive = matchPaths(normalizedPathname, ...paths);
     return `flex flex-col items-center ${isActive ? "text-primary" : "text-muted-foreground"} hover:text-primary`;
   };
 
