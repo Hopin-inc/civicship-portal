@@ -5,7 +5,8 @@ const fallbackDescription = "体験が始まるその一歩は、ここから。
 const fallbackShortDescription = "文化と自然、人のあたたかさにふれる募集がそろいました。気になる体験を探してみませんか。";
 
 export async function generateMetadata({ params }: { params: Promise<{ communityId: string }> }): Promise<Metadata> {
-  const { communityId } = await params; const config = await getCommunityConfig(communityId);
+  const { communityId } = await params;
+  const config = await getCommunityConfig(communityId);
   
   const title = config?.title || "";
   const domain = config?.domain || "";

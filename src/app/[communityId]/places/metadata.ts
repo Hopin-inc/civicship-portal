@@ -2,7 +2,8 @@ import { Metadata } from "next";
 import { getCommunityConfig, getDefaultOgImage } from "@/lib/communities/config";
 
 export async function generateMetadata({ params }: { params: Promise<{ communityId: string }> }): Promise<Metadata> {
-  const { communityId } = await params; const config = await getCommunityConfig(communityId);
+  const { communityId } = await params;
+  const config = await getCommunityConfig(communityId);
   
   const title = config?.title || "";
   const domain = config?.domain || "";
