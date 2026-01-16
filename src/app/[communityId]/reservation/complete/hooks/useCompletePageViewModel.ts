@@ -22,12 +22,12 @@ export function useCompletePageViewModel(
   } = useCompletePageDataRaw(opportunityId, reservationId);
 
   const opportunity = useMemo(() => {
-    return gqlOpportunity ? presenterActivityCard(gqlOpportunity) : null;
+    return gqlOpportunity ? presenterActivityCard(gqlOpportunity as any) : null;
   }, [gqlOpportunity]);
 
   const dateTimeInfo = useMemo(() => {
     if (!reservation || !gqlOpportunity || !gqlOpportunitySlot) return null;
-    return presenterReservationDateTimeInfo(gqlOpportunitySlot, gqlOpportunity, reservation);
+    return presenterReservationDateTimeInfo(gqlOpportunitySlot as any, gqlOpportunity as any, reservation as any);
   }, [reservation, gqlOpportunity, gqlOpportunitySlot]);
 
   const articleCard = useMemo(() => {

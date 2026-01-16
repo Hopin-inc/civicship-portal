@@ -16,7 +16,6 @@ import { OpportunityDetailsContent } from "@/app/[communityId]/opportunities/[id
 import { AdminOpportunityDetailsFooter } from "@/app/[communityId]/opportunities/[id]/components/AdminOpportunityDetailsFooter";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { isActivityCategory, isQuestCategory } from "@/components/domains/opportunities/types";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import {
   presenterActivityDetail,
   presenterQuestDetail,
@@ -24,7 +23,7 @@ import {
 
 export default function AdminOpportunityDetailPage() {
   const params = useParams();
-  const { communityId } = useCommunityConfig();
+  const communityId = params.communityId as string;
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
 
   const headerConfig = useMemo(
@@ -53,10 +52,10 @@ export default function AdminOpportunityDetailPage() {
     if (!data?.opportunity) return null;
     const opp = data.opportunity;
     if (opp.category === GqlOpportunityCategory.Activity) {
-      return presenterActivityDetail(opp);
+      return presenterActivityDetail(opp as any);
     }
     if (opp.category === GqlOpportunityCategory.Quest) {
-      return presenterQuestDetail(opp);
+      return presenterQuestDetail(opp as any);
     }
     return null;
   }, [data?.opportunity]);

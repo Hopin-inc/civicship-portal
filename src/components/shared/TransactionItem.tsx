@@ -2,7 +2,7 @@
 
 import React from "react";
 import { formatCurrency } from "@/utils/transaction";
-import { AppTransaction } from "@/app/wallets/features/shared/type";
+import { AppTransaction } from "@/app/[communityId]/wallets/features/shared/type";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { GqlTransactionReason } from "@/types/graphql";

@@ -14,7 +14,7 @@ import SearchFilterSheets from "@/app/[communityId]/search/components/SearchFilt
 import { useFeatureCheck } from "@/hooks/useFeatureCheck";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
-import { useTranslations, useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
 import { getPrefectureKey } from "@/lib/i18n/prefectures";
 
 interface SearchModalProps {
@@ -25,7 +25,6 @@ interface SearchModalProps {
 
 export default function SearchModal({ isOpen, onClose, type }: SearchModalProps) {
   const t = useTranslations();
-  const locale = useLocale();
   const router = useCommunityRouter();
   const shouldShowQuests = useFeatureCheck("quests");
 

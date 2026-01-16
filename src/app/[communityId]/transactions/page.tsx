@@ -3,9 +3,11 @@ import { getServerCommunityTransactions } from "@/hooks/transactions/server";
 import { InfiniteTransactionList } from "@/shared/transactions/components/InfiniteTransactionList";
 import { getTranslations } from "next-intl/server";
 
-export default async function TransactionsPage() {
+export default async function TransactionsPage({ params }: { params: Promise<{ communityId: string }> }) {
   const t = await getTranslations();
+  const { communityId } = await params;
   const transactions = await getServerCommunityTransactions({
+    communityId,
     first: 20,
   });
   return (

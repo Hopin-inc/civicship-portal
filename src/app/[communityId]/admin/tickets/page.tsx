@@ -1,5 +1,6 @@
 "use client";
 
+import { useParams } from "next/navigation";
 import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
@@ -7,7 +8,6 @@ import {
   GqlSortDirection,
   useGetUtilitiesQuery,
 } from "@/types/graphql";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { useAuth } from "@/contexts/AuthProvider";
 import { TicketIssueCard } from "@/app/[communityId]/admin/tickets/components/IssuerCard";
 import CreateUtilitySheet from "@/app/[communityId]/admin/tickets/utilities/components/CreateUtilitySheet";
@@ -19,7 +19,8 @@ export default function TicketsPage() {
   const headerConfig = useMemo(() => ({ title: "チケット管理", showLogo: false }), []);
   useHeaderConfig(headerConfig);
   const { user } = useAuth();
-  const { communityId } = useCommunityConfig();
+  const params = useParams();
+  const communityId = params.communityId as string;
 
   const { data: utilityData, loading: utilitiesLoading, refetch: refetchUtilities } = useGetUtilitiesQuery({
     variables: {

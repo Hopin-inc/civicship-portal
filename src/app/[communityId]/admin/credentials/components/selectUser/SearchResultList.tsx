@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { MemberRow } from "./Member";
-import { GqlUser, GqlParticipationStatusReason, GqlMembershipEdge, useGetDidIssuanceRequestsQuery, useGetVcIssuanceRequestsByUserQuery, GqlDidIssuanceRequest } from "@/types/graphql";
+import { GqlUser, GqlParticipationStatusReason, useGetVcIssuanceRequestsByUserQuery, GqlDidIssuanceRequest } from "@/types/graphql";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 
 interface SearchResultListProps {
@@ -17,7 +17,6 @@ interface SearchResultListProps {
 }
 
 const SearchResultList: React.FC<SearchResultListProps> = ({
-  searchQuery,
   searchMembershipData,
   selectedUserIds,
   handleCheck,

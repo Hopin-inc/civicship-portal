@@ -1,7 +1,7 @@
+import { useParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthProvider";
 import { GqlSortDirection, useGetOpportunitiesQuery } from "@/types/graphql";
 import { OpportunityCard } from "./OpportunityCard";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { useSelection } from "../../context/SelectionContext";
 import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import { Button } from "@/components/ui/button";
@@ -23,7 +23,8 @@ const STEP_COLORS = {
 
 export default function OpportunityList({ setStep }: { setStep: (step: number) => void }) {
   const { user } = useAuth();
-  const { communityId } = useCommunityConfig();
+  const params = useParams();
+  const communityId = params.communityId as string;
   const { selectedSlot,setSelectedSlot } = useSelection();
   const [searchQuery, setSearchQuery] = useState("");
   const [input, setInput] = useState("");

@@ -1,10 +1,11 @@
 "use client";
 
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
+import { useParams } from "next/navigation";
 import { useGetArticleQuery } from "@/types/graphql";
 
 export const useArticleQuery = (id: string) => {
-  const { communityId } = useCommunityConfig();
+  const params = useParams();
+  const communityId = params.communityId as string;
   
   return useGetArticleQuery({
     variables: {

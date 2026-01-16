@@ -69,7 +69,7 @@ export function PhoneInputForm({ isLoading, error, onSubmit, onBack }: Props) {
               </Button>
               <Button
                 type="button"
-                variant="outline"
+                variant="secondary"
                 onClick={onBack}
                 disabled={isLoading}
                 className="w-full h-12"

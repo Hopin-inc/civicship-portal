@@ -1,5 +1,6 @@
 "use client";
 
+import { useParams } from "next/navigation";
 import { Edit, MoreVertical, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +13,6 @@ import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { usePlaceDeleteMutation } from "@/types/graphql";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 interface PlaceCardMenuProps {
   placeId: string;
@@ -22,7 +22,8 @@ interface PlaceCardMenuProps {
 
 export function PlaceCardMenu({ placeId, placeName, onDelete }: PlaceCardMenuProps) {
   const router = useCommunityRouter();
-  const { communityId } = useCommunityConfig();
+  const params = useParams();
+  const communityId = params.communityId as string;
   const [isDeleting, setIsDeleting] = useState(false);
   const [deletePlace] = usePlaceDeleteMutation();
 

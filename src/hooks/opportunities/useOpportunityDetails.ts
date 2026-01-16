@@ -4,6 +4,7 @@ import { useAvailableTickets } from "@/app/[communityId]/tickets/hooks/useAvaila
 import { useFilterFutureSlots } from "./useFilterFutureSlots";
 import { useSortedSlotsByStartsAt } from "./useSortedSlotsByStartsAt";
 import { useOpportunityDetail } from "./useOpportunityDetail";
+import { useWalletData } from "@/app/[communityId]/reservation/confirm/hooks/useWalletData";
 
 // 呼び出し側のインターフェースを維持
 export const useOpportunityDetails = (id: string | undefined, user: Maybe<GqlUser> | undefined) => {
@@ -16,7 +17,8 @@ export const useOpportunityDetails = (id: string | undefined, user: Maybe<GqlUse
     refetch: refetchSameState,
   } = useSameStateOpportunities(id ?? "", stateCode ?? "");
 
-  const availableTickets = useAvailableTickets(opportunity, user?.id);
+  const walletData = useWalletData(user?.id);
+  const availableTickets = useAvailableTickets(opportunity, walletData.tickets);
   const futureSlots = useFilterFutureSlots(opportunity?.slots);
   const sortedSlots = useSortedSlotsByStartsAt(futureSlots);
 

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -41,7 +42,8 @@ export default function CreateUtilitySheet({ buttonLabel, onUtilityCreated }: Cr
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { user } = useAuth();
-  const { communityId } = useCommunityConfig();
+  const params = useParams();
+  const communityId = params.communityId as string;
   const [createUtility] = useCreateUtilityMutation();
 
   const { data: opportunityData, loading: opportunitiesLoading } = useGetOpportunitiesQuery({

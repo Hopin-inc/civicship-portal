@@ -1,5 +1,6 @@
 "use client";
 
+import { useParams } from "next/navigation";
 import React, { useMemo, useState } from "react";
 import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import { Button } from "@/components/ui/button";
@@ -8,7 +9,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "react-toastify";
 import { useTransactionMutations } from "@/app/[communityId]/admin/wallet/hooks/useTransactionMutations";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 import { useTranslations } from "next-intl";
@@ -17,7 +17,8 @@ const INT_LIMIT = 2000000000;
 
 export default function IssuePointPage() {
   const t = useTranslations();
-  const { communityId } = useCommunityConfig();
+  const params = useParams();
+  const communityId = params.communityId as string;
   const router = useCommunityRouter();
 
   const headerConfig = useMemo(

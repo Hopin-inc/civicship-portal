@@ -1,7 +1,7 @@
+import { useParams } from "next/navigation";
 import { useCallback } from "react";
 import { toast } from "react-toastify";
 import { useUpdateOpportunitySlotsBulkMutation } from "@/types/graphql";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { SlotData } from "../../shared/types/slot";
 import { convertSlotToDates } from "../../shared/utils/dateFormat";
 
@@ -16,7 +16,8 @@ interface UseSlotsBulkSaveOptions {
 export const useSlotsBulkSave = ({
   opportunityId,
 }: UseSlotsBulkSaveOptions) => {
-  const { communityId } = useCommunityConfig();
+  const params = useParams();
+  const communityId = params.communityId as string;
   const [updateSlots, { loading }] = useUpdateOpportunitySlotsBulkMutation();
 
   const handleSave = useCallback(

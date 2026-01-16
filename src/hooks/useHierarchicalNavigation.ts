@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback } from "react";
+import { useCallback } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import { useHeader } from "@/components/providers/HeaderProvider";

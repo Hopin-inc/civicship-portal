@@ -1,5 +1,6 @@
 "use client";
 
+import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import LoginModal from "@/app/[communityId]/login/components/LoginModal";
 import { ReservationConfirmationCard } from "@/app/[communityId]/reservation/confirm/components/ReservationConfirmationCard";
@@ -12,7 +13,6 @@ import { ExpectedPoints } from "@/app/[communityId]/reservation/confirm/componen
 import { PaymentSummary } from "@/app/[communityId]/reservation/confirm/components/payment/PaymentSummary";
 import { ActivityDetail, QuestDetail, isActivityCategory, isQuestCategory } from "@/components/domains/opportunities/types";
 import { AvailableTicket } from "@/app/[communityId]/reservation/confirm/presenters/presentReservationConfirm";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 export interface ConfirmPageViewProps {
   user: GqlCurrentUserPayload["user"] | null;
@@ -107,8 +107,9 @@ export default function ConfirmPageView(props: ConfirmPageViewProps) {
     hasInsufficientPoints,
   } = calculations;
 
-  const { communityId: configCommunityId } = useCommunityConfig();
-  const resolvedCommunityId = communityId ?? configCommunityId;
+  const params = useParams();
+  const communityIdFromParams = params.communityId as string;
+  const resolvedCommunityId = communityId ?? communityIdFromParams;
 
   const getButtonText = () => {
     if (creatingReservation) return "申込処理中...";

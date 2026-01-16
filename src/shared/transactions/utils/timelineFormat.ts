@@ -97,7 +97,8 @@ export const getTimelineDisplayName = (
   transaction: GqlTransaction,
   fromName: string,
   toName: string,
-  perspectiveWalletId?: string
+  perspectiveWalletId?: string,
+  communityTitle: string = ""
 ): string => {
   const reason = transaction.reason;
 

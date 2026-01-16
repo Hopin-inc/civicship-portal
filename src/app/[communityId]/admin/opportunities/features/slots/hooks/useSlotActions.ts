@@ -1,3 +1,4 @@
+import { useParams } from "next/navigation";
 import { useCallback } from "react";
 import { toast } from "react-toastify";
 import { ApolloError } from "@apollo/client";
@@ -5,7 +6,6 @@ import {
   GqlOpportunitySlotHostingStatus,
   useSetOpportunitySlotHostingStatusMutation,
 } from "@/types/graphql";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { SlotData } from "../../shared/types/slot";
 import { convertSlotToDates } from "../../shared/utils/dateFormat";
 
@@ -25,7 +25,8 @@ export const useSlotActions = ({
   onSlotUpdate,
   onSlotUpdateSilent,
 }: UseSlotActionsOptions) => {
-  const { communityId } = useCommunityConfig();
+  const params = useParams();
+  const communityId = params.communityId as string;
   const [setSlotHostingStatus] = useSetOpportunitySlotHostingStatusMutation();
 
   /**

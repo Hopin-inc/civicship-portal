@@ -1,10 +1,10 @@
 "use client";
 
+import { useParams } from "next/navigation";
 import { useCallback, useState } from "react";
 import { GqlRole } from "@/types/graphql";
 import { toast } from "react-toastify";
 import { useMembershipCommand } from "./useMembershipMutations";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 interface PendingRoleChange {
   userId: string;
@@ -15,7 +15,8 @@ interface PendingRoleChange {
 export function useMemberRoleManagement() {
   const [pendingRoleChange, setPendingRoleChange] = useState<PendingRoleChange | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { communityId } = useCommunityConfig();
+  const params = useParams();
+  const communityId = params.communityId as string;
 
   const { assignOwner, assignManager, assignMember } = useMembershipCommand();
 

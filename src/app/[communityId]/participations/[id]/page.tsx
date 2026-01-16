@@ -127,7 +127,7 @@ export default function ParticipationPage() {
   }, [currentStatus, dateTimeInfo]);
 
   if (loading || opportunityLoading) return <LoadingIndicator />;
-  if (hasError || !reservationId || !opportunity || !participation || !opportunityDetail) {
+  if (hasError || !reservationId || !opportunity || !participation || !opportunityDetail || !dateTimeInfo) {
     return <ErrorState title="Could not load reservation page" refetchRef={refetchRef} />;
   }
 
@@ -146,11 +146,11 @@ export default function ParticipationPage() {
       <OpportunityInfo 
         opportunity={opportunityDetail}
         dateTimeInfo={dateTimeInfo}
-        participationCount={dateTimeInfo?.participantCount}
+        participationCount={dateTimeInfo.participantCount}
         phoneNumber={participation.emergencyContactPhone}
-        comment={participation.reservation?.comment}
-        totalPrice={dateTimeInfo?.totalPrice}
-        ticketCount={dateTimeInfo?.ticketCount}
+        comment={(participation as any).reservation?.comment}
+        totalPrice={dateTimeInfo.totalPrice}
+        ticketCount={dateTimeInfo.ticketCount}
         variant="participation"
       />
       {/*<div className="px-6">*/}

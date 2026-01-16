@@ -15,7 +15,7 @@ export interface UseTicketClaimLinksResult {
   ticketClaimLinks: TicketClaimLink[];
   loading: boolean;
   error: any;
-  loadMoreRef: React.RefObject<HTMLDivElement>;
+  loadMoreRef: (node: HTMLDivElement | null) => void;
   refetch: () => void;
   hasNextPage: boolean;
 }

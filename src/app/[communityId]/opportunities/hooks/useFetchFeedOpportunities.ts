@@ -1,3 +1,4 @@
+import { useParams } from "next/navigation";
 import {
   GqlOpportunitiesConnection,
   GqlOpportunityCategory,
@@ -7,7 +8,6 @@ import {
 } from "@/types/graphql";
 import { mapOpportunityCards, sliceOpportunitiesBySection } from "@/components/domains/opportunities/data/presenter";
 import { useFeatureCheck } from "@/hooks/useFeatureCheck";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 
 const fallbackConnection: GqlOpportunitiesConnection = {
@@ -23,7 +23,8 @@ const fallbackConnection: GqlOpportunitiesConnection = {
 
 export function useFetchFeedOpportunities() {
   const shouldShowQuests = useFeatureCheck("quests");
-  const { communityId } = useCommunityConfig();
+  const params = useParams();
+  const communityId = params.communityId as string;
 
   const { data, loading, fetchMore, refetch, error } = useGetOpportunitiesQuery({
     variables: {
@@ -102,7 +103,7 @@ export function useFetchFeedOpportunities() {
     onLoadMore: handleFetchMore,
   });
 
-  const opportunityCards = mapOpportunityCards(data?.opportunities.edges ?? []);
+  const opportunityCards = mapOpportunityCards((data?.opportunities.edges as any) ?? []);
   const { featuredCards, upcomingCards } = sliceOpportunitiesBySection(opportunityCards);
   return {
     featuredCards,

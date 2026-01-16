@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useLoading } from "@/hooks/useLoading";
 import { GqlSortDirection as SortDirection, useGetArticlesQuery } from "@/types/graphql";
@@ -14,7 +14,7 @@ interface UseArticlesResult {
   loading: boolean;
   initialLoading: boolean;
   error: Error | null;
-  loadMoreRef: React.RefObject<HTMLDivElement>;
+  loadMoreRef: (node: HTMLDivElement | null) => void;
   hasMore: boolean;
 }
 
@@ -32,7 +32,7 @@ export const useArticles = (): UseArticlesResult => {
   });
 
   const articles = useMemo(() => {
-    return data?.articles?.edges ? presenterArticleWithAuthorList(data.articles.edges) : [];
+    return data?.articles?.edges ? presenterArticleWithAuthorList(data.articles.edges as any) : [];
   }, [data]);
 
   const hasMore = data?.articles.pageInfo.hasNextPage || false;
@@ -56,7 +56,7 @@ export const useArticles = (): UseArticlesResult => {
             edges: [...(prev.articles.edges ?? []), ...(fetchMoreResult.articles.edges ?? [])],
             pageInfo: fetchMoreResult.articles.pageInfo,
           },
-        };
+        } as any;
       },
     });
   };

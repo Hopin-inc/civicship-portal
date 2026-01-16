@@ -1,5 +1,6 @@
 "use client";
 
+import { useParams } from "next/navigation";
 import { FormEvent, useCallback } from "react";
 import { toast } from "react-toastify";
 import {
@@ -8,7 +9,6 @@ import {
   useUpdateOpportunityContentMutation,
   useUpdateOpportunitySlotsBulkMutation,
 } from "@/types/graphql";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { isNewImage } from "../types/form";
 import { MIN_IMAGES, MAX_IMAGES } from "../constants/form";
 import { convertSlotToDates } from "../../shared/utils/dateFormat";
@@ -25,7 +25,8 @@ export const useOpportunitySave = ({
   opportunityId,
   formState,
 }: UseOpportunitySaveOptions) => {
-  const { communityId } = useCommunityConfig();
+  const params = useParams();
+  const communityId = params.communityId as string;
   
   // ========== GraphQL Mutations ==========
   const [createOpportunity, createResult] = useCreateOpportunityMutation({

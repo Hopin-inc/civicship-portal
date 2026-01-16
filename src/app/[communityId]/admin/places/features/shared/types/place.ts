@@ -24,6 +24,9 @@ export interface PlaceFormData {
   longitude: number | null;
   cityCode: string;
   cityName?: string;
+  stateCode?: string;
+  stateName?: string;
+  streetAddress?: string;
   googlePlaceId?: string;
   isManual: boolean;
   mapLocation?: any;

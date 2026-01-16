@@ -100,9 +100,9 @@ function presentGrantTransaction({
   const isReceive = fromWallet?.type !== GqlWalletType.Community;
   const otherUser = isReceive ? fromUser : toUser;
 
-  const otherName = isReceive
+  const otherName = (isReceive
     ? fromUser?.name
-    : (toWallet?.user?.name ?? toWallet?.community?.name ?? "");
+    : (toWallet?.user?.name ?? toWallet?.community?.name ?? "")) ?? "";
 
   return buildPresentedTransaction({
     transaction,

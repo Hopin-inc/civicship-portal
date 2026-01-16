@@ -14,7 +14,7 @@ export interface UseTicketIssuersResult {
   ticketIssuers: (GqlTicketIssuerEdge | null)[];
   loading: boolean;
   error: ApolloError | undefined;
-  loadMoreRef: React.RefObject<HTMLDivElement>;
+  loadMoreRef: (node: HTMLDivElement | null) => void;
   refetch: () => void;
   hasNextPage: boolean;
 }

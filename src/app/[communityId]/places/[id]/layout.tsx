@@ -69,7 +69,7 @@ async function fetchPlace(id: string): Promise<GqlPlace | null> {
     variables: { id },
   });
 
-  return data.place ?? null;
+  return (data.place as any) ?? null;
 }
 
 const presenterPlaceDetailForMetadata = (place: GqlPlace) => {

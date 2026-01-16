@@ -47,7 +47,7 @@ export async function getServerWalletTransactions(
       GqlGetTransactionsQueryVariables
     >(GET_TRANSACTIONS_SERVER_QUERY, variables);
 
-    return data.transactions ?? fallbackConnection;
+    return (data.transactions as any) ?? fallbackConnection;
   } catch (error) {
     console.error("Failed to fetch wallet transactions:", error);
     return fallbackConnection;

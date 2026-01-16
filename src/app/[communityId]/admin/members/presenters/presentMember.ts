@@ -17,12 +17,12 @@ function formatPoints(points?: bigint | null): string {
   return `${points.toLocaleString()}pt`;
 }
 
-export function presentMember(user: GqlUser): PresentedMember {
+export function presentMember(user: any): PresentedMember {
   return {
     id: user.id,
     name: user.name ?? "未設定",
     image: user.image ?? null,
-    roleLabel: ROLE_LABEL_MAP[user.role] ?? "—",
+    roleLabel: ROLE_LABEL_MAP[user.role as GqlRole] ?? "—",
     roleValue: user.role,
     pointsLabel: formatPoints(user.wallet?.currentPointView?.currentPoint),
   };

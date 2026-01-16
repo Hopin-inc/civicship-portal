@@ -1,3 +1,4 @@
+import { useParams } from "next/navigation";
 import {
   GqlOpportunity,
   GqlOpportunitySlotHostingStatus,
@@ -6,12 +7,6 @@ import {
 } from "@/types/graphql";
 import { toast } from "react-toastify";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
-
-type UseCancelSlotOptions = {
-  onCompleted?: () => void;
-  onError?: () => void;
-};
 
 export const useCancelSlot = (
   reservation: GqlReservation | null | undefined,
@@ -23,7 +18,8 @@ export const useCancelSlot = (
   } = {},
 ) => {
   const track = useAnalytics();
-  const { communityId } = useCommunityConfig();
+  const params = useParams();
+  const communityId = params.communityId as string;
 
   const [cancelSlotMutation, { loading }] = useOpportunitySlotSetHostingStatusMutation({
     onCompleted: () => {

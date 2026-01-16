@@ -60,7 +60,7 @@ export const presenterArticleDetail = (article: GqlArticle): TArticleDetail => {
 
     hostedOpportunitiesByAuthors:
       article.relatedUsers?.flatMap(
-        (author) => author.opportunitiesCreatedByMe?.map(presenterActivityCard) ?? [],
+        (author) => author.opportunitiesCreatedByMe?.map((node) => presenterActivityCard(node)) ?? [],
       ) ?? [],
     relatedArticles: [],
   };

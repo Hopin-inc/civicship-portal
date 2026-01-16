@@ -1,8 +1,8 @@
 "use client";
 
+import { useParams } from "next/navigation";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@/contexts/AuthProvider";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";
@@ -21,7 +21,8 @@ const EMPTY_MEMBERS: [] = [];
 
 export default function MembersPageClient({ initialConnection }: MembersPageClientProps) {
   const { user: currentUser } = useAuth();
-  const { communityId } = useCommunityConfig();
+  const params = useParams();
+  const communityId = params.communityId as string;
   const [searchQuery, setSearchQuery] = useState("");
   const [input, setInput] = useState("");
 

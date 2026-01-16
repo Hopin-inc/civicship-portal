@@ -16,7 +16,7 @@ export default async function TermsPage({ params }: PageProps) {
     communityConfig?.commonDocumentOverrides?.terms,
   );
 
-  const termsMarkdown = getTermsContent();
+  const termsMarkdown = getTermsContent(communityId);
   const html = await convertMarkdownToHtml(termsMarkdown);
 
   return <TermsPageClient html={html} />;

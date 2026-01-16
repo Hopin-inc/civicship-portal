@@ -31,8 +31,8 @@ const useParticipationPage = (id: string): UseParticipationPageResult => {
   });
   const rawParticipation = data?.participation;
   const rawOpportunity = rawParticipation?.reservation?.opportunitySlot?.opportunity;
-  const participation = rawParticipation ? presenterParticipation(rawParticipation) : null;
-  const opportunity = rawOpportunity ? presenterActivityCard(rawOpportunity) : null;
+  const participation = rawParticipation ? presenterParticipation(rawParticipation as any) : null;
+  const opportunity = rawOpportunity ? presenterActivityCard(rawOpportunity as any) : null;
 
   const { currentStatus } = useParticipationState({ participation });
 

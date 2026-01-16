@@ -1,10 +1,10 @@
+import { useParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import {
   GqlEvaluationStatus,
   GqlOpportunityCategory,
   useGetReservationQuery,
 } from "@/types/graphql";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { presentReservationDetail } from "../presenters/presentReservationDetail";
 import {
   calculateRequiredPointsForApproval,
@@ -26,7 +26,8 @@ import type { ReservationMode } from "../types/mode";
  * 予約詳細ページのロジックを統合したhook
  */
 export function useReservationDetail(id: string, mode: ReservationMode | null) {
-  const { communityId } = useCommunityConfig();
+  const params = useParams();
+  const communityId = params.communityId as string;
   
   // データ取得
   const { data, loading, error, refetch } = useGetReservationQuery({
@@ -43,7 +44,7 @@ export function useReservationDetail(id: string, mode: ReservationMode | null) {
         statusMeta: { label: "", variant: "primary" as const, step: "" },
       };
     }
-    return presentReservationDetail(data.reservation);
+    return presentReservationDetail(data.reservation as any);
   }, [data]);
 
   // 料金情報

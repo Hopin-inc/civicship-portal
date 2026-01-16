@@ -104,14 +104,14 @@ export const useAddressForm = (options: UseAddressFormOptions = {}) => {
     setPostalCodeSearching(true);
 
     try {
-      logger.debug("[useAddressForm] Starting postal code search:", postalCode);
+      logger.debug("[useAddressForm] Starting postal code search:", { postalCode });
       const result = await autoCompleteAddress(
         postalCode,
         searchStates,
         searchCities
       );
 
-      logger.debug("[useAddressForm] AutoComplete result:", result);
+      logger.debug("[useAddressForm] AutoComplete result:", result || {});
 
       if (!result) {
         logger.debug("[useAddressForm] No result");
@@ -121,7 +121,7 @@ export const useAddressForm = (options: UseAddressFormOptions = {}) => {
 
       // 結果を反映
       if (result.stateCode && result.stateName) {
-        logger.debug("[useAddressForm] Applying state:", result.stateCode, result.stateName);
+        logger.debug("[useAddressForm] Applying state:", { code: result.stateCode, name: result.stateName });
         updateAddressField("stateCode", result.stateCode);
         updateAddressField("stateName", result.stateName);
         setShowStateSelector(false);
@@ -131,7 +131,7 @@ export const useAddressForm = (options: UseAddressFormOptions = {}) => {
       }
 
       if (result.cityCode && result.cityName) {
-        logger.debug("[useAddressForm] Applying city:", result.cityCode, result.cityName);
+        logger.debug("[useAddressForm] Applying city:", { code: result.cityCode, name: result.cityName });
         updateAddressField("cityCode", result.cityCode);
         updateAddressField("cityName", result.cityName);
         setShowCitySelector(false);
@@ -140,14 +140,14 @@ export const useAddressForm = (options: UseAddressFormOptions = {}) => {
         setShowCitySelector(true);
       }
 
-      logger.debug("[useAddressForm] Applying street address:", result.streetAddress);
+      logger.debug("[useAddressForm] Applying street address:", { streetAddress: result.streetAddress });
       updateAddressField("streetAddress", result.streetAddress);
 
       // 住所変更を通知
       onAddressChange?.();
       logger.debug("[useAddressForm] Address change notified");
     } catch (error) {
-      logger.error("Postal code search error:", error);
+      logger.error("Postal code search error:", { error: error instanceof Error ? error.message : String(error) });
       alert("郵便番号検索中にエラーが発生しました");
     } finally {
       setPostalCodeSearching(false);
@@ -180,5 +180,6 @@ export const useAddressForm = (options: UseAddressFormOptions = {}) => {
     showStateSelector,
     setShowStateSelector,
     showCitySelector,
+    setShowCitySelector,
   };
 };

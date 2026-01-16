@@ -1,3 +1,4 @@
+import { useParams } from "next/navigation";
 import {
   GqlOpportunity,
   GqlReservation,
@@ -5,7 +6,6 @@ import {
   useReservationAcceptMutation,
 } from "@/types/graphql";
 import { toast } from "react-toastify";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 
@@ -22,7 +22,8 @@ export const useReservationApproval = ({
 }) => {
   const track = useAnalytics();
   const router = useCommunityRouter();
-  const { communityId } = useCommunityConfig();
+  const params = useParams();
+  const communityId = params.communityId as string;
 
   const [acceptReservation, { loading: acceptLoading }] = useReservationAcceptMutation({
     onCompleted: () => {
@@ -68,6 +69,7 @@ export const useReservationApproval = ({
         opportunityTitle: opportunity.title,
         category: opportunity.category,
         guest: reservation.participations?.length ?? 0,
+        paidGuest: 0,
         feeRequired: opportunity.feeRequired ?? 0,
         totalFee: (opportunity.feeRequired ?? 0) * (reservation.participations?.length ?? 0),
         scheduledAt:
@@ -103,6 +105,7 @@ export const useReservationApproval = ({
         opportunityTitle: opportunity.title,
         category: opportunity.category,
         guest: reservation.participations?.length ?? 0,
+        paidGuest: 0,
         feeRequired: opportunity.feeRequired ?? 0,
         totalFee: (opportunity.feeRequired ?? 0) * (reservation.participations?.length ?? 0),
         scheduledAt:

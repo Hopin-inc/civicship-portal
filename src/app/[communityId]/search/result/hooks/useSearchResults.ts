@@ -1,5 +1,6 @@
 "use client";
 
+import { useParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   GqlCurrentPrefecture,
@@ -21,7 +22,6 @@ import {
 import { IPrefectureCodeMap } from "@/app/[communityId]/search/data/type";
 import { logger } from "@/lib/logging";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 type CardType = ActivityCard | QuestCard;
 const DEFAULT_PAGE_SIZE = 15;
@@ -86,11 +86,12 @@ export const useSearchResults = (
   error: Error | null;
   hasResults: boolean;
   refetch: () => void;
-  loadMoreRef: React.RefObject<HTMLDivElement>;
+  loadMoreRef: (node: HTMLDivElement | null) => void;
   hasNextPage: boolean;
   isLoadingMore: boolean;
 } => {
-  const { communityId } = useCommunityConfig();
+  const params = useParams();
+  const communityId = params.communityId as string;
   const filter = useMemo(() => buildFilter(searchParams, communityId), [searchParams, communityId]);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
@@ -186,9 +187,9 @@ export const useSearchResults = (
 
   const recommendedOpportunities = useMemo(() => {
     if (searchParams.type === "quest") {
-      return presenterQuestCards(opportunities.edges);
+      return presenterQuestCards(opportunities.edges as any);
     }
-    return presenterActivityCards(opportunities.edges);
+    return presenterActivityCards(opportunities.edges as any);
   }, [opportunities, searchParams.type]);
   
   const groupedOpportunities = useMemo(
@@ -226,7 +227,7 @@ export const useSearchResults = (
     loadMoreRef,
     hasNextPage,
     isLoadingMore,
-  };
+  } as any;
 };
 
 function buildFilter(searchParams: SearchParams, communityId: string): OpportunityFilterInput {

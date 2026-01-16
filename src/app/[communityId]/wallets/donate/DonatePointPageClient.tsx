@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthProvider";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useParams } from "next/navigation";
 import { DonateUserSelect } from "@/app/[communityId]/wallets/features/donate/components";
 import TransferInputStep from "@/app/[communityId]/admin/wallet/grant/components/TransferInputStep";
 import { useDonateFlow } from "@/app/[communityId]/wallets/features/donate/hooks/useDonateFlow";
@@ -17,12 +17,12 @@ import {
   GqlMembershipStatus,
   GqlMembershipStatusReason,
 } from "@/types/graphql";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 export default function DonatePointPageClient() {
   const t = useTranslations();
   const { user } = useAuth();
-  const { communityId } = useCommunityConfig();
+  const params = useParams();
+  const communityId = params.communityId as string;
   const searchParams = useSearchParams();
   const currentPoint = BigInt(searchParams.get("currentPoint") ?? "0");
   const [activeTab, setActiveTab] = useState<Tabs>(Tabs.History);

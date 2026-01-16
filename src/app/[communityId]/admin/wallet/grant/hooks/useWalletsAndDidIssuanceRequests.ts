@@ -1,3 +1,4 @@
+import { useParams } from "next/navigation";
 import { useMemo } from "react";
 import {
   GqlTransaction,
@@ -29,7 +30,8 @@ export function useWalletsAndDidIssuanceRequests({
   presentedTransactions: PresentedTransaction[];
   refetch: () => void;
 } {
-  const { communityId } = useCommunityConfig();
+  const params = useParams();
+  const communityId = params.communityId as string;
   const walletTypeFilter: GqlTransactionFilterInput =
     listType === "grant"
       ? {
@@ -91,15 +93,15 @@ export function useWalletsAndDidIssuanceRequests({
         ?.flatMap((edge) => edge?.node)
         .filter(
           (t): t is GqlTransaction =>
-            !!t && t.fromWallet !== null && !shouldExcludeSelfTransaction(t, currentUserId),
+            !!t && t.fromWallet !== null && !shouldExcludeSelfTransaction(t as any, currentUserId),
         ) ?? []
-    );
+    ) as any[];
   }, [data, currentUserId]);
 
   const presentedTransactions = useMemo<PresentedTransaction[]>(() => {
     return allTransactions.map((transaction) =>
       presentTransaction({
-        transaction,
+        transaction: transaction as any,
         currentUserId,
         listType,
       }),

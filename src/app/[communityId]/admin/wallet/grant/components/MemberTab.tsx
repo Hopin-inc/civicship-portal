@@ -1,9 +1,9 @@
 "use client";
 
+import { useParams } from "next/navigation";
 import React, { useState } from "react";
 import { GqlMembershipsConnection, GqlUser } from "@/types/graphql";
 import { useMemberWithDidSearch as useMemberSearchFromCredentials } from "@/app/[communityId]/admin/credentials/hooks/useMemberWithDidSearch";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { useTranslations } from "next-intl";
 import { Table, TableBody } from "@/components/ui/table";
@@ -18,7 +18,8 @@ interface MemberTabProps {
 
 export function MemberTab({ members, searchQuery, onSelect, initialConnection }: MemberTabProps) {
   const t = useTranslations();
-  const { communityId } = useCommunityConfig();
+  const params = useParams();
+  const communityId = params.communityId as string;
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
   const {

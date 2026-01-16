@@ -1,9 +1,9 @@
 "use client";
 
+import { useParams } from "next/navigation";
 import { useMemo } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { GqlMembershipStatus, GqlRole, useGetMembershipListQuery } from "@/types/graphql";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { ItemContent } from "@/components/ui/item";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { SelectorSheet } from "../../../shared/components/SelectorSheet";
@@ -28,7 +28,8 @@ export function HostSelectorSheet({
   selectedHostId,
   onSelectHost,
 }: HostSelectorSheetProps) {
-  const { communityId } = useCommunityConfig();
+  const params = useParams();
+  const communityId = params.communityId as string;
   
   // クエリはSheetが開いている時のみ実行
   const { data, loading } = useGetMembershipListQuery({

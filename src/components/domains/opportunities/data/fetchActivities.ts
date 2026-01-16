@@ -7,7 +7,7 @@ import {
   GqlPublishStatus,
   GqlSortDirection,
 } from "@/types/graphql";
-import { mapOpportunityCards, sliceActivitiesBySection } from "./presenter";
+import { mapOpportunityCards, sliceOpportunitiesBySection } from "./presenter";
 
 export async function fetchFeaturedAndCarousel(communityId: string) {
   const { data, loading } = await apolloClient.query<
@@ -28,7 +28,7 @@ export async function fetchFeaturedAndCarousel(communityId: string) {
     },
     fetchPolicy: "cache-first",
   });
-  const activityCards = mapOpportunityCards(data.opportunities.edges ?? []);
-  const { featuredCards, upcomingCards } = sliceActivitiesBySection(activityCards);
+  const activityCards = mapOpportunityCards((data.opportunities.edges as any) ?? []);
+  const { featuredCards, upcomingCards } = sliceOpportunitiesBySection(activityCards);
   return { featuredCards, upcomingCards, loading };
 }

@@ -1,7 +1,6 @@
-// src/app/admin/opportunities/hooks/useOpportunityActions.ts
-
 "use client";
 
+import { useParams } from "next/navigation";
 import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import { useCallback } from "react";
 import { toast } from "react-toastify";
@@ -10,7 +9,6 @@ import {
   useDeleteOpportunityMutation,
   useSetPublishStatusMutation,
 } from "@/types/graphql";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 interface UseOpportunityActionsReturn {
   handleEdit: (opportunityId: string) => void;
@@ -22,7 +20,8 @@ interface UseOpportunityActionsReturn {
 
 export function useOpportunityActions(refetch?: () => void): UseOpportunityActionsReturn {
   const router = useCommunityRouter();
-  const { communityId } = useCommunityConfig();
+  const params = useParams();
+  const communityId = params.communityId as string;
   const [setPublishStatus] = useSetPublishStatusMutation();
   const [deleteOpportunity] = useDeleteOpportunityMutation();
 

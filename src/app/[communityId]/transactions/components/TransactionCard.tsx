@@ -17,6 +17,8 @@ import { TransactionHeader } from "@/shared/transactions/components/timeline/Tra
 import { TransactionActionLabel } from "@/shared/transactions/components/timeline/TransactionActionLabel";
 import { TransactionMessageCard } from "@/shared/transactions/components/timeline/TransactionMessageCard";
 
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
+
 interface TransactionCardProps {
   transaction: GqlTransaction;
   image?: string;
@@ -40,14 +42,17 @@ export const TransactionCard = ({
 }: TransactionCardProps) => {
   const t = useTranslations();
   const formatDateTime = useLocaleDateTimeFormat();
-  const info = getTransactionInfo(transaction, perspectiveWalletId);
+  const config = useCommunityConfig();
+  const communityTitle = config?.title ?? "";
+  const info = getTransactionInfo(transaction, perspectiveWalletId, communityTitle);
 
   // 表示名の決定
   const displayName = getTimelineDisplayName(
     transaction,
     info.from,
     info.to,
-    perspectiveWalletId
+    perspectiveWalletId,
+    communityTitle
   );
 
   // 金額のフォーマット

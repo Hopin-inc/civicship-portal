@@ -1,5 +1,6 @@
 "use client";
 
+import { useParams } from "next/navigation";
 import { TransactionCard } from "./TransactionCard";
 import { GqlTransactionsConnection } from "@/types/graphql";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
@@ -9,16 +10,17 @@ import { getFromWalletImage } from "@/app/[communityId]/admin/wallet/data/presen
 
 interface InfiniteTransactionListProps {
   initialTransactions: GqlTransactionsConnection;
-  enableClickNavigation?: boolean;
+  fetchMore: (cursor: string, first: number) => Promise<GqlTransactionsConnection>;
 }
 
 export const InfiniteTransactionList = ({
   initialTransactions,
-  enableClickNavigation = false,
 }: InfiniteTransactionListProps) => {
+  const params = useParams();
+  const communityId = params.communityId as string;
   const { transactions, hasNextPage, loading, loadMoreRef } = useInfiniteTransactions({
     initialTransactions,
-    fetchMore: getServerCommunityTransactionsWithCursor,
+    fetchMore: (cursor, first) => getServerCommunityTransactionsWithCursor(communityId, cursor, first),
   });
 
   return (
@@ -28,15 +30,14 @@ export const InfiniteTransactionList = ({
         return (
           <TransactionCard
             key={transaction.id}
-            transaction={transaction}
+            transaction={transaction as any}
             image={image}
-            enableClickNavigation={enableClickNavigation}
           />
         );
       })}
 
       {hasNextPage && (
-        <div ref={loadMoreRef} className="flex justify-center py-4">
+        <div ref={loadMoreRef as any} className="flex justify-center py-4">
           {loading && (
             <LoadingIndicator fullScreen={false} />
           )}

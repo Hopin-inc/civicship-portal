@@ -1,6 +1,6 @@
+import { useParams } from "next/navigation";
 import { useCallback } from "react";
 import { usePlaceCreateMutation, usePlaceUpdateMutation } from "@/types/graphql";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { PlaceEditorFormState } from "../types/form";
 import { toast } from "react-toastify";
 
@@ -10,7 +10,8 @@ interface UsePlaceSaveOptions {
 }
 
 export const usePlaceSave = ({ placeId, onSuccess }: UsePlaceSaveOptions = {}) => {
-  const { communityId } = useCommunityConfig();
+  const params = useParams();
+  const communityId = params.communityId as string;
   const [createPlace] = usePlaceCreateMutation();
   const [updatePlace] = usePlaceUpdateMutation();
 

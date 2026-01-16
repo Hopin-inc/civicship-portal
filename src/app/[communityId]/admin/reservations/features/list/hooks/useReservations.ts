@@ -1,5 +1,6 @@
 "use client";
 
+import { useParams } from "next/navigation";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import React from "react";
 import {
@@ -10,14 +11,13 @@ import {
   useGetReservationsQuery,
 } from "@/types/graphql";
 import { useAuth } from "@/contexts/AuthProvider";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { useAdminRole } from "@/app/[communityId]/admin/context/AdminRoleContext";
 
 export interface UseReservationsResult {
   reservations: GqlReservationsConnection;
   loading: boolean;
   error: any;
-  loadMoreRef: React.RefObject<HTMLDivElement>;
+  loadMoreRef: (node: HTMLDivElement | null) => void;
   refetch: () => void;
 }
 
@@ -34,7 +34,8 @@ const fallbackConnection: GqlReservationsConnection = {
 
 const useReservations = (filter: GqlReservationFilterInput): UseReservationsResult => {
   const { user } = useAuth();
-  const { communityId } = useCommunityConfig();
+  const params = useParams();
+  const communityId = params.communityId as string;
   const role = useAdminRole();
 
   const mergedFilter = React.useMemo(
@@ -106,7 +107,7 @@ const useReservations = (filter: GqlReservationFilterInput): UseReservationsResu
   });
 
   return {
-    reservations,
+    reservations: reservations as any,
     loading,
     error,
     loadMoreRef,

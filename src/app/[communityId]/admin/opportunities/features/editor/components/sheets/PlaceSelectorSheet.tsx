@@ -1,8 +1,8 @@
 "use client";
 
+import { useParams } from "next/navigation";
 import { useMemo } from "react";
 import { useGetPlacesQuery } from "@/types/graphql";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { ItemContent, ItemTitle } from "@/components/ui/item";
 import { SelectorSheet } from "../../../shared/components/SelectorSheet";
 
@@ -24,7 +24,8 @@ export function PlaceSelectorSheet({
   selectedPlaceId,
   onSelectPlace,
 }: PlaceSelectorSheetProps) {
-  const { communityId } = useCommunityConfig();
+  const params = useParams();
+  const communityId = params.communityId as string;
   
   // クエリはSheetが開いている時のみ実行
   const { data, loading } = useGetPlacesQuery({

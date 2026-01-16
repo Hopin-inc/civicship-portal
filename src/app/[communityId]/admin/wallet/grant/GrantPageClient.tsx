@@ -2,11 +2,10 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { GqlMembershipsConnection, GqlUser } from "@/types/graphql";
 import { useTransactionMutations } from "@/app/[communityId]/admin/wallet/hooks/useTransactionMutations";
 import UserSelectStep from "./components/UserSelectStep";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useParams } from "next/navigation";
 import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import TransferInputStep from "@/app/[communityId]/admin/wallet/grant/components/TransferInputStep";
@@ -30,7 +29,8 @@ export default function GrantPageClient({ initialConnection }: GrantPageClientPr
   const t = useTranslations();
   const router = useCommunityRouter();
   const track = useAnalytics();
-  const { communityId } = useCommunityConfig();
+  const params = useParams();
+  const communityId = params.communityId as string;
 
   const searchParams = useSearchParams();
   const currentPoint = BigInt(searchParams.get("currentPoint") ?? "0");

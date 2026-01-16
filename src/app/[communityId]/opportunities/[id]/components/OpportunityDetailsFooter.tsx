@@ -1,9 +1,9 @@
 "use client";
 
+import { useParams } from "next/navigation";
 import React from "react";
 import CommunityLink from "@/components/navigation/CommunityLink";
 import { Button } from "@/components/ui/button";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { useAuthEnvironment } from "@/hooks/useAuthEnvironment";
 import { cn } from "@/lib/utils";
 
@@ -32,7 +32,8 @@ export const OpportunityDetailsFooter: React.FC<OpportunityDetailsFooterProps> =
   communityId,
   disableReason,
 }) => {
-  const { communityId: configCommunityId } = useCommunityConfig();
+  const params = useParams();
+  const configCommunityId = params.communityId as string;
   const query = new URLSearchParams({
     id: opportunityId,
     community_id: communityId ?? configCommunityId,

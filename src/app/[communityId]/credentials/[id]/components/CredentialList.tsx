@@ -23,7 +23,8 @@ interface OpportunityListProps {
 
 export default function CredentialList(props: OpportunityListProps) {
   const { vcData, loading, error, refetch, data } = props;
-  const { logoPath } = useCommunityConfig();
+  const config = useCommunityConfig();
+  const logoPath = config?.logoPath || "";
 
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {

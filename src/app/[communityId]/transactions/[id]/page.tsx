@@ -31,7 +31,7 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
   useHeaderConfig(headerConfig);
 
   const transaction = data?.transaction;
-  const { detail } = useTransactionDetailData(transaction, t);
+  const { detail } = useTransactionDetailData(transaction as any, t);
 
   if (loading) return <LoadingIndicator />;
 

@@ -74,6 +74,7 @@ export interface AuthContextType {
   environment: AuthEnvironment;
 
   logout: () => Promise<void>;
+  loginWithLiff: (nextPath?: string) => Promise<void>;
 
   updateAuthState: () => Promise<GqlUser | null>;
 

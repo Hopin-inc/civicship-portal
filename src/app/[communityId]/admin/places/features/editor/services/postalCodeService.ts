@@ -77,7 +77,7 @@ export async function fetchAddressByPostalCode(
     // 最初の結果を返す
     return data.results[0];
   } catch (error) {
-    console.error("Postal code search error:", error);
+    console.error("Postal code search error:", { error: error instanceof Error ? error.message : String(error) });
     return null;
   }
 }
@@ -95,7 +95,7 @@ export async function autoCompleteAddress(
   searchStates: (variables: any) => Promise<any>,
   searchCities: (variables: any) => Promise<any>
 ): Promise<AutoCompleteResult | null> {
-  logger.debug("[autoCompleteAddress] Start:", postalCode);
+  logger.debug("[autoCompleteAddress] Start:", { postalCode });
 
   // 1. zipcloud APIで住所を取得
   const result = await fetchAddressByPostalCode(postalCode);
@@ -132,7 +132,7 @@ export async function autoCompleteAddress(
   logger.info("[autoCompleteAddress] States parsed:", {
     count: states.length,
     looking_for: result.address1,
-    sample: states.slice(0, 3).map(s => s.name),
+    sample: states.slice(0, 3).map((s: any) => s.name),
   });
 
   const matchedState = matchPrefecture(result.address1, states);
@@ -163,7 +163,7 @@ export async function autoCompleteAddress(
     ?.map((edge: any) => edge?.node)
     .filter(Boolean) || [];
 
-  logger.debug("[autoCompleteAddress] Cities count:", cities.length);
+  logger.debug("[autoCompleteAddress] Cities count:", { count: cities.length });
 
   const matchResult = matchCity(result.address2, cities, result.address1);
 

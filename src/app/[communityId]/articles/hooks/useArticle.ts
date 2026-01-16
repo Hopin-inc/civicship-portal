@@ -19,7 +19,7 @@ export const useArticle = (id: string): UseArticleResult => {
   const { data, loading, error, refetch } = useArticleQuery(id);
 
   const article = useMemo(() => {
-    return data?.article ? presenterArticleDetail(data.article) : null;
+    return data?.article ? presenterArticleDetail(data.article as any) : null;
   }, [data]);
 
   const recommendedArticles = useMemo(() => {
@@ -27,7 +27,7 @@ export const useArticle = (id: string): UseArticleResult => {
       data?.articles?.edges
         ?.map((edge) => edge?.node)
         .filter((node): node is NonNullable<typeof node> => !!node && node.id !== article?.id)
-        .map(presenterArticleWithAuthor) ?? []
+        .map((node) => presenterArticleWithAuthor(node as any)) ?? []
     );
   }, [data?.articles?.edges, article?.id]);
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { useParams } from "next/navigation";
 import React, { useState } from "react";
 import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import { Button } from "@/components/ui/button";
@@ -41,7 +42,8 @@ export default function CreateTicketSheet({ onTicketCreated }: CreateTicketSheet
 
   const router = useCommunityRouter();
   const { user } = useAuth();
-  const { communityId } = useCommunityConfig();
+  const params = useParams();
+  const communityId = params.communityId as string;
 
   const [issueTicket] = useTicketIssueMutation();
 

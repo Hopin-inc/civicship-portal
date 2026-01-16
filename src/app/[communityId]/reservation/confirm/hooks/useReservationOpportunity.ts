@@ -1,8 +1,8 @@
 "use client";
 
+import { useParams } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { GqlOpportunityCategory, useGetOpportunityQuery } from "@/types/graphql";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { presentReservationActivity, presentReservationQuest } from "../presenters/presentReservationConfirm";
 import { findSlotById, parseSlotDateRange } from "../utils/slotUtils";
 import type { ActivityDetail, QuestDetail } from "@/components/domains/opportunities/types";
@@ -15,7 +15,8 @@ export const useReservationOpportunity = ({
   opportunityId: string;
   slotId: string;
 }) => {
-  const { communityId } = useCommunityConfig();
+  const params = useParams();
+  const communityId = params.communityId as string;
   
   const {
     data,

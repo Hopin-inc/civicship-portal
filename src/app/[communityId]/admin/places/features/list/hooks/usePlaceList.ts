@@ -1,15 +1,12 @@
-/**
- * Place一覧フック
- */
-
+import { useParams } from "next/navigation";
 import { useMemo } from "react";
 import { useGetPlacesQuery } from "@/types/graphql";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { PlaceData } from "../../shared/types/place";
 import { transformPlaceFromGraphQL } from "../services/placeTransformer";
 
 export const usePlaceList = () => {
-  const { communityId } = useCommunityConfig();
+  const params = useParams();
+  const communityId = params.communityId as string;
   
   const { data, loading, error, refetch } = useGetPlacesQuery({
     variables: {

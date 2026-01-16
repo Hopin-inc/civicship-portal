@@ -3,22 +3,23 @@
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
 import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import { toast } from "react-toastify";
-import { GqlCurrentPrefecture, useUpdateMyProfileMutation } from "@/types/graphql";
+import { GqlCurrentPrefecture, useUpdateMyProfileMutation, GqlUser } from "@/types/graphql";
 import { GeneralUserProfile } from "@/app/[communityId]/users/features/shared/types";
 import { mapGqlUserToProfile } from "@/app/[communityId]/users/features/shared/mappers";
 import { prefectureOptions as prefectureEnumValues } from "@/shared/prefectures/constants";
 import { logger } from "@/lib/logging";
 import { useUserProfileContext } from "@/app/[communityId]/users/features/shared/contexts/UserProfileContext";
-import { useTranslations, useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
 import { getPrefectureKey } from "@/lib/i18n/prefectures";
 
 const useProfileEdit = () => {
   const t = useTranslations();
-  const locale = useLocale();
   const router = useCommunityRouter();
   const { gqlUser, userId } = useUserProfileContext();
 
-  const [profile, setProfile] = useState<GeneralUserProfile>(() => mapGqlUserToProfile(gqlUser));
+  const [profile, setProfile] = useState<GeneralUserProfile>(() =>
+    mapGqlUserToProfile(gqlUser as GqlUser),
+  );
 
   const [updateProfile, { loading: updating }] = useUpdateMyProfileMutation();
 
@@ -101,7 +102,7 @@ const useProfileEdit = () => {
   );
 
   return {
-    profileImage: profile.imagePreviewUrl || gqlUser.image || null,
+    profileImage: profile.imagePreviewUrl || (gqlUser ? gqlUser.image : null) || null,
     displayName: profile.name,
     location: profile.currentPrefecture,
     bio: profile.bio ?? "",

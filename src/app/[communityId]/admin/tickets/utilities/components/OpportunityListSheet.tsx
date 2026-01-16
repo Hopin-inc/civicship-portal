@@ -27,7 +27,7 @@ export default function OpportunityListSheet({
                                                utilityName,
                                                children,
                                              }: OpportunityListSheetProps) {
-  const activityCards: ActivityCard[] = opportunities.map(presenterActivityCard);
+  const activityCards: ActivityCard[] = opportunities.map((node) => presenterActivityCard(node));
   const formattedActivityCards = activityCards.map(formatOpportunities);
 
   return (

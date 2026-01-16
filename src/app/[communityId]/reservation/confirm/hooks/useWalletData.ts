@@ -1,12 +1,13 @@
 "use client";
 
+import { useParams } from "next/navigation";
 import { useMemo } from "react";
 import { GqlTicket, GqlWalletType, useGetWalletsWithTicketQuery } from "@/types/graphql";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { toNumberSafe } from "@/utils/bigint";
 
 export function useWalletData(userId?: string) {
-  const { communityId } = useCommunityConfig();
+  const params = useParams();
+  const communityId = params.communityId as string;
   
   const { data, loading, error, refetch } = useGetWalletsWithTicketQuery({
     variables: {

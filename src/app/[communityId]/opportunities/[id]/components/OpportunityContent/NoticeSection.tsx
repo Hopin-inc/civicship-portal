@@ -1,10 +1,13 @@
+import { useParams } from "next/navigation";
 import IconWrapper from "@/components/shared/IconWrapper";
 import { AlertCircle } from "lucide-react";
 import { FC } from "react";
 import { getNoticeItems } from "@/lib/communities/content";
 
 export const NoticeSection: FC = () => {
-    const noticeItems = getNoticeItems();
+    const params = useParams();
+    const communityId = params.communityId as string;
+    const noticeItems = getNoticeItems(communityId);
 
     return (
       <section className="pt-6 pb-8 mt-0 bg-background-hover -mx-4 px-4">

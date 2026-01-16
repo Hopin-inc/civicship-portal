@@ -1,12 +1,12 @@
 "use client";
 
+import { useParams } from "next/navigation";
 import Loading from "@/components/layout/Loading";
 import { Card } from "@/components/ui/card";
 import { GqlEvaluationStatus, GqlVcIssuanceStatus, useGetEvaluationsQuery } from "@/types/graphql";
 import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import { AlertTriangle } from "lucide-react";
 import { useMemo } from "react";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 function getIssuanceStats(evaluations: any[]) {
   const allRequests = evaluations.flatMap((ev) => {
@@ -28,7 +28,8 @@ function getIssuanceStats(evaluations: any[]) {
 
 export default function CredentialList() {
   const router = useCommunityRouter();
-  const { communityId } = useCommunityConfig();
+  const params = useParams();
+  const communityId = params.communityId as string;
   const { data, loading, error } = useGetEvaluationsQuery({
     variables: { 
       filter: { communityId },

@@ -61,7 +61,7 @@ export default function AccountSection() {
                     <AlertCircle className="w-4 h-4 text-red-500" />
                     <span className="text-label-sm text-red-500">{t("users.account.didFailed")}</span>
                   </div>
-                  <Button variant="outline" size="sm" asChild className="h-6 px-2 text-xs">
+                  <Button variant="secondary" size="sm" asChild className="h-6 px-2 text-xs">
                     <CommunityLink href="/users/me/reverify-phone">{t("users.account.reverifyPhone")}</CommunityLink>
                   </Button>
                 </div>

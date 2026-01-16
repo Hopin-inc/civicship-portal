@@ -3,11 +3,11 @@
 import { useParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthProvider";
 import { transformTickets } from "@/app/[communityId]/tickets/data/presenter";
-import { TTicket } from "@/app/[communityId]/tickets/data/type";
+import { Ticket } from "@/app/[communityId]/tickets/data/type";
 import { GqlTicketStatus, useGetTicketsQuery } from "@/types/graphql";
 
 export interface UseTicketsResult {
-  tickets: TTicket[];
+  tickets: Ticket[];
   loading: boolean;
   error: any;
   refetch: () => void;

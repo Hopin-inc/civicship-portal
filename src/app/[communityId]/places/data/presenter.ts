@@ -91,7 +91,7 @@ export const presenterPlaceDetail = (place: GqlPlace): IPlaceDetail => {
     (o) => o.publishStatus === GqlPublishStatus.Public,
   );
 
-  const currentlyHiringOpportunities = publicOpportunities.map(presenterActivityCard);
+  const currentlyHiringOpportunities = publicOpportunities.map((node) => presenterActivityCard(node));
 
   const opportunity = orderedOpportunities[0];
   const user = opportunity?.createdByUser;

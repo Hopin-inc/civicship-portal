@@ -21,7 +21,7 @@ export default function OpportunitiesFeed() {
     refetchRef.current = refetch;
   }, [refetch]);
 
-  const allCards = mapOpportunityCards(opportunities.edges ?? []);
+  const allCards = mapOpportunityCards((opportunities.edges as any) ?? []);
   const firstFour = allCards.slice(0, 4);
   const afterFour = allCards.slice(4);
   const isEmpty = !loading && opportunities?.edges?.length === 0;

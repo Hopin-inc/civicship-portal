@@ -46,7 +46,7 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      const result = await loginWithLiff(nextPath ?? undefined);
+      const result = await loginWithLiff(nextPath ?? undefined) as any;
       
       // Check if the result indicates UserNotFound
       if (result && typeof result === "object" && "code" in result) {

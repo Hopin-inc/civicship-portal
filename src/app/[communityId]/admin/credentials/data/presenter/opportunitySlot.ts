@@ -16,7 +16,7 @@ export const presenterOpportunitySlots = (
       if (!node || !opportunity) return null;
 
       return {
-        ...presenterOpportunitySlot(node, opportunity.feeRequired ?? null),
+        ...presenterOpportunitySlot(node, opportunity.feeRequired ?? null, opportunity.pointsRequired ?? null),
         opportunityId: opportunity.id,
       };
     })
@@ -26,6 +26,7 @@ export const presenterOpportunitySlots = (
 export const presenterOpportunitySlot = (
   slot: GqlOpportunitySlot,
   feeRequired: number | null,
+  pointsRequired: number | null = null,
 ): ActivitySlot => {
   const startsAtDate = new Date(slot.startsAt);
   const activityId = slot.opportunity?.id;
@@ -35,6 +36,7 @@ export const presenterOpportunitySlot = (
     id: slot.id,
     hostingStatus: slot.hostingStatus,
     feeRequired,
+    pointsRequired,
     opportunityId: slot.opportunity?.id ?? "",
     capacity: slot.capacity ?? 0,
     remainingCapacity: slot.remainingCapacity ?? 0,

@@ -1,12 +1,12 @@
+import { useParams } from "next/navigation";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { GqlTransactionsConnection, GqlWalletType, useGetTransactionsQuery } from "@/types/graphql";
 
 export interface UseCommunityTransactionsResult {
   connection: GqlTransactionsConnection;
   loading: boolean;
   error: any;
-  loadMoreRef: React.RefObject<HTMLDivElement>;
+  loadMoreRef: (node: HTMLDivElement | null) => void;
   refetch: () => void;
 }
 
@@ -22,7 +22,8 @@ const fallbackConnection: GqlTransactionsConnection = {
 };
 
 const useCommunityTransactions = (): UseCommunityTransactionsResult => {
-  const { communityId } = useCommunityConfig();
+  const params = useParams();
+  const communityId = params.communityId as string;
   const { data, loading, error, fetchMore, refetch } = useGetTransactionsQuery({
     variables: {
       filter: {
@@ -75,7 +76,7 @@ const useCommunityTransactions = (): UseCommunityTransactionsResult => {
             edges: [...prevEdges, ...dedupedNewEdges],
             pageInfo: fetchMoreResult.transactions.pageInfo,
           },
-        };
+        } as any;
       },
     });
   };
@@ -87,7 +88,7 @@ const useCommunityTransactions = (): UseCommunityTransactionsResult => {
   });
 
   return {
-    connection,
+    connection: connection as any,
     loading,
     error,
     loadMoreRef,

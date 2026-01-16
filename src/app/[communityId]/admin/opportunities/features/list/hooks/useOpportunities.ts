@@ -1,5 +1,6 @@
 "use client";
 
+import { useParams } from "next/navigation";
 import {
   useGetAdminOpportunitiesQuery,
   GqlPublishStatus,
@@ -9,7 +10,6 @@ import {
 import { presentOpportunityList } from "../presenters/presentOpportunityList";
 import { useMemo, useState } from "react";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 const fallbackConnection: GqlOpportunitiesConnection = {
   edges: [],
@@ -42,7 +42,8 @@ interface UseOpportunitiesReturn {
 
 export function useOpportunities(options?: UseOpportunitiesOptions): UseOpportunitiesReturn {
   const { publishStatus = "all" } = options || {};
-  const { communityId } = useCommunityConfig();
+  const params = useParams();
+  const communityId = params.communityId as string;
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   // GraphQLフィルタの構築

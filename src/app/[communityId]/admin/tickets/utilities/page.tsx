@@ -1,5 +1,6 @@
 "use client";
 
+import { useParams } from "next/navigation";
 import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { CardWrapper } from "@/components/ui/card-wrapper";
@@ -8,14 +9,14 @@ import {
   GqlSortDirection,
   useGetUtilitiesQuery,
 } from "@/types/graphql";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { useAuth } from "@/contexts/AuthProvider";
 import CreateUtilitySheet from "./components/CreateUtilitySheet";
 import OpportunityListSheet from "./components/OpportunityListSheet";
 import { Coins, MessageSquareText, Tickets } from "lucide-react";
 
 export default function UtilitiesPage() {
-  const { communityId } = useCommunityConfig();
+  const params = useParams();
+  const communityId = params.communityId as string;
   const headerConfig = useMemo(
     () => ({
       title: "チケットの種類",

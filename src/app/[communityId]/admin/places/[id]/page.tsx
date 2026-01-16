@@ -34,7 +34,7 @@ export default function EditPlacePage() {
   // 初期データ変換（presenter使用）
   const initialData = useMemo(() => {
     if (!data?.place) return undefined;
-    return presentPlaceForEdit(data.place);
+    return presentPlaceForEdit(data.place as any);
   }, [data]);
 
   const handleSuccess = () => {

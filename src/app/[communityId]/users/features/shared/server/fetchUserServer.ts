@@ -12,7 +12,10 @@ export async function fetchUserServer(
   try {
     const cookieStore = await cookies();
     const cookieHeader = cookieStore.toString();
-    const headers = cookieHeader ? { cookie: cookieHeader } : {};
+    const headers: Record<string, string> = {};
+    if (cookieHeader) {
+      headers["cookie"] = cookieHeader;
+    }
 
     const res = await executeServerGraphQLQuery<
       { user: GqlUser | null },

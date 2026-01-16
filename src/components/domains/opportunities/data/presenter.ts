@@ -182,6 +182,7 @@ export const presenterActivitySlot = (
         capacity: slot?.capacity ?? 0,
         remainingCapacity: slot?.remainingCapacity ?? 0,
         feeRequired: feeRequired ?? null,
+        pointsRequired: null,
         applicantCount: 1,
         isReservable,
       };

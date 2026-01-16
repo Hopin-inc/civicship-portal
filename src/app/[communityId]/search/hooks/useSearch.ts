@@ -29,6 +29,7 @@ export const useSearch = () => {
       values.dateRange,
       values.guests,
       values.useTicket,
+      values.usePoints,
       "activity",
       // selectedTab,
     );

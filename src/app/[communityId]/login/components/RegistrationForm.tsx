@@ -97,7 +97,7 @@ export function RegistrationForm({ isLoading, error, phoneNumber, lineUid, onSub
               </Button>
               <Button
                 type="button"
-                variant="outline"
+                variant="secondary"
                 onClick={onBack}
                 disabled={isLoading}
                 className="w-full h-12"

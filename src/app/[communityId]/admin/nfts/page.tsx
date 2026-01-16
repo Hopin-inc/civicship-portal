@@ -1,14 +1,15 @@
 "use client";
 
+import { useParams } from "next/navigation";
 import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useGetNftInstancesQuery } from "@/types/graphql";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { NftList } from "./components/NftList";
 import { NftItemData } from "./components/NftItem";
 
 export default function AdminNftsPage() {
-  const { communityId } = useCommunityConfig();
+  const params = useParams();
+  const communityId = params.communityId as string;
   const headerConfig = useMemo(
     () => ({
       title: "NFT一覧",

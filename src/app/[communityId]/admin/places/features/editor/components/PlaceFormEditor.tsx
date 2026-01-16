@@ -32,7 +32,7 @@ export function PlaceFormEditor({ placeId, initialData, onSuccess }: PlaceFormEd
   // 都道府県マスタを取得（既存データ解析用）
   const { data: statesData } = useQuery(GET_STATES, {
     variables: { first: 50 },
-    skip: !initialData?.address || !!initialData?.cityCode === false,
+    skip: !initialData?.address || !initialData?.cityCode,
     fetchPolicy: "cache-first",
   });
 

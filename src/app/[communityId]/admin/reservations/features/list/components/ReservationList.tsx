@@ -9,7 +9,7 @@ interface ReservationListProps {
   reservations: GqlReservation[];
   loading: boolean;
   error: any;
-  loadMoreRef: React.RefObject<HTMLDivElement>;
+  loadMoreRef: (node: HTMLDivElement | null) => void;
 }
 
 export function ReservationList({

@@ -36,12 +36,12 @@ export default function TicketsPage() {
     <div className="min-h-screen bg-background">
       <TicketContent 
         ticketClaimLinks={ticketClaimLinks} 
-        loadMoreRef={loadMoreRef} 
+        loadMoreRef={loadMoreRef as any} 
         hasNextPage={hasNextPage} 
         loading={loading} 
       />
       {hasNextPage && (
-        <div ref={loadMoreRef} className="py-4 text-center mt-4">
+        <div ref={loadMoreRef as any} className="py-4 text-center mt-4">
           {loading ? (
             <div className="py-2">
               <LoadingIndicator fullScreen={false} />

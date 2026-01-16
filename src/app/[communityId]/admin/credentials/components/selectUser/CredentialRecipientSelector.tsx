@@ -1,5 +1,5 @@
+import { useParams } from "next/navigation";
 import React, { useMemo, useState } from "react";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import {
   GqlDidIssuanceRequest,
   GqlMembershipsConnection,
@@ -99,7 +99,8 @@ export default function CredentialRecipientSelector({
   setStep,
   initialConnection,
 }: CredentialRecipientSelectorProps) {
-  const { communityId } = useCommunityConfig();
+  const params = useParams();
+  const communityId = params.communityId as string;
   const { selectedSlot, setSelectedSlot, participatedUsers } = useSelection();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useCommunityRouter();

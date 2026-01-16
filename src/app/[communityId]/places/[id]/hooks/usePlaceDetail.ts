@@ -26,7 +26,7 @@ export const usePlaceDetail = (placeId: string): UsePlaceDetailResult => {
 
   const place = useMemo(() => {
     const place = data?.place;
-    return place ? presenterPlaceDetail(place) : null;
+    return place ? presenterPlaceDetail(place as any) : null;
   }, [data]);
 
   return {

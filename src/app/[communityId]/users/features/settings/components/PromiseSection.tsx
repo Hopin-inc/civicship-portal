@@ -1,4 +1,5 @@
 "use client";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { FileIcon } from "lucide-react";
 import CommunityLink from "@/components/navigation/CommunityLink";
@@ -15,12 +16,12 @@ export default function PromiseSection() {
 
   const commonDocuments = defaultCommonDocuments.map((doc) => {
     const override = communityConfig?.commonDocumentOverrides?.[doc.id as "terms" | "privacy"];
-    return override || doc;
+    return (override || doc) as { title: string; path: string; type: "internal" | "external"; id: string };
   });
 
-  const communityDocuments = communityConfig?.documents || [];
+  const communityDocuments = (communityConfig?.documents || []) as { title: string; path: string; type: "internal" | "external"; id: string }[];
 
-  const sortedCommunityDocuments = [...communityDocuments].sort((a, b) => {
+  const sortedCommunityDocuments = [...communityDocuments].sort((a: any, b: any) => {
     const orderA = a.order ?? 999;
     const orderB = b.order ?? 999;
     return orderA - orderB;
