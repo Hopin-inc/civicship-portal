@@ -44,7 +44,7 @@ export default function BonusesPage() {
   );
   useHeaderConfig(headerConfig);
 
-  const { data, loading } = useQuery<GetSignupBonusConfigData>(GET_SIGNUP_BONUS_CONFIG, {
+  const { data, loading, error } = useQuery<GetSignupBonusConfigData>(GET_SIGNUP_BONUS_CONFIG, {
     variables: { communityId: COMMUNITY_ID },
   });
 
@@ -64,6 +64,17 @@ export default function BonusesPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-sm text-muted-foreground">{t("common.loading")}</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen p-4 space-y-4">
+        <div className="text-sm font-medium">{t("common.errorState.defaultTitle")}</div>
+        <div className="text-xs text-muted-foreground text-center max-w-md">
+          {t("common.errorState.description")}
+        </div>
       </div>
     );
   }

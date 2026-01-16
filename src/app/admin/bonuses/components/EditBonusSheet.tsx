@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,15 @@ export default function EditBonusSheet({ currentConfig, onSave }: EditBonusSheet
   const [bonusPoint, setBonusPoint] = useState(String(currentConfig?.bonusPoint ?? 0));
   const [message, setMessage] = useState(currentConfig?.message ?? "");
 
+  // currentConfigが変更されたとき、またはシートが開いたときに状態を同期
+  useEffect(() => {
+    if (open) {
+      setIsEnabled(currentConfig?.isEnabled ?? false);
+      setBonusPoint(String(currentConfig?.bonusPoint ?? 0));
+      setMessage(currentConfig?.message ?? "");
+    }
+  }, [open, currentConfig]);
+
   const [updateConfig, { loading }] = useMutation(UPDATE_SIGNUP_BONUS_CONFIG);
 
   const handleSave = async () => {
@@ -49,7 +58,7 @@ export default function EditBonusSheet({ currentConfig, onSave }: EditBonusSheet
       onSave();
       setOpen(false);
     } catch (e) {
-      toast.error(t("adminWallet.grant.errorGeneric"));
+      toast.error(t("adminWallet.settings.signupBonus.form.error"));
     }
   };
 

@@ -34,9 +34,12 @@ interface GetFailedSignupBonusesData {
 export default function SignupBonusDetailPage() {
   const t = useTranslations();
 
-  const { data, loading, refetch } = useQuery<GetSignupBonusConfigData>(GET_SIGNUP_BONUS_CONFIG, {
-    variables: { communityId: COMMUNITY_ID },
-  });
+  const { data, loading, error, refetch } = useQuery<GetSignupBonusConfigData>(
+    GET_SIGNUP_BONUS_CONFIG,
+    {
+      variables: { communityId: COMMUNITY_ID },
+    },
+  );
 
   const { data: failedData, refetch: refetchFailed } = useQuery<GetFailedSignupBonusesData>(
     GET_FAILED_SIGNUP_BONUSES,
@@ -64,15 +67,25 @@ export default function SignupBonusDetailPage() {
   );
   useHeaderConfig(headerConfig);
 
-  const handleRetrySuccess = () => {
-    refetch();
-    refetchFailed();
+  const handleRetrySuccess = async () => {
+    await Promise.all([refetch(), refetchFailed()]);
   };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-sm text-muted-foreground">{t("common.loading")}</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen p-4 space-y-4">
+        <div className="text-sm font-medium">{t("common.errorState.defaultTitle")}</div>
+        <div className="text-xs text-muted-foreground text-center max-w-md">
+          {t("common.errorState.description")}
+        </div>
       </div>
     );
   }
