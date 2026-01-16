@@ -2,7 +2,7 @@
 
 import CommunityLink from "@/components/navigation/CommunityLink";
 import { Globe, Home, Search, User } from "lucide-react";
-import { usePathname, useSearchParams, useParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import React from "react";
 import { cn } from "@/lib/utils";
 import { matchPaths } from "@/utils/path";
@@ -18,8 +18,6 @@ interface HeaderProps {
 const BottomBar: React.FC<HeaderProps> = ({ className }) => {
   const t = useTranslations();
   const pathname = usePathname();
-  const params = useParams();
-  const communityId = params?.communityId as string | undefined;
   const searchParams = useSearchParams();
   const placeId = searchParams.get("placeId");
   const communityConfig = useCommunityConfig();
@@ -37,30 +35,24 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
   }
 
   if (
-    pathname.startsWith("/admin") ||
-    (pathname.startsWith("/reservation") && !pathname.includes("/complete")) ||
-    pathname.startsWith("/activities/") ||
-    pathname.startsWith("/quests/") ||
-    pathname.startsWith("/participations/") ||
-    pathname.startsWith("/sign-up") ||
-    pathname === "/users/me/edit" ||
-    (pathname.startsWith("/places") && placeId) ||
-    pathname.startsWith("/search") ||
-    pathname.startsWith("/wallets") ||
-    pathname.startsWith("/credentials") ||
-    pathname.startsWith("/transactions")
+    matchPaths(pathname, "/admin", "/admin/*") ||
+    (matchPaths(pathname, "/reservation", "/reservation/*") && !matchPaths(pathname, "/reservation/complete")) ||
+    matchPaths(pathname, "/activities/*") ||
+    matchPaths(pathname, "/quests/*") ||
+    matchPaths(pathname, "/participations/*") ||
+    matchPaths(pathname, "/sign-up", "/sign-up/*") ||
+    matchPaths(pathname, "/users/me/edit") ||
+    (matchPaths(pathname, "/places", "/places/*") && placeId) ||
+    matchPaths(pathname, "/search", "/search/*") ||
+    matchPaths(pathname, "/wallets", "/wallets/*") ||
+    matchPaths(pathname, "/credentials", "/credentials/*") ||
+    matchPaths(pathname, "/transactions", "/transactions/*")
   ) {
     return null;
   }
 
   const getLinkStyle = (...paths: string[]) => {
-    // communityId がある場合は pathname からプレフィックスを除去してマッチングさせる
-    const normalizedPathname =
-      communityId && pathname.startsWith(`/${communityId}`)
-        ? pathname.replace(`/${communityId}`, "") || "/"
-        : pathname;
-
-    const isActive = matchPaths(normalizedPathname, ...paths);
+    const isActive = matchPaths(pathname, ...paths);
     return `flex flex-col items-center ${isActive ? "text-primary" : "text-muted-foreground"} hover:text-primary`;
   };
 

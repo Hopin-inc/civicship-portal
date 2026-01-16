@@ -2,7 +2,7 @@
 
 import CommunityLink from "@/components/navigation/CommunityLink";
 import { Book, ClipboardList, Settings, Ticket } from "lucide-react";
-import { usePathname, useParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import React from "react";
 import { cn } from "@/lib/utils";
 import { matchPaths } from "@/utils/path";
@@ -16,31 +16,23 @@ interface AdminBottomBarProps {
 const AdminBottomBar: React.FC<AdminBottomBarProps> = ({ className }) => {
   const t = useTranslations();
   const pathname = usePathname();
-  const params = useParams();
-  const communityId = params?.communityId as string | undefined;
   const communityConfig = useCommunityConfig();
   const enabledFeatures = communityConfig?.enableFeatures ?? [];
 
   if (
-    !pathname.startsWith("/admin") ||
-    pathname.startsWith("/admin/reservations/") ||
-    pathname.startsWith("/admin/credentials/") ||
-    pathname.startsWith("/admin/tickets/") ||
-    pathname.startsWith("/admin/opportunities/") ||
-    pathname.startsWith("/admin/members") ||
-    pathname.startsWith("/admin/wallet/")
+    !matchPaths(pathname, "/admin", "/admin/*") ||
+    matchPaths(pathname, "/admin/reservations/*") ||
+    matchPaths(pathname, "/admin/credentials/*") ||
+    matchPaths(pathname, "/admin/tickets/*") ||
+    matchPaths(pathname, "/admin/opportunities/*") ||
+    matchPaths(pathname, "/admin/members") ||
+    matchPaths(pathname, "/admin/wallet/*")
   ) {
     return null;
   }
 
   const getLinkStyle = (...paths: string[]) => {
-    // communityId がある場合は pathname からプレフィックスを除去してマッチングさせる
-    const normalizedPathname =
-      communityId && pathname.startsWith(`/${communityId}`)
-        ? pathname.replace(`/${communityId}`, "") || "/"
-        : pathname;
-
-    const isActive = matchPaths(normalizedPathname, ...paths);
+    const isActive = matchPaths(pathname, ...paths);
     return `flex flex-col items-center ${isActive ? "text-primary" : "text-muted-foreground"} hover:text-primary`;
   };
 
