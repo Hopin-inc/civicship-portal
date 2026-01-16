@@ -82,6 +82,8 @@ export const OpportunityFormEditor = ({
 
   // スロット保存ハンドラー
   const handleSlotsSave = useCallback(async () => {
+    console.log('[OpportunityFormEditor] handleSlotsSave called with capacity:', editor.capacity);
+
     // 更新モード：開催枠のみサーバーに保存
     if (mode === "update" && opportunityId) {
       const success = await slotsBulkSave.handleSave(editor.slots, editor.capacity);

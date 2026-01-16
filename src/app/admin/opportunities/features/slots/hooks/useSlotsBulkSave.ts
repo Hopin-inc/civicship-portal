@@ -20,6 +20,8 @@ export const useSlotsBulkSave = ({
 
   const handleSave = useCallback(
     async (slots: SlotData[], capacity: number) => {
+      console.log('[useSlotsBulkSave] handleSave called with:', { slots, capacity });
+
       // 新規作成スロット（idなし）
       const slotsToCreate = slots
         .filter((slot) => !slot.id)
@@ -35,6 +37,12 @@ export const useSlotsBulkSave = ({
           id: slot.id,
           ...convertSlotToDates(slot),
         }));
+
+      console.log('[useSlotsBulkSave] Prepared data:', {
+        slotsToCreate,
+        slotsToUpdate,
+        capacityValue: capacity,
+      });
 
       try {
         await updateSlots({
