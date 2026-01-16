@@ -210,6 +210,12 @@ export const GqlClaimLinkStatus = {
 } as const;
 
 export type GqlClaimLinkStatus = (typeof GqlClaimLinkStatus)[keyof typeof GqlClaimLinkStatus];
+export type GqlCommonDocumentOverrides = {
+  __typename?: "CommonDocumentOverrides";
+  privacy?: Maybe<GqlCommunityDocument>;
+  terms?: Maybe<GqlCommunityDocument>;
+};
+
 export type GqlCommunitiesConnection = {
   __typename?: "CommunitiesConnection";
   edges?: Maybe<Array<GqlCommunityEdge>>;
@@ -276,6 +282,15 @@ export type GqlCommunityDeleteSuccess = {
   communityId: Scalars["String"]["output"];
 };
 
+export type GqlCommunityDocument = {
+  __typename?: "CommunityDocument";
+  id: Scalars["String"]["output"];
+  order?: Maybe<Scalars["Int"]["output"]>;
+  path: Scalars["String"]["output"];
+  title: Scalars["String"]["output"];
+  type: Scalars["String"]["output"];
+};
+
 export type GqlCommunityEdge = GqlEdge & {
   __typename?: "CommunityEdge";
   cursor: Scalars["String"]["output"];
@@ -302,6 +317,7 @@ export type GqlCommunityLineConfig = {
   accessToken?: Maybe<Scalars["String"]["output"]>;
   channelId?: Maybe<Scalars["String"]["output"]>;
   channelSecret?: Maybe<Scalars["String"]["output"]>;
+  liffAppId?: Maybe<Scalars["String"]["output"]>;
   liffBaseUrl?: Maybe<Scalars["String"]["output"]>;
   liffId?: Maybe<Scalars["String"]["output"]>;
   richMenus?: Maybe<Array<GqlCommunityLineRichMenuConfig>>;
@@ -325,6 +341,31 @@ export type GqlCommunityLineRichMenuConfig = {
 export type GqlCommunityLineRichMenuConfigInput = {
   richMenuId: Scalars["String"]["input"];
   type: GqlLineRichMenuType;
+};
+
+export type GqlCommunityPortalConfig = {
+  __typename?: "CommunityPortalConfig";
+  adminRootPath: Scalars["String"]["output"];
+  commonDocumentOverrides?: Maybe<GqlCommonDocumentOverrides>;
+  communityId: Scalars["String"]["output"];
+  description: Scalars["String"]["output"];
+  documents?: Maybe<Array<GqlCommunityDocument>>;
+  domain: Scalars["String"]["output"];
+  enableFeatures: Array<Scalars["String"]["output"]>;
+  faviconPrefix: Scalars["String"]["output"];
+  firebaseTenantId?: Maybe<Scalars["String"]["output"]>;
+  liffAppId?: Maybe<Scalars["String"]["output"]>;
+  liffBaseUrl?: Maybe<Scalars["String"]["output"]>;
+  liffId?: Maybe<Scalars["String"]["output"]>;
+  logoPath: Scalars["String"]["output"];
+  ogImagePath: Scalars["String"]["output"];
+  regionKey?: Maybe<Scalars["String"]["output"]>;
+  regionName?: Maybe<Scalars["String"]["output"]>;
+  rootPath: Scalars["String"]["output"];
+  shortDescription?: Maybe<Scalars["String"]["output"]>;
+  squareLogoPath: Scalars["String"]["output"];
+  title: Scalars["String"]["output"];
+  tokenName: Scalars["String"]["output"];
 };
 
 export type GqlCommunitySignupBonusConfig = {
@@ -1068,6 +1109,7 @@ export type GqlMutationTransactionIssueCommunityPointArgs = {
 
 export type GqlMutationUpdateSignupBonusConfigArgs = {
   input: GqlUpdateSignupBonusConfigInput;
+  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlMutationUserDeleteMeArgs = {
@@ -1770,6 +1812,7 @@ export type GqlQuery = {
   cities: GqlCitiesConnection;
   communities: GqlCommunitiesConnection;
   community?: Maybe<GqlCommunity>;
+  communityPortalConfig?: Maybe<GqlCommunityPortalConfig>;
   currentUser?: Maybe<GqlCurrentUserPayload>;
   echo: Scalars["String"]["output"];
   evaluation?: Maybe<GqlEvaluation>;
@@ -1858,6 +1901,10 @@ export type GqlQueryCommunitiesArgs = {
 
 export type GqlQueryCommunityArgs = {
   id: Scalars["ID"]["input"];
+};
+
+export type GqlQueryCommunityPortalConfigArgs = {
+  communityId: Scalars["String"]["input"];
 };
 
 export type GqlQueryEvaluationArgs = {
@@ -3077,6 +3124,7 @@ export type GqlCommunityFieldsFragment = {
 
 export type GqlUpdateSignupBonusConfigMutationVariables = Exact<{
   input: GqlUpdateSignupBonusConfigInput;
+  communityId: Scalars["ID"]["input"];
 }>;
 
 export type GqlUpdateSignupBonusConfigMutation = {
@@ -3102,67 +3150,6 @@ export type GqlRetrySignupBonusGrantMutation = {
     error?: string | null;
     transaction?: { __typename?: "Transaction"; id: string } | null;
   };
-};
-
-export type GqlGetCommunitiesQueryVariables = Exact<{ [key: string]: never }>;
-
-export type GqlGetCommunitiesQuery = {
-  __typename?: "Query";
-  communities: {
-    __typename?: "CommunitiesConnection";
-    totalCount: number;
-    edges?: Array<{
-      __typename?: "CommunityEdge";
-      node?: { __typename?: "Community"; id: string; name?: string | null } | null;
-    }> | null;
-  };
-};
-
-export type GqlGetCommunityQueryVariables = Exact<{
-  id: Scalars["ID"]["input"];
-}>;
-
-export type GqlGetCommunityQuery = {
-  __typename?: "Query";
-  community?: { __typename?: "Community"; id: string; name?: string | null } | null;
-};
-
-export type GqlGetSignupBonusConfigQueryVariables = Exact<{
-  communityId: Scalars["ID"]["input"];
-}>;
-
-export type GqlGetSignupBonusConfigQuery = {
-  __typename?: "Query";
-  community?: {
-    __typename?: "Community";
-    id: string;
-    config?: {
-      __typename?: "CommunityConfig";
-      signupBonusConfig?: {
-        __typename?: "CommunitySignupBonusConfig";
-        bonusPoint: number;
-        isEnabled: boolean;
-        message?: string | null;
-      } | null;
-    } | null;
-  } | null;
-};
-
-export type GqlGetFailedSignupBonusesQueryVariables = Exact<{
-  communityId: Scalars["ID"]["input"];
-}>;
-
-export type GqlGetFailedSignupBonusesQuery = {
-  __typename?: "Query";
-  signupBonuses?: Array<{
-    __typename?: "SignupBonus";
-    id: string;
-    failureCode?: GqlIncentiveGrantFailureCode | null;
-    lastError?: string | null;
-    attemptCount: number;
-    lastAttemptedAt: Date;
-    user?: { __typename?: "User"; id: string; name: string; image?: string | null } | null;
-  }> | null;
 };
 
 export type GqlIdentityFieldsFragment = {
@@ -6984,8 +6971,8 @@ export type GetCitiesQueryResult = Apollo.QueryResult<
   GqlGetCitiesQueryVariables
 >;
 export const UpdateSignupBonusConfigDocument = gql`
-  mutation UpdateSignupBonusConfig($input: UpdateSignupBonusConfigInput!) {
-    updateSignupBonusConfig(input: $input) {
+  mutation UpdateSignupBonusConfig($input: UpdateSignupBonusConfigInput!, $communityId: ID!) {
+    updateSignupBonusConfig(input: $input, permission: { communityId: $communityId }) {
       bonusPoint
       isEnabled
       message
@@ -7011,6 +6998,7 @@ export type GqlUpdateSignupBonusConfigMutationFn = Apollo.MutationFunction<
  * const [updateSignupBonusConfigMutation, { data, loading, error }] = useUpdateSignupBonusConfigMutation({
  *   variables: {
  *      input: // value for 'input'
+ *      communityId: // value for 'communityId'
  *   },
  * });
  */
@@ -7091,312 +7079,6 @@ export type RetrySignupBonusGrantMutationResult =
 export type RetrySignupBonusGrantMutationOptions = Apollo.BaseMutationOptions<
   GqlRetrySignupBonusGrantMutation,
   GqlRetrySignupBonusGrantMutationVariables
->;
-export const GetCommunitiesDocument = gql`
-  query GetCommunities {
-    communities {
-      edges {
-        node {
-          id
-          name
-        }
-      }
-      totalCount
-    }
-  }
-`;
-
-/**
- * __useGetCommunitiesQuery__
- *
- * To run a query within a React component, call `useGetCommunitiesQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetCommunitiesQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetCommunitiesQuery({
- *   variables: {
- *   },
- * });
- */
-export function useGetCommunitiesQuery(
-  baseOptions?: Apollo.QueryHookOptions<GqlGetCommunitiesQuery, GqlGetCommunitiesQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GqlGetCommunitiesQuery, GqlGetCommunitiesQueryVariables>(
-    GetCommunitiesDocument,
-    options,
-  );
-}
-export function useGetCommunitiesLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    GqlGetCommunitiesQuery,
-    GqlGetCommunitiesQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GqlGetCommunitiesQuery, GqlGetCommunitiesQueryVariables>(
-    GetCommunitiesDocument,
-    options,
-  );
-}
-export function useGetCommunitiesSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<GqlGetCommunitiesQuery, GqlGetCommunitiesQueryVariables>,
-) {
-  const options =
-    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<GqlGetCommunitiesQuery, GqlGetCommunitiesQueryVariables>(
-    GetCommunitiesDocument,
-    options,
-  );
-}
-export type GetCommunitiesQueryHookResult = ReturnType<typeof useGetCommunitiesQuery>;
-export type GetCommunitiesLazyQueryHookResult = ReturnType<typeof useGetCommunitiesLazyQuery>;
-export type GetCommunitiesSuspenseQueryHookResult = ReturnType<
-  typeof useGetCommunitiesSuspenseQuery
->;
-export type GetCommunitiesQueryResult = Apollo.QueryResult<
-  GqlGetCommunitiesQuery,
-  GqlGetCommunitiesQueryVariables
->;
-export const GetCommunityDocument = gql`
-  query GetCommunity($id: ID!) {
-    community(id: $id) {
-      id
-      name
-    }
-  }
-`;
-
-/**
- * __useGetCommunityQuery__
- *
- * To run a query within a React component, call `useGetCommunityQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetCommunityQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetCommunityQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function useGetCommunityQuery(
-  baseOptions: Apollo.QueryHookOptions<GqlGetCommunityQuery, GqlGetCommunityQueryVariables> &
-    ({ variables: GqlGetCommunityQueryVariables; skip?: boolean } | { skip: boolean }),
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GqlGetCommunityQuery, GqlGetCommunityQueryVariables>(
-    GetCommunityDocument,
-    options,
-  );
-}
-export function useGetCommunityLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<GqlGetCommunityQuery, GqlGetCommunityQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GqlGetCommunityQuery, GqlGetCommunityQueryVariables>(
-    GetCommunityDocument,
-    options,
-  );
-}
-export function useGetCommunitySuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<GqlGetCommunityQuery, GqlGetCommunityQueryVariables>,
-) {
-  const options =
-    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<GqlGetCommunityQuery, GqlGetCommunityQueryVariables>(
-    GetCommunityDocument,
-    options,
-  );
-}
-export type GetCommunityQueryHookResult = ReturnType<typeof useGetCommunityQuery>;
-export type GetCommunityLazyQueryHookResult = ReturnType<typeof useGetCommunityLazyQuery>;
-export type GetCommunitySuspenseQueryHookResult = ReturnType<typeof useGetCommunitySuspenseQuery>;
-export type GetCommunityQueryResult = Apollo.QueryResult<
-  GqlGetCommunityQuery,
-  GqlGetCommunityQueryVariables
->;
-export const GetSignupBonusConfigDocument = gql`
-  query GetSignupBonusConfig($communityId: ID!) {
-    community(id: $communityId) {
-      id
-      config {
-        signupBonusConfig {
-          bonusPoint
-          isEnabled
-          message
-        }
-      }
-    }
-  }
-`;
-
-/**
- * __useGetSignupBonusConfigQuery__
- *
- * To run a query within a React component, call `useGetSignupBonusConfigQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetSignupBonusConfigQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetSignupBonusConfigQuery({
- *   variables: {
- *      communityId: // value for 'communityId'
- *   },
- * });
- */
-export function useGetSignupBonusConfigQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    GqlGetSignupBonusConfigQuery,
-    GqlGetSignupBonusConfigQueryVariables
-  > &
-    ({ variables: GqlGetSignupBonusConfigQueryVariables; skip?: boolean } | { skip: boolean }),
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GqlGetSignupBonusConfigQuery, GqlGetSignupBonusConfigQueryVariables>(
-    GetSignupBonusConfigDocument,
-    options,
-  );
-}
-export function useGetSignupBonusConfigLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    GqlGetSignupBonusConfigQuery,
-    GqlGetSignupBonusConfigQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GqlGetSignupBonusConfigQuery, GqlGetSignupBonusConfigQueryVariables>(
-    GetSignupBonusConfigDocument,
-    options,
-  );
-}
-export function useGetSignupBonusConfigSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        GqlGetSignupBonusConfigQuery,
-        GqlGetSignupBonusConfigQueryVariables
-      >,
-) {
-  const options =
-    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    GqlGetSignupBonusConfigQuery,
-    GqlGetSignupBonusConfigQueryVariables
-  >(GetSignupBonusConfigDocument, options);
-}
-export type GetSignupBonusConfigQueryHookResult = ReturnType<typeof useGetSignupBonusConfigQuery>;
-export type GetSignupBonusConfigLazyQueryHookResult = ReturnType<
-  typeof useGetSignupBonusConfigLazyQuery
->;
-export type GetSignupBonusConfigSuspenseQueryHookResult = ReturnType<
-  typeof useGetSignupBonusConfigSuspenseQuery
->;
-export type GetSignupBonusConfigQueryResult = Apollo.QueryResult<
-  GqlGetSignupBonusConfigQuery,
-  GqlGetSignupBonusConfigQueryVariables
->;
-export const GetFailedSignupBonusesDocument = gql`
-  query GetFailedSignupBonuses($communityId: ID!) {
-    signupBonuses(
-      permission: { communityId: $communityId }
-      filter: { status: FAILED }
-      sort: { field: LAST_ATTEMPTED_AT, order: desc }
-    ) {
-      id
-      user {
-        id
-        name
-        image
-      }
-      failureCode
-      lastError
-      attemptCount
-      lastAttemptedAt
-    }
-  }
-`;
-
-/**
- * __useGetFailedSignupBonusesQuery__
- *
- * To run a query within a React component, call `useGetFailedSignupBonusesQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetFailedSignupBonusesQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetFailedSignupBonusesQuery({
- *   variables: {
- *      communityId: // value for 'communityId'
- *   },
- * });
- */
-export function useGetFailedSignupBonusesQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    GqlGetFailedSignupBonusesQuery,
-    GqlGetFailedSignupBonusesQueryVariables
-  > &
-    ({ variables: GqlGetFailedSignupBonusesQueryVariables; skip?: boolean } | { skip: boolean }),
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GqlGetFailedSignupBonusesQuery, GqlGetFailedSignupBonusesQueryVariables>(
-    GetFailedSignupBonusesDocument,
-    options,
-  );
-}
-export function useGetFailedSignupBonusesLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    GqlGetFailedSignupBonusesQuery,
-    GqlGetFailedSignupBonusesQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    GqlGetFailedSignupBonusesQuery,
-    GqlGetFailedSignupBonusesQueryVariables
-  >(GetFailedSignupBonusesDocument, options);
-}
-export function useGetFailedSignupBonusesSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        GqlGetFailedSignupBonusesQuery,
-        GqlGetFailedSignupBonusesQueryVariables
-      >,
-) {
-  const options =
-    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    GqlGetFailedSignupBonusesQuery,
-    GqlGetFailedSignupBonusesQueryVariables
-  >(GetFailedSignupBonusesDocument, options);
-}
-export type GetFailedSignupBonusesQueryHookResult = ReturnType<
-  typeof useGetFailedSignupBonusesQuery
->;
-export type GetFailedSignupBonusesLazyQueryHookResult = ReturnType<
-  typeof useGetFailedSignupBonusesLazyQuery
->;
-export type GetFailedSignupBonusesSuspenseQueryHookResult = ReturnType<
-  typeof useGetFailedSignupBonusesSuspenseQuery
->;
-export type GetFailedSignupBonusesQueryResult = Apollo.QueryResult<
-  GqlGetFailedSignupBonusesQuery,
-  GqlGetFailedSignupBonusesQueryVariables
 >;
 export const UserSignUpDocument = gql`
   mutation userSignUp($input: UserSignUpInput!) {
