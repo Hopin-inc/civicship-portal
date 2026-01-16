@@ -35,7 +35,7 @@ const SearchResultList: React.FC<SearchResultListProps> = ({
       }
     });
     return userIds;
-  }, [searchQuery, searchMembershipData]);
+  }, [searchMembershipData]);
   // VC発行リクエストを一括取得
   const { data: vcIssuanceRequestsData } = useGetVcIssuanceRequestsByUserQuery({
     variables: {

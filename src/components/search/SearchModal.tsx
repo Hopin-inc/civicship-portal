@@ -59,7 +59,7 @@ export default function SearchModal({ isOpen, onClose, type }: SearchModalProps)
       Object.fromEntries(
         prefectureOptions.map((value) => [value, t(getPrefectureKey(value))])
       ),
-    [t, locale]
+    [t]
   );
 
   const prefectures = useMemo(
@@ -68,7 +68,7 @@ export default function SearchModal({ isOpen, onClose, type }: SearchModalProps)
         id: value,
         name: t(getPrefectureKey(value)),
       })),
-    [t, locale]
+    [t]
   );
 
   const handleSearch = () => {

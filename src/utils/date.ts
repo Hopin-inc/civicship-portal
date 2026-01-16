@@ -1,8 +1,7 @@
-import { format } from "date-fns";
+import { format, differenceInCalendarDays } from "date-fns";
 import { ja } from "date-fns/locale";
 import type { Locale } from "date-fns";
 import { logger } from "@/lib/logging";
-import { differenceInCalendarDays } from "date-fns";
 import dayjs from "dayjs";
 
 const YEAR_FMT = "YYYY年";

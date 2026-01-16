@@ -97,7 +97,7 @@ const useProfileEdit = () => {
         value,
         label: t(getPrefectureKey(value)),
       })),
-    [t, locale],
+    [t],
   );
 
   return {

@@ -7,7 +7,7 @@ export default function QuestsPage() {
   const router = useCommunityRouter();
   useEffect(() => {
     router.replace("/opportunities/search?type=quest");
-  }, []);
+  }, [router]);
 
   return <LoadingIndicator/>;
 }

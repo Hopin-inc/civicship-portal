@@ -1,6 +1,7 @@
 "use client";
 
 import { ChangeEvent, useRef } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Item, ItemActions, ItemContent, ItemTitle } from "@/components/ui/item";
 import { X } from "lucide-react";
@@ -29,12 +30,13 @@ export const ImageUploadSection = ({
           <div className="mt-3 space-y-2">
             <div className="grid grid-cols-3 gap-2">
               {images.map((img, index) => (
-                <div key={index} className="relative">
-                  <img
+                <div key={index} className="relative aspect-square w-full">
+                  <Image
                     src={img.url}
                     alt={`画像 ${index + 1}`}
-                    className="aspect-square w-full rounded-md object-cover bg-muted"
-                    loading="lazy"
+                    fill
+                    className="rounded-md object-cover bg-muted"
+                    sizes="(max-width: 768px) 33vw, 150px"
                   />
 
                   {/* 削除ボタン */}

@@ -72,7 +72,7 @@ export function PlaceFormEditor({ placeId, initialData, onSuccess }: PlaceFormEd
         editor.updateField("streetAddress", streetAddress);
       }
     }
-  }, [initialData, statesData, editor.formState.stateCode]);
+  }, [initialData, statesData, editor.formState.stateCode, editor]);
 
   const handleStateSelect = (code: string, name: string) => {
     editor.handleStateSelect(code, name);

@@ -60,10 +60,10 @@ export default function ConfirmPage() {
 
   const loading = oppLoading || walletLoading;
   const hasError = Boolean(oppError || walletError);
-  const triggerRefetch = () => {
+  const triggerRefetch = useMemo(() => () => {
     oppRefetch();
     walletRefetch();
-  };
+  }, [oppRefetch, walletRefetch]);
 
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {

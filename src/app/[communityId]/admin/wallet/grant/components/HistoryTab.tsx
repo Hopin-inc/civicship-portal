@@ -27,7 +27,7 @@ export function HistoryTab({ listType, searchQuery, onSelect }: HistoryTabProps)
   });
   useEffect(() => {
     refetch();
-  }, []);
+  }, [refetch]);
 
   if (error) {
     return (

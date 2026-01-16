@@ -1,8 +1,8 @@
 "use client";
 import DateGroupedOpportunities from "@/app/[communityId]/search/result/components/DateGroupedOpportunities";
 import EmptySearchResults from "@/app/[communityId]/search/result/components/EmptySearchResults";
-import useSearchResultHeader from "@/app/[communityId]/search/result/components/SearchResultHeader";
-import useSearchResults from "@/app/[communityId]/search/result/hooks/useSearchResults";
+import useSearchResultHeaderHook from "@/app/[communityId]/search/result/components/SearchResultHeader";
+import useSearchResultsHook from "@/app/[communityId]/search/result/hooks/useSearchResults";
 import { OpportunityCarouselListSection } from "@/components/domains/opportunities/components/ListSection/OpportunityCarouselListSection";
 import { formatOpportunities } from "@/components/domains/opportunities/utils";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
@@ -26,7 +26,7 @@ export default function SearchPage() {
       [searchParams],
     );
 
-    useSearchResultHeader(queryParams);
+    useSearchResultHeaderHook(queryParams);
 
     const { 
         recommendedOpportunities, 
@@ -34,7 +34,7 @@ export default function SearchPage() {
         loading, 
         loadMoreRef,
         isLoadingMore,
-      } = useSearchResults(queryParams);
+      } = useSearchResultsHook(queryParams);
 
     const isEmpty =
     recommendedOpportunities.length === 0 && Object.keys(groupedOpportunities).length === 0;

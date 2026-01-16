@@ -8,6 +8,6 @@ export default function ActivitiesPage() {
   const router = useCommunityRouter();
   useEffect(() => {
     router.replace("/opportunities/search?type=activity");
-  }, []);
+  }, [router]);
   return <LoadingIndicator/>;
 }

@@ -145,7 +145,7 @@ export const useHierarchicalNavigation = () => {
     }
 
     return "/";
-  }, [pathname, config.backTo, getPathPattern, searchParams, isSearchResultPath, getPageType]);
+  }, [pathname, config.backTo, getPathPattern, searchParams, isSearchResultPath, lastVisitedUrls]);
 
   const isChildOf = useCallback(
     (parentPath: string): boolean => {

@@ -9,7 +9,7 @@ export default function WalletsRedirectPage() {
 
   useEffect(() => {
     router.replace("/wallets/me");
-  }, []);
+  }, [router]);
 
   return <LoadingIndicator />;
 }
