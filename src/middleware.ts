@@ -47,6 +47,14 @@ export async function middleware(request: NextRequest) {
   // Extract communityId from URL path
   const communityId = extractCommunityIdFromPath(pathname);
   
+  // Debug logging for LIFF callback
+  console.log("[middleware] Request:", {
+    pathname,
+    communityId,
+    hasLiffState: !!request.nextUrl.searchParams.get("liff.state"),
+    url: request.url,
+  });
+  
   // If no communityId in path and accessing root, show loading page (for LIFF deep-link handling)
   if (!communityId && pathname === "/") {
     const res = NextResponse.next();

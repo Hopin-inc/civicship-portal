@@ -17,6 +17,7 @@ import { LiffDeepLinkHandler } from "@/components/liff/LiffDeepLinkHandler";
 import { SwipeBackNavigation } from "@/components/navigation/SwipeBackNavigation";
 import { BackgroundLayer } from "@/components/layout/BackgroundLayer";
 import { CommunityConfigProvider } from "@/contexts/CommunityConfigContext";
+import { headers } from "next/headers";
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -38,7 +39,17 @@ const RootLayout = async ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
-  const { user, lineAuthenticated, phoneAuthenticated } = await getUserServer();
+  // Extract communityId from x-community-id header (set by middleware)
+  const headersList = await headers();
+  const communityId = headersList.get("x-community-id") || undefined;
+  
+  // Debug logging for auth header
+  console.log("[RootLayout] Headers:", {
+    communityId,
+    allHeaders: Object.fromEntries(headersList.entries()),
+  });
+  
+  const { user, lineAuthenticated, phoneAuthenticated } = await getUserServer(communityId);
 
   const locale = await getLocale();
   const messages = await getMessages();
