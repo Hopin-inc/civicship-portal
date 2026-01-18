@@ -1,6 +1,7 @@
 "use client";
 
 import liff from "@line/liff";
+import { logger } from "@/lib/logging";
 
 export enum AuthEnvironment {
   LIFF = "liff",
@@ -13,13 +14,28 @@ export const detectEnvironment = (): AuthEnvironment => {
     return AuthEnvironment.REGULAR_BROWSER;
   }
 
-  if (liff.isInClient()) return AuthEnvironment.LIFF;
-
-  if (typeof navigator !== "undefined" && /Line/i.test(navigator.userAgent)) {
-    return AuthEnvironment.LINE_BROWSER;
+  const isInClient = liff.isInClient();
+  const userAgent = typeof navigator !== "undefined" ? navigator.userAgent : "";
+  const isLineUserAgent = /Line/i.test(userAgent);
+  
+  let result: AuthEnvironment;
+  if (isInClient) {
+    result = AuthEnvironment.LIFF;
+  } else if (isLineUserAgent) {
+    result = AuthEnvironment.LINE_BROWSER;
+  } else {
+    result = AuthEnvironment.REGULAR_BROWSER;
   }
+  
+  logger.info("[LIFF DEBUG] detectEnvironment() result", {
+    component: "environment-detector",
+    isInClient,
+    isLineUserAgent,
+    userAgent: userAgent.substring(0, 100),
+    result,
+  });
 
-  return AuthEnvironment.REGULAR_BROWSER;
+  return result;
 };
 
 export const isRunningInLiff = (): boolean => {

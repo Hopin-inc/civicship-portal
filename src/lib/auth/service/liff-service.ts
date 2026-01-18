@@ -49,6 +49,13 @@ export class LiffService {
   }
 
   public static getInstance(liffId?: string): LiffService {
+    logger.info("[LIFF DEBUG] getInstance called", {
+      component: "LiffService",
+      providedLiffId: liffId || "(empty)",
+      hasExistingInstance: !!LiffService.instance,
+      existingInstanceLiffId: LiffService.instance?.liffId || "(none)",
+    });
+    
     if (!LiffService.instance) {
       // Use empty string if liffId is not provided - initialization will fail gracefully
       // and the error will be captured in the state for proper handling
@@ -59,11 +66,21 @@ export class LiffService {
         logger.warn("LiffService initialized without LIFF ID - LIFF features will be disabled", {
           component: "LiffService",
         });
+      } else {
+        logger.info("[LIFF DEBUG] LiffService instance created with liffId", {
+          component: "LiffService",
+          liffId,
+        });
       }
     } else {
       // Fix race condition: if the singleton was created with an empty liffId
       // and a valid one is now provided, update the instance
       if (!LiffService.instance.liffId && liffId) {
+        logger.info("[LIFF DEBUG] Updating existing instance with new liffId", {
+          component: "LiffService",
+          oldLiffId: LiffService.instance.liffId || "(empty)",
+          newLiffId: liffId,
+        });
         LiffService.instance.liffId = liffId;
         // Clear the error state since we now have a valid liffId
         LiffService.instance.state.error = null;
@@ -76,26 +93,69 @@ export class LiffService {
   }
 
   public async initialize(): Promise<boolean> {
+    logger.info("[LIFF DEBUG] initialize() called", {
+      component: "LiffService",
+      liffId: this.liffId || "(empty)",
+      isAlreadyInitialized: this.state.isInitialized,
+      hasInitializationPromise: !!this.initializationPromise,
+    });
+    
     if (this.state.isInitialized) {
+      logger.info("[LIFF DEBUG] Already initialized, returning true", {
+        component: "LiffService",
+        isLoggedIn: this.state.isLoggedIn,
+      });
       return true;
     }
 
     if (this.initializationPromise) {
+      logger.info("[LIFF DEBUG] Initialization in progress, waiting for existing promise", {
+        component: "LiffService",
+      });
       return this.initializationPromise;
     }
 
     this.initializationPromise = (async () => {
       try {
+        logger.info("[LIFF DEBUG] Calling liff.init()", {
+          component: "LiffService",
+          liffId: this.liffId,
+          isInClient: typeof liff !== "undefined" ? liff.isInClient() : "liff not loaded",
+        });
+        
         await liff.init({ liffId: this.liffId });
         this.state.isInitialized = true;
         this.state.isLoggedIn = liff.isLoggedIn();
 
+        logger.info("[LIFF DEBUG] liff.init() completed successfully", {
+          component: "LiffService",
+          isLoggedIn: this.state.isLoggedIn,
+          isInClient: liff.isInClient(),
+          os: liff.getOS(),
+          language: liff.getLanguage(),
+        });
+
         if (this.state.isLoggedIn) {
           await this.updateProfile();
+          logger.info("[LIFF DEBUG] Profile updated after login", {
+            component: "LiffService",
+            userId: this.state.profile.userId,
+            displayName: this.state.profile.displayName,
+          });
+        } else {
+          logger.warn("[LIFF DEBUG] liff.isLoggedIn() returned false after init", {
+            component: "LiffService",
+            isInClient: liff.isInClient(),
+          });
         }
 
         return true;
       } catch (error) {
+        logger.error("[LIFF DEBUG] liff.init() failed with error", {
+          component: "LiffService",
+          error: error instanceof Error ? error.message : String(error),
+          liffId: this.liffId,
+        });
         this._handleLiffError(error, "initialize");
         return false;
       } finally {
@@ -207,16 +267,38 @@ export class LiffService {
   }
 
   public async signInWithLiffToken(): Promise<boolean> {
+    logger.info("[LIFF DEBUG] signInWithLiffToken() called", {
+      component: "LiffService",
+      isInitialized: this.state.isInitialized,
+      isLoggedIn: this.state.isLoggedIn,
+    });
+    
     const accessToken = this.getAccessToken();
     if (!accessToken) {
+      logger.warn("[LIFF DEBUG] signInWithLiffToken() - no access token available", {
+        component: "LiffService",
+        isInitialized: this.state.isInitialized,
+        isLoggedIn: this.state.isLoggedIn,
+      });
       return false;
     }
+
+    logger.info("[LIFF DEBUG] signInWithLiffToken() - access token obtained", {
+      component: "LiffService",
+      accessTokenLength: accessToken.length,
+    });
 
     // For LINE authentication, we always use the 'integrated' configuration
     // regardless of which community the user is currently in.
     const configId = "integrated";
     const endpoint = `${process.env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT}/line/liff-login`;
     const authStateManager = AuthStateManager.getInstance();
+
+    logger.info("[LIFF DEBUG] signInWithLiffToken() - calling backend", {
+      component: "LiffService",
+      endpoint,
+      configId,
+    });
 
     // 最大3回まで（token切れ or transient errorのみリトライ）
     for (let attempt = 1; attempt <= 3; attempt++) {
@@ -232,14 +314,32 @@ export class LiffService {
 
         if (!response.ok) {
           const errorText = await response.text();
+          logger.error("[LIFF DEBUG] signInWithLiffToken() - backend returned error", {
+            component: "LiffService",
+            status: response.status,
+            errorText,
+            attempt,
+          });
           if (response.status >= 500 || response.status === 401) {
             if (attempt < 3) continue;
           }
           throw new Error(`LIFF authentication failed: ${response.status} - ${errorText}`);
         }
 
+        logger.info("[LIFF DEBUG] signInWithLiffToken() - backend returned success", {
+          component: "LiffService",
+          attempt,
+        });
+
         const responseData = await response.json();
         const { customToken, profile } = responseData;
+        
+        logger.info("[LIFF DEBUG] signInWithLiffToken() - signing in with custom token", {
+          component: "LiffService",
+          hasCustomToken: !!customToken,
+          profileDisplayName: profile?.displayName,
+        });
+        
         const userCredential = await signInWithCustomToken(lineAuth, customToken);
 
         await Promise.race([
