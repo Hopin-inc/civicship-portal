@@ -45,17 +45,27 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   
   // Extract communityId from URL path
-  const communityId = extractCommunityIdFromPath(pathname);
+  let communityId = extractCommunityIdFromPath(pathname);
+  
+  // If no communityId in path but liff.state is present, extract communityId from liff.state
+  // This handles LINE OAuth callback where the URL is /?liff.state=%2Fneo88%2Fusers%2Fme
+  const liffState = request.nextUrl.searchParams.get("liff.state");
+  if (!communityId && liffState) {
+    // liff.state contains the original path (URL-encoded), e.g., "/neo88/users/me"
+    const decodedLiffState = decodeURIComponent(liffState);
+    communityId = extractCommunityIdFromPath(decodedLiffState);
+  }
   
   // Debug logging for LIFF callback
   console.log("[middleware] Request:", {
     pathname,
     communityId,
-    hasLiffState: !!request.nextUrl.searchParams.get("liff.state"),
+    liffState,
+    hasLiffState: !!liffState,
     url: request.url,
   });
   
-  // If no communityId in path and accessing root, show loading page (for LIFF deep-link handling)
+  // If no communityId in path and accessing root (without liff.state), show loading page
   if (!communityId && pathname === "/") {
     const res = NextResponse.next();
     return addSecurityHeaders(res, isDev);
