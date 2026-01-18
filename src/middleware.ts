@@ -92,10 +92,15 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  const res = NextResponse.next();
+  // Create new request headers with x-community-id for server components to read via headers()
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-community-id", communityId);
   
-  // Add x-community-id header for backend requests
-  res.headers.set("x-community-id", communityId);
+  const res = NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
   
   // Add security headers
   addSecurityHeaders(res, isDev);
