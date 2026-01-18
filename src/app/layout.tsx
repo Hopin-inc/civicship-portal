@@ -18,6 +18,7 @@ import { SwipeBackNavigation } from "@/components/navigation/SwipeBackNavigation
 import { BackgroundLayer } from "@/components/layout/BackgroundLayer";
 import { CommunityConfigProvider } from "@/contexts/CommunityConfigContext";
 import { headers } from "next/headers";
+import { getCommunityConfig } from "@/lib/communities/config";
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -40,6 +41,7 @@ const RootLayout = async ({
   children: React.ReactNode;
 }>) => {
   // Extract communityId from x-community-id header (set by middleware)
+  // This includes communityId extracted from liff.state for LINE OAuth callbacks
   const headersList = await headers();
   const communityId = headersList.get("x-community-id") || undefined;
   
@@ -48,6 +50,23 @@ const RootLayout = async ({
     communityId,
     allHeaders: Object.fromEntries(headersList.entries()),
   });
+  
+  // Fetch community config if communityId is available
+  // This is important for LINE OAuth callbacks where the URL is /?liff.state=/neo88/users/me
+  // The middleware extracts communityId from liff.state and sets it in the header
+  let communityConfig = null;
+  let isFromDatabase = false;
+  if (communityId) {
+    try {
+      communityConfig = await getCommunityConfig(communityId);
+      if (communityConfig) {
+        isFromDatabase = true;
+        console.log("[RootLayout] Fetched community config for:", communityId);
+      }
+    } catch (error) {
+      console.error("[RootLayout] Failed to fetch community config:", error);
+    }
+  }
   
   const { user, lineAuthenticated, phoneAuthenticated } = await getUserServer(communityId);
 
@@ -60,7 +79,7 @@ const RootLayout = async ({
         <ClientPolyfills />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <CookiesProvider>
-            <CommunityConfigProvider config={null} isFromDatabase={false}>
+            <CommunityConfigProvider config={communityConfig} isFromDatabase={isFromDatabase}>
               <ApolloProvider>
                 <AuthProvider
                   ssrCurrentUser={user}
