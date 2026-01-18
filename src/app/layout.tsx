@@ -43,6 +43,12 @@ const RootLayout = async ({
   const headersList = await headers();
   const communityId = headersList.get("x-community-id") || undefined;
   
+  // Debug logging for auth header
+  console.log("[RootLayout] Headers:", {
+    communityId,
+    allHeaders: Object.fromEntries(headersList.entries()),
+  });
+  
   const { user, lineAuthenticated, phoneAuthenticated } = await getUserServer(communityId);
 
   const locale = await getLocale();
