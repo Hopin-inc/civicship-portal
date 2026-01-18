@@ -62,7 +62,19 @@ export class LiffService {
         });
       }
     } else {
-      console.log("[LiffService.getInstance] Returning existing instance, current liffId:", LiffService.instance.liffId, "requested liffId:", liffId);
+      // Fix race condition: if the singleton was created with an empty liffId
+      // and a valid one is now provided, update the instance
+      if (!LiffService.instance.liffId && liffId) {
+        console.log("[LiffService.getInstance] Updating empty liffId with:", liffId);
+        LiffService.instance.liffId = liffId;
+        // Clear the error state since we now have a valid liffId
+        LiffService.instance.state.error = null;
+        // Reset initialization state so it can be re-initialized with the new liffId
+        LiffService.instance.state.isInitialized = false;
+        LiffService.instance.initializationPromise = null;
+      } else {
+        console.log("[LiffService.getInstance] Returning existing instance, current liffId:", LiffService.instance.liffId, "requested liffId:", liffId);
+      }
     }
     return LiffService.instance;
   }
