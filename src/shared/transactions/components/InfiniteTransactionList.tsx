@@ -32,7 +32,7 @@ export const InfiniteTransactionList = ({
   const fetchMore = useCallback(
     async (cursor: string, first: number) => {
       if (walletId) {
-        return getServerWalletTransactionsWithCursor(walletId, cursor, first);
+        return getServerWalletTransactionsWithCursor(walletId, communityId, cursor, first);
       }
       return getServerCommunityTransactionsWithCursor(communityId, cursor, first);
     },

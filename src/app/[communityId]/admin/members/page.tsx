@@ -10,14 +10,17 @@ export default async function MembersPage({ params }: PageProps) {
   const { communityId } = await params;
 
   try {
-    const result = await getMembershipListServer({
-      filter: {
-        communityId,
+    const result = await getMembershipListServer(
+      {
+        filter: {
+          communityId,
+        },
+        first: 20,
+        withWallets: true,
+        withDidIssuanceRequests: true,
       },
-      first: 20,
-      withWallets: true,
-      withDidIssuanceRequests: true,
-    });
+      communityId
+    );
     connection = result.connection;
   } catch (error) {
     console.error("SSR fetch for MembersPage failed:", error);

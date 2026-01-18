@@ -3,8 +3,13 @@ import { TransactionList } from "@/app/[communityId]/wallets/features/transactio
 import { getServerMyWalletWithTransactions } from "@/app/[communityId]/wallets/features/shared/server/getServerMyWalletWithTransactions";
 import { redirect } from "next/navigation";
 
-export default async function WalletMePage() {
-  const { wallet, transactions } = await getServerMyWalletWithTransactions({ first: 20 });
+export default async function WalletMePage({
+  params,
+}: {
+  params: Promise<{ communityId: string }>;
+}) {
+  const { communityId } = await params;
+  const { wallet, transactions } = await getServerMyWalletWithTransactions({ first: 20, communityId });
 
   if (!wallet) {
     redirect("/login");

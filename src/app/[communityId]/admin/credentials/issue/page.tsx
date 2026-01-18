@@ -10,12 +10,15 @@ export default async function SelectOpportunity({ params }: PageProps) {
   const { communityId } = await params;
 
   try {
-    const result = await getMembershipListServer({
-      filter: { communityId },
-      first: 20,
-      withWallets: true,
-      withDidIssuanceRequests: true,
-    });
+    const result = await getMembershipListServer(
+      {
+        filter: { communityId },
+        first: 20,
+        withWallets: true,
+        withDidIssuanceRequests: true,
+      },
+      communityId
+    );
     connection = result.connection;
   } catch (error) {
     console.error("SSR fetch for credentials page failed:", error);

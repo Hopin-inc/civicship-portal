@@ -46,7 +46,9 @@ export async function getServerCommunityTransactions(
     const data = await executeServerGraphQLQuery<
       GqlGetTransactionsQuery,
       GqlGetTransactionsQueryVariables
-    >(GET_TRANSACTIONS_SERVER_QUERY, variables);
+    >(GET_TRANSACTIONS_SERVER_QUERY, variables, {
+      "X-Community-Id": communityId,
+    });
 
     return (data.transactions as any) ?? fallbackConnection;
   } catch (error) {

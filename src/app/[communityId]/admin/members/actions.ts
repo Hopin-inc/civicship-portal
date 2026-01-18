@@ -18,12 +18,15 @@ export async function queryMemberships({
   withWallets?: boolean;
   withDidIssuanceRequests?: boolean;
 }) {
-  return await getMembershipListServer({
-    cursor,
-    filter,
-    sort,
-    first,
-    withWallets,
-    withDidIssuanceRequests,
-  });
+  return await getMembershipListServer(
+    {
+      cursor,
+      filter,
+      sort,
+      first,
+      withWallets,
+      withDidIssuanceRequests,
+    },
+    filter?.communityId ?? cursor?.communityId
+  );
 }

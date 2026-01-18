@@ -4,10 +4,17 @@ import { getServerMyWalletWithTransactions } from "@/app/[communityId]/wallets/f
 import { toPointNumber } from "@/utils/bigint";
 import { logger } from "@/lib/logging";
 
-export default async function WalletMeLayout({ children }: { children: React.ReactNode }) {
+export default async function WalletMeLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode;
+  params: Promise<{ communityId: string }>;
+}) {
+  const { communityId } = await params;
   let result;
   try {
-    result = await getServerMyWalletWithTransactions({ first: 20 });
+    result = await getServerMyWalletWithTransactions({ first: 20, communityId });
   } catch (error) {
     logger.error("Failed to fetch wallet data with transactions (SSR):", {
       error: error instanceof Error ? error.message : String(error),

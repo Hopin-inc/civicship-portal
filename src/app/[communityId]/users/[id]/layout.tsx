@@ -22,7 +22,7 @@ const DEFAULT_OPEN_GRAPH_IMAGE = [
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { communityId, id } = await params;
   const communityConfig = await getCommunityConfig(communityId);
-  const user = await fetchUserServer(id);
+  const user = await fetchUserServer(id, communityId);
 
   const fallbackMetadata: Metadata = {
     title: communityConfig?.title ?? "Civicship",
@@ -62,8 +62,8 @@ export default async function Layout({
   children: React.ReactNode;
   params: Promise<{ communityId: string; id: string }>;
 }) {
-  const { id } = await params;
-  const gqlUser = await fetchUserServer(id);
+  const { communityId, id } = await params;
+  const gqlUser = await fetchUserServer(id, communityId);
 
   if (!gqlUser) {
     notFound();
