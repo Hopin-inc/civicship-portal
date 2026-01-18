@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { usePathname, useSearchParams, useParams } from "next/navigation";
 import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import { useAuth } from "@/contexts/AuthProvider";
@@ -28,6 +28,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   const authRedirectService = React.useMemo(() => AuthRedirectService.getInstance(), []);
   const [isReadyToRender, setIsReadyToRender] = useState(false);
   const redirectedRef = React.useRef<string | null>(null);
+  const lastCheckedPathnameRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (authState.isAuthenticating || authState.isAuthInProgress) {
@@ -73,16 +74,20 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       if (redirectedRef.current !== redirectPath) {
         redirectedRef.current = redirectPath;
         setIsReadyToRender(false);
+        lastCheckedPathnameRef.current = pathname;
         router.replace(redirectPath);
       }
     } else {
       redirectedRef.current = null;
       setIsReadyToRender(true);
+      lastCheckedPathnameRef.current = pathname;
     }
   }, [pathname, authState, currentUser, loading, router, authRedirectService, nextParam, searchParams, communityId]);
 
   // --- 未確定中は描画しない（チラつき防止） ---
-  if (!isReadyToRender) {
+  // Also show loading if pathname changed (client-side navigation) and we haven't re-checked auth yet
+  const pathnameChanged = lastCheckedPathnameRef.current !== null && lastCheckedPathnameRef.current !== pathname;
+  if (!isReadyToRender || pathnameChanged) {
     return <LoadingIndicator />; // or return null;
   }
 
