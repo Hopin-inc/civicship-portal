@@ -2258,29 +2258,6 @@ export const GqlRole = {
 } as const;
 
 export type GqlRole = (typeof GqlRole)[keyof typeof GqlRole];
-export type GqlSignupBonus = {
-  __typename?: "SignupBonus";
-  attemptCount: Scalars["Int"]["output"];
-  community: GqlCommunity;
-  createdAt: Scalars["Datetime"]["output"];
-  failureCode?: Maybe<GqlIncentiveGrantFailureCode>;
-  /** Grant ID */
-  id: Scalars["ID"]["output"];
-  lastAttemptedAt: Scalars["Datetime"]["output"];
-  lastError?: Maybe<Scalars["String"]["output"]>;
-  status: GqlIncentiveGrantStatus;
-  transaction?: Maybe<GqlTransaction>;
-  user?: Maybe<GqlUser>;
-};
-
-export const GqlSignupBonusSortField = {
-  AttemptCount: "ATTEMPT_COUNT",
-  CreatedAt: "CREATED_AT",
-  LastAttemptedAt: "LAST_ATTEMPTED_AT",
-} as const;
-
-export type GqlSignupBonusSortField =
-  (typeof GqlSignupBonusSortField)[keyof typeof GqlSignupBonusSortField];
 export const GqlSortDirection = {
   Asc: "asc",
   Desc: "desc",
