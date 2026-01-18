@@ -195,28 +195,13 @@ export class LiffService {
     return liff.getAccessToken();
   }
 
-  // Extract communityId from URL path (first segment after /)
-  private extractCommunityIdFromPath(pathname: string): string | null {
-    const segments = pathname.split("/").filter(Boolean);
-    if (segments.length === 0) {
-      return null;
-    }
-    const firstSegment = segments[0];
-    // Skip if it's a known non-community path
-    if (["api", "_next", "favicon.ico"].includes(firstSegment)) {
-      return null;
-    }
-    return firstSegment;
-  }
-
   public async signInWithLiffToken(): Promise<boolean> {
     const accessToken = this.getAccessToken();
     if (!accessToken) return false;
 
-    // Extract communityId from URL path for multi-tenant routing
-    const communityId = typeof window !== "undefined" 
-      ? this.extractCommunityIdFromPath(window.location.pathname) 
-      : null;
+    // For LINE authentication, we always use the 'integrated' configuration
+    // regardless of which community the user is currently in.
+    const configId = "integrated";
     const endpoint = `${process.env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT}/line/liff-login`;
     const authStateManager = AuthStateManager.getInstance();
 
@@ -227,7 +212,7 @@ export class LiffService {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-Community-Id": communityId ?? "",
+            "X-Community-Id": configId,
           },
           body: JSON.stringify({ accessToken }),
         });
