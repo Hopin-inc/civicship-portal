@@ -104,7 +104,7 @@ async function initAuthFast({
     if (typeof window !== "undefined") {
       (async () => {
         try {
-          const firebaseUser = await initializeFirebase(liffService, environment);
+          const { user: firebaseUser } = await initializeFirebase(liffService, environment);
           if (firebaseUser) {
             useAuthStore.getState().setState({ firebaseUser });
             logger.debug("[AUTH] initAuthFast: Firebase user hydrated for CSR", {
@@ -154,7 +154,16 @@ async function initAuthFull({
   try {
     prepareInitialState(setState);
 
-    const firebaseUser = await initializeFirebase(liffService, environment);
+    const { user: firebaseUser, signInFailed } = await initializeFirebase(liffService, environment);
+    
+    // If LIFF sign-in explicitly failed, finalize as unauthenticated immediately
+    // This prevents infinite loading when LIFF is logged in but Firebase sign-in fails
+    if (signInFailed) {
+      logger.warn("[AUTH] initAuthFull: LIFF sign-in failed, finalizing as unauthenticated");
+      finalizeAuthState("unauthenticated", undefined, setState, authStateManager);
+      return;
+    }
+    
     if (!firebaseUser) {
       const shouldContinue = handleUnauthenticatedBranch(
         liffService,
