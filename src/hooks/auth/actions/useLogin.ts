@@ -22,16 +22,7 @@ export const useLogin = (liffService: LiffService, authStateManager: AuthStateMa
 
         const loggedIn = await liffService.login(redirectPath as any);
         if (loggedIn) {
-          const signedIn = await liffService.signInWithLiffToken();
-          if (!signedIn) {
-            logger.warn("LIFF signInWithLiffToken returned false", {
-              component: "useLogin",
-            });
-            if (authStateManager) {
-              authStateManager.updateState("unauthenticated", "signInWithLiffToken failed");
-            }
-            return;
-          }
+          await liffService.signInWithLiffToken();
         }
       } catch (error) {
         logger.warn("LIFF login failed", {
