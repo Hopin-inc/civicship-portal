@@ -9,16 +9,6 @@ export const useLogin = (liffService: LiffService, authStateManager: AuthStateMa
 
   return useCallback(
     async (redirectPath?: string): Promise<void> => {
-      // Debug logging when login button is clicked
-      const liffState = liffService.getState();
-      console.log("[useLogin] Login button clicked - LIFF state:", {
-        isInitialized: liffState.isInitialized,
-        isLoggedIn: liffState.isLoggedIn,
-        hasError: !!liffState.error,
-        errorMessage: liffState.error?.message,
-        liffServiceInstance: liffService,
-      });
-      
       if (authStateManager) {
         authStateManager.updateState("authenticating", "useLogin");
       }
@@ -27,15 +17,11 @@ export const useLogin = (liffService: LiffService, authStateManager: AuthStateMa
 
       try {
         if (!liffService.getState().isInitialized) {
-          console.log("[useLogin] Initializing LIFF...");
           await liffService.initialize();
-          console.log("[useLogin] LIFF initialized, state:", liffService.getState());
         }
 
         const loggedIn = await liffService.login(redirectPath as any);
-        console.log("[useLogin] LIFF login result:", { loggedIn });
         if (loggedIn) {
-          console.log("[useLogin] Calling signInWithLiffToken...");
           await liffService.signInWithLiffToken();
         }
       } catch (error) {

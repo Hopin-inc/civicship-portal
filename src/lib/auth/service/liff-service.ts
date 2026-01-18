@@ -52,7 +52,6 @@ export class LiffService {
     if (!LiffService.instance) {
       // Use empty string if liffId is not provided - initialization will fail gracefully
       // and the error will be captured in the state for proper handling
-      console.log("[LiffService.getInstance] Creating new instance with liffId:", liffId);
       LiffService.instance = new LiffService(liffId || "");
       if (!liffId) {
         // Set error state immediately if LIFF ID is missing
@@ -65,15 +64,12 @@ export class LiffService {
       // Fix race condition: if the singleton was created with an empty liffId
       // and a valid one is now provided, update the instance
       if (!LiffService.instance.liffId && liffId) {
-        console.log("[LiffService.getInstance] Updating empty liffId with:", liffId);
         LiffService.instance.liffId = liffId;
         // Clear the error state since we now have a valid liffId
         LiffService.instance.state.error = null;
         // Reset initialization state so it can be re-initialized with the new liffId
         LiffService.instance.state.isInitialized = false;
         LiffService.instance.initializationPromise = null;
-      } else {
-        console.log("[LiffService.getInstance] Returning existing instance, current liffId:", LiffService.instance.liffId, "requested liffId:", liffId);
       }
     }
     return LiffService.instance;
@@ -213,7 +209,6 @@ export class LiffService {
   public async signInWithLiffToken(): Promise<boolean> {
     const accessToken = this.getAccessToken();
     if (!accessToken) {
-      console.log("[signInWithLiffToken] No access token available");
       return false;
     }
 
@@ -223,17 +218,9 @@ export class LiffService {
     const endpoint = `${process.env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT}/line/liff-login`;
     const authStateManager = AuthStateManager.getInstance();
 
-    console.log("[signInWithLiffToken] Starting authentication:", {
-      endpoint,
-      configId,
-      liffIdUsedForInit: this.liffId,
-      hasAccessToken: !!accessToken,
-    });
-
     // 最大3回まで（token切れ or transient errorのみリトライ）
     for (let attempt = 1; attempt <= 3; attempt++) {
       try {
-        console.log("[signInWithLiffToken] Attempt", attempt, "- calling endpoint...");
         const response = await fetch(endpoint, {
           method: "POST",
           headers: {
@@ -245,10 +232,6 @@ export class LiffService {
 
         if (!response.ok) {
           const errorText = await response.text();
-          console.log("[signInWithLiffToken] Error response:", {
-            status: response.status,
-            errorText,
-          });
           if (response.status >= 500 || response.status === 401) {
             if (attempt < 3) continue;
           }
@@ -256,10 +239,6 @@ export class LiffService {
         }
 
         const responseData = await response.json();
-        console.log("[signInWithLiffToken] Success response:", {
-          hasCustomToken: !!responseData.customToken,
-          profile: responseData.profile,
-        });
         const { customToken, profile } = responseData;
         const userCredential = await signInWithCustomToken(lineAuth, customToken);
 
