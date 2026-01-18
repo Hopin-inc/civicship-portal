@@ -10,6 +10,17 @@ export function useAuthDependencies() {
   // liffAppId is the full LIFF app ID (e.g., '1234567890-xxxxxxxx') used for liff.init()
   // liffId is the channel ID used for token verification
   const liffAppId = communityConfig?.liffAppId || process.env.NEXT_PUBLIC_LIFF_ID || "";
+  
+  // Debug logging for LIFF ID configuration
+  console.log("[useAuthDependencies] LIFF ID config:", {
+    communityId: communityConfig?.communityId,
+    liffAppIdFromConfig: communityConfig?.liffAppId,
+    liffIdFromConfig: communityConfig?.liffId,
+    envLiffId: process.env.NEXT_PUBLIC_LIFF_ID,
+    resolvedLiffAppId: liffAppId,
+    source: communityConfig?.liffAppId ? "communityConfig" : process.env.NEXT_PUBLIC_LIFF_ID ? "env" : "empty",
+  });
+  
   const liffService = useMemo(() => LiffService.getInstance(liffAppId), [liffAppId]);
   const phoneAuthService = useMemo(() => PhoneAuthService.getInstance(), []);
   const authStateManager = useMemo(() => {
