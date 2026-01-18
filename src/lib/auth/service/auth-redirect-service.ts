@@ -98,19 +98,19 @@ export class AuthRedirectService {
 
     switch (authState) {
       case "unauthenticated":
-        if (basePath !== "/login") {
+        if (!matchPaths(basePath, "/login")) {
           return `/login${nextParam}` as RawURIComponent; // 未ログイン → ログインへ
         }
         return null;
 
       case "line_authenticated": {
         const target = `/sign-up/phone-verification${nextParam}`;
-        if (pathname === target || basePath === "/sign-up/phone-verification") return null; // すでに居る場合はリダイレクト不要
+        if (matchPaths(basePath, "/sign-up/phone-verification")) return null; // すでに居る場合はリダイレクト不要
         return target as RawURIComponent; // LINE認証済み → 電話認証へ
       }
 
       case "phone_authenticated":
-        if (basePath !== "/sign-up") {
+        if (!matchPaths(basePath, "/sign-up")) {
           return `/sign-up${nextParam}` as RawURIComponent; // 電話認証済み → サインアップへ
         }
         return null;
