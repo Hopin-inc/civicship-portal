@@ -55,7 +55,13 @@ export const useLineAuthProcessing = ({
             authType: "liff",
             component: "useLineAuthProcessing",
           });
-          return; // 🟠 stop: cannot init LIFF
+          // Update auth state to unauthenticated to prevent infinite loading
+          setState({
+            authenticationState: "unauthenticated",
+            isAuthenticating: false,
+          });
+          authStateManager.updateState("unauthenticated", "useLineAuthProcessing (LIFF init failed)");
+          return;
         }
 
         const { isLoggedIn } = liffService.getState();
@@ -73,7 +79,13 @@ export const useLineAuthProcessing = ({
               authType: "liff",
               component: "useLineAuthProcessing",
             });
-            return; // 🟠 stop: login token exchange failed
+            // Update auth state to unauthenticated to prevent infinite loading
+            setState({
+              authenticationState: "unauthenticated",
+              isAuthenticating: false,
+            });
+            authStateManager.updateState("unauthenticated", "useLineAuthProcessing (signInWithLiffToken failed)");
+            return;
           }
         }
 
