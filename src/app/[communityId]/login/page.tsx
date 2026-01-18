@@ -6,7 +6,6 @@ import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import { decodeURIComponentWithType, EncodedURIComponent } from "@/utils/path";
 import { getLiffLoginErrorMessage } from "@/app/[communityId]/login/utils/getLiffLoginErrorMessage";
 import { toast } from "react-toastify";
-import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { LoginView } from "@/app/[communityId]/login/components/LoginView";
 import { PhoneInputForm } from "@/app/[communityId]/login/components/PhoneInputForm";
 import { RegistrationForm, RegistrationData } from "@/app/[communityId]/login/components/RegistrationForm";
@@ -28,7 +27,7 @@ export default function LoginPage() {
   const { liffService, authStateManager } = useAuthDependencies();
   const loginWithLiff = useLogin(liffService, authStateManager);
 
-  const { authenticationState, isAuthenticating } = useAuthStore((s) => s.state);
+  const { isAuthenticating } = useAuthStore((s) => s.state);
 
   const [step, setStep] = useState<LoginStep>("login");
   const [isLoading, setIsLoading] = useState(false);
@@ -157,10 +156,6 @@ export default function LoginPage() {
       setStep("login");
     }
   };
-
-  if (isAuthenticating || authenticationState !== "unauthenticated") {
-    return <LoadingIndicator />;
-  }
 
   switch (step) {
     case "phone-input":
