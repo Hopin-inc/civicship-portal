@@ -1,7 +1,6 @@
 "use client";
 
 import liff from "@line/liff";
-import { logger } from "@/lib/logging";
 
 export enum AuthEnvironment {
   LIFF = "liff",
@@ -27,14 +26,6 @@ export const detectEnvironment = (): AuthEnvironment => {
     result = AuthEnvironment.REGULAR_BROWSER;
   }
   
-  logger.info("[LIFF DEBUG] detectEnvironment() result", {
-    component: "environment-detector",
-    isInClient,
-    isLineUserAgent,
-    userAgent: userAgent.substring(0, 100),
-    result,
-  });
-
   return result;
 };
 

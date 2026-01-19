@@ -1,5 +1,4 @@
 import { useAuthStore } from "@/lib/auth/core/auth-store";
-import { logger } from "@/lib/logging";
 import { TokenManager } from "@/lib/auth/core/token-manager";
 import { GqlUser } from "@/types/graphql";
 import { AuthEnvironment, detectEnvironment } from "@/lib/auth/core/environment-detector";
@@ -14,6 +13,7 @@ import {
   restoreUserSession,
 } from "@/lib/auth/init/helper";
 import { initializeFirebase } from "@/lib/auth/init/firebase";
+import { logger } from "@/lib/logging";
 
 interface InitAuthParams {
   liffService: LiffService;
@@ -38,15 +38,6 @@ export async function initAuth(params: InitAuthParams) {
   TokenManager.clearDeprecatedCookies();
 
   const environment = detectEnvironment();
-
-  logger.debug("[AUTH] initAuth", {
-    environment,
-    ssrCurrentUser: !!ssrCurrentUser,
-    ssrCurrentUserId: ssrCurrentUser?.id,
-    ssrLineAuthenticated,
-    ssrPhoneAuthenticated,
-    willUseInitAuthFast: !!(ssrCurrentUser && ssrLineAuthenticated),
-  });
 
   if (ssrCurrentUser && ssrLineAuthenticated) {
     return await initAuthFast({
@@ -107,12 +98,9 @@ async function initAuthFast({
           const { user: firebaseUser } = await initializeFirebase(liffService, environment);
           if (firebaseUser) {
             useAuthStore.getState().setState({ firebaseUser });
-            logger.debug("[AUTH] initAuthFast: Firebase user hydrated for CSR", {
-              uid: firebaseUser.uid,
-            });
           }
         } catch (error) {
-          logger.warn("[AUTH] initAuthFast: Failed to hydrate Firebase user", { error });
+          logger.warn("initAuthFast: Failed to hydrate Firebase user", { error });
         }
       })();
     }
@@ -159,7 +147,6 @@ async function initAuthFull({
     // If LIFF sign-in explicitly failed, finalize as unauthenticated immediately
     // This prevents infinite loading when LIFF is logged in but Firebase sign-in fails
     if (signInFailed) {
-      logger.warn("[AUTH] initAuthFull: LIFF sign-in failed, finalizing as unauthenticated");
       finalizeAuthState("unauthenticated", undefined, setState, authStateManager);
       return;
     }
@@ -193,7 +180,6 @@ async function initAuthFull({
       : null;
     
     if (!communityId) {
-      logger.warn("[AUTH] initAuthFull: No communityId found in URL path");
       finalizeAuthState("line_authenticated", user, setState, authStateManager);
       return;
     }

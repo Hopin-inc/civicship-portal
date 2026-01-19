@@ -10,7 +10,6 @@ import { useAuthActions } from "@/hooks/auth/actions";
 import { useAuthSideEffects } from "@/hooks/auth/sideEffects";
 import { useAuthValue } from "@/hooks/auth/init/useAuthValue";
 import { useLanguageSync } from "@/hooks/useLanguageSync";
-import { logger } from "@/lib/logging";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -30,15 +29,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     if (!authStateManager) return;
     if (hasInitialized.current) return;
     hasInitialized.current = true;
-
-    logger.debug("[AUTH] AuthProvider initialization", {
-      hasFullAuth,
-      ssrCurrentUser: !!ssrCurrentUser,
-      ssrCurrentUserId: ssrCurrentUser?.id,
-      ssrLineAuthenticated,
-      ssrPhoneAuthenticated,
-      environment: typeof window !== "undefined" ? liffService.getState() : "SSR",
-    });
 
     // ✅ SSR初期状態適用
     applySsrAuthState(ssrCurrentUser, ssrLineAuthenticated, ssrPhoneAuthenticated);
