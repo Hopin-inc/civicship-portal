@@ -50,6 +50,8 @@ export class AuthRedirectService {
       authState,
       next,
       nextParam,
+      currentUser,
+      communityId,
     );
     if (redirectFromLogin) {
       logger.debug("[AUTH] AuthRedirectService: redirect from handleAuthEntryFlow", {
@@ -93,6 +95,8 @@ export class AuthRedirectService {
     authState: AuthenticationState,
     next?: string | null,
     nextParam?: string,
+    currentUser?: GqlUser | null,
+    communityId?: string,
   ): RawURIComponent | null {
     if (!this.isAuthEntryPath(basePath)) return null;
 
@@ -115,12 +119,29 @@ export class AuthRedirectService {
         }
         return null;
 
-      case "user_registered":
+      case "user_registered": {
+        // 登録済みユーザーが現在のコミュニティにメンバーシップを持っていない場合、
+        // 電話認証ページに留まることを許可する（checkPhoneUserでメンバーシップが作成される）
+        if (matchPaths(basePath, "/sign-up/phone-verification")) {
+          const hasMembershipInCurrentCommunity = currentUser?.memberships?.some(
+            (m) => m.community?.id === communityId
+          );
+          if (!hasMembershipInCurrentCommunity) {
+            logger.debug("[AUTH] handleAuthEntryFlow: user_registered without membership, staying on phone-verification", {
+              userId: currentUser?.id,
+              communityId,
+              membershipIds: currentUser?.memberships?.map(m => m.community?.id) ?? [],
+              component: "AuthRedirectService",
+            });
+            return null; // 電話認証ページに留まる
+          }
+        }
         // 登録済みユーザーが sign-up 系や login に来たらトップ or nextへ
         if (next?.startsWith("/") && !next.startsWith("/login") && !next.startsWith("/sign-up")) {
           return next as RawURIComponent;
         }
         return "/" as RawURIComponent;
+      }
 
       default:
         return null;
