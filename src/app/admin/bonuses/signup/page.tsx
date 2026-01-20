@@ -6,7 +6,7 @@ import { Item } from "@/components/ui/item";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { useQuery } from "@apollo/client";
-import { GqlCommunitySignupBonusConfig, GqlSignupBonus } from "@/types/graphql";
+import { GqlCommunitySignupBonusConfig, GqlIncentiveGrant } from "@/types/graphql";
 import { cn } from "@/lib/utils";
 import {
   GET_FAILED_SIGNUP_BONUSES,
@@ -28,7 +28,11 @@ interface GetSignupBonusConfigData {
 }
 
 interface GetFailedSignupBonusesData {
-  signupBonuses: GqlSignupBonus[];
+  incentiveGrants: {
+    edges: Array<{
+      node: GqlIncentiveGrant;
+    }>;
+  };
 }
 
 export default function SignupBonusDetailPage() {
@@ -52,9 +56,9 @@ export default function SignupBonusDetailPage() {
 
   const config = data?.community?.config?.signupBonusConfig;
   // user が null のアイテムをフィルタリング
-  const failedBonuses = (failedData?.signupBonuses ?? []).filter(
-    (bonus) => bonus.user !== null && bonus.user !== undefined
-  );
+  const failedBonuses = (failedData?.incentiveGrants?.edges ?? [])
+    .map((edge) => edge.node)
+    .filter((bonus) => bonus.user !== null && bonus.user !== undefined);
 
   const headerConfig = useMemo(
     () => ({

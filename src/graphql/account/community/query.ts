@@ -39,22 +39,25 @@ export const GET_SIGNUP_BONUS_CONFIG = gql`
 `;
 
 export const GET_FAILED_SIGNUP_BONUSES = gql`
-  query GetFailedSignupBonuses($communityId: ID!) {
-    signupBonuses(
-      permission: { communityId: $communityId }
-      filter: { status: FAILED }
-      sort: { field: LAST_ATTEMPTED_AT, order: desc }
+  query GetFailedIncentiveGrants($communityId: ID!) {
+    incentiveGrants(
+      filter: { communityId: $communityId, type: SIGNUP, status: FAILED }
+      sort: { updatedAt: DESC }
     ) {
-      id
-      user {
-        id
-        name
-        image
+      edges {
+        node {
+          id
+          user {
+            id
+            name
+            image
+          }
+          failureCode
+          lastError
+          attemptCount
+          lastAttemptedAt
+        }
       }
-      failureCode
-      lastError
-      attemptCount
-      lastAttemptedAt
     }
   }
 `;

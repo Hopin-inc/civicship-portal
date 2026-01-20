@@ -5,14 +5,14 @@ import { useTranslations } from "next-intl";
 import { Item, ItemActions, ItemContent, ItemFooter, ItemTitle } from "@/components/ui/item";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { GqlSignupBonus } from "@/types/graphql";
+import { GqlIncentiveGrant } from "@/types/graphql";
 import { useMutation } from "@apollo/client";
 import { toast } from "react-toastify";
 import { SIGNUP_BONUS_RETRY } from "@/graphql/account/community/mutation";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 interface FailedBonusItemProps {
-  bonus: GqlSignupBonus;
+  bonus: GqlIncentiveGrant;
   onRetrySuccess: () => void;
 }
 
@@ -26,16 +26,14 @@ export default function FailedBonusItem({ bonus, onRetrySuccess }: FailedBonusIt
     setRetrying(true);
     try {
       const { data } = await retryGrant({
-        variables: { grantId: bonus.id, communityId: COMMUNITY_ID },
+        variables: { incentiveGrantId: bonus.id, communityId: COMMUNITY_ID },
       });
 
-      if (data?.signupBonusRetry?.success) {
+      if (data?.incentiveGrantRetry) {
         toast.success(t("adminWallet.settings.pending.retrySuccess"));
         onRetrySuccess();
       } else {
-        toast.error(
-          data?.signupBonusRetry?.error || t("adminWallet.settings.pending.retryError"),
-        );
+        toast.error(t("adminWallet.settings.pending.retryError"));
       }
     } catch (e) {
       toast.error(t("adminWallet.settings.pending.retryError"));

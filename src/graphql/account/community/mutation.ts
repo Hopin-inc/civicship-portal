@@ -11,14 +11,18 @@ export const UPDATE_SIGNUP_BONUS_CONFIG = gql`
 `;
 
 export const SIGNUP_BONUS_RETRY = gql`
-  mutation RetrySignupBonusGrant($grantId: ID!, $communityId: ID!) {
-    signupBonusRetry(grantId: $grantId, permission: { communityId: $communityId }) {
-      ... on SignupBonusRetryPayload {
-        success
+  mutation IncentiveGrantRetry($incentiveGrantId: ID!, $communityId: ID!) {
+    incentiveGrantRetry(
+      input: { incentiveGrantId: $incentiveGrantId }
+      permission: { communityId: $communityId }
+    ) {
+      ... on IncentiveGrantRetrySuccess {
+        incentiveGrant {
+          id
+        }
         transaction {
           id
         }
-        error
       }
     }
   }
