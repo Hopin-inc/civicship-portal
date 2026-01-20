@@ -7,7 +7,6 @@ import { useInfiniteTransactions } from "@/hooks/transactions/useInfiniteTransac
 import { getServerCommunityTransactionsWithCursor } from "@/hooks/transactions/server-community-transactions";
 import { getServerWalletTransactionsWithCursor } from "@/hooks/transactions/server-wallet-transactions";
 import { getCounterpartyImage, getFromWalletImage } from "@/shared/transactions/utils/images";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 interface InfiniteTransactionListProps {
   initialTransactions: GqlTransactionsConnection;
@@ -25,9 +24,6 @@ export const InfiniteTransactionList = ({
   perspectiveWalletId,
   enableClickNavigation = false,
 }: InfiniteTransactionListProps) => {
-  const communityConfig = useCommunityConfig();
-  const communitySquareLogoPath = communityConfig?.squareLogoPath ?? "";
-
   const fetchMore = walletId
     ? (cursor?: string, first: number = 20) =>
         getServerWalletTransactionsWithCursor(walletId, cursor, first)
@@ -42,8 +38,8 @@ export const InfiniteTransactionList = ({
     <div className="timeline-container">
       {transactions.map((transaction, index) => {
         const image = perspectiveWalletId
-          ? getCounterpartyImage(transaction, perspectiveWalletId, communitySquareLogoPath)
-          : getFromWalletImage(transaction, communitySquareLogoPath);
+          ? getCounterpartyImage(transaction, perspectiveWalletId)
+          : getFromWalletImage(transaction);
         const isFirst = index === 0;
         const isLast = index === transactions.length - 1;
         return (
