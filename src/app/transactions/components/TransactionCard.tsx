@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useLocaleDateTimeFormat } from "@/utils/i18n";
 import {  getTransactionInfo } from "@/shared/transactions/utils/format";
 import { computeTransactionHref } from "@/shared/transactions/utils/navigation";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import {
   formatActionLabelForTimeline,
   getTimelineDisplayName,
@@ -40,7 +41,9 @@ export const TransactionCard = ({
 }: TransactionCardProps) => {
   const t = useTranslations();
   const formatDateTime = useLocaleDateTimeFormat();
-  const info = getTransactionInfo(transaction, perspectiveWalletId);
+  const communityConfig = useCommunityConfig();
+  const communityTitle = communityConfig?.title ?? "";
+  const info = getTransactionInfo(transaction, perspectiveWalletId, communityTitle);
 
   // 表示名の決定
   const displayName = getTimelineDisplayName(
