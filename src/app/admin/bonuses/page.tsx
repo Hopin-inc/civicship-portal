@@ -51,7 +51,6 @@ export default function BonusesPage() {
   const { data, loading, error } = useQuery<GetSignupBonusConfigData>(GET_SIGNUP_BONUS_CONFIG, {
     variables: { communityId: COMMUNITY_ID },
   });
-  console.log(data);
 
   const { data: failedData } = useQuery<GetFailedSignupBonusesData>(GET_FAILED_SIGNUP_BONUSES, {
     variables: { communityId: COMMUNITY_ID },
