@@ -13,6 +13,7 @@ import { GqlCommunitySignupBonusConfig } from "@/types/graphql";
 import { useMutation } from "@apollo/client";
 import { toast } from "react-toastify";
 import { UPDATE_SIGNUP_BONUS_CONFIG } from "@/graphql/account/community/mutation";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 interface EditBonusSheetProps {
   currentConfig?: GqlCommunitySignupBonusConfig | null;
@@ -52,6 +53,7 @@ export default function EditBonusSheet({ currentConfig, onSave }: EditBonusSheet
             bonusPoint: pointValue,
             message,
           },
+          communityId: COMMUNITY_ID,
         },
       });
       toast.success(t("adminWallet.settings.signupBonus.form.success"));
