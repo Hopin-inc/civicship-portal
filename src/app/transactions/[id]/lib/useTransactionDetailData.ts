@@ -6,6 +6,7 @@ import {
   GqlWalletType,
 } from "@/types/graphql";
 import { getNameFromWallet, mapReasonToAction } from "@/utils/transaction";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 type TransactionDetailData = {
   transactionType: string;
@@ -26,6 +27,9 @@ export function useTransactionDetailData(
   transaction: GqlGetTransactionDetailQuery["transaction"],
   t: (key: string, values?: Record<string, string>) => string,
 ) {
+  const communityConfig = useCommunityConfig();
+  const communityTitle = communityConfig?.title ?? "";
+
   const detail = useMemo((): TransactionDetailData | null => {
     if (!transaction) {
       return null;
@@ -42,8 +46,8 @@ export function useTransactionDetailData(
       transactionType = t("transactions.name.move");
     }
 
-    const fromName = getNameFromWallet(transaction.fromWallet);
-    const toName = getNameFromWallet(transaction.toWallet);
+    const fromName = getNameFromWallet(transaction.fromWallet, communityTitle);
+    const toName = getNameFromWallet(transaction.toWallet, communityTitle);
     const pointAmount = Math.abs(transaction.fromPointChange ?? 0);
     const dateTime = transaction.createdAt
       ? new Date(transaction.createdAt).toISOString()
@@ -62,7 +66,7 @@ export function useTransactionDetailData(
       toUserId,
       comment: transaction.comment ?? null,
     };
-  }, [transaction, t]);
+  }, [transaction, t, communityTitle]);
 
   return { detail };
 }
