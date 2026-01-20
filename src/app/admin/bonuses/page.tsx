@@ -11,7 +11,7 @@ import { useQuery } from "@apollo/client";
 import { GqlCommunitySignupBonusConfig, GqlIncentiveGrant } from "@/types/graphql";
 import { cn } from "@/lib/utils";
 import {
-  GET_FAILED_SIGNUP_BONUSES,
+  GET_FAILED_INCENTIVE_GRANTS,
   GET_SIGNUP_BONUS_CONFIG,
 } from "@/graphql/account/community/query";
 import Link from "next/link";
@@ -52,7 +52,7 @@ export default function BonusesPage() {
     variables: { communityId: COMMUNITY_ID },
   });
 
-  const { data: failedData } = useQuery<GetFailedSignupBonusesData>(GET_FAILED_SIGNUP_BONUSES, {
+  const { data: failedData } = useQuery<GetFailedSignupBonusesData>(GET_FAILED_INCENTIVE_GRANTS, {
     variables: { communityId: COMMUNITY_ID },
     // user が null のアイテムがある場合でも、エラーを無視して利用可能なデータを返す
     errorPolicy: "all",
@@ -60,9 +60,9 @@ export default function BonusesPage() {
 
   const config = data?.community?.config?.signupBonusConfig;
   // user が null のアイテムをフィルタリングしてカウント
-  const failedCount = (failedData?.incentiveGrants?.edges ?? [])
-    .map((edge) => edge.node)
-    .filter((bonus) => bonus.user !== null && bonus.user !== undefined).length;
+  const failedCount = (failedData?.incentiveGrants?.edges ?? []).filter(
+    (edge) => edge.node.user != null,
+  ).length;
 
   if (loading) {
     return (

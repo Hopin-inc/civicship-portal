@@ -10,7 +10,7 @@ export const UPDATE_SIGNUP_BONUS_CONFIG = gql`
   }
 `;
 
-export const SIGNUP_BONUS_RETRY = gql`
+export const INCENTIVE_GRANT_RETRY = gql`
   mutation IncentiveGrantRetry($incentiveGrantId: ID!, $communityId: ID!) {
     incentiveGrantRetry(
       input: { incentiveGrantId: $incentiveGrantId }

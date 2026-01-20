@@ -18,6 +18,15 @@ const linkifyText = (text: string) => {
   return parts.map((part, index) => {
     // URLの場合
     if (part.match(urlRegex)) {
+      // 安全のため、http/https/www 以外で始まるスキームレスな文字列はリンク化しない
+      if (
+        !part.startsWith('http://') &&
+        !part.startsWith('https://') &&
+        !part.startsWith('www.')
+      ) {
+        return part;
+      }
+
       // スキーム検証: http または https のみ許可
       const normalizedHref = part.startsWith('www.') ? `https://${part}` : part;
 
@@ -51,8 +60,9 @@ const linkifyText = (text: string) => {
             {part}
           </span>
         );
-      } catch {
+      } catch (error) {
         // 不正な URL はテキストのまま
+        console.warn('Invalid URL detected in TransactionMessageCard.linkifyText:', normalizedHref, error);
         return part;
       }
     }
@@ -75,7 +85,7 @@ export const TransactionMessageCard = ({
   return (
     <p className="text-label-sm whitespace-pre-line break-words leading-relaxed">
       {lines.map((line, lineIndex) => (
-        <span key={lineIndex}>
+        <span key={`line-${lineIndex}`}>
           {linkifyText(line)}
           {lineIndex < lines.length - 1 && '\n'}
         </span>

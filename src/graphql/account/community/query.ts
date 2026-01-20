@@ -38,7 +38,7 @@ export const GET_SIGNUP_BONUS_CONFIG = gql`
   }
 `;
 
-export const GET_FAILED_SIGNUP_BONUSES = gql`
+export const GET_FAILED_INCENTIVE_GRANTS = gql`
   query GetFailedIncentiveGrants($communityId: ID!) {
     incentiveGrants(
       filter: { communityId: $communityId, type: SIGNUP, status: FAILED }
