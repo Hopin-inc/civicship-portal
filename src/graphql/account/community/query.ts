@@ -42,7 +42,7 @@ export const GET_FAILED_SIGNUP_BONUSES = gql`
   query GetFailedIncentiveGrants($communityId: ID!) {
     incentiveGrants(
       filter: { communityId: $communityId, type: SIGNUP, status: FAILED }
-      sort: { updatedAt: DESC }
+      sort: { updatedAt: desc }
     ) {
       edges {
         node {
@@ -60,8 +60,6 @@ export const GET_FAILED_SIGNUP_BONUSES = gql`
       }
     }
   }
-`;
-
 `;
 
 export const GET_COMMUNITY_PORTAL_CONFIG = gql`
