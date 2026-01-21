@@ -9,10 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Item, ItemActions, ItemContent, ItemGroup, ItemTitle } from "@/components/ui/item";
-import { GqlCommunitySignupBonusConfig } from "@/types/graphql";
-import { useMutation } from "@apollo/client";
+import { GqlCommunitySignupBonusConfig, useUpdateSignupBonusConfigMutation } from "@/types/graphql";
 import { toast } from "react-toastify";
-import { UPDATE_SIGNUP_BONUS_CONFIG } from "@/graphql/account/community/mutation";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 interface EditBonusSheetProps {
@@ -36,11 +34,11 @@ export default function EditBonusSheet({ currentConfig, onSave }: EditBonusSheet
     }
   }, [open, currentConfig]);
 
-  const [updateConfig, { loading }] = useMutation(UPDATE_SIGNUP_BONUS_CONFIG);
+  const [updateConfig, { loading }] = useUpdateSignupBonusConfigMutation();
 
   const handleSave = async () => {
     const pointValue = Number(bonusPoint);
-    if (isNaN(pointValue) || !Number.isInteger(pointValue) || pointValue < 0) {
+    if (isNaN(pointValue) || !Number.isSafeInteger(pointValue) || pointValue < 0) {
       toast.error(t("adminWallet.settings.signupBonus.form.invalidPoints"));
       return;
     }

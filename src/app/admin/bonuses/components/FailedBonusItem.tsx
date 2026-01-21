@@ -5,10 +5,8 @@ import { useTranslations } from "next-intl";
 import { Item, ItemActions, ItemContent, ItemFooter, ItemTitle } from "@/components/ui/item";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { GqlIncentiveGrant } from "@/types/graphql";
-import { useMutation } from "@apollo/client";
+import { GqlIncentiveGrant, useIncentiveGrantRetryMutation } from "@/types/graphql";
 import { toast } from "react-toastify";
-import { INCENTIVE_GRANT_RETRY } from "@/graphql/account/community/mutation";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 interface FailedBonusItemProps {
@@ -20,7 +18,7 @@ export default function FailedBonusItem({ bonus, onRetrySuccess }: FailedBonusIt
   const t = useTranslations();
   const [retrying, setRetrying] = useState(false);
 
-  const [retryGrant] = useMutation(INCENTIVE_GRANT_RETRY);
+  const [retryGrant] = useIncentiveGrantRetryMutation();
 
   const handleRetry = async () => {
     setRetrying(true);

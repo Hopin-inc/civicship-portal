@@ -5,36 +5,16 @@ import { useTranslations } from "next-intl";
 import { Item } from "@/components/ui/item";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { useQuery } from "@apollo/client";
 import {
-  GqlCommunitySignupBonusConfig,
-  GqlIncentiveGrant,
   useGetSignupBonusConfigQuery,
+  useGetFailedIncentiveGrantsQuery,
 } from "@/types/graphql";
 import { cn } from "@/lib/utils";
-import { GET_FAILED_INCENTIVE_GRANTS } from "@/graphql/account/community/query";
 import FailedBonusItem from "../components/FailedBonusItem";
 import Link from "next/link";
 import EditBonusSheet from "@/app/admin/bonuses/components/EditBonusSheet";
 import { CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-interface GetSignupBonusConfigData {
-  community: {
-    id: string;
-    config: {
-      signupBonusConfig: GqlCommunitySignupBonusConfig | null;
-    } | null;
-  } | null;
-}
-
-interface GetFailedSignupBonusesData {
-  incentiveGrants: {
-    edges: Array<{
-      node: GqlIncentiveGrant;
-    }>;
-  };
-}
 
 export default function SignupBonusDetailPage() {
   const t = useTranslations();
@@ -43,14 +23,11 @@ export default function SignupBonusDetailPage() {
     variables: { communityId: COMMUNITY_ID },
   });
 
-  const { data: failedData, refetch: refetchFailed } = useQuery<GetFailedSignupBonusesData>(
-    GET_FAILED_INCENTIVE_GRANTS,
-    {
-      variables: { communityId: COMMUNITY_ID },
-      // user が null のアイテムがある場合でも、エラーを無視して利用可能なデータを返す
-      errorPolicy: "all",
-    },
-  );
+  const { data: failedData, refetch: refetchFailed } = useGetFailedIncentiveGrantsQuery({
+    variables: { communityId: COMMUNITY_ID },
+    // user が null のアイテムがある場合でも、エラーを無視して利用可能なデータを返す
+    errorPolicy: "all",
+  });
 
   const config = data?.signupBonusConfig;
   // user が null のアイテムをフィルタリング

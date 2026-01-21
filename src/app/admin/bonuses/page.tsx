@@ -7,33 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import { useQuery } from "@apollo/client";
 import {
-  GqlCommunitySignupBonusConfig,
-  GqlIncentiveGrant,
   useGetSignupBonusConfigQuery,
+  useGetFailedIncentiveGrantsQuery,
 } from "@/types/graphql";
 import { cn } from "@/lib/utils";
-import { GET_FAILED_INCENTIVE_GRANTS } from "@/graphql/account/community/query";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
-
-interface GetSignupBonusConfigData {
-  community: {
-    id: string;
-    config: {
-      signupBonusConfig: GqlCommunitySignupBonusConfig | null;
-    } | null;
-  } | null;
-}
-
-interface GetFailedSignupBonusesData {
-  incentiveGrants: {
-    edges: Array<{
-      node: GqlIncentiveGrant;
-    }>;
-  };
-}
 
 export default function BonusesPage() {
   const t = useTranslations();
@@ -53,7 +33,7 @@ export default function BonusesPage() {
     variables: { communityId: COMMUNITY_ID },
   });
 
-  const { data: failedData } = useQuery<GetFailedSignupBonusesData>(GET_FAILED_INCENTIVE_GRANTS, {
+  const { data: failedData } = useGetFailedIncentiveGrantsQuery({
     variables: { communityId: COMMUNITY_ID },
     // user が null のアイテムがある場合でも、エラーを無視して利用可能なデータを返す
     errorPolicy: "all",

@@ -37,6 +37,22 @@ const linkifyText = (text: string) => {
           return part; // 危険なスキーム（javascript:, data:等）はテキストのまま
         }
 
+        // 認証情報を含むURLを拒否（フィッシング対策）
+        if (url.username || url.password) {
+          if (process.env.NODE_ENV !== 'production') {
+            console.warn('URL with credentials rejected:', normalizedHref);
+          }
+          return part;
+        }
+
+        // ホスト名の基本検証
+        if (!url.hostname || url.hostname.includes('@')) {
+          if (process.env.NODE_ENV !== 'production') {
+            console.warn('Invalid hostname detected:', normalizedHref);
+          }
+          return part;
+        }
+
         const href = url.toString();
         return (
           <span
@@ -62,7 +78,9 @@ const linkifyText = (text: string) => {
         );
       } catch (error) {
         // 不正な URL はテキストのまま
-        console.warn('Invalid URL detected in TransactionMessageCard.linkifyText:', normalizedHref, error);
+        if (process.env.NODE_ENV !== 'production') {
+          console.warn('Invalid URL detected in TransactionMessageCard.linkifyText:', normalizedHref, error);
+        }
         return part;
       }
     }
