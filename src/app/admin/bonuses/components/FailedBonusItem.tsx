@@ -2,10 +2,15 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { ApolloError } from "@apollo/client";
 import { Item, ItemActions, ItemContent, ItemFooter, ItemTitle } from "@/components/ui/item";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { GqlIncentiveGrantFailureCode, useIncentiveGrantRetryMutation } from "@/types/graphql";
+import {
+  GqlErrorCode,
+  GqlIncentiveGrantFailureCode,
+  useIncentiveGrantRetryMutation,
+} from "@/types/graphql";
 import { toast } from "react-toastify";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
@@ -39,10 +44,25 @@ export default function FailedBonusItem({ bonus, onRetrySuccess }: FailedBonusIt
         toast.success(t("adminWallet.settings.pending.retrySuccess"));
         onRetrySuccess();
       } else {
-        toast.error(t("adminWallet.settings.pending.retryError"));
+        toast.error(t("adminWallet.settings.pending.retryError.generic"));
       }
-    } catch (e) {
-      toast.error(t("adminWallet.settings.pending.retryError"));
+    } catch (error) {
+      if (error instanceof ApolloError) {
+        const errorCode = error.graphQLErrors[0]?.extensions?.code as GqlErrorCode | undefined;
+
+        const messageKey = errorCode
+          ? `adminWallet.settings.pending.retryError.${errorCode}`
+          : "adminWallet.settings.pending.retryError.generic";
+
+        const message = t(messageKey);
+
+        // 翻訳が存在しない場合は generic にフォールバック
+        toast.error(
+          message !== messageKey ? message : t("adminWallet.settings.pending.retryError.generic"),
+        );
+      } else {
+        toast.error(t("adminWallet.settings.pending.retryError.generic"));
+      }
     } finally {
       setRetrying(false);
     }
