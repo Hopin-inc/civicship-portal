@@ -14,6 +14,7 @@ import {
   restoreUserSession,
 } from "@/lib/auth/init/helper";
 import { initializeFirebase } from "@/lib/auth/init/firebase";
+import { getCommunityIdFromEnv } from "@/lib/communities/config";
 
 interface InitAuthParams {
   liffService: LiffService;
@@ -86,16 +87,31 @@ async function initAuthFast({
   setState: ReturnType<typeof useAuthStore.getState>["setState"];
 }) {
   try {
+    const communityId = getCommunityIdFromEnv();
+    const hasMembershipInCurrentCommunity = !!ssrCurrentUser.memberships?.some(
+      (m) => m.community?.id === communityId
+    );
+    const isFullyRegistered = ssrPhoneAuthenticated && hasMembershipInCurrentCommunity;
+
+    logger.debug("[AUTH] initAuthFast: checking membership", {
+      userId: ssrCurrentUser.id,
+      communityId,
+      ssrPhoneAuthenticated,
+      hasMembershipInCurrentCommunity,
+      isFullyRegistered,
+      membershipIds: ssrCurrentUser.memberships?.map(m => m.community?.id) ?? [],
+    });
+
     finalizeAuthState(
-      ssrPhoneAuthenticated ? "user_registered" : "line_authenticated",
+      isFullyRegistered ? "user_registered" : "line_authenticated",
       ssrCurrentUser,
       setState,
       authStateManager,
     );
     TokenManager.saveLineAuthFlag(true);
-    if (ssrPhoneAuthenticated) TokenManager.savePhoneAuthFlag(true);
+    if (isFullyRegistered) TokenManager.savePhoneAuthFlag(true);
     await authStateManager.handleUserRegistrationStateChange(
-      !!ssrPhoneAuthenticated,
+      isFullyRegistered,
       { ssrMode: true }
     );
 
