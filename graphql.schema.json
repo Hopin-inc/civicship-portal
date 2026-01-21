@@ -4094,7 +4094,19 @@
             "deprecationReason": null
           },
           {
+            "name": "CONCURRENT_RETRY_DETECTED",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "FORBIDDEN",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "INCENTIVE_DISABLED",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -4107,6 +4119,12 @@
           },
           {
             "name": "INTERNAL_SERVER_ERROR",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "INVALID_GRANT_STATUS",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -4191,6 +4209,12 @@
           },
           {
             "name": "UNKNOWN",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "UNSUPPORTED_GRANT_TYPE",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
