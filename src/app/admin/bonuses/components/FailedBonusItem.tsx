@@ -5,12 +5,20 @@ import { useTranslations } from "next-intl";
 import { Item, ItemActions, ItemContent, ItemFooter, ItemTitle } from "@/components/ui/item";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { GqlIncentiveGrant, useIncentiveGrantRetryMutation } from "@/types/graphql";
+import { GqlIncentiveGrantFailureCode, useIncentiveGrantRetryMutation } from "@/types/graphql";
 import { toast } from "react-toastify";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 
 interface FailedBonusItemProps {
-  bonus: GqlIncentiveGrant;
+  bonus: {
+    id: string;
+    failureCode?: GqlIncentiveGrantFailureCode | null;
+    attemptCount: number;
+    user?: {
+      name?: string | null;
+      image?: string | null;
+    } | null;
+  };
   onRetrySuccess: () => void;
 }
 

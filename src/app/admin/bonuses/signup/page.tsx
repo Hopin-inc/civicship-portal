@@ -5,10 +5,7 @@ import { useTranslations } from "next-intl";
 import { Item } from "@/components/ui/item";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
-import {
-  useGetSignupBonusConfigQuery,
-  useGetFailedIncentiveGrantsQuery,
-} from "@/types/graphql";
+import { useGetFailedIncentiveGrantsQuery, useGetSignupBonusConfigQuery } from "@/types/graphql";
 import { cn } from "@/lib/utils";
 import FailedBonusItem from "../components/FailedBonusItem";
 import Link from "next/link";
@@ -32,8 +29,8 @@ export default function SignupBonusDetailPage() {
   const config = data?.signupBonusConfig;
   // user が null のアイテムをフィルタリング
   const failedBonuses = (failedData?.incentiveGrants?.edges ?? [])
-    .filter((edge) => edge.node.user != null)
-    .map((edge) => edge.node);
+    .filter((edge) => edge?.node?.user != null)
+    .map((edge) => edge?.node);
 
   const headerConfig = useMemo(
     () => ({
@@ -133,12 +130,15 @@ export default function SignupBonusDetailPage() {
           </div>
 
           <div className="flex flex-col border rounded-lg">
-            {failedBonuses.map((bonus, index) => (
-              <React.Fragment key={bonus.id}>
-                {index > 0 && <hr className="border-muted" />}
-                <FailedBonusItem bonus={bonus} onRetrySuccess={handleRetrySuccess} />
-              </React.Fragment>
-            ))}
+            {failedBonuses.map(
+              (bonus, index) =>
+                bonus && (
+                  <React.Fragment key={bonus.id}>
+                    {index > 0 && <hr className="border-muted" />}
+                    <FailedBonusItem bonus={bonus} onRetrySuccess={handleRetrySuccess} />
+                  </React.Fragment>
+                ),
+            )}
           </div>
         </div>
       )}
