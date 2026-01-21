@@ -3,6 +3,7 @@ import { AuthenticationState } from "@/types/auth";
 import { GqlUser } from "@/types/graphql";
 import { logger } from "@/lib/logging";
 import { getCommunityIdFromEnv } from "@/lib/communities/config";
+import { TokenManager } from "@/lib/auth/core/token-manager";
 
 export function applySsrAuthState(
   ssrCurrentUser?: GqlUser | null,
@@ -15,7 +16,12 @@ export function applySsrAuthState(
   const hasMembershipInCurrentCommunity = !!ssrCurrentUser?.memberships?.some(
     (m) => m.community?.id === communityId
   );
-  const isFullyRegistered = ssrPhoneAuthenticated && hasMembershipInCurrentCommunity;
+  const hasPhoneIdentity = !!ssrCurrentUser?.identities?.some(
+    (i) => i.platform?.toUpperCase() === "PHONE"
+  );
+  const isPhoneVerified =
+    !!ssrPhoneAuthenticated || hasPhoneIdentity || TokenManager.phoneVerified();
+  const isFullyRegistered = isPhoneVerified && hasMembershipInCurrentCommunity;
 
   let initialState: AuthenticationState = "loading";
   if (ssrCurrentUser && ssrLineAuthenticated && isFullyRegistered) {
@@ -31,6 +37,8 @@ export function applySsrAuthState(
     ssrLineAuthenticated,
     ssrPhoneAuthenticated,
     communityId,
+    hasPhoneIdentity,
+    isPhoneVerified,
     hasMembershipInCurrentCommunity,
     isFullyRegistered,
     membershipIds: ssrCurrentUser?.memberships?.map(m => m.community?.id) ?? [],

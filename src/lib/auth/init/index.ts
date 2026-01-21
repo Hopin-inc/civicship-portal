@@ -91,12 +91,19 @@ async function initAuthFast({
     const hasMembershipInCurrentCommunity = !!ssrCurrentUser.memberships?.some(
       (m) => m.community?.id === communityId
     );
-    const isFullyRegistered = ssrPhoneAuthenticated && hasMembershipInCurrentCommunity;
+    const hasPhoneIdentity = !!ssrCurrentUser.identities?.some(
+      (i) => i.platform?.toUpperCase() === "PHONE"
+    );
+    const isPhoneVerified =
+      !!ssrPhoneAuthenticated || hasPhoneIdentity || TokenManager.phoneVerified();
+    const isFullyRegistered = isPhoneVerified && hasMembershipInCurrentCommunity;
 
     logger.debug("[AUTH] initAuthFast: checking membership", {
       userId: ssrCurrentUser.id,
       communityId,
       ssrPhoneAuthenticated,
+      hasPhoneIdentity,
+      isPhoneVerified,
       hasMembershipInCurrentCommunity,
       isFullyRegistered,
       membershipIds: ssrCurrentUser.memberships?.map(m => m.community?.id) ?? [],
