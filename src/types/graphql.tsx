@@ -681,6 +681,7 @@ export const GqlIncentiveGrantStatus = {
   Completed: "COMPLETED",
   Failed: "FAILED",
   Pending: "PENDING",
+  Retrying: "RETRYING",
 } as const;
 
 export type GqlIncentiveGrantStatus =
@@ -1887,6 +1888,7 @@ export type GqlQuery = {
   reservationHistories: GqlReservationHistoriesConnection;
   reservationHistory?: Maybe<GqlReservationHistory>;
   reservations: GqlReservationsConnection;
+  signupBonusConfig?: Maybe<GqlCommunitySignupBonusConfig>;
   states: GqlStatesConnection;
   ticket?: Maybe<GqlTicket>;
   ticketClaimLink?: Maybe<GqlTicketClaimLink>;
@@ -2088,6 +2090,10 @@ export type GqlQueryReservationsArgs = {
   filter?: InputMaybe<GqlReservationFilterInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   sort?: InputMaybe<GqlReservationSortInput>;
+};
+
+export type GqlQuerySignupBonusConfigArgs = {
+  communityId: Scalars["ID"]["input"];
 };
 
 export type GqlQueryStatesArgs = {
@@ -3160,18 +3166,11 @@ export type GqlGetSignupBonusConfigQueryVariables = Exact<{
 
 export type GqlGetSignupBonusConfigQuery = {
   __typename?: "Query";
-  community?: {
-    __typename?: "Community";
-    id: string;
-    config?: {
-      __typename?: "CommunityConfig";
-      signupBonusConfig?: {
-        __typename?: "CommunitySignupBonusConfig";
-        bonusPoint: number;
-        isEnabled: boolean;
-        message?: string | null;
-      } | null;
-    } | null;
+  signupBonusConfig?: {
+    __typename?: "CommunitySignupBonusConfig";
+    bonusPoint: number;
+    isEnabled: boolean;
+    message?: string | null;
   } | null;
 };
 
@@ -7320,15 +7319,10 @@ export type GetCommunityQueryResult = Apollo.QueryResult<
 >;
 export const GetSignupBonusConfigDocument = gql`
   query GetSignupBonusConfig($communityId: ID!) {
-    community(id: $communityId) {
-      id
-      config {
-        signupBonusConfig {
-          bonusPoint
-          isEnabled
-          message
-        }
-      }
+    signupBonusConfig(communityId: $communityId) {
+      bonusPoint
+      isEnabled
+      message
     }
   }
 `;

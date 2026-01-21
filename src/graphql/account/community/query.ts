@@ -25,15 +25,10 @@ export const GET_COMMUNITY = gql`
 
 export const GET_SIGNUP_BONUS_CONFIG = gql`
   query GetSignupBonusConfig($communityId: ID!) {
-    community(id: $communityId) {
-      id
-      config {
-        signupBonusConfig {
-          bonusPoint
-          isEnabled
-          message
-        }
-      }
+    signupBonusConfig(communityId: $communityId) {
+      bonusPoint
+      isEnabled
+      message
     }
   }
 `;
