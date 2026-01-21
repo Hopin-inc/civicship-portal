@@ -8,12 +8,13 @@ import { Badge } from "@/components/ui/badge";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { useQuery } from "@apollo/client";
-import { GqlCommunitySignupBonusConfig, GqlIncentiveGrant } from "@/types/graphql";
-import { cn } from "@/lib/utils";
 import {
-  GET_FAILED_INCENTIVE_GRANTS,
-  GET_SIGNUP_BONUS_CONFIG,
-} from "@/graphql/account/community/query";
+  GqlCommunitySignupBonusConfig,
+  GqlIncentiveGrant,
+  useGetSignupBonusConfigQuery,
+} from "@/types/graphql";
+import { cn } from "@/lib/utils";
+import { GET_FAILED_INCENTIVE_GRANTS } from "@/graphql/account/community/query";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 
@@ -48,7 +49,7 @@ export default function BonusesPage() {
   );
   useHeaderConfig(headerConfig);
 
-  const { data, loading, error } = useQuery<GetSignupBonusConfigData>(GET_SIGNUP_BONUS_CONFIG, {
+  const { data, loading, error } = useGetSignupBonusConfigQuery({
     variables: { communityId: COMMUNITY_ID },
   });
 
@@ -58,7 +59,7 @@ export default function BonusesPage() {
     errorPolicy: "all",
   });
 
-  const config = data?.community?.config?.signupBonusConfig;
+  const config = data?.signupBonusConfig;
   // user が null のアイテムをフィルタリングしてカウント
   const failedCount = (failedData?.incentiveGrants?.edges ?? []).filter(
     (edge) => edge.node.user != null,

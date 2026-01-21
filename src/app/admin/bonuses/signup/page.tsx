@@ -6,12 +6,13 @@ import { Item } from "@/components/ui/item";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import { useQuery } from "@apollo/client";
-import { GqlCommunitySignupBonusConfig, GqlIncentiveGrant } from "@/types/graphql";
-import { cn } from "@/lib/utils";
 import {
-  GET_FAILED_INCENTIVE_GRANTS,
-  GET_SIGNUP_BONUS_CONFIG,
-} from "@/graphql/account/community/query";
+  GqlCommunitySignupBonusConfig,
+  GqlIncentiveGrant,
+  useGetSignupBonusConfigQuery,
+} from "@/types/graphql";
+import { cn } from "@/lib/utils";
+import { GET_FAILED_INCENTIVE_GRANTS } from "@/graphql/account/community/query";
 import FailedBonusItem from "../components/FailedBonusItem";
 import Link from "next/link";
 import EditBonusSheet from "@/app/admin/bonuses/components/EditBonusSheet";
@@ -38,12 +39,9 @@ interface GetFailedSignupBonusesData {
 export default function SignupBonusDetailPage() {
   const t = useTranslations();
 
-  const { data, loading, error, refetch } = useQuery<GetSignupBonusConfigData>(
-    GET_SIGNUP_BONUS_CONFIG,
-    {
-      variables: { communityId: COMMUNITY_ID },
-    },
-  );
+  const { data, loading, error, refetch } = useGetSignupBonusConfigQuery({
+    variables: { communityId: COMMUNITY_ID },
+  });
 
   const { data: failedData, refetch: refetchFailed } = useQuery<GetFailedSignupBonusesData>(
     GET_FAILED_INCENTIVE_GRANTS,
@@ -54,7 +52,7 @@ export default function SignupBonusDetailPage() {
     },
   );
 
-  const config = data?.community?.config?.signupBonusConfig;
+  const config = data?.signupBonusConfig;
   // user が null のアイテムをフィルタリング
   const failedBonuses = (failedData?.incentiveGrants?.edges ?? [])
     .filter((edge) => edge.node.user != null)
