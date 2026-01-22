@@ -9,7 +9,7 @@ export function Toaster() {
 
   return (
     <ToastContainer
-      position="bottom-center"
+      position="top-center"
       autoClose={3000}
       hideProgressBar={false}
       newestOnTop={true}
@@ -19,8 +19,7 @@ export function Toaster() {
       draggable
       pauseOnHover
       theme={resolvedTheme === "dark" ? "dark" : "light"}
-      className="mx-8"
-      style={{ bottom: "48px" }}
+      toastStyle={{ fontSize: "10px", minHeight: "auto" }}
     />
   );
 }
