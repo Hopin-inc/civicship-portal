@@ -42,7 +42,7 @@ export default function BonusesPage() {
   const config = data?.signupBonusConfig;
   // user が null のアイテムをフィルタリングしてカウント
   const failedCount = (failedData?.incentiveGrants?.edges ?? []).filter(
-    (edge) => edge.node.user != null,
+    (edge) => edge?.node?.user != null,
   ).length;
 
   if (loading) {
