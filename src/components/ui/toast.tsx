@@ -19,7 +19,7 @@ export function Toaster() {
       draggable
       pauseOnHover
       theme={resolvedTheme === "dark" ? "dark" : "light"}
-      toastStyle={{ fontSize: "10px", minHeight: "auto" }}
+      toastStyle={{ fontSize: "12px", minHeight: "auto" }}
     />
   );
 }
