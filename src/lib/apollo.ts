@@ -13,6 +13,20 @@ import { logger } from "@/lib/logging";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { setContext } from "@apollo/client/link/context";
 
+// Helper to get communityId from Next.js headers on server-side
+// This is used when Apollo client is used in Server Components
+async function getServerSideCommunityId(): Promise<string | null> {
+  try {
+    // Dynamic import to avoid issues with client-side bundling
+    const { headers } = await import("next/headers");
+    const headersList = await headers();
+    return headersList.get("x-community-id");
+  } catch {
+    // headers() is not available (e.g., during module initialization or in client context)
+    return null;
+  }
+}
+
 const httpLink = createUploadLink({
   uri: process.env.NEXT_PUBLIC_API_ENDPOINT,
   credentials: "include",
@@ -58,6 +72,7 @@ const requestLink = setContext(async (operation, prevContext) => {
   
   // Extract communityId from current URL path (dynamic multi-tenant routing)
   // Fallback to liff.state parameter when LIFF launches at root path "/"
+  // On server-side, try to get communityId from Next.js request headers (set by middleware)
   let communityId: string | null = null;
   if (isBrowser) {
     communityId = extractCommunityIdFromPath(window.location.pathname);
@@ -66,6 +81,10 @@ const requestLink = setContext(async (operation, prevContext) => {
     if (!communityId) {
       communityId = extractCommunityIdFromLiffState();
     }
+  } else {
+    // Server-side: try to get communityId from Next.js request headers
+    // This is set by the middleware based on the URL path
+    communityId = await getServerSideCommunityId();
   }
 
   if (isBrowser) {
