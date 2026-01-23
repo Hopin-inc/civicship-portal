@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useLocaleDateTimeFormat } from "@/utils/i18n";
 import {  getTransactionInfo } from "@/shared/transactions/utils/format";
 import { computeTransactionHref } from "@/shared/transactions/utils/navigation";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import {
   formatActionLabelForTimeline,
   getTimelineDisplayName,
@@ -16,8 +17,6 @@ import { TransactionTimelineItem } from "@/shared/transactions/components/timeli
 import { TransactionHeader } from "@/shared/transactions/components/timeline/TransactionHeader";
 import { TransactionActionLabel } from "@/shared/transactions/components/timeline/TransactionActionLabel";
 import { TransactionMessageCard } from "@/shared/transactions/components/timeline/TransactionMessageCard";
-
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 interface TransactionCardProps {
   transaction: GqlTransaction;
@@ -42,8 +41,8 @@ export const TransactionCard = ({
 }: TransactionCardProps) => {
   const t = useTranslations();
   const formatDateTime = useLocaleDateTimeFormat();
-  const config = useCommunityConfig();
-  const communityTitle = config?.title ?? "";
+  const communityConfig = useCommunityConfig();
+  const communityTitle = communityConfig?.title ?? "";
   const info = getTransactionInfo(transaction, perspectiveWalletId, communityTitle);
 
   // 表示名の決定

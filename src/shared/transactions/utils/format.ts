@@ -79,7 +79,11 @@ export const formatTransactionDescription = (
   };
 };
 
-export const getTransactionInfo = (transaction: GqlTransaction, perspectiveWalletId?: string, communityTitle: string = "") => {
+export const getTransactionInfo = (
+  transaction: GqlTransaction,
+  perspectiveWalletId?: string,
+  communityTitle: string = ""
+) => {
   const from = getNameFromWallet(transaction.fromWallet, communityTitle);
   const to = getNameFromWallet(transaction.toWallet, communityTitle);
   const rawAmount = Math.abs(transaction.fromPointChange ?? 0);
