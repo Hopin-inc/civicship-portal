@@ -35,6 +35,20 @@ function extractCommunityIdFromPath(pathname: string): string | null {
   return firstSegment;
 }
 
+// Extract communityId from liff.state parameter (used when LIFF launches at root path)
+function extractCommunityIdFromLiffState(): string | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+  const searchParams = new URLSearchParams(window.location.search);
+  const liffState = searchParams.get("liff.state");
+  if (!liffState) {
+    return null;
+  }
+  // liff.state contains the target path, e.g., "/neo88/users/me"
+  return extractCommunityIdFromPath(liffState);
+}
+
 const requestLink = setContext(async (operation, prevContext) => {
   const isBrowser = typeof window !== "undefined";
   let token: string | null = null;
@@ -43,9 +57,15 @@ const requestLink = setContext(async (operation, prevContext) => {
   let authMode: "session" | "id_token" = isBrowser ? "id_token" : "session";
   
   // Extract communityId from current URL path (dynamic multi-tenant routing)
+  // Fallback to liff.state parameter when LIFF launches at root path "/"
   let communityId: string | null = null;
   if (isBrowser) {
     communityId = extractCommunityIdFromPath(window.location.pathname);
+    // When LIFF launches, it starts at "/" with liff.state=/target/path
+    // We need to extract communityId from liff.state in this case
+    if (!communityId) {
+      communityId = extractCommunityIdFromLiffState();
+    }
   }
 
   if (isBrowser) {
