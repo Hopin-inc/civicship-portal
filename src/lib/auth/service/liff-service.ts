@@ -71,12 +71,40 @@ export class LiffService {
 
     this.initializationPromise = (async () => {
       try {
-        if (!this.liffId) {
-          throw new Error("LIFF ID is not configured");
+        // Check if we're running inside a LIFF mini-app (SDK is pre-initialized by LINE)
+        // In this case, liff.isInClient() returns true even before liff.init() is called
+        const isInLiffClient = liff.isInClient();
+        
+        if (isInLiffClient) {
+          // When running inside LINE mini-app, the SDK is already initialized by LINE
+          // We need to call liff.init() but it may fail if the liffId doesn't match
+          // the one used to launch the mini-app. In this case, we should still
+          // consider the SDK as initialized since LINE has already done it.
+          try {
+            if (this.liffId) {
+              await liff.init({ liffId: this.liffId });
+            }
+          } catch (initError) {
+            // If init fails in LIFF client, the SDK is still usable because
+            // LINE has already initialized it. Log the error but continue.
+            logger.warn("LIFF init in mini-app environment failed, using pre-initialized SDK", {
+              error: initError instanceof Error ? initError.message : String(initError),
+              liffId: this.liffId,
+              isInClient: true,
+            });
+          }
+          // SDK is usable regardless of init result when in LIFF client
+          this.state.isInitialized = true;
+          this.state.isLoggedIn = liff.isLoggedIn();
+        } else {
+          // Normal browser environment - must initialize with liffId
+          if (!this.liffId) {
+            throw new Error("LIFF ID is not configured");
+          }
+          await liff.init({ liffId: this.liffId });
+          this.state.isInitialized = true;
+          this.state.isLoggedIn = liff.isLoggedIn();
         }
-        await liff.init({ liffId: this.liffId });
-        this.state.isInitialized = true;
-        this.state.isLoggedIn = liff.isLoggedIn();
 
         if (this.state.isLoggedIn) {
           await this.updateProfile();
