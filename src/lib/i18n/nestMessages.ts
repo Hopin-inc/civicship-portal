@@ -22,7 +22,7 @@ export function nestMessages(flat: Record<string, string>): Record<string, any> 
           `Translation key conflict: "${currentPath}" is already defined as a string value, ` +
           `but "${key}" tries to use it as a parent key. ` +
           `Current value: "${current[part]}". ` +
-          `Either remove the base key "${currentPath}" or rename the nested key "${key}".`
+          `Use either the base key "${currentPath}" or the nested key "${key}", but not both.`
         );
       }
 

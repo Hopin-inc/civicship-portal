@@ -29,15 +29,21 @@ export default function GlobalError({
     const loadMessages = async () => {
       try {
         // Try to get locale from cookie or default to 'ja'
-        const cookieLocale = document.cookie
+        const cookieLocaleFromCookie = document.cookie
           .split('; ')
           .find(row => row.startsWith('language='))
           ?.split('=')[1] || 'ja'
 
-        setLocale(cookieLocale)
+        // Validate locale against supported locales and fallback to 'ja' if invalid
+        const supportedLocales = ['ja', 'en'] as const
+        const safeLocale = supportedLocales.includes(cookieLocaleFromCookie as (typeof supportedLocales)[number])
+          ? cookieLocaleFromCookie
+          : 'ja'
+
+        setLocale(safeLocale)
 
         // Load common translations needed for ErrorState
-        const commonFlat = await import(`@/messages/${cookieLocale}/common.json`)
+        const commonFlat = await import(`@/messages/${safeLocale}/common.json`)
         const nestedMessages = nestMessages(commonFlat.default)
         setMessages(nestedMessages)
       } catch (err) {
