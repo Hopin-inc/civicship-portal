@@ -250,7 +250,7 @@ function buildFilter(searchParams: SearchParams, communityId: string): Opportuni
 
   if (searchParams.guests) {
     const guests = Number(searchParams.guests);
-    if (Number.isInteger(guests) && guests > 0) {
+    if (Number.isSafeInteger(guests) && guests > 0) {
       filter.slotRemainingCapacity = guests;
     }
   }

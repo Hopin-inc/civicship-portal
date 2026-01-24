@@ -110,7 +110,7 @@ export const presenterTransaction = (
   if (!node) return null;
   const communityTitle = communityConfig?.title ?? "";
   const squareLogoPath = communityConfig?.squareLogoPath ?? "";
-  
+
   const from = getNameFromWallet(node.fromWallet, communityTitle);
   const to = getNameFromWallet(node.toWallet, communityTitle);
   const rawPoint = node.fromPointChange ?? 0;

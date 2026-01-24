@@ -24,5 +24,49 @@
   "adminWallet.issue.success": "ポイントを発行しました",
 
   "adminWallet.common.notSet": "未設定",
-  "adminWallet.common.toConfirm": "要確認"
+  "adminWallet.common.toConfirm": "要確認",
+
+  "adminWallet.buttons.settings": "特典設定",
+
+  "adminWallet.settings.title": "特典設定",
+  "adminWallet.settings.signupBonus.title": "新規加入特典",
+  "adminWallet.settings.signupBonus.points": "{points} pt支給",
+  "adminWallet.settings.signupBonus.statusEnabled": "自動配布中",
+  "adminWallet.settings.signupBonus.statusDisabled": "停止中",
+  "adminWallet.settings.signupBonus.edit": "編集",
+
+  "adminWallet.settings.signupBonus.form.title": "新規加入特典の編集",
+  "adminWallet.settings.signupBonus.form.pointsLabel": "贈呈ポイント数",
+  "adminWallet.settings.signupBonus.form.messageLabel": "ウェルカムメッセージ（LINE通知）",
+  "adminWallet.settings.signupBonus.form.enabledLabel": "自動配布を有効にする",
+  "adminWallet.settings.signupBonus.form.submit": "保存する",
+  "adminWallet.settings.signupBonus.form.success": "設定を保存しました",
+  "adminWallet.settings.signupBonus.form.invalidPoints": "0以上の整数を入力してください",
+  "adminWallet.settings.signupBonus.form.error": "設定の保存に失敗しました",
+
+  "adminWallet.settings.signupBonus.alert": "要確認",
+  "adminWallet.settings.signupBonus.details.allGood": "問題なく付与できています",
+  "adminWallet.settings.signupBonus.details.seeTransactions": "付与の詳細はウォレット管理で確認できます",
+  "adminWallet.settings.signupBonus.details.viewWallet": "確認する",
+
+  "adminWallet.settings.pending.title": "付与失敗一覧",
+  "adminWallet.settings.pending.count": "{count}件",
+  "adminWallet.settings.pending.description": "残高不足等で特典が届いていないメンバーです",
+  "adminWallet.settings.pending.retry": "再試行",
+  "adminWallet.settings.pending.retrying": "再試行中...",
+  "adminWallet.settings.pending.attempts": "{count}回試行",
+  "adminWallet.settings.pending.retrySuccess": "特典を再送しました",
+  "adminWallet.settings.pending.retryError.INVALID_GRANT_STATUS": "この付与は既に処理済みか、処理中です",
+  "adminWallet.settings.pending.retryError.UNSUPPORTED_GRANT_TYPE": "このタイプの付与は再送できません",
+  "adminWallet.settings.pending.retryError.INCENTIVE_DISABLED": "サインアップボーナスが無効化されています",
+  "adminWallet.settings.pending.retryError.CONCURRENT_RETRY_DETECTED": "既に他のリクエストで再送処理中です。しばらく待ってから再度お試しください",
+  "adminWallet.settings.pending.retryError.INSUFFICIENT_BALANCE": "コミュニティの残高が不足しています",
+  "adminWallet.settings.pending.retryError.NOT_FOUND": "付与またはウォレットが見つかりません",
+  "adminWallet.settings.pending.retryError.FORBIDDEN": "この操作を実行する権限がありません",
+  "adminWallet.settings.pending.retryError.generic": "再送に失敗しました",
+
+  "adminWallet.settings.pending.failureReason.INSUFFICIENT_BALANCE": "残高不足",
+  "adminWallet.settings.pending.failureReason.INSUFFICIENT_FUNDS": "残高不足",
+  "adminWallet.settings.pending.failureReason.WALLET_NOT_FOUND": "ウォレット未作成",
+  "adminWallet.settings.pending.failureReason.unknown": "不明なエラー"
 }

@@ -3,6 +3,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { TransactionMessageCard } from "./timeline/TransactionMessageCard";
 
 interface TransactionCardBaseProps {
   image?: string;
@@ -73,9 +74,9 @@ export const TransactionCardBase = ({
         )}
 
         {comment && (
-          <p className="text-label-xs text-caption bg-background-hover leading-relaxed whitespace-pre-line break-words p-2 rounded-sm">
-            {comment}
-          </p>
+          <div className="text-label-xs text-caption bg-background-hover leading-relaxed p-2 rounded-sm">
+            <TransactionMessageCard comment={comment} />
+          </div>
         )}
 
         <span className="text-label-xs text-muted-foreground mt-1 block">

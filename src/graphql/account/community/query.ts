@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql } from "@apollo/client";
 
 export const GET_COMMUNITIES = gql`
   query GetCommunities {
@@ -19,6 +19,40 @@ export const GET_COMMUNITY = gql`
     community(id: $id) {
       id
       name
+    }
+  }
+`;
+
+export const GET_SIGNUP_BONUS_CONFIG = gql`
+  query GetSignupBonusConfig($communityId: ID!) {
+    signupBonusConfig(communityId: $communityId) {
+      bonusPoint
+      isEnabled
+      message
+    }
+  }
+`;
+
+export const GET_FAILED_INCENTIVE_GRANTS = gql`
+  query GetFailedIncentiveGrants($communityId: ID!) {
+    incentiveGrants(
+      filter: { communityId: $communityId, type: SIGNUP, status: FAILED }
+      sort: { updatedAt: desc }
+    ) {
+      edges {
+        node {
+          id
+          user {
+            id
+            name
+            image
+          }
+          failureCode
+          lastError
+          attemptCount
+          lastAttemptedAt
+        }
+      }
     }
   }
 `;
@@ -67,4 +101,4 @@ export const GET_COMMUNITY_PORTAL_CONFIG = gql`
       firebaseTenantId
     }
   }
-`; 
+`;
