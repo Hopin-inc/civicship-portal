@@ -101,9 +101,18 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  const res = NextResponse.next();
+  // Create new request headers with x-community-id for server components
+  // This makes the header available via headers() from next/headers
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-community-id", communityId);
   
-  // Add x-community-id header for backend requests
+  const res = NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
+  
+  // Also set on response headers for any code that reads from response
   res.headers.set("x-community-id", communityId);
   
   // Add security headers
