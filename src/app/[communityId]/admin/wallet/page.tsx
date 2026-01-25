@@ -27,6 +27,7 @@ export default function WalletPage() {
     (m: GqlMembership) => m.community?.id === communityId,
   )?.role;
 
+  const router = useCommunityRouter();
   const searchParams = useSearchParams();
   const shouldRefresh = searchParams.get("refresh") === "true";
 
@@ -41,7 +42,6 @@ export default function WalletPage() {
   );
   useHeaderConfig(headerConfig);
 
-  const router = useCommunityRouter();
   const handleNavigateToIssue = () => router.push("/admin/wallet/issue");
   const handleNavigateToGrant = () =>
     router.push(`/admin/wallet/grant?currentPoint=${currentPoint}&tab=history`);

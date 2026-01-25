@@ -248,6 +248,7 @@ export type GqlCommunityConfig = {
   __typename?: "CommunityConfig";
   firebaseConfig?: Maybe<GqlCommunityFirebaseConfig>;
   lineConfig?: Maybe<GqlCommunityLineConfig>;
+  signupBonusConfig?: Maybe<GqlCommunitySignupBonusConfig>;
 };
 
 export type GqlCommunityConfigInput = {
@@ -367,6 +368,13 @@ export type GqlCommunityPortalConfig = {
   tokenName: Scalars["String"]["output"];
 };
 
+export type GqlCommunitySignupBonusConfig = {
+  __typename?: "CommunitySignupBonusConfig";
+  bonusPoint: Scalars["Int"]["output"];
+  isEnabled: Scalars["Boolean"]["output"];
+  message?: Maybe<Scalars["String"]["output"]>;
+};
+
 export type GqlCommunitySortInput = {
   createdAt?: InputMaybe<GqlSortDirection>;
 };
@@ -452,9 +460,12 @@ export const GqlErrorCode = {
   AlreadyUsedClaimLink: "ALREADY_USED_CLAIM_LINK",
   CannotEvaluateBeforeOpportunityStart: "CANNOT_EVALUATE_BEFORE_OPPORTUNITY_START",
   ClaimLinkExpired: "CLAIM_LINK_EXPIRED",
+  ConcurrentRetryDetected: "CONCURRENT_RETRY_DETECTED",
   Forbidden: "FORBIDDEN",
+  IncentiveDisabled: "INCENTIVE_DISABLED",
   InsufficientBalance: "INSUFFICIENT_BALANCE",
   InternalServerError: "INTERNAL_SERVER_ERROR",
+  InvalidGrantStatus: "INVALID_GRANT_STATUS",
   InvalidTransferMethod: "INVALID_TRANSFER_METHOD",
   MissingWalletInformation: "MISSING_WALLET_INFORMATION",
   NotFound: "NOT_FOUND",
@@ -469,6 +480,7 @@ export const GqlErrorCode = {
   TicketParticipantMismatch: "TICKET_PARTICIPANT_MISMATCH",
   Unauthenticated: "UNAUTHENTICATED",
   Unknown: "UNKNOWN",
+  UnsupportedGrantType: "UNSUPPORTED_GRANT_TYPE",
   UnsupportedTransactionReason: "UNSUPPORTED_TRANSACTION_REASON",
   ValidationError: "VALIDATION_ERROR",
 } as const;
@@ -607,6 +619,88 @@ export type GqlImageInput = {
   alt?: InputMaybe<Scalars["String"]["input"]>;
   caption?: InputMaybe<Scalars["String"]["input"]>;
   file?: InputMaybe<Scalars["Upload"]["input"]>;
+};
+
+export type GqlIncentiveGrant = {
+  __typename?: "IncentiveGrant";
+  attemptCount: Scalars["Int"]["output"];
+  community: GqlCommunity;
+  createdAt: Scalars["Datetime"]["output"];
+  failureCode?: Maybe<GqlIncentiveGrantFailureCode>;
+  id: Scalars["ID"]["output"];
+  lastAttemptedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  lastError?: Maybe<Scalars["String"]["output"]>;
+  sourceId: Scalars["String"]["output"];
+  status: GqlIncentiveGrantStatus;
+  transaction?: Maybe<GqlTransaction>;
+  type: GqlIncentiveGrantType;
+  updatedAt: Scalars["Datetime"]["output"];
+  user: GqlUser;
+};
+
+export type GqlIncentiveGrantEdge = GqlEdge & {
+  __typename?: "IncentiveGrantEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<GqlIncentiveGrant>;
+};
+
+export const GqlIncentiveGrantFailureCode = {
+  DatabaseError: "DATABASE_ERROR",
+  InsufficientFunds: "INSUFFICIENT_FUNDS",
+  Timeout: "TIMEOUT",
+  Unknown: "UNKNOWN",
+  WalletNotFound: "WALLET_NOT_FOUND",
+} as const;
+
+export type GqlIncentiveGrantFailureCode =
+  (typeof GqlIncentiveGrantFailureCode)[keyof typeof GqlIncentiveGrantFailureCode];
+export type GqlIncentiveGrantFilterInput = {
+  and?: InputMaybe<Array<GqlIncentiveGrantFilterInput>>;
+  communityId?: InputMaybe<Scalars["ID"]["input"]>;
+  not?: InputMaybe<GqlIncentiveGrantFilterInput>;
+  or?: InputMaybe<Array<GqlIncentiveGrantFilterInput>>;
+  status?: InputMaybe<GqlIncentiveGrantStatus>;
+  type?: InputMaybe<GqlIncentiveGrantType>;
+  userId?: InputMaybe<Scalars["ID"]["input"]>;
+};
+
+export type GqlIncentiveGrantRetryInput = {
+  incentiveGrantId: Scalars["ID"]["input"];
+};
+
+export type GqlIncentiveGrantRetryPayload = GqlIncentiveGrantRetrySuccess;
+
+export type GqlIncentiveGrantRetrySuccess = {
+  __typename?: "IncentiveGrantRetrySuccess";
+  incentiveGrant: GqlIncentiveGrant;
+  transaction?: Maybe<GqlTransaction>;
+};
+
+export type GqlIncentiveGrantSortInput = {
+  createdAt?: InputMaybe<GqlSortDirection>;
+  updatedAt?: InputMaybe<GqlSortDirection>;
+};
+
+export const GqlIncentiveGrantStatus = {
+  Completed: "COMPLETED",
+  Failed: "FAILED",
+  Pending: "PENDING",
+  Retrying: "RETRYING",
+} as const;
+
+export type GqlIncentiveGrantStatus =
+  (typeof GqlIncentiveGrantStatus)[keyof typeof GqlIncentiveGrantStatus];
+export const GqlIncentiveGrantType = {
+  Signup: "SIGNUP",
+} as const;
+
+export type GqlIncentiveGrantType =
+  (typeof GqlIncentiveGrantType)[keyof typeof GqlIncentiveGrantType];
+export type GqlIncentiveGrantsConnection = {
+  __typename?: "IncentiveGrantsConnection";
+  edges?: Maybe<Array<Maybe<GqlIncentiveGrantEdge>>>;
+  pageInfo: GqlPageInfo;
+  totalCount: Scalars["Int"]["output"];
 };
 
 export const GqlLanguage = {
@@ -781,6 +875,7 @@ export type GqlMutation = {
   communityUpdateProfile?: Maybe<GqlCommunityUpdateProfilePayload>;
   evaluationBulkCreate?: Maybe<GqlEvaluationBulkCreatePayload>;
   identityCheckPhoneUser: GqlIdentityCheckPhoneUserPayload;
+  incentiveGrantRetry?: Maybe<GqlIncentiveGrantRetryPayload>;
   linkPhoneAuth?: Maybe<GqlLinkPhoneAuthPayload>;
   membershipAcceptMyInvitation?: Maybe<GqlMembershipSetInvitationStatusPayload>;
   membershipAssignManager?: Maybe<GqlMembershipSetRolePayload>;
@@ -819,6 +914,7 @@ export type GqlMutation = {
   transactionDonateSelfPoint?: Maybe<GqlTransactionDonateSelfPointPayload>;
   transactionGrantCommunityPoint?: Maybe<GqlTransactionGrantCommunityPointPayload>;
   transactionIssueCommunityPoint?: Maybe<GqlTransactionIssueCommunityPointPayload>;
+  updateSignupBonusConfig: GqlCommunitySignupBonusConfig;
   userDeleteMe?: Maybe<GqlUserDeletePayload>;
   userSignUp?: Maybe<GqlCurrentUserPayload>;
   userUpdateMyProfile?: Maybe<GqlUserUpdateProfilePayload>;
@@ -866,6 +962,11 @@ export type GqlMutationEvaluationBulkCreateArgs = {
 
 export type GqlMutationIdentityCheckPhoneUserArgs = {
   input: GqlIdentityCheckPhoneUserInput;
+};
+
+export type GqlMutationIncentiveGrantRetryArgs = {
+  input: GqlIncentiveGrantRetryInput;
+  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlMutationLinkPhoneAuthArgs = {
@@ -1054,6 +1155,11 @@ export type GqlMutationTransactionGrantCommunityPointArgs = {
 
 export type GqlMutationTransactionIssueCommunityPointArgs = {
   input: GqlTransactionIssueCommunityPointInput;
+  permission: GqlCheckCommunityPermissionInput;
+};
+
+export type GqlMutationUpdateSignupBonusConfigArgs = {
+  input: GqlUpdateSignupBonusConfigInput;
   permission: GqlCheckCommunityPermissionInput;
 };
 
@@ -1764,6 +1870,8 @@ export type GqlQuery = {
   evaluationHistories: GqlEvaluationHistoriesConnection;
   evaluationHistory?: Maybe<GqlEvaluationHistory>;
   evaluations: GqlEvaluationsConnection;
+  incentiveGrant?: Maybe<GqlIncentiveGrant>;
+  incentiveGrants: GqlIncentiveGrantsConnection;
   membership?: Maybe<GqlMembership>;
   memberships: GqlMembershipsConnection;
   myWallet?: Maybe<GqlWallet>;
@@ -1784,6 +1892,7 @@ export type GqlQuery = {
   reservationHistories: GqlReservationHistoriesConnection;
   reservationHistory?: Maybe<GqlReservationHistory>;
   reservations: GqlReservationsConnection;
+  signupBonusConfig?: Maybe<GqlCommunitySignupBonusConfig>;
   states: GqlStatesConnection;
   ticket?: Maybe<GqlTicket>;
   ticketClaimLink?: Maybe<GqlTicketClaimLink>;
@@ -1867,6 +1976,17 @@ export type GqlQueryEvaluationsArgs = {
   filter?: InputMaybe<GqlEvaluationFilterInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   sort?: InputMaybe<GqlEvaluationSortInput>;
+};
+
+export type GqlQueryIncentiveGrantArgs = {
+  id: Scalars["ID"]["input"];
+};
+
+export type GqlQueryIncentiveGrantsArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<GqlIncentiveGrantFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<GqlIncentiveGrantSortInput>;
 };
 
 export type GqlQueryMembershipArgs = {
@@ -1974,6 +2094,10 @@ export type GqlQueryReservationsArgs = {
   filter?: InputMaybe<GqlReservationFilterInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   sort?: InputMaybe<GqlReservationSortInput>;
+};
+
+export type GqlQuerySignupBonusConfigArgs = {
+  communityId: Scalars["ID"]["input"];
 };
 
 export type GqlQueryStatesArgs = {
@@ -2608,6 +2732,12 @@ export type GqlTransactionsConnection = {
   totalCount: Scalars["Int"]["output"];
 };
 
+export type GqlUpdateSignupBonusConfigInput = {
+  bonusPoint: Scalars["Int"]["input"];
+  isEnabled: Scalars["Boolean"]["input"];
+  message?: InputMaybe<Scalars["String"]["input"]>;
+};
+
 export type GqlUser = {
   __typename?: "User";
   articlesAboutMe?: Maybe<Array<GqlArticle>>;
@@ -2982,6 +3112,35 @@ export type GqlCommunityFieldsFragment = {
   image?: string | null;
 };
 
+export type GqlUpdateSignupBonusConfigMutationVariables = Exact<{
+  input: GqlUpdateSignupBonusConfigInput;
+  communityId: Scalars["ID"]["input"];
+}>;
+
+export type GqlUpdateSignupBonusConfigMutation = {
+  __typename?: "Mutation";
+  updateSignupBonusConfig: {
+    __typename?: "CommunitySignupBonusConfig";
+    bonusPoint: number;
+    isEnabled: boolean;
+    message?: string | null;
+  };
+};
+
+export type GqlIncentiveGrantRetryMutationVariables = Exact<{
+  incentiveGrantId: Scalars["ID"]["input"];
+  communityId: Scalars["ID"]["input"];
+}>;
+
+export type GqlIncentiveGrantRetryMutation = {
+  __typename?: "Mutation";
+  incentiveGrantRetry?: {
+    __typename?: "IncentiveGrantRetrySuccess";
+    incentiveGrant: { __typename?: "IncentiveGrant"; id: string };
+    transaction?: { __typename?: "Transaction"; id: string } | null;
+  } | null;
+};
+
 export type GqlGetCommunitiesQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GqlGetCommunitiesQuery = {
@@ -3003,6 +3162,43 @@ export type GqlGetCommunityQueryVariables = Exact<{
 export type GqlGetCommunityQuery = {
   __typename?: "Query";
   community?: { __typename?: "Community"; id: string; name?: string | null } | null;
+};
+
+export type GqlGetSignupBonusConfigQueryVariables = Exact<{
+  communityId: Scalars["ID"]["input"];
+}>;
+
+export type GqlGetSignupBonusConfigQuery = {
+  __typename?: "Query";
+  signupBonusConfig?: {
+    __typename?: "CommunitySignupBonusConfig";
+    bonusPoint: number;
+    isEnabled: boolean;
+    message?: string | null;
+  } | null;
+};
+
+export type GqlGetFailedIncentiveGrantsQueryVariables = Exact<{
+  communityId: Scalars["ID"]["input"];
+}>;
+
+export type GqlGetFailedIncentiveGrantsQuery = {
+  __typename?: "Query";
+  incentiveGrants: {
+    __typename?: "IncentiveGrantsConnection";
+    edges?: Array<{
+      __typename?: "IncentiveGrantEdge";
+      node?: {
+        __typename?: "IncentiveGrant";
+        id: string;
+        failureCode?: GqlIncentiveGrantFailureCode | null;
+        lastError?: string | null;
+        attemptCount: number;
+        lastAttemptedAt?: Date | null;
+        user: { __typename?: "User"; id: string; name: string; image?: string | null };
+      } | null;
+    } | null> | null;
+  };
 };
 
 export type GqlGetCommunityPortalConfigQueryVariables = Exact<{
@@ -6877,6 +7073,120 @@ export type GetCitiesQueryResult = Apollo.QueryResult<
   GqlGetCitiesQuery,
   GqlGetCitiesQueryVariables
 >;
+export const UpdateSignupBonusConfigDocument = gql`
+  mutation UpdateSignupBonusConfig($input: UpdateSignupBonusConfigInput!, $communityId: ID!) {
+    updateSignupBonusConfig(input: $input, permission: { communityId: $communityId }) {
+      bonusPoint
+      isEnabled
+      message
+    }
+  }
+`;
+export type GqlUpdateSignupBonusConfigMutationFn = Apollo.MutationFunction<
+  GqlUpdateSignupBonusConfigMutation,
+  GqlUpdateSignupBonusConfigMutationVariables
+>;
+
+/**
+ * __useUpdateSignupBonusConfigMutation__
+ *
+ * To run a mutation, you first call `useUpdateSignupBonusConfigMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateSignupBonusConfigMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateSignupBonusConfigMutation, { data, loading, error }] = useUpdateSignupBonusConfigMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *      communityId: // value for 'communityId'
+ *   },
+ * });
+ */
+export function useUpdateSignupBonusConfigMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlUpdateSignupBonusConfigMutation,
+    GqlUpdateSignupBonusConfigMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    GqlUpdateSignupBonusConfigMutation,
+    GqlUpdateSignupBonusConfigMutationVariables
+  >(UpdateSignupBonusConfigDocument, options);
+}
+export type UpdateSignupBonusConfigMutationHookResult = ReturnType<
+  typeof useUpdateSignupBonusConfigMutation
+>;
+export type UpdateSignupBonusConfigMutationResult =
+  Apollo.MutationResult<GqlUpdateSignupBonusConfigMutation>;
+export type UpdateSignupBonusConfigMutationOptions = Apollo.BaseMutationOptions<
+  GqlUpdateSignupBonusConfigMutation,
+  GqlUpdateSignupBonusConfigMutationVariables
+>;
+export const IncentiveGrantRetryDocument = gql`
+  mutation IncentiveGrantRetry($incentiveGrantId: ID!, $communityId: ID!) {
+    incentiveGrantRetry(
+      input: { incentiveGrantId: $incentiveGrantId }
+      permission: { communityId: $communityId }
+    ) {
+      ... on IncentiveGrantRetrySuccess {
+        incentiveGrant {
+          id
+        }
+        transaction {
+          id
+        }
+      }
+    }
+  }
+`;
+export type GqlIncentiveGrantRetryMutationFn = Apollo.MutationFunction<
+  GqlIncentiveGrantRetryMutation,
+  GqlIncentiveGrantRetryMutationVariables
+>;
+
+/**
+ * __useIncentiveGrantRetryMutation__
+ *
+ * To run a mutation, you first call `useIncentiveGrantRetryMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useIncentiveGrantRetryMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [incentiveGrantRetryMutation, { data, loading, error }] = useIncentiveGrantRetryMutation({
+ *   variables: {
+ *      incentiveGrantId: // value for 'incentiveGrantId'
+ *      communityId: // value for 'communityId'
+ *   },
+ * });
+ */
+export function useIncentiveGrantRetryMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlIncentiveGrantRetryMutation,
+    GqlIncentiveGrantRetryMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    GqlIncentiveGrantRetryMutation,
+    GqlIncentiveGrantRetryMutationVariables
+  >(IncentiveGrantRetryDocument, options);
+}
+export type IncentiveGrantRetryMutationHookResult = ReturnType<
+  typeof useIncentiveGrantRetryMutation
+>;
+export type IncentiveGrantRetryMutationResult =
+  Apollo.MutationResult<GqlIncentiveGrantRetryMutation>;
+export type IncentiveGrantRetryMutationOptions = Apollo.BaseMutationOptions<
+  GqlIncentiveGrantRetryMutation,
+  GqlIncentiveGrantRetryMutationVariables
+>;
 export const GetCommunitiesDocument = gql`
   query GetCommunities {
     communities {
@@ -7010,6 +7320,176 @@ export type GetCommunitySuspenseQueryHookResult = ReturnType<typeof useGetCommun
 export type GetCommunityQueryResult = Apollo.QueryResult<
   GqlGetCommunityQuery,
   GqlGetCommunityQueryVariables
+>;
+export const GetSignupBonusConfigDocument = gql`
+  query GetSignupBonusConfig($communityId: ID!) {
+    signupBonusConfig(communityId: $communityId) {
+      bonusPoint
+      isEnabled
+      message
+    }
+  }
+`;
+
+/**
+ * __useGetSignupBonusConfigQuery__
+ *
+ * To run a query within a React component, call `useGetSignupBonusConfigQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetSignupBonusConfigQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetSignupBonusConfigQuery({
+ *   variables: {
+ *      communityId: // value for 'communityId'
+ *   },
+ * });
+ */
+export function useGetSignupBonusConfigQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GqlGetSignupBonusConfigQuery,
+    GqlGetSignupBonusConfigQueryVariables
+  > &
+    ({ variables: GqlGetSignupBonusConfigQueryVariables; skip?: boolean } | { skip: boolean }),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetSignupBonusConfigQuery, GqlGetSignupBonusConfigQueryVariables>(
+    GetSignupBonusConfigDocument,
+    options,
+  );
+}
+export function useGetSignupBonusConfigLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetSignupBonusConfigQuery,
+    GqlGetSignupBonusConfigQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetSignupBonusConfigQuery, GqlGetSignupBonusConfigQueryVariables>(
+    GetSignupBonusConfigDocument,
+    options,
+  );
+}
+export function useGetSignupBonusConfigSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetSignupBonusConfigQuery,
+        GqlGetSignupBonusConfigQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GqlGetSignupBonusConfigQuery,
+    GqlGetSignupBonusConfigQueryVariables
+  >(GetSignupBonusConfigDocument, options);
+}
+export type GetSignupBonusConfigQueryHookResult = ReturnType<typeof useGetSignupBonusConfigQuery>;
+export type GetSignupBonusConfigLazyQueryHookResult = ReturnType<
+  typeof useGetSignupBonusConfigLazyQuery
+>;
+export type GetSignupBonusConfigSuspenseQueryHookResult = ReturnType<
+  typeof useGetSignupBonusConfigSuspenseQuery
+>;
+export type GetSignupBonusConfigQueryResult = Apollo.QueryResult<
+  GqlGetSignupBonusConfigQuery,
+  GqlGetSignupBonusConfigQueryVariables
+>;
+export const GetFailedIncentiveGrantsDocument = gql`
+  query GetFailedIncentiveGrants($communityId: ID!) {
+    incentiveGrants(
+      filter: { communityId: $communityId, type: SIGNUP, status: FAILED }
+      sort: { updatedAt: desc }
+    ) {
+      edges {
+        node {
+          id
+          user {
+            id
+            name
+            image
+          }
+          failureCode
+          lastError
+          attemptCount
+          lastAttemptedAt
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetFailedIncentiveGrantsQuery__
+ *
+ * To run a query within a React component, call `useGetFailedIncentiveGrantsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetFailedIncentiveGrantsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetFailedIncentiveGrantsQuery({
+ *   variables: {
+ *      communityId: // value for 'communityId'
+ *   },
+ * });
+ */
+export function useGetFailedIncentiveGrantsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GqlGetFailedIncentiveGrantsQuery,
+    GqlGetFailedIncentiveGrantsQueryVariables
+  > &
+    ({ variables: GqlGetFailedIncentiveGrantsQueryVariables; skip?: boolean } | { skip: boolean }),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GqlGetFailedIncentiveGrantsQuery,
+    GqlGetFailedIncentiveGrantsQueryVariables
+  >(GetFailedIncentiveGrantsDocument, options);
+}
+export function useGetFailedIncentiveGrantsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetFailedIncentiveGrantsQuery,
+    GqlGetFailedIncentiveGrantsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GqlGetFailedIncentiveGrantsQuery,
+    GqlGetFailedIncentiveGrantsQueryVariables
+  >(GetFailedIncentiveGrantsDocument, options);
+}
+export function useGetFailedIncentiveGrantsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetFailedIncentiveGrantsQuery,
+        GqlGetFailedIncentiveGrantsQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GqlGetFailedIncentiveGrantsQuery,
+    GqlGetFailedIncentiveGrantsQueryVariables
+  >(GetFailedIncentiveGrantsDocument, options);
+}
+export type GetFailedIncentiveGrantsQueryHookResult = ReturnType<
+  typeof useGetFailedIncentiveGrantsQuery
+>;
+export type GetFailedIncentiveGrantsLazyQueryHookResult = ReturnType<
+  typeof useGetFailedIncentiveGrantsLazyQuery
+>;
+export type GetFailedIncentiveGrantsSuspenseQueryHookResult = ReturnType<
+  typeof useGetFailedIncentiveGrantsSuspenseQuery
+>;
+export type GetFailedIncentiveGrantsQueryResult = Apollo.QueryResult<
+  GqlGetFailedIncentiveGrantsQuery,
+  GqlGetFailedIncentiveGrantsQueryVariables
 >;
 export const GetCommunityPortalConfigDocument = gql`
   query GetCommunityPortalConfig($communityId: String!) {

@@ -8,6 +8,7 @@ import {
   ArrowLeftRight,
   CalendarCheck,
   ClipboardList,
+  Gift,
   Image,
   MapPin,
   MegaphoneIcon,
@@ -34,6 +35,12 @@ const adminSettings = [
     title: "ウォレット管理",
     href: "/admin/wallet",
     icon: Wallet,
+    requiredFeature: "points" as FeaturesType,
+  },
+  {
+    title: "特典管理",
+    href: "/admin/bonuses",
+    icon: Gift,
     requiredFeature: "points" as FeaturesType,
   },
 ];
