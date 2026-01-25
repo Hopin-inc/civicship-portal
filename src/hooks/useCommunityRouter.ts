@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams, usePathname } from "next/navigation";
 import { useCallback, useMemo } from "react";
 
 /**
@@ -10,12 +10,19 @@ import { useCallback, useMemo } from "react";
 export function useCommunityRouter() {
   const router = useRouter();
   const params = useParams();
+  const pathname = usePathname();
   const communityId = params?.communityId as string | undefined;
 
   const buildHref = useCallback(
     (href: string) => {
       if (!communityId) {
         return href;
+      }
+
+      // Handle query-only navigation (e.g., "?tab=member")
+      // In this case, preserve the current pathname and just update the query params
+      if (href.startsWith("?")) {
+        return `${pathname}${href}`;
       }
 
       // Skip if already has communityId prefix or is external/absolute URL
@@ -32,7 +39,7 @@ export function useCommunityRouter() {
       const path = href.startsWith("/") ? href : `/${href}`;
       return `/${communityId}${path}`;
     },
-    [communityId]
+    [communityId, pathname]
   );
 
   return useMemo(
