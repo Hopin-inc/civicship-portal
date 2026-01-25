@@ -106,6 +106,12 @@ export async function middleware(request: NextRequest) {
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-community-id", communityId);
   
+  console.log("[Middleware] Setting x-community-id header:", {
+    communityId,
+    pathname,
+    liffState: liffState || "none",
+  });
+  
   const res = NextResponse.next({
     request: {
       headers: requestHeaders,

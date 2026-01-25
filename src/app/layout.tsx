@@ -45,6 +45,11 @@ const RootLayout = async ({
   const headersList = await headers();
   const communityId = headersList.get("x-community-id") || undefined;
   
+  console.log("[RootLayout] Reading x-community-id header:", {
+    communityId: communityId || "not found",
+    allHeaders: Array.from(headersList.keys()),
+  });
+  
   // Fetch community config if communityId is available
   // This is important for LINE OAuth callbacks where the URL is /?liff.state=/neo88/users/me
   // The middleware extracts communityId from liff.state and sets it in the header

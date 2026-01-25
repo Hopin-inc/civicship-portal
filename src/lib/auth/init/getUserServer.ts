@@ -33,6 +33,12 @@ export async function getUserServer(communityId?: string): Promise<{
     if (communityId) {
       headers["X-Community-Id"] = communityId;
     }
+    
+    console.log("[getUserServer] Making GraphQL request:", {
+      communityId: communityId || "not provided",
+      hasXCommunityIdHeader: !!headers["X-Community-Id"],
+      hasCookieHeader: !!headers.cookie,
+    });
 
     const res = await executeServerGraphQLQuery<
       GqlCurrentUserServerQuery,
