@@ -25,6 +25,8 @@ import { logger } from "@/lib/logging";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { useCreateUser } from "@/hooks/auth/actions/useCreateUser";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
+import { useSearchParams } from "next/navigation";
 
 const createFormSchema = (t: (key: string) => string) =>
   z.object({
@@ -42,6 +44,9 @@ export function SignUpForm() {
   const { isAuthenticated, isPhoneVerified, loading } = useAuth();
   const createUser = useCreateUser();
   const communityConfig = useCommunityConfig();
+  const router = useCommunityRouter();
+  const searchParams = useSearchParams();
+  const next = searchParams.get("next");
 
   const [isLoading, setIsLoading] = useState(false);
   const firebaseUser = useAuthStore((s) => s.state.firebaseUser);
@@ -72,8 +77,15 @@ export function SignUpForm() {
         return null;
       }
 
-      await createUser(values.name, values.prefecture, phoneUid);
-      toast.success(t("auth.signup.successMessage"));
+      const result = await createUser(values.name, values.prefecture, phoneUid);
+      if (result) {
+        toast.success(t("auth.signup.successMessage"));
+        // Redirect to next param or home page after successful registration
+        const redirectPath = next && next.startsWith("/") && !next.startsWith("/login") && !next.startsWith("/sign-up")
+          ? next
+          : "/";
+        router.replace(redirectPath);
+      }
     } catch (error) {
       logger.warn("Sign up error", {
         error: error instanceof Error ? error.message : String(error),

@@ -97,10 +97,12 @@ export const useLineAuthProcessing = ({
         );
         const hasMembership = !!user.memberships?.some((m) => m.community?.id === communityId);
 
-        if (hasPhoneIdentity || TokenManager.phoneVerified()) {
+        // Prioritize database state (hasPhoneIdentity) over localStorage flag (TokenManager.phoneVerified())
+        // This prevents issues where a stale localStorage flag causes incorrect auth state
+        if (hasPhoneIdentity) {
           TokenManager.savePhoneAuthFlag(true);
           
-          // Only set user_registered if BOTH phone identity AND membership exist
+          // Set user_registered if BOTH phone identity AND membership exist
           if (hasMembership) {
             logger.debug("[AUTH] useLineAuthProcessing: setting user_registered", {
               userId: user.id,
@@ -116,6 +118,8 @@ export const useLineAuthProcessing = ({
             authStateManager.updateState("user_registered", "useLineAuthProcessing (phone + membership)");
             await authStateManager.handleUserRegistrationStateChange(true);
           } else {
+            // User has phone identity but no membership in current community
+            // Backend should auto-create membership, but if it fails, user needs to complete phone verification again
             logger.debug("[AUTH] useLineAuthProcessing: setting phone_authenticated", {
               userId: user.id,
               hasPhoneIdentity,
@@ -130,6 +134,16 @@ export const useLineAuthProcessing = ({
             authStateManager.updateState("phone_authenticated", "useLineAuthProcessing (phone only, no membership)");
           }
         } else {
+          // User does not have phone identity in database
+          // Clear any stale localStorage flag to prevent incorrect auth state
+          if (TokenManager.phoneVerified()) {
+            logger.debug("[AUTH] useLineAuthProcessing: clearing stale phoneVerified flag", {
+              userId: user.id,
+              hasPhoneIdentity,
+              component: "useLineAuthProcessing",
+            });
+            TokenManager.savePhoneAuthFlag(false);
+          }
           setState({
             currentUser: user,
             authenticationState: "line_authenticated",
