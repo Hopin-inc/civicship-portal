@@ -3,6 +3,7 @@
 import { Item, ItemContent, ItemTitle, ItemDescription } from "@/components/ui/item";
 import { PlaceData } from "../../shared/types/place";
 import { PlaceCardMenu } from "./PlaceCardMenu";
+import CommunityLink from "@/components/navigation/CommunityLink";
 
 interface PlaceItemProps {
   place: PlaceData;
@@ -12,7 +13,7 @@ interface PlaceItemProps {
 export function PlaceItem({ place, refetch }: PlaceItemProps) {
   return (
     <Item asChild>
-      <a href={`/admin/places/${place.id}`} className="flex flex-1 gap-3">
+      <CommunityLink href={`/admin/places/${place.id}`} className="flex flex-1 gap-3">
         {/* 左側コンテンツ */}
         <div className="flex flex-1 flex-col min-w-0">
           <ItemContent>
@@ -29,7 +30,7 @@ export function PlaceItem({ place, refetch }: PlaceItemProps) {
 
         {/* アクションメニュー（右端の…） */}
         <PlaceCardMenu placeId={place.id!} placeName={place.name} onDelete={refetch} />
-      </a>
+      </CommunityLink>
     </Item>
   );
 }

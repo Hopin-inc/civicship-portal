@@ -8,6 +8,7 @@ import { OpportunityActionsMenu } from "./OpportunityActionsMenu";
 import { useOpportunityActions } from "../hooks/useOpportunityActions";
 import { formatISODateTime } from "../../shared/utils/dateFormat";
 import { PUBLISH_STATUS_COLORS } from "../constants/opportunity";
+import CommunityLink from "@/components/navigation/CommunityLink";
 
 interface OpportunityItemProps {
   opportunity: OpportunityListItem;
@@ -24,7 +25,7 @@ export function OpportunityItem({ opportunity, refetch }: OpportunityItemProps) 
 
   return (
     <Item asChild>
-      <a href={`/admin/opportunities/${opportunity.id}`} className="flex flex-1 gap-3">
+      <CommunityLink href={`/admin/opportunities/${opportunity.id}`} className="flex flex-1 gap-3">
         {/* --- LEFT CONTENT --- */}
         <div className="flex flex-1 flex-col min-w-0">
           <ItemContent>
@@ -66,7 +67,7 @@ export function OpportunityItem({ opportunity, refetch }: OpportunityItemProps) 
           onCopyUrl={() => handleCopyUrl(opportunity.id)}
           onDeleteDraft={() => handleDeleteDraft(opportunity.id)}
         />
-      </a>
+      </CommunityLink>
     </Item>
   );
 }
