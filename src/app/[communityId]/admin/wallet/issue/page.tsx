@@ -37,7 +37,7 @@ export default function IssuePointPage() {
   const [displayValue, setDisplayValue] = useState<string>("");
   const [comment, setComment] = useState<string>("");
 
-  const { issuePoint } = useTransactionMutations();
+  const { issuePoint, isAuthReady } = useTransactionMutations();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value;
@@ -76,9 +76,11 @@ export default function IssuePointPage() {
         });
         toast.success(t("adminWallet.issue.success"));
         router.push("/admin/wallet?refresh=true");
+      } else {
+        toast.error(t("adminWallet.issue.errorGeneric"));
       }
     } catch (err) {
-      toast.error;
+      toast.error(t("adminWallet.issue.errorGeneric"));
     }
   };
 
@@ -135,7 +137,7 @@ export default function IssuePointPage() {
               size="lg"
               className="w-full"
               onClick={handleIssuePoint}
-              disabled={!amount || amount <= 0 || amount > INT_LIMIT}
+              disabled={!amount || amount <= 0 || amount > INT_LIMIT || !isAuthReady}
             >
               {t("adminWallet.issue.submit")}
             </Button>

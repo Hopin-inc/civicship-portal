@@ -19,6 +19,7 @@
   "adminWallet.issue.validation.min": "Please specify 0 or more",
   "adminWallet.issue.validation.max": "Please specify 2 billion or less",
   "adminWallet.issue.success": "Points issued successfully",
+  "adminWallet.issue.errorGeneric": "Failed to issue points",
   "adminWallet.common.notSet": "Not set",
   "adminWallet.common.toConfirm": "To confirm"
 }
