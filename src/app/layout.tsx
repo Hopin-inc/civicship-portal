@@ -24,8 +24,8 @@ const font = Inter({ subsets: ["latin"] });
 
 // Root layout uses generic metadata - community-specific metadata is generated in [communityId]/layout.tsx
 export const metadata: Metadata = {
-  title: "Civicship",
-  description: "Community platform",
+  title: "civicship",
+  description: "",
 };
 
 export const viewport: Viewport = {
