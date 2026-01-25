@@ -51,22 +51,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
   });
 
   const refetchUser = useCallback(async () => {
-    console.log("[AuthProvider] refetchUser: starting fetch with useLazyQuery");
-    try {
-      const result = await fetchCurrentUser();
-      console.log("[AuthProvider] refetchUser: fetch completed", {
-        hasData: !!result.data,
-        hasUser: !!result.data?.currentUser?.user,
-        userId: result.data?.currentUser?.user?.id,
-        error: result.error?.message,
-      });
-      return result.data?.currentUser?.user ?? null;
-    } catch (error) {
-      console.error("[AuthProvider] refetchUser: fetch failed", {
-        error: (error as Error).message,
-      });
-      return null;
-    }
+    const result = await fetchCurrentUser();
+    return result.data?.currentUser?.user ?? null;
   }, [fetchCurrentUser]);
 
   useAuthSideEffects({ authStateManager, liffService, refetchUser, hasFullAuth });

@@ -50,12 +50,6 @@ const RootLayout = async ({
   const communityIdFromCookie = cookieStore.get("x-community-id")?.value;
   const communityId = communityIdFromHeader || communityIdFromCookie || undefined;
   
-  console.log("[RootLayout] Reading x-community-id:", {
-    fromHeader: communityIdFromHeader || "not found",
-    fromCookie: communityIdFromCookie || "not found",
-    resolved: communityId || "none",
-  });
-  
   // Fetch community config if communityId is available
   // This is important for LINE OAuth callbacks where the URL is /?liff.state=/neo88/users/me
   // The middleware extracts communityId from liff.state and sets it in the header
