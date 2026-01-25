@@ -106,7 +106,7 @@ export async function middleware(request: NextRequest) {
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-community-id", communityId);
   
-  console.log("[Middleware] Setting x-community-id header:", {
+  console.log("[Middleware] Setting x-community-id:", {
     communityId,
     pathname,
     liffState: liffState || "none",
@@ -120,6 +120,16 @@ export async function middleware(request: NextRequest) {
   
   // Also set on response headers for any code that reads from response
   res.headers.set("x-community-id", communityId);
+  
+  // Set communityId as a cookie as a fallback mechanism
+  // This ensures server components can read it even if header propagation fails
+  res.cookies.set("x-community-id", communityId, {
+    path: "/",
+    httpOnly: false,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 60 * 60, // 1 hour - short-lived since it's just for request context
+  });
   
   // Add security headers
   addSecurityHeaders(res, isDev);

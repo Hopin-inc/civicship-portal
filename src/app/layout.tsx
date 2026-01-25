@@ -17,7 +17,7 @@ import { LiffDeepLinkHandler } from "@/components/liff/LiffDeepLinkHandler";
 import { SwipeBackNavigation } from "@/components/navigation/SwipeBackNavigation";
 import { BackgroundLayer } from "@/components/layout/BackgroundLayer";
 import { CommunityConfigProvider } from "@/contexts/CommunityConfigContext";
-import { headers } from "next/headers";
+import { headers, cookies } from "next/headers";
 import { getCommunityConfig } from "@/lib/communities/config";
 
 const font = Inter({ subsets: ["latin"] });
@@ -43,11 +43,17 @@ const RootLayout = async ({
   // Extract communityId from x-community-id header (set by middleware)
   // This includes communityId extracted from liff.state for LINE OAuth callbacks
   const headersList = await headers();
-  const communityId = headersList.get("x-community-id") || undefined;
+  const cookieStore = await cookies();
   
-  console.log("[RootLayout] Reading x-community-id header:", {
-    communityId: communityId || "not found",
-    allHeaders: Array.from(headersList.keys()),
+  // Try header first, then fall back to cookie (middleware sets both)
+  const communityIdFromHeader = headersList.get("x-community-id");
+  const communityIdFromCookie = cookieStore.get("x-community-id")?.value;
+  const communityId = communityIdFromHeader || communityIdFromCookie || undefined;
+  
+  console.log("[RootLayout] Reading x-community-id:", {
+    fromHeader: communityIdFromHeader || "not found",
+    fromCookie: communityIdFromCookie || "not found",
+    resolved: communityId || "none",
   });
   
   // Fetch community config if communityId is available
