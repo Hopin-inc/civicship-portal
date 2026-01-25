@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { getNftImageUrl } from "@/lib/nfts/image-helper";
+import CommunityLink from "@/components/navigation/CommunityLink";
 
 export interface NftItemData {
   id: string;
@@ -40,7 +41,7 @@ export function NftItem({ nftInstance }: NftItemProps) {
 
   return (
     <Item asChild>
-      <a href={`/nfts/${nftInstance.id}`} className="flex flex-1 gap-3">
+      <CommunityLink href={`/nfts/${nftInstance.id}`} className="flex flex-1 gap-3">
         {/* --- LEFT CONTENT --- */}
         <div className="flex flex-1 flex-col min-w-0">
           <ItemContent>
@@ -70,7 +71,7 @@ export function NftItem({ nftInstance }: NftItemProps) {
             sizes="56px"
           />
         </div>
-      </a>
+      </CommunityLink>
     </Item>
   );
 }
