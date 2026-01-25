@@ -15,7 +15,7 @@ const DEFAULT_OPEN_GRAPH_IMAGE = [
     url: DEFAULT_ASSET_PATHS.OG_IMAGE,
     width: 1200,
     height: 630,
-    alt: "Civicship",
+    alt: "civicship",
   },
 ];
 
@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const user = await fetchUserServer(id, communityId);
 
   const fallbackMetadata: Metadata = {
-    title: communityConfig?.title ?? "Civicship",
+    title: communityConfig?.title ?? "civicship",
     description: communityConfig?.description ?? "",
     openGraph: {
       images: DEFAULT_OPEN_GRAPH_IMAGE,
@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!user) return fallbackMetadata;
 
   return {
-    title: `${user.name} | ${communityConfig?.title ?? "Civicship"}`,
+    title: `${user.name} | ${communityConfig?.title ?? "civicship"}`,
     description: user.bio ?? "",
     openGraph: {
       type: "profile",

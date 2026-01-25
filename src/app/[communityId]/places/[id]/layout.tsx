@@ -15,7 +15,7 @@ const DEFAULT_OPEN_GRAPH_IMAGE = [
     url: DEFAULT_ASSET_PATHS.OG_IMAGE,
     width: 1200,
     height: 630,
-    alt: "Civicship",
+    alt: "civicship",
   },
 ];
 
@@ -29,7 +29,7 @@ export const generateMetadata = async ({
   const place = await fetchPlace(id);
   
   const fallbackMetadata: Metadata = {
-    title: communityConfig?.title ?? "Civicship",
+    title: communityConfig?.title ?? "civicship",
     description: communityConfig?.description ?? "",
     openGraph: {
       images: DEFAULT_OPEN_GRAPH_IMAGE,
@@ -41,7 +41,7 @@ export const generateMetadata = async ({
   const placeDetail = presenterPlaceDetailForMetadata(place);
 
   return {
-    title: `${placeDetail.name} | ${communityConfig?.title ?? "Civicship"}`,
+    title: `${placeDetail.name} | ${communityConfig?.title ?? "civicship"}`,
     description: placeDetail.bio,
     openGraph: {
       title: placeDetail.name,

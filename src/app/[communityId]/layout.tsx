@@ -19,8 +19,8 @@ export async function generateMetadata({ params }: CommunityLayoutProps): Promis
 
   if (!config) {
     return {
-      title: "Civicship",
-      description: "Community platform",
+      title: "civicship",
+      description: "",
       robots: isProduction ? undefined : { index: false, follow: false },
     };
   }
