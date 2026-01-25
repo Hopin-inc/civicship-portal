@@ -3,7 +3,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef } from "react";
 import { AuthContextType, AuthProviderProps } from "@/types/auth";
 import { initAuth } from "@/lib/auth/init";
-import { useCurrentUserServerQuery } from "@/types/graphql";
+import { useCurrentUserServerLazyQuery } from "@/types/graphql";
 import { useAuthDependencies } from "@/hooks/auth/init/useAuthDependencies";
 import { applySsrAuthState } from "@/lib/auth/init/applySsrAuthState";
 import { useAuthActions } from "@/hooks/auth/actions";
@@ -43,16 +43,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     });
   }, [authStateManager, liffService, ssrCurrentUser, ssrLineAuthenticated, ssrPhoneAuthenticated, hasFullAuth]);
 
-  const { refetch } = useCurrentUserServerQuery({
-    skip: Boolean(ssrCurrentUser),
+  // Use useLazyQuery instead of useQuery with skip + refetch
+  // This ensures the query actually executes when called, even if ssrCurrentUser was provided
+  // Using refetch() on a skipped query doesn't reliably execute the network request
+  const [fetchCurrentUser] = useCurrentUserServerLazyQuery({
     fetchPolicy: "network-only",
   });
 
   const refetchUser = useCallback(async () => {
-    console.log("[AuthProvider] refetchUser: starting refetch");
+    console.log("[AuthProvider] refetchUser: starting fetch with useLazyQuery");
     try {
-      const result = await refetch();
-      console.log("[AuthProvider] refetchUser: refetch completed", {
+      const result = await fetchCurrentUser();
+      console.log("[AuthProvider] refetchUser: fetch completed", {
         hasData: !!result.data,
         hasUser: !!result.data?.currentUser?.user,
         userId: result.data?.currentUser?.user?.id,
@@ -60,12 +62,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
       });
       return result.data?.currentUser?.user ?? null;
     } catch (error) {
-      console.error("[AuthProvider] refetchUser: refetch failed", {
+      console.error("[AuthProvider] refetchUser: fetch failed", {
         error: (error as Error).message,
       });
       return null;
     }
-  }, [refetch]);
+  }, [fetchCurrentUser]);
 
   useAuthSideEffects({ authStateManager, liffService, refetchUser, hasFullAuth });
 
