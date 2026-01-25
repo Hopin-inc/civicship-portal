@@ -20,9 +20,19 @@ async function getServerSideCommunityId(): Promise<string | null> {
     // Dynamic import to avoid issues with client-side bundling
     const { headers } = await import("next/headers");
     const headersList = await headers();
-    return headersList.get("x-community-id");
-  } catch {
+    const communityId = headersList.get("x-community-id");
+    
+    // Log for debugging - can be removed after issue is resolved
+    if (!communityId) {
+      console.log("[Apollo] getServerSideCommunityId: x-community-id header not found in request headers");
+    } else {
+      console.log("[Apollo] getServerSideCommunityId: found communityId =", communityId);
+    }
+    
+    return communityId;
+  } catch (error) {
     // headers() is not available (e.g., during module initialization or in client context)
+    console.log("[Apollo] getServerSideCommunityId: headers() not available, error:", error);
     return null;
   }
 }

@@ -32,13 +32,17 @@ export async function executeServerGraphQLQuery<
     ...headers,
   };
 
+  // Extract operation name from query for better debugging
+  const operationNameMatch = query.match(/(?:query|mutation|subscription)\s+(\w+)/);
+  const operationName = operationNameMatch ? operationNameMatch[1] : undefined;
+
   let response: Response;
 
   try {
     response = await fetch(process.env.NEXT_PUBLIC_API_ENDPOINT!, {
       method: "POST",
       headers: requestHeaders,
-      body: JSON.stringify({ query, variables }),
+      body: JSON.stringify({ query, variables, operationName }),
       signal: controller.signal, // ← ★重要
     });
   } catch (err: any) {
