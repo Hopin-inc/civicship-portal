@@ -18,7 +18,8 @@ type LoginStep = "login" | "phone-input" | "registration";
 export default function LoginPage() {
   const router = useCommunityRouter();
   const params = useParams();
-  const communityId = params?.communityId as string;
+  const communityIdParam = params?.communityId;
+  const communityId = Array.isArray(communityIdParam) ? communityIdParam[0] : communityIdParam ?? "";
   const searchParams = useSearchParams();
   const nextPath = decodeURIComponentWithType(
     (searchParams.get("next") ?? "/") as EncodedURIComponent | null,
@@ -63,7 +64,7 @@ export default function LoginPage() {
         return;
       }
       
-      const { title, description } = getLiffLoginErrorMessage(error);
+      const { title, description } = getLiffLoginErrorMessage(err);
       toast.error(
         <div>
           <div className="font-bold">{title}</div>

@@ -21,14 +21,15 @@ export function PhoneInputForm({ isLoading, error, onSubmit, onBack }: Props) {
   const t = useTranslations();
   const [phoneNumber, setPhoneNumber] = useState("");
 
+  const sanitizedPhoneNumber = phoneNumber.replace(/[-\s]/g, "");
+  const isValidPhoneNumber = /^\d{10,11}$/.test(sanitizedPhoneNumber);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (phoneNumber.trim()) {
-      onSubmit(phoneNumber.trim());
+    if (isValidPhoneNumber) {
+      onSubmit(sanitizedPhoneNumber);
     }
   };
-
-  const isValidPhoneNumber = phoneNumber.length >= 10;
 
   return (
     <div className="flex items-center justify-center p-12">
