@@ -22,6 +22,7 @@ import { GqlRole } from "@/types/graphql";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
+import { AdminPortalHeader } from "@/app/admin/components/AdminPortalHeader";
 
 type FeaturesType = string;
 
@@ -123,7 +124,11 @@ export default function AdminPage() {
       : [];
 
   return (
-    <div className="max-w-xl mx-auto mt-8 space-y-6 px-4">
+    <div className="max-w-xl mx-auto space-y-6">
+      {/* ポータルヘッダー */}
+      <AdminPortalHeader />
+
+      <div className="px-4 space-y-6">
       {/* 管理者セクション */}
       <section>
         <h2 className="text-sm text-muted-foreground font-semibold mb-2">管理者</h2>
@@ -173,6 +178,7 @@ export default function AdminPage() {
           )}
         </div>
       </section>
+      </div>
     </div>
   );
 }
