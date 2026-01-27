@@ -9,7 +9,6 @@
 ### 目的
 
 - 全ページを `src/app/[communityId]/` ディレクトリに移動
-- 既存の `Link` コンポーネントを `CommunityLink` に置き換え
 - レガシー URL リダイレクトを有効化
 
 ### 変更対象ファイル
@@ -17,8 +16,12 @@
 | カテゴリ | 変更内容 |
 |---------|---------|
 | ディレクトリ構造 | `src/app/` → `src/app/[communityId]/` |
-| Link コンポーネント | `Link` → `CommunityLink` に置き換え |
-| 環境変数 | `NEXT_PUBLIC_NEW_ROUTING_ENABLED=true` |
+
+### 注意: Link → CommunityLink 置き換えについて
+
+`Link` から `CommunityLink` への置き換えは **PR 2a（Phase 2）で完了済み**。`CommunityLink` は `communityId` がない場合は元の href をそのまま返すフォールバック動作を持つため、Phase 4 でディレクトリ移動を行う前でも既存の動作を壊さない。
+
+この PR では純粋なディレクトリ移動のみを行う。
 
 ### epic/mini-appify 参照コード
 
@@ -109,24 +112,11 @@ export default function SomePage() {
 ### 実装手順
 
 1. `src/app/[communityId]/` ディレクトリを作成
-2. 各ページディレクトリを移動
-3. 移動したページ内の `Link` を `CommunityLink` に置き換え
-4. `useParams()` で communityId を取得するように変更
-5. `NEXT_PUBLIC_NEW_ROUTING_ENABLED=true` を設定
-6. レガシー URL リダイレクトを有効化
+2. 各ページディレクトリを移動（git mv を使用）
+3. `useParams()` で communityId を取得するように変更
+4. レガシー URL リダイレクトを有効化（NODE_ENV で制御済み）
 
-### Link → CommunityLink 置き換え対象
-
-```bash
-# 置き換えが必要なファイルを検索
-grep -r "from \"next/link\"" src/app/[communityId]/ --include="*.tsx"
-```
-
-主な置き換え対象:
-- ナビゲーションリンク
-- カード内のリンク
-- ボタンリンク
-- パンくずリスト
+※ Link → CommunityLink 置き換えは PR 2a で完了済み
 
 ### テスト方法
 
@@ -145,14 +135,12 @@ grep -r "from \"next/link\"" src/app/[communityId]/ --include="*.tsx"
 
 ### ロールバック手順
 
-1. `NEXT_PUBLIC_NEW_ROUTING_ENABLED=false` に設定
-2. ディレクトリを元に戻す（git revert）
-3. Phase 3 の準備コードは残っていても問題なし
+1. ディレクトリを元に戻す（git revert）
+2. Phase 3 の準備コードは残っていても問題なし
 
 ### デプロイ手順
 
 1. PR をマージ
-2. 環境変数 `NEXT_PUBLIC_NEW_ROUTING_ENABLED=true` を設定
-3. デプロイ
-4. 動作確認
-5. 問題があれば環境変数を false に戻してロールバック
+2. デプロイ
+3. 動作確認
+4. 問題があれば git revert でロールバック

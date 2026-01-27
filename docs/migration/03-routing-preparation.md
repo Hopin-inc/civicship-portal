@@ -248,25 +248,25 @@ export async function middleware(request: NextRequest) {
 
 | ファイル | 変更内容 |
 |---------|---------|
-| `src/middleware.ts` | リダイレクトロジック追加（条件付き） |
+| `src/middleware.ts` | リダイレクトロジック追加（NODE_ENV で制御） |
 
 ### 実装方針
+
+NODE_ENV を使用してルーティングを制御する。新しい環境変数は追加しない。
 
 ```typescript
 // src/middleware.ts
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
-  
-  // Check if new routing structure is enabled
-  // This flag will be set to true in Phase 4
-  const isNewRoutingEnabled = process.env.NEXT_PUBLIC_NEW_ROUTING_ENABLED === "true";
+  const isProduction = process.env.NODE_ENV === "production";
   
   // Extract communityId from path
   let communityId = extractCommunityIdFromPath(pathname);
   
-  // Legacy URL redirect (only when new routing is enabled)
-  if (isNewRoutingEnabled && !communityId) {
+  // Legacy URL redirect (only in non-production environments)
+  // In production, this will be enabled after Phase 4 deployment
+  if (!isProduction && !communityId) {
     // Get default communityId from env var
     const defaultCommunityId = process.env.NEXT_PUBLIC_COMMUNITY_ID;
     
@@ -284,19 +284,21 @@ export async function middleware(request: NextRequest) {
 
 ### 実装手順
 
-1. `NEXT_PUBLIC_NEW_ROUTING_ENABLED` 環境変数を追加（デフォルト: false）
-2. リダイレクトロジックを追加（環境変数で制御）
-3. 308 Permanent Redirect を使用
+1. NODE_ENV を使用してリダイレクトを制御
+2. 開発環境（NODE_ENV !== "production"）では新ルーティングを有効化
+3. 本番環境（NODE_ENV === "production"）では Phase 4 デプロイ後に有効化
+4. 308 Permanent Redirect を使用
 
 ### テスト方法
 
-1. `NEXT_PUBLIC_NEW_ROUTING_ENABLED=false` の状態で既存の URL が正常に動作することを確認
-2. `NEXT_PUBLIC_NEW_ROUTING_ENABLED=true` の状態でリダイレクトが動作することを確認（Phase 4 後）
+1. 開発環境で新しい URL 構造（`/neo88/activities`）が動作することを確認
+2. 開発環境で旧 URL（`/activities`）が新 URL にリダイレクトされることを確認
+3. 本番環境では既存の動作が維持されることを確認
 
 ### 注意事項
 
-- この PR 単体ではリダイレクトは無効
-- Phase 4 でページ移動後に環境変数を有効化
+- 新しい環境変数は追加しない（NODE_ENV を使用）
+- 開発環境では新ルーティングが有効、本番環境では Phase 4 デプロイ後に有効化
 - LINE リッチメニューなどの外部リンクが壊れないようにするための対策
 
 ### リダイレクト対象パス

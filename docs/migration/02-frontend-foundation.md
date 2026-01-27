@@ -99,6 +99,12 @@ export function extractCommunityIdFromPath(pathname: string): string | null {
 /**
  * communityId プレフィックスを除いたパスを取得
  * 例: "/neo88/activities" → "/activities"
+ * 
+ * 用途: Middleware の feature gating で使用。
+ * communityId プレフィックスを除いたパスを取得し、
+ * そのパスが有効な機能かどうかを判定する。
+ * 例: `/neo88/activities` → `/activities` に変換し、
+ * `/activities` が enabledFeatures に含まれているかを確認。
  */
 export function getPathWithoutCommunityId(pathname: string, communityId: string): string {
   const prefix = `/${communityId}`;
@@ -130,16 +136,32 @@ export function getPathWithoutCommunityId(pathname: string, communityId: string)
 
 ### 注意事項
 
-- この PR では `CommunityLink` を使用する箇所は変更しない
-- Phase 4 でページ移動時に既存の `Link` を `CommunityLink` に置き換える
+- この PR で既存の `Link` を `CommunityLink` に置き換える
+- `CommunityLink` は `communityId` がない場合は元の href をそのまま返すため、既存の動作は維持される
+- Phase 4 ではディレクトリ移動のみを行う（Link 置き換えは不要）
+
+### Link → CommunityLink 置き換え
+
+PR 2a で全ての内部リンクを `Link` から `CommunityLink` に置き換える。`CommunityLink` は以下のフォールバック動作を持つ：
+
+1. `communityId` が URL パスに含まれている場合: href に communityId プレフィックスを追加
+2. `communityId` が URL パスに含まれていない場合: 元の href をそのまま返す
+
+これにより、Phase 4 でディレクトリ移動を行う前でも、既存の動作を壊さずに `CommunityLink` を導入できる。
 
 ---
 
-## PR 2b: Mini-app 403 エラー対策
+## PR 2b: Mini-app 403 エラー対策（Phase 5b で有効化）
 
 ### 目的
 
 LINE Mini-app 環境で発生する 403 エラー（profile スコープ不足）を解決する。
+
+### 重要: 有効化タイミング
+
+この機能は **Phase 5b（CI/CD 単一デプロイ + 認証完全移行）で有効化** する。Phase 2b では準備のみを行い、本番環境では有効化しない。
+
+理由: 本番環境で統合チャネルへの移行が完了する前に `ensureProfilePermission()` を有効化すると、既存の認証フローに影響を与える可能性がある。
 
 ### 背景
 

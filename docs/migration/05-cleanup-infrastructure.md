@@ -97,6 +97,7 @@ let currentUser = await issuer.internal((tx) =>
 - 環境変数フォールバックを削除
 - CI/CD を単一デプロイに変更
 - 認証サービスを完全に新ロジックに移行
+- `ensureProfilePermission()` を有効化（Mini-app 403 エラー対策）
 
 ### 重要: この PR は一括デプロイ必須
 
@@ -109,6 +110,7 @@ CI/CD の変更と認証サービスの変更は密接に関連しているた�
 | Apollo Client | `src/lib/apollo.ts` | 環境変数フォールバック削除 |
 | Middleware | `src/middleware.ts` | 環境変数フォールバック削除 |
 | 認証サービス | `src/lib/auth/service/liff-service.ts` | "integrated" 設定に完全移行 |
+| 認証サービス | `src/lib/auth/service/liff-service.ts` | `ensureProfilePermission()` 有効化 |
 | CI/CD | `.github/workflows/deploy-to-cloud-run-prod.yml` | Matrix ビルド削除、単一デプロイ化 |
 | CI/CD | `.github/workflows/deploy-to-cloud-run-dev.yml` | Matrix ビルド削除、単一デプロイ化 |
 

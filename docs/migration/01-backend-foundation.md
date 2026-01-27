@@ -16,10 +16,14 @@ Backend に新しい認証・Identity 基盤を追加する。既存の認証フ
 | ファイル | 変更内容 |
 |---------|---------|
 | `src/application/domain/account/identity/service.ts` | `findGlobalIdentity()`, `addIdentityToUser()` 追加 |
-| `src/application/domain/account/identity/data/repository.ts` | `findByUidAndCommunity()` 追加 |
+| `src/application/domain/account/identity/data/repository.ts` | `findByUidAndCommunity()` 追加、`findGlobalIdentity()` 追加（推奨） |
 | `src/application/domain/account/user/service.ts` | `findUserByPhoneNumber()` 追加 |
 | `src/infrastructure/prisma/schema.prisma` | `communityId` nullable 化 |
 | `prisma/migrations/` | マイグレーションファイル追加 |
+
+### 設計上の注意
+
+Repository レベルでも `findGlobalIdentity(uid, platform)` メソッドを追加することを推奨する。`findByUidAndCommunity(uid, platform, null)` のように `null` を直接渡すのは、将来的に混乱を生む可能性があるため。
 
 ### epic/mini-appify 参照コード
 
@@ -29,6 +33,8 @@ Backend に新しい認証・Identity 基盤を追加する。既存の認証フ
 // src/application/domain/account/identity/service.ts
 
 // 新規メソッド: グローバル Identity を検索
+// ※ Repository レベルでも findGlobalIdentity() を追加することを推奨
+//    null を直接渡すのは混乱を生む可能性があるため
 async findGlobalIdentity(uid: string, platform: IdentityPlatform) {
   return this.identityRepository.findByUidAndCommunity(uid, platform, null);
 }
@@ -108,7 +114,14 @@ ALTER TABLE "t_community_configs" ALTER COLUMN "community_id" DROP NOT NULL;
 | ファイル | 変更内容 |
 |---------|---------|
 | `src/application/domain/account/auth/liff/usecase.ts` | 新認証メソッド追加 |
+| `src/application/domain/account/community/config/service.ts` | `getIntegratedLiffConfig()` 追加（推奨） |
 | `src/presentation/router/line.ts` | 新エンドポイント追加 |
+
+### 設計上の注意
+
+`getLiffConfig(ctx, null)` のように `null` を直接渡すのは混乱を生む可能性がある。`getIntegratedLiffConfig(ctx)` のような専用メソッドを追加することを推奨する。
+
+現在の epic/mini-appify の実装では、`getLiffConfig(ctx, _communityId)` は `_communityId` パラメータを受け取るが、実際には使用せず常に `"integrated"` を使用している。この設計は将来的に混乱を生む可能性があるため、明示的なメソッド名に変更することを推奨する。
 
 ### epic/mini-appify 参照コード
 
@@ -202,7 +215,17 @@ static async registerNewUser(request: UserRegistrationRequest): Promise<UserRegi
 
 | ファイル | 変更内容 |
 |---------|---------|
-| `src/presentation/middleware/auth/firebase-auth.ts` | シャドウモード実装 |
+| `src/presentation/middleware/auth/firebase-auth.ts` | シャドウモード呼び出し |
+| `src/presentation/middleware/auth/shadow-mode.ts` | シャドウモードロジック（新規作成） |
+| `src/presentation/middleware/auth/identity-resolution.ts` | Identity 解決ロジック（新規作成） |
+
+### 設計上の注意
+
+firebase-auth.ts にシャドウモードロジックを直接実装すると可読性が下がるため、以下のように分割することを推奨する：
+
+1. `identity-resolution.ts`: グローバル Identity 検索、コミュニティ別 Identity 検索のロジック
+2. `shadow-mode.ts`: 新旧ロジックの比較、ログ出力のロジック
+3. `firebase-auth.ts`: 上記を呼び出すエントリーポイント
 
 ### epic/mini-appify 参照コード
 
