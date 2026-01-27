@@ -216,6 +216,11 @@ export type GqlCommonDocumentOverrides = {
   terms?: Maybe<GqlCommunityDocument>;
 };
 
+export type GqlCommonDocumentOverridesInput = {
+  privacy?: InputMaybe<GqlCommunityDocumentInput>;
+  terms?: InputMaybe<GqlCommunityDocumentInput>;
+};
+
 export type GqlCommunitiesConnection = {
   __typename?: "CommunitiesConnection";
   edges?: Maybe<Array<GqlCommunityEdge>>;
@@ -291,6 +296,15 @@ export type GqlCommunityDocument = {
   type: Scalars["String"]["output"];
 };
 
+export type GqlCommunityDocumentInput = {
+  file?: InputMaybe<Scalars["Upload"]["input"]>;
+  id: Scalars["String"]["input"];
+  order?: InputMaybe<Scalars["Int"]["input"]>;
+  path?: InputMaybe<Scalars["String"]["input"]>;
+  title: Scalars["String"]["input"];
+  type: Scalars["String"]["input"];
+};
+
 export type GqlCommunityEdge = GqlEdge & {
   __typename?: "CommunityEdge";
   cursor: Scalars["String"]["output"];
@@ -351,8 +365,10 @@ export type GqlCommunityPortalConfig = {
   description: Scalars["String"]["output"];
   documents?: Maybe<Array<GqlCommunityDocument>>;
   domain: Scalars["String"]["output"];
+  /** @deprecated No longer supported */
   enableFeatures: Array<Scalars["String"]["output"]>;
   faviconPrefix: Scalars["String"]["output"];
+  features?: Maybe<Array<GqlEnableFeature>>;
   firebaseTenantId?: Maybe<Scalars["String"]["output"]>;
   liffAppId?: Maybe<Scalars["String"]["output"]>;
   liffBaseUrl?: Maybe<Scalars["String"]["output"]>;
@@ -366,6 +382,32 @@ export type GqlCommunityPortalConfig = {
   squareLogoPath: Scalars["String"]["output"];
   title: Scalars["String"]["output"];
   tokenName: Scalars["String"]["output"];
+};
+
+export type GqlCommunityPortalConfigUpsertInput = {
+  adminRootPath?: InputMaybe<Scalars["String"]["input"]>;
+  commonDocumentOverrides?: InputMaybe<GqlCommonDocumentOverridesInput>;
+  description: Scalars["String"]["input"];
+  documents?: InputMaybe<Array<GqlCommunityDocumentInput>>;
+  domain: Scalars["String"]["input"];
+  favicon?: InputMaybe<GqlImageInput>;
+  features: Array<GqlEnableFeature>;
+  logo?: InputMaybe<GqlImageInput>;
+  ogImage?: InputMaybe<GqlImageInput>;
+  regionKey?: InputMaybe<Scalars["String"]["input"]>;
+  regionName?: InputMaybe<Scalars["String"]["input"]>;
+  rootPath?: InputMaybe<Scalars["String"]["input"]>;
+  shortDescription?: InputMaybe<Scalars["String"]["input"]>;
+  squareLogo?: InputMaybe<GqlImageInput>;
+  title: Scalars["String"]["input"];
+  tokenName: Scalars["String"]["input"];
+};
+
+export type GqlCommunityPortalConfigUpsertPayload = GqlCommunityPortalConfigUpsertSuccess;
+
+export type GqlCommunityPortalConfigUpsertSuccess = {
+  __typename?: "CommunityPortalConfigUpsertSuccess";
+  portalConfig: GqlCommunityPortalConfig;
 };
 
 export type GqlCommunitySignupBonusConfig = {
@@ -447,6 +489,20 @@ export type GqlEdge = {
   cursor: Scalars["String"]["output"];
 };
 
+export const GqlEnableFeature = {
+  Article: "ARTICLE",
+  Credential: "CREDENTIAL",
+  JustDaoIt: "JUST_DAO_IT",
+  LanguageSwitcher: "LANGUAGE_SWITCHER",
+  Opportunity: "OPPORTUNITY",
+  Place: "PLACE",
+  Point: "POINT",
+  Prefecture: "PREFECTURE",
+  Quest: "QUEST",
+  Ticket: "TICKET",
+} as const;
+
+export type GqlEnableFeature = (typeof GqlEnableFeature)[keyof typeof GqlEnableFeature];
 export type GqlError = {
   __typename?: "Error";
   code: GqlErrorCode;
@@ -624,7 +680,7 @@ export type GqlImageInput = {
 export type GqlIncentiveGrant = {
   __typename?: "IncentiveGrant";
   attemptCount: Scalars["Int"]["output"];
-  community: GqlCommunity;
+  community?: Maybe<GqlCommunity>;
   createdAt: Scalars["Datetime"]["output"];
   failureCode?: Maybe<GqlIncentiveGrantFailureCode>;
   id: Scalars["ID"]["output"];
@@ -635,7 +691,7 @@ export type GqlIncentiveGrant = {
   transaction?: Maybe<GqlTransaction>;
   type: GqlIncentiveGrantType;
   updatedAt: Scalars["Datetime"]["output"];
-  user: GqlUser;
+  user?: Maybe<GqlUser>;
 };
 
 export type GqlIncentiveGrantEdge = GqlEdge & {
@@ -872,6 +928,7 @@ export type GqlMutation = {
   articleUpdateContent?: Maybe<GqlArticleUpdateContentPayload>;
   communityCreate?: Maybe<GqlCommunityCreatePayload>;
   communityDelete?: Maybe<GqlCommunityDeletePayload>;
+  communityPortalConfigUpsert: GqlCommunityPortalConfigUpsertPayload;
   communityUpdateProfile?: Maybe<GqlCommunityUpdateProfilePayload>;
   evaluationBulkCreate?: Maybe<GqlEvaluationBulkCreatePayload>;
   identityCheckPhoneUser: GqlIdentityCheckPhoneUserPayload;
@@ -946,6 +1003,11 @@ export type GqlMutationCommunityCreateArgs = {
 
 export type GqlMutationCommunityDeleteArgs = {
   id: Scalars["ID"]["input"];
+  permission: GqlCheckCommunityPermissionInput;
+};
+
+export type GqlMutationCommunityPortalConfigUpsertArgs = {
+  input: GqlCommunityPortalConfigUpsertInput;
   permission: GqlCheckCommunityPermissionInput;
 };
 
@@ -3195,7 +3257,7 @@ export type GqlGetFailedIncentiveGrantsQuery = {
         lastError?: string | null;
         attemptCount: number;
         lastAttemptedAt?: Date | null;
-        user: { __typename?: "User"; id: string; name: string; image?: string | null };
+        user?: { __typename?: "User"; id: string; name: string; image?: string | null } | null;
       } | null;
     } | null> | null;
   };
