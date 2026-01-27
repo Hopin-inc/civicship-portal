@@ -128,56 +128,54 @@ export default function AdminPage() {
       {/* ポータルヘッダー */}
       <AdminPortalHeader />
 
-      <div className="px-4 space-y-6">
-      {/* 管理者セクション */}
-      <section>
-        <h2 className="text-sm text-muted-foreground font-semibold mb-2">管理者</h2>
-        <div className="space-y-2">
-          {visibleAdminSettings.length > 0 ? (
-            visibleAdminSettings.map((item) => (
-              <Card
-                key={item.href}
-                onClick={() => router.push(item.href)}
-                className="cursor-pointer hover:bg-background-hover transition"
-              >
-                <CardHeader>
-                  <CardTitle className="text-body-sm font-bold flex items-center space-x-2">
-                    <item.icon className="w-4 h-4" />
-                    <span>{item.title}</span>
-                  </CardTitle>
-                </CardHeader>
-              </Card>
-            ))
-          ) : (
-            <p className="text-muted-foreground text-sm">表示できる設定項目はありません。</p>
-          )}
-        </div>
-      </section>
+      <div className="px-4 space-y-2">
+        {/* 管理者セクション */}
+        <section>
+          <div className="space-y-2">
+            {visibleAdminSettings.length > 0 ? (
+              visibleAdminSettings.map((item) => (
+                <Card
+                  key={item.href}
+                  onClick={() => router.push(item.href)}
+                  className="cursor-pointer hover:bg-background-hover transition"
+                >
+                  <CardHeader>
+                    <CardTitle className="text-body-sm font-bold flex items-center space-x-2">
+                      <item.icon className="w-4 h-4" />
+                      <span>{item.title}</span>
+                    </CardTitle>
+                  </CardHeader>
+                </Card>
+              ))
+            ) : (
+              <p className="text-muted-foreground text-sm">表示できる設定項目はありません。</p>
+            )}
+          </div>
+        </section>
 
-      {/* 運用担当者セクション */}
-      <section>
-        <h2 className="text-sm text-muted-foreground font-semibold mb-2">運用担当者</h2>
-        <div className="space-y-2">
-          {visibleOperatorSettings.length > 0 ? (
-            visibleOperatorSettings.map((item) => (
-              <Card
-                key={item.href}
-                onClick={() => router.push(item.href)}
-                className="cursor-pointer hover:bg-background-hover transition"
-              >
-                <CardHeader>
-                  <CardTitle className="text-body-sm font-bold flex items-center space-x-2">
-                    <item.icon className="w-4 h-4" />
-                    <span>{item.title}</span>
-                  </CardTitle>
-                </CardHeader>
-              </Card>
-            ))
-          ) : (
-            <p className="text-muted-foreground text-sm">表示できる設定項目はありません。</p>
-          )}
-        </div>
-      </section>
+        {/* 運用担当者セクション */}
+        <section>
+          <div className="space-y-2">
+            {visibleOperatorSettings.length > 0 ? (
+              visibleOperatorSettings.map((item) => (
+                <Card
+                  key={item.href}
+                  onClick={() => router.push(item.href)}
+                  className="cursor-pointer hover:bg-background-hover transition"
+                >
+                  <CardHeader>
+                    <CardTitle className="text-body-sm font-bold flex items-center space-x-2">
+                      <item.icon className="w-4 h-4" />
+                      <span>{item.title}</span>
+                    </CardTitle>
+                  </CardHeader>
+                </Card>
+              ))
+            ) : (
+              <p className="text-muted-foreground text-sm">表示できる設定項目はありません。</p>
+            )}
+          </div>
+        </section>
       </div>
     </div>
   );
