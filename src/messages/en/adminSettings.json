@@ -1,6 +1,6 @@
 {
-  "adminSettings.header.title": "Settings",
-  "adminSettings.header.settingsButton": "Settings",
+  "adminSettings.header.title": "Edit",
+  "adminSettings.header.settingsButton": "Edit",
   "adminSettings.validation.titleRequired": "Title is required",
   "adminSettings.validation.titleMaxLength": "Title must be 100 characters or less",
   "adminSettings.validation.descriptionRequired": "Description is required",

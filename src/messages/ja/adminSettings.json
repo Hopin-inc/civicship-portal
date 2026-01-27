@@ -1,6 +1,6 @@
 {
-  "adminSettings.header.title": "設定",
-  "adminSettings.header.settingsButton": "設定",
+  "adminSettings.header.title": "編集",
+  "adminSettings.header.settingsButton": "編集",
   "adminSettings.validation.titleRequired": "タイトルは必須です",
   "adminSettings.validation.titleMaxLength": "タイトルは100文字以内で入力してください",
   "adminSettings.validation.descriptionRequired": "説明は必須です",

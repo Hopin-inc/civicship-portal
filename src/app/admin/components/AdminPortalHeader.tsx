@@ -2,10 +2,10 @@
 
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
 
 /**
  * 管理画面のポータルヘッダーコンポーネント
@@ -22,22 +22,35 @@ export function AdminPortalHeader() {
   const { title, squareLogoPath } = communityConfig;
 
   return (
-    <div className="flex items-center justify-between px-4 py-3 bg-background border-b">
-      <div className="flex items-center gap-3">
-        <Avatar className="h-10 w-10 rounded-md">
-          <AvatarImage src={squareLogoPath} alt={title} />
-          <AvatarFallback className="rounded-md bg-muted">
-            {title?.[0]?.toUpperCase() ?? "C"}
-          </AvatarFallback>
-        </Avatar>
-        <h1 className="text-lg font-semibold">{title}</h1>
+    <div className="bg-background px-8 pt-6">
+      <div className="relative max-w-mobile-l mx-auto w-full">
+        <div className="flex flex-col items-start">
+          <div className="flex items-center w-full gap-3">
+            <div className="flex items-center gap-2 flex-grow min-w-0">
+              <div className="p-1 rounded-sm border bg-background flex-shrink-0">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={squareLogoPath} alt={title} />
+                  <AvatarFallback className="rounded-sm bg-muted text-xs">
+                    {title?.[0]?.toUpperCase() ?? "C"}
+                  </AvatarFallback>
+                </Avatar>
+              </div>
+
+              <h2 className="text-title-sm truncate">{title}</h2>
+            </div>
+            <Link href="/admin/settings" className="flex-shrink-0">
+              <Button
+                variant="icon-only"
+                size="icon"
+                className="text-foreground hover:bg-muted rounded-full"
+                aria-label={t("adminSettings.header.settingsButton")}
+              >
+                <Settings className="h-5 w-5" />
+              </Button>
+            </Link>
+          </div>
+        </div>
       </div>
-      <Link href="/admin/settings">
-        <Button variant="ghost" size="sm">
-          <Settings className="h-4 w-4 mr-1" />
-          {t("adminSettings.header.settingsButton")}
-        </Button>
-      </Link>
     </div>
   );
 }
