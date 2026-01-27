@@ -26,8 +26,8 @@ export function AdminPortalHeader() {
       <div className="relative max-w-mobile-l mx-auto w-full">
         <div className="flex flex-col items-start">
           <div className="flex items-center w-full gap-3">
-            <div className="flex items-center gap-2 flex-grow min-w-0">
-              <div className="p-1 rounded-sm border bg-background flex-shrink-0">
+            <div className="flex items-center gap-3 flex-grow min-w-0">
+              <div className="p-2 rounded-sm border bg-background flex-shrink-0">
                 <Avatar className="h-8 w-8">
                   <AvatarImage src={squareLogoPath} alt={title} />
                   <AvatarFallback className="rounded-sm bg-muted text-xs">
