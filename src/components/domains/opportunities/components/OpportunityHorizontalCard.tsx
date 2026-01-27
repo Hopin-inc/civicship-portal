@@ -1,7 +1,7 @@
 "use client";
 
 import { ActivityCard, QuestCard } from "@/components/domains/opportunities/types";
-import Link from "next/link";
+import CommunityLink from "@/components/navigation/CommunityLink";
 import { SafeImage } from "@/components/ui/safe-image";
 import { JapaneseYenIcon, MapPin } from "lucide-react";
 import React from "react";
@@ -22,7 +22,7 @@ type Props = {
 
 function OpportunityHorizontalCard({ title, image, imageAlt, badge, price, location, pointsToEarn, pointsRequired, href, withShadow = true }: Props) {
   return (
-    <Link
+    <CommunityLink
       href={href ?? ""}
       className="block"
     >
@@ -79,7 +79,7 @@ function OpportunityHorizontalCard({ title, image, imageAlt, badge, price, locat
           </div>
         </div>
       </div>
-    </Link>
+    </CommunityLink>
   );
 }
 

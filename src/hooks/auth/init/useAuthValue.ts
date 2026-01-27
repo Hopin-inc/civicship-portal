@@ -7,6 +7,7 @@ type UseAuthValueArgs = {
   refetchUser: () => Promise<GqlUser | null>;
   actions: {
     logout: AuthContextType["logout"];
+    loginWithLiff: AuthContextType["loginWithLiff"];
   };
 };
 
@@ -31,6 +32,7 @@ export const useAuthValue = ({ refetchUser, actions }: UseAuthValueArgs): AuthCo
       isAuthenticating,
       environment,
       logout: actions.logout,
+      loginWithLiff: actions.loginWithLiff, // Promise<void> matching AuthContextType
       updateAuthState: refetchUser,
       loading: authenticationState === "loading" || isAuthenticating,
     }),
@@ -41,6 +43,7 @@ export const useAuthValue = ({ refetchUser, actions }: UseAuthValueArgs): AuthCo
       isAuthenticating,
       environment,
       actions.logout,
+      actions.loginWithLiff,
       refetchUser,
     ],
   );

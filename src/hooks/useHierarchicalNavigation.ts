@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useCallback } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useCallback } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import { useHeader } from "@/components/providers/HeaderProvider";
 import { matchPaths } from "@/utils/path";
 
@@ -40,7 +41,7 @@ export const PAGE_TYPES = {
  */
 export const useHierarchicalNavigation = () => {
   const pathname = usePathname();
-  const router = useRouter();
+  const router = useCommunityRouter();
   const searchParams = useSearchParams();
   const { config, lastVisitedUrls } = useHeader() as any;
 
@@ -144,7 +145,7 @@ export const useHierarchicalNavigation = () => {
     }
 
     return "/";
-  }, [pathname, config.backTo, getPathPattern, searchParams, isSearchResultPath, getPageType]);
+  }, [pathname, config.backTo, getPathPattern, searchParams, isSearchResultPath, lastVisitedUrls]);
 
   const isChildOf = useCallback(
     (parentPath: string): boolean => {

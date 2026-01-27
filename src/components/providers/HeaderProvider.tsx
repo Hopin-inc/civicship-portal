@@ -119,7 +119,7 @@ const HeaderProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     if (currentLastUrl !== pathname) {
       addToHistory(pageType, pathname);
     }
-  }, [pathname, getPageType, addToHistory]);
+  }, [pathname, getPageType, addToHistory, lastVisitedUrls]);
 
   const contextValue = useMemo(() => ({
     config, 

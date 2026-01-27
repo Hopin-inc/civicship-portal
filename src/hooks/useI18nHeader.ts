@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
-import { useHeaderConfig } from '@/contexts/HeaderContext';
+import useHeaderConfig from '@/hooks/useHeaderConfig';
 import { TranslationKey } from '@/types/i18n';
 
 interface I18nHeaderConfig {

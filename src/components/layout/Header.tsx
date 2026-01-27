@@ -1,8 +1,9 @@
 "use client";
 
 import React from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
+import CommunityLink from "@/components/navigation/CommunityLink";
 import Image from "next/image";
 import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,7 +11,7 @@ import { useHeader } from "@/components/providers/HeaderProvider";
 import { useHierarchicalNavigation } from "@/hooks/useHierarchicalNavigation";
 import { useAuthEnvironment } from "@/hooks/useAuthEnvironment";
 import { cn } from "@/lib/utils";
-import SearchBox from "@/app/search/components/SearchBox";
+import SearchBox from "@/app/[communityId]/search/components/SearchBox";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 interface HeaderProps {
@@ -23,7 +24,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
   const { isInLine } = useAuthEnvironment();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const router = useRouter();
+  const router = useCommunityRouter();
   const communityConfig = useCommunityConfig();
 
   const handleBackButton = () => {
@@ -79,7 +80,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
         )
       )}
       {config.showLogo && communityConfig?.squareLogoPath && (
-        <Link href="/" className="flex items-center space-x-2">
+        <CommunityLink href="/" className="flex items-center space-x-2">
           <Image
             src={communityConfig.squareLogoPath}
             alt="Logo"
@@ -87,7 +88,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
             height={72}
             className="h-[28px] w-auto"
           />
-        </Link>
+        </CommunityLink>
       )}
       {communityConfig?.enableFeatures?.includes("opportunities") && config.showSearchForm && (
         <div className="flex-1 ml-4">

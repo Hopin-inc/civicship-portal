@@ -19,8 +19,8 @@ export function useCommunityConfigContext(): CommunityConfigContextValue {
 }
 
 export function useCommunityConfig(): CommunityPortalConfig | null {
-  const { config } = useCommunityConfigContext();
-  return config;
+  const context = useContext(CommunityConfigContext);
+  return context?.config ?? null;
 }
 
 export function useIsConfigFromDatabase(): boolean {

@@ -3,20 +3,37 @@ import { logger } from "@/lib/logging";
 import { User } from "firebase/auth";
 import { GET_CURRENT_USER_SERVER_QUERY } from "@/graphql/account/user/server";
 
+// Extract communityId from URL path (first segment after /)
+function extractCommunityIdFromPath(pathname: string): string | null {
+  const segments = pathname.split("/").filter(Boolean);
+  if (segments.length === 0) {
+    return null;
+  }
+  const firstSegment = segments[0];
+  // Skip if it's a known non-community path
+  if (["api", "_next", "favicon.ico"].includes(firstSegment)) {
+    return null;
+  }
+  return firstSegment;
+}
+
 export async function fetchCurrentUserClient(
   firebaseUser?: User | null
 ): Promise<GqlCurrentUserPayload["user"] | null> {
   try {
     const apiEndpoint = process.env.NEXT_PUBLIC_API_ENDPOINT;
-    const tenantId = process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID;
-    const communityId = process.env.NEXT_PUBLIC_COMMUNITY_ID;
+    // Extract communityId from URL path for multi-tenant routing
+    const communityId = typeof window !== "undefined" 
+      ? extractCommunityIdFromPath(window.location.pathname) 
+      : null;
 
-    if (!apiEndpoint || !tenantId || !communityId) {
-      logger.error("[fetchCurrentUserClient] Missing required environment variables", {
-        hasApiEndpoint: !!apiEndpoint,
-        hasTenantId: !!tenantId,
-        hasCommunityId: !!communityId,
-      });
+    if (!apiEndpoint) {
+      logger.error("[fetchCurrentUserClient] Missing API endpoint");
+      return null;
+    }
+
+    if (!communityId) {
+      logger.warn("[fetchCurrentUserClient] Could not extract communityId from URL path");
       return null;
     }
 
@@ -25,7 +42,6 @@ export async function fetchCurrentUserClient(
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
       "X-Auth-Mode": authMode,
-      "X-Civicship-Tenant": tenantId,
       "X-Community-Id": communityId,
     };
 

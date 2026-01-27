@@ -22,6 +22,7 @@
   "adminWallet.issue.validation.min": "0以上を指定してください",
   "adminWallet.issue.validation.max": "20億以下を指定してください",
   "adminWallet.issue.success": "ポイントを発行しました",
+  "adminWallet.issue.errorGeneric": "発行に失敗しました",
 
   "adminWallet.common.notSet": "未設定",
   "adminWallet.common.toConfirm": "要確認",

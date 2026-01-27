@@ -13,6 +13,20 @@ import { logger } from "@/lib/logging";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { setContext } from "@apollo/client/link/context";
 
+// Helper to get communityId from Next.js headers on server-side
+// This is used when Apollo client is used in Server Components
+async function getServerSideCommunityId(): Promise<string | null> {
+  try {
+    // Dynamic import to avoid issues with client-side bundling
+    const { headers } = await import("next/headers");
+    const headersList = await headers();
+    return headersList.get("x-community-id");
+  } catch {
+    // headers() is not available (e.g., during module initialization or in client context)
+    return null;
+  }
+}
+
 const httpLink = createUploadLink({
   uri: process.env.NEXT_PUBLIC_API_ENDPOINT,
   credentials: "include",
@@ -21,12 +35,57 @@ const httpLink = createUploadLink({
   },
 });
 
+// Extract communityId from URL path (first segment after /)
+function extractCommunityIdFromPath(pathname: string): string | null {
+  const segments = pathname.split("/").filter(Boolean);
+  if (segments.length === 0) {
+    return null;
+  }
+  const firstSegment = segments[0];
+  // Skip if it's a known non-community path
+  if (["api", "_next", "favicon.ico"].includes(firstSegment)) {
+    return null;
+  }
+  return firstSegment;
+}
+
+// Extract communityId from liff.state parameter (used when LIFF launches at root path)
+function extractCommunityIdFromLiffState(): string | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+  const searchParams = new URLSearchParams(window.location.search);
+  const liffState = searchParams.get("liff.state");
+  if (!liffState) {
+    return null;
+  }
+  // liff.state contains the target path, e.g., "/neo88/users/me"
+  return extractCommunityIdFromPath(liffState);
+}
+
 const requestLink = setContext(async (operation, prevContext) => {
   const isBrowser = typeof window !== "undefined";
   let token: string | null = null;
   // Browser uses id_token mode only (session mode is SSR-only via executeServerGraphQLQuery)
   // Server keeps session mode for any server-side Apollo usage
   let authMode: "session" | "id_token" = isBrowser ? "id_token" : "session";
+  
+  // Extract communityId from current URL path (dynamic multi-tenant routing)
+  // Fallback to liff.state parameter when LIFF launches at root path "/"
+  // On server-side, try to get communityId from Next.js request headers (set by middleware)
+  let communityId: string | null = null;
+  if (isBrowser) {
+    communityId = extractCommunityIdFromPath(window.location.pathname);
+    // When LIFF launches, it starts at "/" with liff.state=/target/path
+    // We need to extract communityId from liff.state in this case
+    if (!communityId) {
+      communityId = extractCommunityIdFromLiffState();
+    }
+  } else {
+    // Server-side: try to get communityId from Next.js request headers
+    // This is set by the middleware based on the URL path
+    communityId = await getServerSideCommunityId();
+  }
 
   if (isBrowser) {
     const { firebaseUser, authenticationState } = useAuthStore.getState().state;
@@ -71,8 +130,8 @@ const requestLink = setContext(async (operation, prevContext) => {
     // Only send Authorization header when we have a token
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     "X-Auth-Mode": authMode,
-    "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
-    "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID,
+    // Use dynamic communityId from URL path for multi-tenant routing
+    ...(communityId ? { "X-Community-Id": communityId } : {}),
   };
 
   return { headers };

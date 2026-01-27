@@ -9,11 +9,10 @@ import {
   Maybe,
 } from "@/types/graphql";
 import { ActivityCard, ActivityDetail, OpportunityHost, QuestCard, QuestDetail } from "@/components/domains/opportunities/types";
-import { presenterArticleCard } from "@/app/articles/data/presenter";
-import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
-import { presenterPlace } from "@/app/places/data/presenter";
-import { getCommunityIdFromEnv } from "@/lib/communities/config";
-import { isDateReservable } from "@/app/reservation/data/presenter/opportunitySlot";
+import { presenterArticleCard } from "@/app/[communityId]/articles/data/presenter";
+import { ActivitySlot, QuestSlot } from "@/app/[communityId]/reservation/data/type/opportunitySlot";
+import { presenterPlace } from "@/app/[communityId]/places/data/presenter";
+import { isDateReservable } from "@/app/[communityId]/reservation/data/presenter/opportunitySlot";
 import { format, isAfter } from "date-fns";
 import { getCrossDayLabel } from "@/utils/date";
 import { ja } from "date-fns/locale";
@@ -53,7 +52,7 @@ export const mapOpportunityCards = (edges: GqlOpportunityEdge[]): (ActivityCard 
     })
     .filter((v): v is ActivityCard | QuestCard => v !== null);
 
-export const presenterActivityCard = (node: Partial<GqlOpportunity>): ActivityCard => {
+export const presenterActivityCard = (node: Partial<GqlOpportunity>, communityId?: string): ActivityCard => {
   return {
     id: node?.id || "",
     title: node?.title || "",
@@ -61,21 +60,21 @@ export const presenterActivityCard = (node: Partial<GqlOpportunity>): ActivityCa
     feeRequired: node?.feeRequired ?? null,
     location: node?.place?.name || "場所未定",
     images: node?.images || [],
-    communityId: getCommunityIdFromEnv(),
+    communityId: communityId ?? node?.community?.id ?? "",
     hasReservableTicket: node?.isReservableWithTicket || false,
     pointsRequired: node?.pointsRequired ?? null,
     slots: node?.slots ?? [],
   };
 };
 
-export const presenterQuestCard = (node: Partial<GqlOpportunity>): QuestCard => {
+export const presenterQuestCard = (node: Partial<GqlOpportunity>, communityId?: string): QuestCard => {
   return {
     id: node?.id || "",
     title: node?.title || "",
     category: node?.category || GqlOpportunityCategory.Quest,
     location: node?.place?.name || "場所未定",
     images: node?.images || [],
-    communityId: getCommunityIdFromEnv(),
+    communityId: communityId ?? node?.community?.id ?? "",
     hasReservableTicket: node?.isReservableWithTicket || false,
     pointsToEarn: node?.pointsToEarn ?? 0,
     slots: node?.slots ?? [],
@@ -83,14 +82,14 @@ export const presenterQuestCard = (node: Partial<GqlOpportunity>): QuestCard => 
   };
 };
 
-export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail => {
+export const presenterActivityDetail = (data: GqlOpportunity, communityId?: string): ActivityDetail => {
   const { images, place, slots, articles, createdByUser } = data;
 
   const activitySlots = presenterActivitySlot(slots, data.id, data.feeRequired);
   const isReservable = activitySlots.some((slot) => slot.isReservable);
 
   return {
-    communityId: getCommunityIdFromEnv(),
+    communityId: communityId ?? data.community?.id ?? "",
     id: data.id,
     title: data.title,
     description: data.description || "",
@@ -115,14 +114,14 @@ export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail =>
   };
 };
 
-export const presenterQuestDetail = (data: GqlOpportunity): QuestDetail => {
+export const presenterQuestDetail = (data: GqlOpportunity, communityId?: string): QuestDetail => {
   const { images, place, slots, articles, createdByUser } = data;
 
   const activitySlots = presenterActivitySlot(slots, data.id, data.feeRequired);
   const isReservable = activitySlots.some((slot) => slot.isReservable);
 
   return {
-    communityId: getCommunityIdFromEnv(),
+    communityId: communityId ?? data.community?.id ?? "",
     id: data.id,
     title: data.title,
     description: data.description || "",
@@ -183,6 +182,7 @@ export const presenterActivitySlot = (
         capacity: slot?.capacity ?? 0,
         remainingCapacity: slot?.remainingCapacity ?? 0,
         feeRequired: feeRequired ?? null,
+        pointsRequired: null,
         applicantCount: 1,
         isReservable,
       };

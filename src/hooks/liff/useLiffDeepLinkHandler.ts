@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { usePathname, useSearchParams, useRouter } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import { logger } from "@/lib/logging";
 
 /**
@@ -20,7 +21,7 @@ import { logger } from "@/lib/logging";
 export const useLiffDeepLinkHandler = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const router = useRouter();
+  const router = useCommunityRouter();
   const hasProcessedRef = useRef(false);
 
   useEffect(() => {

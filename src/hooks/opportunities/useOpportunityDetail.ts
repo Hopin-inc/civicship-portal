@@ -42,7 +42,7 @@ export const useOpportunityDetail = (id: string | undefined) => {
       return presenterQuestDetail(opp as GqlOpportunity);
     }
     return null;
-  }, [data?.opportunity]);
+  }, [data]);
 
   return {
     opportunity,

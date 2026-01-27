@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import React, { useEffect, useRef, useState } from "react";
+import { usePathname, useSearchParams, useParams } from "next/navigation";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import { useAuth } from "@/contexts/AuthProvider";
 import { AuthRedirectService } from "@/lib/auth/service/auth-redirect-service";
 import { decodeURIComponentWithType, EncodedURIComponent, RawURIComponent } from "@/utils/path";
@@ -17,14 +18,17 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   const { loading } = useAuth();
   const authState = useAuthStore((s) => s.state);
   const currentUser = useAuthStore((s) => s.state.currentUser);
-  const router = useRouter();
+  const router = useCommunityRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const params = useParams<{ communityId?: string }>();
+  const communityId = params.communityId;
   const nextParam = searchParams.get("next") as EncodedURIComponent;
 
   const authRedirectService = React.useMemo(() => AuthRedirectService.getInstance(), []);
   const [isReadyToRender, setIsReadyToRender] = useState(false);
   const redirectedRef = React.useRef<string | null>(null);
+  const lastCheckedPathnameRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (authState.isAuthenticating || authState.isAuthInProgress) {
@@ -53,6 +57,7 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       pathWithParams as RawURIComponent,
       decodeURIComponentWithType(nextParam),
       currentUser,
+      communityId,
     );
 
     logger.debug("[AUTH] RouteGuard redirect check", {
@@ -69,16 +74,20 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       if (redirectedRef.current !== redirectPath) {
         redirectedRef.current = redirectPath;
         setIsReadyToRender(false);
+        lastCheckedPathnameRef.current = pathname;
         router.replace(redirectPath);
       }
     } else {
       redirectedRef.current = null;
       setIsReadyToRender(true);
+      lastCheckedPathnameRef.current = pathname;
     }
-  }, [pathname, authState, currentUser, loading, router, authRedirectService, nextParam, searchParams]);
+  }, [pathname, authState, currentUser, loading, router, authRedirectService, nextParam, searchParams, communityId]);
 
   // --- 未確定中は描画しない（チラつき防止） ---
-  if (!isReadyToRender) {
+  // Also show loading if pathname changed (client-side navigation) and we haven't re-checked auth yet
+  const pathnameChanged = lastCheckedPathnameRef.current !== null && lastCheckedPathnameRef.current !== pathname;
+  if (!isReadyToRender || pathnameChanged) {
     return <LoadingIndicator />; // or return null;
   }
 

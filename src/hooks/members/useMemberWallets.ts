@@ -12,7 +12,7 @@ export interface UseMemberWalletsResult {
   loading: boolean;
   error: Error | null;
   refetch: () => void;
-  loadMoreRef: React.RefObject<HTMLDivElement>;
+  loadMoreRef: (node: HTMLDivElement | null) => void;
   hasNextPage: boolean;
   isLoadingMore: boolean;
 }

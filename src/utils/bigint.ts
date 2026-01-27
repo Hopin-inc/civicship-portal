@@ -22,7 +22,7 @@
  */
 export function parseGraphQLBigInt(
   value: string | number | bigint | null | undefined,
-  defaultValue: bigint = 0n
+  defaultValue: bigint = BigInt(0)
 ): bigint {
   if (value === null || value === undefined || value === '') {
     return defaultValue;

@@ -3,14 +3,13 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef } from "react";
 import { AuthContextType, AuthProviderProps } from "@/types/auth";
 import { initAuth } from "@/lib/auth/init";
-import { useCurrentUserServerQuery } from "@/types/graphql";
+import { useCurrentUserServerLazyQuery } from "@/types/graphql";
 import { useAuthDependencies } from "@/hooks/auth/init/useAuthDependencies";
 import { applySsrAuthState } from "@/lib/auth/init/applySsrAuthState";
 import { useAuthActions } from "@/hooks/auth/actions";
 import { useAuthSideEffects } from "@/hooks/auth/sideEffects";
 import { useAuthValue } from "@/hooks/auth/init/useAuthValue";
 import { useLanguageSync } from "@/hooks/useLanguageSync";
-import { logger } from "@/lib/logging";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -31,15 +30,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     if (hasInitialized.current) return;
     hasInitialized.current = true;
 
-    logger.debug("[AUTH] AuthProvider initialization", {
-      hasFullAuth,
-      ssrCurrentUser: !!ssrCurrentUser,
-      ssrCurrentUserId: ssrCurrentUser?.id,
-      ssrLineAuthenticated,
-      ssrPhoneAuthenticated,
-      environment: typeof window !== "undefined" ? liffService.getState() : "SSR",
-    });
-
     // ✅ SSR初期状態適用
     applySsrAuthState(ssrCurrentUser, ssrLineAuthenticated, ssrPhoneAuthenticated);
 
@@ -51,25 +41,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
       ssrLineAuthenticated,
       ssrPhoneAuthenticated,
     });
-  }, [authStateManager, liffService, ssrCurrentUser, ssrLineAuthenticated, ssrPhoneAuthenticated]);
+  }, [authStateManager, liffService, ssrCurrentUser, ssrLineAuthenticated, ssrPhoneAuthenticated, hasFullAuth]);
 
-  const { refetch } = useCurrentUserServerQuery({
-    skip: Boolean(ssrCurrentUser),
+  // Use useLazyQuery instead of useQuery with skip + refetch
+  // This ensures the query actually executes when called, even if ssrCurrentUser was provided
+  // Using refetch() on a skipped query doesn't reliably execute the network request
+  const [fetchCurrentUser] = useCurrentUserServerLazyQuery({
     fetchPolicy: "network-only",
   });
 
   const refetchUser = useCallback(async () => {
-    const { data } = await refetch();
-    return data?.currentUser?.user ?? null;
-  }, [refetch]);
+    const result = await fetchCurrentUser();
+    return result.data?.currentUser?.user ?? null;
+  }, [fetchCurrentUser]);
 
   useAuthSideEffects({ authStateManager, liffService, refetchUser, hasFullAuth });
 
-  const { logout } = useAuthActions({
+  const { logout, loginWithLiff } = useAuthActions({
     liffService,
     phoneAuthService,
+    authStateManager,
   });
-  const actions = React.useMemo(() => ({ logout }), [logout]);
+  const actions = React.useMemo(() => ({ logout, loginWithLiff }), [logout, loginWithLiff]);
 
   const value = useAuthValue({ refetchUser, actions });
 

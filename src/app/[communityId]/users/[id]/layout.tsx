@@ -1,0 +1,86 @@
+import React from "react";
+import { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { fetchUserServer } from "@/app/[communityId]/users/features/shared/server";
+import { getCommunityConfig } from "@/lib/communities/config";
+import { DEFAULT_ASSET_PATHS } from "@/lib/communities/constants";
+import { mapGqlPortfolio, UserProfileProvider } from "@/app/[communityId]/users/features/shared";
+
+type Props = {
+  params: Promise<{ communityId: string; id: string }>;
+};
+
+const DEFAULT_OPEN_GRAPH_IMAGE = [
+  {
+    url: DEFAULT_ASSET_PATHS.OG_IMAGE,
+    width: 1200,
+    height: 630,
+    alt: "civicship",
+  },
+];
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { communityId, id } = await params;
+  const communityConfig = await getCommunityConfig(communityId);
+  const user = await fetchUserServer(id, communityId);
+
+  const fallbackMetadata: Metadata = {
+    title: communityConfig?.title ?? "civicship",
+    description: communityConfig?.description ?? "",
+    openGraph: {
+      images: DEFAULT_OPEN_GRAPH_IMAGE,
+    },
+  };
+
+  if (!user) return fallbackMetadata;
+
+  return {
+    title: `${user.name} | ${communityConfig?.title ?? "civicship"}`,
+    description: user.bio ?? "",
+    openGraph: {
+      type: "profile",
+      title: user.name,
+      description: user.bio ?? "",
+      images: user.image
+        ? [
+            {
+              url: user.image,
+              width: 1200,
+              height: 630,
+              alt: user.name,
+            },
+          ]
+        : DEFAULT_OPEN_GRAPH_IMAGE,
+    },
+  };
+}
+
+export default async function Layout({
+  children,
+  params,
+}: {
+  children: React.ReactNode;
+  params: Promise<{ communityId: string; id: string }>;
+}) {
+  const { communityId, id } = await params;
+  const gqlUser = await fetchUserServer(id, communityId);
+
+  if (!gqlUser) {
+    notFound();
+  }
+
+  const portfolios = (gqlUser.portfolios ?? []).map(mapGqlPortfolio);
+
+  return (
+    <UserProfileProvider
+      value={{
+        userId: gqlUser.id,
+        isOwner: false,
+        gqlUser,
+        portfolios,
+      }}
+    >
+      {children}
+    </UserProfileProvider>
+  );
+}

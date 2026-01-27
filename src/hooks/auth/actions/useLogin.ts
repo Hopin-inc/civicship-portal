@@ -1,7 +1,6 @@
 import { useCallback } from "react";
 import { logger } from "@/lib/logging";
 import { LiffService } from "@/lib/auth/service/liff-service";
-import { RawURIComponent } from "@/utils/path";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { AuthStateManager } from "@/lib/auth/core/auth-state-manager";
 
@@ -9,7 +8,7 @@ export const useLogin = (liffService: LiffService, authStateManager: AuthStateMa
   const setState = useAuthStore((s) => s.setState);
 
   return useCallback(
-    async (redirectPath?: RawURIComponent): Promise<boolean> => {
+    async (redirectPath?: string): Promise<void> => {
       if (authStateManager) {
         authStateManager.updateState("authenticating", "useLogin");
       }
@@ -21,10 +20,10 @@ export const useLogin = (liffService: LiffService, authStateManager: AuthStateMa
           await liffService.initialize();
         }
 
-        const loggedIn = await liffService.login(redirectPath);
-        if (!loggedIn) return false;
-
-        return await liffService.signInWithLiffToken();
+        const loggedIn = await liffService.login(redirectPath as any);
+        if (loggedIn) {
+          await liffService.signInWithLiffToken();
+        }
       } catch (error) {
         logger.warn("LIFF login failed", {
           error: error instanceof Error ? error.message : String(error),
@@ -33,9 +32,8 @@ export const useLogin = (liffService: LiffService, authStateManager: AuthStateMa
         if (authStateManager) {
           authStateManager.updateState("unauthenticated", "useLogin failed");
         }
-
+      } finally {
         setState({ isAuthenticating: false });
-        return false;
       }
     },
     [setState, liffService, authStateManager],

@@ -1,6 +1,5 @@
 import { executeServerGraphQLQuery } from "@/lib/graphql/server";
 import { GET_TRANSACTIONS_SERVER_QUERY } from "@/graphql/account/transaction/query";
-import { getCommunityIdFromEnv } from "@/lib/communities/config";
 import {
   GqlGetTransactionsQuery,
   GqlGetTransactionsQueryVariables,
@@ -8,6 +7,7 @@ import {
 } from "@/types/graphql";
 
 export interface ServerCommunityTransactionsParams {
+  communityId: string;
   first?: number;
   after?: string;
   withDidIssuanceRequests?: boolean;
@@ -26,12 +26,12 @@ const fallbackConnection: GqlTransactionsConnection = {
 
 /**
  * サーバーサイドでコミュニティのトランザクションを取得する関数
+ * @param params.communityId - Community ID from URL path parameter (required for multi-tenant routing)
  */
 export async function getServerCommunityTransactions(
-  params: ServerCommunityTransactionsParams = {},
+  params: ServerCommunityTransactionsParams,
 ): Promise<GqlTransactionsConnection> {
-  const { first = 20, after, withDidIssuanceRequests = true } = params;
-  const communityId = getCommunityIdFromEnv();
+  const { communityId, first = 20, after, withDidIssuanceRequests = true } = params;
 
   try {
     const variables: GqlGetTransactionsQueryVariables = {
@@ -46,9 +46,11 @@ export async function getServerCommunityTransactions(
     const data = await executeServerGraphQLQuery<
       GqlGetTransactionsQuery,
       GqlGetTransactionsQueryVariables
-    >(GET_TRANSACTIONS_SERVER_QUERY, variables);
+    >(GET_TRANSACTIONS_SERVER_QUERY, variables, {
+      "X-Community-Id": communityId,
+    });
 
-    return data.transactions ?? fallbackConnection;
+    return (data.transactions as any) ?? fallbackConnection;
   } catch (error) {
     console.error("Failed to fetch community transactions:", error);
     return fallbackConnection;
@@ -57,12 +59,15 @@ export async function getServerCommunityTransactions(
 
 /**
  * カーソルベースのページネーションでコミュニティのトランザクションを取得する関数
+ * @param communityId - Community ID from URL path parameter (required for multi-tenant routing)
  */
 export async function getServerCommunityTransactionsWithCursor(
+  communityId: string,
   cursor?: string,
   first: number = 20,
 ): Promise<GqlTransactionsConnection> {
   return getServerCommunityTransactions({
+    communityId,
     first,
     after: cursor,
   });

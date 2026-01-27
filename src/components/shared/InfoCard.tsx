@@ -3,7 +3,7 @@ import { Copy, Info, ExternalLink, ChevronRight } from "lucide-react";
 import { toast } from "react-toastify";
 import { truncateText, shortenMiddle } from "@/utils/stringUtils";
 import { InfoCardProps } from "@/types";
-import Link from "next/link";
+import CommunityLink from "@/components/navigation/CommunityLink";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
@@ -61,7 +61,7 @@ const ExternalLinkButton = ({
 }) => (
   <>
     {externalLink && (
-      <Link
+      <CommunityLink
         href={externalLink.url}
         target="_blank"
         rel="noopener noreferrer"
@@ -69,7 +69,7 @@ const ExternalLinkButton = ({
         aria-label={`${secondaryLabel || label}の詳細を開く`}
       >
         <ExternalLink className="w-4 h-4" />
-      </Link>
+      </CommunityLink>
     )}
   </>
 );
@@ -114,14 +114,14 @@ export const InfoCard = ({
   const renderValue = (content: React.ReactNode, className?: string) => {
     if (internalLink) {
       return (
-        <Link
+        <CommunityLink
           href={internalLink}
           className={cn('flex items-center gap-1 hover:underline', className)}
           aria-label={`${label}の詳細ページへ移動`}
         >
           {content}
           <ChevronRight className="w-4 h-4 flex-shrink-0" />
-        </Link>
+        </CommunityLink>
       );
     }
     return <span className={className}>{content}</span>;

@@ -8,6 +8,7 @@ import {
 
 export interface ServerWalletTransactionsParams {
   walletId: string;
+  communityId?: string;
   first?: number;
   after?: string;
   withDidIssuanceRequests?: boolean;
@@ -30,7 +31,7 @@ const fallbackConnection: GqlTransactionsConnection = {
 export async function getServerWalletTransactions(
   params: ServerWalletTransactionsParams,
 ): Promise<GqlTransactionsConnection> {
-  const { walletId, first = 50, after, withDidIssuanceRequests = true } = params;
+  const { walletId, communityId, first = 50, after, withDidIssuanceRequests = true } = params;
 
   try {
     const variables: GqlGetTransactionsQueryVariables = {
@@ -42,12 +43,17 @@ export async function getServerWalletTransactions(
       withDidIssuanceRequests,
     };
 
+    const headers: Record<string, string> = {};
+    if (communityId) {
+      headers["X-Community-Id"] = communityId;
+    }
+
     const data = await executeServerGraphQLQuery<
       GqlGetTransactionsQuery,
       GqlGetTransactionsQueryVariables
-    >(GET_TRANSACTIONS_SERVER_QUERY, variables);
+    >(GET_TRANSACTIONS_SERVER_QUERY, variables, headers);
 
-    return data.transactions ?? fallbackConnection;
+    return (data.transactions as any) ?? fallbackConnection;
   } catch (error) {
     console.error("Failed to fetch wallet transactions:", error);
     return fallbackConnection;
@@ -59,11 +65,13 @@ export async function getServerWalletTransactions(
  */
 export async function getServerWalletTransactionsWithCursor(
   walletId: string,
+  communityId?: string,
   cursor?: string,
   first: number = 20,
 ): Promise<GqlTransactionsConnection> {
   return getServerWalletTransactions({
     walletId,
+    communityId,
     first,
     after: cursor,
   });

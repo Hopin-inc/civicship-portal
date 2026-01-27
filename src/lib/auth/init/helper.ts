@@ -8,7 +8,6 @@ import { User } from "firebase/auth";
 import { LiffService } from "@/lib/auth/service/liff-service";
 import { AuthEnvironment } from "@/lib/auth/core/environment-detector";
 import { logger } from "@/lib/logging";
-import { getCommunityIdFromEnv } from "@/lib/communities/config";
 
 /**
  * 1️⃣ 認証前の初期状態を設定
@@ -158,15 +157,16 @@ export async function restoreUserSession(
 
 /**
  * 5️⃣ phone認証 or 登録状態を評価して認証状態を確定
+ * @param communityId - Community ID from URL path parameter (multi-tenant routing)
  */
 export async function evaluateUserRegistrationState(
   user: GqlUser,
   ssrPhoneAuthenticated: boolean | undefined,
   setState: ReturnType<typeof useAuthStore.getState>["setState"],
   authStateManager: AuthStateManager,
+  communityId: string,
 ): Promise<boolean> {
   const hasPhoneIdentity = !!user.identities?.some((i) => i.platform?.toUpperCase() === "PHONE");
-  const communityId = getCommunityIdFromEnv();
   
   const hasMembershipInCurrentCommunity = !!user.memberships?.some(
     (m) => m.community?.id === communityId

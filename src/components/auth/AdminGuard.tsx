@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
 import { useAuth } from "@/contexts/AuthProvider";
 import { toast } from "react-toastify";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
@@ -9,7 +9,7 @@ import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { GqlMembership, GqlRole } from "@/types/graphql";
 import { AuthRedirectService } from "@/lib/auth/service/auth-redirect-service";
 import { logger } from "@/lib/logging";
-import { AdminRoleContext } from "@/app/admin/context/AdminRoleContext";
+import { AdminRoleContext } from "@/app/[communityId]/admin/context/AdminRoleContext";
 import { AccessPolicy } from "@/lib/auth/core/access-policy";
 
 interface AdminGuardProps {
@@ -18,7 +18,7 @@ interface AdminGuardProps {
 
 export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
   const { isAuthenticated, loading, user: currentUser } = useAuth();
-  const router = useRouter();
+  const router = useCommunityRouter();
   const communityConfig = useCommunityConfig();
   const communityId = communityConfig?.communityId;
 
@@ -43,9 +43,15 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
 
     const checkAdminAccess = () => {
       const pathname = window.location.pathname;
-      const canAccess = AccessPolicy.canAccessRole(currentUser, pathname);
+      if (!communityId) {
+        logger.debug("No communityId found. Cannot check admin access", {
+          component: "AdminGuard",
+        });
+        return;
+      }
+      const canAccess = AccessPolicy.canAccessRole(currentUser, pathname, communityId);
       if (!canAccess) {
-        const redirectPath = AccessPolicy.getFallbackPath(currentUser);
+        const redirectPath = AccessPolicy.getFallbackPath(currentUser, communityId);
         toast.warning("管理者権限がありません");
         router.replace(redirectPath);
         return;
@@ -57,7 +63,7 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
     };
 
     checkAdminAccess();
-  }, [currentUser, isAuthenticated, loading, router, authRedirectService]);
+  }, [currentUser, isAuthenticated, loading, router, authRedirectService, communityId]);
 
   if (loading) {
     return <LoadingIndicator />;

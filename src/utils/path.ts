@@ -18,7 +18,16 @@ export const decodeURIComponentWithType = <T extends EncodedURIComponent | null>
 
 export const matchPaths = (pathname: string, ...pathPatterns: string[]) => {
   const pathOnly = pathname.split(/[?#]/, 1)[0];
-  return pathPatterns.some((path) => micromatch.isMatch(pathOnly, path));
+
+  // /[communityId]/... の形式からプレフィックスを除去
+  const communityIdMatch = pathOnly.match(/^\/([^/]+)(\/.*)?$/);
+  const normalizedPathname = communityIdMatch ? communityIdMatch[2] || "/" : pathOnly;
+
+  return pathPatterns.some((path) => {
+    // パターン側も正規化（先頭のスラッシュを保証）
+    const normalizedPattern = path.startsWith("/") ? path : `/${path}`;
+    return micromatch.isMatch(normalizedPathname, normalizedPattern);
+  });
 };
 
 export const extractSearchParamFromRelativePath = <T = string>(relativePath: string, key: string): T | null => {

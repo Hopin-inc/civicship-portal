@@ -1,6 +1,8 @@
 "use client";
 
-import { TransactionCard } from "@/app/transactions/components/TransactionCard";
+import { useParams } from "next/navigation";
+import { useCallback } from "react";
+import { TransactionCard } from "@/app/[communityId]/transactions/components/TransactionCard";
 import { GqlTransactionsConnection } from "@/types/graphql";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { useInfiniteTransactions } from "@/hooks/transactions/useInfiniteTransactions";
@@ -24,10 +26,18 @@ export const InfiniteTransactionList = ({
   perspectiveWalletId,
   enableClickNavigation = false,
 }: InfiniteTransactionListProps) => {
-  const fetchMore = walletId
-    ? (cursor?: string, first: number = 20) =>
-        getServerWalletTransactionsWithCursor(walletId, cursor, first)
-    : getServerCommunityTransactionsWithCursor;
+  const params = useParams();
+  const communityId = params.communityId as string;
+
+  const fetchMore = useCallback(
+    async (cursor: string, first: number) => {
+      if (walletId) {
+        return getServerWalletTransactionsWithCursor(walletId, communityId, cursor, first);
+      }
+      return getServerCommunityTransactionsWithCursor(communityId, cursor, first);
+    },
+    [walletId, communityId],
+  );
 
   const { transactions, hasNextPage, loading, loadMoreRef } = useInfiniteTransactions({
     initialTransactions,
@@ -45,7 +55,7 @@ export const InfiniteTransactionList = ({
         return (
           <TransactionCard
             key={transaction.id}
-            transaction={transaction}
+            transaction={transaction as any}
             image={image}
             perspectiveWalletId={perspectiveWalletId}
             enableClickNavigation={enableClickNavigation}
@@ -56,7 +66,7 @@ export const InfiniteTransactionList = ({
       })}
 
       {hasNextPage && (
-        <div ref={loadMoreRef} className="flex justify-center py-4">
+        <div ref={loadMoreRef as any} className="flex justify-center py-4">
           {loading && <LoadingIndicator fullScreen={false} />}
         </div>
       )}

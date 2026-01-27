@@ -50,16 +50,12 @@ export class LiffService {
 
   public static getInstance(liffId?: string): LiffService {
     if (!LiffService.instance) {
-      // Use empty string if liffId is not provided - initialization will fail gracefully
-      // and the error will be captured in the state for proper handling
       LiffService.instance = new LiffService(liffId || "");
-      if (!liffId) {
-        // Set error state immediately if LIFF ID is missing
-        LiffService.instance.state.error = new Error("LIFF ID is not configured");
-        logger.warn("LiffService initialized without LIFF ID - LIFF features will be disabled", {
-          component: "LiffService",
-        });
-      }
+    } else if (!LiffService.instance.liffId && liffId) {
+      LiffService.instance.liffId = liffId;
+      LiffService.instance.state.error = null;
+      LiffService.instance.state.isInitialized = false;
+      LiffService.instance.initializationPromise = null;
     }
     return LiffService.instance;
   }
@@ -75,9 +71,40 @@ export class LiffService {
 
     this.initializationPromise = (async () => {
       try {
-        await liff.init({ liffId: this.liffId });
-        this.state.isInitialized = true;
-        this.state.isLoggedIn = liff.isLoggedIn();
+        // Check if we're running inside a LIFF mini-app (SDK is pre-initialized by LINE)
+        // In this case, liff.isInClient() returns true even before liff.init() is called
+        const isInLiffClient = liff.isInClient();
+
+        if (isInLiffClient) {
+          // When running inside LINE mini-app, the SDK is already initialized by LINE
+          // We need to call liff.init() but it may fail if the liffId doesn't match
+          // the one used to launch the mini-app. In this case, we should still
+          // consider the SDK as initialized since LINE has already done it.
+          try {
+            if (this.liffId) {
+              await liff.init({ liffId: this.liffId });
+            }
+          } catch (initError) {
+            // If init fails in LIFF client, the SDK is still usable because
+            // LINE has already initialized it. Log the error but continue.
+            logger.warn("LIFF init in mini-app environment failed, using pre-initialized SDK", {
+              error: initError instanceof Error ? initError.message : String(initError),
+              liffId: this.liffId,
+              isInClient: true,
+            });
+          }
+          // SDK is usable regardless of init result when in LIFF client
+          this.state.isInitialized = true;
+          this.state.isLoggedIn = liff.isLoggedIn();
+        } else {
+          // Normal browser environment - must initialize with liffId
+          if (!this.liffId) {
+            throw new Error("LIFF ID is not configured");
+          }
+          await liff.init({ liffId: this.liffId });
+          this.state.isInitialized = true;
+          this.state.isLoggedIn = liff.isLoggedIn();
+        }
 
         if (this.state.isLoggedIn) {
           await this.updateProfile();
@@ -85,6 +112,10 @@ export class LiffService {
 
         return true;
       } catch (error) {
+        logger.error("LIFF initialization failed", {
+          error: error instanceof Error ? error.message : String(error),
+          liffId: this.liffId,
+        });
         this._handleLiffError(error, "initialize");
         return false;
       } finally {
@@ -156,7 +187,8 @@ export class LiffService {
         expected: true,
       });
     } else {
-      const infoMessage = operation === "login" ? "LIFF login process failed" : "LIFF initialization failed";
+      const infoMessage =
+        operation === "login" ? "LIFF login process failed" : "LIFF initialization failed";
       const errorCategory = operation === "login" ? "auth_temporary" : "initialization_error";
       logger.warn(infoMessage, {
         ...logContext,
@@ -188,6 +220,39 @@ export class LiffService {
     }
   }
 
+  /**
+   * Mini App用: profileスコープの権限を確保する
+   * チャネル同意の簡略化により、デフォルトではopenidのみ。
+   * バックエンドでgetProfileを呼ぶ前に、この権限を取得する必要がある。
+   * @see https://developers.line.biz/ja/news/2025/10/31/channel-consent-simplification/
+   */
+  private async ensureProfilePermission(): Promise<void> {
+    if (typeof window === "undefined") return;
+    if (!liff.isInClient()) return;
+    if (!liff.isApiAvailable("permission")) return;
+
+    try {
+      const permissionStatus = await liff.permission.query("profile");
+
+      logger.info("LIFF profile permission status", {
+        authType: "liff",
+        component: "LiffService",
+        state: permissionStatus.state,
+      });
+
+      if (permissionStatus.state === "prompt") {
+        await liff.permission.requestAll();
+      }
+    } catch (error) {
+      const processedError = error instanceof Error ? error : new Error(String(error));
+      logger.info("LIFF profile permission check failed", {
+        authType: "liff",
+        component: "LiffService",
+        error: processedError.message,
+      });
+    }
+  }
+
   public getAccessToken(): string | null {
     if (!this.state.isInitialized || !this.state.isLoggedIn) {
       return null;
@@ -197,9 +262,15 @@ export class LiffService {
 
   public async signInWithLiffToken(): Promise<boolean> {
     const accessToken = this.getAccessToken();
-    if (!accessToken) return false;
+    if (!accessToken) {
+      return false;
+    }
 
-    const communityId = process.env.NEXT_PUBLIC_COMMUNITY_ID;
+    await this.ensureProfilePermission();
+
+    // For LINE authentication, we always use the 'integrated' configuration
+    // regardless of which community the user is currently in.
+    const configId = "integrated";
     const endpoint = `${process.env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT}/line/liff-login`;
     const authStateManager = AuthStateManager.getInstance();
 
@@ -210,19 +281,22 @@ export class LiffService {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-Community-Id": communityId ?? "",
+            "X-Community-Id": configId,
           },
           body: JSON.stringify({ accessToken }),
         });
 
         if (!response.ok) {
+          const errorText = await response.text();
           if (response.status >= 500 || response.status === 401) {
             if (attempt < 3) continue;
           }
-          throw new Error(`LIFF authentication failed: ${response.status}`);
+          throw new Error(`LIFF authentication failed: ${response.status} - ${errorText}`);
         }
 
-        const { customToken, profile } = await response.json();
+        const responseData = await response.json();
+        const { customToken, profile } = responseData;
+
         const userCredential = await signInWithCustomToken(lineAuth, customToken);
 
         await Promise.race([
@@ -275,7 +349,11 @@ export class LiffService {
       } catch (error) {
         const processedError = error instanceof Error ? error : new Error(String(error));
 
-        if (processedError.message.includes("401") || processedError.message.includes("network") || processedError.message.includes("fetch")) {
+        if (
+          processedError.message.includes("401") ||
+          processedError.message.includes("network") ||
+          processedError.message.includes("fetch")
+        ) {
           await new Promise((r) => setTimeout(r, attempt * 1000)); // 1s,2s,3s
           continue;
         }

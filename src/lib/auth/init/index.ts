@@ -1,5 +1,4 @@
 import { useAuthStore } from "@/lib/auth/core/auth-store";
-import { logger } from "@/lib/logging";
 import { TokenManager } from "@/lib/auth/core/token-manager";
 import { GqlUser } from "@/types/graphql";
 import { AuthEnvironment, detectEnvironment } from "@/lib/auth/core/environment-detector";
@@ -14,6 +13,7 @@ import {
   restoreUserSession,
 } from "@/lib/auth/init/helper";
 import { initializeFirebase } from "@/lib/auth/init/firebase";
+import { logger } from "@/lib/logging";
 
 interface InitAuthParams {
   liffService: LiffService;
@@ -38,15 +38,6 @@ export async function initAuth(params: InitAuthParams) {
   TokenManager.clearDeprecatedCookies();
 
   const environment = detectEnvironment();
-
-  logger.debug("[AUTH] initAuth", {
-    environment,
-    ssrCurrentUser: !!ssrCurrentUser,
-    ssrCurrentUserId: ssrCurrentUser?.id,
-    ssrLineAuthenticated,
-    ssrPhoneAuthenticated,
-    willUseInitAuthFast: !!(ssrCurrentUser && ssrLineAuthenticated),
-  });
 
   if (ssrCurrentUser && ssrLineAuthenticated) {
     return await initAuthFast({
@@ -104,15 +95,12 @@ async function initAuthFast({
     if (typeof window !== "undefined") {
       (async () => {
         try {
-          const firebaseUser = await initializeFirebase(liffService, environment);
+          const { user: firebaseUser } = await initializeFirebase(liffService, environment);
           if (firebaseUser) {
             useAuthStore.getState().setState({ firebaseUser });
-            logger.debug("[AUTH] initAuthFast: Firebase user hydrated for CSR", {
-              uid: firebaseUser.uid,
-            });
           }
         } catch (error) {
-          logger.warn("[AUTH] initAuthFast: Failed to hydrate Firebase user", { error });
+          logger.warn("initAuthFast: Failed to hydrate Firebase user", { error });
         }
       })();
     }
@@ -120,6 +108,20 @@ async function initAuthFast({
     logger.error("initAuthFast failed", { error: e });
     finalizeAuthState("unauthenticated", undefined, setState, authStateManager);
   }
+}
+
+// Extract communityId from URL path (first segment after /)
+function extractCommunityIdFromPath(pathname: string): string | null {
+  const segments = pathname.split("/").filter(Boolean);
+  if (segments.length === 0) {
+    return null;
+  }
+  const firstSegment = segments[0];
+  // Skip if it's a known non-community path
+  if (["api", "_next", "favicon.ico", "login", "sign-up"].includes(firstSegment)) {
+    return null;
+  }
+  return firstSegment;
 }
 
 async function initAuthFull({
@@ -140,7 +142,15 @@ async function initAuthFull({
   try {
     prepareInitialState(setState);
 
-    const firebaseUser = await initializeFirebase(liffService, environment);
+    const { user: firebaseUser, signInFailed } = await initializeFirebase(liffService, environment);
+    
+    // If LIFF sign-in explicitly failed, finalize as unauthenticated immediately
+    // This prevents infinite loading when LIFF is logged in but Firebase sign-in fails
+    if (signInFailed) {
+      finalizeAuthState("unauthenticated", undefined, setState, authStateManager);
+      return;
+    }
+    
     if (!firebaseUser) {
       const shouldContinue = handleUnauthenticatedBranch(
         liffService,
@@ -164,7 +174,17 @@ async function initAuthFull({
       return;
     }
 
-    await evaluateUserRegistrationState(user, ssrPhoneAuthenticated, setState, authStateManager);
+    // Extract communityId from URL path for multi-tenant routing
+    const communityId = typeof window !== "undefined" 
+      ? extractCommunityIdFromPath(window.location.pathname) 
+      : null;
+    
+    if (!communityId) {
+      finalizeAuthState("line_authenticated", user, setState, authStateManager);
+      return;
+    }
+
+    await evaluateUserRegistrationState(user, ssrPhoneAuthenticated, setState, authStateManager, communityId);
   } catch (error) {
     logger.warn("initAuthFull failed", { error });
     finalizeAuthState("unauthenticated", undefined, setState, authStateManager);

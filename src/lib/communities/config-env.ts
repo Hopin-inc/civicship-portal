@@ -5,18 +5,6 @@
  */
 
 /**
- * Get community ID from environment variable
- */
-export function getCommunityIdFromEnv(): string {
-  const communityId = process.env.NEXT_PUBLIC_COMMUNITY_ID;
-  if (!communityId) {
-    console.warn("NEXT_PUBLIC_COMMUNITY_ID is not set, using 'default'");
-    return "default";
-  }
-  return communityId;
-}
-
-/**
  * Minimal config type for middleware/edge runtime use
  */
 export interface EdgeCommunityConfig {

@@ -28,10 +28,13 @@ export async function executeServerGraphQLQuery<
   const requestHeaders = {
     "Content-Type": "application/json",
     "X-Auth-Mode": "session",
-    "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID!,
-    "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID!,
+    // X-Community-Id should be passed via headers parameter for multi-tenant routing
     ...headers,
   };
+
+  // Extract operation name from query for better debugging
+  const operationNameMatch = query.match(/(?:query|mutation|subscription)\s+(\w+)/);
+  const operationName = operationNameMatch ? operationNameMatch[1] : undefined;
 
   let response: Response;
 
@@ -39,7 +42,7 @@ export async function executeServerGraphQLQuery<
     response = await fetch(process.env.NEXT_PUBLIC_API_ENDPOINT!, {
       method: "POST",
       headers: requestHeaders,
-      body: JSON.stringify({ query, variables }),
+      body: JSON.stringify({ query, variables, operationName }),
       signal: controller.signal, // ← ★重要
     });
   } catch (err: any) {

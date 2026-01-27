@@ -1,0 +1,58 @@
+"use client";
+
+import { useParams } from "next/navigation";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
+import useHeaderConfig from "@/hooks/useHeaderConfig";
+import { PlaceFormEditor } from "../features/editor/components/PlaceFormEditor";
+import { useGetPlaceQuery } from "@/types/graphql";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { useMemo } from "react";
+import { presentPlaceForEdit } from "../features/editor/presenters/presentPlaceForEdit";
+
+export default function EditPlacePage() {
+  const params = useParams();
+  const router = useCommunityRouter();
+  const placeId = params?.id as string;
+
+  const { data, loading, error } = useGetPlaceQuery({
+    variables: { id: placeId },
+    skip: !placeId,
+    fetchPolicy: "network-only",
+  });
+
+  const headerConfig = useMemo(
+    () => ({
+      title: "場所を編集",
+      showLogo: false,
+      showBackButton: true,
+      backTo: "/admin/places",
+    }),
+    []
+  );
+  useHeaderConfig(headerConfig);
+
+  // 初期データ変換（presenter使用）
+  const initialData = useMemo(() => {
+    if (!data?.place) return undefined;
+    return presentPlaceForEdit(data.place as any);
+  }, [data]);
+
+  const handleSuccess = () => {
+    // 更新成功後、一覧ページに戻る
+    router.push("/admin/places");
+  };
+
+  if (loading) {
+    return <LoadingIndicator fullScreen />;
+  }
+
+  if (error || !data?.place) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-error">場所の読み込みに失敗しました</p>
+      </div>
+    );
+  }
+
+  return <PlaceFormEditor placeId={placeId} initialData={initialData} onSuccess={handleSuccess} />;
+}

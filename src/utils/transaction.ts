@@ -5,7 +5,7 @@ import {
   GqlWallet,
   GqlWalletType,
 } from "@/types/graphql";
-import type { AppTransaction, TransactionDescriptionData } from "@/app/wallets/features/shared/type";
+import type { AppTransaction, TransactionDescriptionData } from "@/app/[communityId]/wallets/features/shared/type";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { CommunityPortalConfig } from "@/lib/communities/config";
 

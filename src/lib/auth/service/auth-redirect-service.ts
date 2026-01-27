@@ -24,6 +24,7 @@ export class AuthRedirectService {
     pathname: RawURIComponent,
     next?: RawURIComponent | null,
     currentUser?: GqlUser | null,
+    communityId?: string,
   ): RawURIComponent | null {
     const authState = this.authStateManager.getState();
     const basePath = pathname.split("?")[0];
@@ -49,6 +50,8 @@ export class AuthRedirectService {
       authState,
       next,
       nextParam,
+      currentUser,
+      communityId,
     );
     if (redirectFromLogin) {
       logger.debug("[AUTH] AuthRedirectService: redirect from handleAuthEntryFlow", {
@@ -65,7 +68,7 @@ export class AuthRedirectService {
       return redirectFromUserPath;
     }
 
-    const redirectByRole = this.handleRoleRestriction(currentUser, basePath);
+    const redirectByRole = this.handleRoleRestriction(currentUser, basePath, communityId);
     if (redirectByRole) {
       logger.debug("[AUTH] AuthRedirectService: redirect from handleRoleRestriction", {
         redirectPath: redirectByRole,
@@ -92,34 +95,53 @@ export class AuthRedirectService {
     authState: AuthenticationState,
     next?: string | null,
     nextParam?: string,
+    currentUser?: GqlUser | null,
+    communityId?: string,
   ): RawURIComponent | null {
     if (!this.isAuthEntryPath(basePath)) return null;
 
     switch (authState) {
       case "unauthenticated":
-        if (basePath !== "/login") {
+        if (!matchPaths(basePath, "/login")) {
           return `/login${nextParam}` as RawURIComponent; // 未ログイン → ログインへ
         }
         return null;
 
       case "line_authenticated": {
         const target = `/sign-up/phone-verification${nextParam}`;
-        if (pathname === target || basePath === "/sign-up/phone-verification") return null; // すでに居る場合はリダイレクト不要
+        if (matchPaths(basePath, "/sign-up/phone-verification")) return null; // すでに居る場合はリダイレクト不要
         return target as RawURIComponent; // LINE認証済み → 電話認証へ
       }
 
       case "phone_authenticated":
-        if (basePath !== "/sign-up") {
+        if (!matchPaths(basePath, "/sign-up")) {
           return `/sign-up${nextParam}` as RawURIComponent; // 電話認証済み → サインアップへ
         }
         return null;
 
-      case "user_registered":
+      case "user_registered": {
+        // 登録済みユーザーが現在のコミュニティにメンバーシップを持っていない場合、
+        // 電話認証ページに留まることを許可する（checkPhoneUserでメンバーシップが作成される）
+        if (matchPaths(basePath, "/sign-up/phone-verification")) {
+          const hasMembershipInCurrentCommunity = currentUser?.memberships?.some(
+            (m) => m.community?.id === communityId
+          );
+          if (!hasMembershipInCurrentCommunity) {
+            logger.debug("[AUTH] handleAuthEntryFlow: user_registered without membership, staying on phone-verification", {
+              userId: currentUser?.id,
+              communityId,
+              membershipIds: currentUser?.memberships?.map(m => m.community?.id) ?? [],
+              component: "AuthRedirectService",
+            });
+            return null; // 電話認証ページに留まる
+          }
+        }
         // 登録済みユーザーが sign-up 系や login に来たらトップ or nextへ
         if (next?.startsWith("/") && !next.startsWith("/login") && !next.startsWith("/sign-up")) {
           return next as RawURIComponent;
         }
         return "/" as RawURIComponent;
+      }
 
       default:
         return null;
@@ -161,6 +183,7 @@ export class AuthRedirectService {
   private handleRoleRestriction(
     currentUser: GqlUser | null | undefined,
     basePath: string,
+    communityId?: string,
   ): RawURIComponent | null {
     logger.debug("[AUTH] handleRoleRestriction: start", {
       basePath,
@@ -168,17 +191,18 @@ export class AuthRedirectService {
       hasMemberships: !!currentUser?.memberships?.length,
       membershipsCount: currentUser?.memberships?.length ?? 0,
       membershipIds: currentUser?.memberships?.map(m => m.community?.id) ?? [],
+      communityId,
       component: "AuthRedirectService",
     });
 
-    if (!currentUser) {
-      logger.debug("[AUTH] handleRoleRestriction: no currentUser", {
+    if (!currentUser || !communityId) {
+      logger.debug("[AUTH] handleRoleRestriction: no currentUser or communityId", {
         component: "AuthRedirectService",
       });
       return null;
     }
 
-    const canAccess = AccessPolicy.canAccessRole(currentUser, basePath);
+    const canAccess = AccessPolicy.canAccessRole(currentUser, basePath, communityId);
     logger.debug("[AUTH] handleRoleRestriction: canAccessRole result", {
       basePath,
       userId: currentUser.id,
@@ -187,7 +211,7 @@ export class AuthRedirectService {
     });
 
     if (!canAccess) {
-      const fallbackPath = AccessPolicy.getFallbackPath(currentUser);
+      const fallbackPath = AccessPolicy.getFallbackPath(currentUser, communityId);
       logger.debug("[AUTH] handleRoleRestriction: redirecting to fallback (master logic)", {
         basePath,
         userId: currentUser.id,

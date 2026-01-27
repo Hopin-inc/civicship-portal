@@ -22,7 +22,8 @@ interface GetMembershipListServerResponse {
 }
 
 export async function getMembershipListServer(
-  variables: GetMembershipListServerVariables
+  variables: GetMembershipListServerVariables,
+  communityId?: string
 ): Promise<{
   connection: GqlMembershipsConnection | null;
 }> {
@@ -37,13 +38,18 @@ export async function getMembershipListServer(
   }
 
   try {
+    const headers: Record<string, string> = cookieHeader ? { cookie: cookieHeader } : {};
+    if (communityId) {
+      headers["X-Community-Id"] = communityId;
+    }
+
     const res = await executeServerGraphQLQuery<
       GetMembershipListServerResponse,
       GetMembershipListServerVariables
     >(
       GET_MEMBERSHIP_LIST_SERVER_QUERY,
       variables,
-      cookieHeader ? { cookie: cookieHeader } : {}
+      headers
     );
 
     return {

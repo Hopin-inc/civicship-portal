@@ -1,20 +1,20 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
-import { buildSearchResultParams, formatDateRange } from "@/app/search/data/presenter";
-import SearchTabs, { SearchTabType } from "@/app/search/components/Tabs";
-import { SearchFilterType } from "@/app/search/hooks/useSearch";
+import { useCommunityRouter } from "@/hooks/useCommunityRouter";
+import { buildSearchResultParams, formatDateRange } from "@/app/[communityId]/search/data/presenter";
+import SearchTabs, { SearchTabType } from "@/app/[communityId]/search/components/Tabs";
+import { SearchFilterType } from "@/app/[communityId]/search/hooks/useSearch";
 import { prefectureOptions } from "@/shared/prefectures/constants";
-import { useSearchForm } from "@/app/search/hooks/useSearchForm";
-import SearchForm from "@/app/search/components/SearchForm";
-import SearchFilters from "@/app/search/components/SearchFilters";
-import SearchFooter from "@/app/search/components/Footer";
-import SearchFilterSheets from "@/app/search/components/SearchFilterSheet";
+import { useSearchForm } from "@/app/[communityId]/search/hooks/useSearchForm";
+import SearchForm from "@/app/[communityId]/search/components/SearchForm";
+import SearchFilters from "@/app/[communityId]/search/components/SearchFilters";
+import SearchFooter from "@/app/[communityId]/search/components/Footer";
+import SearchFilterSheets from "@/app/[communityId]/search/components/SearchFilterSheet";
 import { useFeatureCheck } from "@/hooks/useFeatureCheck";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
-import { useTranslations, useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
 import { getPrefectureKey } from "@/lib/i18n/prefectures";
 
 interface SearchModalProps {
@@ -25,8 +25,7 @@ interface SearchModalProps {
 
 export default function SearchModal({ isOpen, onClose, type }: SearchModalProps) {
   const t = useTranslations();
-  const locale = useLocale();
-  const router = useRouter();
+  const router = useCommunityRouter();
   const shouldShowQuests = useFeatureCheck("quests");
 
   const defaultTab: SearchTabType = shouldShowQuests && type === "quest" ? "quest" : "activity";
@@ -59,7 +58,7 @@ export default function SearchModal({ isOpen, onClose, type }: SearchModalProps)
       Object.fromEntries(
         prefectureOptions.map((value) => [value, t(getPrefectureKey(value))])
       ),
-    [t, locale]
+    [t]
   );
 
   const prefectures = useMemo(
@@ -68,7 +67,7 @@ export default function SearchModal({ isOpen, onClose, type }: SearchModalProps)
         id: value,
         name: t(getPrefectureKey(value)),
       })),
-    [t, locale]
+    [t]
   );
 
   const handleSearch = () => {

@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import CommunityLink from "@/components/navigation/CommunityLink";
 import { Book, ClipboardList, Settings, Ticket } from "lucide-react";
 import { usePathname } from "next/navigation";
 import React from "react";
@@ -20,13 +20,13 @@ const AdminBottomBar: React.FC<AdminBottomBarProps> = ({ className }) => {
   const enabledFeatures = communityConfig?.enableFeatures ?? [];
 
   if (
-    !pathname.startsWith("/admin") ||
-    pathname.startsWith("/admin/reservations/") ||
-    pathname.startsWith("/admin/credentials/") ||
-    pathname.startsWith("/admin/tickets/") ||
-    pathname.startsWith("/admin/opportunities/") ||
-    pathname.startsWith("/admin/members") ||
-    pathname.startsWith("/admin/wallet/")
+    !matchPaths(pathname, "/admin", "/admin/*") ||
+    matchPaths(pathname, "/admin/reservations/*") ||
+    matchPaths(pathname, "/admin/credentials/*") ||
+    matchPaths(pathname, "/admin/tickets/*") ||
+    matchPaths(pathname, "/admin/opportunities/*") ||
+    matchPaths(pathname, "/admin/members") ||
+    matchPaths(pathname, "/admin/wallet/*")
   ) {
     return null;
   }
@@ -41,7 +41,7 @@ const AdminBottomBar: React.FC<AdminBottomBarProps> = ({ className }) => {
       <div className="max-w-screen-xl mx-auto px-4">
         <div className="flex justify-around items-center">
           {enabledFeatures.includes("opportunities") && (
-            <Link
+            <CommunityLink
               href="/admin/reservations"
               className={cn(
                 getLinkStyle("/admin/reservations", "/admin/reservations/*"),
@@ -50,19 +50,19 @@ const AdminBottomBar: React.FC<AdminBottomBarProps> = ({ className }) => {
             >
               <Book size={24} />
               <span className="text-xs mt-1">{t("navigation.adminBottomBar.reservations")}</span>
-            </Link>
+            </CommunityLink>
           )}
           {enabledFeatures.includes("tickets") && (
-            <Link
+            <CommunityLink
               href="/admin/tickets"
               className={cn(getLinkStyle("/admin/tickets", "/admin/tickets/*"), "flex-grow")}
             >
               <Ticket size={24} />
               <span className="text-xs mt-1">{t("navigation.adminBottomBar.tickets")}</span>
-            </Link>
+            </CommunityLink>
           )}
           {enabledFeatures.includes("credentials") && (
-            <Link
+            <CommunityLink
               href="/admin/credentials"
               className={cn(
                 getLinkStyle("/admin/credentials", "/admin/credentials/*"),
@@ -71,15 +71,15 @@ const AdminBottomBar: React.FC<AdminBottomBarProps> = ({ className }) => {
             >
               <ClipboardList size={24} />
               <span className="text-xs mt-1">{t("navigation.adminBottomBar.credentials")}</span>
-            </Link>
+            </CommunityLink>
           )}
-          <Link
+          <CommunityLink
             href="/admin"
             className={cn(getLinkStyle("/admin", "/admin/*"), "flex-grow")}
           >
             <Settings size={24} />
             <span className="text-xs mt-1">{t("navigation.adminBottomBar.settings")}</span>
-          </Link>
+          </CommunityLink>
         </div>
       </div>
     </nav>

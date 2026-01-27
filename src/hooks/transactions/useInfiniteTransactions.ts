@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { GqlTransaction, GqlTransactionsConnection } from "@/types/graphql";
 import { toast } from "react-toastify";
 
@@ -29,7 +29,7 @@ export const useInfiniteTransactions = ({
   const [loading, setLoading] = useState(false);
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
-  const loadMore = async () => {
+  const loadMore = React.useCallback(async () => {
     if (loading || !hasNextPage || !endCursor) return;
 
     setLoading(true);
@@ -48,7 +48,7 @@ export const useInfiniteTransactions = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, [loading, hasNextPage, endCursor, fetchMore]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -65,7 +65,7 @@ export const useInfiniteTransactions = ({
     }
 
     return () => observer.disconnect();
-  }, [hasNextPage, loading, endCursor]);
+  }, [hasNextPage, loading, loadMore]);
 
   return {
     transactions,
