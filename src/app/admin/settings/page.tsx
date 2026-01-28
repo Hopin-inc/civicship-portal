@@ -152,8 +152,9 @@ export default function AdminSettingsPage() {
   const displayTitle = localTitle || title;
   const displayDescription = localDescription || description;
 
-  // ファビコン画像URL（32x32）
-  const faviconImageUrl = faviconPrefix ? `/${faviconPrefix}-32x32.png` : null;
+  // ファビコン画像URL
+  // faviconPrefixはディレクトリパス（例: /communities/neo88 または https://storage.googleapis.com/.../communities/neo88）
+  const faviconImageUrl = faviconPrefix ? `${faviconPrefix}/favicon-32x32.png` : null;
 
   return (
     <>
