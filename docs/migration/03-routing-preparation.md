@@ -16,12 +16,18 @@ Apollo Client が URL パスから communityId を抽出できるようにする
 |---------|---------|
 | `src/lib/apollo.ts` | communityId 抽出ロジック追加（フォールバック付き） |
 
-### epic/mini-appify 参照コード
+### 実装コード（転記用）
 
 #### apollo.ts 変更
 
 ```typescript
 // src/lib/apollo.ts
+// ファイル先頭に以下のヘルパー関数を追加
+
+import { setContext } from "@apollo/client/link/context";
+import { ApolloClient, InMemoryCache, HttpLink, from } from "@apollo/client";
+import { onError } from "@apollo/client/link/error";
+import { auth } from "@/lib/auth/init/firebase";
 
 // Helper to get communityId from Next.js headers on server-side
 async function getServerSideCommunityId(): Promise<string | null> {
@@ -41,7 +47,9 @@ function extractCommunityIdFromPath(pathname: string): string | null {
     return null;
   }
   const firstSegment = segments[0];
-  if (["api", "_next", "favicon.ico"].includes(firstSegment)) {
+  // Skip if it's a known non-community path
+  const nonCommunityPaths = ["api", "_next", "favicon.ico", "robots.txt", "sitemap.xml"];
+  if (nonCommunityPaths.includes(firstSegment)) {
     return null;
   }
   return firstSegment;
@@ -57,43 +65,117 @@ function extractCommunityIdFromLiffState(): string | null {
   if (!liffState) {
     return null;
   }
-  return extractCommunityIdFromPath(liffState);
+  // liff.state is URL-encoded, decode it first
+  try {
+    const decodedLiffState = decodeURIComponent(liffState);
+    return extractCommunityIdFromPath(decodedLiffState);
+  } catch {
+    return null;
+  }
 }
 
+// requestLink を以下のように変更
 const requestLink = setContext(async (operation, prevContext) => {
   const isBrowser = typeof window !== "undefined";
-  // ... 既存のトークン取得処理
+
+  // Get Firebase ID token
+  let token: string | null = null;
+  let authMode: "token" | "session" = "token";
+
+  if (isBrowser) {
+    const currentUser = auth.currentUser;
+    if (currentUser) {
+      try {
+        token = await currentUser.getIdToken();
+      } catch (error) {
+        console.error("Failed to get ID token:", error);
+      }
+    }
+  } else {
+    // Server-side: try to get session cookie
+    try {
+      const { cookies } = await import("next/headers");
+      const cookieStore = await cookies();
+      const sessionCookie = cookieStore.get("session");
+      if (sessionCookie?.value) {
+        token = sessionCookie.value;
+        authMode = "session";
+      }
+    } catch {
+      // Ignore errors in non-request contexts
+    }
+  }
 
   // Extract communityId from current URL path (dynamic multi-tenant routing)
   // Fallback to env var for backward compatibility
   let communityId: string | null = null;
   if (isBrowser) {
+    // 1. Try to extract from URL path
     communityId = extractCommunityIdFromPath(window.location.pathname);
+    
+    // 2. If not found, try liff.state parameter (LINE OAuth callback)
     if (!communityId) {
       communityId = extractCommunityIdFromLiffState();
     }
   } else {
+    // Server-side: get from request headers (set by middleware)
     communityId = await getServerSideCommunityId();
   }
 
-  // Fallback to environment variable (backward compatibility)
+  // 3. Fallback to environment variable (backward compatibility)
   if (!communityId) {
     communityId = process.env.NEXT_PUBLIC_COMMUNITY_ID ?? null;
   }
 
-  const headers = {
+  const headers: Record<string, string> = {
     ...prevContext.headers,
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
     "X-Auth-Mode": authMode,
-    // Use dynamic communityId from URL path, fallback to env var
-    ...(communityId ? { "X-Community-Id": communityId } : {}),
   };
+
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  if (communityId) {
+    headers["X-Community-Id"] = communityId;
+  }
 
   return { headers };
 });
-```
 
-参照: https://github.com/Hopin-inc/civicship-portal/blob/epic/mini-appify/src/lib/apollo.ts
+// エラーリンク
+const errorLink = onError(({ graphQLErrors, networkError }) => {
+  if (graphQLErrors) {
+    graphQLErrors.forEach(({ message, locations, path }) => {
+      console.error(
+        `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
+      );
+    });
+  }
+  if (networkError) {
+    console.error(`[Network error]: ${networkError}`);
+  }
+});
+
+// HTTP リンク
+const httpLink = new HttpLink({
+  uri: process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT,
+  credentials: "include",
+});
+
+// Apollo Client インスタンス
+export const apolloClient = new ApolloClient({
+  link: from([errorLink, requestLink, httpLink]),
+  cache: new InMemoryCache(),
+  defaultOptions: {
+    watchQuery: {
+      fetchPolicy: "cache-and-network",
+    },
+  },
+});
+
+export default apolloClient;
+```
 
 ### 実装手順
 
@@ -105,13 +187,34 @@ const requestLink = setContext(async (operation, prevContext) => {
 
 ### テスト方法
 
-1. 既存の URL（`/activities`）でアクセスし、環境変数から communityId が取得されることを確認
-2. 新しい URL（`/neo88/activities`）でアクセスし、パスから communityId が抽出されることを確認（Phase 4 後）
+```bash
+# civicship-portal ディレクトリで実行
+
+# 型チェック
+pnpm lint
+
+# ビルド確認
+pnpm build
+
+# ローカルで動作確認
+pnpm dev
+```
+
+動作確認手順:
+1. `pnpm dev` でサーバーを起動
+2. 既存の URL（`/activities`）でアクセスし、環境変数から communityId が取得されることを確認
+3. ブラウザの開発者ツールで Network タブを開き、GraphQL リクエストの `X-Community-Id` ヘッダーを確認
+4. 新しい URL（`/neo88/activities`）でアクセスし、パスから communityId が抽出されることを確認（Phase 4 後）
+
+### 参照
+
+- apollo.ts: https://github.com/Hopin-inc/civicship-portal/blob/epic/mini-appify/src/lib/apollo.ts
 
 ### 注意事項
 
 - 環境変数フォールバックを必ず維持する
 - この PR 単体では動作に変化なし（既存の URL 構造のため）
+- liff.state パラメータは URL エンコードされているため、デコードが必要
 
 ---
 
@@ -126,26 +229,67 @@ Middleware が新しい URL 構造（`/[communityId]/...`）を処理できる�
 | ファイル | 変更内容 |
 |---------|---------|
 | `src/middleware.ts` | 新ルーティングロジック追加 |
+| `src/lib/communities/config-env.ts` | Edge Runtime 用設定取得関数（新規作成） |
 
-### epic/mini-appify 参照コード
+### 実装コード（転記用）
 
-#### middleware.ts 変更
+#### 1. config-env.ts（新規作成）
+
+```typescript
+// src/lib/communities/config-env.ts
+// Edge Runtime で使用可能なコミュニティ設定取得関数
+
+export interface CommunityConfigForEdge {
+  communityId: string;
+  enableFeatures: string[];
+  rootPath: string;
+}
+
+// 静的な設定マップ（Edge Runtime では DB アクセス不可のため）
+const COMMUNITY_CONFIGS: Record<string, CommunityConfigForEdge> = {
+  neo88: {
+    communityId: "neo88",
+    enableFeatures: [
+      "/activities",
+      "/activities/[id]",
+      "/users",
+      "/users/[id]",
+      "/users/me",
+      "/wallets",
+      "/admin",
+    ],
+    rootPath: "/activities",
+  },
+  // 他のコミュニティ設定を追加
+};
+
+export async function fetchCommunityConfigForEdge(
+  communityId: string
+): Promise<CommunityConfigForEdge | null> {
+  return COMMUNITY_CONFIGS[communityId] ?? null;
+}
+```
+
+#### 2. middleware.ts 変更
 
 ```typescript
 // src/middleware.ts
+// 完全な実装
 
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { fetchCommunityConfigForEdge } from "@/lib/communities/config-env";
 
-// Extract communityId from URL path
+// Extract communityId from URL path (first segment after /)
 function extractCommunityIdFromPath(pathname: string): string | null {
   const segments = pathname.split("/").filter(Boolean);
   if (segments.length === 0) {
     return null;
   }
   const firstSegment = segments[0];
-  if (["api", "_next", "favicon.ico"].includes(firstSegment)) {
+  // Skip if it's a known non-community path
+  const nonCommunityPaths = ["api", "_next", "favicon.ico", "robots.txt", "sitemap.xml"];
+  if (nonCommunityPaths.includes(firstSegment)) {
     return null;
   }
   return firstSegment;
@@ -161,8 +305,33 @@ function getPathWithoutCommunityId(pathname: string, communityId: string): strin
   return pathname;
 }
 
+// Check if path matches any enabled feature pattern
+function isFeatureEnabled(path: string, enabledFeatures: string[]): boolean {
+  // Normalize path (remove trailing slash)
+  const normalizedPath = path.endsWith("/") && path !== "/" ? path.slice(0, -1) : path;
+  
+  return enabledFeatures.some((feature) => {
+    // Convert feature pattern to regex
+    // e.g., "/activities/[id]" -> /^\/activities\/[^/]+$/
+    const pattern = feature
+      .replace(/\[([^\]]+)\]/g, "[^/]+")  // Replace [param] with regex
+      .replace(/\*/g, ".*");               // Replace * with wildcard
+    const regex = new RegExp(`^${pattern}$`);
+    return regex.test(normalizedPath);
+  });
+}
+
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
+  
+  // Skip static files and API routes
+  if (
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/api") ||
+    pathname.includes(".") // Static files like favicon.ico
+  ) {
+    return NextResponse.next();
+  }
   
   // Try to extract communityId from URL path
   let communityId = extractCommunityIdFromPath(pathname);
@@ -170,8 +339,12 @@ export async function middleware(request: NextRequest) {
   // Handle liff.state parameter for LINE OAuth callback
   const liffState = request.nextUrl.searchParams.get("liff.state");
   if (!communityId && liffState) {
-    const decodedLiffState = decodeURIComponent(liffState);
-    communityId = extractCommunityIdFromPath(decodedLiffState);
+    try {
+      const decodedLiffState = decodeURIComponent(liffState);
+      communityId = extractCommunityIdFromPath(decodedLiffState);
+    } catch {
+      // Ignore decode errors
+    }
   }
   
   // If no communityId in path, fall back to env var (backward compatibility)
@@ -191,7 +364,18 @@ export async function middleware(request: NextRequest) {
   // Get path relative to communityId (for new URL structure)
   const relativePath = getPathWithoutCommunityId(pathname, communityId);
 
-  // ... feature gating logic using relativePath
+  // Feature gating: check if the path is enabled for this community
+  if (relativePath !== "/" && !isFeatureEnabled(relativePath, enabledFeatures)) {
+    // Redirect to root path if feature is not enabled
+    const redirectUrl = new URL(`/${communityId}${rootPath}`, request.url);
+    return NextResponse.redirect(redirectUrl);
+  }
+
+  // Handle root path redirect
+  if (relativePath === "/") {
+    const redirectUrl = new URL(`/${communityId}${rootPath}`, request.url);
+    return NextResponse.redirect(redirectUrl);
+  }
 
   // Set x-community-id header for server components
   const requestHeaders = new Headers(request.headers);
@@ -203,38 +387,66 @@ export async function middleware(request: NextRequest) {
   
   res.headers.set("x-community-id", communityId);
   
-  // Set cookie as fallback
+  // Set cookie as fallback for client-side access
   res.cookies.set("x-community-id", communityId, {
     path: "/",
     httpOnly: false,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    maxAge: 60 * 60,
+    maxAge: 60 * 60, // 1 hour
   });
   
   return res;
 }
-```
 
-参照: https://github.com/Hopin-inc/civicship-portal/blob/epic/mini-appify/src/middleware.ts
+export const config = {
+  matcher: [
+    // Match all paths except static files
+    "/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)",
+  ],
+};
+```
 
 ### 実装手順
 
-1. `extractCommunityIdFromPath()` 関数を追加
-2. `getPathWithoutCommunityId()` 関数を追加
-3. communityId 抽出ロジックを追加（パス優先、環境変数フォールバック）
-4. `x-community-id` ヘッダーと Cookie を設定
-5. feature gating を `relativePath` ベースに変更
+1. `src/lib/communities/config-env.ts` を作成
+2. `extractCommunityIdFromPath()` 関数を追加
+3. `getPathWithoutCommunityId()` 関数を追加
+4. `isFeatureEnabled()` 関数を追加
+5. communityId 抽出ロジックを追加（パス優先、環境変数フォールバック）
+6. `x-community-id` ヘッダーと Cookie を設定
+7. feature gating を `relativePath` ベースに変更
 
 ### テスト方法
 
-1. 既存の URL（`/activities`）でアクセスし、環境変数から communityId が取得されることを確認
-2. `x-community-id` ヘッダーが正しく設定されることを確認
+```bash
+# civicship-portal ディレクトリで実行
+
+# 型チェック
+pnpm lint
+
+# ビルド確認
+pnpm build
+
+# ローカルで動作確認
+pnpm dev
+```
+
+動作確認手順:
+1. `pnpm dev` でサーバーを起動
+2. 既存の URL（`/activities`）でアクセスし、環境変数から communityId が取得されることを確認
+3. ブラウザの開発者ツールで Application > Cookies を開き、`x-community-id` Cookie が設定されていることを確認
+4. Network タブでレスポンスヘッダーに `x-community-id` が含まれていることを確認
+
+### 参照
+
+- middleware.ts: https://github.com/Hopin-inc/civicship-portal/blob/epic/mini-appify/src/middleware.ts
 
 ### 注意事項
 
 - 環境変数フォールバックを必ず維持する
 - 既存の URL 構造での動作を壊さない
+- Edge Runtime では DB アクセス不可のため、静的な設定マップを使用
 
 ---
 
@@ -250,36 +462,101 @@ export async function middleware(request: NextRequest) {
 |---------|---------|
 | `src/middleware.ts` | リダイレクトロジック追加（NODE_ENV で制御） |
 
-### 実装方針
+### 実装コード（転記用）
 
-NODE_ENV を使用してルーティングを制御する。新しい環境変数は追加しない。
+#### middleware.ts にリダイレクトロジックを追加
 
 ```typescript
 // src/middleware.ts
+// middleware 関数の先頭に以下のリダイレクトロジックを追加
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const isProduction = process.env.NODE_ENV === "production";
   
+  // Skip static files and API routes
+  if (
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/api") ||
+    pathname.includes(".")
+  ) {
+    return NextResponse.next();
+  }
+  
   // Extract communityId from path
   let communityId = extractCommunityIdFromPath(pathname);
   
-  // Legacy URL redirect (only in non-production environments)
-  // In production, this will be enabled after Phase 4 deployment
-  if (!isProduction && !communityId) {
+  // Legacy URL redirect (only in non-production environments initially)
+  // After Phase 4 deployment, remove the isProduction check
+  if (!communityId) {
     // Get default communityId from env var
     const defaultCommunityId = process.env.NEXT_PUBLIC_COMMUNITY_ID;
     
-    if (defaultCommunityId && pathname !== "/") {
-      // Redirect /activities to /neo88/activities
-      const newUrl = new URL(`/${defaultCommunityId}${pathname}`, request.url);
-      newUrl.search = request.nextUrl.search;
-      return NextResponse.redirect(newUrl, { status: 308 });
+    // Check if this is a legacy URL that needs redirect
+    const legacyPaths = [
+      "/activities",
+      "/users",
+      "/wallets",
+      "/admin",
+      "/opportunities",
+      "/places",
+      "/articles",
+      "/reservations",
+      "/tickets",
+    ];
+    
+    const isLegacyPath = legacyPaths.some(
+      (legacyPath) => pathname === legacyPath || pathname.startsWith(`${legacyPath}/`)
+    );
+    
+    if (defaultCommunityId && isLegacyPath) {
+      // 開発環境: 即座にリダイレクト
+      // 本番環境: Phase 4 デプロイ後に isProduction チェックを削除
+      if (!isProduction) {
+        // Redirect /activities to /neo88/activities
+        const newUrl = new URL(`/${defaultCommunityId}${pathname}`, request.url);
+        newUrl.search = request.nextUrl.search;
+        return NextResponse.redirect(newUrl, { status: 308 });
+      }
     }
   }
   
-  // ... 残りの処理
+  // Handle liff.state parameter for LINE OAuth callback
+  const liffState = request.nextUrl.searchParams.get("liff.state");
+  if (!communityId && liffState) {
+    try {
+      const decodedLiffState = decodeURIComponent(liffState);
+      communityId = extractCommunityIdFromPath(decodedLiffState);
+    } catch {
+      // Ignore decode errors
+    }
+  }
+  
+  // If no communityId in path, fall back to env var (backward compatibility)
+  if (!communityId) {
+    communityId = process.env.NEXT_PUBLIC_COMMUNITY_ID ?? null;
+  }
+  
+  // ... 残りの処理（PR 3b と同じ）
 }
+```
+
+### Phase 4 デプロイ後の変更
+
+Phase 4 でページを `[communityId]` ディレクトリに移動した後、以下の変更を行う:
+
+```typescript
+// 変更前（開発環境のみリダイレクト）
+if (!isProduction) {
+  const newUrl = new URL(`/${defaultCommunityId}${pathname}`, request.url);
+  newUrl.search = request.nextUrl.search;
+  return NextResponse.redirect(newUrl, { status: 308 });
+}
+
+// 変更後（本番環境でもリダイレクト）
+const newUrl = new URL(`/${defaultCommunityId}${pathname}`, request.url);
+newUrl.search = request.nextUrl.search;
+return NextResponse.redirect(newUrl, { status: 308 });
 ```
 
 ### 実装手順
@@ -287,19 +564,39 @@ export async function middleware(request: NextRequest) {
 1. NODE_ENV を使用してリダイレクトを制御
 2. 開発環境（NODE_ENV !== "production"）では新ルーティングを有効化
 3. 本番環境（NODE_ENV === "production"）では Phase 4 デプロイ後に有効化
-4. 308 Permanent Redirect を使用
+4. 308 Permanent Redirect を使用（SEO に影響なし）
 
 ### テスト方法
 
-1. 開発環境で新しい URL 構造（`/neo88/activities`）が動作することを確認
-2. 開発環境で旧 URL（`/activities`）が新 URL にリダイレクトされることを確認
-3. 本番環境では既存の動作が維持されることを確認
+```bash
+# civicship-portal ディレクトリで実行
+
+# 型チェック
+pnpm lint
+
+# ビルド確認
+pnpm build
+
+# ローカルで動作確認
+pnpm dev
+```
+
+動作確認手順:
+1. `pnpm dev` でサーバーを起動
+2. 開発環境で旧 URL（`/activities`）にアクセス
+3. 新 URL（`/neo88/activities`）にリダイレクトされることを確認
+4. クエリパラメータが保持されることを確認（例: `/activities?page=2` → `/neo88/activities?page=2`）
+
+### 参照
+
+- middleware.ts: https://github.com/Hopin-inc/civicship-portal/blob/epic/mini-appify/src/middleware.ts
 
 ### 注意事項
 
 - 新しい環境変数は追加しない（NODE_ENV を使用）
 - 開発環境では新ルーティングが有効、本番環境では Phase 4 デプロイ後に有効化
 - LINE リッチメニューなどの外部リンクが壊れないようにするための対策
+- 308 Permanent Redirect を使用（ブラウザがリダイレクトをキャッシュ）
 
 ### リダイレクト対象パス
 
@@ -308,6 +605,11 @@ export async function middleware(request: NextRequest) {
 | `/activities` | `/[communityId]/activities` |
 | `/activities/[id]` | `/[communityId]/activities/[id]` |
 | `/users/me` | `/[communityId]/users/me` |
+| `/users/[id]` | `/[communityId]/users/[id]` |
 | `/wallets` | `/[communityId]/wallets` |
 | `/admin/*` | `/[communityId]/admin/*` |
-| ... | ... |
+| `/opportunities/*` | `/[communityId]/opportunities/*` |
+| `/places/*` | `/[communityId]/places/*` |
+| `/articles/*` | `/[communityId]/articles/*` |
+| `/reservations/*` | `/[communityId]/reservations/*` |
+| `/tickets/*` | `/[communityId]/tickets/*` |
