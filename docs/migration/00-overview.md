@@ -36,6 +36,24 @@
 - 認証: 統合チャネル（LINE ミニアプリ + LIFF 両対応、communityId: null）
 - ルーティング: URL パスベース（例: `/neo88/activities`）
 
+## 統合インスタンスでのミニアプリ移行の必要条件
+
+以下の条件をすべて満たすことで、統合インスタンスでのミニアプリ移行が実現可能となる。
+
+| # | 必要条件 | 説明 | 対応 PR |
+|---|----------|------|---------|
+| 1 | グローバル Identity 対応 | communityId: null の Identity をサポートし、同一プロバイダーでの uid 重複問題を解決 | PR 1a |
+| 2 | 統合 LIFF チャネル認証 | 統合チャネルからのログインをサポートする新認証メソッド追加 | PR 1b |
+| 3 | 認証シャドウモード | 本番環境で安全に新認証ロジックを検証可能にする | PR 1c |
+| 4 | URL パスベースのコミュニティ識別 | communityId を URL パスから抽出し、CommunityLink で自動付与 | PR 2a |
+| 5 | Mini-app 403 エラー対策 | profile スコープの権限確保（準備: PR 2b、有効化: PR 5b） | PR 2b, 5b |
+| 6 | Apollo Client の動的 communityId 対応 | URL パスから communityId を抽出してヘッダーに設定 | PR 3a |
+| 7 | Middleware の新ルーティング対応 | 新旧両方の URL 構造をサポート | PR 3b |
+| 8 | レガシー URL リダイレクト | 旧 URL から新 URL への自動リダイレクト | PR 3c |
+| 9 | ディレクトリ構造の変更 | ページを [communityId] ディレクトリに移動 | PR 4a |
+| 10 | CI/CD 単一デプロイ化 | Matrix ビルドから単一デプロイへ移行 | PR 5b |
+| 11 | 環境変数フォールバック削除 | パスベースの communityId 取得のみに統一 | PR 5b |
+
 ## PR 分割戦略
 
 ### Phase 1: Backend 基盤（破壊的変更なし）
