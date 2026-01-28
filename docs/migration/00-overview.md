@@ -17,6 +17,22 @@
 
 この問題を解決するため、統合チャネル用の Identity は `communityId: null`（グローバル Identity）として管理する設計を採用した。
 
+### 設計判断: communityId: null を選択した理由
+
+**採用理由**:
+1. 既存の Identity テーブル構造を維持しつつ、グローバル Identity を表現可能
+2. 新テーブル追加によるスキーマ複雑化を回避
+3. 既存クエリロジックとの互換性（null 許容で段階移行可能）
+4. 移行期間中の旧ロジック（communityId 指定）と新ロジック（null）の共存が容易
+
+**検討した代替案**:
+
+| 案 | 不採用理由 |
+|----|-----------|
+| 別テーブル（GlobalIdentity） | スキーマ変更が大きく、移行リスク増大 |
+| type 列追加（GLOBAL/COMMUNITY） | 既存データのマイグレーションが必要 |
+| 別フィールド（globalUserId） | アプリ層の変更箇所が多い |
+
 ### 調査項目
 
 - [ ] 同一プロバイダーなら Messaging API は1つでも良いのか調査が必要
@@ -94,6 +110,46 @@
 
 ## 依存関係
 
+### PR 依存関係図
+
+```mermaid
+graph LR
+    subgraph Phase1[Phase 1: Backend]
+        PR1a[1a: Global Identity] --> PR1b[1b: Auth Methods]
+        PR1b --> PR1c[1c: Shadow Mode]
+    end
+    
+    subgraph Phase2[Phase 2: Frontend]
+        PR2a[2a: CommunityLink]
+        PR2b[2b: Mini-app Prep]
+    end
+    
+    subgraph Phase3[Phase 3: Routing Prep]
+        PR3a[3a: Apollo Client] --> PR3b[3b: Middleware]
+        PR3b --> PR3c[3c: Legacy Redirect]
+    end
+    
+    subgraph Phase4[Phase 4: Routing Apply]
+        PR4a[4a: Directory Migration]
+    end
+    
+    subgraph Phase5[Phase 5: Cleanup]
+        PR5a[5a: Backend Cleanup]
+        PR5b[5b: Frontend + CI/CD]
+    end
+    
+    PR1c --> PR2a
+    PR1c --> PR2b
+    PR2a --> PR3a
+    PR2b --> PR5b
+    PR3c --> PR4a
+    PR4a --> PR5a
+    PR4a --> PR5b
+    PR1c --> PR5a
+```
+
+### フェーズ間の依存関係
+
 ```
 Phase 1 (Backend)
   PR 1a → PR 1b → PR 1c
@@ -140,6 +196,31 @@ NODE_ENV=development:
 }
 ```
 
+### シャドウモード成功基準
+
+Phase 5a（Backend クリーンアップ）に進む前に、以下の基準をすべて満たす必要がある。
+
+**観察要件**:
+- 観察期間: 最低 1-2 週間
+- サンプル数: 各認証フロー 100 件以上
+- 差分率: 0.1% 未満（エッジケースを除く）
+
+**必須確認項目**:
+- [ ] Global Identity 検索の一致率: 99.9% 以上
+- [ ] Membership 自動作成の成功率: 99.9% 以上
+- [ ] 認証トークンの整合性: 100%
+- [ ] エラー発生率: 旧ロジックと同等以下
+
+**許容されるエッジケース**:
+- 移行期間中に作成された新規ユーザー（旧ロジックで Identity が存在しない）
+- テスト用アカウント
+
+**判定プロセス**:
+1. Cloud Logging でシャドウモードログを集計
+2. 差分が発生したケースを個別に調査
+3. エッジケース以外の差分がゼロであることを確認
+4. チームでレビューし、Phase 5a 移行を承認
+
 ## ロールバック戦略
 
 ### Phase 1-3
@@ -154,8 +235,103 @@ NODE_ENV=development:
 
 ### Phase 5
 
-- CI/CD 変更後は旧インフラに戻すのが困難
-- 十分な検証期間を設けてから実行
+Phase 5 は CI/CD と LIFF 設定が同時に変更されるため、ロールバック手順が複雑になる。
+
+#### PR 5a (Backend) ロールバック手順
+
+1. `git revert` でシャドウモードコードを復元
+2. デプロイ後、シャドウモードを再有効化
+3. 影響範囲: Backend のみ、Frontend への影響なし
+
+#### PR 5b (Frontend + CI/CD) ロールバック手順
+
+**即座に必要な対応**:
+1. Cloud Run: 前バージョンのリビジョンにトラフィックを 100% 切り替え
+   ```bash
+   gcloud run services update-traffic civicship-portal \
+     --to-revisions=PREVIOUS_REVISION=100 \
+     --region=asia-northeast1
+   ```
+
+**コード復旧**:
+1. 環境変数フォールバックを復元（`apollo.ts`, `middleware.ts`）
+2. Matrix ビルドを復元（`.github/workflows/deploy-to-cloud-run-prod.yml`）
+3. `ensureProfilePermission()` を無効化
+
+**LIFF 設定**:
+1. 統合 LIFF チャネルから各コミュニティ LIFF へ戻す
+2. LINE Developers Console で Endpoint URL を変更
+
+**注意事項**:
+- Phase 5b のロールバックは複雑なため、十分な検証期間（最低 1 週間）を設けてから実行
+- ロールバック時は、新規ユーザーのデータ整合性に注意（Global Identity で作成されたユーザー）
+
+## 運用手順
+
+### 新コミュニティ追加時の手順
+
+統合インスタンス移行後、新しいコミュニティを追加する際の手順。
+
+**1. Backend 設定**:
+```sql
+-- t_community_configs にコミュニティ設定を追加
+INSERT INTO t_community_configs (id, name, ...) VALUES ('new-community', '新コミュニティ', ...);
+
+-- t_community_line_configs に LINE 設定を追加（統合チャネルを使用）
+INSERT INTO t_community_line_configs (community_id, liff_id, ...) 
+VALUES ('new-community', 'INTEGRATED_LIFF_ID', ...);
+```
+
+**2. Frontend 設定**:
+```typescript
+// src/lib/config/config-env.ts に追加
+export const COMMUNITY_CONFIGS: Record<string, CommunityConfig> = {
+  // 既存のコミュニティ...
+  "new-community": {
+    name: "新コミュニティ",
+    // 統合設定を使用
+  },
+};
+```
+
+**3. デプロイ**:
+- Frontend の設定変更をデプロイ（Edge Runtime 制約のため、設定はハードコード）
+- Backend は DB 変更のみでデプロイ不要
+
+**注意事項**:
+- Edge Runtime では DB アクセスができないため、`config-env.ts` のコミュニティ設定はハードコードが必要
+- 新コミュニティ追加時は Frontend のデプロイが必要
+
+## テスト計画
+
+### E2E テストシナリオ
+
+**認証フロー**:
+- [ ] LINE ミニアプリからの新規ユーザー登録
+- [ ] LINE ミニアプリからの既存ユーザーログイン
+- [ ] LIFF ブラウザからのログイン
+- [ ] 複数コミュニティ間でのユーザー切り替え
+
+**ルーティング**:
+- [ ] 新 URL（`/neo88/activities`）でのページ表示
+- [ ] 旧 URL（`/activities`）からのリダイレクト
+- [ ] CommunityLink による正しい URL 生成
+- [ ] 存在しないコミュニティへのアクセス時のエラーハンドリング
+
+**API**:
+- [ ] GraphQL リクエストの X-Community-Id ヘッダー付与
+- [ ] Webhook での communityId 取得
+
+### 負荷テスト計画
+
+**目的**: 単一インスタンス化による影響を評価
+
+**テスト項目**:
+- 同時接続数: 現在の全コミュニティ合計の 1.5 倍
+- レスポンスタイム: 95 パーセンタイルで 500ms 以下
+- エラー率: 0.1% 以下
+
+**実施タイミング**: Phase 5b デプロイ前（dev 環境で実施）
 
 ## 参照情報
 
