@@ -1,11 +1,17 @@
-import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getCommunityIdFromEnv, fetchCommunityConfigForEdge } from "@/lib/communities/config-env";
+import { NextResponse } from "next/server";
+import { fetchCommunityConfigForEdge, getCommunityIdFromEnv } from "@/lib/communities/config-env";
 import { detectPreferredLocale } from "@/lib/i18n/languageDetection";
-import { locales, defaultLocale } from "@/lib/i18n/config";
+import { defaultLocale, locales } from "@/lib/i18n/config";
 
 // Feature types for route gating
-type FeaturesType = "places" | "opportunities" | "points" | "tickets" | "articles" | "languageSwitcher";
+type FeaturesType =
+  | "places"
+  | "opportunities"
+  | "points"
+  | "tickets"
+  | "articles"
+  | "languageSwitcher";
 
 // Map features to their corresponding route paths
 const featureToRoutesMap: Partial<Record<FeaturesType, string[]>> = {
@@ -19,7 +25,10 @@ const featureToRoutesMap: Partial<Record<FeaturesType, string[]>> = {
 export async function middleware(request: NextRequest) {
   const isDev = process.env.NODE_ENV !== "production";
   const pathname = request.nextUrl.pathname;
-  
+
+  const host = request.headers.get("host");
+  getCommunityIdFromHost(host);
+
   // Fetch config from server-side API
   const communityId = getCommunityIdFromEnv();
   const config = await fetchCommunityConfigForEdge(communityId);
@@ -65,21 +74,11 @@ export async function middleware(request: NextRequest) {
     ...(isDev ? [`'unsafe-eval'`] : []),
   ].join(" ");
 
-  const styleSrcElem = [
-    `'self'`,
-    "https://fonts.googleapis.com",
-    `'unsafe-inline'`,
-  ].join(" ");
+  const styleSrcElem = [`'self'`, "https://fonts.googleapis.com", `'unsafe-inline'`].join(" ");
 
-  const styleSrcAttr = [
-    `'unsafe-inline'`,
-  ].join(" ");
+  const styleSrcAttr = [`'unsafe-inline'`].join(" ");
 
-  const styleSrc = [
-    `'self'`,
-    "https://fonts.googleapis.com",
-    `'unsafe-inline'`,
-  ].join(" ");
+  const styleSrc = [`'self'`, "https://fonts.googleapis.com", `'unsafe-inline'`].join(" ");
 
   const connectSrc = [
     `'self'`,
@@ -133,18 +132,18 @@ export async function middleware(request: NextRequest) {
   res.headers.set("Referrer-Policy", "no-referrer");
 
   const hasLanguageSwitcher = enabledFeatures.includes("languageSwitcher");
-  const languageCookie = request.cookies.get('language');
-  
+  const languageCookie = request.cookies.get("language");
+
   if (hasLanguageSwitcher && !languageCookie) {
     const detectedLanguage = detectPreferredLocale(
-      request.headers.get('accept-language'),
+      request.headers.get("accept-language"),
       locales,
-      defaultLocale
+      defaultLocale,
     );
-    res.cookies.set('language', detectedLanguage, {
-      path: '/',
+    res.cookies.set("language", detectedLanguage, {
+      path: "/",
       maxAge: 60 * 60 * 24 * 365,
-      sameSite: 'lax',
+      sameSite: "lax",
     });
   }
 
@@ -154,3 +153,24 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };
+
+/**
+ * ホスト名からサブドメイン（communityId）を抽出するヘルパー
+ */
+function getCommunityIdFromHost(host: string | null): string {
+  console.log(`Host: ${host}`);
+  if (!host) return "default";
+
+  // localhost や 127.0.0.1 の場合は開発用のデフォルトを返す
+  if (host.includes("localhost") || host.includes("127.0.0.1")) {
+    return process.env.NEXT_PUBLIC_COMMUNITY_ID || "default";
+  }
+
+  // サブドメイン部分を抽出 (例: izu.civicship.app -> izu)
+  const parts = host.split(".");
+  if (parts.length >= 3) {
+    return parts[0];
+  }
+
+  return "default";
+}
