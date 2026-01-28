@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useCallback } from "react";
+import { useCallback, useMemo, useState } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { ChevronRight } from "lucide-react";
 import {
@@ -16,7 +16,7 @@ import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
-import { usePortalConfigSheets, SheetType } from "./hooks/usePortalConfigSheets";
+import { SheetType, usePortalConfigSheets } from "./hooks/usePortalConfigSheets";
 import { usePortalConfigSave } from "./hooks/usePortalConfigSave";
 import { EditTextSheet } from "./components/sheets/EditTextSheet";
 import { EditImageSheet } from "./components/sheets/EditImageSheet";
@@ -40,50 +40,51 @@ const FEATURE_DEFINITIONS: {
   description: string;
 }[] = [
   {
-    key: "opportunities",
-    title: "募集",
-    description: "ボランティア募集機能を有効にする",
-  },
-  {
-    key: "quests",
-    title: "クエスト",
-    description: "クエスト機能を有効にする",
-  },
-  {
     key: "points",
     title: "ポイント",
-    description: "ポイント・ウォレット機能を有効にする",
+    description: "独自のポイントを発行し、コミュニティ内での感謝や活動の循環を可視化します。",
   },
   {
     key: "tickets",
     title: "チケット",
-    description: "チケット機能を有効にする",
+    description: "知り合いを体験に無料招待できる仕組みを導入。縁を広げるきっかけを作れます。",
   },
   {
     key: "credentials",
-    title: "証明書",
-    description: "証明書発行機能を有効にする",
+    title: "証明書発行",
+    description: "募集への参加実績をデジタル証明書(VC)として発行。活動の証を形に残せます。",
+  },
+  {
+    key: "opportunities",
+    title: "募集",
+    description:
+      "コミュニティメンバーが気軽に参加できる「体験・お手伝い」の募集ページを公開します。",
   },
   {
     key: "places",
     title: "拠点",
-    description: "拠点・場所機能を有効にする",
+    description: "活動場所を地図上に表示。近くにいる人たちがあなたの拠点を見つけやすくなります。",
   },
-  {
-    key: "prefectures",
-    title: "都道府県",
-    description: "都道府県選択機能を有効にする",
-  },
-  {
-    key: "languageSwitcher",
-    title: "言語切り替え",
-    description: "言語切り替え機能を有効にする",
-  },
-  {
-    key: "justDaoIt",
-    title: "JustDaoIt",
-    description: "JustDaoIt連携機能を有効にする",
-  },
+  // {
+  //   key: "quests",
+  //   title: "クエスト",
+  //   description: "クエスト機能を有効にする",
+  // },
+  // {
+  //   key: "prefectures",
+  //   title: "都道府県",
+  //   description: "都道府県選択機能を有効にする",
+  // },
+  // {
+  //   key: "languageSwitcher",
+  //   title: "言語切り替え",
+  //   description: "日本語・英語のどちらかを切り替える機能です",
+  // },
+  // {
+  //   key: "justDaoIt",
+  //   title: "JustDaoIt",
+  //   description: "JustDaoIt連携機能を有効にする",
+  // },
 ];
 
 export default function AdminSettingsPage() {
@@ -104,32 +105,39 @@ export default function AdminSettingsPage() {
   // ローカルステート（編集後の値を保持）
   const [localTitle, setLocalTitle] = useState(communityConfig?.title ?? "");
   const [localDescription, setLocalDescription] = useState(communityConfig?.description ?? "");
-  const [features, setFeatures] = useState<string[]>(
-    communityConfig?.enableFeatures ?? []
+  const [features, setFeatures] = useState<string[]>(communityConfig?.enableFeatures ?? []);
+
+  const handleFeatureToggle = useCallback(
+    async (featureKey: FeatureKey, checked: boolean) => {
+      const newFeatures = checked
+        ? [...features, featureKey]
+        : features.filter((f) => f !== featureKey);
+
+      setFeatures(newFeatures);
+      await save.saveFeatures(newFeatures);
+    },
+    [features, save],
   );
 
-  const handleFeatureToggle = useCallback(async (featureKey: FeatureKey, checked: boolean) => {
-    const newFeatures = checked
-      ? [...features, featureKey]
-      : features.filter((f) => f !== featureKey);
+  const handleTitleSave = useCallback(
+    async (value: string) => {
+      const success = await save.saveTitle(value);
+      if (success) {
+        setLocalTitle(value);
+      }
+    },
+    [save],
+  );
 
-    setFeatures(newFeatures);
-    await save.saveFeatures(newFeatures);
-  }, [features, save]);
-
-  const handleTitleSave = useCallback(async (value: string) => {
-    const success = await save.saveTitle(value);
-    if (success) {
-      setLocalTitle(value);
-    }
-  }, [save]);
-
-  const handleDescriptionSave = useCallback(async (value: string) => {
-    const success = await save.saveDescription(value);
-    if (success) {
-      setLocalDescription(value);
-    }
-  }, [save]);
+  const handleDescriptionSave = useCallback(
+    async (value: string) => {
+      const success = await save.saveDescription(value);
+      if (success) {
+        setLocalDescription(value);
+      }
+    },
+    [save],
+  );
 
   const handleItemClick = (sheet: SheetType) => {
     sheets.openSheet(sheet);
@@ -139,22 +147,11 @@ export default function AdminSettingsPage() {
     return null;
   }
 
-  const {
-    title,
-    description,
-    squareLogoPath,
-    logoPath,
-    ogImagePath,
-    faviconPrefix,
-  } = communityConfig;
+  const { title, description, squareLogoPath, logoPath, ogImagePath, faviconPrefix } =
+    communityConfig;
 
-  // ローカルで更新された値を優先表示
   const displayTitle = localTitle || title;
   const displayDescription = localDescription || description;
-
-  // ファビコン画像URL
-  // faviconPrefixはディレクトリパス（例: /communities/neo88 または https://storage.googleapis.com/.../communities/neo88）
-  const faviconImageUrl = faviconPrefix ? `${faviconPrefix}/favicon-32x32.png` : null;
 
   return (
     <>
@@ -237,12 +234,7 @@ export default function AdminSettingsPage() {
               <ItemActions className="flex items-center gap-2">
                 {logoPath ? (
                   <div className="h-8 w-20 relative border rounded overflow-hidden bg-muted">
-                    <Image
-                      src={logoPath}
-                      alt="横長ロゴ"
-                      fill
-                      className="object-contain"
-                    />
+                    <Image src={logoPath} alt="横長ロゴ" fill className="object-contain" />
                   </div>
                 ) : (
                   <div className="h-8 w-20 border rounded bg-muted flex items-center justify-center">
@@ -272,12 +264,7 @@ export default function AdminSettingsPage() {
               </div>
               {ogImagePath ? (
                 <div className="mt-2 w-full aspect-[1.91/1] relative border rounded overflow-hidden bg-muted">
-                  <Image
-                    src={ogImagePath}
-                    alt="OG画像"
-                    fill
-                    className="object-cover"
-                  />
+                  <Image src={ogImagePath} alt="OG画像" fill className="object-cover" />
                 </div>
               ) : (
                 <div className="mt-2 w-full aspect-[1.91/1] border rounded bg-muted flex items-center justify-center">
@@ -299,14 +286,9 @@ export default function AdminSettingsPage() {
                 <ItemTitle className="font-bold">ファビコン</ItemTitle>
               </ItemContent>
               <ItemActions className="flex items-center gap-2">
-                {faviconImageUrl ? (
+                {faviconPrefix ? (
                   <div className="h-8 w-8 relative border rounded overflow-hidden bg-muted">
-                    <Image
-                      src={faviconImageUrl}
-                      alt="ファビコン"
-                      fill
-                      className="object-contain"
-                    />
+                    <Image src={faviconPrefix} alt="ファビコン" fill className="object-contain" />
                   </div>
                 ) : (
                   <div className="h-8 w-8 border rounded bg-muted flex items-center justify-center">
@@ -329,7 +311,7 @@ export default function AdminSettingsPage() {
                 <div key={feature.key}>
                   <Item size="sm">
                     <ItemContent>
-                      <ItemTitle>{feature.title}</ItemTitle>
+                      <ItemTitle className="font-bold">{feature.title}</ItemTitle>
                       <ItemDescription className="text-xs text-muted-foreground">
                         {feature.description}
                       </ItemDescription>
@@ -411,7 +393,7 @@ export default function AdminSettingsPage() {
         open={sheets.isOpen("favicon")}
         onOpenChange={(open) => !open && sheets.closeSheet()}
         title="ファビコンを編集"
-        currentImageUrl={faviconImageUrl}
+        currentImageUrl={faviconPrefix}
         onSave={save.saveFavicon}
         aspectRatio="1/1"
         description="32x32ピクセルのファビコン画像をアップロードしてください"
