@@ -2,6 +2,8 @@ import { getCommunityIdFromEnv } from "@/lib/communities/config";
 import { getMembershipListServer } from "@/lib/graphql/getMembershipListServer";
 import OpportunitySelector from "../components/CredentialIssuanceWizard";
 
+export const dynamic = "force-dynamic";
+
 export default async function SelectOpportunity() {
   let connection = null;
   const communityId = getCommunityIdFromEnv();
