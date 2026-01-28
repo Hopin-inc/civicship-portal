@@ -38,11 +38,13 @@ const FEATURE_DEFINITIONS: {
   key: FeatureKey;
   title: string;
   description: string;
+  disabled?: boolean; // 切り替え不可（常にON）
 }[] = [
   {
     key: "points",
     title: "ポイント",
     description: "独自のポイントを発行し、コミュニティ内での感謝や活動の循環を可視化します。",
+    disabled: true, // 常にON
   },
   {
     key: "tickets",
@@ -65,27 +67,15 @@ const FEATURE_DEFINITIONS: {
     title: "拠点",
     description: "活動場所を地図上に表示。近くにいる人たちがあなたの拠点を見つけやすくなります。",
   },
-  // {
-  //   key: "quests",
-  //   title: "クエスト",
-  //   description: "クエスト機能を有効にする",
-  // },
-  // {
-  //   key: "prefectures",
-  //   title: "都道府県",
-  //   description: "都道府県選択機能を有効にする",
-  // },
-  // {
-  //   key: "languageSwitcher",
-  //   title: "言語切り替え",
-  //   description: "日本語・英語のどちらかを切り替える機能です",
-  // },
-  // {
-  //   key: "justDaoIt",
-  //   title: "JustDaoIt",
-  //   description: "JustDaoIt連携機能を有効にする",
-  // },
 ];
+
+// 画像サイズ定義
+const IMAGE_SIZES = {
+  squareLogo: { width: 512, height: 512 },
+  logo: { width: 1280, height: 512 },
+  ogImage: { width: 1200, height: 630 },
+  favicon: { width: 32, height: 32 },
+} as const;
 
 export default function AdminSettingsPage() {
   const communityConfig = useCommunityConfig();
@@ -207,6 +197,9 @@ export default function AdminSettingsPage() {
             >
               <ItemContent>
                 <ItemTitle className="font-bold">ロゴ(正方形)</ItemTitle>
+                <ItemDescription className="text-xs">
+                  {IMAGE_SIZES.squareLogo.width} x {IMAGE_SIZES.squareLogo.height} px
+                </ItemDescription>
               </ItemContent>
               <ItemActions className="flex items-center gap-2">
                 <Avatar className="h-10 w-10 rounded-md border">
@@ -230,6 +223,9 @@ export default function AdminSettingsPage() {
             >
               <ItemContent>
                 <ItemTitle className="font-bold">ロゴ(横長)</ItemTitle>
+                <ItemDescription className="text-xs">
+                  {IMAGE_SIZES.logo.width} x {IMAGE_SIZES.logo.height} px
+                </ItemDescription>
               </ItemContent>
               <ItemActions className="flex items-center gap-2">
                 {logoPath ? (
@@ -257,6 +253,9 @@ export default function AdminSettingsPage() {
               <div className="flex items-center justify-between w-full">
                 <ItemContent>
                   <ItemTitle className="font-bold">OG画像</ItemTitle>
+                  <ItemDescription className="text-xs">
+                    {IMAGE_SIZES.ogImage.width} x {IMAGE_SIZES.ogImage.height} px
+                  </ItemDescription>
                 </ItemContent>
                 <ItemActions>
                   <ChevronRight className="h-4 w-4 text-muted-foreground" />
@@ -284,6 +283,9 @@ export default function AdminSettingsPage() {
             >
               <ItemContent>
                 <ItemTitle className="font-bold">ファビコン</ItemTitle>
+                <ItemDescription className="text-xs">
+                  {IMAGE_SIZES.favicon.width} x {IMAGE_SIZES.favicon.height} px
+                </ItemDescription>
               </ItemContent>
               <ItemActions className="flex items-center gap-2">
                 {faviconPrefix ? (
@@ -318,9 +320,9 @@ export default function AdminSettingsPage() {
                     </ItemContent>
                     <ItemActions>
                       <Switch
-                        checked={features.includes(feature.key)}
+                        checked={feature.disabled ? true : features.includes(feature.key)}
                         onCheckedChange={(checked) => handleFeatureToggle(feature.key, checked)}
-                        disabled={save.saving}
+                        disabled={save.saving || feature.disabled}
                       />
                     </ItemActions>
                   </Item>
@@ -362,7 +364,7 @@ export default function AdminSettingsPage() {
         title="ロゴ(正方形)を編集"
         currentImageUrl={squareLogoPath}
         onSave={save.saveSquareLogo}
-        aspectRatio="1/1"
+        recommendedSize={IMAGE_SIZES.squareLogo}
         description="正方形のロゴ画像をアップロードしてください"
         saving={save.saving}
       />
@@ -373,7 +375,7 @@ export default function AdminSettingsPage() {
         title="ロゴ(横長)を編集"
         currentImageUrl={logoPath}
         onSave={save.saveLogo}
-        aspectRatio="5/2"
+        recommendedSize={IMAGE_SIZES.logo}
         description="横長のロゴ画像をアップロードしてください"
         saving={save.saving}
       />
@@ -384,7 +386,7 @@ export default function AdminSettingsPage() {
         title="OG画像を編集"
         currentImageUrl={ogImagePath}
         onSave={save.saveOgImage}
-        aspectRatio="1.91/1"
+        recommendedSize={IMAGE_SIZES.ogImage}
         description="SNSシェア時に表示される画像をアップロードしてください"
         saving={save.saving}
       />
@@ -395,8 +397,8 @@ export default function AdminSettingsPage() {
         title="ファビコンを編集"
         currentImageUrl={faviconPrefix}
         onSave={save.saveFavicon}
-        aspectRatio="1/1"
-        description="32x32ピクセルのファビコン画像をアップロードしてください"
+        recommendedSize={IMAGE_SIZES.favicon}
+        description="ファビコン画像をアップロードしてください"
         saving={save.saving}
       />
     </>
