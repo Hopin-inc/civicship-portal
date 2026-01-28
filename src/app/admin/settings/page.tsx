@@ -50,15 +50,15 @@ const FEATURE_DEFINITIONS: {
     description: "知り合いを体験に無料招待できる仕組みを導入。縁を広げるきっかけを作れます。",
   },
   {
-    key: "credentials",
-    title: "証明書発行",
-    description: "募集への参加実績をデジタル証明書(VC)として発行。活動の証を形に残せます。",
-  },
-  {
     key: "opportunities",
     title: "募集",
     description:
       "コミュニティメンバーが気軽に参加できる「体験・お手伝い」の募集ページを公開します。",
+  },
+  {
+    key: "credentials",
+    title: "証明書発行",
+    description: "募集への参加実績をデジタル証明書(VC)として発行。活動の証を形に残せます。",
   },
   {
     key: "places",
