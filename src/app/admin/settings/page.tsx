@@ -1,67 +1,28 @@
 "use client";
 
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
+import { ChevronRight } from "lucide-react";
 import {
-  FileText,
-  Image,
-  Globe,
-  Coins,
-  ToggleLeft,
-  ChevronRight,
-} from "lucide-react";
-import { useAdminRole } from "@/app/admin/context/AdminRoleContext";
-import { GqlRole } from "@/types/graphql";
-
-type SettingItem = {
-  title: string;
-  description: string;
-  href: string;
-  icon: React.ComponentType<{ className?: string }>;
-};
-
-const settingsItems: SettingItem[] = [
-  {
-    title: "基本情報",
-    description: "ポータルのタイトル、説明文を設定",
-    href: "/admin/settings/basic",
-    icon: FileText,
-  },
-  {
-    title: "ロゴ・画像",
-    description: "ロゴ、OG画像、ファビコンを設定",
-    href: "/admin/settings/images",
-    icon: Image,
-  },
-  {
-    title: "ドメイン",
-    description: "ドメイン、ルートパスを設定",
-    href: "/admin/settings/domain",
-    icon: Globe,
-  },
-  {
-    title: "トークン",
-    description: "トークン名を設定",
-    href: "/admin/settings/token",
-    icon: Coins,
-  },
-  {
-    title: "機能フラグ",
-    description: "有効にする機能を選択",
-    href: "/admin/settings/features",
-    icon: ToggleLeft,
-  },
-];
+  Item,
+  ItemActions,
+  ItemContent,
+  ItemDescription,
+  ItemGroup,
+  ItemSeparator,
+  ItemTitle,
+} from "@/components/ui/item";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
+import { Switch } from "@/components/ui/switch";
 
 export default function AdminSettingsPage() {
   const router = useRouter();
-  const role = useAdminRole();
+  const communityConfig = useCommunityConfig();
 
   const headerConfig = useMemo(
     () => ({
-      title: "ポータル設定",
+      title: "設定",
       showBackButton: true,
       showLogo: false,
     }),
@@ -69,46 +30,113 @@ export default function AdminSettingsPage() {
   );
   useHeaderConfig(headerConfig);
 
-  // Ownerのみアクセス可能
-  if (role !== GqlRole.Owner) {
-    return (
-      <div className="max-w-xl mx-auto mt-8 px-4">
-        <p className="text-muted-foreground text-sm">
-          この設定にアクセスする権限がありません。
-        </p>
-      </div>
-    );
+  if (!communityConfig) {
+    return null;
   }
+
+  const {
+    title,
+    description,
+    squareLogoPath,
+    logoPath,
+    ogImagePath,
+    faviconPrefix,
+    enableFeatures,
+  } = communityConfig;
 
   return (
     <div className="max-w-xl mx-auto mt-8 space-y-6 px-4">
       <section>
-        <h2 className="text-sm text-muted-foreground font-semibold mb-2">
-          ポータル設定
-        </h2>
         <div className="space-y-2">
-          {settingsItems.map((item) => (
-            <Card
-              key={item.href}
-              onClick={() => router.push(item.href)}
-              className="cursor-pointer hover:bg-background-hover transition"
-            >
-              <CardHeader className="flex flex-row items-center justify-between py-4">
-                <div className="flex items-center space-x-3">
-                  <item.icon className="w-5 h-5 text-muted-foreground" />
-                  <div>
-                    <CardTitle className="text-body-sm font-bold">
-                      {item.title}
-                    </CardTitle>
-                    <CardDescription className="text-xs">
-                      {item.description}
-                    </CardDescription>
-                  </div>
-                </div>
-                <ChevronRight className="w-4 h-4 text-muted-foreground" />
-              </CardHeader>
-            </Card>
-          ))}
+          <Item
+            size="sm"
+            variant={"outline"}
+            role="button"
+            tabIndex={0}
+            // onClick={onDescriptionClick}
+            // onKeyDown={(e) => {
+            //   if (e.key === "Enter") {
+            //     onDescriptionClick();
+            //   }
+            // }}
+            className="cursor-pointer"
+          >
+            <ItemContent>
+              <ItemTitle className="font-bold">名前</ItemTitle>
+              <ItemDescription className="whitespace-pre-wrap">{title}</ItemDescription>
+            </ItemContent>
+            <ItemActions>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </ItemActions>
+          </Item>
+          <Item
+            size="sm"
+            variant={"outline"}
+            role="button"
+            tabIndex={0}
+            // onClick={onDescriptionClick}
+            // onKeyDown={(e) => {
+            //   if (e.key === "Enter") {
+            //     onDescriptionClick();
+            //   }
+            // }}
+            className="cursor-pointer"
+          >
+            <ItemContent>
+              <ItemTitle className="font-bold">概要</ItemTitle>
+              <ItemDescription className="whitespace-pre-wrap">{description}</ItemDescription>
+            </ItemContent>
+            <ItemActions>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </ItemActions>
+          </Item>
+
+          <Item
+            size="sm"
+            variant={"outline"}
+            role="button"
+            tabIndex={0}
+            // onClick={onDescriptionClick}
+            // onKeyDown={(e) => {
+            //   if (e.key === "Enter") {
+            //     onDescriptionClick();
+            //   }
+            // }}
+            className="cursor-pointer"
+          >
+            <ItemContent>
+              <ItemTitle className="font-bold">ロゴ(正方形)</ItemTitle>
+              <ItemDescription className="whitespace-pre-wrap">{description}</ItemDescription>
+            </ItemContent>
+            <ItemActions>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </ItemActions>
+          </Item>
+
+          <ItemGroup className="border rounded-lg">
+            <Item size="sm">
+              <ItemContent>
+                <ItemTitle className="flex items-center font-bold gap-2">利用機能</ItemTitle>
+              </ItemContent>
+            </Item>
+
+            <Item size="sm">
+              <ItemContent>
+                <ItemTitle>募集</ItemTitle>
+                <ItemDescription className="text-xs text-muted-foreground">
+                  hogehogehoge
+                </ItemDescription>
+              </ItemContent>
+
+              <ItemActions>
+                <Switch
+                  checked={true}
+                  // onCheckedChange={onRequireHostApprovalChange}
+                />
+              </ItemActions>
+            </Item>
+            <ItemSeparator />
+          </ItemGroup>
         </div>
       </section>
     </div>
