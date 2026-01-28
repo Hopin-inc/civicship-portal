@@ -43,6 +43,7 @@ jobs:
       SERVICE_ACCOUNT_CREDENTIAL_JSON: ${{ secrets.SERVICE_ACCOUNT_CREDENTIAL_JSON }}
       ARTIFACT_REGISTRY: ${{ secrets.ARTIFACT_REGISTRY }}
       APPLICATION_NAME: ${{ secrets.APPLICATION_NAME }}
+      NEXT_PUBLIC_CONFIG: ${{ secrets.NEXT_PUBLIC_CONFIG }}
       NEXT_PUBLIC_COMMUNITY_ID: ${{ secrets.NEXT_PUBLIC_COMMUNITY_ID }}
       NEXT_PUBLIC_LIFF_ID: ${{ secrets.NEXT_PUBLIC_LIFF_ID }}
       NEXT_PUBLIC_LINE_CLIENT: ${{ secrets.NEXT_PUBLIC_LINE_CLIENT }}
@@ -93,6 +94,7 @@ jobs:
       - name: Build Docker image
         run: |
           docker build -t ${{ env.ARTIFACT_REGISTRY }}/${{ env.APPLICATION_NAME }}-${{ matrix.community }}:latest . \
+            --build-arg NEXT_PUBLIC_CONFIG=${{ env.NEXT_PUBLIC_CONFIG }} \
             --build-arg NEXT_PUBLIC_COMMUNITY_ID=${{ env.NEXT_PUBLIC_COMMUNITY_ID }} \
             --build-arg NEXT_PUBLIC_LIFF_ID=${{ env.NEXT_PUBLIC_LIFF_ID }} \
             --build-arg NEXT_PUBLIC_LINE_CLIENT=${{ env.NEXT_PUBLIC_LINE_CLIENT }} \

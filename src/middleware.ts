@@ -159,6 +159,9 @@ export const config = {
  */
 function getCommunityIdFromHost(host: string | null): string {
   console.log(`Host: ${host}`);
+  const config = process.env.NEXT_PUBLIC_CONFIG;
+  console.log(`Config: ${config}`);
+
   if (!host) return "default";
 
   // localhost や 127.0.0.1 の場合は開発用のデフォルトを返す
