@@ -2,12 +2,11 @@
 
 ## 目的
 
-本移行は以下の2つの目標を達成する：
+本移行は以下の目標を達成する：
 
-1. **インフラ統合**: コミュニティごとの Cloud Run インスタンスから、単一の統合インスタンスへの移行
-2. **LINE ミニアプリ対応**: LIFF アプリから LINE ミニアプリへの移行対応
+**インフラ統合**: コミュニティごとの Cloud Run インスタンスから、単一の統合インスタンスへの移行
 
-※ これらは技術的には分割可能だが、本計画では統合的に実施する。
+※ LINE ミニアプリ対応は別 PR で実施予定。
 
 ## 背景
 
@@ -49,50 +48,12 @@
 
 - Frontend: 単一の Cloud Run インスタンス
 - Backend: 単一インスタンス（変更なし）
-- 認証: 統合チャネル（LINE ミニアプリ + LIFF 両対応、communityId: null）
+- 認証: 統合 LIFF チャネル（communityId: null）
 - ルーティング: URL パスベース（例: `/neo88/activities`）
 
-## 技術要件
+## 統合インスタンス移行の必要条件
 
-### LIFF SDK バージョン
-
-| 要件 | バージョン | 備考 |
-|------|-----------|------|
-| 推奨 | v2.27.0 以上 | `requestAll()` の改善版 |
-| 最低要件 | v2.13.x | Mini App 必須バージョン、`liff.permission` API 利用可能 |
-
-```json
-// package.json
-{
-  "dependencies": {
-    "@line/liff": "^2.27.0"
-  }
-}
-```
-
-### LINE Mini App 仕様変更（2026年1月8日〜）
-
-「チャネル同意の簡略化」が必須化され、Mini-app からのアクセス時はデフォルトで `openid` スコープのみが付与される。`profile` スコープは明示的な権限リクエストが必要。
-
-### 既知の制約
-
-**LIFF 間遷移の制約**:
-統合後も、異なる LIFF App 間の遷移時は同意画面が表示される。これは LINE Platform の仕様であり回避不可能。
-
-緩和策:
-- 頻繁な遷移を避ける UI 設計
-- 同一セッション内での権限キャッシュ
-
-**外部ブラウザの制約**:
-`liff.getContext().type === 'external'` の場合、以下の機能は利用不可:
-- `liff.sendMessages()`
-- `liff.openWindow()`
-- `liff.closeWindow()`
-- `liff.scanCode()`
-
-## 統合インスタンスでのミニアプリ移行の必要条件
-
-以下の条件をすべて満たすことで、統合インスタンスでのミニアプリ移行が実現可能となる。
+以下の条件をすべて満たすことで、統合インスタンス移行が実現可能となる。
 
 | # | 必要条件 | 説明 | 対応 PR |
 |---|----------|------|---------|
@@ -100,13 +61,12 @@
 | 2 | 統合 LIFF チャネル認証 | 統合チャネルからのログインをサポートする新認証メソッド追加 | PR 1b |
 | 3 | 認証シャドウモード | 本番環境で安全に新認証ロジックを検証可能にする | PR 1c |
 | 4 | URL パスベースのコミュニティ識別 | communityId を URL パスから抽出し、CommunityLink で自動付与 | PR 2a |
-| 5 | Mini-app 403 エラー対策 | profile スコープの権限確保（準備: PR 2b、有効化: PR 5b） | PR 2b, 5b |
-| 6 | Apollo Client の動的 communityId 対応 | URL パスから communityId を抽出してヘッダーに設定 | PR 3a |
-| 7 | Middleware の新ルーティング対応 | 新旧両方の URL 構造をサポート | PR 3b |
-| 8 | レガシー URL リダイレクト | 旧 URL から新 URL への自動リダイレクト | PR 3c |
-| 9 | ディレクトリ構造の変更 | ページを [communityId] ディレクトリに移動 | PR 4a |
-| 10 | CI/CD 単一デプロイ化 | Matrix ビルドから単一デプロイへ移行 | PR 5b |
-| 11 | 環境変数フォールバック削除 | パスベースの communityId 取得のみに統一 | PR 5b |
+| 5 | Apollo Client の動的 communityId 対応 | URL パスから communityId を抽出してヘッダーに設定 | PR 3a |
+| 6 | Middleware の新ルーティング対応 | 新旧両方の URL 構造をサポート | PR 3b |
+| 7 | レガシー URL リダイレクト | 旧 URL から新 URL への自動リダイレクト | PR 3c |
+| 8 | ディレクトリ構造の変更 | ページを [communityId] ディレクトリに移動 | PR 4a |
+| 9 | CI/CD 単一デプロイ化 | Matrix ビルドから単一デプロイへ移行 | PR 5b |
+| 10 | 環境変数フォールバック削除 | パスベースの communityId 取得のみに統一 | PR 5b |
 
 ## PR 分割戦略
 
@@ -123,7 +83,6 @@
 | PR | 内容 | リスク |
 |----|------|--------|
 | 2a | ユーティリティ追加（CommunityLink, extractCommunityIdFromPath） | 低 |
-| 2b | Mini-app 403 エラー対策（ensureProfilePermission） | 低 |
 
 ### Phase 3: ルーティング準備（コード追加のみ、未適用）
 
@@ -159,7 +118,6 @@ graph LR
     
     subgraph Phase2[Phase 2: Frontend]
         PR2a[2a: CommunityLink]
-        PR2b[2b: Mini-app Prep]
     end
     
     subgraph Phase3[Phase 3: Routing Prep]
@@ -177,9 +135,7 @@ graph LR
     end
     
     PR1c --> PR2a
-    PR1c --> PR2b
     PR2a --> PR3a
-    PR2b --> PR5b
     PR3c --> PR4a
     PR4a --> PR5a
     PR4a --> PR5b
@@ -193,7 +149,7 @@ Phase 1 (Backend)
   PR 1a → PR 1b → PR 1c
               ↓
 Phase 2 (Frontend)
-  PR 2a, PR 2b（並行可能）
+  PR 2a
               ↓
 Phase 3 (Routing Prep)
   PR 3a → PR 3b → PR 3c
@@ -294,7 +250,6 @@ Phase 5 は CI/CD と LIFF 設定が同時に変更されるため、ロール�
 **コード復旧**:
 1. 環境変数フォールバックを復元（`apollo.ts`, `middleware.ts`）
 2. Matrix ビルドを復元（`.github/workflows/deploy-to-cloud-run-prod.yml`）
-3. `ensureProfilePermission()` を無効化
 
 **LIFF 設定**:
 1. 統合 LIFF チャネルから各コミュニティ LIFF へ戻す
@@ -329,9 +284,8 @@ Phase 5 は CI/CD と LIFF 設定が同時に変更されるため、ロール�
 ### E2E テストシナリオ
 
 **認証フロー**:
-- [ ] LINE ミニアプリからの新規ユーザー登録
-- [ ] LINE ミニアプリからの既存ユーザーログイン
-- [ ] LIFF ブラウザからのログイン
+- [ ] LIFF ブラウザからの新規ユーザー登録
+- [ ] LIFF ブラウザからの既存ユーザーログイン
 - [ ] 複数コミュニティ間でのユーザー切り替え
 
 **ルーティング**:
