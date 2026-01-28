@@ -307,6 +307,112 @@ LINE の「チャネル同意の簡略化」により、Mini-app からのアク
 
 参照: https://developers.line.biz/ja/news/2025/10/31/channel-consent-simplification/
 
+### 必要スコープ一覧
+
+| スコープ | 用途 | チェック必須 |
+|---------|------|-------------|
+| `profile` | `liff.getProfile()`, `liff.getFriendship()` | 必須 |
+| `openid` | ユーザー ID 取得 | 自動付与 |
+| `chat_message.write` | `liff.sendMessages()` | 使用時のみ |
+
+### 環境検出ロジック
+
+Mini-app 環境かどうかを正確に判定するためのロジック:
+
+```typescript
+/**
+ * Mini-app 環境かどうかを判定
+ * - liff.isInClient(): LINE 内ブラウザかどうか
+ * - liff.getContext().type: 起動元画面タイプ
+ *   - 'utou': 1対1トーク
+ *   - 'group': グループトーク
+ *   - 'room': ルーム
+ *   - 'external': 外部ブラウザ
+ *   - 'square_chat': オープンチャット
+ */
+const isMiniAppEnvironment = (): boolean => {
+  if (!liff.isInClient()) return false;
+  const context = liff.getContext();
+  // 外部ブラウザからのアクセスは Mini-app 環境ではない
+  return context?.type !== 'external';
+};
+
+/**
+ * 外部ブラウザからのアクセスかどうかを判定
+ */
+const isExternalBrowser = (): boolean => {
+  if (!liff.isInClient()) return true;  // LIFF 外は外部ブラウザ扱い
+  const context = liff.getContext();
+  return context?.type === 'external';
+};
+```
+
+### 権限拒否時のエラーハンドリング
+
+ユーザーが権限を拒否した場合のフォールバック処理:
+
+```typescript
+/**
+ * 権限拒否時のフォールバック処理
+ * 
+ * UX 考慮点:
+ * - 権限拒否後も基本機能は利用可能にすべき
+ * - プロフィール取得が必須の機能は権限取得後に有効化
+ */
+private async handlePermissionDenied(): Promise<void> {
+  logger.warn("User denied profile permission", {
+    authType: "liff",
+    component: "LiffService",
+  });
+
+  // オプション 1: 制限機能モードで継続
+  // プロフィール情報なしで利用可能な機能のみ提供
+
+  // オプション 2: ユーザーに再度許可を求める UI 表示
+  // 次回アクセス時に再度 permission.query() で確認
+
+  // オプション 3: LINE 設定画面への誘導（任意）
+  // liff.openWindow({ url: 'https://line.me/R/nv/settings/privacy' });
+}
+
+/**
+ * 権限ステータスに応じた処理
+ */
+private async ensureProfilePermission(): Promise<boolean> {
+  if (typeof window === "undefined") return true;
+  if (!liff.isInClient()) return true;
+  if (!liff.isApiAvailable("permission")) return true;
+
+  try {
+    const permissionStatus = await liff.permission.query("profile");
+
+    switch (permissionStatus.state) {
+      case "granted":
+        // 既に権限あり
+        return true;
+      
+      case "prompt":
+        // 権限リクエストが必要
+        await liff.permission.requestAll();
+        // リクエスト後の状態を再確認
+        const newStatus = await liff.permission.query("profile");
+        return newStatus.state === "granted";
+      
+      case "unavailable":
+        // 権限が利用不可（拒否済み等）
+        await this.handlePermissionDenied();
+        return false;
+      
+      default:
+        return false;
+    }
+  } catch (error) {
+    logger.error("Permission check failed", { error });
+    return false;
+  }
+}
+```
+
 ### 変更対象ファイル
 
 | ファイル | 変更内容 |

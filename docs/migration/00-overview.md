@@ -52,6 +52,44 @@
 - 認証: 統合チャネル（LINE ミニアプリ + LIFF 両対応、communityId: null）
 - ルーティング: URL パスベース（例: `/neo88/activities`）
 
+## 技術要件
+
+### LIFF SDK バージョン
+
+| 要件 | バージョン | 備考 |
+|------|-----------|------|
+| 推奨 | v2.27.0 以上 | `requestAll()` の改善版 |
+| 最低要件 | v2.13.x | Mini App 必須バージョン、`liff.permission` API 利用可能 |
+
+```json
+// package.json
+{
+  "dependencies": {
+    "@line/liff": "^2.27.0"
+  }
+}
+```
+
+### LINE Mini App 仕様変更（2026年1月8日〜）
+
+「チャネル同意の簡略化」が必須化され、Mini-app からのアクセス時はデフォルトで `openid` スコープのみが付与される。`profile` スコープは明示的な権限リクエストが必要。
+
+### 既知の制約
+
+**LIFF 間遷移の制約**:
+統合後も、異なる LIFF App 間の遷移時は同意画面が表示される。これは LINE Platform の仕様であり回避不可能。
+
+緩和策:
+- 頻繁な遷移を避ける UI 設計
+- 同一セッション内での権限キャッシュ
+
+**外部ブラウザの制約**:
+`liff.getContext().type === 'external'` の場合、以下の機能は利用不可:
+- `liff.sendMessages()`
+- `liff.openWindow()`
+- `liff.closeWindow()`
+- `liff.scanCode()`
+
 ## 統合インスタンスでのミニアプリ移行の必要条件
 
 以下の条件をすべて満たすことで、統合インスタンスでのミニアプリ移行が実現可能となる。
