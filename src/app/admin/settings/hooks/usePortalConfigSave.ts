@@ -86,8 +86,9 @@ export function usePortalConfigSave({ communityId }: UsePortalConfigSaveOptions)
   );
 
   const saveFavicon = useCallback(
-    async (prefix: string) => {
-      return saveField("faviconPrefix", prefix);
+    async (file: File | null) => {
+      // TODO: 画像アップロード処理を実装
+      return saveField("faviconPrefix", file);
     },
     [saveField]
   );

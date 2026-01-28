@@ -21,7 +21,70 @@ import { usePortalConfigSave } from "./hooks/usePortalConfigSave";
 import { EditTextSheet } from "./components/sheets/EditTextSheet";
 import { EditImageSheet } from "./components/sheets/EditImageSheet";
 
-type FeatureKey = "opportunities" | "points" | "tickets" | "credentials";
+// 利用可能なすべてのフィーチャーキー
+type FeatureKey =
+  | "opportunities"
+  | "points"
+  | "tickets"
+  | "credentials"
+  | "quests"
+  | "places"
+  | "prefectures"
+  | "languageSwitcher"
+  | "justDaoIt";
+
+// フィーチャー定義
+const FEATURE_DEFINITIONS: {
+  key: FeatureKey;
+  title: string;
+  description: string;
+}[] = [
+  {
+    key: "opportunities",
+    title: "募集",
+    description: "ボランティア募集機能を有効にする",
+  },
+  {
+    key: "quests",
+    title: "クエスト",
+    description: "クエスト機能を有効にする",
+  },
+  {
+    key: "points",
+    title: "ポイント",
+    description: "ポイント・ウォレット機能を有効にする",
+  },
+  {
+    key: "tickets",
+    title: "チケット",
+    description: "チケット機能を有効にする",
+  },
+  {
+    key: "credentials",
+    title: "証明書",
+    description: "証明書発行機能を有効にする",
+  },
+  {
+    key: "places",
+    title: "拠点",
+    description: "拠点・場所機能を有効にする",
+  },
+  {
+    key: "prefectures",
+    title: "都道府県",
+    description: "都道府県選択機能を有効にする",
+  },
+  {
+    key: "languageSwitcher",
+    title: "言語切り替え",
+    description: "言語切り替え機能を有効にする",
+  },
+  {
+    key: "justDaoIt",
+    title: "JustDaoIt",
+    description: "JustDaoIt連携機能を有効にする",
+  },
+];
 
 export default function AdminSettingsPage() {
   const communityConfig = useCommunityConfig();
@@ -88,6 +151,9 @@ export default function AdminSettingsPage() {
   // ローカルで更新された値を優先表示
   const displayTitle = localTitle || title;
   const displayDescription = localDescription || description;
+
+  // ファビコン画像URL（32x32）
+  const faviconImageUrl = faviconPrefix ? `/${faviconPrefix}-32x32.png` : null;
 
   return (
     <>
@@ -219,7 +285,7 @@ export default function AdminSettingsPage() {
               )}
             </Item>
 
-            {/* ファビコン */}
+            {/* ファビコン - 右側にプレビュー（画像） */}
             <Item
               size="sm"
               variant="outline"
@@ -230,20 +296,20 @@ export default function AdminSettingsPage() {
             >
               <ItemContent>
                 <ItemTitle className="font-bold">ファビコン</ItemTitle>
-                <ItemDescription className="whitespace-pre-wrap">
-                  {faviconPrefix || "未設定"}
-                </ItemDescription>
               </ItemContent>
               <ItemActions className="flex items-center gap-2">
-                {faviconPrefix && (
-                  <div className="h-6 w-6 relative">
+                {faviconImageUrl ? (
+                  <div className="h-8 w-8 relative border rounded overflow-hidden bg-muted">
                     <Image
-                      src={`/${faviconPrefix}-32x32.png`}
+                      src={faviconImageUrl}
                       alt="ファビコン"
-                      width={24}
-                      height={24}
+                      fill
                       className="object-contain"
                     />
+                  </div>
+                ) : (
+                  <div className="h-8 w-8 border rounded bg-muted flex items-center justify-center">
+                    <span className="text-xs text-muted-foreground">?</span>
                   </div>
                 )}
                 <ChevronRight className="h-4 w-4 text-muted-foreground" />
@@ -258,72 +324,26 @@ export default function AdminSettingsPage() {
                 </ItemContent>
               </Item>
 
-              <Item size="sm">
-                <ItemContent>
-                  <ItemTitle>募集</ItemTitle>
-                  <ItemDescription className="text-xs text-muted-foreground">
-                    ボランティア募集機能を有効にする
-                  </ItemDescription>
-                </ItemContent>
-                <ItemActions>
-                  <Switch
-                    checked={features.includes("opportunities")}
-                    onCheckedChange={(checked) => handleFeatureToggle("opportunities", checked)}
-                    disabled={save.saving}
-                  />
-                </ItemActions>
-              </Item>
-              <ItemSeparator />
-
-              <Item size="sm">
-                <ItemContent>
-                  <ItemTitle>ポイント</ItemTitle>
-                  <ItemDescription className="text-xs text-muted-foreground">
-                    ポイント・ウォレット機能を有効にする
-                  </ItemDescription>
-                </ItemContent>
-                <ItemActions>
-                  <Switch
-                    checked={features.includes("points")}
-                    onCheckedChange={(checked) => handleFeatureToggle("points", checked)}
-                    disabled={save.saving}
-                  />
-                </ItemActions>
-              </Item>
-              <ItemSeparator />
-
-              <Item size="sm">
-                <ItemContent>
-                  <ItemTitle>チケット</ItemTitle>
-                  <ItemDescription className="text-xs text-muted-foreground">
-                    チケット機能を有効にする
-                  </ItemDescription>
-                </ItemContent>
-                <ItemActions>
-                  <Switch
-                    checked={features.includes("tickets")}
-                    onCheckedChange={(checked) => handleFeatureToggle("tickets", checked)}
-                    disabled={save.saving}
-                  />
-                </ItemActions>
-              </Item>
-              <ItemSeparator />
-
-              <Item size="sm">
-                <ItemContent>
-                  <ItemTitle>証明書</ItemTitle>
-                  <ItemDescription className="text-xs text-muted-foreground">
-                    証明書発行機能を有効にする
-                  </ItemDescription>
-                </ItemContent>
-                <ItemActions>
-                  <Switch
-                    checked={features.includes("credentials")}
-                    onCheckedChange={(checked) => handleFeatureToggle("credentials", checked)}
-                    disabled={save.saving}
-                  />
-                </ItemActions>
-              </Item>
+              {FEATURE_DEFINITIONS.map((feature, index) => (
+                <div key={feature.key}>
+                  <Item size="sm">
+                    <ItemContent>
+                      <ItemTitle>{feature.title}</ItemTitle>
+                      <ItemDescription className="text-xs text-muted-foreground">
+                        {feature.description}
+                      </ItemDescription>
+                    </ItemContent>
+                    <ItemActions>
+                      <Switch
+                        checked={features.includes(feature.key)}
+                        onCheckedChange={(checked) => handleFeatureToggle(feature.key, checked)}
+                        disabled={save.saving}
+                      />
+                    </ItemActions>
+                  </Item>
+                  {index < FEATURE_DEFINITIONS.length - 1 && <ItemSeparator />}
+                </div>
+              ))}
             </ItemGroup>
           </div>
         </section>
@@ -386,14 +406,14 @@ export default function AdminSettingsPage() {
         saving={save.saving}
       />
 
-      <EditTextSheet
+      <EditImageSheet
         open={sheets.isOpen("favicon")}
         onOpenChange={(open) => !open && sheets.closeSheet()}
-        title="ファビコンプレフィックスを編集"
-        value={faviconPrefix ?? ""}
+        title="ファビコンを編集"
+        currentImageUrl={faviconImageUrl}
         onSave={save.saveFavicon}
-        placeholder="favicon"
-        maxLength={50}
+        aspectRatio="1/1"
+        description="32x32ピクセルのファビコン画像をアップロードしてください"
         saving={save.saving}
       />
     </>
