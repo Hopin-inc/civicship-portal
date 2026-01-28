@@ -16,7 +16,7 @@ interface EditImageSheetProps {
   onOpenChange: (open: boolean) => void;
   title: string;
   currentImageUrl: string | null;
-  onSave: (file: File | null) => Promise<void>;
+  onSave: (file: File | null) => Promise<boolean>;
   aspectRatio?: string;
   description?: string;
   saving?: boolean;
