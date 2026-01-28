@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, useCallback } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { ChevronRight } from "lucide-react";
 import {
@@ -17,6 +17,8 @@ import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
 
+type FeatureKey = "opportunities" | "points" | "tickets" | "credentials";
+
 export default function AdminSettingsPage() {
   const communityConfig = useCommunityConfig();
 
@@ -30,6 +32,22 @@ export default function AdminSettingsPage() {
   );
   useHeaderConfig(headerConfig);
 
+  // 利用機能のローカルステート
+  const [features, setFeatures] = useState<string[]>(
+    communityConfig?.enableFeatures ?? []
+  );
+
+  const handleFeatureToggle = useCallback((featureKey: FeatureKey, checked: boolean) => {
+    setFeatures((prev) => {
+      if (checked) {
+        return prev.includes(featureKey) ? prev : [...prev, featureKey];
+      } else {
+        return prev.filter((f) => f !== featureKey);
+      }
+    });
+    // TODO: API呼び出しでupsert
+  }, []);
+
   if (!communityConfig) {
     return null;
   }
@@ -40,7 +58,7 @@ export default function AdminSettingsPage() {
     squareLogoPath,
     logoPath,
     ogImagePath,
-    enableFeatures,
+    faviconPrefix,
   } = communityConfig;
 
   return (
@@ -167,6 +185,36 @@ export default function AdminSettingsPage() {
             )}
           </Item>
 
+          {/* ファビコン */}
+          <Item
+            size="sm"
+            variant="outline"
+            role="button"
+            tabIndex={0}
+            className="cursor-pointer"
+          >
+            <ItemContent>
+              <ItemTitle className="font-bold">ファビコン</ItemTitle>
+              <ItemDescription className="whitespace-pre-wrap">
+                {faviconPrefix || "未設定"}
+              </ItemDescription>
+            </ItemContent>
+            <ItemActions className="flex items-center gap-2">
+              {faviconPrefix && (
+                <div className="h-6 w-6 relative">
+                  <Image
+                    src={`/${faviconPrefix}-32x32.png`}
+                    alt="ファビコン"
+                    width={24}
+                    height={24}
+                    className="object-contain"
+                  />
+                </div>
+              )}
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </ItemActions>
+          </Item>
+
           {/* 利用機能 */}
           <ItemGroup className="border rounded-lg">
             <Item size="sm">
@@ -184,7 +232,8 @@ export default function AdminSettingsPage() {
               </ItemContent>
               <ItemActions>
                 <Switch
-                  checked={enableFeatures?.includes("opportunities") ?? false}
+                  checked={features.includes("opportunities")}
+                  onCheckedChange={(checked) => handleFeatureToggle("opportunities", checked)}
                 />
               </ItemActions>
             </Item>
@@ -199,7 +248,8 @@ export default function AdminSettingsPage() {
               </ItemContent>
               <ItemActions>
                 <Switch
-                  checked={enableFeatures?.includes("points") ?? false}
+                  checked={features.includes("points")}
+                  onCheckedChange={(checked) => handleFeatureToggle("points", checked)}
                 />
               </ItemActions>
             </Item>
@@ -214,7 +264,8 @@ export default function AdminSettingsPage() {
               </ItemContent>
               <ItemActions>
                 <Switch
-                  checked={enableFeatures?.includes("tickets") ?? false}
+                  checked={features.includes("tickets")}
+                  onCheckedChange={(checked) => handleFeatureToggle("tickets", checked)}
                 />
               </ItemActions>
             </Item>
@@ -229,7 +280,8 @@ export default function AdminSettingsPage() {
               </ItemContent>
               <ItemActions>
                 <Switch
-                  checked={enableFeatures?.includes("credentials") ?? false}
+                  checked={features.includes("credentials")}
+                  onCheckedChange={(checked) => handleFeatureToggle("credentials", checked)}
                 />
               </ItemActions>
             </Item>
