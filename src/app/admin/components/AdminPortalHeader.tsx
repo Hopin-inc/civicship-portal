@@ -19,7 +19,7 @@ export function AdminPortalHeader() {
     return null;
   }
 
-  const { title, squareLogoPath } = communityConfig;
+  const { title, description, squareLogoPath } = communityConfig;
 
   return (
     <div className="bg-background px-8 pt-6">
@@ -27,7 +27,7 @@ export function AdminPortalHeader() {
         <div className="flex flex-col items-start">
           <div className="flex items-center w-full gap-3">
             <div className="flex items-center gap-3 flex-grow min-w-0">
-              <div className="p-2 rounded-sm border bg-background flex-shrink-0">
+              <div className="p-3 rounded-sm border bg-background flex-shrink-0">
                 <Avatar className="h-8 w-8">
                   <AvatarImage src={squareLogoPath} alt={title} />
                   <AvatarFallback className="rounded-sm bg-muted text-xs">
@@ -36,7 +36,12 @@ export function AdminPortalHeader() {
                 </Avatar>
               </div>
 
-              <h2 className="text-title-sm truncate">{title}</h2>
+              <div className="flex flex-col gap-0.5">
+                <h2 className="text-title-sm truncate">{title}</h2>
+                <p className="text-body-xs text-muted-foreground line-clamp-2 text-wrap">
+                  {description}
+                </p>
+              </div>
             </div>
             <Link href="/admin/settings" className="flex-shrink-0">
               <Button
