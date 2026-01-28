@@ -270,37 +270,21 @@ Phase 5 は CI/CD と LIFF 設定が同時に変更されるため、ロール�
 
 ### 新コミュニティ追加時の手順
 
-統合インスタンス移行後、新しいコミュニティを追加する際の手順。
+統合インスタンス移行後、新しいコミュニティは管理画面から作成可能。
 
-**1. Backend 設定**:
-```sql
--- t_community_configs にコミュニティ設定を追加
-INSERT INTO t_community_configs (id, name, ...) VALUES ('new-community', '新コミュニティ', ...);
+**手順**:
+1. 管理画面にアクセス
+2. コミュニティ作成フォームから必要情報を入力
+3. 作成ボタンをクリック
 
--- t_community_line_configs に LINE 設定を追加（統合チャネルを使用）
-INSERT INTO t_community_line_configs (community_id, liff_id, ...) 
-VALUES ('new-community', 'INTEGRATED_LIFF_ID', ...);
-```
-
-**2. Frontend 設定**:
-```typescript
-// src/lib/config/config-env.ts に追加
-export const COMMUNITY_CONFIGS: Record<string, CommunityConfig> = {
-  // 既存のコミュニティ...
-  "new-community": {
-    name: "新コミュニティ",
-    // 統合設定を使用
-  },
-};
-```
-
-**3. デプロイ**:
-- Frontend の設定変更をデプロイ（Edge Runtime 制約のため、設定はハードコード）
-- Backend は DB 変更のみでデプロイ不要
+**自動的に設定される項目**:
+- Backend: `t_community_configs`、`t_community_line_configs` への DB レコード追加
+- 統合 LIFF チャネルの設定（`INTEGRATED_LIFF_ID` を使用）
 
 **注意事項**:
-- Edge Runtime では DB アクセスができないため、`config-env.ts` のコミュニティ設定はハードコードが必要
-- 新コミュニティ追加時は Frontend のデプロイが必要
+- Edge Runtime では DB アクセスができないため、Middleware でのコミュニティ検証は `config-env.ts` のハードコード設定に依存
+- 新コミュニティを Middleware で認識させるには、`config-env.ts` への追加と Frontend デプロイが必要
+- 将来的には、コミュニティ一覧を API から取得してキャッシュする仕組みへの移行を検討
 
 ## テスト計画
 
