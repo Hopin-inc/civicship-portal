@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { ChevronRight } from "lucide-react";
@@ -15,9 +14,10 @@ import {
 } from "@/components/ui/item";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { Switch } from "@/components/ui/switch";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Image from "next/image";
 
 export default function AdminSettingsPage() {
-  const router = useRouter();
   const communityConfig = useCommunityConfig();
 
   const headerConfig = useMemo(
@@ -40,7 +40,6 @@ export default function AdminSettingsPage() {
     squareLogoPath,
     logoPath,
     ogImagePath,
-    faviconPrefix,
     enableFeatures,
   } = communityConfig;
 
@@ -48,17 +47,12 @@ export default function AdminSettingsPage() {
     <div className="max-w-xl mx-auto mt-8 space-y-6 px-4">
       <section>
         <div className="space-y-2">
+          {/* 名前 */}
           <Item
             size="sm"
-            variant={"outline"}
+            variant="outline"
             role="button"
             tabIndex={0}
-            // onClick={onDescriptionClick}
-            // onKeyDown={(e) => {
-            //   if (e.key === "Enter") {
-            //     onDescriptionClick();
-            //   }
-            // }}
             className="cursor-pointer"
           >
             <ItemContent>
@@ -69,50 +63,111 @@ export default function AdminSettingsPage() {
               <ChevronRight className="h-4 w-4 text-muted-foreground" />
             </ItemActions>
           </Item>
+
+          {/* 概要 */}
           <Item
             size="sm"
-            variant={"outline"}
+            variant="outline"
             role="button"
             tabIndex={0}
-            // onClick={onDescriptionClick}
-            // onKeyDown={(e) => {
-            //   if (e.key === "Enter") {
-            //     onDescriptionClick();
-            //   }
-            // }}
             className="cursor-pointer"
           >
             <ItemContent>
               <ItemTitle className="font-bold">概要</ItemTitle>
-              <ItemDescription className="whitespace-pre-wrap">{description}</ItemDescription>
+              <ItemDescription className="whitespace-pre-wrap line-clamp-2">
+                {description}
+              </ItemDescription>
             </ItemContent>
             <ItemActions>
               <ChevronRight className="h-4 w-4 text-muted-foreground" />
             </ItemActions>
           </Item>
 
+          {/* ロゴ(正方形) - 右側にプレビュー */}
           <Item
             size="sm"
-            variant={"outline"}
+            variant="outline"
             role="button"
             tabIndex={0}
-            // onClick={onDescriptionClick}
-            // onKeyDown={(e) => {
-            //   if (e.key === "Enter") {
-            //     onDescriptionClick();
-            //   }
-            // }}
             className="cursor-pointer"
           >
             <ItemContent>
               <ItemTitle className="font-bold">ロゴ(正方形)</ItemTitle>
-              <ItemDescription className="whitespace-pre-wrap">{description}</ItemDescription>
             </ItemContent>
-            <ItemActions>
+            <ItemActions className="flex items-center gap-2">
+              <Avatar className="h-10 w-10 rounded-md border">
+                <AvatarImage src={squareLogoPath} alt="正方形ロゴ" />
+                <AvatarFallback className="rounded-md bg-muted text-xs">
+                  {title?.[0]?.toUpperCase() ?? "?"}
+                </AvatarFallback>
+              </Avatar>
               <ChevronRight className="h-4 w-4 text-muted-foreground" />
             </ItemActions>
           </Item>
 
+          {/* ロゴ(横長) - 右側にプレビュー */}
+          <Item
+            size="sm"
+            variant="outline"
+            role="button"
+            tabIndex={0}
+            className="cursor-pointer"
+          >
+            <ItemContent>
+              <ItemTitle className="font-bold">ロゴ(横長)</ItemTitle>
+            </ItemContent>
+            <ItemActions className="flex items-center gap-2">
+              {logoPath ? (
+                <div className="h-8 w-20 relative border rounded overflow-hidden bg-muted">
+                  <Image
+                    src={logoPath}
+                    alt="横長ロゴ"
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+              ) : (
+                <div className="h-8 w-20 border rounded bg-muted flex items-center justify-center">
+                  <span className="text-xs text-muted-foreground">未設定</span>
+                </div>
+              )}
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </ItemActions>
+          </Item>
+
+          {/* OG画像 - 下にプレビュー */}
+          <Item
+            size="sm"
+            variant="outline"
+            role="button"
+            tabIndex={0}
+            className="cursor-pointer flex-col items-stretch"
+          >
+            <div className="flex items-center justify-between w-full">
+              <ItemContent>
+                <ItemTitle className="font-bold">OG画像</ItemTitle>
+              </ItemContent>
+              <ItemActions>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              </ItemActions>
+            </div>
+            {ogImagePath ? (
+              <div className="mt-2 w-full aspect-[1.91/1] relative border rounded overflow-hidden bg-muted">
+                <Image
+                  src={ogImagePath}
+                  alt="OG画像"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            ) : (
+              <div className="mt-2 w-full aspect-[1.91/1] border rounded bg-muted flex items-center justify-center">
+                <span className="text-sm text-muted-foreground">未設定</span>
+              </div>
+            )}
+          </Item>
+
+          {/* 利用機能 */}
           <ItemGroup className="border rounded-lg">
             <Item size="sm">
               <ItemContent>
@@ -124,18 +179,60 @@ export default function AdminSettingsPage() {
               <ItemContent>
                 <ItemTitle>募集</ItemTitle>
                 <ItemDescription className="text-xs text-muted-foreground">
-                  hogehogehoge
+                  ボランティア募集機能を有効にする
                 </ItemDescription>
               </ItemContent>
-
               <ItemActions>
                 <Switch
-                  checked={true}
-                  // onCheckedChange={onRequireHostApprovalChange}
+                  checked={enableFeatures?.includes("opportunities") ?? false}
                 />
               </ItemActions>
             </Item>
             <ItemSeparator />
+
+            <Item size="sm">
+              <ItemContent>
+                <ItemTitle>ポイント</ItemTitle>
+                <ItemDescription className="text-xs text-muted-foreground">
+                  ポイント・ウォレット機能を有効にする
+                </ItemDescription>
+              </ItemContent>
+              <ItemActions>
+                <Switch
+                  checked={enableFeatures?.includes("points") ?? false}
+                />
+              </ItemActions>
+            </Item>
+            <ItemSeparator />
+
+            <Item size="sm">
+              <ItemContent>
+                <ItemTitle>チケット</ItemTitle>
+                <ItemDescription className="text-xs text-muted-foreground">
+                  チケット機能を有効にする
+                </ItemDescription>
+              </ItemContent>
+              <ItemActions>
+                <Switch
+                  checked={enableFeatures?.includes("tickets") ?? false}
+                />
+              </ItemActions>
+            </Item>
+            <ItemSeparator />
+
+            <Item size="sm">
+              <ItemContent>
+                <ItemTitle>証明書</ItemTitle>
+                <ItemDescription className="text-xs text-muted-foreground">
+                  証明書発行機能を有効にする
+                </ItemDescription>
+              </ItemContent>
+              <ItemActions>
+                <Switch
+                  checked={enableFeatures?.includes("credentials") ?? false}
+                />
+              </ItemActions>
+            </Item>
           </ItemGroup>
         </div>
       </section>
