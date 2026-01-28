@@ -188,7 +188,7 @@ static async registerNewUser(request: UserRegistrationRequest): Promise<UserRegi
 }
 ```
 
-参照: https://github.com/Hopin-inc/civicship-api/blob/epic/mini-appify/src/application/domain/account/auth/liff/usercase.ts#L79-L211
+参照: https://github.com/Hopin-inc/civicship-api/blob/epic/mini-appify/src/application/domain/account/auth/liff/usecase.ts#L79-L211
 
 ### 実装手順
 
