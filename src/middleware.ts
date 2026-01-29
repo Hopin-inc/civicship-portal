@@ -172,7 +172,7 @@ function checkConfigMismatch(communityId: string, config: any) {
 }
 
 function getCommunityIdFromHost(host: string | null): string {
-  const DEFAULT_ID = "neo88";
+  const DEFAULT_ID = "himeji-ymca";
   let communityId = DEFAULT_ID;
 
   if (!host) {
