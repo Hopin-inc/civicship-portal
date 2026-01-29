@@ -1,11 +1,18 @@
-import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getCommunityIdFromEnv, fetchCommunityConfigForEdge } from "@/lib/communities/config-env";
+import { NextResponse } from "next/server";
+import { fetchCommunityConfigForEdge, getCommunityIdFromEnv } from "@/lib/communities/config-env";
 import { detectPreferredLocale } from "@/lib/i18n/languageDetection";
-import { locales, defaultLocale } from "@/lib/i18n/config";
+import { defaultLocale, locales } from "@/lib/i18n/config";
+import { COMMUNITY_CONFIGS } from "@/lib/communities/constants";
 
 // Feature types for route gating
-type FeaturesType = "places" | "opportunities" | "points" | "tickets" | "articles" | "languageSwitcher";
+type FeaturesType =
+  | "places"
+  | "opportunities"
+  | "points"
+  | "tickets"
+  | "articles"
+  | "languageSwitcher";
 
 // Map features to their corresponding route paths
 const featureToRoutesMap: Partial<Record<FeaturesType, string[]>> = {
@@ -19,7 +26,10 @@ const featureToRoutesMap: Partial<Record<FeaturesType, string[]>> = {
 export async function middleware(request: NextRequest) {
   const isDev = process.env.NODE_ENV !== "production";
   const pathname = request.nextUrl.pathname;
-  
+  const host = request.headers.get("host");
+
+  getCommunityIdFromHost(host);
+
   // Fetch config from server-side API
   const communityId = getCommunityIdFromEnv();
   const config = await fetchCommunityConfigForEdge(communityId);
@@ -65,21 +75,11 @@ export async function middleware(request: NextRequest) {
     ...(isDev ? [`'unsafe-eval'`] : []),
   ].join(" ");
 
-  const styleSrcElem = [
-    `'self'`,
-    "https://fonts.googleapis.com",
-    `'unsafe-inline'`,
-  ].join(" ");
+  const styleSrcElem = [`'self'`, "https://fonts.googleapis.com", `'unsafe-inline'`].join(" ");
 
-  const styleSrcAttr = [
-    `'unsafe-inline'`,
-  ].join(" ");
+  const styleSrcAttr = [`'unsafe-inline'`].join(" ");
 
-  const styleSrc = [
-    `'self'`,
-    "https://fonts.googleapis.com",
-    `'unsafe-inline'`,
-  ].join(" ");
+  const styleSrc = [`'self'`, "https://fonts.googleapis.com", `'unsafe-inline'`].join(" ");
 
   const connectSrc = [
     `'self'`,
@@ -133,22 +133,57 @@ export async function middleware(request: NextRequest) {
   res.headers.set("Referrer-Policy", "no-referrer");
 
   const hasLanguageSwitcher = enabledFeatures.includes("languageSwitcher");
-  const languageCookie = request.cookies.get('language');
-  
+  const languageCookie = request.cookies.get("language");
+
   if (hasLanguageSwitcher && !languageCookie) {
     const detectedLanguage = detectPreferredLocale(
-      request.headers.get('accept-language'),
+      request.headers.get("accept-language"),
       locales,
-      defaultLocale
+      defaultLocale,
     );
-    res.cookies.set('language', detectedLanguage, {
-      path: '/',
+    res.cookies.set("language", detectedLanguage, {
+      path: "/",
       maxAge: 60 * 60 * 24 * 365,
-      sameSite: 'lax',
+      sameSite: "lax",
     });
   }
 
   return res;
+}
+
+function getCommunityIdFromHost(host: string | null): string {
+  console.log(`[Middleware Debug] Incoming Host: "${host}"`);
+
+  if (!host) {
+    console.log(`[Middleware Debug] Result: No host, returning default (neo88)`);
+    return "neo88";
+  }
+
+  if (host.includes("localhost") || host.includes("127.0.0.1")) {
+    const envId = process.env.NEXT_PUBLIC_COMMUNITY_ID || "neo88";
+    console.log(`[Middleware Debug] Result: Local environment detected. Returning envId: ${envId}`);
+    return envId;
+  }
+
+  const parts = host.split(".");
+  console.log(`[Middleware Debug] Host parts:`, parts);
+
+  if (parts.length >= 3) {
+    const subdomain = parts[0];
+    console.log(`[Middleware Debug] Checking subdomain: "${subdomain}"`);
+
+    if (subdomain in COMMUNITY_CONFIGS) {
+      console.log(`[Middleware Debug] Result: Subdomain match found! Returning: ${subdomain}`);
+      return subdomain;
+    } else {
+      console.log(
+        `[Middleware Debug] Warning: Subdomain "${subdomain}" not found in COMMUNITY_CONFIGS`,
+      );
+    }
+  }
+
+  console.log(`[Middleware Debug] Result: No match, falling back to default (neo88)`);
+  return "neo88";
 }
 
 export const config = {
