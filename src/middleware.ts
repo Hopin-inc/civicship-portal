@@ -159,8 +159,19 @@ export const config = {
  */
 function getCommunityIdFromHost(host: string | null): string {
   console.log(`Host: ${host}`);
-  const config = process.env.NEXT_PUBLIC_CONFIG;
-  console.log(`Config: ${config}`);
+  const configStr = process.env.NEXT_PUBLIC_CONFIG;
+
+  if (configStr) {
+    try {
+      const config = JSON.parse(configStr);
+      console.log("Config Object:", config);
+      console.log(`Community ID: ${config.communityId}`);
+    } catch (e) {
+      console.error("JSONのパースに失敗しました。形式が正しくない可能性があります。");
+    }
+  } else {
+    console.log("NEXT_PUBLIC_CONFIG が設定されていません。");
+  }
 
   if (!host) return "default";
 
