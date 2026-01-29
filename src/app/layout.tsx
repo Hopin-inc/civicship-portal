@@ -18,28 +18,19 @@ import { LiffDeepLinkHandler } from "@/components/liff/LiffDeepLinkHandler";
 import { SwipeBackNavigation } from "@/components/navigation/SwipeBackNavigation";
 import { BackgroundLayer } from "@/components/layout/BackgroundLayer";
 import { CommunityConfigProvider } from "@/contexts/CommunityConfigContext";
-import { CommunityPortalConfig, getCommunityConfig } from "@/lib/communities/config";
+import { getCommunityConfig, getCommunityIdFromEnv, CommunityPortalConfig } from "@/lib/communities/config";
 import { DEFAULT_ASSET_PATHS } from "@/lib/communities/constants";
-import { headers } from "next/headers";
 
 const font = Inter({ subsets: ["latin"] });
 
-const getCommunityId = async () => {
-  const headersList = await headers();
-  const communityId = headersList.get("x-community-id");
-  if (!communityId) throw new Error("No community ID found in headers");
-  return communityId;
-};
-
 export async function generateMetadata(): Promise<Metadata> {
-  const communityId = await getCommunityId();
+  const communityId = getCommunityIdFromEnv();
   const config = await getCommunityConfig(communityId);
-  console.log(`Community Config: ${JSON.stringify(config, null, 2)}`);
   const isProduction = process.env.NODE_ENV === "production";
 
   if (!config) {
     return {
-      title: "civicship",
+      title: "Civicship",
       description: "Community platform",
       robots: isProduction ? undefined : { index: false, follow: false },
     };
@@ -104,7 +95,7 @@ const RootLayout = async ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
-  const communityId = await getCommunityId();
+  const communityId = getCommunityIdFromEnv();
   const { user, lineAuthenticated, phoneAuthenticated } = await getUserServer();
 
   const locale = await getLocale();
@@ -120,10 +111,7 @@ const RootLayout = async ({
       isFromDatabase = true;
     }
   } catch (error) {
-    console.error(
-      `[CommunityConfig] Failed to fetch config for ${communityId} from database:`,
-      error,
-    );
+    console.error(`[CommunityConfig] Failed to fetch config for ${communityId} from database:`, error);
   }
 
   return (
