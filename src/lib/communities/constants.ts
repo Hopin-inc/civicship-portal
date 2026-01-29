@@ -10,13 +10,31 @@ export const DEFAULT_ASSET_PATHS = {
 } as const;
 
 const getActiveConfigs = () => {
-  const env = process.env.ENV;
-  const isDev = process.env.NODE_ENV !== "production";
+  // 生の値をログに出す（サーバーのターミナルを確認してください）
+  console.log("--- Config Debug ---");
+  console.log("NODE_ENV (raw):", process.env.NODE_ENV);
+  console.log("ENV (raw):", process.env.ENV);
 
-  if (!isDev) return COMMUNITY_PRD_CONFIGS;
-  if (env !== "LOCAL") return COMMUNITY_DEV_CONFIGS;
+  // 明示的な判定用定数
+  const isPrd = process.env.NODE_ENV === "production";
+  const envValue = process.env.ENV;
 
-  return COMMUNITY_LOCAL_CONFIGS;
+  console.log("isPrd check:", isPrd);
+  console.log("envValue check:", envValue);
+
+  // もし isPrd が true になっていたら、なぜそうなったかを探る
+  if (isPrd) {
+    console.log("Returning: COMMUNITY_PRD_CONFIGS");
+    return COMMUNITY_PRD_CONFIGS;
+  }
+
+  if (envValue !== "LOCAL") {
+    console.log("Returning: COMMUNITY_DEV_CONFIGS");
+    return COMMUNITY_DEV_CONFIGS;
+  }
+
+  console.log("Returning: COMMUNITY_LOCAL_CONFIGS (Merged)");
+  return { ...COMMUNITY_DEV_CONFIGS, ...COMMUNITY_LOCAL_CONFIGS };
 };
 
 export const COMMUNITY_CONFIGS = getActiveConfigs();
