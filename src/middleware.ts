@@ -1,57 +1,59 @@
-import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getCommunityIdFromEnv, fetchCommunityConfigForEdge } from "@/lib/communities/config-env";
+import { NextResponse } from "next/server";
+import { fetchCommunityConfigForEdge } from "@/lib/communities/config-env";
 import { detectPreferredLocale } from "@/lib/i18n/languageDetection";
-import { locales, defaultLocale } from "@/lib/i18n/config";
-
-// Feature types for route gating
-type FeaturesType = "places" | "opportunities" | "points" | "tickets" | "articles" | "languageSwitcher";
-
-// Map features to their corresponding route paths
-const featureToRoutesMap: Partial<Record<FeaturesType, string[]>> = {
-  places: ["/places"],
-  opportunities: ["/activities", "/search"],
-  points: ["/wallets"],
-  tickets: ["/tickets"],
-  articles: ["/articles"],
-};
+import { defaultLocale, locales } from "@/lib/i18n/config";
+import { COMMUNITY_CONFIGS } from "@/lib/communities/constants";
 
 export async function middleware(request: NextRequest) {
-  const isDev = process.env.NODE_ENV !== "production";
+  const host = request.headers.get("host");
   const pathname = request.nextUrl.pathname;
-  
-  // Fetch config from server-side API
-  const communityId = getCommunityIdFromEnv();
+
+  // 1. コミュニティIDの特定とバトンパス
+  const communityId = getCommunityIdFromHost(host);
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-community-id", communityId);
+
+  const res = NextResponse.next({
+    request: { headers: requestHeaders },
+  });
+
+  // 2. DBから動的設定を取得
   const config = await fetchCommunityConfigForEdge(communityId);
   const enabledFeatures = config?.enableFeatures || [];
   const rootPath = config?.rootPath || "/";
 
-  // liff.state がある場合はrootPathへのリダイレクトをスキップ（LIFFのルーティングバグ対策）
-  const hasLiffState = request.nextUrl.searchParams.get("liff.state");
+  // 3. ルートリダイレクト処理
+  const redirectRes = handleRootRedirect(request, pathname, rootPath);
+  if (redirectRes) return redirectRes;
 
-  // ルートページへのアクセスを処理（liff.stateがない場合、またはliff.stateが/の場合のみrootPathにリダイレクト）
+  // 4. セキュリティヘッダー (CSP) の設定
+  const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
+  setSecurityHeaders(res, nonce);
+
+  // 5. 言語設定処理
+  handleLanguageSetting(request, res, enabledFeatures);
+
+  console.log(`[Middleware] Passing ID to Layout: ${communityId}`);
+  return res;
+}
+
+/**
+ * ルートページへのリダイレクト判定
+ */
+function handleRootRedirect(request: NextRequest, pathname: string, rootPath: string) {
+  const hasLiffState = request.nextUrl.searchParams.get("liff.state");
   if (pathname === "/" && rootPath !== "/" && (!hasLiffState || hasLiffState === "/")) {
     return NextResponse.redirect(new URL(rootPath, request.url));
   }
+  return null;
+}
 
-  for (const [feature, routes] of Object.entries(featureToRoutesMap)) {
-    if (!enabledFeatures.includes(feature as FeaturesType)) {
-      for (const route of routes) {
-        if (feature === "opportunities" && /^\/activities\/[^/]+$/.test(pathname)) {
-          continue;
-        }
-
-        if (pathname === route || pathname.startsWith(`${route}/`)) {
-          if (isDev) {
-            console.log(`Redirecting from disabled feature path: ${pathname} to ${rootPath}`);
-          }
-          return NextResponse.redirect(new URL(rootPath, request.url));
-        }
-      }
-    }
-  }
-
-  const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
+/**
+ * セキュリティヘッダー (CSP) のセット
+ */
+function setSecurityHeaders(res: NextResponse, nonce: string) {
+  const isDev = process.env.NODE_ENV !== "production";
 
   const scriptSrc = [
     `'self'`,
@@ -63,22 +65,6 @@ export async function middleware(request: NextRequest) {
     "https://maps.googleapis.com",
     "https://www.gstatic.com",
     ...(isDev ? [`'unsafe-eval'`] : []),
-  ].join(" ");
-
-  const styleSrcElem = [
-    `'self'`,
-    "https://fonts.googleapis.com",
-    `'unsafe-inline'`,
-  ].join(" ");
-
-  const styleSrcAttr = [
-    `'unsafe-inline'`,
-  ].join(" ");
-
-  const styleSrc = [
-    `'self'`,
-    "https://fonts.googleapis.com",
-    `'unsafe-inline'`,
   ].join(" ");
 
   const connectSrc = [
@@ -97,7 +83,7 @@ export async function middleware(request: NextRequest) {
     "https://analytics.google.com",
     "https://region1.google-analytics.com",
     "https://www.googletagmanager.com",
-    "https://zipcloud.ibsnet.co.jp", // 郵便番号検索API
+    "https://zipcloud.ibsnet.co.jp",
   ].join(" ");
 
   const frameSrc = [
@@ -109,17 +95,14 @@ export async function middleware(request: NextRequest) {
       : []),
   ].join(" ");
 
-  const res = NextResponse.next();
-  res.headers.set("x-nonce", nonce);
-
   const csp = [
     `default-src 'self'`,
     `base-uri 'self'`,
     `object-src 'none'`,
     `script-src ${scriptSrc}`,
-    `style-src ${styleSrc}`,
-    `style-src-elem ${styleSrcElem}`,
-    `style-src-attr ${styleSrcAttr}`,
+    `style-src 'self' https://fonts.googleapis.com 'unsafe-inline'`,
+    `style-src-elem 'self' https://fonts.googleapis.com 'unsafe-inline'`,
+    `style-src-attr 'unsafe-inline'`,
     `img-src 'self' https: data: blob:`,
     `font-src 'self' https: data:`,
     `connect-src ${connectSrc}`,
@@ -128,27 +111,107 @@ export async function middleware(request: NextRequest) {
     `form-action 'self'`,
   ].join("; ");
 
+  res.headers.set("x-nonce", nonce);
   res.headers.set("Content-Security-Policy", csp);
   res.headers.set("X-Content-Type-Options", "nosniff");
   res.headers.set("Referrer-Policy", "no-referrer");
+}
 
+/**
+ * 言語設定の処理
+ */
+function handleLanguageSetting(request: NextRequest, res: NextResponse, enabledFeatures: string[]) {
   const hasLanguageSwitcher = enabledFeatures.includes("languageSwitcher");
-  const languageCookie = request.cookies.get('language');
-  
+  const languageCookie = request.cookies.get("language");
+
   if (hasLanguageSwitcher && !languageCookie) {
     const detectedLanguage = detectPreferredLocale(
-      request.headers.get('accept-language'),
+      request.headers.get("accept-language"),
       locales,
-      defaultLocale
+      defaultLocale,
     );
-    res.cookies.set('language', detectedLanguage, {
-      path: '/',
+    res.cookies.set("language", detectedLanguage, {
+      path: "/",
       maxAge: 60 * 60 * 24 * 365,
-      sameSite: 'lax',
+      sameSite: "lax",
     });
   }
+}
 
-  return res;
+function checkConfigMismatch(communityId: string, config: (typeof COMMUNITY_CONFIGS)[keyof typeof COMMUNITY_CONFIGS]) {
+  const envMapping = {
+    COMMUNITY_ID: process.env.NEXT_PUBLIC_COMMUNITY_ID,
+    FIREBASE_AUTH_TENANT_ID: process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
+    LIFF_ID: process.env.NEXT_PUBLIC_LIFF_ID,
+    LINE_CLIENT_ID: process.env.NEXT_PUBLIC_LINE_CLIENT,
+  };
+
+  console.log(`[Config Check] Verifying config for: ${communityId}`);
+
+  let hasMismatch = false;
+
+  Object.entries(envMapping).forEach(([key, envValue]) => {
+    const constValue = config[key as keyof typeof config];
+
+    if (envValue) {
+      if (constValue !== envValue) {
+        hasMismatch = true;
+        console.warn(
+          `[⚠️ CONFIG MISMATCH] ${key} is different!\n` +
+            `   - Constant: "${constValue}"\n` +
+            `   - Env (.env): "${envValue}"`,
+        );
+      }
+    }
+  });
+
+  // すべて一致している場合に「問題なし」のログを出す
+  if (!hasMismatch) {
+    console.log(`[Config Check] ✅ All environment variables match COMMUNITY_CONFIGS.`);
+  }
+}
+
+function getCommunityIdFromHost(host: string | null): string {
+  const DEFAULT_ID = "himeji-ymca";
+  let communityId = DEFAULT_ID;
+
+  if (!host) {
+    console.log(`[Middleware Debug] No host header. Using default: ${DEFAULT_ID}`);
+  } else if (host.includes("localhost") || host.includes("127.0.0.1")) {
+    communityId = process.env.NEXT_PUBLIC_COMMUNITY_ID || DEFAULT_ID;
+    console.log(`[Middleware Debug] Local environment: "${host}" -> Using: ${communityId}`);
+  } else {
+    // 逆順スキャン方式でホワイトラベルとcivicship.app両方に対応
+    const parts = host.split(".");
+    const reversedParts = [...parts].reverse();
+    const ignoreWords = ["app", "civicship", "dev", "www"];
+
+    let extractedId = "";
+    for (const part of reversedParts) {
+      if (!ignoreWords.includes(part.toLowerCase())) {
+        extractedId = part;
+        break;
+      }
+    }
+
+    if (extractedId && extractedId in COMMUNITY_CONFIGS) {
+      communityId = extractedId;
+      console.log(`[Middleware Debug] Match found! Host: "${host}" -> ID: ${communityId}`);
+    } else {
+      console.warn(
+        `[Middleware Debug] Unknown community ID: "${extractedId}" from host: "${host}". Using default: ${DEFAULT_ID}`,
+      );
+      communityId = DEFAULT_ID;
+    }
+  }
+
+  // 差分チェックの実行
+  const selectedConfig = COMMUNITY_CONFIGS[communityId as keyof typeof COMMUNITY_CONFIGS];
+  if (selectedConfig) {
+    checkConfigMismatch(communityId, selectedConfig);
+  }
+
+  return communityId;
 }
 
 export const config = {

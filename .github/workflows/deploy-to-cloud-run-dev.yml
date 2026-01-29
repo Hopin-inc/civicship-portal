@@ -117,7 +117,7 @@ jobs:
           image: ${{ env.ARTIFACT_REGISTRY }}/${{ env.APPLICATION_NAME }}-${{ matrix.community }}:latest
           region: ${{ env.GCP_REGION }}
           env_vars: |
-            NODE_ENV=development
+            ENV=staging
           flags: >
             --min-instances=0
             --max-instances=10

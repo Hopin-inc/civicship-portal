@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { executeServerGraphQLQuery } from "@/lib/graphql/server";
 import { getCommunityIdFromEnv } from "./config-env";
+import { COMMUNITY_CONFIGS, CommunityId } from "@/lib/communities/constants";
 
 /**
  * Community portal configuration fetched from the database
@@ -110,7 +111,20 @@ export const getCommunityConfig = cache(
         },
       );
 
-      return data.communityPortalConfig;
+      const dbConfig = data.communityPortalConfig;
+
+      // --- ここからチェック処理を追加 ---
+      if (dbConfig) {
+        const staticConfig = COMMUNITY_CONFIGS[communityId as CommunityId];
+        if (staticConfig) {
+          checkConfigMismatch(communityId, staticConfig, dbConfig);
+        } else {
+          console.warn(`[Config Check] ⚠️ No static config found for ID: ${communityId}`);
+        }
+      }
+      // --- ここまで ---
+
+      return dbConfig;
     } catch (error) {
       console.error(`Failed to fetch community config for ${communityId}:`, error);
       return null;
@@ -118,15 +132,46 @@ export const getCommunityConfig = cache(
   },
 );
 
-/**
- * Get community portal config or throw an error if not found
- */
-export async function getCommunityConfigOrThrow(communityId: string): Promise<CommunityPortalConfig> {
-  const config = await getCommunityConfig(communityId);
-  if (!config) {
-    throw new Error(`Community config not found for ${communityId}`);
+function checkConfigMismatch(
+  communityId: string,
+  staticConfig: (typeof COMMUNITY_CONFIGS)[CommunityId],
+  dbConfig: CommunityPortalConfig,
+) {
+  const comparisons = [
+    {
+      label: "LIFF Short ID (LINE_CLIENT_ID)",
+      staticVal: staticConfig.LINE_CLIENT_ID,
+      dbVal: dbConfig.liffId,
+    },
+    {
+      label: "LIFF Full ID (LIFF_ID)",
+      staticVal: staticConfig.LIFF_ID,
+      dbVal: dbConfig.liffAppId,
+    },
+    {
+      label: "Firebase Tenant ID",
+      staticVal: staticConfig.FIREBASE_AUTH_TENANT_ID,
+      dbVal: dbConfig.firebaseTenantId,
+    },
+  ];
+
+  let hasMismatch = false;
+
+  comparisons.forEach(({ label, staticVal, dbVal }) => {
+    // 両方に値がある場合のみ比較（片方が未設定ならスキップして事故を防ぐ）
+    if (staticVal && dbVal && staticVal !== dbVal) {
+      hasMismatch = true;
+      console.warn(
+        `[⚠️ CONFIG MISMATCH] ${communityId}: ${label} is different!\n` +
+          `   - Static (Constants): "${staticVal}"\n` +
+          `   - DB (Supabase):      "${dbVal}"`,
+      );
+    }
+  });
+
+  if (!hasMismatch) {
+    console.log(`[Config Check] ✅ ${communityId}: IDs match between Static and DB.`);
   }
-  return config;
 }
 
 /**
