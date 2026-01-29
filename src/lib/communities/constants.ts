@@ -9,13 +9,13 @@ export const COMMUNITY_CONFIGS = {
   neo88: {
     COMMUNITY_ID: "neo88",
     FIREBASE_AUTH_TENANT_ID: "neo88-5qtpy",
-    LIFF_ID: "2007251473-yJNnzapO",
+    LIFF_ID: "2007251473-z8B97aQb",
     LINE_CLIENT_ID: "2007251473",
   },
   kibotcha: {
     COMMUNITY_ID: "kibotcha",
     FIREBASE_AUTH_TENANT_ID: "kibotcha-sff2c",
-    LIFF_ID: "2007594502-amjOlNlxs",
+    LIFF_ID: "2007594502-XLgqPjP7",
     LINE_CLIENT_ID: "2007594502",
   },
   dais: {
