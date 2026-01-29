@@ -29,7 +29,7 @@ export const COMMUNITY_PRD_CONFIGS = {
     LIFF_ID: "2007846881-vj47oo5D",
     LINE_CLIENT_ID: "2007846881",
   },
-  "izu-dao": {
+  izu: {
     COMMUNITY_ID: "izu",
     FIREBASE_AUTH_TENANT_ID: "izu-dao-s5ok1",
     LIFF_ID: "2008325794-jz3vlVz0",

@@ -21,7 +21,7 @@ export const COMMUNITY_DEV_CONFIGS = {
     COMMUNITY_ID: "kotohira",
     FIREBASE_AUTH_TENANT_ID: "kotohira-cemsv",
     LIFF_ID: "2007838666-MvzW5bnr",
-    LINE_CLIENT_ID: "2007726826",
+    LINE_CLIENT_ID: "2007838666",
   },
   "himeji-ymca": {
     COMMUNITY_ID: "himeji-ymca",
@@ -29,7 +29,7 @@ export const COMMUNITY_DEV_CONFIGS = {
     LIFF_ID: "2007838818-DmvQX2eN",
     LINE_CLIENT_ID: "2007838818",
   },
-  "izu-dao": {
+  izu: {
     COMMUNITY_ID: "izu",
     FIREBASE_AUTH_TENANT_ID: "izu-dao-s5ok1",
     LIFF_ID: "2008325789-XlD6wNkZ",
