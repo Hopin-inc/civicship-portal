@@ -11,15 +11,12 @@ export const DEFAULT_ASSET_PATHS = {
 
 const getActiveConfigs = () => {
   const env = process.env.ENV;
-  const isPrd = process.env.NODE_ENV === "production";
+  const isDev = process.env.NODE_ENV !== "production";
 
-  if (isPrd) return COMMUNITY_PRD_CONFIGS;
+  if (!isDev) return COMMUNITY_PRD_CONFIGS;
+  if (env !== "LOCAL") return COMMUNITY_DEV_CONFIGS;
 
-  if (env === "LOCAL") {
-    return { ...COMMUNITY_DEV_CONFIGS, ...COMMUNITY_LOCAL_CONFIGS };
-  }
-
-  return COMMUNITY_DEV_CONFIGS;
+  return COMMUNITY_LOCAL_CONFIGS;
 };
 
 export const COMMUNITY_CONFIGS = getActiveConfigs();
