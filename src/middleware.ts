@@ -138,7 +138,7 @@ function handleLanguageSetting(request: NextRequest, res: NextResponse, enabledF
   }
 }
 
-function checkConfigMismatch(communityId: string, config: any) {
+function checkConfigMismatch(communityId: string, config: (typeof COMMUNITY_CONFIGS)[keyof typeof COMMUNITY_CONFIGS]) {
   const envMapping = {
     COMMUNITY_ID: process.env.NEXT_PUBLIC_COMMUNITY_ID,
     FIREBASE_AUTH_TENANT_ID: process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
