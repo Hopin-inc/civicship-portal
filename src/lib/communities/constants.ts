@@ -20,9 +20,33 @@ export const COMMUNITY_CONFIGS = {
   },
   dais: {
     COMMUNITY_ID: "dais",
-    FIREBASE_AUTH_TENANT_ID: "neo88-5qtpy", // neo88と同じ
-    LIFF_ID: "2007251473-yJNnzapO", // neo88と同じ
-    LINE_CLIENT_ID: "2007251473", // neo88と同じ
+    FIREBASE_AUTH_TENANT_ID: "dais-hpvht",
+    LIFF_ID: "2007726826-Xq2yG2ow",
+    LINE_CLIENT_ID: "2007726826",
+  },
+  kotohira: {
+    COMMUNITY_ID: "kotohira",
+    FIREBASE_AUTH_TENANT_ID: "kotohira-cemsv",
+    LIFF_ID: "2007726826-Xq2yG2ow",
+    LINE_CLIENT_ID: "2007726826",
+  },
+  "himeji-ymca": {
+    COMMUNITY_ID: "himeji-ymca",
+    FIREBASE_AUTH_TENANT_ID: "himeji-ymca-5pdjx",
+    LIFF_ID: "2007838818-DmvQX2eN",
+    LINE_CLIENT_ID: "2007838818",
+  },
+  "izu-dao": {
+    COMMUNITY_ID: "izu",
+    FIREBASE_AUTH_TENANT_ID: "izu-dao-s5ok1",
+    LIFF_ID: "2008325789-XlD6wNkZ",
+    LINE_CLIENT_ID: "2008325789",
+  },
+  ubuyama: {
+    COMMUNITY_ID: "ubuyama",
+    FIREBASE_AUTH_TENANT_ID: "ubuyama-ruvmf",
+    LIFF_ID: "2008931473-AuXq5Hr2",
+    LINE_CLIENT_ID: "2008931473",
   },
 } as const;
 

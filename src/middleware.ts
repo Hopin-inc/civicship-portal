@@ -152,38 +152,72 @@ export async function middleware(request: NextRequest) {
 }
 
 function getCommunityIdFromHost(host: string | null): string {
-  console.log(`[Middleware Debug] Incoming Host: "${host}"`);
+  const DEFAULT_ID = "neo88";
+  let communityId = DEFAULT_ID;
 
+  // 1. ホスト名がない場合
   if (!host) {
-    console.log(`[Middleware Debug] Result: No host, returning default (neo88)`);
-    return "neo88";
+    console.log(`[Middleware Debug] No host header. Using default: ${DEFAULT_ID}`);
   }
-
-  if (host.includes("localhost") || host.includes("127.0.0.1")) {
-    const envId = process.env.NEXT_PUBLIC_COMMUNITY_ID || "neo88";
-    console.log(`[Middleware Debug] Result: Local environment detected. Returning envId: ${envId}`);
-    return envId;
+  // 2. ローカル開発環境 (localhost / 127.0.0.1)
+  else if (host.includes("localhost") || host.includes("127.0.0.1")) {
+    communityId = process.env.NEXT_PUBLIC_COMMUNITY_ID || DEFAULT_ID;
+    console.log(`[Middleware Debug] Local environment: "${host}" -> Using: ${communityId}`);
   }
+  // 3. サブドメイン解析 (dev.kibotcha.civicship.app / kibotcha.civicship.app)
+  else {
+    const parts = host.split(".");
+    //
+    // 後ろから3番目がコミュニティID (parts.length - 3)
+    const communityIndex = parts.length - 3;
 
-  const parts = host.split(".");
-  console.log(`[Middleware Debug] Host parts:`, parts);
-
-  if (parts.length >= 3) {
-    const subdomain = parts[0];
-    console.log(`[Middleware Debug] Checking subdomain: "${subdomain}"`);
-
-    if (subdomain in COMMUNITY_CONFIGS) {
-      console.log(`[Middleware Debug] Result: Subdomain match found! Returning: ${subdomain}`);
-      return subdomain;
+    if (communityIndex >= 0) {
+      const extractedId = parts[communityIndex];
+      if (extractedId in COMMUNITY_CONFIGS) {
+        communityId = extractedId;
+        console.log(`[Middleware Debug] Match found! Host: "${host}" -> ID: ${communityId}`);
+      } else {
+        console.warn(
+          `[Middleware Debug] Unknown community ID: "${extractedId}" from host: "${host}"`,
+        );
+      }
     } else {
-      console.log(
-        `[Middleware Debug] Warning: Subdomain "${subdomain}" not found in COMMUNITY_CONFIGS`,
-      );
+      console.log(`[Middleware Debug] Host structure too short: "${host}"`);
     }
   }
 
-  console.log(`[Middleware Debug] Result: No match, falling back to default (neo88)`);
-  return "neo88";
+  // 4. 差分チェックを実行（定数にデータがある場合のみ）
+  const selectedConfig = COMMUNITY_CONFIGS[communityId as keyof typeof COMMUNITY_CONFIGS];
+  if (selectedConfig) {
+    checkConfigMismatch(communityId, selectedConfig);
+  }
+
+  return communityId;
+}
+
+function checkConfigMismatch(communityId: string, config: any) {
+  // 比較したい環境変数のマッピング
+  const envMapping = {
+    COMMUNITY_ID: process.env.NEXT_PUBLIC_COMMUNITY_ID,
+    FIREBASE_AUTH_TENANT_ID: process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
+    LIFF_ID: process.env.NEXT_PUBLIC_LIFF_ID,
+    LINE_CLIENT_ID: process.env.NEXT_PUBLIC_LINE_CLIENT,
+  };
+
+  console.log(`[Config Check] Verifying config for: ${communityId}`);
+
+  Object.entries(envMapping).forEach(([key, envValue]) => {
+    const constValue = config[key];
+
+    // 環境変数が設定されており、かつ定数と一致しない場合のみ警告
+    if (envValue && constValue !== envValue) {
+      console.warn(
+        `[⚠️ CONFIG MISMATCH] ${key} is different!\n` +
+          `   - Constant: "${constValue}"\n` +
+          `   - Env (.env): "${envValue}"`,
+      );
+    }
+  });
 }
 
 export const config = {
