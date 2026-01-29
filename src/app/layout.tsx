@@ -18,19 +18,25 @@ import { LiffDeepLinkHandler } from "@/components/liff/LiffDeepLinkHandler";
 import { SwipeBackNavigation } from "@/components/navigation/SwipeBackNavigation";
 import { BackgroundLayer } from "@/components/layout/BackgroundLayer";
 import { CommunityConfigProvider } from "@/contexts/CommunityConfigContext";
-import { getCommunityConfig, getCommunityIdFromEnv, CommunityPortalConfig } from "@/lib/communities/config";
+import { CommunityPortalConfig, getCommunityConfig } from "@/lib/communities/config";
 import { DEFAULT_ASSET_PATHS } from "@/lib/communities/constants";
+import { headers } from "next/headers";
 
 const font = Inter({ subsets: ["latin"] });
 
+const getCommunityId = async () => {
+  const headersList = await headers();
+  return headersList.get("x-community-id") || "neo88";
+};
+
 export async function generateMetadata(): Promise<Metadata> {
-  const communityId = getCommunityIdFromEnv();
+  const communityId = await getCommunityId();
   const config = await getCommunityConfig(communityId);
   const isProduction = process.env.NODE_ENV === "production";
 
   if (!config) {
     return {
-      title: "Civicship",
+      title: "civicship",
       description: "Community platform",
       robots: isProduction ? undefined : { index: false, follow: false },
     };
@@ -95,7 +101,7 @@ const RootLayout = async ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
-  const communityId = getCommunityIdFromEnv();
+  const communityId = await getCommunityId();
   const { user, lineAuthenticated, phoneAuthenticated } = await getUserServer();
 
   const locale = await getLocale();
@@ -111,7 +117,10 @@ const RootLayout = async ({
       isFromDatabase = true;
     }
   } catch (error) {
-    console.error(`[CommunityConfig] Failed to fetch config for ${communityId} from database:`, error);
+    console.error(
+      `[CommunityConfig] Failed to fetch config for ${communityId} from database:`,
+      error,
+    );
   }
 
   return (
