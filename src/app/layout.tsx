@@ -32,6 +32,7 @@ const getCommunityId = async () => {
 export async function generateMetadata(): Promise<Metadata> {
   const communityId = await getCommunityId();
   const config = await getCommunityConfig(communityId);
+  console.log(`⚠️Communtiy Config: ${config}`);
   const isProduction = process.env.NODE_ENV === "production";
 
   if (!config) {
