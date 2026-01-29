@@ -134,7 +134,7 @@ export const getCommunityConfig = cache(
 
 function checkConfigMismatch(
   communityId: string,
-  staticConfig: any,
+  staticConfig: (typeof COMMUNITY_CONFIGS)[CommunityId],
   dbConfig: CommunityPortalConfig,
 ) {
   const comparisons = [
