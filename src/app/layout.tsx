@@ -26,7 +26,9 @@ const font = Inter({ subsets: ["latin"] });
 
 const getCommunityId = async () => {
   const headersList = await headers();
-  return headersList.get("x-community-id") || "neo88";
+  const communityId = headersList.get("x-community-id");
+  if (!communityId) throw new Error("No community ID found in headers");
+  return communityId;
 };
 
 export async function generateMetadata(): Promise<Metadata> {
