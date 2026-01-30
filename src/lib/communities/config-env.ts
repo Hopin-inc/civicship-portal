@@ -48,10 +48,12 @@ const CACHE_TTL_MS = 60000; // 1 minute cache
  * Fetch community config from the server-side API
  * This function is Edge Runtime compatible and uses fetch directly
  */
-export async function fetchCommunityConfigForEdge(communityId: string): Promise<EdgeCommunityConfig | null> {
+export async function fetchCommunityConfigForEdge(
+  communityId: string,
+): Promise<EdgeCommunityConfig | null> {
   // Check cache first
   const now = Date.now();
-  if (configCache && (now - configCacheTimestamp) < CACHE_TTL_MS) {
+  if (configCache && now - configCacheTimestamp < CACHE_TTL_MS) {
     return configCache;
   }
 
@@ -106,13 +108,4 @@ export async function fetchCommunityConfigForEdge(communityId: string): Promise<
 export async function getEnabledFeatures(communityId: string): Promise<string[]> {
   const config = await fetchCommunityConfigForEdge(communityId);
   return config?.enableFeatures || [];
-}
-
-/**
- * Get root path from server-side config
- * Falls back to "/" if fetch fails
- */
-export async function getRootPath(communityId: string): Promise<string> {
-  const config = await fetchCommunityConfigForEdge(communityId);
-  return config?.rootPath || "/";
 }

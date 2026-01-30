@@ -1,33 +1,53 @@
-import { COMMUNITY_PRD_CONFIGS } from "@/lib/communities/configs/prd";
-import { COMMUNITY_DEV_CONFIGS } from "@/lib/communities/configs/dev";
-import { COMMUNITY_LOCAL_CONFIGS } from "@/lib/communities/configs/local";
+import { CommunityPortalConfig } from "@/lib/communities/config";
 
 export const DEFAULT_ASSET_PATHS = {
   LOGO: "/communities/default/logo.jpg",
   SQUARE_LOGO: "/communities/default/logo-square.jpg",
   FAVICON: "/communities/default/favicon.ico",
   APPLE_TOUCH_ICON: "/communities/default/apple-touch-icon.png",
+  OG_IMAGE: "/communities/default/ogp.png",
 } as const;
 
-const getActiveConfigs = () => {
-  const env = process.env.ENV;
-  const isPrd = process.env.NODE_ENV === "production";
+export const ACTIVE_COMMUNITY_IDS = [
+  "neo88",
+  "kibotcha",
+  "dais",
+  "kotohira",
+  "himeji-ymca",
+  "izu",
+  "ubuyama",
+] as const;
 
-  if (env === "LOCAL") {
-    return { ...COMMUNITY_DEV_CONFIGS, ...COMMUNITY_LOCAL_CONFIGS };
-  }
+export const COMMUNITY_LOCAL_CONFIGS: CommunityPortalConfig = {
+  communityId: "himeji-ymca",
 
-  if (isPrd && env === "staging") {
-    return COMMUNITY_DEV_CONFIGS;
-  }
+  title: "姫路YMCA",
+  tokenName: "姫路YMCA",
+  description: "",
+  shortDescription: "",
+  domain: "https://himeji-ymca.civicship.jp",
 
-  return COMMUNITY_PRD_CONFIGS;
+  faviconPrefix:
+    "https://storage.googleapis.com/kyoso-dev-civicship-storage-public/communities/himeji-ymca/favicon.ico",
+  logoPath:
+    "https://storage.googleapis.com/kyoso-dev-civicship-storage-public/communities/himeji-ymca/logo.jpg",
+  squareLogoPath:
+    "https://storage.googleapis.com/kyoso-dev-civicship-storage-public/communities/himeji-ymca/logo-square.jpg",
+  ogImagePath: "",
+
+  enableFeatures: ["points", "opportunities", "quests"],
+
+  rootPath: "/users/me",
+  adminRootPath: "/admin/wallet",
+
+  documents: null,
+  commonDocumentOverrides: null,
+
+  regionName: null,
+  regionKey: null,
+
+  firebaseTenantId: "himeji-ymca-5pdjx",
+  liffId: "2007838818",
+  liffAppId: "2007838818-VR4yRvgL",
+  liffBaseUrl: "https://liff.line.me/2007838818-VR4yRvgL",
 };
-
-export const COMMUNITY_CONFIGS = getActiveConfigs();
-
-/**
- * プロジェクトに存在する全てのコミュニティIDの型定義
- * DEVの設定にあるキーをマスターリストとして使用
- */
-export type CommunityId = keyof typeof COMMUNITY_DEV_CONFIGS;

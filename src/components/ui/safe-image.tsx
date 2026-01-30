@@ -1,8 +1,8 @@
 "use client";
 
 import Image, { ImageProps } from "next/image";
-import { useState, useCallback, useEffect } from "react";
-import { PLACEHOLDER_IMAGE, FALLBACK_IMAGE } from "@/utils";
+import { useCallback, useEffect, useState } from "react";
+import { PLACEHOLDER_IMAGE } from "@/utils";
 
 export interface SafeImageProps extends Omit<ImageProps, "onError"> {
   fallbackSrc?: string;
@@ -22,12 +22,7 @@ export interface SafeImageProps extends Omit<ImageProps, "onError"> {
  * 2. fallbackSrc (default: PLACEHOLDER_IMAGE)
  * 3. FALLBACK_IMAGE (data URI) as final fallback
  */
-export function SafeImage({
-  src,
-  fallbackSrc = PLACEHOLDER_IMAGE,
-  alt,
-  ...props
-}: SafeImageProps) {
+export function SafeImage({ src, fallbackSrc = PLACEHOLDER_IMAGE, alt, ...props }: SafeImageProps) {
   const [imgSrc, setImgSrc] = useState(src);
 
   useEffect(() => {
@@ -39,18 +34,11 @@ export function SafeImage({
       if (prevSrc === src) {
         return fallbackSrc;
       }
-      return FALLBACK_IMAGE;
+      return PLACEHOLDER_IMAGE;
     });
   }, [src, fallbackSrc]);
 
-  return (
-    <Image
-      {...props}
-      src={imgSrc || FALLBACK_IMAGE}
-      alt={alt}
-      onError={handleError}
-    />
-  );
+  return <Image {...props} src={imgSrc || PLACEHOLDER_IMAGE} alt={alt} onError={handleError} />;
 }
 
 export default SafeImage;
