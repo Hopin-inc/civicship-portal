@@ -103,11 +103,14 @@ interface CommunityPortalConfigResponse {
 export const getCommunityConfig = cache(
   async (communityId: string): Promise<CommunityPortalConfig | null> => {
     const isBuildPhase = process.env.NEXT_PHASE === "phase-production-build";
-    if (isBuildPhase || (process.env.ENV === "LOCAL" && typeof window === "undefined")) {
-      console.log(`[Build] Skipping API fetch for ${communityId}, using static config.`);
+    if (isBuildPhase) {
+      console.log(`[Build] Skipping API fetch for ${communityId}`);
+      return null;
+    }
+    if (process.env.ENV === "LOCAL" && typeof window === "undefined") {
+      console.log(`[LOCAL] Response Local Config for ${communityId}, using static config.`);
       return COMMUNITY_LOCAL_CONFIGS;
     }
-
     try {
       const data = await executeServerGraphQLQuery<CommunityPortalConfigResponse>(
         COMMUNITY_PORTAL_CONFIG_QUERY,
