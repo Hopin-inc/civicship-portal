@@ -138,39 +138,6 @@ function handleLanguageSetting(request: NextRequest, res: NextResponse, enabledF
   }
 }
 
-function checkConfigMismatch(communityId: string, config: (typeof COMMUNITY_CONFIGS)[keyof typeof COMMUNITY_CONFIGS]) {
-  const envMapping = {
-    COMMUNITY_ID: process.env.NEXT_PUBLIC_COMMUNITY_ID,
-    FIREBASE_AUTH_TENANT_ID: process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
-    LIFF_ID: process.env.NEXT_PUBLIC_LIFF_ID,
-    LINE_CLIENT_ID: process.env.NEXT_PUBLIC_LINE_CLIENT,
-  };
-
-  console.log(`[Config Check] Verifying config for: ${communityId}`);
-
-  let hasMismatch = false;
-
-  Object.entries(envMapping).forEach(([key, envValue]) => {
-    const constValue = config[key as keyof typeof config];
-
-    if (envValue) {
-      if (constValue !== envValue) {
-        hasMismatch = true;
-        console.warn(
-          `[⚠️ CONFIG MISMATCH] ${key} is different!\n` +
-            `   - Constant: "${constValue}"\n` +
-            `   - Env (.env): "${envValue}"`,
-        );
-      }
-    }
-  });
-
-  // すべて一致している場合に「問題なし」のログを出す
-  if (!hasMismatch) {
-    console.log(`[Config Check] ✅ All environment variables match COMMUNITY_CONFIGS.`);
-  }
-}
-
 function getCommunityIdFromHost(host: string | null): string {
   const DEFAULT_ID = "himeji-ymca";
   let communityId = DEFAULT_ID;
@@ -203,12 +170,6 @@ function getCommunityIdFromHost(host: string | null): string {
       );
       communityId = DEFAULT_ID;
     }
-  }
-
-  // 差分チェックの実行
-  const selectedConfig = COMMUNITY_CONFIGS[communityId as keyof typeof COMMUNITY_CONFIGS];
-  if (selectedConfig) {
-    checkConfigMismatch(communityId, selectedConfig);
   }
 
   return communityId;
