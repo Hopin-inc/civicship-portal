@@ -1,7 +1,7 @@
 "use client";
 
 import { getApps, initializeApp } from "firebase/app";
-import { Auth, getAuth, setPersistence, browserLocalPersistence } from "firebase/auth";
+import { Auth, browserLocalPersistence, getAuth, setPersistence } from "firebase/auth";
 import { Analytics, getAnalytics, isSupported } from "firebase/analytics";
 import { logger } from "@/lib/logging";
 
@@ -19,7 +19,10 @@ export const defaultApp = initializeApp(firebaseConfigWithAppId);
 
 export const lineApp = initializeApp(firebaseConfig, "line-auth-app");
 export const lineAuth: Auth = getAuth(lineApp);
-lineAuth.tenantId = process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID ?? null;
+
+export const setLineAuthTenantId = (tenantId: string | null) => {
+  lineAuth.tenantId = tenantId;
+};
 
 // Use localStorage instead of IndexedDB for persistence
 // IndexedDB can hang in LIFF WebView environments (WKWebView on iOS, WebView on Android)
@@ -78,7 +81,7 @@ export const categorizeFirebaseError = (
   message: string;
   messageKey: string;
   retryable: boolean;
-  logLevel: 'error' | 'warn' | 'info';
+  logLevel: "error" | "warn" | "info";
   errorCategory: string;
 } => {
   if (error?.code) {

@@ -8,7 +8,7 @@ import { User } from "firebase/auth";
 import { LiffService } from "@/lib/auth/service/liff-service";
 import { AuthEnvironment } from "@/lib/auth/core/environment-detector";
 import { logger } from "@/lib/logging";
-import { getCommunityIdFromEnv } from "@/lib/communities/config";
+import { CommunityPortalConfig, getCommunityIdFromEnv } from "@/lib/communities/config";
 
 /**
  * 1️⃣ 認証前の初期状態を設定
@@ -128,6 +128,7 @@ async function createSession(idToken: string) {
  * 4️⃣ ユーザーセッションを復元（SSR or Firebaseから）
  */
 export async function restoreUserSession(
+  communityConfig: CommunityPortalConfig | null,
   ssrCurrentUser: GqlUser | null | undefined,
   firebaseUser: User,
   setState: ReturnType<typeof useAuthStore.getState>["setState"],
@@ -147,7 +148,7 @@ export async function restoreUserSession(
     return ssrCurrentUser;
   }
 
-  const user = await fetchCurrentUserClient(firebaseUser);
+  const user = await fetchCurrentUserClient(communityConfig, firebaseUser);
   if (user) {
     setState({ currentUser: user });
     return user;
@@ -167,9 +168,9 @@ export async function evaluateUserRegistrationState(
 ): Promise<boolean> {
   const hasPhoneIdentity = !!user.identities?.some((i) => i.platform?.toUpperCase() === "PHONE");
   const communityId = getCommunityIdFromEnv();
-  
+
   const hasMembershipInCurrentCommunity = !!user.memberships?.some(
-    (m) => m.community?.id === communityId
+    (m) => m.community?.id === communityId,
   );
 
   const isPhoneVerified = ssrPhoneAuthenticated || hasPhoneIdentity || TokenManager.phoneVerified();

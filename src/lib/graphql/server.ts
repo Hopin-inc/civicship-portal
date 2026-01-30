@@ -28,7 +28,6 @@ export async function executeServerGraphQLQuery<
   const requestHeaders = {
     "Content-Type": "application/json",
     "X-Auth-Mode": "session",
-    "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID!,
     "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID!,
     ...headers,
   };

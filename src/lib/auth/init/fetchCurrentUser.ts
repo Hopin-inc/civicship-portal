@@ -2,19 +2,19 @@ import { GqlCurrentUserPayload } from "@/types/graphql";
 import { logger } from "@/lib/logging";
 import { User } from "firebase/auth";
 import { GET_CURRENT_USER_SERVER_QUERY } from "@/graphql/account/user/server";
+import { CommunityPortalConfig } from "@/lib/communities/config";
 
 export async function fetchCurrentUserClient(
-  firebaseUser?: User | null
+  communityConfig: CommunityPortalConfig | null,
+  firebaseUser?: User | null,
 ): Promise<GqlCurrentUserPayload["user"] | null> {
   try {
     const apiEndpoint = process.env.NEXT_PUBLIC_API_ENDPOINT;
-    const tenantId = process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID;
-    const communityId = process.env.NEXT_PUBLIC_COMMUNITY_ID;
+    const communityId = communityConfig?.communityId;
 
-    if (!apiEndpoint || !tenantId || !communityId) {
+    if (!apiEndpoint || !communityId) {
       logger.error("[fetchCurrentUserClient] Missing required environment variables", {
         hasApiEndpoint: !!apiEndpoint,
-        hasTenantId: !!tenantId,
         hasCommunityId: !!communityId,
       });
       return null;
@@ -25,7 +25,6 @@ export async function fetchCurrentUserClient(
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
       "X-Auth-Mode": authMode,
-      "X-Civicship-Tenant": tenantId,
       "X-Community-Id": communityId,
     };
 

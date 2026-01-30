@@ -11,6 +11,7 @@ import { useAuthSideEffects } from "@/hooks/auth/sideEffects";
 import { useAuthValue } from "@/hooks/auth/init/useAuthValue";
 import { useLanguageSync } from "@/hooks/useLanguageSync";
 import { logger } from "@/lib/logging";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -20,7 +21,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
   ssrLineAuthenticated,
   ssrPhoneAuthenticated,
 }) => {
-  const { liffService, phoneAuthService, authStateManager } = useAuthDependencies();
+  const communityConfig = useCommunityConfig();
+  const { liffService, phoneAuthService, authStateManager } = useAuthDependencies(communityConfig);
   const hasInitialized = useRef(false);
   const hasFullAuth = Boolean(ssrCurrentUser && ssrLineAuthenticated && ssrPhoneAuthenticated);
 
@@ -45,6 +47,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
 
     // 🚀 通常の初期化
     void initAuth({
+      communityConfig,
       liffService,
       authStateManager,
       ssrCurrentUser,

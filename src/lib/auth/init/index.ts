@@ -14,8 +14,10 @@ import {
   restoreUserSession,
 } from "@/lib/auth/init/helper";
 import { initializeFirebase } from "@/lib/auth/init/firebase";
+import { CommunityPortalConfig } from "@/lib/communities/config";
 
 interface InitAuthParams {
+  communityConfig: CommunityPortalConfig | null;
   liffService: LiffService;
   authStateManager: AuthStateManager;
   ssrCurrentUser?: GqlUser | undefined | null;
@@ -25,6 +27,7 @@ interface InitAuthParams {
 
 export async function initAuth(params: InitAuthParams) {
   const {
+    communityConfig,
     authStateManager,
     ssrCurrentUser,
     ssrLineAuthenticated,
@@ -61,6 +64,7 @@ export async function initAuth(params: InitAuthParams) {
 
   setState({ isAuthInProgress: true, isAuthenticating: true });
   return await initAuthFull({
+    communityConfig,
     liffService,
     authStateManager,
     environment,
@@ -94,10 +98,9 @@ async function initAuthFast({
     );
     TokenManager.saveLineAuthFlag(true);
     if (ssrPhoneAuthenticated) TokenManager.savePhoneAuthFlag(true);
-    await authStateManager.handleUserRegistrationStateChange(
-      !!ssrPhoneAuthenticated,
-      { ssrMode: true }
-    );
+    await authStateManager.handleUserRegistrationStateChange(!!ssrPhoneAuthenticated, {
+      ssrMode: true,
+    });
 
     // Initialize Firebase in background for CSR (non-blocking)
     // This ensures firebaseUser is available for client-side Apollo queries
@@ -123,6 +126,7 @@ async function initAuthFast({
 }
 
 async function initAuthFull({
+  communityConfig,
   liffService,
   authStateManager,
   environment,
@@ -130,6 +134,7 @@ async function initAuthFull({
   ssrPhoneAuthenticated,
   setState,
 }: {
+  communityConfig: CommunityPortalConfig | null;
   liffService: LiffService;
   authStateManager: AuthStateManager;
   environment: AuthEnvironment;
@@ -158,7 +163,7 @@ async function initAuthFull({
       return;
     }
 
-    const user = await restoreUserSession(ssrCurrentUser, firebaseUser, setState);
+    const user = await restoreUserSession(communityConfig, ssrCurrentUser, firebaseUser, setState);
     if (!user) {
       finalizeAuthState("unauthenticated", undefined, setState, authStateManager);
       return;
