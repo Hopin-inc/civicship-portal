@@ -1,7 +1,7 @@
 import { cache } from "react";
 import { executeServerGraphQLQuery } from "@/lib/graphql/server";
 import { getCommunityIdFromEnv } from "./config-env";
-import { COMMUNITY_CONFIGS } from "@/lib/communities/constants";
+import { ACTIVE_COMMUNITY_IDS } from "@/lib/communities/constants";
 
 /**
  * Community portal configuration fetched from the database
@@ -105,7 +105,7 @@ export const getCommunityConfig = cache(
     const isBuildPhase = process.env.NEXT_PHASE === "phase-production-build";
     if (isBuildPhase || (process.env.ENV === "LOCAL" && typeof window === "undefined")) {
       console.log(`[Build] Skipping API fetch for ${communityId}, using static config.`);
-      return (COMMUNITY_CONFIGS as any)[communityId] || null;
+      return (ACTIVE_COMMUNITY_IDS as any)[communityId] || null;
     }
 
     try {
@@ -120,7 +120,7 @@ export const getCommunityConfig = cache(
       return data.communityPortalConfig;
     } catch (error) {
       console.error(`Failed to fetch community config for ${communityId}:`, error);
-      return (COMMUNITY_CONFIGS as any)[communityId] || null;
+      return (ACTIVE_COMMUNITY_IDS as any)[communityId] || null;
     }
   },
 );

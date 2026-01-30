@@ -1,7 +1,3 @@
-import { COMMUNITY_PRD_CONFIGS } from "@/lib/communities/configs/prd";
-import { COMMUNITY_DEV_CONFIGS } from "@/lib/communities/configs/dev";
-import { COMMUNITY_LOCAL_CONFIGS } from "@/lib/communities/configs/local";
-
 export const DEFAULT_ASSET_PATHS = {
   LOGO: "/communities/default/logo.jpg",
   SQUARE_LOGO: "/communities/default/logo-square.jpg",
@@ -9,25 +5,21 @@ export const DEFAULT_ASSET_PATHS = {
   APPLE_TOUCH_ICON: "/communities/default/apple-touch-icon.png",
 } as const;
 
-const getActiveConfigs = () => {
-  const env = process.env.ENV;
-  const isPrd = process.env.NODE_ENV === "production";
+export const ACTIVE_COMMUNITY_IDS = [
+  "neo88",
+  "kibotcha",
+  "dais",
+  "kotohira",
+  "himeji-ymca",
+  "izu",
+  "ubuyama",
+] as const;
 
-  if (env === "LOCAL") {
-    return { ...COMMUNITY_DEV_CONFIGS, ...COMMUNITY_LOCAL_CONFIGS };
-  }
-
-  if (isPrd && env === "staging") {
-    return COMMUNITY_DEV_CONFIGS;
-  }
-
-  return COMMUNITY_PRD_CONFIGS;
-};
-
-export const COMMUNITY_CONFIGS = getActiveConfigs();
-
-/**
- * プロジェクトに存在する全てのコミュニティIDの型定義
- * DEVの設定にあるキーをマスターリストとして使用
- */
-export type CommunityId = keyof typeof COMMUNITY_DEV_CONFIGS;
+export const COMMUNITY_LOCAL_CONFIGS = {
+  "himeji-ymca": {
+    COMMUNITY_ID: "himeji-ymca",
+    FIREBASE_AUTH_TENANT_ID: "himeji-ymca-5pdjx",
+    LIFF_ID: "2007838818-VR4yRvgL",
+    LINE_CLIENT_ID: "2007838818",
+  },
+} as const;

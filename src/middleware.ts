@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { fetchCommunityConfigForEdge } from "@/lib/communities/config-env";
 import { detectPreferredLocale } from "@/lib/i18n/languageDetection";
 import { defaultLocale, locales } from "@/lib/i18n/config";
-import { COMMUNITY_CONFIGS } from "@/lib/communities/constants";
+import { ACTIVE_COMMUNITY_IDS } from "@/lib/communities/constants";
 
 export async function middleware(request: NextRequest) {
   const host = request.headers.get("host");
@@ -161,7 +161,7 @@ function getCommunityIdFromHost(host: string | null): string {
       }
     }
 
-    if (extractedId && extractedId in COMMUNITY_CONFIGS) {
+    if (extractedId && extractedId in ACTIVE_COMMUNITY_IDS) {
       communityId = extractedId;
       console.log(`[Middleware Debug] Match found! Host: "${host}" -> ID: ${communityId}`);
     } else {
