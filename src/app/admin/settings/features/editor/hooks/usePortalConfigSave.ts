@@ -1,7 +1,14 @@
 import { useState, useCallback } from "react";
 import { toast } from "react-toastify";
 
-type FieldType = "title" | "description" | "squareLogoPath" | "logoPath" | "ogImagePath" | "faviconPrefix" | "enableFeatures";
+type FieldType =
+  | "title"
+  | "description"
+  | "squareLogoPath"
+  | "logoPath"
+  | "ogImagePath"
+  | "faviconPrefix"
+  | "enableFeatures";
 
 interface UsePortalConfigSaveOptions {
   communityId: string;

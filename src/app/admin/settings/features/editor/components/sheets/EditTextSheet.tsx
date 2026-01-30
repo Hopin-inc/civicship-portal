@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
-interface EditTextSheetProps {
+export interface EditTextSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;

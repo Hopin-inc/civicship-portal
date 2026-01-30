@@ -11,13 +11,9 @@ import { Button } from "@/components/ui/button";
 import { Upload, X, AlertCircle } from "lucide-react";
 import Image from "next/image";
 import { toast } from "react-toastify";
+import { ImageSize } from "../../types/settings";
 
-interface ImageSize {
-  width: number;
-  height: number;
-}
-
-interface EditImageSheetProps {
+export interface EditImageSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
@@ -27,6 +23,8 @@ interface EditImageSheetProps {
   recommendedSize?: ImageSize;
   description?: string;
   saving?: boolean;
+  /** SVGを許可するか */
+  acceptSvg?: boolean;
 }
 
 export function EditImageSheet({
@@ -38,11 +36,13 @@ export function EditImageSheet({
   recommendedSize,
   description,
   saving = false,
+  acceptSvg = false,
 }: EditImageSheetProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(currentImageUrl);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [imageSize, setImageSize] = useState<ImageSize | null>(null);
   const [sizeError, setSizeError] = useState<string | null>(null);
+  const [isSvg, setIsSvg] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // シートが開くたびにリセット
@@ -52,6 +52,7 @@ export function EditImageSheet({
       setSelectedFile(null);
       setImageSize(null);
       setSizeError(null);
+      setIsSvg(currentImageUrl?.endsWith(".svg") ?? false);
     }
   }, [open, currentImageUrl]);
 
@@ -74,12 +75,18 @@ export function EditImageSheet({
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const isSvgFile = file.type === "image/svg+xml" || file.name.endsWith(".svg");
+    setIsSvg(isSvgFile);
+
     try {
       const size = await validateImageSize(file);
       setImageSize(size);
 
-      // サイズバリデーション
-      if (recommendedSize) {
+      // SVGはサイズバリデーションをスキップ（スケーラブル）
+      if (isSvgFile) {
+        setSizeError(null);
+      } else if (recommendedSize) {
+        // サイズバリデーション
         if (size.width !== recommendedSize.width || size.height !== recommendedSize.height) {
           setSizeError(
             `推奨サイズは ${recommendedSize.width}x${recommendedSize.height}px です。選択された画像は ${size.width}x${size.height}px です。`
@@ -106,6 +113,7 @@ export function EditImageSheet({
     setSelectedFile(null);
     setImageSize(null);
     setSizeError(null);
+    setIsSvg(false);
   };
 
   const handleSave = async () => {
@@ -124,6 +132,9 @@ export function EditImageSheet({
     ? `${recommendedSize.width}/${recommendedSize.height}`
     : "1/1";
 
+  // ファイル受け入れ形式
+  const acceptTypes = acceptSvg ? "image/*,.svg" : "image/*";
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
@@ -135,9 +146,14 @@ export function EditImageSheet({
           {description && (
             <p className="text-sm text-muted-foreground">{description}</p>
           )}
-          {recommendedSize && (
+          {recommendedSize && !acceptSvg && (
             <p className="text-xs text-muted-foreground">
               推奨サイズ: {recommendedSize.width} x {recommendedSize.height} px
+            </p>
+          )}
+          {acceptSvg && (
+            <p className="text-xs text-muted-foreground">
+              SVG形式推奨（スケーラブル）
             </p>
           )}
         </SheetHeader>
@@ -178,9 +194,14 @@ export function EditImageSheet({
           </div>
 
           {/* 選択した画像のサイズ表示 */}
-          {imageSize && (
+          {imageSize && !isSvg && (
             <p className="text-xs text-muted-foreground text-center">
               選択中: {imageSize.width} x {imageSize.height} px
+            </p>
+          )}
+          {isSvg && selectedFile && (
+            <p className="text-xs text-muted-foreground text-center">
+              SVG形式（スケーラブル）
             </p>
           )}
 
@@ -195,7 +216,7 @@ export function EditImageSheet({
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/*"
+            accept={acceptTypes}
             onChange={handleFileSelect}
             className="hidden"
           />
