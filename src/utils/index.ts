@@ -1,7 +1,6 @@
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/ja";
-import parsePhoneNumberFromString from "libphonenumber-js/min";
 
 dayjs.locale("ja");
 dayjs.extend(relativeTime);
@@ -10,12 +9,6 @@ export const PLACEHOLDER_IMAGE = `/images/placeholder.jpg`;
 
 export const displayRelativeTime = (date: Date | string) => {
   return dayjs(date).fromNow();
-};
-
-export const displayPhoneNumber = (phoneNumber: string) => {
-  const parsed = parsePhoneNumberFromString(phoneNumber, "JP");
-  if (!parsed) return phoneNumber;
-  return parsed.formatInternational();
 };
 
 export const displayMultipleUsers = (
