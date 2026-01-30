@@ -102,6 +102,12 @@ interface CommunityPortalConfigResponse {
  */
 export const getCommunityConfig = cache(
   async (communityId: string): Promise<CommunityPortalConfig | null> => {
+    const isBuildPhase = process.env.NEXT_PHASE === "phase-production-build";
+    if (isBuildPhase || (process.env.ENV === "LOCAL" && typeof window === "undefined")) {
+      console.log(`[Build] Skipping API fetch for ${communityId}, using static config.`);
+      return (COMMUNITY_CONFIGS as any)[communityId] || null;
+    }
+
     try {
       const data = await executeServerGraphQLQuery<CommunityPortalConfigResponse>(
         COMMUNITY_PORTAL_CONFIG_QUERY,
@@ -127,7 +133,7 @@ export const getCommunityConfig = cache(
       return dbConfig;
     } catch (error) {
       console.error(`Failed to fetch community config for ${communityId}:`, error);
-      return null;
+      return (COMMUNITY_CONFIGS as any)[communityId] || null;
     }
   },
 );
