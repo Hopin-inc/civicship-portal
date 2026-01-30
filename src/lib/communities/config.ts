@@ -105,8 +105,7 @@ export const getCommunityConfig = cache(
     const isBuildPhase = process.env.NEXT_PHASE === "phase-production-build";
     if (isBuildPhase || (process.env.ENV === "LOCAL" && typeof window === "undefined")) {
       console.log(`[Build] Skipping API fetch for ${communityId}, using static config.`);
-      const localConfig = (COMMUNITY_LOCAL_CONFIGS as any)[communityId];
-      return localConfig || null;
+      return COMMUNITY_LOCAL_CONFIGS;
     }
 
     try {

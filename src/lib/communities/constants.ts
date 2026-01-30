@@ -27,11 +27,13 @@ export const COMMUNITY_LOCAL_CONFIGS: CommunityPortalConfig = {
   shortDescription: "",
   domain: "https://himeji-ymca.civicship.jp",
 
-  faviconPrefix: "/communities/himeji-ymca",
-  logoPath: "/communities/himeji-ymca/logo.jpg",
-  squareLogoPath: "/communities/himeji-ymca/logo-square.jpg",
-  ogImagePath:
-    "https://storage.googleapis.com/prod-civicship-storage-public/asset/himeji-ymca/ogp.jpg",
+  faviconPrefix:
+    "https://storage.googleapis.com/kyoso-dev-civicship-storage-public/communities/himeji-ymca/favicon.ico",
+  logoPath:
+    "https://storage.googleapis.com/kyoso-dev-civicship-storage-public/communities/himeji-ymca/logo.jpg",
+  squareLogoPath:
+    "https://storage.googleapis.com/kyoso-dev-civicship-storage-public/communities/himeji-ymca/logo-square.jpg",
+  ogImagePath: "",
 
   enableFeatures: ["points", "opportunities", "quests"],
 
