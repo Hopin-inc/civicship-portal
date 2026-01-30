@@ -33,7 +33,7 @@ const requestLink = setContext(async (operation, prevContext) => {
 
     // Mutation の場合は認証を厳格にチェック
     const isMutation = operation.query.definitions.some(
-      (def) => def.kind === "OperationDefinition" && def.operation === "mutation"
+      (def) => def.kind === "OperationDefinition" && def.operation === "mutation",
     );
 
     if (isMutation) {
@@ -71,7 +71,6 @@ const requestLink = setContext(async (operation, prevContext) => {
     // Only send Authorization header when we have a token
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     "X-Auth-Mode": authMode,
-    "X-Civicship-Tenant": process.env.NEXT_PUBLIC_FIREBASE_AUTH_TENANT_ID,
     "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID,
   };
 
