@@ -10,13 +10,11 @@ export async function fetchCurrentUserClient(
 ): Promise<GqlCurrentUserPayload["user"] | null> {
   try {
     const apiEndpoint = process.env.NEXT_PUBLIC_API_ENDPOINT;
-    const tenantId = communityConfig?.firebaseTenantId;
     const communityId = communityConfig?.communityId;
 
-    if (!apiEndpoint || !tenantId || !communityId) {
+    if (!apiEndpoint || !communityId) {
       logger.error("[fetchCurrentUserClient] Missing required environment variables", {
         hasApiEndpoint: !!apiEndpoint,
-        hasTenantId: !!tenantId,
         hasCommunityId: !!communityId,
       });
       return null;
@@ -27,7 +25,6 @@ export async function fetchCurrentUserClient(
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
       "X-Auth-Mode": authMode,
-      "X-Civicship-Tenant": tenantId,
       "X-Community-Id": communityId,
     };
 
