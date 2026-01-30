@@ -3,6 +3,7 @@ export const DEFAULT_ASSET_PATHS = {
   SQUARE_LOGO: "/communities/default/logo-square.jpg",
   FAVICON: "/communities/default/favicon.ico",
   APPLE_TOUCH_ICON: "/communities/default/apple-touch-icon.png",
+  OG_IMAGE: "/communities/default/ogp.png",
 } as const;
 
 export const ACTIVE_COMMUNITY_IDS = [
