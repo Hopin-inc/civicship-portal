@@ -161,7 +161,7 @@ function getCommunityIdFromHost(host: string | null): string {
       }
     }
 
-    if (extractedId && extractedId in ACTIVE_COMMUNITY_IDS) {
+    if (extractedId && (ACTIVE_COMMUNITY_IDS as readonly string[]).includes(extractedId)) {
       communityId = extractedId;
       console.log(`[Middleware Debug] Match found! Host: "${host}" -> ID: ${communityId}`);
     } else {
