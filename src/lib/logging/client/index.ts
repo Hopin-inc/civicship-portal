@@ -23,10 +23,10 @@ const shouldThrottle = (message: string, level: string): boolean => {
 
 const forwardLogToServer = async (level: string, message: string, meta?: Record<string, any>) => {
   // In production, only forward warn/error logs to server
-  const isProduction = process.env.ENV !== "development" && process.env.NODE_ENV === "production";
-  if (isProduction && (level === "debug" || level === "info")) {
-    return;
-  }
+  // const isProduction = process.env.ENV !== "development" && process.env.NODE_ENV === "production";
+  // if (isProduction && (level === "debug" || level === "info")) {
+  //   return;
+  // }
 
   const { authType = "general", ...restMeta } = meta ?? {};
 
