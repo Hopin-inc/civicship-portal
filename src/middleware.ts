@@ -158,7 +158,7 @@ function getCommunityIdFromHost(host: string | null): string {
   if (!host) {
     console.log(`[Middleware Debug] No host header. Using default: ${DEFAULT_ID}`);
   } else if (host.includes("localhost") || host.includes("127.0.0.1")) {
-    communityId = process.env.NEXT_PUBLIC_COMMUNITY_ID || DEFAULT_ID;
+    communityId = process.env.LOCAL_COMMUNITY_ID || DEFAULT_ID;
     console.log(`[Middleware Debug] Local environment: "${host}" -> Using: ${communityId}`);
   } else {
     // 逆順スキャン方式でホワイトラベルとcivicship.app両方に対応

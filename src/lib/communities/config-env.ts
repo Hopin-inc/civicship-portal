@@ -5,12 +5,12 @@
  */
 
 /**
- * Get community ID from environment variable
+ * Get community ID from environment variable (for local development)
  */
 export function getCommunityIdFromEnv(): string {
-  const communityId = process.env.NEXT_PUBLIC_COMMUNITY_ID;
+  const communityId = process.env.LOCAL_COMMUNITY_ID;
   if (!communityId) {
-    console.warn("NEXT_PUBLIC_COMMUNITY_ID is not set, using 'default'");
+    console.warn("LOCAL_COMMUNITY_ID is not set, using 'default'");
     return "default";
   }
   return communityId;
