@@ -27,7 +27,7 @@ export const generateMetadata = async ({
 }): Promise<Metadata> => {
   const id = params.id;
   const communityId = await getCommunityIdFromHeader();
-  const communityConfig = await getCommunityConfig(communityId);
+  const communityConfig = communityId ? await getCommunityConfig(communityId) : null;
   const place = await fetchPlace(id);
   
   const fallbackMetadata: Metadata = {
