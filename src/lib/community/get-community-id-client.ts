@@ -52,14 +52,15 @@ export function getCommunityIdClient(): string | null {
 
 /**
  * Cookie から値をパースするユーティリティ
+ * ブラウザによって "; " または ";" で区切られる可能性があるため、正規表現で対応
  */
 function parseCookieValue(name: string): string | null {
   if (typeof document === "undefined") return null;
 
-  const cookies = document.cookie.split("; ");
-  const cookie = cookies.find((c) => c.startsWith(`${name}=`));
-  if (!cookie) return null;
+  // 大文字小文字を区別しない正規表現でCookieを検索
+  const regex = new RegExp(`(?:^|;\\s*)${name}=([^;]*)`, "i");
+  const match = document.cookie.match(regex);
+  if (!match) return null;
 
-  const [, ...values] = cookie.split("=");
-  return decodeURIComponent(values.join("=")) || null;
+  return decodeURIComponent(match[1]) || null;
 }

@@ -25,8 +25,11 @@ export async function executeServerGraphQLQuery<
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
-  // X-Community-Id のログ
-  const communityId = headers["X-Community-Id"];
+  // X-Community-Id のログ（HTTP ヘッダーは大文字小文字を区別しない）
+  const communityIdKey = Object.keys(headers).find(
+    (key) => key.toLowerCase() === "x-community-id"
+  );
+  const communityId = communityIdKey ? headers[communityIdKey] : undefined;
   if (!communityId) {
     logger.warn("[executeServerGraphQLQuery] No X-Community-Id in headers", {
       query: query.substring(0, 100),
