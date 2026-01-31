@@ -36,13 +36,13 @@ export const useOpportunityDetail = (id: string | undefined) => {
     }
     const { opportunity: opp } = data;
     if (opp.category === GqlOpportunityCategory.Activity) {
-      return presenterActivityDetail(opp as GqlOpportunity);
+      return presenterActivityDetail(opp as GqlOpportunity, communityId || null);
     }
     if (opp.category === GqlOpportunityCategory.Quest) {
-      return presenterQuestDetail(opp as GqlOpportunity);
+      return presenterQuestDetail(opp as GqlOpportunity, communityId || null);
     }
     return null;
-  }, [data?.opportunity]);
+  }, [data, communityId]);
 
   return {
     opportunity,
