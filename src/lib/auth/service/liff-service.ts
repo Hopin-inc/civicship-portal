@@ -195,13 +195,20 @@ export class LiffService {
     return liff.getAccessToken();
   }
 
-  public async signInWithLiffToken(): Promise<boolean> {
+  public async signInWithLiffToken(tenantId?: string | null): Promise<boolean> {
     const accessToken = this.getAccessToken();
     if (!accessToken) return false;
 
     const communityId = process.env.NEXT_PUBLIC_COMMUNITY_ID;
     const endpoint = `${process.env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT}/line/liff-login`;
     const authStateManager = AuthStateManager.getInstance();
+
+    logger.debug("[LiffService] signInWithLiffToken starting", {
+      communityId,
+      tenantId,
+      hasAccessToken: !!accessToken,
+      component: "LiffService",
+    });
 
     // 最大3回まで（token切れ or transient errorのみリトライ）
     for (let attempt = 1; attempt <= 3; attempt++) {
@@ -223,6 +230,16 @@ export class LiffService {
         }
 
         const { customToken, profile } = await response.json();
+
+        // ❌ TENANT_ID_MISMATCH 防止: トークン発行時のテナントIDと一致させる
+        if (tenantId !== undefined) {
+          lineAuth.tenantId = tenantId;
+          logger.debug("[LiffService] lineAuth.tenantId updated", {
+            newTenantId: lineAuth.tenantId,
+            component: "LiffService",
+          });
+        }
+
         const userCredential = await signInWithCustomToken(lineAuth, customToken);
 
         await Promise.race([

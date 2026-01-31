@@ -7,6 +7,7 @@ import { User } from "@firebase/auth";
 export async function initializeFirebase(
   liffService: LiffService,
   environment: AuthEnvironment,
+  tenantId?: string | null,
 ): Promise<User | null> {
   if (environment === AuthEnvironment.LIFF) {
     try {
@@ -14,7 +15,7 @@ export async function initializeFirebase(
       const liffState = liffService.getState();
       if (liffState.isLoggedIn) {
         try {
-          await liffService.signInWithLiffToken();
+          await liffService.signInWithLiffToken(tenantId);
         } catch (signInErr) {
           logger.warn("LIFF sign-in with token failed", { err: signInErr });
         }
