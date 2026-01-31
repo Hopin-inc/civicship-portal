@@ -12,33 +12,33 @@ const shouldThrottle = (message: string, level: string): boolean => {
   const key = `${level}:${message}`;
   const now = Date.now();
   const lastLogged = logThrottle.get(key);
-  
+
   if (lastLogged && (now - lastLogged) < THROTTLE_DURATION) {
     return true;
   }
-  
+
   logThrottle.set(key, now);
   return false;
 };
 
 const forwardLogToServer = async (level: string, message: string, meta?: Record<string, any>) => {
   // In production, only forward warn/error logs to server
-  const isProduction = process.env.NODE_ENV === "production";
+  const isProduction = process.env.ENV !== "development" && process.env.NODE_ENV === "production";
   if (isProduction && (level === "debug" || level === "info")) {
     return;
   }
 
   const { authType = "general", ...restMeta } = meta ?? {};
-  
-  const isBrowserIssue = message.includes("IndexedDB") || 
-                        message.includes("Database server lost") ||
-                        message.includes("Connection to Indexed Database server lost") ||
-                        message.includes("storage");
-  
+
+  const isBrowserIssue = message.includes("IndexedDB") ||
+    message.includes("Database server lost") ||
+    message.includes("Connection to Indexed Database server lost") ||
+    message.includes("storage");
+
   if (isBrowserIssue && shouldThrottle(message, level)) {
     return;
   }
-  
+
   const enrichedMeta = createAuthLogContext(cachedSessionId, authType, restMeta);
 
   try {
@@ -53,8 +53,7 @@ const forwardLogToServer = async (level: string, message: string, meta?: Record<
     });
   } catch (e) {
     console.warn(
-      `[CLIENT LOGGER] Failed to forward log to server: ${
-        e instanceof Error ? e.message : String(e)
+      `[CLIENT LOGGER] Failed to forward log to server: ${e instanceof Error ? e.message : String(e)
       }`,
     );
   }
