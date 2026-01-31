@@ -4,7 +4,7 @@ import React, { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { Item } from "@/components/ui/item";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { getCommunityIdClient } from "@/lib/community/get-community-id-client";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { useGetFailedIncentiveGrantsQuery, useGetSignupBonusConfigQuery } from "@/types/graphql";
 import { cn } from "@/lib/utils";
 import FailedBonusItem from "../components/FailedBonusItem";
@@ -15,7 +15,8 @@ import { Button } from "@/components/ui/button";
 
 export default function SignupBonusDetailPage() {
   const t = useTranslations();
-  const communityId = getCommunityIdClient();
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId;
 
   const { data, loading, error, refetch } = useGetSignupBonusConfigQuery({
     variables: { communityId: communityId ?? "" },

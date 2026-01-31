@@ -1,16 +1,16 @@
 import { GqlTicketStatus, GqlUser } from "@/types/graphql";
 import { UserProfileViewModel } from "@/app/users/features/profile/types";
 import { AppPortfolio } from "@/app/users/features/shared/types";
-import { getCommunityIdClient } from "@/lib/community/get-community-id-client";
+
 import { logger } from "@/lib/logging";
 
 export function presentUserProfile(
   gqlUser: GqlUser | null,
+  communityId: string,
   isOwner: boolean = false,
   portfolios?: AppPortfolio[],
-  communityId?: string,
 ): UserProfileViewModel {
-  const resolvedCommunityId = communityId ?? getCommunityIdClient();
+  const resolvedCommunityId = communityId;
   const wallet = gqlUser?.wallets?.find((w) => w.community?.id === resolvedCommunityId);
 
   logger.debug("[AUTH] presentUserProfile: wallet selection", {

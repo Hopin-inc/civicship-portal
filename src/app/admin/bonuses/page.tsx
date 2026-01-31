@@ -6,7 +6,7 @@ import { Item, ItemContent, ItemFooter, ItemTitle } from "@/components/ui/item";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { getCommunityIdClient } from "@/lib/community/get-community-id-client";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import {
   useGetSignupBonusConfigQuery,
   useGetFailedIncentiveGrantsQuery,
@@ -29,7 +29,8 @@ export default function BonusesPage() {
   );
   useHeaderConfig(headerConfig);
 
-  const communityId = getCommunityIdClient();
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId;
 
   const { data, loading, error } = useGetSignupBonusConfigQuery({
     variables: { communityId: communityId ?? "" },

@@ -12,7 +12,7 @@ import {
   useIncentiveGrantRetryMutation,
 } from "@/types/graphql";
 import { toast } from "react-toastify";
-import { getCommunityIdClient } from "@/lib/community/get-community-id-client";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 interface FailedBonusItemProps {
   bonus: {
@@ -29,7 +29,8 @@ interface FailedBonusItemProps {
 
 export default function FailedBonusItem({ bonus, onRetrySuccess }: FailedBonusItemProps) {
   const t = useTranslations();
-  const communityId = getCommunityIdClient();
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId;
   const [retrying, setRetrying] = useState(false);
 
   const [retryGrant] = useIncentiveGrantRetryMutation();

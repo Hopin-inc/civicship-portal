@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Item, ItemActions, ItemContent, ItemGroup, ItemTitle } from "@/components/ui/item";
 import { GqlCommunitySignupBonusConfig, useUpdateSignupBonusConfigMutation } from "@/types/graphql";
 import { toast } from "react-toastify";
-import { getCommunityIdClient } from "@/lib/community/get-community-id-client";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 interface EditBonusSheetProps {
   currentConfig?: GqlCommunitySignupBonusConfig | null;
@@ -20,7 +20,8 @@ interface EditBonusSheetProps {
 
 export default function EditBonusSheet({ currentConfig, onSave }: EditBonusSheetProps) {
   const t = useTranslations();
-  const communityId = getCommunityIdClient();
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId;
   const [open, setOpen] = useState(false);
   const [isEnabled, setIsEnabled] = useState(currentConfig?.isEnabled ?? false);
   const [bonusPoint, setBonusPoint] = useState(String(currentConfig?.bonusPoint ?? 0));
