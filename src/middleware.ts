@@ -18,6 +18,14 @@ export async function middleware(request: NextRequest) {
     request: { headers: requestHeaders },
   });
 
+  // Cookie にも設定（Client JS から参照可能にする）
+  res.cookies.set("x-community-id", communityId, {
+    path: "/",
+    maxAge: 60 * 60 * 24, // 24時間
+    sameSite: "lax",
+    httpOnly: false, // JS から読み取り可能
+  });
+
   // 2. DBから動的設定を取得
   const config = await fetchCommunityConfigForEdge(communityId);
   const enabledFeatures = config?.enableFeatures || [];
@@ -34,7 +42,12 @@ export async function middleware(request: NextRequest) {
   // 5. 言語設定処理
   handleLanguageSetting(request, res, enabledFeatures);
 
-  console.log(`[Middleware] Passing ID to Layout: ${communityId}`);
+  console.log(`[Middleware] communityId resolved`, {
+    host,
+    communityId,
+    pathname,
+    method: request.method,
+  });
   return res;
 }
 

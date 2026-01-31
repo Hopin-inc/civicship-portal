@@ -8,6 +8,7 @@ import { logger } from "@/lib/logging";
 import { RawURIComponent } from "@/utils/path";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { AuthStateManager } from "@/lib/auth/core/auth-state-manager";
+import { getCommunityIdClient } from "@/lib/community/get-community-id-client";
 
 export type LiffState = {
   isInitialized: boolean;
@@ -199,9 +200,15 @@ export class LiffService {
     const accessToken = this.getAccessToken();
     if (!accessToken) return false;
 
-    const communityId = process.env.NEXT_PUBLIC_COMMUNITY_ID;
+    const communityId = getCommunityIdClient();
     const endpoint = `${process.env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT}/line/liff-login`;
     const authStateManager = AuthStateManager.getInstance();
+
+    logger.debug("[LiffService] signInWithLiffToken starting", {
+      communityId,
+      hasAccessToken: !!accessToken,
+      component: "LiffService",
+    });
 
     // 最大3回まで（token切れ or transient errorのみリトライ）
     for (let attempt = 1; attempt <= 3; attempt++) {

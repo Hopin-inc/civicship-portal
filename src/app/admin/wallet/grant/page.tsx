@@ -1,4 +1,4 @@
-import { getCommunityIdFromEnv } from "@/lib/communities/config";
+import { getCommunityIdFromHeader } from "@/lib/community/get-community-id-server";
 import { getMembershipListServer } from "@/lib/graphql/getMembershipListServer";
 import GrantPageClient from "./GrantPageClient";
 
@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 export default async function GrantPage() {
   let connection = null;
-  const communityId = getCommunityIdFromEnv();
+  const communityId = await getCommunityIdFromHeader();
 
   try {
     const result = await getMembershipListServer({

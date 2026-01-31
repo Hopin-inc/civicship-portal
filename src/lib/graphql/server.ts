@@ -25,10 +25,24 @@ export async function executeServerGraphQLQuery<
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
+  // X-Community-Id のログ
+  const communityId = headers["X-Community-Id"];
+  if (!communityId) {
+    logger.warn("[executeServerGraphQLQuery] No X-Community-Id in headers", {
+      query: query.substring(0, 100),
+      component: "executeServerGraphQLQuery",
+    });
+  } else {
+    logger.debug("[executeServerGraphQLQuery] Request with communityId", {
+      communityId,
+      query: query.substring(0, 100),
+      component: "executeServerGraphQLQuery",
+    });
+  }
+
   const requestHeaders = {
     "Content-Type": "application/json",
     "X-Auth-Mode": "session",
-    "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID!,
     ...headers,
   };
 

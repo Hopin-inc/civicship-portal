@@ -1,4 +1,4 @@
-import { getCommunityIdFromEnv } from "./metadata";
+import { getCommunityIdClient } from "@/lib/community/get-community-id-client";
 
 interface CommunityContent {
   termsFile: string;
@@ -37,7 +37,7 @@ export const COMMUNITY_CONTENT: Record<string, CommunityContent> = {
 
 // 現在のコミュニティの注意事項を取得する関数
 export function getNoticeItems(): string[] {
-  const communityId = getCommunityIdFromEnv();
+  const communityId = getCommunityIdClient() || "default";
   const content = COMMUNITY_CONTENT[communityId];
 
   if (!content || !content.noticeItems) {

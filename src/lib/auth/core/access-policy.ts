@@ -1,5 +1,5 @@
 import { GqlRole, GqlUser } from "@/types/graphql";
-import { getCommunityIdFromEnv } from "@/lib/communities/config";
+import { getCommunityIdClient } from "@/lib/community/get-community-id-client";
 import { matchPaths } from "@/utils/path";
 import { logger } from "@/lib/logging";
 
@@ -9,7 +9,7 @@ const MANAGER_PATHS = ["/admin", "/admin/*"];
 export class AccessPolicy {
   private static getMembership(user: GqlUser | null | undefined) {
     if (!user?.memberships?.length) return null;
-    const communityId = getCommunityIdFromEnv();
+    const communityId = getCommunityIdClient();
     return user.memberships.find((m) => m.community?.id === communityId) ?? null;
   }
 
@@ -30,7 +30,7 @@ export class AccessPolicy {
   }
 
   public static canAccessRole(user: GqlUser | null | undefined, pathname: string): boolean {
-    const communityId = getCommunityIdFromEnv();
+    const communityId = getCommunityIdClient();
     logger.debug("[AUTH] AccessPolicy.canAccessRole: start", {
       pathname,
       userId: user?.id,
@@ -109,7 +109,7 @@ export class AccessPolicy {
   public static getFallbackPath(user: GqlUser | null | undefined): string {
     if (!user) return "/login";
     const membership = this.getMembership(user);
-    const communityId = getCommunityIdFromEnv();
+    const communityId = getCommunityIdClient();
     
     if (!membership) {
       logger.warn("[AUTH] user_registered but no membership", {
