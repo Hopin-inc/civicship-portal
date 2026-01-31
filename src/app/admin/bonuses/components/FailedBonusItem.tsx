@@ -12,7 +12,7 @@ import {
   useIncentiveGrantRetryMutation,
 } from "@/types/graphql";
 import { toast } from "react-toastify";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { getCommunityIdClient } from "@/lib/community/get-community-id-client";
 
 interface FailedBonusItemProps {
   bonus: {
@@ -29,15 +29,21 @@ interface FailedBonusItemProps {
 
 export default function FailedBonusItem({ bonus, onRetrySuccess }: FailedBonusItemProps) {
   const t = useTranslations();
+  const communityId = getCommunityIdClient();
   const [retrying, setRetrying] = useState(false);
 
   const [retryGrant] = useIncentiveGrantRetryMutation();
 
   const handleRetry = async () => {
+    if (!communityId) {
+      toast.error(t("adminWallet.settings.pending.retryError.generic"));
+      return;
+    }
+
     setRetrying(true);
     try {
       const { data } = await retryGrant({
-        variables: { incentiveGrantId: bonus.id, communityId: COMMUNITY_ID },
+        variables: { incentiveGrantId: bonus.id, communityId },
       });
 
       if (data?.incentiveGrantRetry) {

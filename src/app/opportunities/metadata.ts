@@ -1,18 +1,20 @@
 import { Metadata } from "next";
-import { getCommunityConfigFromEnv, getDefaultOgImage } from "@/lib/communities/config";
+import { getCommunityConfig, getDefaultOgImage } from "@/lib/communities/config";
+import { getCommunityIdFromHeader } from "@/lib/community/get-community-id-server";
 
 const fallbackDescription = "体験が始まるその一歩は、ここから。文化と自然、人のあたたかさにふれる募集がそろいました。気になる体験を見つけて、あなただけの時間を過ごしてみませんか。";
 const fallbackShortDescription = "文化と自然、人のあたたかさにふれる募集がそろいました。気になる体験を探してみませんか。";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const config = await getCommunityConfigFromEnv();
-  
+  const communityId = await getCommunityIdFromHeader();
+  const config = communityId ? await getCommunityConfig(communityId) : null;
+
   const title = config?.title || "";
   const domain = config?.domain || "";
   const description = config?.description || fallbackDescription;
   const shortDescription = config?.shortDescription || fallbackShortDescription;
   const ogImages = getDefaultOgImage(config);
-  
+
   return {
     title: `${title} - 募集一覧`,
     description: description,
