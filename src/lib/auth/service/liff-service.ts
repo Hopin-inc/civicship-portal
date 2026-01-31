@@ -232,9 +232,12 @@ export class LiffService {
 
         const { customToken, profile } = await response.json();
 
+        const tokenTenantId = this.decodeTokenTenantId(customToken);
+
         // ❌ TENANT_ID_MISMATCH 防止: トークン発行時のテナントIDと一致させる
         logger.info("[LiffService] Custom token response received, preparing sign-in", {
           hasCustomToken: !!customToken,
+          tokenTenantId,
           profileUserId: profile?.userId,
           targetTenantId: tenantId,
           authInstanceTenantIdBeforeUpdate: lineAuth.tenantId,
@@ -326,5 +329,25 @@ export class LiffService {
 
   public getState(): LiffState {
     return { ...this.state };
+  }
+
+  private decodeTokenTenantId(token: string): string | null {
+    try {
+      const parts = token.split(".");
+      if (parts.length !== 3) return null;
+      // Base64Url decode payload
+      const base64Url = parts[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split("")
+          .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+          .join(""),
+      );
+      const payload = JSON.parse(jsonPayload);
+      return payload.tenant_id || null;
+    } catch (error) {
+      return null;
+    }
   }
 }
