@@ -196,7 +196,7 @@ export class LiffService {
     return liff.getAccessToken();
   }
 
-  public async signInWithLiffToken(): Promise<boolean> {
+  public async signInWithLiffToken(tenantId?: string | null): Promise<boolean> {
     const accessToken = this.getAccessToken();
     if (!accessToken) return false;
 
@@ -206,6 +206,7 @@ export class LiffService {
 
     logger.debug("[LiffService] signInWithLiffToken starting", {
       communityId,
+      tenantId,
       hasAccessToken: !!accessToken,
       component: "LiffService",
     });
@@ -230,7 +231,31 @@ export class LiffService {
         }
 
         const { customToken, profile } = await response.json();
+
+        // ❌ TENANT_ID_MISMATCH 防止: トークン発行時のテナントIDと一致させる
+        logger.debug("[LiffService] Custom token received", {
+          hasToken: !!customToken,
+          currentAuthTenantId: lineAuth.tenantId,
+          targetTenantId: tenantId,
+          component: "LiffService",
+        });
+
+        if (tenantId !== undefined) {
+          lineAuth.tenantId = tenantId;
+          logger.debug("[LiffService] lineAuth.tenantId updated", {
+            newTenantId: lineAuth.tenantId,
+            component: "LiffService",
+          });
+        }
+
+        logger.debug("[LiffService] Calling signInWithCustomToken", {
+          component: "LiffService",
+        });
         const userCredential = await signInWithCustomToken(lineAuth, customToken);
+        logger.info("[LiffService] signInWithCustomToken successful", {
+          uid: userCredential.user.uid,
+          component: "LiffService",
+        });
 
         await Promise.race([
           new Promise<void>((resolve) => {
