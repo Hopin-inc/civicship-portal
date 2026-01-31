@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Item, ItemActions, ItemContent, ItemGroup, ItemTitle } from "@/components/ui/item";
 import { GqlCommunitySignupBonusConfig, useUpdateSignupBonusConfigMutation } from "@/types/graphql";
 import { toast } from "react-toastify";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { getCommunityIdClient } from "@/lib/community/get-community-id-client";
 
 interface EditBonusSheetProps {
   currentConfig?: GqlCommunitySignupBonusConfig | null;
@@ -20,6 +20,7 @@ interface EditBonusSheetProps {
 
 export default function EditBonusSheet({ currentConfig, onSave }: EditBonusSheetProps) {
   const t = useTranslations();
+  const communityId = getCommunityIdClient();
   const [open, setOpen] = useState(false);
   const [isEnabled, setIsEnabled] = useState(currentConfig?.isEnabled ?? false);
   const [bonusPoint, setBonusPoint] = useState(String(currentConfig?.bonusPoint ?? 0));
@@ -43,6 +44,11 @@ export default function EditBonusSheet({ currentConfig, onSave }: EditBonusSheet
       return;
     }
 
+    if (!communityId) {
+      toast.error(t("adminWallet.settings.signupBonus.form.error"));
+      return;
+    }
+
     try {
       await updateConfig({
         variables: {
@@ -51,7 +57,7 @@ export default function EditBonusSheet({ currentConfig, onSave }: EditBonusSheet
             bonusPoint: pointValue,
             message,
           },
-          communityId: COMMUNITY_ID,
+          communityId,
         },
       });
       toast.success(t("adminWallet.settings.signupBonus.form.success"));
