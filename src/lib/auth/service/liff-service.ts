@@ -203,9 +203,10 @@ export class LiffService {
     const endpoint = `${process.env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT}/line/liff-login`;
     const authStateManager = AuthStateManager.getInstance();
 
-    logger.debug("[LiffService] signInWithLiffToken starting", {
+    logger.info("[LiffService] signInWithLiffToken starting", {
       communityId,
-      tenantId,
+      tenantIdFromInit: tenantId,
+      currentLineAuthTenantId: lineAuth.tenantId,
       hasAccessToken: !!accessToken,
       component: "LiffService",
     });
@@ -232,15 +233,28 @@ export class LiffService {
         const { customToken, profile } = await response.json();
 
         // ❌ TENANT_ID_MISMATCH 防止: トークン発行時のテナントIDと一致させる
+        logger.info("[LiffService] Custom token response received, preparing sign-in", {
+          hasCustomToken: !!customToken,
+          profileUserId: profile?.userId,
+          targetTenantId: tenantId,
+          authInstanceTenantIdBeforeUpdate: lineAuth.tenantId,
+          component: "LiffService",
+        });
+
         if (tenantId !== undefined) {
           lineAuth.tenantId = tenantId;
-          logger.debug("[LiffService] lineAuth.tenantId updated", {
+          logger.info("[LiffService] lineAuth.tenantId explicitly updated before sign-in", {
             newTenantId: lineAuth.tenantId,
             component: "LiffService",
           });
         }
 
         const userCredential = await signInWithCustomToken(lineAuth, customToken);
+        logger.info("[LiffService] signInWithCustomToken success", {
+          uid: userCredential.user.uid,
+          tenantIdOnUser: userCredential.user.tenantId,
+          component: "LiffService",
+        });
 
         await Promise.race([
           new Promise<void>((resolve) => {
@@ -291,6 +305,13 @@ export class LiffService {
         return true;
       } catch (error) {
         const processedError = error instanceof Error ? error : new Error(String(error));
+        logger.error("[LiffService] signInWithLiffToken attempt failed", {
+          error: processedError.message,
+          tenantId,
+          lineAuthTenantId: lineAuth.tenantId,
+          attempt,
+          component: "LiffService",
+        });
 
         if (processedError.message.includes("401") || processedError.message.includes("network") || processedError.message.includes("fetch")) {
           await new Promise((r) => setTimeout(r, attempt * 1000)); // 1s,2s,3s
