@@ -23,7 +23,7 @@ const DEFAULT_OPEN_GRAPH_IMAGE = [
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const communityId = await getCommunityIdFromHeader();
-  const communityConfig = await getCommunityConfig(communityId);
+  const communityConfig = communityId ? await getCommunityConfig(communityId) : null;
   const user = await fetchUserServer(id);
 
   const fallbackMetadata: Metadata = {

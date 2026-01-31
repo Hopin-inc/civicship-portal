@@ -84,7 +84,7 @@ const requestLink = setContext(async (operation, prevContext) => {
     // Only send Authorization header when we have a token
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     "X-Auth-Mode": authMode,
-    "X-Community-Id": communityId,
+    "X-Community-Id": communityId ?? "",
   };
 
   return { headers };

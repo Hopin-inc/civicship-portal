@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import { getTermsContent } from "@/lib/communities/terms";
 import { convertMarkdownToHtml } from "@/utils/markdownUtils";
 import TermsPageClient from "./TermsPageClient";
@@ -7,6 +8,11 @@ import { handleExternalDocumentRedirect } from "@/lib/communities/documents";
 
 export default async function TermsPage() {
   const communityId = await getCommunityIdFromHeader();
+
+  if (!communityId) {
+    notFound();
+  }
+
   const communityConfig = await getCommunityConfig(communityId);
   
   await handleExternalDocumentRedirect(
