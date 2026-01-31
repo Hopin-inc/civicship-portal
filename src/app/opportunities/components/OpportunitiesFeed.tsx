@@ -12,16 +12,19 @@ import { useRouter } from "next/navigation";
 import { useFeatureCheck } from "@/hooks/useFeatureCheck";
 import { formatOpportunities } from "@/components/domains/opportunities/utils";
 import { useFetchFeedOpportunities } from "../hooks/useFetchFeedOpportunities";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 export default function OpportunitiesFeed() {
   const { opportunities, loading, error, loadMoreRef, refetch } = useFetchFeedOpportunities();
+  const config = useCommunityConfig();
+  const communityId = config?.communityId ?? null;
   const router = useRouter();
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
     refetchRef.current = refetch;
   }, [refetch]);
 
-  const allCards = mapOpportunityCards(opportunities.edges ?? []);
+  const allCards = mapOpportunityCards(opportunities.edges ?? [], communityId);
   const firstFour = allCards.slice(0, 4);
   const afterFour = allCards.slice(4);
   const isEmpty = !loading && opportunities?.edges?.length === 0;
