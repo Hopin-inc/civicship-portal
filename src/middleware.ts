@@ -1,7 +1,6 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { fetchCommunityConfigForEdge } from "@/lib/communities/config-env";
-import { logger } from "@/lib/logging";
 import { detectPreferredLocale } from "@/lib/i18n/languageDetection";
 import { defaultLocale, locales } from "@/lib/i18n/config";
 import { ACTIVE_COMMUNITY_IDS } from "@/lib/communities/constants";
@@ -157,20 +156,14 @@ function getCommunityIdFromHost(host: string | null): string {
   let communityId = DEFAULT_ID;
 
   if (!host) {
-    logger.warn(`[Middleware Debug] No host header. Using default: ${DEFAULT_ID}`, {
-      component: "Middleware",
-    });
+    console.warn(`[Middleware Debug] No host header. Using default: ${DEFAULT_ID}`);
   } else {
     // ポート番号が含まれている場合は除去（例: localhost:3000 -> localhost）
     const hostName = host.split(":")[0];
 
     if (hostName.includes("localhost") || hostName.includes("127.0.0.1")) {
       communityId = process.env.LOCAL_COMMUNITY_ID || DEFAULT_ID;
-      logger.debug(`[Middleware Debug] Local environment detected`, {
-        host: hostName,
-        communityId,
-        component: "Middleware",
-      });
+      console.log(`[Middleware Debug] Local environment detected: ${hostName} -> ${communityId}`);
     } else {
       // 逆順スキャン方式でホワイトラベルとcivicship.app両方に対応
       const parts = hostName.split(".");
@@ -187,20 +180,10 @@ function getCommunityIdFromHost(host: string | null): string {
 
       if (extractedId && (ACTIVE_COMMUNITY_IDS as readonly string[]).includes(extractedId)) {
         communityId = extractedId;
-        logger.debug(`[Middleware Debug] Community ID resolved from host`, {
-          host: hostName,
-          communityId,
-          component: "Middleware",
-        });
+        console.log(`[Middleware Debug] Community ID resolved: ${hostName} -> ${communityId}`);
       } else {
-        logger.warn(
-          `[Middleware Debug] Unknown or missing community ID from host. Falling back to default.`,
-          {
-            host: hostName,
-            extractedId: extractedId || "(none)",
-            fallbackId: DEFAULT_ID,
-            component: "Middleware",
-          },
+        console.warn(
+          `[Middleware Debug] Unknown or missing community ID from host: ${hostName} (extracted: ${extractedId || "(none)"}). Falling back to default: ${DEFAULT_ID}`,
         );
         communityId = DEFAULT_ID;
       }
