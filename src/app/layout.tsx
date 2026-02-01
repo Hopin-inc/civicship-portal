@@ -34,7 +34,8 @@ const getCommunityId = async () => {
 export async function generateMetadata(): Promise<Metadata> {
   const communityId = await getCommunityId();
   const config = await getCommunityConfig(communityId);
-  const isProduction = process.env.NODE_ENV === "production";
+  const isStaging = process.env.ENV === "staging";
+  const isProduction = process.env.NODE_ENV === "production" && !isStaging;
 
   if (!config) {
     return {
@@ -85,9 +86,9 @@ export async function generateMetadata(): Promise<Metadata> {
     robots: isProduction
       ? undefined
       : {
-          index: false,
-          follow: false,
-        },
+        index: false,
+        follow: false,
+      },
   };
 }
 
