@@ -41,9 +41,15 @@ export function getCommunityIdClient(): string | null {
     return cookieId;
   }
 
+  // ID解決に失敗した場合の診断ログ
+  const allCookies = typeof document !== "undefined" ? document.cookie : "N/A";
+  const hasMultipleCookies = allCookies.includes("x-community-id");
+
   logger.warn("[getCommunityIdClient] No communityId available", {
     storeState: useCommunityStore.getState().state,
-    hasCookies: typeof document !== "undefined" ? document.cookie.length > 0 : false,
+    hasCookies: allCookies !== "N/A" && allCookies.length > 0,
+    cookieFoundByRegex: hasMultipleCookies,
+    location: typeof window !== "undefined" ? window.location.href : "N/A",
     component: "getCommunityIdClient",
   });
 
