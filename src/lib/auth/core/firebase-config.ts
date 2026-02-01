@@ -47,7 +47,7 @@ let analyticsInstance: Analytics | undefined;
 
 export const getFirebaseAnalytics = async (): Promise<Analytics | undefined> => {
   const isBrowser = typeof window !== "undefined";
-  const isStaging = process.env.NEXT_PUBLIC_ENV === "staging" || process.env.ENV === "staging";
+  const isStaging = process.env.ENV === "staging";
   const isProduction = process.env.NODE_ENV === "production" && !isStaging;
   if (!isBrowser || !isProduction) return;
 
