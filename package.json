@@ -68,6 +68,7 @@
     "graphql": "^16.11.0",
     "graphql-scalars": "^1.24.2",
     "input-otp": "^1.4.2",
+    "jwt-decode": "^4.0.0",
     "libphonenumber-js": "^1.12.23",
     "linkify-it": "^5.0.0",
     "lucide-react": "^0.427.0",

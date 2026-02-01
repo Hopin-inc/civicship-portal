@@ -4,6 +4,7 @@ import { getApps, initializeApp } from "firebase/app";
 import { Auth, browserLocalPersistence, getAuth, setPersistence } from "firebase/auth";
 import { Analytics, getAnalytics, isSupported } from "firebase/analytics";
 import { logger } from "@/lib/logging";
+import { isProduction } from "@/lib/environment";
 
 const firebaseConfig = {
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
@@ -47,7 +48,7 @@ let analyticsInstance: Analytics | undefined;
 
 export const getFirebaseAnalytics = async (): Promise<Analytics | undefined> => {
   const isBrowser = typeof window !== "undefined";
-  if (!isBrowser || process.env.NODE_ENV !== "production") return;
+  if (!isBrowser || !isProduction) return;
 
   if (!analyticsInstance) {
     const supported = await isSupported();
