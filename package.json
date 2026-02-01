@@ -96,7 +96,7 @@
     "retry": "^0.13.1",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
-    "undici": "^7.9.0",
+    "undici": "^7.18.2",
     "unified": "^11.0.5",
     "utility-types": "^3.11.0",
     "winston": "^3.17.0",
