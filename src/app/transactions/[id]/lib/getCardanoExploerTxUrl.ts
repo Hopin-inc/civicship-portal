@@ -1,6 +1,5 @@
 export const getCardanoExplorerTxUrl = (txHash: string) => {
-  const isStaging = process.env.ENV === "staging";
-  const isProduction = process.env.NODE_ENV === "production" && !isStaging;
+  const { isProduction } = require("@/lib/environment");
 
   const baseUrl = isProduction
     ? "https://cardanoscan.io/transaction"

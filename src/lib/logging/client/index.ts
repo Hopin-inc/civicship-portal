@@ -23,8 +23,7 @@ const shouldThrottle = (message: string, level: string): boolean => {
 
 const forwardLogToServer = async (level: string, message: string, meta?: Record<string, any>) => {
   // In production, only forward warn/error logs to server
-  const isStaging = process.env.ENV === "staging";
-  const isProduction = process.env.NODE_ENV === "production" && !isStaging;
+  const { isProduction } = require("@/lib/environment");
   if (isProduction && (level === "debug" || level === "info")) {
     return;
   }
@@ -55,8 +54,7 @@ const forwardLogToServer = async (level: string, message: string, meta?: Record<
     });
   } catch (e) {
     console.warn(
-      `[CLIENT LOGGER] Failed to forward log to server: ${
-        e instanceof Error ? e.message : String(e)
+      `[CLIENT LOGGER] Failed to forward log to server: ${e instanceof Error ? e.message : String(e)
       }`,
     );
   }

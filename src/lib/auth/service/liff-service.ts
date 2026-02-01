@@ -5,7 +5,10 @@ import { signInWithCustomToken, updateProfile } from "firebase/auth";
 import { lineAuth } from "../core/firebase-config";
 import { TokenManager } from "../core/token-manager";
 import { logger } from "@/lib/logging";
-import { RawURIComponent } from "@/utils/path";
+import { jwtDecode } from "jwt-decode";
+import {
+  RawURIComponent
+} from "@/utils/path";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { AuthStateManager } from "@/lib/auth/core/auth-state-manager";
 
@@ -333,20 +336,13 @@ export class LiffService {
 
   private decodeTokenTenantId(token: string): string | null {
     try {
-      const parts = token.split(".");
-      if (parts.length !== 3) return null;
-      // Base64Url decode payload
-      const base64Url = parts[1];
-      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-      const jsonPayload = decodeURIComponent(
-        atob(base64)
-          .split("")
-          .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-          .join(""),
-      );
-      const payload = JSON.parse(jsonPayload);
+      const payload = jwtDecode<{ tenant_id?: string }>(token);
       return payload.tenant_id || null;
     } catch (error) {
+      logger.warn("[LiffService] Failed to decode custom token", {
+        error: error instanceof Error ? error.message : String(error),
+        component: "LiffService",
+      });
       return null;
     }
   }

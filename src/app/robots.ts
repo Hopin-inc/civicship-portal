@@ -1,8 +1,7 @@
 import { MetadataRoute } from "next";
+import { isProduction } from "@/lib/environment";
 
 export default function robots(): MetadataRoute.Robots {
-  const isStaging = process.env.ENV === "staging";
-  const isProduction = process.env.NODE_ENV === "production" && !isStaging;
 
   if (!isProduction) {
     // 非本番環境: すべての検索エンジンをブロック

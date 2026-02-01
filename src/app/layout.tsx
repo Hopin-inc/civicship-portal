@@ -21,6 +21,7 @@ import { CommunityConfigProvider } from "@/contexts/CommunityConfigContext";
 import { CommunityPortalConfig, getCommunityConfig } from "@/lib/communities/config";
 import { DEFAULT_ASSET_PATHS } from "@/lib/communities/constants";
 import { headers } from "next/headers";
+import { isProduction } from "@/lib/environment";
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -34,8 +35,6 @@ const getCommunityId = async () => {
 export async function generateMetadata(): Promise<Metadata> {
   const communityId = await getCommunityId();
   const config = await getCommunityConfig(communityId);
-  const isStaging = process.env.ENV === "staging";
-  const isProduction = process.env.NODE_ENV === "production" && !isStaging;
 
   if (!config) {
     return {
