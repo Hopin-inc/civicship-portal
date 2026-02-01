@@ -1,19 +1,18 @@
 import clientLogger from "@/lib/logging/client";
 import { ILogger } from "@/lib/logging/type";
+import { isLocal, isStorybook } from "@/lib/environment";
 
 const noopLogger: ILogger = {
-  info: () => {},
-  warn: () => {},
-  error: () => {},
-  debug: () => {},
+  info: () => { },
+  warn: () => { },
+  error: () => { },
+  debug: () => { },
 };
 
-const isLocalEnv = process.env.ENV === "LOCAL";
-const isStorybookEnv = process.env.ENV === "STORYBOOK";
 
 let logger: ILogger;
 
-if (isLocalEnv || isStorybookEnv) {
+if (isLocal || isStorybook) {
   logger = noopLogger;
 } else if (typeof window === "undefined") {
   logger = require("./server").default;

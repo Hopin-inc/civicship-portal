@@ -1,7 +1,7 @@
-export const getCardanoExplorerTxUrl = (txHash: string) => {
-  const isProd = process.env.NODE_ENV === "production";
+import { isProduction } from "@/lib/environment";
 
-  const baseUrl = isProd
+export const getCardanoExplorerTxUrl = (txHash: string) => {
+  const baseUrl = isProduction
     ? "https://cardanoscan.io/transaction"
     : "https://preprod.cardanoscan.io/transaction";
 

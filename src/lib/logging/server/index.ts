@@ -1,9 +1,7 @@
 import winston from "winston";
 import { LoggingWinston } from "@google-cloud/logging-winston";
 import { ILogger } from "@/lib/logging/type";
-
-const isLocal = process.env.ENV === "LOCAL";
-const isProduction = process.env.NODE_ENV === "production";
+import { isProduction, isLocal } from "@/lib/environment";
 
 const severity = winston.format((log) => {
   log.severity = log.level.toUpperCase();

@@ -53,6 +53,7 @@ export async function initAuth(params: InitAuthParams) {
 
   if (ssrCurrentUser && ssrLineAuthenticated) {
     return await initAuthFast({
+      communityConfig,
       ssrCurrentUser,
       ssrPhoneAuthenticated,
       environment,
@@ -75,6 +76,7 @@ export async function initAuth(params: InitAuthParams) {
 }
 
 async function initAuthFast({
+  communityConfig,
   ssrCurrentUser,
   ssrPhoneAuthenticated,
   environment,
@@ -82,6 +84,7 @@ async function initAuthFast({
   authStateManager,
   setState,
 }: {
+  communityConfig: CommunityPortalConfig | null;
   ssrCurrentUser: GqlUser;
   ssrPhoneAuthenticated?: boolean;
   environment: AuthEnvironment;
@@ -107,7 +110,11 @@ async function initAuthFast({
     if (typeof window !== "undefined") {
       (async () => {
         try {
-          const firebaseUser = await initializeFirebase(liffService, environment);
+          const firebaseUser = await initializeFirebase(
+            liffService,
+            environment,
+            communityConfig?.firebaseTenantId,
+          );
           if (firebaseUser) {
             useAuthStore.getState().setState({ firebaseUser });
             logger.debug("[AUTH] initAuthFast: Firebase user hydrated for CSR", {
@@ -145,7 +152,11 @@ async function initAuthFull({
   try {
     prepareInitialState(setState);
 
-    const firebaseUser = await initializeFirebase(liffService, environment);
+    const firebaseUser = await initializeFirebase(
+      liffService,
+      environment,
+      communityConfig?.firebaseTenantId,
+    );
     if (!firebaseUser) {
       const shouldContinue = handleUnauthenticatedBranch(
         liffService,

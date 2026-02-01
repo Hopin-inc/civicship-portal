@@ -5,7 +5,10 @@ import { signInWithCustomToken, updateProfile } from "firebase/auth";
 import { lineAuth } from "../core/firebase-config";
 import { TokenManager } from "../core/token-manager";
 import { logger } from "@/lib/logging";
-import { RawURIComponent } from "@/utils/path";
+import { jwtDecode } from "jwt-decode";
+import {
+  RawURIComponent
+} from "@/utils/path";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { AuthStateManager } from "@/lib/auth/core/auth-state-manager";
 
@@ -195,13 +198,21 @@ export class LiffService {
     return liff.getAccessToken();
   }
 
-  public async signInWithLiffToken(): Promise<boolean> {
+  public async signInWithLiffToken(tenantId?: string | null): Promise<boolean> {
     const accessToken = this.getAccessToken();
     if (!accessToken) return false;
 
     const communityId = process.env.NEXT_PUBLIC_COMMUNITY_ID;
     const endpoint = `${process.env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT}/line/liff-login`;
     const authStateManager = AuthStateManager.getInstance();
+
+    logger.info("[LiffService] signInWithLiffToken starting", {
+      communityId,
+      tenantIdFromInit: tenantId,
+      currentLineAuthTenantId: lineAuth.tenantId,
+      hasAccessToken: !!accessToken,
+      component: "LiffService",
+    });
 
     // 最大3回まで（token切れ or transient errorのみリトライ）
     for (let attempt = 1; attempt <= 3; attempt++) {
@@ -223,7 +234,33 @@ export class LiffService {
         }
 
         const { customToken, profile } = await response.json();
+
+        const tokenTenantId = this.decodeTokenTenantId(customToken);
+
+        // ❌ TENANT_ID_MISMATCH 防止: トークン発行時のテナントIDと一致させる
+        logger.info("[LiffService] Custom token response received, preparing sign-in", {
+          hasCustomToken: !!customToken,
+          tokenTenantId,
+          profileUserId: profile?.userId,
+          targetTenantId: tenantId,
+          authInstanceTenantIdBeforeUpdate: lineAuth.tenantId,
+          component: "LiffService",
+        });
+
+        if (tenantId !== undefined) {
+          lineAuth.tenantId = tenantId;
+          logger.info("[LiffService] lineAuth.tenantId explicitly updated before sign-in", {
+            newTenantId: lineAuth.tenantId,
+            component: "LiffService",
+          });
+        }
+
         const userCredential = await signInWithCustomToken(lineAuth, customToken);
+        logger.info("[LiffService] signInWithCustomToken success", {
+          uid: userCredential.user.uid,
+          tenantIdOnUser: userCredential.user.tenantId,
+          component: "LiffService",
+        });
 
         await Promise.race([
           new Promise<void>((resolve) => {
@@ -274,6 +311,13 @@ export class LiffService {
         return true;
       } catch (error) {
         const processedError = error instanceof Error ? error : new Error(String(error));
+        logger.error("[LiffService] signInWithLiffToken attempt failed", {
+          error: processedError.message,
+          tenantId,
+          lineAuthTenantId: lineAuth.tenantId,
+          attempt,
+          component: "LiffService",
+        });
 
         if (processedError.message.includes("401") || processedError.message.includes("network") || processedError.message.includes("fetch")) {
           await new Promise((r) => setTimeout(r, attempt * 1000)); // 1s,2s,3s
@@ -288,5 +332,18 @@ export class LiffService {
 
   public getState(): LiffState {
     return { ...this.state };
+  }
+
+  private decodeTokenTenantId(token: string): string | null {
+    try {
+      const payload = jwtDecode<{ tenant_id?: string }>(token);
+      return payload.tenant_id || null;
+    } catch (error) {
+      logger.warn("[LiffService] Failed to decode custom token", {
+        error: error instanceof Error ? error.message : String(error),
+        component: "LiffService",
+      });
+      return null;
+    }
   }
 }
