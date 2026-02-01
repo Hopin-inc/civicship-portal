@@ -2,6 +2,7 @@
 
 import { ILogger } from "@/lib/logging/type";
 import { createAuthLogContext, generateSessionId } from "@/lib/logging/client/utils";
+import { isProduction } from "@/lib/environment";
 
 const cachedSessionId = generateSessionId();
 
@@ -23,7 +24,6 @@ const shouldThrottle = (message: string, level: string): boolean => {
 
 const forwardLogToServer = async (level: string, message: string, meta?: Record<string, any>) => {
   // In production, only forward warn/error logs to server
-  const { isProduction } = require("@/lib/environment");
   if (isProduction && (level === "debug" || level === "info")) {
     return;
   }
