@@ -45,7 +45,7 @@ export default function MyProfilePage() {
 
   useHeaderConfig(headerConfig);
 
-  const viewModel = presentUserProfile(gqlUser, communityId ?? "", isOwner, portfolios);
+  const viewModel = presentUserProfile(gqlUser, isOwner, portfolios);
 
   return <UserProfileView viewModel={viewModel} isOwner={isOwner} />;
 }

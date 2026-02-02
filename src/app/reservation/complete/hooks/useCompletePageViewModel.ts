@@ -5,15 +5,11 @@ import {
 } from "@/components/domains/opportunities/data/presenter";
 import { useCompletePageDataRaw } from "./useCompletePageDataRaw";
 import { presenterArticleCard } from "@/app/articles/data/presenter";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 export function useCompletePageViewModel(
   opportunityId: string | null,
   reservationId: string | null,
 ) {
-  const config = useCommunityConfig();
-  const communityId = config?.communityId ?? null;
-
   const {
     reservation,
     gqlOpportunity,
@@ -26,8 +22,8 @@ export function useCompletePageViewModel(
   } = useCompletePageDataRaw(opportunityId, reservationId);
 
   const opportunity = useMemo(() => {
-    return gqlOpportunity ? presenterActivityCard(gqlOpportunity, communityId) : null;
-  }, [gqlOpportunity, communityId]);
+    return gqlOpportunity ? presenterActivityCard(gqlOpportunity) : null;
+  }, [gqlOpportunity]);
 
   const dateTimeInfo = useMemo(() => {
     if (!reservation || !gqlOpportunity || !gqlOpportunitySlot) return null;

@@ -1,5 +1,6 @@
 import { cache } from "react";
 import { executeServerGraphQLQuery } from "@/lib/graphql/server";
+import { getCommunityIdFromEnv } from "./config-env";
 import { COMMUNITY_LOCAL_CONFIGS } from "@/lib/communities/constants";
 
 /**
@@ -128,6 +129,12 @@ export const getCommunityConfig = cache(
 );
 
 /**
+ * Get community ID from environment variable
+ * Re-exported from config-env.ts for convenience
+ */
+export { getCommunityIdFromEnv } from "./config-env";
+
+/**
  * Get default OG image for a community config
  */
 export function getDefaultOgImage(config: CommunityPortalConfig | null): string[] {
@@ -135,4 +142,13 @@ export function getDefaultOgImage(config: CommunityPortalConfig | null): string[
     return [];
   }
   return config.ogImagePath ? [config.ogImagePath] : [];
+}
+
+/**
+ * Get community config using the environment variable community ID
+ * Convenience function for server components
+ */
+export async function getCommunityConfigFromEnv(): Promise<CommunityPortalConfig | null> {
+  const communityId = getCommunityIdFromEnv();
+  return getCommunityConfig(communityId);
 }

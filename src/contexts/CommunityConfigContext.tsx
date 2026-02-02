@@ -1,9 +1,7 @@
 "use client";
 
-import { createContext, useContext, ReactNode, useEffect } from "react";
+import { createContext, useContext, ReactNode } from "react";
 import { CommunityPortalConfig } from "@/lib/communities/config";
-import { useCommunityStore } from "@/lib/community/community-store";
-import { logger } from "@/lib/logging";
 
 interface CommunityConfigContextValue {
   config: CommunityPortalConfig | null;
@@ -37,24 +35,6 @@ interface CommunityConfigProviderProps {
 }
 
 export function CommunityConfigProvider({ children, config, isFromDatabase }: CommunityConfigProviderProps) {
-  // Zustand store に communityId を同期
-  useEffect(() => {
-    if (config?.communityId) {
-      logger.debug("[CommunityConfigProvider] Syncing communityId to store", {
-        communityId: config.communityId,
-        isFromDatabase,
-        component: "CommunityConfigProvider",
-      });
-      useCommunityStore.getState().setCommunityId(config.communityId, "ssr");
-    } else {
-      logger.warn("[CommunityConfigProvider] No communityId in config", {
-        hasConfig: !!config,
-        isFromDatabase,
-        component: "CommunityConfigProvider",
-      });
-    }
-  }, [config, isFromDatabase]);
-
   return (
     <CommunityConfigContext.Provider value={{ config, isFromDatabase }}>
       {children}

@@ -13,15 +13,12 @@ import {
   presenterOpportunitySlots,
 } from "@/app/reservation/data/presenter/opportunitySlot";
 import { presenterActivityDetail, presenterQuestDetail } from "@/components/domains/opportunities/data/presenter";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 interface UseReservationDateLoaderProps {
   opportunityId: string;
 }
 
 export const useReservationDateLoader = ({ opportunityId }: UseReservationDateLoaderProps) => {
-  const config = useCommunityConfig();
-  const communityId = config?.communityId ?? null;
   const { data, loading, error, refetch } = useGetOpportunitySlotsQuery({
     variables: {
       filter: {
@@ -43,13 +40,13 @@ export const useReservationDateLoader = ({ opportunityId }: UseReservationDateLo
       ?.opportunity;
 
     if (raw?.category === GqlOpportunityCategory.Activity) {
-      return presenterActivityDetail(raw, communityId);
+      return presenterActivityDetail(raw);
     } else if (raw?.category === GqlOpportunityCategory.Quest) {
-      return presenterQuestDetail(raw, communityId);
+      return presenterQuestDetail(raw);
     }
 
     return null;
-  }, [data, communityId]);
+  }, [data]);
 
   const groupedSlots: ActivitySlotGroup[] = useMemo(() => {
     const slots = presenterOpportunitySlots(data?.opportunitySlots?.edges);

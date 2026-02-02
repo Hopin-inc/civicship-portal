@@ -24,8 +24,7 @@ import {
 
 export default function AdminOpportunityDetailPage() {
   const params = useParams();
-  const config = useCommunityConfig();
-  const communityId = config?.communityId ?? null;
+  const { communityId } = useCommunityConfig();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
 
   const headerConfig = useMemo(
@@ -42,7 +41,7 @@ export default function AdminOpportunityDetailPage() {
   const { data, loading, error, refetch } = useGetOpportunityQuery({
     variables: {
       id: id ?? "",
-      permission: { communityId: communityId ?? "" },
+      permission: { communityId },
       slotSort: { startsAt: GqlSortDirection.Asc },
       slotFilter: { hostingStatus: [GqlOpportunitySlotHostingStatus.Scheduled] },
     },
@@ -54,13 +53,13 @@ export default function AdminOpportunityDetailPage() {
     if (!data?.opportunity) return null;
     const opp = data.opportunity;
     if (opp.category === GqlOpportunityCategory.Activity) {
-      return presenterActivityDetail(opp, communityId);
+      return presenterActivityDetail(opp);
     }
     if (opp.category === GqlOpportunityCategory.Quest) {
-      return presenterQuestDetail(opp, communityId);
+      return presenterQuestDetail(opp);
     }
     return null;
-  }, [data?.opportunity, communityId]);
+  }, [data?.opportunity]);
 
   if (loading) return <LoadingIndicator />;
   if (error) return <ErrorState title="募集ページを読み込めませんでした" refetchRef={refetchRef} />;

@@ -12,7 +12,6 @@ import type { ParticipationDetail } from "@/app/participations/[id]/data/type";
 import type { ReservationStatus } from "@/types/participationStatus";
 import type { ActivityCard } from "@/components/domains/opportunities/types";
 import { logger } from "@/lib/logging";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 interface UseParticipationPageResult {
   participation: ParticipationDetail | null;
@@ -25,9 +24,6 @@ interface UseParticipationPageResult {
 }
 
 const useParticipationPage = (id: string): UseParticipationPageResult => {
-  const config = useCommunityConfig();
-  const communityId = config?.communityId ?? null;
-
   const { data, loading, error, refetch } = useGetParticipationQuery({
     variables: { id: id },
     skip: !id,
@@ -36,7 +32,7 @@ const useParticipationPage = (id: string): UseParticipationPageResult => {
   const rawParticipation = data?.participation;
   const rawOpportunity = rawParticipation?.reservation?.opportunitySlot?.opportunity;
   const participation = rawParticipation ? presenterParticipation(rawParticipation) : null;
-  const opportunity = rawOpportunity ? presenterActivityCard(rawOpportunity, communityId) : null;
+  const opportunity = rawOpportunity ? presenterActivityCard(rawOpportunity) : null;
 
   const { currentStatus } = useParticipationState({ participation });
 

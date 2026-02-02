@@ -1,20 +1,11 @@
-import { notFound } from "next/navigation";
 import { Header } from "@/app/transactions/components/Header";
 import { getServerCommunityTransactions } from "@/hooks/transactions/server";
 import { InfiniteTransactionList } from "@/shared/transactions/components/InfiniteTransactionList";
 import { getTranslations } from "next-intl/server";
-import { getCommunityIdFromHeader } from "@/lib/community/get-community-id-server";
 
 export default async function TransactionsPage() {
   const t = await getTranslations();
-  const communityId = await getCommunityIdFromHeader();
-
-  if (!communityId) {
-    notFound();
-  }
-
   const transactions = await getServerCommunityTransactions({
-    communityId,
     first: 20,
   });
   return (

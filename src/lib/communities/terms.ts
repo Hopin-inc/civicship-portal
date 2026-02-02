@@ -1,8 +1,10 @@
 import fs from "fs";
 import path from "path";
+import { getCommunityIdFromEnv } from "./metadata";
 import { COMMUNITY_CONTENT } from "./content";
 
-export function getTermsContent(communityId: string): string {
+export function getTermsContent(): string {
+  const communityId = getCommunityIdFromEnv();
   const content = COMMUNITY_CONTENT[communityId];
 
   const termsFile = content?.termsFile || COMMUNITY_CONTENT.default.termsFile;

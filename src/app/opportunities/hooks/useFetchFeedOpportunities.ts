@@ -23,14 +23,13 @@ const fallbackConnection: GqlOpportunitiesConnection = {
 
 export function useFetchFeedOpportunities() {
   const shouldShowQuests = useFeatureCheck("quests");
-  const config = useCommunityConfig();
-  const communityId = config?.communityId ?? null;
+  const { communityId } = useCommunityConfig();
 
   const { data, loading, fetchMore, refetch, error } = useGetOpportunitiesQuery({
     variables: {
       includeSlot: true,
       filter: {
-        communityIds: communityId ? [communityId] : [],
+        communityIds: [communityId],
         or: [
           {
             category: GqlOpportunityCategory.Activity,
@@ -64,7 +63,7 @@ export function useFetchFeedOpportunities() {
     await fetchMore({
       variables: {
         filter: {
-          communityIds: communityId ? [communityId] : [],
+          communityIds: [communityId],
           category: GqlOpportunityCategory.Activity,
           publishStatus: [GqlPublishStatus.Public],
         },
@@ -103,7 +102,7 @@ export function useFetchFeedOpportunities() {
     onLoadMore: handleFetchMore,
   });
 
-  const opportunityCards = mapOpportunityCards(data?.opportunities.edges ?? [], communityId);
+  const opportunityCards = mapOpportunityCards(data?.opportunities.edges ?? []);
   const { featuredCards, upcomingCards } = sliceOpportunitiesBySection(opportunityCards);
   return {
     featuredCards,

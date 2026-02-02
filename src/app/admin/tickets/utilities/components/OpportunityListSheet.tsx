@@ -15,7 +15,6 @@ import { ActivityCard, FormattedOpportunityCard } from "@/components/domains/opp
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { formatOpportunities } from "@/components/domains/opportunities/utils";
 import OpportunityHorizontalCard from "@/components/domains/opportunities/components/OpportunityHorizontalCard";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 interface OpportunityListSheetProps {
   opportunities: GqlOpportunity[];
@@ -28,9 +27,7 @@ export default function OpportunityListSheet({
                                                utilityName,
                                                children,
                                              }: OpportunityListSheetProps) {
-  const config = useCommunityConfig();
-  const communityId = config?.communityId ?? null;
-  const activityCards: ActivityCard[] = opportunities.map((opp) => presenterActivityCard(opp, communityId));
+  const activityCards: ActivityCard[] = opportunities.map(presenterActivityCard);
   const formattedActivityCards = activityCards.map(formatOpportunities);
 
   return (

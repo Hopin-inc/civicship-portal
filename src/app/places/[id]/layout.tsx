@@ -7,8 +7,7 @@ import {
   GqlPlace,
   GqlPublishStatus,
 } from "@/types/graphql";
-import { getCommunityConfig } from "@/lib/communities/config";
-import { getCommunityIdFromHeader } from "@/lib/community/get-community-id-server";
+import { getCommunityConfig, getCommunityIdFromEnv } from "@/lib/communities/config";
 import { DEFAULT_ASSET_PATHS } from "@/lib/communities/constants";
 
 const DEFAULT_OPEN_GRAPH_IMAGE = [
@@ -26,8 +25,8 @@ export const generateMetadata = async ({
   params: { id: string };
 }): Promise<Metadata> => {
   const id = params.id;
-  const communityId = await getCommunityIdFromHeader();
-  const communityConfig = communityId ? await getCommunityConfig(communityId) : null;
+  const communityId = getCommunityIdFromEnv();
+  const communityConfig = await getCommunityConfig(communityId);
   const place = await fetchPlace(id);
   
   const fallbackMetadata: Metadata = {
