@@ -90,7 +90,8 @@ export const useSearchResults = (
   hasNextPage: boolean;
   isLoadingMore: boolean;
 } => {
-  const { communityId } = useCommunityConfig();
+  const config = useCommunityConfig();
+  const communityId = config?.communityId ?? null;
   const filter = useMemo(() => buildFilter(searchParams, communityId), [searchParams, communityId]);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
@@ -186,10 +187,10 @@ export const useSearchResults = (
 
   const recommendedOpportunities = useMemo(() => {
     if (searchParams.type === "quest") {
-      return presenterQuestCards(opportunities.edges);
+      return presenterQuestCards(opportunities.edges, communityId);
     }
-    return presenterActivityCards(opportunities.edges);
-  }, [opportunities, searchParams.type]);
+    return presenterActivityCards(opportunities.edges, communityId);
+  }, [opportunities, searchParams.type, communityId]);
   
   const groupedOpportunities = useMemo(
     () =>
@@ -229,10 +230,10 @@ export const useSearchResults = (
   };
 };
 
-function buildFilter(searchParams: SearchParams, communityId: string): OpportunityFilterInput {
+function buildFilter(searchParams: SearchParams, communityId: string | null): OpportunityFilterInput {
   const filter: OpportunityFilterInput = {
     publishStatus: [PublishStatus.Public],
-    communityIds: [communityId],
+    communityIds: communityId ? [communityId] : [],
   };
 
   if (searchParams.type === "activity") {

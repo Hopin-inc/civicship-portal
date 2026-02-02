@@ -2,7 +2,8 @@ import React from "react";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { fetchUserServer } from "@/app/users/features/shared/server";
-import { getCommunityConfig, getCommunityIdFromEnv } from "@/lib/communities/config";
+import { getCommunityConfig } from "@/lib/communities/config";
+import { getCommunityIdFromHeader } from "@/lib/community/get-community-id-server";
 import { DEFAULT_ASSET_PATHS } from "@/lib/communities/constants";
 import { mapGqlPortfolio, UserProfileProvider } from "@/app/users/features/shared";
 
@@ -21,8 +22,8 @@ const DEFAULT_OPEN_GRAPH_IMAGE = [
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const communityId = getCommunityIdFromEnv();
-  const communityConfig = await getCommunityConfig(communityId);
+  const communityId = await getCommunityIdFromHeader();
+  const communityConfig = communityId ? await getCommunityConfig(communityId) : null;
   const user = await fetchUserServer(id);
 
   const fallbackMetadata: Metadata = {

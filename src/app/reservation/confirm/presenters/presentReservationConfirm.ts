@@ -18,7 +18,7 @@ import {
   presenterActivitySlot,
   presenterOpportunityHost,
 } from "@/components/domains/opportunities/data/presenter";
-import { getCommunityIdFromEnv } from "@/lib/communities/config";
+
 import { QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
 import { isDateReservable } from "@/app/reservation/data/presenter/opportunitySlot";
 
@@ -60,7 +60,7 @@ export function presentReservationActivity(data: any, communityId?: string): Act
   const { images, place, slots, articles, createdByUser } = data;
   const activitySlots = presenterActivitySlot(slots, data.id, data.feeRequired);
   const isReservable = activitySlots.some((slot) => slot.isReservable);
-  const resolvedCommunityId = communityId ?? getCommunityIdFromEnv();
+  const resolvedCommunityId = communityId;
 
   return {
     communityId: resolvedCommunityId || "",
@@ -99,7 +99,7 @@ export function presentReservationQuest(data: any, communityId?: string): QuestD
   const { images, place, slots, articles, createdByUser } = data;
   const questSlots = presentQuestSlotsLocal(slots, data.id);
   const isReservable = questSlots.some((slot: QuestSlot) => slot.isReservable);
-  const resolvedCommunityId = communityId ?? getCommunityIdFromEnv();
+  const resolvedCommunityId = communityId;
 
   return {
     communityId: resolvedCommunityId || "",
@@ -218,10 +218,10 @@ function presentAvailableTickets(
       id: utilityId,
       utility: firstTicket.utility
         ? {
-            id: firstTicket.utility.id,
-            name: firstTicket.utility.name ?? null,
-            owner: firstTicket.utility.owner ?? null,
-          }
+          id: firstTicket.utility.id,
+          name: firstTicket.utility.name ?? null,
+          owner: firstTicket.utility.owner ?? null,
+        }
         : null,
       status: availableTickets.length > 0 ? GqlTicketStatus.Available : firstTicket.status,
       count: availableTickets.length,
