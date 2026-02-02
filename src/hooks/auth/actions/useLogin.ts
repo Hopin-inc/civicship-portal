@@ -24,6 +24,12 @@ export const useLogin = (liffService: LiffService, authStateManager: AuthStateMa
         const loggedIn = await liffService.login(redirectPath);
         if (!loggedIn) return false;
 
+        // 🔍 DEBUG: テナントIDパラメータを確認
+        logger.info("[useLogin] 🔍 DEBUG: Calling signInWithLiffToken", {
+          tenantIdParam: undefined,
+          note: "No tenant ID is being passed to signInWithLiffToken",
+        });
+
         return await liffService.signInWithLiffToken();
       } catch (error) {
         logger.warn("LIFF login failed", {
