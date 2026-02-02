@@ -1,7 +1,7 @@
 import { executeServerGraphQLQuery } from "@/lib/graphql/server";
 import { GqlTransactionsConnection } from "@/types/graphql";
 import { GET_MY_WALLET_WITH_TRANSACTIONS_SERVER_QUERY } from "@/graphql/account/wallet/server";
-import { hasServerSession, getServerCookieHeader } from "@/lib/auth/server/session";
+import { hasServerSession } from "@/lib/auth/server/session";
 
 export interface MyWalletWithTransactionsResult {
   wallet: {
@@ -36,7 +36,6 @@ export async function getServerMyWalletWithTransactions(
   params: { first?: number; after?: string } = {}
 ): Promise<MyWalletWithTransactionsResult> {
   const hasSession = await hasServerSession();
-  const cookieHeader = await getServerCookieHeader();
 
   if (!hasSession) {
     return {
@@ -67,11 +66,7 @@ export async function getServerMyWalletWithTransactions(
         } | null;
         transactionsConnection: GqlTransactionsConnection;
       } | null;
-    }>(
-      GET_MY_WALLET_WITH_TRANSACTIONS_SERVER_QUERY,
-      variables,
-      cookieHeader ? { cookie: cookieHeader } : {}
-    );
+    }>(GET_MY_WALLET_WITH_TRANSACTIONS_SERVER_QUERY, variables);
 
     const myWallet = data.myWallet;
 

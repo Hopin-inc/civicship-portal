@@ -2,7 +2,53 @@
  * サーバーサイド用のGraphQLクエリ実行ヘルパー関数
  */
 
+import { headers, cookies } from "next/headers";
 import { logger } from "@/lib/logging";
+
+/**
+ * サーバーサイドでリクエストヘッダーを自動解決する
+ * - X-Community-Id: ミドルウェアが設定したヘッダーから取得
+ * - cookie: Next.js の cookies() から取得
+ */
+async function resolveServerHeaders(
+  providedHeaders?: Record<string, string>
+): Promise<Record<string, string>> {
+  const resolved: Record<string, string> = { ...providedHeaders };
+
+  try {
+    // X-Community-Id が未設定の場合、headers() から自動取得
+    const hasCommunityId = Object.keys(resolved).some(
+      (key) => key.toLowerCase() === "x-community-id"
+    );
+    if (!hasCommunityId) {
+      const headersList = await headers();
+      const communityId = headersList.get("x-community-id");
+      if (communityId) {
+        resolved["X-Community-Id"] = communityId;
+      }
+    }
+
+    // cookie が未設定の場合、cookies() から自動取得（case-insensitive）
+    const hasCookie = Object.keys(resolved).some(
+      (key) => key.toLowerCase() === "cookie"
+    );
+    if (!hasCookie) {
+      const cookieStore = await cookies();
+      const cookieHeader = cookieStore.toString();
+      if (cookieHeader) {
+        resolved.cookie = cookieHeader;
+      }
+    }
+  } catch (error) {
+    // ビルド時など headers()/cookies() が使えない場合は無視
+    logger.debug("[resolveServerHeaders] Could not resolve headers automatically", {
+      error: (error as Error).message,
+      component: "resolveServerHeaders",
+    });
+  }
+
+  return resolved;
+}
 
 export interface GraphQLResponse<T> {
   data: T;
@@ -19,17 +65,20 @@ export async function executeServerGraphQLQuery<
 >(
   query: string,
   variables: TVariables,
-  headers: Record<string, string> = {},
+  providedHeaders: Record<string, string> = {},
   timeoutMs: number = 5000, // ← ★ タイムアウト（デフォルト5秒）
 ): Promise<TData> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
+  // ヘッダーを自動解決（X-Community-Id, cookie）
+  const resolvedHeaders = await resolveServerHeaders(providedHeaders);
+
   // X-Community-Id のログ（HTTP ヘッダーは大文字小文字を区別しない）
-  const communityIdKey = Object.keys(headers).find(
+  const communityIdKey = Object.keys(resolvedHeaders).find(
     (key) => key.toLowerCase() === "x-community-id"
   );
-  const communityId = communityIdKey ? headers[communityIdKey] : undefined;
+  const communityId = communityIdKey ? resolvedHeaders[communityIdKey] : undefined;
   if (!communityId) {
     logger.warn("[executeServerGraphQLQuery] No X-Community-Id in headers", {
       query: query.substring(0, 100),
@@ -46,7 +95,7 @@ export async function executeServerGraphQLQuery<
   const requestHeaders = {
     "Content-Type": "application/json",
     "X-Auth-Mode": "session",
-    ...headers,
+    ...resolvedHeaders,
   };
 
   let response: Response;
