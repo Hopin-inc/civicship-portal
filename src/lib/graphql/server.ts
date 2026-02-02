@@ -2,13 +2,15 @@
  * サーバーサイド用のGraphQLクエリ実行ヘルパー関数
  */
 
-import { headers, cookies } from "next/headers";
 import { logger } from "@/lib/logging";
 
 /**
  * サーバーサイドでリクエストヘッダーを自動解決する
  * - X-Community-Id: ミドルウェアが設定したヘッダーから取得
  * - cookie: Next.js の cookies() から取得
+ *
+ * Note: next/headers は動的インポートを使用。
+ * クライアントコンポーネントから間接的にインポートされてもビルドエラーを回避。
  */
 async function resolveServerHeaders(
   providedHeaders?: Record<string, string>
@@ -16,6 +18,9 @@ async function resolveServerHeaders(
   const resolved: Record<string, string> = { ...providedHeaders };
 
   try {
+    // 動的インポートでサーバー専用モジュールを読み込み
+    const { headers, cookies } = await import("next/headers");
+
     // X-Community-Id が未設定の場合、headers() から自動取得
     const hasCommunityId = Object.keys(resolved).some(
       (key) => key.toLowerCase() === "x-community-id"
