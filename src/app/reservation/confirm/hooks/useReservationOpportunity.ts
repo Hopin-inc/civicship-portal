@@ -15,8 +15,9 @@ export const useReservationOpportunity = ({
   opportunityId: string;
   slotId: string;
 }) => {
-  const { communityId } = useCommunityConfig();
-  
+  const config = useCommunityConfig();
+  const communityId = config?.communityId;
+
   const {
     data,
     loading,
@@ -25,7 +26,7 @@ export const useReservationOpportunity = ({
   } = useGetOpportunityQuery({
     variables: {
       id: opportunityId,
-      permission: { communityId },
+      permission: { communityId: communityId ?? "" },
     },
     skip: !opportunityId,
     fetchPolicy: "network-only",
@@ -34,13 +35,13 @@ export const useReservationOpportunity = ({
 
   const opportunity: ActivityDetail | QuestDetail | null = useMemo(() => {
     if (data?.opportunity?.category === GqlOpportunityCategory.Activity) {
-      return presentReservationActivity(data.opportunity);
+      return presentReservationActivity(data.opportunity, communityId ?? undefined);
     }
     if (data?.opportunity?.category === GqlOpportunityCategory.Quest) {
-      return presentReservationQuest(data.opportunity);
+      return presentReservationQuest(data.opportunity, communityId ?? undefined);
     }
     return null;
-  }, [data]);
+  }, [data, communityId]);
 
   const selectedSlot = useMemo(() => {
     if (!opportunity) return null;
