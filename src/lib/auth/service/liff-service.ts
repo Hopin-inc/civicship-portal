@@ -11,7 +11,6 @@ import {
 } from "@/utils/path";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { AuthStateManager } from "@/lib/auth/core/auth-state-manager";
-import { getCommunityIdClient } from "@/lib/community/get-community-id-client";
 
 export type LiffState = {
   isInitialized: boolean;
@@ -203,7 +202,7 @@ export class LiffService {
     const accessToken = this.getAccessToken();
     if (!accessToken) return false;
 
-    const communityId = getCommunityIdClient();
+    const communityId = process.env.NEXT_PUBLIC_COMMUNITY_ID;
     const endpoint = `${process.env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT}/line/liff-login`;
     const authStateManager = AuthStateManager.getInstance();
 

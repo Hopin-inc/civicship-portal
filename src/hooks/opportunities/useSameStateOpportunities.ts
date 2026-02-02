@@ -26,8 +26,8 @@ export const useSameStateOpportunities = (opportunityId: string, stateCode: stri
     return (data?.opportunities.edges ?? [])
       .map((edge) => edge.node)
       .filter((node): node is GqlOpportunity => !!node)
-      .map((node) => presenterActivityCard(node, communityId || null));
-  }, [data?.opportunities.edges, communityId]);
+      .map(presenterActivityCard);
+  }, [data?.opportunities.edges]);
 
   return {
     sameStateOpportunities,

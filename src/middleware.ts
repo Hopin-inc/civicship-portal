@@ -18,14 +18,6 @@ export async function middleware(request: NextRequest) {
     request: { headers: requestHeaders },
   });
 
-  // Cookie にも設定（Client JS から参照可能にする）
-  res.cookies.set("x-community-id", communityId, {
-    path: "/",
-    maxAge: 60 * 60 * 24, // 24時間
-    sameSite: "lax",
-    httpOnly: false, // JS から読み取り可能
-  });
-
   // 2. DBから動的設定を取得
   const config = await fetchCommunityConfigForEdge(communityId);
   const enabledFeatures = config?.enableFeatures || [];
@@ -42,12 +34,7 @@ export async function middleware(request: NextRequest) {
   // 5. 言語設定処理
   handleLanguageSetting(request, res, enabledFeatures);
 
-  console.log(`[Middleware] communityId resolved`, {
-    host,
-    communityId,
-    pathname,
-    method: request.method,
-  });
+  console.log(`[Middleware] Passing ID to Layout: ${communityId}`);
   return res;
 }
 
@@ -156,37 +143,32 @@ function getCommunityIdFromHost(host: string | null): string {
   let communityId = DEFAULT_ID;
 
   if (!host) {
-    console.warn(`[Middleware Debug] No host header. Using default: ${DEFAULT_ID}`);
+    console.log(`[Middleware Debug] No host header. Using default: ${DEFAULT_ID}`);
+  } else if (host.includes("localhost") || host.includes("127.0.0.1")) {
+    communityId = process.env.NEXT_PUBLIC_COMMUNITY_ID || DEFAULT_ID;
+    console.log(`[Middleware Debug] Local environment: "${host}" -> Using: ${communityId}`);
   } else {
-    // ポート番号が含まれている場合は除去（例: localhost:3000 -> localhost）
-    const hostName = host.split(":")[0];
+    // 逆順スキャン方式でホワイトラベルとcivicship.app両方に対応
+    const parts = host.split(".");
+    const reversedParts = [...parts].reverse();
+    const ignoreWords = ["app", "civicship", "dev", "www"];
 
-    if (hostName.includes("localhost") || hostName.includes("127.0.0.1")) {
-      communityId = process.env.LOCAL_COMMUNITY_ID || DEFAULT_ID;
-      console.log(`[Middleware Debug] Local environment detected: ${hostName} -> ${communityId}`);
+    let extractedId = "";
+    for (const part of reversedParts) {
+      if (!ignoreWords.includes(part.toLowerCase())) {
+        extractedId = part;
+        break;
+      }
+    }
+
+    if (extractedId && (ACTIVE_COMMUNITY_IDS as readonly string[]).includes(extractedId)) {
+      communityId = extractedId;
+      console.log(`[Middleware Debug] Match found! Host: "${host}" -> ID: ${communityId}`);
     } else {
-      // 逆順スキャン方式でホワイトラベルとcivicship.app両方に対応
-      const parts = hostName.split(".");
-      const reversedParts = [...parts].reverse();
-      const ignoreWords = ["app", "civicship", "dev", "www"];
-
-      let extractedId = "";
-      for (const part of reversedParts) {
-        if (!ignoreWords.includes(part.toLowerCase())) {
-          extractedId = part;
-          break;
-        }
-      }
-
-      if (extractedId && (ACTIVE_COMMUNITY_IDS as readonly string[]).includes(extractedId)) {
-        communityId = extractedId;
-        console.log(`[Middleware Debug] Community ID resolved: ${hostName} -> ${communityId}`);
-      } else {
-        console.warn(
-          `[Middleware Debug] Unknown or missing community ID from host: ${hostName} (extracted: ${extractedId || "(none)"}). Falling back to default: ${DEFAULT_ID}`,
-        );
-        communityId = DEFAULT_ID;
-      }
+      console.warn(
+        `[Middleware Debug] Unknown community ID: "${extractedId}" from host: "${host}". Using default: ${DEFAULT_ID}`,
+      );
+      communityId = DEFAULT_ID;
     }
   }
 

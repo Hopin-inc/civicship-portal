@@ -12,6 +12,7 @@ import { ActivityCard, ActivityDetail, OpportunityHost, QuestCard, QuestDetail }
 import { presenterArticleCard } from "@/app/articles/data/presenter";
 import { ActivitySlot, QuestSlot } from "@/app/reservation/data/type/opportunitySlot";
 import { presenterPlace } from "@/app/places/data/presenter";
+import { getCommunityIdFromEnv } from "@/lib/communities/config";
 import { isDateReservable } from "@/app/reservation/data/presenter/opportunitySlot";
 import { format, isAfter } from "date-fns";
 import { getCrossDayLabel } from "@/utils/date";
@@ -19,48 +20,40 @@ import { ja } from "date-fns/locale";
 
 export const presenterActivityCards = (
   edges: (GqlOpportunityEdge | null | undefined)[] | null | undefined,
-  communityId: string | null,
 ): ActivityCard[] => {
   if (!edges) return [];
 
   return edges
     .map((edge) => edge?.node)
     .filter((node): node is GqlOpportunity => !!node)
-    .map((node) => presenterActivityCard(node, communityId));
+    .map((node) => presenterActivityCard(node));
 };
 
 export const presenterQuestCards = (
   edges: (GqlOpportunityEdge | null | undefined)[] | null | undefined,
-  communityId: string | null,
 ): QuestCard[] => {
   if (!edges) return [];
 
   return edges
     .map((edge) => edge?.node)
     .filter((node): node is GqlOpportunity => !!node)
-    .map((node) => presenterQuestCard(node, communityId));
+    .map((node) => presenterQuestCard(node));
 };
-export const mapOpportunityCards = (
-  edges: GqlOpportunityEdge[],
-  communityId: string | null,
-): (ActivityCard | QuestCard)[] =>
+export const mapOpportunityCards = (edges: GqlOpportunityEdge[]): (ActivityCard | QuestCard)[] =>
   edges
     .map((edge) => edge.node)
     .filter((node): node is GqlOpportunity => !!node)
-    .map((node) => {
+    .map((node) => {  
       if (node.category === GqlOpportunityCategory.Activity) {
-        return presenterActivityCard(node, communityId);
+        return presenterActivityCard(node);
       } else if (node.category === GqlOpportunityCategory.Quest) {
-        return presenterQuestCard(node, communityId);
+        return presenterQuestCard(node);
       }
       return null;
     })
     .filter((v): v is ActivityCard | QuestCard => v !== null);
 
-export const presenterActivityCard = (
-  node: Partial<GqlOpportunity>,
-  communityId: string | null,
-): ActivityCard => {
+export const presenterActivityCard = (node: Partial<GqlOpportunity>): ActivityCard => {
   return {
     id: node?.id || "",
     title: node?.title || "",
@@ -68,24 +61,21 @@ export const presenterActivityCard = (
     feeRequired: node?.feeRequired ?? null,
     location: node?.place?.name || "場所未定",
     images: node?.images || [],
-    communityId: communityId,
+    communityId: getCommunityIdFromEnv(),
     hasReservableTicket: node?.isReservableWithTicket || false,
     pointsRequired: node?.pointsRequired ?? null,
     slots: node?.slots ?? [],
   };
 };
 
-export const presenterQuestCard = (
-  node: Partial<GqlOpportunity>,
-  communityId: string | null,
-): QuestCard => {
+export const presenterQuestCard = (node: Partial<GqlOpportunity>): QuestCard => {
   return {
     id: node?.id || "",
     title: node?.title || "",
     category: node?.category || GqlOpportunityCategory.Quest,
     location: node?.place?.name || "場所未定",
     images: node?.images || [],
-    communityId: communityId,
+    communityId: getCommunityIdFromEnv(),
     hasReservableTicket: node?.isReservableWithTicket || false,
     pointsToEarn: node?.pointsToEarn ?? 0,
     slots: node?.slots ?? [],
@@ -93,17 +83,14 @@ export const presenterQuestCard = (
   };
 };
 
-export const presenterActivityDetail = (
-  data: GqlOpportunity,
-  communityId: string | null,
-): ActivityDetail => {
+export const presenterActivityDetail = (data: GqlOpportunity): ActivityDetail => {
   const { images, place, slots, articles, createdByUser } = data;
 
   const activitySlots = presenterActivitySlot(slots, data.id, data.feeRequired);
   const isReservable = activitySlots.some((slot) => slot.isReservable);
 
   return {
-    communityId: communityId,
+    communityId: getCommunityIdFromEnv(),
     id: data.id,
     title: data.title,
     description: data.description || "",
@@ -128,17 +115,14 @@ export const presenterActivityDetail = (
   };
 };
 
-export const presenterQuestDetail = (
-  data: GqlOpportunity,
-  communityId: string | null,
-): QuestDetail => {
+export const presenterQuestDetail = (data: GqlOpportunity): QuestDetail => {
   const { images, place, slots, articles, createdByUser } = data;
 
   const activitySlots = presenterActivitySlot(slots, data.id, data.feeRequired);
   const isReservable = activitySlots.some((slot) => slot.isReservable);
 
   return {
-    communityId: communityId,
+    communityId: getCommunityIdFromEnv(),
     id: data.id,
     title: data.title,
     description: data.description || "",

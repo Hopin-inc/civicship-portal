@@ -6,7 +6,7 @@ import { Item, ItemContent, ItemFooter, ItemTitle } from "@/components/ui/item";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
+import { COMMUNITY_ID } from "@/lib/communities/metadata";
 import {
   useGetSignupBonusConfigQuery,
   useGetFailedIncentiveGrantsQuery,
@@ -29,17 +29,12 @@ export default function BonusesPage() {
   );
   useHeaderConfig(headerConfig);
 
-  const communityConfig = useCommunityConfig();
-  const communityId = communityConfig?.communityId;
-
   const { data, loading, error } = useGetSignupBonusConfigQuery({
-    variables: { communityId: communityId ?? "" },
-    skip: !communityId,
+    variables: { communityId: COMMUNITY_ID },
   });
 
   const { data: failedData } = useGetFailedIncentiveGrantsQuery({
-    variables: { communityId: communityId ?? "" },
-    skip: !communityId,
+    variables: { communityId: COMMUNITY_ID },
     // user が null のアイテムがある場合でも、エラーを無視して利用可能なデータを返す
     errorPolicy: "all",
   });

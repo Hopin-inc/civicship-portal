@@ -3,7 +3,7 @@ import { cookies, headers } from 'next/headers';
 import { defaultLocale, locales, type Locale } from './config';
 import { nestMessages } from './nestMessages';
 import { detectPreferredLocale } from './languageDetection';
-import { getEnabledFeatures } from '@/lib/communities/config-env';
+import { getCommunityIdFromEnv, getEnabledFeatures } from '@/lib/communities/config-env';
 
 /**
  * メッセージをマージ（メモ化付き）
@@ -42,12 +42,12 @@ export default getRequestConfig(async ({ requestLocale }) => {
   if (savedLocale && locales.includes(savedLocale as Locale)) {
     locale = savedLocale as Locale;
   } else {
-    const headersList = await headers();
-    const communityId = headersList.get('x-community-id') || 'default';
+    const communityId = getCommunityIdFromEnv();
     const enabledFeatures = await getEnabledFeatures(communityId);
     const hasLanguageSwitcher = enabledFeatures.includes('languageSwitcher');
     
     if (hasLanguageSwitcher) {
+      const headersList = await headers();
       const acceptLanguage = headersList.get('accept-language');
       locale = detectPreferredLocale(acceptLanguage, locales, defaultLocale);
     } else {

@@ -12,7 +12,6 @@ import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
 import { logger } from "@/lib/logging";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { setContext } from "@apollo/client/link/context";
-import { getCommunityIdClient } from "@/lib/community/get-community-id-client";
 
 const httpLink = createUploadLink({
   uri: process.env.NEXT_PUBLIC_API_ENDPOINT,
@@ -67,24 +66,12 @@ const requestLink = setContext(async (operation, prevContext) => {
     }
   }
 
-  // Community ID の取得（Client Side のみ）
-  const communityId = isBrowser ? getCommunityIdClient() : null;
-
-  logger.debug("[Apollo] Request context", {
-    operationName: operation.operationName,
-    communityId,
-    isBrowser,
-    hasToken: !!token,
-    authMode,
-    component: "ApolloRequestLink",
-  });
-
   const headers = {
     ...prevContext.headers,
     // Only send Authorization header when we have a token
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     "X-Auth-Mode": authMode,
-    "X-Community-Id": communityId ?? "",
+    "X-Community-Id": process.env.NEXT_PUBLIC_COMMUNITY_ID,
   };
 
   return { headers };

@@ -26,8 +26,7 @@ import type { ReservationMode } from "../types/mode";
  * 予約詳細ページのロジックを統合したhook
  */
 export function useReservationDetail(id: string, mode: ReservationMode | null) {
-  const config = useCommunityConfig();
-  const communityId = config?.communityId ?? null;
+  const { communityId } = useCommunityConfig();
   
   // データ取得
   const { data, loading, error, refetch } = useGetReservationQuery({
@@ -44,8 +43,8 @@ export function useReservationDetail(id: string, mode: ReservationMode | null) {
         statusMeta: { label: "", variant: "primary" as const, step: "" },
       };
     }
-    return presentReservationDetail(data.reservation, communityId);
-  }, [data, communityId]);
+    return presentReservationDetail(data.reservation);
+  }, [data]);
 
   // 料金情報
   const priceInfo = useMemo(() => {

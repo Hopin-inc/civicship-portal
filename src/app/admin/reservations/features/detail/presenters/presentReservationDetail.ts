@@ -5,10 +5,7 @@ import getReservationStatusMeta from "../hooks/useGetReservationStatusMeta";
 /**
  * 予約詳細ページ用のデータを整形
  */
-export function presentReservationDetail(
-  reservation: GqlReservation,
-  communityId: string | null,
-) {
+export function presentReservationDetail(reservation: GqlReservation) {
   const opportunity = reservation.opportunitySlot?.opportunity;
 
   // 有効な参加者のみフィルタリング
@@ -17,7 +14,7 @@ export function presentReservationDetail(
   );
 
   // アクティビティカード用データ
-  const activityCard = opportunity ? presenterActivityCard(opportunity, communityId) : null;
+  const activityCard = opportunity ? presenterActivityCard(opportunity) : null;
 
   // ステータス情報
   const statusMeta = getReservationStatusMeta(reservation);
