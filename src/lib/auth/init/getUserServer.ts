@@ -7,7 +7,7 @@ import {
 import { cookies } from "next/headers";
 import { logger } from "@/lib/logging";
 import { GET_CURRENT_USER_SERVER_QUERY } from "@/graphql/account/user/server";
-import { hasServerSession, getServerCookieHeader } from "@/lib/auth/server/session";
+import { hasServerSession } from "@/lib/auth/server/session";
 
 export async function getUserServer(): Promise<{
   user: GqlUser | null;
@@ -16,7 +16,6 @@ export async function getUserServer(): Promise<{
 }> {
   const cookieStore = await cookies();
   const hasSession = await hasServerSession();
-  const cookieHeader = await getServerCookieHeader();
 
   const phoneAuthenticated = cookieStore.get("phone_authenticated")?.value === "true";
 
@@ -32,7 +31,7 @@ export async function getUserServer(): Promise<{
     const res = await executeServerGraphQLQuery<
       GqlCurrentUserServerQuery,
       GqlCurrentUserServerQueryVariables
-    >(GET_CURRENT_USER_SERVER_QUERY, {}, cookieHeader ? { cookie: cookieHeader } : {});
+    >(GET_CURRENT_USER_SERVER_QUERY, {});
 
     const user: GqlUser | null = res.currentUser?.user ?? null;
     const hasPhoneIdentity = !!user?.identities?.some((i) => i.platform?.toUpperCase() === "PHONE");

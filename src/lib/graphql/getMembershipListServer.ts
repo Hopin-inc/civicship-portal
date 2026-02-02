@@ -6,7 +6,7 @@ import {
 } from "@/types/graphql";
 import { logger } from "@/lib/logging";
 import { GET_MEMBERSHIP_LIST_SERVER_QUERY } from "@/graphql/account/membership/server";
-import { hasServerSession, getServerCookieHeader } from "@/lib/auth/server/session";
+import { hasServerSession } from "@/lib/auth/server/session";
 
 interface GetMembershipListServerVariables {
   first?: number;
@@ -27,7 +27,6 @@ export async function getMembershipListServer(
   connection: GqlMembershipsConnection | null;
 }> {
   const hasSession = await hasServerSession();
-  const cookieHeader = await getServerCookieHeader();
 
   if (!hasSession) {
     logger.debug("No session cookie found for SSR membership fetch");
@@ -40,11 +39,7 @@ export async function getMembershipListServer(
     const res = await executeServerGraphQLQuery<
       GetMembershipListServerResponse,
       GetMembershipListServerVariables
-    >(
-      GET_MEMBERSHIP_LIST_SERVER_QUERY,
-      variables,
-      cookieHeader ? { cookie: cookieHeader } : {}
-    );
+    >(GET_MEMBERSHIP_LIST_SERVER_QUERY, variables);
 
     return {
       connection: res.memberships,
