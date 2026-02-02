@@ -41,18 +41,10 @@ async function resolveServerHeaders(
     }
   } catch (error) {
     // ビルド時など headers()/cookies() が使えない場合は無視
-    const isBuildPhase = process.env.NEXT_PHASE === "phase-production-build";
-    if (isBuildPhase) {
-      logger.debug("[resolveServerHeaders] Could not resolve headers automatically (build phase)", {
-        error: (error as Error).message,
-        component: "resolveServerHeaders",
-      });
-    } else {
-      logger.warn("[resolveServerHeaders] Could not resolve headers automatically at runtime", {
-        error: (error as Error).message,
-        component: "resolveServerHeaders",
-      });
-    }
+    logger.debug("[resolveServerHeaders] Could not resolve headers automatically", {
+      error: (error as Error).message,
+      component: "resolveServerHeaders",
+    });
   }
 
   return resolved;
