@@ -28,8 +28,11 @@ async function resolveServerHeaders(
       }
     }
 
-    // cookie が未設定の場合、cookies() から自動取得
-    if (!resolved.cookie) {
+    // cookie が未設定の場合、cookies() から自動取得（case-insensitive）
+    const hasCookie = Object.keys(resolved).some(
+      (key) => key.toLowerCase() === "cookie"
+    );
+    if (!hasCookie) {
       const cookieStore = await cookies();
       const cookieHeader = cookieStore.toString();
       if (cookieHeader) {
