@@ -248,20 +248,69 @@ export class LiffService {
           component: "LiffService",
         });
 
+        // 🔍 DEBUG: トークンから取得したテナントIDをログ出力
+        logger.info("[LiffService] 🔍 DEBUG: Decoded token tenant ID", {
+          tokenTenantId,
+          tokenTenantIdType: typeof tokenTenantId,
+          tokenTenantIdIsNull: tokenTenantId === null,
+          tokenTenantIdIsUndefined: tokenTenantId === undefined,
+          component: "LiffService",
+        });
+
         if (tenantId !== undefined) {
           lineAuth.tenantId = tenantId;
           logger.info("[LiffService] lineAuth.tenantId explicitly updated before sign-in", {
             newTenantId: lineAuth.tenantId,
             component: "LiffService",
           });
+        } else {
+          // 🔍 DEBUG: tenantIdが未定義の場合、トークンから取得したテナントIDを使用
+          logger.info("[LiffService] 🔍 DEBUG: tenantId parameter is undefined, using tokenTenantId", {
+            tokenTenantId,
+            currentLineAuthTenantId: lineAuth.tenantId,
+            component: "LiffService",
+          });
+
+          if (tokenTenantId !== null) {
+            lineAuth.tenantId = tokenTenantId;
+            logger.info("[LiffService] 🔍 DEBUG: Updated lineAuth.tenantId from token", {
+              newTenantId: lineAuth.tenantId,
+              component: "LiffService",
+            });
+          }
         }
 
-        const userCredential = await signInWithCustomToken(lineAuth, customToken);
-        logger.info("[LiffService] signInWithCustomToken success", {
-          uid: userCredential.user.uid,
-          tenantIdOnUser: userCredential.user.tenantId,
+        // 🔍 DEBUG: signInWithCustomToken実行直前の状態を記録
+        logger.info("[LiffService] 🔍 DEBUG: About to call signInWithCustomToken", {
+          lineAuthTenantId: lineAuth.tenantId,
+          tokenTenantId,
+          tenantIdMatch: lineAuth.tenantId === tokenTenantId,
           component: "LiffService",
         });
+
+        let userCredential;
+        try {
+          userCredential = await signInWithCustomToken(lineAuth, customToken);
+          logger.info("[LiffService] ✅ signInWithCustomToken success", {
+            uid: userCredential.user.uid,
+            tenantIdOnUser: userCredential.user.tenantId,
+            lineAuthTenantId: lineAuth.tenantId,
+            component: "LiffService",
+          });
+        } catch (signInError: any) {
+          // 🔍 DEBUG: signInWithCustomTokenのエラーを詳細にログ出力
+          logger.error("[LiffService] ❌ signInWithCustomToken failed", {
+            error: signInError?.message || String(signInError),
+            errorCode: signInError?.code,
+            errorName: signInError?.name,
+            lineAuthTenantId: lineAuth.tenantId,
+            tokenTenantId,
+            tenantIdMismatch: lineAuth.tenantId !== tokenTenantId,
+            customTokenPreview: customToken?.substring(0, 50) + "...",
+            component: "LiffService",
+          });
+          throw signInError;
+        }
 
         await Promise.race([
           new Promise<void>((resolve) => {
@@ -312,11 +361,18 @@ export class LiffService {
         return true;
       } catch (error) {
         const processedError = error instanceof Error ? error : new Error(String(error));
-        logger.error("[LiffService] signInWithLiffToken attempt failed", {
+
+        // 🔍 DEBUG: エラーの詳細情報を記録
+        const errorDetails: any = error;
+        logger.error("[LiffService] ❌ signInWithLiffToken attempt failed", {
           error: processedError.message,
+          errorCode: errorDetails?.code,
+          errorName: errorDetails?.name,
+          errorStack: errorDetails?.stack?.split('\n').slice(0, 3).join('\n'),
           tenantId,
           lineAuthTenantId: lineAuth.tenantId,
           attempt,
+          isTenantIdMismatch: processedError.message.includes('TENANT_ID_MISMATCH'),
           component: "LiffService",
         });
 
