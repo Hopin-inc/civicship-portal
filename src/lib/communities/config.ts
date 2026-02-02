@@ -114,9 +114,6 @@ export const getCommunityConfig = cache(
       const data = await executeServerGraphQLQuery<CommunityPortalConfigResponse>(
         COMMUNITY_PORTAL_CONFIG_QUERY,
         { communityId },
-        {
-          "X-Community-Id": communityId,
-        },
       );
 
       return data.communityPortalConfig;
