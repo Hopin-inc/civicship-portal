@@ -5,12 +5,51 @@ import { detectPreferredLocale } from "@/lib/i18n/languageDetection";
 import { defaultLocale, locales } from "@/lib/i18n/config";
 import { ACTIVE_COMMUNITY_IDS } from "@/lib/communities/constants";
 
+/**
+ * パスベースルーティングのリダイレクト対象外パターン
+ * これらのパスは /community/{communityId} プレフィックスへリダイレクトしない
+ */
+const EXCLUDED_REDIRECT_PATTERNS = [
+  "/community", // 既にパスベース形式
+  "/api",       // API ルート
+  "/terms",     // 静的ページ
+  "/privacy",   // 静的ページ
+  "/_next",     // Next.js 内部
+  "/images",    // 静的アセット
+  "/communities", // コミュニティアセット
+  "/icons",     // アイコン
+];
+
 export async function middleware(request: NextRequest) {
   const host = request.headers.get("host");
   const pathname = request.nextUrl.pathname;
 
-  // 1. コミュニティIDの特定とバトンパス
-  const communityId = getCommunityIdFromHost(host);
+  // 1. コミュニティIDの特定（サブドメインまたはパスから）
+  let communityId = getCommunityIdFromPath(pathname);
+
+  if (!communityId) {
+    communityId = getCommunityIdFromHost(host);
+  }
+
+  // 2. パスベースリダイレクト判定
+  // サブドメインでアクセスされ、パスが /community で始まっていない場合はリダイレクト
+  const shouldRedirect = shouldRedirectToPathBased(pathname);
+  if (shouldRedirect) {
+    const newPath = pathname === "/"
+      ? `/community/${communityId}`
+      : `/community/${communityId}${pathname}`;
+    const redirectUrl = new URL(newPath, request.url);
+    redirectUrl.search = request.nextUrl.search;
+
+    console.log(`[Middleware] Redirecting to path-based URL`, {
+      from: pathname,
+      to: newPath,
+      communityId,
+    });
+
+    return NextResponse.redirect(redirectUrl, 301);
+  }
+
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-community-id", communityId);
 
@@ -26,20 +65,20 @@ export async function middleware(request: NextRequest) {
     httpOnly: false, // JS から読み取り可能
   });
 
-  // 2. DBから動的設定を取得
+  // 3. DBから動的設定を取得
   const config = await fetchCommunityConfigForEdge(communityId);
   const enabledFeatures = config?.enableFeatures || [];
   const rootPath = config?.rootPath || "/";
 
-  // 3. ルートリダイレクト処理
-  const redirectRes = handleRootRedirect(request, pathname, rootPath);
+  // 4. ルートリダイレクト処理（/community/{communityId} へのアクセス時）
+  const redirectRes = handleRootRedirect(request, pathname, rootPath, communityId);
   if (redirectRes) return redirectRes;
 
-  // 4. セキュリティヘッダー (CSP) の設定
+  // 5. セキュリティヘッダー (CSP) の設定
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
   setSecurityHeaders(res, nonce);
 
-  // 5. 言語設定処理
+  // 6. 言語設定処理
   handleLanguageSetting(request, res, enabledFeatures);
 
   console.log(`[Middleware] communityId resolved`, {
@@ -52,13 +91,63 @@ export async function middleware(request: NextRequest) {
 }
 
 /**
- * ルートページへのリダイレクト判定
+ * パスから communityId を抽出
+ * /community/{communityId}/... 形式の場合に communityId を返す
  */
-function handleRootRedirect(request: NextRequest, pathname: string, rootPath: string) {
-  const hasLiffState = request.nextUrl.searchParams.get("liff.state");
-  if (pathname === "/" && rootPath !== "/" && (!hasLiffState || hasLiffState === "/")) {
-    return NextResponse.redirect(new URL(rootPath, request.url));
+function getCommunityIdFromPath(pathname: string): string | null {
+  const match = pathname.match(/^\/community\/([a-zA-Z0-9-]+)/);
+  if (match) {
+    const extractedId = match[1];
+    if ((ACTIVE_COMMUNITY_IDS as readonly string[]).includes(extractedId)) {
+      return extractedId;
+    }
   }
+  return null;
+}
+
+/**
+ * パスベースURLへリダイレクトすべきかどうかを判定
+ */
+function shouldRedirectToPathBased(pathname: string): boolean {
+  // 既に /community で始まっている場合はリダイレクト不要
+  if (pathname.startsWith("/community")) {
+    return false;
+  }
+
+  // 除外パターンに一致する場合はリダイレクト不要
+  for (const pattern of EXCLUDED_REDIRECT_PATTERNS) {
+    if (pathname === pattern || pathname.startsWith(pattern + "/")) {
+      return false;
+    }
+  }
+
+  // favicon.ico などのファイルはリダイレクト不要
+  if (pathname === "/favicon.ico" || pathname === "/robots.txt") {
+    return false;
+  }
+
+  return true;
+}
+
+/**
+ * ルートページへのリダイレクト判定
+ * /community/{communityId} へのアクセス時に rootPath へリダイレクト
+ */
+function handleRootRedirect(
+  request: NextRequest,
+  pathname: string,
+  rootPath: string,
+  communityId: string
+) {
+  const hasLiffState = request.nextUrl.searchParams.get("liff.state");
+  const communityRoot = `/community/${communityId}`;
+
+  // /community/{communityId} へのアクセス時に rootPath へリダイレクト
+  if (pathname === communityRoot && rootPath !== "/" && (!hasLiffState || hasLiffState === "/")) {
+    const redirectPath = `/community/${communityId}${rootPath}`;
+    return NextResponse.redirect(new URL(redirectPath, request.url));
+  }
+
   return null;
 }
 
