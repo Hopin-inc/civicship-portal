@@ -39,6 +39,10 @@ const EXCLUDED_PATH_PATTERNS = [
   "/login/**",
   "/sign-up",
   "/sign-up/**",
+
+  // 静的ページ（コミュニティ非依存）
+  "/terms",
+  "/privacy",
 ];
 
 /**
@@ -106,6 +110,12 @@ export function resolvePath(
   path: string,
   communityId: string | null
 ): string {
+  // communityId の検証（パストラバーサル/オープンリダイレクト対策）
+  // 英数字とハイフンのみ許可
+  if (communityId && !/^[a-zA-Z0-9-]+$/.test(communityId)) {
+    return path;
+  }
+
   // パスベースモードでない場合、またはcommunityIdがない場合はそのまま返す
   if (!IS_PATH_BASED_MODE || !communityId) {
     return path;
