@@ -12,7 +12,7 @@ import {
   useGetFailedIncentiveGrantsQuery,
 } from "@/types/graphql";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
+import { AppLink } from "@/lib/navigation";
 import { ChevronRight } from "lucide-react";
 
 export default function BonusesPage() {
@@ -74,7 +74,7 @@ export default function BonusesPage() {
       <div className="flex flex-col">
         {/* 新規加入特典 */}
         <Item asChild>
-          <Link href="/admin/bonuses/signup" className="flex flex-1 gap-3">
+          <AppLink href="/admin/bonuses/signup" className="flex flex-1 gap-3">
             <div className="flex flex-1 flex-col min-w-0">
               <ItemContent>
                 <ItemTitle className="font-bold text-base leading-snug flex items-center gap-2">
@@ -117,7 +117,7 @@ export default function BonusesPage() {
             <div className="shrink-0 flex items-center">
               <ChevronRight className="h-4 w-4 text-muted-foreground" />
             </div>
-          </Link>
+          </AppLink>
         </Item>
 
         {/* 区切り線 */}

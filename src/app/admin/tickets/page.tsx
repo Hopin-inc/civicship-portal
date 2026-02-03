@@ -12,7 +12,7 @@ import { useAuth } from "@/contexts/AuthProvider";
 import { TicketIssueCard } from "@/app/admin/tickets/components/IssuerCard";
 import CreateUtilitySheet from "@/app/admin/tickets/utilities/components/CreateUtilitySheet";
 import CreateTicketSheet from "@/app/admin/tickets/components/CreateTicketSheet";
-import Link from "next/link";
+import { AppLink } from "@/lib/navigation";
 import { useTicketIssuers } from "./hooks/useTicketIssuers";
 
 export default function TicketsPage() {
@@ -61,8 +61,8 @@ export default function TicketsPage() {
         </div>
         <p className="text-body-sm text-muted-foreground">
           発行するチケットの種類は
-          <Link href="/admin/tickets/utilities"
-                className="text-primary hover:text-primary-hover underline">こちら</Link>
+          <AppLink href="/admin/tickets/utilities"
+                className="text-primary hover:text-primary-hover underline">こちら</AppLink>
           から確認・追加できます。
         </p>
         <div className="flex flex-col gap-3">

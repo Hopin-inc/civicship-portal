@@ -8,7 +8,7 @@ import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { useGetFailedIncentiveGrantsQuery, useGetSignupBonusConfigQuery } from "@/types/graphql";
 import { cn } from "@/lib/utils";
 import FailedBonusItem from "../components/FailedBonusItem";
-import Link from "next/link";
+import { AppLink } from "@/lib/navigation";
 import EditBonusSheet from "@/app/admin/bonuses/components/EditBonusSheet";
 import { CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -118,9 +118,9 @@ export default function SignupBonusDetailPage() {
               {t("adminWallet.settings.signupBonus.details.seeTransactions")}
             </div>
             <Button variant="text" size="sm" asChild>
-              <Link href="/admin/wallet">
+              <AppLink href="/admin/wallet">
                 {t("adminWallet.settings.signupBonus.details.viewWallet")}
-              </Link>
+              </AppLink>
             </Button>
           </div>
         </div>

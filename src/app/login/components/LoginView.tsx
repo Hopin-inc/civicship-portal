@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
-import Link from "next/link";
+import { AppLink } from "@/lib/navigation";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 type Props = {
@@ -43,9 +43,9 @@ export function LoginView({ isLoading, isAuthenticating, error, onLogin }: Props
                 onCheckedChange={(checked) => setAgreedTerms(!!checked)}
               />
               <Label htmlFor="agree-terms" className="text-label-md text-muted-foreground">
-                <Link href="/terms" className="underline">
+                <AppLink href="/terms" className="underline">
                   {t("auth.login.termsLabel")}
-                </Link>
+                </AppLink>
                 <span className="text-label-sm">{t("auth.login.termsAgree")}</span>
               </Label>
             </div>
@@ -59,9 +59,9 @@ export function LoginView({ isLoading, isAuthenticating, error, onLogin }: Props
                 onCheckedChange={(checked) => setAgreedPrivacy(!!checked)}
               />
               <Label htmlFor="agree-privacy" className="text-label-md text-muted-foreground">
-                <Link href="/privacy" className="underline">
+                <AppLink href="/privacy" className="underline">
                   {t("auth.login.privacyLabel")}
-                </Link>
+                </AppLink>
                 <span className="text-label-sm">{t("auth.login.privacyAgree")}</span>
               </Label>
             </div>

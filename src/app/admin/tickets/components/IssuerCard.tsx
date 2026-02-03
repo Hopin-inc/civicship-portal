@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import Link from "next/link";
+import { AppLink } from "@/lib/navigation";
 import { formatDate } from "@/utils/date";
 import { GqlClaimLinkStatus } from "@/types/graphql";
 
@@ -49,5 +49,5 @@ export function TicketIssueCard({
     </Card>
   );
 
-  return href ? <Link href={ href }>{ content }</Link> : content;
+  return href ? <AppLink href={ href }>{ content }</AppLink> : content;
 }

@@ -13,7 +13,7 @@ import { toast } from "react-toastify";
 import useCommunityTransactions from "@/app/admin/wallet/hooks/useCommunityTransactions";
 import { InfiniteTransactionList } from "@/shared/transactions/components/InfiniteTransactionList";
 import { logger } from "@/lib/logging";
-import Link from "next/link";
+import { AppLink } from "@/lib/navigation";
 import { toPointNumber } from "@/utils/bigint";
 import { useTranslations } from "next-intl";
 
@@ -140,12 +140,12 @@ export default function WalletPage() {
 
       <div className="pt-10 flex justify-between items-center">
         <h2 className="text-display-sm">{t("transactions.list.title")}</h2>
-        <Link
+        <AppLink
           href="/transactions"
           className="text-sm border-b-[1px] border-black cursor-pointer bg-transparent p-0"
         >
           {t("transactions.list.communityHistoryLink")}
-        </Link>
+        </AppLink>
       </div>
       <div className="mt-2">
         {connection.edges?.length === 0 ? (

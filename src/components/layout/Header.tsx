@@ -2,7 +2,7 @@
 
 import React from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
+import { AppLink } from "@/lib/navigation";
 import Image from "next/image";
 import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -79,7 +79,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
         )
       )}
       {config.showLogo && communityConfig?.squareLogoPath && (
-        <Link href="/" className="flex items-center space-x-2">
+        <AppLink href="/" className="flex items-center space-x-2">
           <Image
             src={communityConfig.squareLogoPath}
             alt="Logo"
@@ -87,7 +87,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
             height={72}
             className="h-[28px] w-auto"
           />
-        </Link>
+        </AppLink>
       )}
       {communityConfig?.enableFeatures?.includes("opportunities") && config.showSearchForm && (
         <div className="flex-1 ml-4">

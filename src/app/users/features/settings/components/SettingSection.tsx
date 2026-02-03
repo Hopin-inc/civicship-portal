@@ -3,7 +3,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Contact, Globe } from "lucide-react";
-import Link from "next/link";
+import { AppLink } from "@/lib/navigation";
 import { LocaleSwitcher } from "@/components/shared/LocaleSwitcher";
 import { useTranslations } from "next-intl";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
@@ -20,7 +20,7 @@ export default function SettingSection() {
             <Contact className="w-5 h-5" />
             <span className="font-bold text-sm">{t("users.settings.profileLabel")}</span>
           </div>
-          <Link
+          <AppLink
             href="/users/me/edit"
             className={cn(
               buttonVariants({ variant: "tertiary", size: "sm" }),
@@ -28,7 +28,7 @@ export default function SettingSection() {
             )}
           >
             {t("users.settings.editButton")}
-          </Link>
+          </AppLink>
         </div>
 
         {/* 言語切替 */}

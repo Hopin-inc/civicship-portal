@@ -1,7 +1,7 @@
 "use client";
 import { Card, CardContent } from "@/components/ui/card";
 import { FileIcon } from "lucide-react";
-import Link from "next/link";
+import { AppLink } from "@/lib/navigation";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { useTranslations, useLocale } from "next-intl";
 import { resolveLocalePath } from "@/utils/i18n";
@@ -70,7 +70,7 @@ function DocumentLink({ document }: DocumentLinkProps) {
   );
 
   if (document.type === "internal") {
-    return <Link href={href}>{content}</Link>;
+    return <AppLink href={href}>{content}</AppLink>;
   }
 
   return (
