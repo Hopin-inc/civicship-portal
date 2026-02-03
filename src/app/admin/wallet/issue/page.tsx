@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useAppRouter } from "@/lib/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,7 +18,7 @@ const INT_LIMIT = 2000000000;
 export default function IssuePointPage() {
   const t = useTranslations();
   const { communityId } = useCommunityConfig();
-  const router = useRouter();
+  const router = useAppRouter();
 
   const headerConfig = useMemo(
     () => ({

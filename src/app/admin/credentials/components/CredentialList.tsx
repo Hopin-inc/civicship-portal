@@ -3,7 +3,7 @@
 import Loading from "@/components/layout/Loading";
 import { Card } from "@/components/ui/card";
 import { GqlEvaluationStatus, GqlVcIssuanceStatus, useGetEvaluationsQuery } from "@/types/graphql";
-import { useRouter } from "next/navigation";
+import { useAppRouter } from "@/lib/navigation";
 import { AlertTriangle } from "lucide-react";
 import { useMemo } from "react";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
@@ -27,7 +27,7 @@ function getIssuanceStats(evaluations: any[]) {
 }
 
 export default function CredentialList() {
-  const router = useRouter();
+  const router = useAppRouter();
   const { communityId } = useCommunityConfig();
   const { data, loading, error } = useGetEvaluationsQuery({
     variables: { 

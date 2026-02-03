@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocale } from "next-intl";
-import { useRouter } from "next/navigation";
+import { useAppRouter } from "@/lib/navigation";
 import { useTransition } from "react";
 import {
   Select,
@@ -18,7 +18,7 @@ import { logger } from "@/lib/logging";
 
 export function LocaleSwitcher() {
   const locale = useLocale();
-  const router = useRouter();
+  const router = useAppRouter();
   const [isPending, startTransition] = useTransition();
   const { user: currentUser } = useAuth();
   const [updateMyProfile] = useMutation(UPDATE_MY_PROFILE);

@@ -1,6 +1,7 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
+import { useAppRouter } from "@/lib/navigation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { PlaceFormEditor } from "../features/editor/components/PlaceFormEditor";
 import { useGetPlaceQuery } from "@/types/graphql";
@@ -10,7 +11,7 @@ import { presentPlaceForEdit } from "../features/editor/presenters/presentPlaceF
 
 export default function EditPlacePage() {
   const params = useParams();
-  const router = useRouter();
+  const router = useAppRouter();
   const placeId = params?.id as string;
 
   const { data, loading, error } = useGetPlaceQuery({

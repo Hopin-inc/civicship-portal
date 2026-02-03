@@ -3,7 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthProvider";
 import { toast } from "react-toastify";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useAppRouter } from "@/lib/navigation";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { VerificationStep } from "../types";
 import { isValidPhoneNumber } from "../utils/validatePhoneNumber";
@@ -21,7 +22,7 @@ import { useAuthDependencies } from "@/hooks/auth/init/useAuthDependencies";
 
 export function PhoneVerificationForm() {
   const t = useTranslations();
-  const router = useRouter();
+  const router = useAppRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next");
   const nextParam = next ? `?next=${encodeURIComponent(next)}` : "";

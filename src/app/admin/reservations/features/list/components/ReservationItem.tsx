@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useAppRouter } from "@/lib/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { displayRelativeTime } from "@/utils";
 import { GqlReservation } from "@/types/graphql";
@@ -13,7 +13,7 @@ interface ReservationItemProps {
 }
 
 export function ReservationItem({ reservation }: ReservationItemProps) {
-  const router = useRouter();
+  const router = useAppRouter();
   const { step, label, variant } = getReservationStatusMeta(reservation);
 
   const handleClick = () => {

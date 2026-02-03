@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { useRouter } from "next/navigation";
+import { useAppRouter } from "@/lib/navigation";
 import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import {
@@ -84,7 +84,7 @@ const operatorSettings = [
 ];
 
 export default function AdminPage() {
-  const router = useRouter();
+  const router = useAppRouter();
   const role = useAdminRole();
   const t = useTranslations();
   const communityConfig = useCommunityConfig();

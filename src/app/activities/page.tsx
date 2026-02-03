@@ -2,10 +2,10 @@
 
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useAppRouter } from "@/lib/navigation";
 
 export default function ActivitiesPage() {
-  const router = useRouter();
+  const router = useAppRouter();
   useEffect(() => {
     router.replace("/opportunities/search?type=activity");
   }, []);

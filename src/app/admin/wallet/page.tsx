@@ -8,12 +8,12 @@ import useHeaderConfig from "@/hooks/useHeaderConfig";
 import WalletCard from "@/components/shared/WalletCard";
 import { GqlMembership, GqlRole, GqlWallet, useGetCommunityWalletQuery } from "@/types/graphql";
 import { Coins, Gift } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
 import useCommunityTransactions from "@/app/admin/wallet/hooks/useCommunityTransactions";
 import { InfiniteTransactionList } from "@/shared/transactions/components/InfiniteTransactionList";
 import { logger } from "@/lib/logging";
-import { AppLink } from "@/lib/navigation";
+import { AppLink, useAppRouter } from "@/lib/navigation";
 import { toPointNumber } from "@/utils/bigint";
 import { useTranslations } from "next-intl";
 
@@ -25,7 +25,7 @@ export default function WalletPage() {
     (m: GqlMembership) => m.community?.id === communityId,
   )?.role;
 
-  const router = useRouter();
+  const router = useAppRouter();
   const searchParams = useSearchParams();
   const shouldRefresh = searchParams.get("refresh") === "true";
 

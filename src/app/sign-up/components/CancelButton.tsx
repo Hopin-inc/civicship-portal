@@ -1,16 +1,15 @@
 "use client";
 
 import { ChevronLeft } from "lucide-react";
-import { AppLink } from "@/lib/navigation";
+import { AppLink, useAppRouter } from "@/lib/navigation";
 import { lineAuth as auth } from "@/lib/auth/core/firebase-config";
 import { useCookies } from "next-client-cookies";
-import { useRouter } from "next/navigation";
 import { MouseEventHandler } from "react";
 import { useTranslations } from "next-intl";
 
 const CancelButton: React.FC = () => {
   const t = useTranslations();
-  const router = useRouter();
+  const router = useAppRouter();
   const cookies = useCookies();
 
   const cancel: MouseEventHandler = async (e) => {

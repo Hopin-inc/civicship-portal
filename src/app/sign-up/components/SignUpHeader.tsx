@@ -1,11 +1,10 @@
 "use client";
 
 import React from "react";
-import { AppLink } from "@/lib/navigation";
+import { AppLink, useAppRouter } from "@/lib/navigation";
 import { ChevronLeft } from "lucide-react";
 import { lineAuth as auth } from "@/lib/auth/core/firebase-config";
 import { useCookies } from "next-client-cookies";
-import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 
 /**
@@ -13,7 +12,7 @@ import { useTranslations } from "next-intl";
  */
 const SignUpHeader: React.FC = () => {
   const t = useTranslations();
-  const router = useRouter();
+  const router = useAppRouter();
   const cookies = useCookies();
 
   const handleCancel = async (e: React.MouseEvent) => {
