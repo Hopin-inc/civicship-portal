@@ -23,10 +23,6 @@ const EXCLUDED_PATH_PATTERNS = [
 
   // API ルート
   "/api/**",
-
-  // 静的ページ（コミュニティ非依存）
-  "/terms",
-  "/privacy",
 ];
 
 /**

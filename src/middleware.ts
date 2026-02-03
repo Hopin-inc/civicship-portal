@@ -12,8 +12,6 @@ import { ACTIVE_COMMUNITY_IDS } from "@/lib/communities/constants";
 const EXCLUDED_REDIRECT_PATTERNS = [
   "/community", // 既にパスベース形式
   "/api",       // API ルート
-  "/terms",     // 静的ページ
-  "/privacy",   // 静的ページ
   "/_next",     // Next.js 内部
   "/images",    // 静的アセット
   "/communities", // コミュニティアセット
