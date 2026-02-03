@@ -2,7 +2,7 @@
 
 import React from "react";
 import { SearchX } from "lucide-react";
-import Link from "next/link";
+import { AppLink } from "@/lib/navigation";
 import { Button } from "@/components/ui/button";
 
 interface EmptySearchResultsProps {
@@ -32,9 +32,9 @@ const EmptySearchResults: React.FC<EmptySearchResultsProps> = ({ searchQuery }) 
         </p>
 
         <div className="w-full px-[40px]">
-          <Link href="/search">
+          <AppLink href="/search">
             <Button className="w-full flex justify-center">検索条件を変更する</Button>
-          </Link>
+          </AppLink>
         </div>
       </div>
     </div>

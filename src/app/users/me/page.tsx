@@ -7,7 +7,7 @@ import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { GqlMembership, GqlRole } from "@/types/graphql";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useMemo } from "react";
-import Link from "next/link";
+import { AppLink } from "@/lib/navigation";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import { ArrowLeftRight } from "lucide-react";
@@ -32,12 +32,12 @@ export default function MyProfilePage() {
   const headerConfig = useMemo(
     () => ({
       action: hasAdminRole ? (
-        <Link href="/admin">
+        <AppLink href="/admin">
           <Button variant="tertiary" size="sm">
             {t("users.profileHeader.adminButton")}
             <ArrowLeftRight className="w-4 h-4 ml-1" />
           </Button>
-        </Link>
+        </AppLink>
       ) : undefined,
     }),
     [hasAdminRole, t],

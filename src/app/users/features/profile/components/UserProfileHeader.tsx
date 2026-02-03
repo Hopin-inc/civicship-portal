@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import Link from "next/link";
+import { AppLink } from "@/lib/navigation";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Facebook, Home, Instagram, Twitter } from "lucide-react";
 import { useReadMore } from "@/hooks/useReadMore";
@@ -51,7 +51,7 @@ export function UserProfileHeader({
           </div>
           {isOwner && (
             <div className="flex gap-2">
-              <Link
+              <AppLink
                 href="/users/me/setting"
                 className={cn(
                   buttonVariants({ variant: "tertiary", size: "md" }),
@@ -59,7 +59,7 @@ export function UserProfileHeader({
                 )}
               >
                 {t("users.profileHeader.settingsButton")}
-              </Link>
+              </AppLink>
             </div>
           )}
         </div>

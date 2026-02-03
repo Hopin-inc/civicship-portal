@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { AppLink } from "@/lib/navigation";
 import { Book, ClipboardList, Settings, Ticket } from "lucide-react";
 import { usePathname } from "next/navigation";
 import React from "react";
@@ -41,7 +41,7 @@ const AdminBottomBar: React.FC<AdminBottomBarProps> = ({ className }) => {
       <div className="max-w-screen-xl mx-auto px-4">
         <div className="flex justify-around items-center">
           {enabledFeatures.includes("opportunities") && (
-            <Link
+            <AppLink
               href="/admin/reservations"
               className={cn(
                 getLinkStyle("/admin/reservations", "/admin/reservations/*"),
@@ -50,19 +50,19 @@ const AdminBottomBar: React.FC<AdminBottomBarProps> = ({ className }) => {
             >
               <Book size={24} />
               <span className="text-xs mt-1">{t("navigation.adminBottomBar.reservations")}</span>
-            </Link>
+            </AppLink>
           )}
           {enabledFeatures.includes("tickets") && (
-            <Link
+            <AppLink
               href="/admin/tickets"
               className={cn(getLinkStyle("/admin/tickets", "/admin/tickets/*"), "flex-grow")}
             >
               <Ticket size={24} />
               <span className="text-xs mt-1">{t("navigation.adminBottomBar.tickets")}</span>
-            </Link>
+            </AppLink>
           )}
           {enabledFeatures.includes("credentials") && (
-            <Link
+            <AppLink
               href="/admin/credentials"
               className={cn(
                 getLinkStyle("/admin/credentials", "/admin/credentials/*"),
@@ -71,15 +71,15 @@ const AdminBottomBar: React.FC<AdminBottomBarProps> = ({ className }) => {
             >
               <ClipboardList size={24} />
               <span className="text-xs mt-1">{t("navigation.adminBottomBar.credentials")}</span>
-            </Link>
+            </AppLink>
           )}
-          <Link
+          <AppLink
             href="/admin"
             className={cn(getLinkStyle("/admin", "/admin/*"), "flex-grow")}
           >
             <Settings size={24} />
             <span className="text-xs mt-1">{t("navigation.adminBottomBar.settings")}</span>
-          </Link>
+          </AppLink>
         </div>
       </div>
     </nav>

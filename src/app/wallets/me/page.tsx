@@ -1,13 +1,13 @@
 import { WalletOverview } from "@/app/wallets/features/overview/WalletOverview";
 import { TransactionList } from "@/app/wallets/features/transactions/TransactionList";
 import { getServerMyWalletWithTransactions } from "@/app/wallets/features/shared/server/getServerMyWalletWithTransactions";
-import { redirect } from "next/navigation";
+import { appRedirect } from "@/lib/navigation/server";
 
 export default async function WalletMePage() {
   const { wallet, transactions } = await getServerMyWalletWithTransactions({ first: 20 });
 
   if (!wallet) {
-    redirect("/login");
+    await appRedirect("/login");
   }
 
   return (

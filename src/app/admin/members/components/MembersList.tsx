@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useAppRouter } from "@/lib/navigation";
 import { GqlRole, GqlUser } from "@/types/graphql";
 import {
   Table,
@@ -41,7 +41,7 @@ export function MembersList({
   loadMoreRef,
   onRoleChange,
 }: MembersListProps) {
-  const router = useRouter();
+  const router = useAppRouter();
   const [targetMember, setTargetMember] = useState<PresentedMember | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 

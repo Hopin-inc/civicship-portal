@@ -2,7 +2,7 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
+import { AppLink } from "@/lib/navigation";
 import { TransactionMessageCard } from "./timeline/TransactionMessageCard";
 
 interface TransactionCardBaseProps {
@@ -88,13 +88,13 @@ export const TransactionCardBase = ({
 
   if (transactionHref) {
     return (
-      <Link
+      <AppLink
         href={transactionHref}
         prefetch={false}
         className="block cursor-pointer hover:bg-zinc-50 rounded-lg transition-colors"
       >
         {cardContent}
-      </Link>
+      </AppLink>
     );
   }
 

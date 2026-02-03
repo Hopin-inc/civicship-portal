@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { AppLink } from "@/lib/navigation";
 import { Button } from "@/components/ui/button";
 import { Home } from "lucide-react";
 import React, { useEffect } from "react";
@@ -32,12 +32,12 @@ export default function EmptyState({
 
         <p className="text-left text-body-sm text-muted-foreground">{message}</p>
 
-        <Link href="/" passHref>
+        <AppLink href="/" passHref>
           <Button className="w-full flex justify-center mt-6">
             <Home className="mr-2 h-4 w-4" />
             トップページに戻る
           </Button>
-        </Link>
+        </AppLink>
       </div>
     </div>
   );

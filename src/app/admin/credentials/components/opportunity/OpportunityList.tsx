@@ -3,7 +3,7 @@ import { GqlSortDirection, useGetOpportunitiesQuery } from "@/types/graphql";
 import { OpportunityCard } from "./OpportunityCard";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { useSelection } from "../../context/SelectionContext";
-import { useRouter } from "next/navigation";
+import { useAppRouter } from "@/lib/navigation";
 import { Button } from "@/components/ui/button";
 import React, { useMemo, useState } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
@@ -27,7 +27,7 @@ export default function OpportunityList({ setStep }: { setStep: (step: number) =
   const { selectedSlot,setSelectedSlot } = useSelection();
   const [searchQuery, setSearchQuery] = useState("");
   const [input, setInput] = useState("");
-  const router = useRouter();
+  const router = useAppRouter();
 
   const headerConfig = useMemo(
     () => ({

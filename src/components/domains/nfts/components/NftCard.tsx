@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { AppLink } from "@/lib/navigation";
 import { SafeImage } from "@/components/ui/safe-image";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { Card } from "@/components/ui/card";
@@ -19,7 +19,7 @@ interface NftCardProps {
 
 export const NftCard = ({ nftInstance, isCarousel = false }: NftCardProps) => {
   return (
-    <Link
+    <AppLink
       key={nftInstance.id}
       href={`/nfts/${nftInstance.id}`}
       className={`relative w-full flex-shrink-0 ${isCarousel ? "max-w-[100px]" : ""}`}
@@ -41,6 +41,6 @@ export const NftCard = ({ nftInstance, isCarousel = false }: NftCardProps) => {
       <div className="mt-3">
         <h3 className="text-label-xs text-foreground line-clamp-1">{nftInstance.name}</h3>
       </div>
-    </Link>
+    </AppLink>
   );
 };

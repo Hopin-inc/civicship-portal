@@ -8,7 +8,7 @@ import EmptyState from "@/components/shared/EmptyState";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { Coins } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useAppRouter } from "@/lib/navigation";
 import { useFeatureCheck } from "@/hooks/useFeatureCheck";
 import { formatOpportunities } from "@/components/domains/opportunities/utils";
 import { useFetchFeedOpportunities } from "../hooks/useFetchFeedOpportunities";
@@ -18,7 +18,7 @@ export default function OpportunitiesFeed() {
   const { opportunities, loading, error, loadMoreRef, refetch } = useFetchFeedOpportunities();
   const config = useCommunityConfig();
   const communityId = config?.communityId ?? null;
-  const router = useRouter();
+  const router = useAppRouter();
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
     refetchRef.current = refetch;

@@ -2,7 +2,8 @@
 
 import React, { useEffect } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useAppRouter } from "@/lib/navigation";
 import { PortfolioTab } from "../../types";
 import { useTranslations } from "next-intl";
 
@@ -17,7 +18,7 @@ function isPortfolioTab(value: string | null): value is PortfolioTab {
 
 export function PortfolioTabs({ activeTab, setActiveTab }: PortfolioTabsProps) {
   const t = useTranslations();
-  const router = useRouter();
+  const router = useAppRouter();
   const searchParams = useSearchParams();
 
   useEffect(() => {

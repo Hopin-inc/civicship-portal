@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { useRouter } from "next/navigation";
+import { useAppRouter } from "@/lib/navigation";
 import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import {
@@ -19,7 +19,7 @@ import {
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { useAdminRole } from "@/app/admin/context/AdminRoleContext";
 import { GqlRole } from "@/types/graphql";
-import Link from "next/link";
+import { AppLink } from "@/lib/navigation";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 
@@ -84,7 +84,7 @@ const operatorSettings = [
 ];
 
 export default function AdminPage() {
-  const router = useRouter();
+  const router = useAppRouter();
   const role = useAdminRole();
   const t = useTranslations();
   const communityConfig = useCommunityConfig();
@@ -95,12 +95,12 @@ export default function AdminPage() {
       showBackButton: false,
       showLogo: false,
       action: (
-        <Link href="/users/me">
+        <AppLink href="/users/me">
           <Button variant="tertiary" size="sm">
             {t("navigation.adminHeader.toUserScreen")}
             <ArrowLeftRight className="w-4 h-4 ml-1" />
           </Button>
-        </Link>
+        </AppLink>
       ),
     }),
     [t],

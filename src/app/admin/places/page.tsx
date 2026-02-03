@@ -3,12 +3,12 @@
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PlaceList } from "./features/list/components/PlaceList";
-import { useRouter } from "next/navigation";
+import { useAppRouter } from "@/lib/navigation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useMemo } from "react";
 
 export default function PlacesPage() {
-  const router = useRouter();
+  const router = useAppRouter();
 
   const headerConfig = useMemo(
     () => ({

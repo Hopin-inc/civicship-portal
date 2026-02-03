@@ -1,6 +1,7 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
+import { useAppRouter } from "@/lib/navigation";
 import { useMemo, useRef } from "react";
 import { useGetOpportunityQuery } from "@/types/graphql";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
@@ -12,7 +13,7 @@ import { presentOpportunityForEdit } from "../../features/editor/presenters/pres
 
 export default function EditOpportunityPage() {
   const params = useParams();
-  const router = useRouter();
+  const router = useAppRouter();
   const { communityId } = useCommunityConfig();
   const opportunityId = params.id as string;
 

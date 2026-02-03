@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useAppRouter } from "@/lib/navigation";
 import { ActivitySlot } from "@/app/reservation/data/type/opportunitySlot";
 import { buildReservationParams } from "@/app/reservation/data/presenter/opportunitySlot";
 
@@ -16,7 +16,7 @@ export const useReservationDateHandler = ({
   selectedGuests: number;
   setSelectedDate: (value: string) => void;
 }) => {
-  const router = useRouter();
+  const router = useAppRouter();
 
   const handleReservation = useCallback(
     (slot: ActivitySlot) => {

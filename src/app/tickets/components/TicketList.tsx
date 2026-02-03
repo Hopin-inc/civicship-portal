@@ -5,7 +5,7 @@ import { Ticket as TicketIcon } from "lucide-react";
 import { TicketClaimLink } from "@/app/tickets/data/type";
 import React from "react";
 import { PLACEHOLDER_IMAGE } from "@/utils";
-import Link from "next/link";
+import { AppLink } from "@/lib/navigation";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -43,12 +43,12 @@ export default function TicketList({ tickets }: TicketListProps) {
               </div>
             </div>
           </div>
-          <Link
+          <AppLink
             href={ `/search/result?type=activity&q=${ encodeURIComponent(ticket.hostName) }&useTicket=true` }
             className={ cn(buttonVariants({ variant: "secondary", size: "md" }), "w-full") }
           >
             体験を探す
-          </Link>
+          </AppLink>
         </div>
       )) }
     </div>

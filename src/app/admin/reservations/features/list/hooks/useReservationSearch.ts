@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from "react";
 import { useForm } from "react-hook-form";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useAppRouter } from "@/lib/navigation";
 import { GqlReservation } from "@/types/graphql";
 
 export type SearchFormValues = {
@@ -8,7 +9,7 @@ export type SearchFormValues = {
 };
 
 export const useReservationSearch = (reservations: GqlReservation[]) => {
-  const router = useRouter();
+  const router = useAppRouter();
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get("q") || "";
 

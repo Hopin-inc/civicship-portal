@@ -2,7 +2,7 @@
 
 import { OpportunityList } from "./features/list/components/OpportunityList";
 import { useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useAppRouter } from "@/lib/navigation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ import { GqlPublishStatus } from "@/types/graphql";
 import { Plus } from "lucide-react";
 
 export default function OpportunitiesPage() {
-  const router = useRouter();
+  const router = useAppRouter();
 
   const headerConfig = useMemo(
     () => ({

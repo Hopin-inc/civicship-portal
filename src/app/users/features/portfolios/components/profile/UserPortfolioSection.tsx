@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useAppRouter } from "@/lib/navigation";
 import { AppPortfolio } from "@/app/users/features/shared/types";
 import { ActiveOpportunitiesSection } from "./ActiveOpportunitiesSection";
 import { PortfolioGrid } from "../ui/PortfolioGrid";
@@ -30,7 +30,7 @@ export function UserPortfolioSection({
   const t = useTranslations();
   const lastPortfolioRef = useRef<HTMLDivElement>(null);
   const showEmptyState = portfolios.length === 0;
-  const router = useRouter();
+  const router = useAppRouter();
 
   const activeOpportunityCards = presentActiveOpportunityCards(activeOpportunities);
   const portfolioViewModels = portfolios.map((p) => presentPortfolioCard(p));

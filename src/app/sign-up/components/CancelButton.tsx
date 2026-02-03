@@ -1,16 +1,15 @@
 "use client";
 
 import { ChevronLeft } from "lucide-react";
-import Link from "next/link";
+import { AppLink, useAppRouter } from "@/lib/navigation";
 import { lineAuth as auth } from "@/lib/auth/core/firebase-config";
 import { useCookies } from "next-client-cookies";
-import { useRouter } from "next/navigation";
 import { MouseEventHandler } from "react";
 import { useTranslations } from "next-intl";
 
 const CancelButton: React.FC = () => {
   const t = useTranslations();
-  const router = useRouter();
+  const router = useAppRouter();
   const cookies = useCookies();
 
   const cancel: MouseEventHandler = async (e) => {
@@ -21,10 +20,10 @@ const CancelButton: React.FC = () => {
   };
 
   return (
-    <Link href="/public" onClick={cancel} className="inline-flex ul-link">
+    <AppLink href="/" onClick={cancel} className="inline-flex ul-link">
       <ChevronLeft />
       {t("auth.signup.backToTop")}
-    </Link>
+    </AppLink>
   );
 };
 

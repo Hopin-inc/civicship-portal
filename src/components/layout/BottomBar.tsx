@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { AppLink } from "@/lib/navigation";
 import { Globe, Home, Search, User } from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
 import React from "react";
@@ -68,7 +68,7 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
       <div className="max-w-screen-xl mx-auto px-4">
         <div className="flex justify-around items-center">
           {hasOppOrQuest ? (
-            <Link
+            <AppLink
               href="/opportunities"
               className={cn(
                 getLinkStyle("/opportunities", "/opportunities/*", "opportunities/search/*"),
@@ -77,29 +77,29 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
             >
               <Search size={24} />
               <span className="text-xs mt-1">{t("navigation.bottomBar.discover")}</span>
-            </Link>
+            </AppLink>
           ) : (
-            <Link
+            <AppLink
               href="/transactions"
               className={cn(getLinkStyle("/transactions", "/transactions/*"), "flex-grow")}
             >
               <Home size={24} />
               <span className="text-xs mt-1">{t("navigation.bottomBar.timeline")}</span>
-            </Link>
+            </AppLink>
           )}
           {communityConfig?.enableFeatures?.includes("places") && (
-            <Link href="/places" className={cn(getLinkStyle("/places", "/places/*"), "flex-grow")}>
+            <AppLink href="/places" className={cn(getLinkStyle("/places", "/places/*"), "flex-grow")}>
               <Globe size={24} />
               <span className="text-xs mt-1">{t("navigation.bottomBar.places")}</span>
-            </Link>
+            </AppLink>
           )}
-          <Link
+          <AppLink
             href="/users/me"
             className={cn(getLinkStyle("/users/me", "/users/me/*"), "flex-grow")}
           >
             <User size={24} />
             <span className="text-xs mt-1">{t("navigation.bottomBar.myPage")}</span>
-          </Link>
+          </AppLink>
         </div>
       </div>
     </nav>

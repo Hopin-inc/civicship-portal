@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useAppRouter } from "@/lib/navigation";
 import { buildSearchResultParams, formatDateRange } from "@/app/search/data/presenter";
 import SearchTabs, { SearchTabType } from "@/app/search/components/Tabs";
 import { SearchFilterType } from "@/app/search/hooks/useSearch";
@@ -26,7 +26,7 @@ interface SearchModalProps {
 export default function SearchModal({ isOpen, onClose, type }: SearchModalProps) {
   const t = useTranslations();
   const locale = useLocale();
-  const router = useRouter();
+  const router = useAppRouter();
   const shouldShowQuests = useFeatureCheck("quests");
 
   const defaultTab: SearchTabType = shouldShowQuests && type === "quest" ? "quest" : "activity";

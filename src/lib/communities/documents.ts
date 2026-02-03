@@ -1,7 +1,7 @@
 import "server-only";
-import { redirect } from "next/navigation";
 import { getLocale } from "next-intl/server";
 import type { CommunityDocumentConfig } from "@/lib/communities/config";
+import { appRedirect } from "@/lib/navigation/server";
 
 /**
  * Type alias for backward compatibility
@@ -21,6 +21,7 @@ export async function handleExternalDocumentRedirect(
   if (document && document.type === "external") {
     const locale = await getLocale();
     const path = document.path.replace(/{locale}/g, locale);
-    redirect(path);
+    // External paths should skip path resolution
+    await appRedirect(path, { skipPathResolution: true });
   }
 }

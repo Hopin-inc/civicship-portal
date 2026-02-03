@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { AppLink } from "@/lib/navigation";
 import { Button } from "@/components/ui/button";
 import { Home, AlertCircle } from "lucide-react";
 import React, { useEffect } from "react";
@@ -40,10 +40,10 @@ export default function NotFound() {
         </EmptyHeader>
         <EmptyContent>
           <Button asChild className="w-full">
-            <Link href={rootPath}>
+            <AppLink href={rootPath}>
               <Home className="mr-2 h-4 w-4" />
               トップに戻る
-            </Link>
+            </AppLink>
           </Button>
         </EmptyContent>
       </Empty>

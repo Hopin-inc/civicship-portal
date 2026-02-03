@@ -1,8 +1,9 @@
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useAppRouter } from "@/lib/navigation";
 
 export function usePlaceQueryActions() {
   const searchParams = useSearchParams();
-  const router = useRouter();
+  const router = useAppRouter();
 
   const updateParams = (updater: (params: URLSearchParams) => void) => {
     const params = new URLSearchParams(searchParams.toString());

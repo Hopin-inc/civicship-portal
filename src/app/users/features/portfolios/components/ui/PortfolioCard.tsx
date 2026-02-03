@@ -1,6 +1,6 @@
 import { Calendar, MapPin, ShieldCheck } from "lucide-react";
 import { SafeImage } from "@/components/ui/safe-image";
-import Link from "next/link";
+import { AppLink } from "@/lib/navigation";
 import { RefObject } from "react";
 import { ParticipantsList } from "@/components/shared/ParticipantsList";
 import { PortfolioCardViewModel } from "../../presenters/viewModels";
@@ -16,7 +16,7 @@ type PortfolioCardProps = {
 export const PortfolioCard = ({ viewModel, isLast, lastRef }: PortfolioCardProps) => {
   const t = useTranslations();
   return (
-    <Link href={viewModel.linkHref} className="block w-full">
+    <AppLink href={viewModel.linkHref} className="block w-full">
       <div
         ref={isLast ? lastRef : undefined}
         className="rounded-lg overflow-hidden hover:opacity-90 transition-opacity"
@@ -80,6 +80,6 @@ export const PortfolioCard = ({ viewModel, isLast, lastRef }: PortfolioCardProps
           </div>
         </div>
       </div>
-    </Link>
+    </AppLink>
   );
 };

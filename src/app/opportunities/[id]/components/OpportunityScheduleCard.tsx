@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
+import { AppLink } from "@/lib/navigation";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
@@ -179,11 +179,11 @@ const renderAvailableSlotCard = (
                   定員まで残り{slot.remainingCapacity}名
                 </span>
               )}
-            <Link href={href} className="w-full">
+            <AppLink href={href} className="w-full">
               <Button variant="primary" size="md" className="w-full">
                 この日程を選択
               </Button>
-            </Link>
+            </AppLink>
           </>
         ) : (
           <Button disabled variant="tertiary" size="md" className="w-full">
