@@ -8,7 +8,8 @@ import { User } from "firebase/auth";
 import { LiffService } from "@/lib/auth/service/liff-service";
 import { AuthEnvironment } from "@/lib/auth/core/environment-detector";
 import { logger } from "@/lib/logging";
-import { CommunityPortalConfig, getCommunityIdFromEnv } from "@/lib/communities/config";
+import { CommunityPortalConfig } from "@/lib/communities/config";
+import { getCommunityIdClient } from "@/lib/community/get-community-id-client";
 
 /**
  * 1️⃣ 認証前の初期状態を設定
@@ -167,7 +168,15 @@ export async function evaluateUserRegistrationState(
   authStateManager: AuthStateManager,
 ): Promise<boolean> {
   const hasPhoneIdentity = !!user.identities?.some((i) => i.platform?.toUpperCase() === "PHONE");
-  const communityId = getCommunityIdFromEnv();
+  const communityId = getCommunityIdClient();
+
+  logger.debug("[evaluateUserRegistrationState] Checking membership", {
+    communityId,
+    userId: user.id,
+    hasPhoneIdentity,
+    membershipsCount: user.memberships?.length ?? 0,
+    component: "evaluateUserRegistrationState",
+  });
 
   const hasMembershipInCurrentCommunity = !!user.memberships?.some(
     (m) => m.community?.id === communityId,

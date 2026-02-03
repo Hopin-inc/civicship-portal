@@ -4,7 +4,7 @@ import React, { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { Item } from "@/components/ui/item";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { COMMUNITY_ID } from "@/lib/communities/metadata";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { useGetFailedIncentiveGrantsQuery, useGetSignupBonusConfigQuery } from "@/types/graphql";
 import { cn } from "@/lib/utils";
 import FailedBonusItem from "../components/FailedBonusItem";
@@ -15,13 +15,17 @@ import { Button } from "@/components/ui/button";
 
 export default function SignupBonusDetailPage() {
   const t = useTranslations();
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId;
 
   const { data, loading, error, refetch } = useGetSignupBonusConfigQuery({
-    variables: { communityId: COMMUNITY_ID },
+    variables: { communityId: communityId ?? "" },
+    skip: !communityId,
   });
 
   const { data: failedData, refetch: refetchFailed } = useGetFailedIncentiveGrantsQuery({
-    variables: { communityId: COMMUNITY_ID },
+    variables: { communityId: communityId ?? "" },
+    skip: !communityId,
     // user が null のアイテムがある場合でも、エラーを無視して利用可能なデータを返す
     errorPolicy: "all",
   });
