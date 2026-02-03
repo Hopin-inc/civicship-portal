@@ -1,6 +1,6 @@
 "use client";
 
-import { TransactionCard } from "@/app/transactions/components/TransactionCard";
+import { TransactionCard } from "@/app/community/[communityId]/transactions/components/TransactionCard";
 import { GqlTransactionsConnection } from "@/types/graphql";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { useInfiniteTransactions } from "@/hooks/transactions/useInfiniteTransactions";

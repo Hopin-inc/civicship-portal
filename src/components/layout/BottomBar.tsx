@@ -94,7 +94,7 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
             </AppLink>
           )}
           <AppLink
-            href="/users/me"
+            href="/community/[communityId]/users/me"
             className={cn(getLinkStyle("/users/me", "/users/me/*"), "flex-grow")}
           >
             <User size={24} />
