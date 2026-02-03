@@ -98,8 +98,8 @@ function splitPath(path: string): {
  * resolvePath("/settings", "community-a") // => "/settings"
  *
  * // IS_PATH_BASED_MODE = true の場合
- * resolvePath("/settings", "community-a") // => "/c/community-a/settings"
- * resolvePath("/", "community-a") // => "/c/community-a"
+ * resolvePath("/settings", "community-a") // => "/community/community-a/settings"
+ * resolvePath("/", "community-a") // => "/community/community-a"
  * resolvePath("/api/users", "community-a") // => "/api/users" (除外対象)
  */
 export function resolvePath(
@@ -124,11 +124,11 @@ export function resolvePath(
     ? pathname
     : `/${pathname}`;
 
-  // /c/communityId プレフィックスを付与
+  // /community/communityId プレフィックスを付与
   const resolvedPathname =
     normalizedPathname === "/"
-      ? `/c/${communityId}`
-      : `/c/${communityId}${normalizedPathname}`;
+      ? `/community/${communityId}`
+      : `/community/${communityId}${normalizedPathname}`;
 
   return resolvedPathname + queryAndHash;
 }

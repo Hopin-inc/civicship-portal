@@ -36,7 +36,7 @@
  *
  * 2. PR 2.0: フラグを有効化してパスベースルーティングに移行
  *    - `NEXT_PUBLIC_ENABLE_PATH_BASED_ROUTING=true`
- *    - パスが自動的に `/c/{communityId}/...` 形式に変換される
+ *    - パスが自動的に `/community/{communityId}/...` 形式に変換される
  */
 
 // Client-side components and hooks

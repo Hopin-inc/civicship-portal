@@ -52,12 +52,12 @@ describe("path-resolver", () => {
       // these tests demonstrate the expected behavior documentation rather than
       // live testing. The actual behavior requires module re-import.
 
-      it.skip("should add /c/{communityId} prefix to paths", async () => {
+      it.skip("should add /community/{communityId} prefix to paths", async () => {
         const { resolvePath: resolvePathFresh } = await import(
           "../path-resolver"
         );
         expect(resolvePathFresh("/settings", "community-a")).toBe(
-          "/c/community-a/settings"
+          "/community/community-a/settings"
         );
       });
 
@@ -65,7 +65,7 @@ describe("path-resolver", () => {
         const { resolvePath: resolvePathFresh } = await import(
           "../path-resolver"
         );
-        expect(resolvePathFresh("/", "community-a")).toBe("/c/community-a");
+        expect(resolvePathFresh("/", "community-a")).toBe("/community/community-a");
       });
     });
 
