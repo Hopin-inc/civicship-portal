@@ -4,8 +4,10 @@ import { TransactionCard } from "@/app/transactions/components/TransactionCard";
 import { GqlTransactionsConnection } from "@/types/graphql";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { useInfiniteTransactions } from "@/hooks/transactions/useInfiniteTransactions";
-import { getServerCommunityTransactionsWithCursor } from "@/hooks/transactions/server-community-transactions";
-import { getServerWalletTransactionsWithCursor } from "@/hooks/transactions/server-wallet-transactions";
+import {
+  fetchMoreCommunityTransactions,
+  fetchMoreWalletTransactions,
+} from "@/hooks/transactions/actions";
 import { getCounterpartyImage, getFromWalletImage } from "@/shared/transactions/utils/images";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
@@ -30,8 +32,9 @@ export const InfiniteTransactionList = ({
 
   const fetchMore = walletId
     ? (cursor?: string, first: number = 20) =>
-      getServerWalletTransactionsWithCursor(walletId, cursor, first)
-    : (cursor?: string, first: number = 20) => getServerCommunityTransactionsWithCursor(communityIdFromConfig ?? "", cursor, first);
+      fetchMoreWalletTransactions(walletId, cursor, first)
+    : (cursor?: string, first: number = 20) =>
+      fetchMoreCommunityTransactions(communityIdFromConfig ?? "", cursor, first);
 
   const { transactions, hasNextPage, loading, loadMoreRef } = useInfiniteTransactions({
     initialTransactions,
