@@ -25,7 +25,7 @@ const SignUpHeader: React.FC = () => {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background border-b max-w-mobile-l mx-auto w-full h-16 flex items-center px-4">
       <AppLink
-        href="/public"
+        href="/"
         onClick={handleCancel}
         className="absolute left-4 inline-flex items-center text-muted-foreground hover:text-foreground"
       >

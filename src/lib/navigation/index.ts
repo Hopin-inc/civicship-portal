@@ -40,7 +40,7 @@
  */
 
 // Client-side components and hooks
-export { AppLink, default as Link } from "./AppLink";
+export { AppLink } from "./AppLink";
 export { useAppRouter } from "./useAppRouter";
 
 // Path resolution utilities (can be used on both client and server)

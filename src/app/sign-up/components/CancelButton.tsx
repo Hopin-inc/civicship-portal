@@ -20,7 +20,7 @@ const CancelButton: React.FC = () => {
   };
 
   return (
-    <AppLink href="/public" onClick={cancel} className="inline-flex ul-link">
+    <AppLink href="/" onClick={cancel} className="inline-flex ul-link">
       <ChevronLeft />
       {t("auth.signup.backToTop")}
     </AppLink>

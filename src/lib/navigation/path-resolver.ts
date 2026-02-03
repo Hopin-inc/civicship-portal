@@ -111,11 +111,6 @@ export function resolvePath(
     return path;
   }
 
-  // 除外対象のパスはそのまま返す
-  if (isExcludedPath(path)) {
-    return path;
-  }
-
   // クエリパラメータとハッシュを分離
   const { pathname, queryAndHash } = splitPath(path);
 
@@ -123,6 +118,12 @@ export function resolvePath(
   const normalizedPathname = pathname.startsWith("/")
     ? pathname
     : `/${pathname}`;
+
+  // 除外対象のパスはそのまま返す
+  // 元のパス（favicon.ico等）と正規化後のパス（/login等）の両方でチェック
+  if (isExcludedPath(path) || isExcludedPath(normalizedPathname)) {
+    return path;
+  }
 
   // /community/communityId プレフィックスを付与
   const resolvedPathname =
