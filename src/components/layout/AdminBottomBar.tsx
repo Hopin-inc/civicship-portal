@@ -42,7 +42,7 @@ const AdminBottomBar: React.FC<AdminBottomBarProps> = ({ className }) => {
         <div className="flex justify-around items-center">
           {enabledFeatures.includes("opportunities") && (
             <AppLink
-              href="/community/[communityId]/admin/reservations"
+              href="/admin/reservations"
               className={cn(
                 getLinkStyle("/admin/reservations", "/admin/reservations/*"),
                 "flex-grow",
@@ -54,7 +54,7 @@ const AdminBottomBar: React.FC<AdminBottomBarProps> = ({ className }) => {
           )}
           {enabledFeatures.includes("tickets") && (
             <AppLink
-              href="/community/[communityId]/admin/tickets"
+              href="/admin/tickets"
               className={cn(getLinkStyle("/admin/tickets", "/admin/tickets/*"), "flex-grow")}
             >
               <Ticket size={24} />
@@ -63,7 +63,7 @@ const AdminBottomBar: React.FC<AdminBottomBarProps> = ({ className }) => {
           )}
           {enabledFeatures.includes("credentials") && (
             <AppLink
-              href="/community/[communityId]/admin/credentials"
+              href="/admin/credentials"
               className={cn(
                 getLinkStyle("/admin/credentials", "/admin/credentials/*"),
                 "flex-grow",
