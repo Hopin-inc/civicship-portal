@@ -95,7 +95,7 @@ export default function AdminPage() {
       showBackButton: false,
       showLogo: false,
       action: (
-        <AppLink href="/community/[communityId]/users/me">
+        <AppLink href="/users/me">
           <Button variant="tertiary" size="sm">
             {t("navigation.adminHeader.toUserScreen")}
             <ArrowLeftRight className="w-4 h-4 ml-1" />

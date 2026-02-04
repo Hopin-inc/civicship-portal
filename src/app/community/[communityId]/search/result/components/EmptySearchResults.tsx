@@ -32,7 +32,7 @@ const EmptySearchResults: React.FC<EmptySearchResultsProps> = ({ searchQuery }) 
         </p>
 
         <div className="w-full px-[40px]">
-          <AppLink href="/community/[communityId]/search">
+          <AppLink href="/search">
             <Button className="w-full flex justify-center">検索条件を変更する</Button>
           </AppLink>
         </div>

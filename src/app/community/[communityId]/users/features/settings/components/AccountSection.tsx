@@ -62,7 +62,7 @@ export default function AccountSection() {
                     <span className="text-label-sm text-red-500">{t("users.account.didFailed")}</span>
                   </div>
                   <Button variant="outline" size="sm" asChild className="h-6 px-2 text-xs">
-                    <AppLink href="/community/[communityId]/users/me/reverify-phone">{t("users.account.reverifyPhone")}</AppLink>
+                    <AppLink href="/users/me/reverify-phone">{t("users.account.reverifyPhone")}</AppLink>
                   </Button>
                 </div>
               ) : (

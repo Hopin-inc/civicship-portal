@@ -65,7 +65,7 @@ export function UserTicketsAndPoints({ ticketCount, pointCount, canNavigate = tr
         </MaybeLink>
       )}
       {communityConfig?.enableFeatures?.includes("points") && pointCount !== undefined && (
-        <MaybeLink canNavigate={canNavigate} href="/community/[communityId]/wallets/me">
+        <MaybeLink canNavigate={canNavigate} href="/wallets/me">
           {pointContent}
         </MaybeLink>
       )}

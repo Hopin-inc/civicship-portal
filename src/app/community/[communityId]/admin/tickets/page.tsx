@@ -61,7 +61,7 @@ export default function TicketsPage() {
         </div>
         <p className="text-body-sm text-muted-foreground">
           発行するチケットの種類は
-          <AppLink href="/community/[communityId]/admin/tickets/utilities"
+          <AppLink href="/admin/tickets/utilities"
                 className="text-primary hover:text-primary-hover underline">こちら</AppLink>
           から確認・追加できます。
         </p>

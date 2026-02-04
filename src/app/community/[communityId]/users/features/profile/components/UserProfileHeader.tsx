@@ -52,7 +52,7 @@ export function UserProfileHeader({
           {isOwner && (
             <div className="flex gap-2">
               <AppLink
-                href="/community/[communityId]/users/me/setting"
+                href="/users/me/setting"
                 className={cn(
                   buttonVariants({ variant: "tertiary", size: "md" }),
                   "ml-auto text-black",

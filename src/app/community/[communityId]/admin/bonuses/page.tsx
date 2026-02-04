@@ -74,7 +74,7 @@ export default function BonusesPage() {
       <div className="flex flex-col">
         {/* 新規加入特典 */}
         <Item asChild>
-          <AppLink href="/community/[communityId]/admin/bonuses/signup" className="flex flex-1 gap-3">
+          <AppLink href="/admin/bonuses/signup" className="flex flex-1 gap-3">
             <div className="flex flex-1 flex-col min-w-0">
               <ItemContent>
                 <ItemTitle className="font-bold text-base leading-snug flex items-center gap-2">

@@ -21,7 +21,7 @@ export default function SettingSection() {
             <span className="font-bold text-sm">{t("users.settings.profileLabel")}</span>
           </div>
           <AppLink
-            href="/community/[communityId]/users/me/edit"
+            href="/users/me/edit"
             className={cn(
               buttonVariants({ variant: "tertiary", size: "sm" }),
               "ml-auto text-black w-24",

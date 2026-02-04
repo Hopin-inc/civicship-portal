@@ -118,7 +118,7 @@ export default function SignupBonusDetailPage() {
               {t("adminWallet.settings.signupBonus.details.seeTransactions")}
             </div>
             <Button variant="text" size="sm" asChild>
-              <AppLink href="/community/[communityId]/admin/wallet">
+              <AppLink href="/admin/wallet">
                 {t("adminWallet.settings.signupBonus.details.viewWallet")}
               </AppLink>
             </Button>
