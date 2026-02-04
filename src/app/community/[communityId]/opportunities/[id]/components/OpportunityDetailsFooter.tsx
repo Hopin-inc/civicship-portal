@@ -50,7 +50,7 @@ export const OpportunityDetailsFooter: React.FC<OpportunityDetailsFooterProps> =
     }
 
     return (
-      <AppLink href={`/src/app/community/%5BcommunityId%5D/reservation/select-date?${query.toString()}`}>
+      <AppLink href={`/reservation/select-date?${query.toString()}`}>
         <Button variant="primary" size="lg" className="px-8">
           日付を選択
         </Button>

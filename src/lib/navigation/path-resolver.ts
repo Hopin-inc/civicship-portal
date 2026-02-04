@@ -101,6 +101,11 @@ export function resolvePath(
     ? pathname
     : `/${pathname}`;
 
+  // 既に /community/ で始まるパスは二重処理しない
+  if (normalizedPathname.startsWith("/community/")) {
+    return path;
+  }
+
   // 除外対象のパスはそのまま返す
   // 元のパス（favicon.ico等）と正規化後のパス（/terms等）の両方でチェック
   if (isExcludedPath(path) || isExcludedPath(normalizedPathname)) {

@@ -14,7 +14,7 @@ interface PlaceCardProps {
 }
 
 const PlaceCard: React.FC<PlaceCardProps> = ({ place, selected, buttonVariant = "tertiary" }) => (
-  <AppLink href={`/src/app/community/%5BcommunityId%5D/places/${place.id}`}>
+  <AppLink href={`/places/${place.id}`}>
     <Card
       className={`w-full overflow-hidden transition-transform duration-200 ${
         selected ? "scale-[1.02]" : "scale-100"

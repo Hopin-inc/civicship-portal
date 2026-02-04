@@ -60,7 +60,7 @@ export const ScheduleSection = ({
                 ))}
               </div>
               {visibleSlots.length > 2 && (
-                <Link href={`/src/app/community/%5BcommunityId%5D/reservation/select-date?${query.toString()}`}>
+                <Link href={`/reservation/select-date?${query.toString()}`}>
                   <Button variant="secondary" size="md" className="w-full">
                     参加できる日程を探す
                   </Button>

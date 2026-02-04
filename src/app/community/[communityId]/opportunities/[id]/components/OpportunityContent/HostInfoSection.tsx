@@ -13,7 +13,7 @@ export const HostInfoSection = ({ host, hostLabel }: { host: OpportunityHost, ho
         <div className="rounded-xl flex flex-col gap-4">
           <div className="flex items-center gap-4">
             {host.id ? (
-              <AppLink href={`/src/app/community/%5BcommunityId%5D/users/${host.id}`} className="flex-shrink-0">
+              <AppLink href={`/users/${host.id}`} className="flex-shrink-0">
                 <Avatar className="w-16 h-16 mt-1">
                   <AvatarImage src={host.image ?? PLACEHOLDER_IMAGE} alt={host.name || "案内人"} />
                   <AvatarFallback>{host.name?.[0] || "U"}</AvatarFallback>

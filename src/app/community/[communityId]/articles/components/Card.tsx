@@ -20,7 +20,7 @@ interface ArticleCardProps {
 
 const ArticleCard: React.FC<ArticleCardProps> = ({ article, showCategory, showUser }) => {
   return (
-    <AppLink href={`/src/app/community/%5BcommunityId%5D/articles/${article.id}`} className="block">
+    <AppLink href={`/articles/${article.id}`} className="block">
       <Card className="bg-white">
         {article.thumbnail && (
           <div className="relative w-full h-48">

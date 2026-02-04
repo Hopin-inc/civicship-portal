@@ -44,7 +44,7 @@ const TicketReceiveActionButton: React.FC<TicketReceiveActionButtonProps> = ({
   } else {
     return (
       <AppLink
-        href={`/src/app/community/%5BcommunityId%5D/search/result?type=activity&q=${encodeURIComponent(ownerName)}&useTicket=true`}
+        href={`/search/result?type=activity&q=${encodeURIComponent(ownerName)}&useTicket=true`}
         className={buttonVariants({ variant: "secondary", size: "lg" })}
       >
         体験を探す

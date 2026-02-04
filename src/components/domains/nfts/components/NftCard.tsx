@@ -21,7 +21,7 @@ export const NftCard = ({ nftInstance, isCarousel = false }: NftCardProps) => {
   return (
     <AppLink
       key={nftInstance.id}
-      href={`/src/app/community/%5BcommunityId%5D/nfts/${nftInstance.id}`}
+      href={`/nfts/${nftInstance.id}`}
       className={`relative w-full flex-shrink-0 ${isCarousel ? "max-w-[100px]" : ""}`}
     >
       <Card className="w-full h-[100px] overflow-hidden relative">

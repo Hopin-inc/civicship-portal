@@ -116,7 +116,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, nextPath }) =>
             </Button>
           ) : (
             <AppLink
-              href={`/src/app/community/%5BcommunityId%5D/sign-up/phone-verification?next=${encodeURIComponentWithType(nextPath ?? null)}`}
+              href={`/sign-up/phone-verification?next=${encodeURIComponentWithType(nextPath ?? null)}`}
               className={cn(buttonVariants({ variant: "primary", size: "lg" }), "w-full")}
             >
               ユーザー登録に進む

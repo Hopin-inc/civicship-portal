@@ -44,7 +44,7 @@ export default function TicketList({ tickets }: TicketListProps) {
             </div>
           </div>
           <AppLink
-            href={ `/src/app/community/%5BcommunityId%5D/search/result?type=activity&q=${encodeURIComponent(ticket.hostName)}&useTicket=true` }
+            href={ `/search/result?type=activity&q=${encodeURIComponent(ticket.hostName)}&useTicket=true` }
             className={ cn(buttonVariants({ variant: "secondary", size: "md" }), "w-full") }
           >
             体験を探す
