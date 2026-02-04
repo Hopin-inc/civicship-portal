@@ -15,6 +15,7 @@ import { CommunityConfigProvider } from "@/contexts/CommunityConfigContext";
 import { CommunityPortalConfig, getCommunityConfig } from "@/lib/communities/config";
 import { DEFAULT_ASSET_PATHS } from "@/lib/communities/constants";
 import { isProduction } from "@/lib/environment";
+import { logger } from "@/lib/logging";
 
 interface CommunityLayoutProps {
   children: React.ReactNode;
@@ -98,9 +99,9 @@ const CommunityLayout = async ({ children, params }: CommunityLayoutProps) => {
       isFromDatabase = true;
     }
   } catch (error) {
-    console.error(
-      `[CommunityConfig] Failed to fetch config for ${communityId} from database:`,
-      error,
+    logger.error(
+      `[CommunityConfig] Failed to fetch config for ${communityId} from database`,
+      { error: error instanceof Error ? error.message : String(error) },
     );
   }
 
