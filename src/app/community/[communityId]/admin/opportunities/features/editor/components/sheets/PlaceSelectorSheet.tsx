@@ -24,7 +24,8 @@ export function PlaceSelectorSheet({
   selectedPlaceId,
   onSelectPlace,
 }: PlaceSelectorSheetProps) {
-  const { communityId } = useCommunityConfig();
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId ?? "";
   
   // クエリはSheetが開いている時のみ実行
   const { data, loading } = useGetPlacesQuery({

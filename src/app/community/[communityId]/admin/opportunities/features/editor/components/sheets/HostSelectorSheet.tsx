@@ -28,7 +28,8 @@ export function HostSelectorSheet({
   selectedHostId,
   onSelectHost,
 }: HostSelectorSheetProps) {
-  const { communityId } = useCommunityConfig();
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId ?? "";
   
   // クエリはSheetが開いている時のみ実行
   const { data, loading } = useGetMembershipListQuery({

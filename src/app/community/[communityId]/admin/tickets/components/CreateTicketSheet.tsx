@@ -41,7 +41,8 @@ export default function CreateTicketSheet({ onTicketCreated }: CreateTicketSheet
 
   const router = useAppRouter();
   const { user } = useAuth();
-  const { communityId } = useCommunityConfig();
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId ?? "";
 
   const [issueTicket] = useTicketIssueMutation();
 

@@ -23,7 +23,8 @@ const STEP_COLORS = {
 
 export default function OpportunityList({ setStep }: { setStep: (step: number) => void }) {
   const { user } = useAuth();
-  const { communityId } = useCommunityConfig();
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId ?? "";
   const { selectedSlot,setSelectedSlot } = useSelection();
   const [searchQuery, setSearchQuery] = useState("");
   const [input, setInput] = useState("");

@@ -15,7 +15,8 @@ import OpportunityListSheet from "./components/OpportunityListSheet";
 import { Coins, MessageSquareText, Tickets } from "lucide-react";
 
 export default function UtilitiesPage() {
-  const { communityId } = useCommunityConfig();
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId ?? "";
   const headerConfig = useMemo(
     () => ({
       title: "チケットの種類",

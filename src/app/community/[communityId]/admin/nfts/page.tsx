@@ -8,7 +8,8 @@ import { NftList } from "./components/NftList";
 import { NftItemData } from "./components/NftItem";
 
 export default function AdminNftsPage() {
-  const { communityId } = useCommunityConfig();
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId ?? "";
   const headerConfig = useMemo(
     () => ({
       title: "NFT一覧",

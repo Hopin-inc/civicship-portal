@@ -19,7 +19,8 @@ import { useTranslations } from "next-intl";
 
 export default function WalletPage() {
   const t = useTranslations();
-  const { communityId } = useCommunityConfig();
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId ?? "";
   const { user: currentUser } = useAuth();
   const currentUserRole = currentUser?.memberships?.find(
     (m: GqlMembership) => m.community?.id === communityId,

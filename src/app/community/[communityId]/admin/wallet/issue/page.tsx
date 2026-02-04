@@ -17,7 +17,8 @@ const INT_LIMIT = 2000000000;
 
 export default function IssuePointPage() {
   const t = useTranslations();
-  const { communityId } = useCommunityConfig();
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId ?? "";
   const router = useAppRouter();
 
   const headerConfig = useMemo(

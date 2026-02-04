@@ -22,7 +22,8 @@ import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 export default function DonatePointPageClient() {
   const t = useTranslations();
   const { user } = useAuth();
-  const { communityId } = useCommunityConfig();
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId ?? "";
   const searchParams = useSearchParams();
   const currentPoint = BigInt(searchParams.get("currentPoint") ?? "0");
   const [activeTab, setActiveTab] = useState<Tabs>(Tabs.History);

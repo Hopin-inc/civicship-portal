@@ -14,7 +14,8 @@ import { presentOpportunityForEdit } from "../../features/editor/presenters/pres
 export default function EditOpportunityPage() {
   const params = useParams();
   const router = useAppRouter();
-  const { communityId } = useCommunityConfig();
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId ?? "";
   const opportunityId = params.id as string;
 
   const refetchRef = useRef<(() => void) | null>(null);

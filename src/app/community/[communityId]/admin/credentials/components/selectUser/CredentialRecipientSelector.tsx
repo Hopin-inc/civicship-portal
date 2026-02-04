@@ -99,7 +99,8 @@ export default function CredentialRecipientSelector({
   setStep,
   initialConnection,
 }: CredentialRecipientSelectorProps) {
-  const { communityId } = useCommunityConfig();
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId ?? "";
   const { selectedSlot, setSelectedSlot, participatedUsers } = useSelection();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useAppRouter();

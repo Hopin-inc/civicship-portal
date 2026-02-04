@@ -21,7 +21,8 @@ const EMPTY_MEMBERS: [] = [];
 
 export default function MembersPageClient({ initialConnection }: MembersPageClientProps) {
   const { user: currentUser } = useAuth();
-  const { communityId } = useCommunityConfig();
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId ?? "";
   const [searchQuery, setSearchQuery] = useState("");
   const [input, setInput] = useState("");
 

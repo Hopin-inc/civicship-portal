@@ -30,7 +30,8 @@ export default function GrantPageClient({ initialConnection }: GrantPageClientPr
   const t = useTranslations();
   const router = useAppRouter();
   const track = useAnalytics();
-  const { communityId } = useCommunityConfig();
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId ?? "";
 
   const searchParams = useSearchParams();
   const currentPoint = BigInt(searchParams.get("currentPoint") ?? "0");

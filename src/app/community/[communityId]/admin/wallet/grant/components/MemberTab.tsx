@@ -18,7 +18,8 @@ interface MemberTabProps {
 
 export function MemberTab({ members, searchQuery, onSelect, initialConnection }: MemberTabProps) {
   const t = useTranslations();
-  const { communityId } = useCommunityConfig();
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId ?? "";
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
   const {

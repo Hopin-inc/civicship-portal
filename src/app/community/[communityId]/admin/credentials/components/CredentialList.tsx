@@ -28,7 +28,8 @@ function getIssuanceStats(evaluations: any[]) {
 
 export default function CredentialList() {
   const router = useAppRouter();
-  const { communityId } = useCommunityConfig();
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId ?? "";
   const { data, loading, error } = useGetEvaluationsQuery({
     variables: { 
       filter: { communityId },

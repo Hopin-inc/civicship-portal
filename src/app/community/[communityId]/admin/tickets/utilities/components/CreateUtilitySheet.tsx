@@ -41,7 +41,8 @@ export default function CreateUtilitySheet({ buttonLabel, onUtilityCreated }: Cr
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { user } = useAuth();
-  const { communityId } = useCommunityConfig();
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId ?? "";
   const [createUtility] = useCreateUtilityMutation();
 
   const { data: opportunityData, loading: opportunitiesLoading } = useGetOpportunitiesQuery({
