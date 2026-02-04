@@ -22,7 +22,6 @@ interface OpportunityDetailsContentProps {
   opportunity: ActivityDetail | QuestDetail;
   availableDates: (ActivitySlot | QuestSlot)[];
   sameStateActivities: ActivityCard[] | QuestCard[];
-  communityId?: string;
 }
 
 const getTitle = (category: GqlOpportunityCategory): {title: string, hostLabel: string} => {
@@ -40,7 +39,6 @@ export const OpportunityDetailsContent = ({
   opportunity,
   availableDates,
   sameStateActivities,
-  communityId = "",
 }: OpportunityDetailsContentProps) => {
   const bodyText = opportunity.description + "\n\n" + opportunity.body;
   return (
@@ -53,7 +51,6 @@ export const OpportunityDetailsContent = ({
       <ScheduleSection
         slots={availableDates}
         opportunityId={opportunity.id}
-        communityId={communityId}
         place={isActivityCategory(opportunity) ? opportunity.feeRequired : null}
         points={isQuestCategory(opportunity) ? opportunity.pointsToEarn : null}
         pointsRequired={isActivityCategory(opportunity) ? opportunity.pointsRequired : null}

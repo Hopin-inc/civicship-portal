@@ -34,7 +34,7 @@ export default function ConfirmPage() {
 
   const { user, isAuthenticated } = useAuth();
   const router = useAppRouter();
-  const { opportunityId, slotId, participantCount: initialParticipantCount, communityId } = useReservationParams();
+  const { opportunityId, slotId, participantCount: initialParticipantCount } = useReservationParams();
 
   const [participantCount, setParticipantCount] = useState<number>(initialParticipantCount);
   const [selectedPointCount, setSelectedPointCount] = useState(0);
@@ -135,7 +135,6 @@ export default function ConfirmPage() {
     const participationCount = result.reservation.participations?.length ?? 1;
     const query = new URLSearchParams({
       id: opportunityId,
-      community_id: communityId ?? "",
       reservation_id: result.reservation.id,
       guests: participationCount.toString(),
     });
@@ -177,7 +176,6 @@ export default function ConfirmPage() {
       onConfirm={handleConfirm}
       validation={validation}
       creatingReservation={creatingReservation}
-      communityId={communityId}
     />
   );
 }

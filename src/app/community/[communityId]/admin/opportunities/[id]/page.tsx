@@ -78,7 +78,6 @@ export default function AdminOpportunityDetailPage() {
             opportunity={opportunity}
             availableDates={opportunity.slots || []}
             sameStateActivities={[]}
-            communityId=""
           />
         </div>
       </main>

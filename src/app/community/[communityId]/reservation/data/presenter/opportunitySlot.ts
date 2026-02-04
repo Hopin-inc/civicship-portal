@@ -129,13 +129,11 @@ export const isSlotAvailable = (slot: ActivitySlot, selectedGuests: number): boo
 
 export const buildReservationParams = (
   opportunityId: string,
-  communityId: string,
   slot: ActivitySlot,
   selectedGuests: number,
 ): URLSearchParams => {
   return new URLSearchParams({
     id: opportunityId,
-    community_id: communityId,
     slot_id: slot.id,
     guests: selectedGuests.toString(),
   });

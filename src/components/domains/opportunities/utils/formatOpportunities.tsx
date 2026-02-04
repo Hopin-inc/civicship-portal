@@ -8,7 +8,7 @@ export const formatOpportunities = (opportunity: ActivityCard | QuestCard): Form
     
     return {
       ...opportunity,
-      href: getLink(opportunity.id, opportunity.communityId, opportunity.category),
+      href: getLink(opportunity.id, opportunity.category),
       price: shouldHidePrice ? undefined : (isActivityCategory(opportunity) ? opportunity.feeRequired : null),
       badge: selectBadge(opportunity.hasReservableTicket, opportunity.pointsRequired) ?? undefined,
       image: opportunity.images?.[0],

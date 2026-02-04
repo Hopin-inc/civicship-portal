@@ -12,7 +12,6 @@ import { ExpectedPoints } from "@/app/community/[communityId]/reservation/confir
 import { PaymentSummary } from "@/app/community/[communityId]/reservation/confirm/components/payment/PaymentSummary";
 import { ActivityDetail, QuestDetail, isActivityCategory, isQuestCategory } from "@/components/domains/opportunities/types";
 import { AvailableTicket } from "@/app/community/[communityId]/reservation/confirm/presenters/presentReservationConfirm";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 export interface ConfirmPageViewProps {
   user: GqlCurrentUserPayload["user"] | null;
@@ -60,7 +59,6 @@ export interface ConfirmPageViewProps {
     disabledReason: string | null;
   };
   creatingReservation: boolean;
-  communityId?: string | null;
 }
 
 export default function ConfirmPageView(props: ConfirmPageViewProps) {
@@ -94,7 +92,6 @@ export default function ConfirmPageView(props: ConfirmPageViewProps) {
     onConfirm,
     validation,
     creatingReservation,
-    communityId,
   } = props;
 
   const {
@@ -106,9 +103,6 @@ export default function ConfirmPageView(props: ConfirmPageViewProps) {
     isPointsOnly,
     hasInsufficientPoints,
   } = calculations;
-
-  const { communityId: configCommunityId } = useCommunityConfig();
-  const resolvedCommunityId = communityId ?? configCommunityId;
 
   const getButtonText = () => {
     if (creatingReservation) return "申込処理中...";
@@ -138,7 +132,7 @@ export default function ConfirmPageView(props: ConfirmPageViewProps) {
             title: opportunity.title,
             feeRequired,
             category: opportunity.category,
-            communityId: resolvedCommunityId,
+            communityId: "",
             images: opportunity.images,
             location: opportunity.place?.name ?? "",
             hasReservableTicket: maxTickets > 0,

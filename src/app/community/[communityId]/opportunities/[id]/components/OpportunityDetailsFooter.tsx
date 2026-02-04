@@ -3,7 +3,6 @@
 import React from "react";
 import { AppLink } from "@/lib/navigation";
 import { Button } from "@/components/ui/button";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { useAuthEnvironment } from "@/hooks/useAuthEnvironment";
 import { cn } from "@/lib/utils";
 
@@ -14,7 +13,6 @@ interface OpportunityDetailsFooterProps {
   price: number | null;
   point: number | null;
   pointsRequired?: number | null;
-  communityId: string | undefined;
   disableReason?: DisableReasonType;
 }
 
@@ -29,13 +27,10 @@ export const OpportunityDetailsFooter: React.FC<OpportunityDetailsFooterProps> =
   price,
   point,
   pointsRequired,
-  communityId,
   disableReason,
 }) => {
-  const { communityId: configCommunityId } = useCommunityConfig();
   const query = new URLSearchParams({
     id: opportunityId,
-    community_id: communityId ?? configCommunityId,
   });
 
   const { isLiffClient } = useAuthEnvironment();

@@ -9,21 +9,18 @@ import { Button } from "@/components/ui/button";
 export const ScheduleSection = ({
     slots,
     opportunityId,
-    communityId,
     place,
     points,
     pointsRequired,
   }: {
     slots: (ActivitySlot | QuestSlot)[];
     opportunityId: string;
-    communityId: string;
     place?:number | null;
     points?:number | null;
     pointsRequired?:number | null;
   }) => {
     const query = new URLSearchParams({
       id: opportunityId,
-      community_id: communityId ?? "",
     });
     const visibleSlots = useMemo(
       () =>
@@ -51,7 +48,6 @@ export const ScheduleSection = ({
                     <OpportunityScheduleCard
                       slot={slot}
                       opportunityId={opportunityId}
-                      communityId={communityId}
                       place={place}
                       points={points}
                       pointsRequired={pointsRequired}

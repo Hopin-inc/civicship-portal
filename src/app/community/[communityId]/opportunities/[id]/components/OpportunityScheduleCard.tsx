@@ -11,7 +11,6 @@ import { getCrossDayLabel } from "@/utils/date";
 interface OpportunityScheduleCardProps {
   slot: ActivitySlot | QuestSlot;
   opportunityId: string;
-  communityId: string;
   place?:number | null;
   points?:number | null;
   pointsRequired?:number | null;
@@ -20,7 +19,6 @@ interface OpportunityScheduleCardProps {
 export const OpportunityScheduleCard: React.FC<OpportunityScheduleCardProps> = ({
   slot,
   opportunityId,
-  communityId,
   place,
   points,
   pointsRequired,
@@ -28,7 +26,7 @@ export const OpportunityScheduleCard: React.FC<OpportunityScheduleCardProps> = (
   const isFull = slot.remainingCapacity === 0;
   return isFull
     ? renderFullSlotCard(slot, place, points, pointsRequired)
-    : renderAvailableSlotCard(slot, opportunityId, communityId, place, points, pointsRequired);
+    : renderAvailableSlotCard(slot, opportunityId, place, points, pointsRequired);
 };
 
 const renderFullSlotCard = (slot: ActivitySlot | QuestSlot, price?:number | null, points?:number | null, pointsRequired?:number | null) => {
@@ -99,7 +97,6 @@ const renderFullSlotCard = (slot: ActivitySlot | QuestSlot, price?:number | null
 const renderAvailableSlotCard = (
   slot: ActivitySlot | QuestSlot,
   opportunityId: string,
-  communityId: string,
   price?:number | null,
   points?:number | null,
   pointsRequired?:number | null,
@@ -110,7 +107,6 @@ const renderAvailableSlotCard = (
 
   const query = new URLSearchParams({
     id: opportunityId,
-    community_id: communityId,
     slot_id: slot.id,
     guests: String(slot.applicantCount),
   });

@@ -89,7 +89,7 @@ export default function CredentialsDetailPage({ params }: { params: Promise<{ id
       value: opportunity?.title ?? "",
       showExternalLink: true,
       externalLink: {
-        url: `/activities/${opportunity?.id}?community_id=${opportunity?.community?.id}`,
+        url: `/opportunities/${opportunity?.id}?type=activity`,
         text: "詳細を見る"
       }
     },

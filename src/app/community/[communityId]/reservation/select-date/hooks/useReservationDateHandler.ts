@@ -5,13 +5,11 @@ import { buildReservationParams } from "@/app/community/[communityId]/reservatio
 
 export const useReservationDateHandler = ({
   opportunityId,
-  communityId,
   selectedDate,
   selectedGuests,
   setSelectedDate,
 }: {
   opportunityId: string;
-  communityId: string;
   selectedDate: string | null;
   selectedGuests: number;
   setSelectedDate: (value: string) => void;
@@ -31,10 +29,10 @@ export const useReservationDateHandler = ({
         setSelectedDate(dateLabel);
       }
 
-      const params = buildReservationParams(opportunityId, communityId, slot, selectedGuests);
+      const params = buildReservationParams(opportunityId, slot, selectedGuests);
       router.push(`/reservation/confirm?${params.toString()}`);
     },
-    [opportunityId, communityId, selectedGuests, selectedDate, setSelectedDate, router],
+    [opportunityId, selectedGuests, selectedDate, setSelectedDate, router],
   );
 
   return {

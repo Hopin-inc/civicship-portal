@@ -57,10 +57,9 @@ export function presentReservationDetailRows({
 
   // 募集タイトル（リンク）
   if (opportunity) {
-    const communityId = opportunity.community?.id;
     const opportunityLink = isQuest
-      ? `/quests/${opportunity.id}${communityId ? `?community_id=${communityId}` : ""}`
-      : `/activities/${opportunity.id}${communityId ? `?community_id=${communityId}` : ""}`;
+      ? `/opportunities/${opportunity.id}?type=quest`
+      : `/opportunities/${opportunity.id}?type=activity`;
 
     rows.push({
       key: "opportunity",

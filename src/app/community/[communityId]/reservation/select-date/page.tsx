@@ -33,7 +33,6 @@ export default function SelectDatePage() {
 
   const searchParams = useSearchParams();
   const opportunityId = searchParams.get("id");
-  const communityId = searchParams.get("community_id");
 
   const { opportunity, groupedSlots, loading, error, refetch } = useReservationDateLoader({
     opportunityId: opportunityId ?? "",
@@ -55,7 +54,6 @@ export default function SelectDatePage() {
 
   const { handleReservation, isSlotAvailable } = useReservationDateHandler({
     opportunityId: opportunityId ?? "",
-    communityId: communityId ?? "",
     selectedDate,
     selectedGuests,
     setSelectedDate,

@@ -62,7 +62,7 @@ export default function CredentialList(props: OpportunityListProps) {
       value: data?.participation?.opportunitySlot?.opportunity?.title ?? "",
       showExternalLink: true,
       externalLink: {
-        url: `/activities/${data?.participation?.opportunitySlot?.opportunity?.id}?community_id=${data?.participation?.opportunitySlot?.opportunity?.community?.id}`,
+        url: `/opportunities/${data?.participation?.opportunitySlot?.opportunity?.id}?type=activity`,
         text: "詳細を見る"
       },
     },

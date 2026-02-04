@@ -6,7 +6,6 @@ export const useReservationParams = () => {
   return useMemo(
     () => ({
       opportunityId: searchParams.get("id") ?? "",
-      communityId: searchParams.get("community_id") ?? "",
       slotId: searchParams.get("slot_id") ?? "",
       participantCount: parseInt(searchParams.get("guests") ?? "1", 10),
     }),
