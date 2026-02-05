@@ -2,8 +2,7 @@
 
 import React, { useEffect } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useSearchParams } from "next/navigation";
-import { useAppRouter } from "@/lib/navigation";
+import { useSearchParams, usePathname, useRouter } from "next/navigation";
 import { PortfolioTab } from "../../types";
 import { useTranslations } from "next-intl";
 
@@ -18,7 +17,8 @@ function isPortfolioTab(value: string | null): value is PortfolioTab {
 
 export function PortfolioTabs({ activeTab, setActiveTab }: PortfolioTabsProps) {
   const t = useTranslations();
-  const router = useAppRouter();
+  const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -33,7 +33,7 @@ export function PortfolioTabs({ activeTab, setActiveTab }: PortfolioTabsProps) {
       setActiveTab(value);
       const params = new URLSearchParams(searchParams.toString());
       params.set("tab", value);
-      router.push(`?${params.toString()}`, { scroll: false });
+      router.push(`${pathname}?${params.toString()}`, { scroll: false });
     }
   };
 
