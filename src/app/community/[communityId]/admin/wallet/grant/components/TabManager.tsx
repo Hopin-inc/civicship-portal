@@ -3,8 +3,8 @@
 import React, { useEffect } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tabs as TabsEnum } from "../types/tabs";
-import { useSearchParams } from "next/navigation";
-import { useAppRouter } from "@/lib/navigation";
+import { useSearchParams, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
 
@@ -15,7 +15,8 @@ interface TabManagerProps {
 
 export function TabManager({ activeTab, setActiveTab }: TabManagerProps) {
   const t = useTranslations();
-  const router = useAppRouter();
+  const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -30,7 +31,8 @@ export function TabManager({ activeTab, setActiveTab }: TabManagerProps) {
     setActiveTab(newTab);
     const params = new URLSearchParams(searchParams.toString());
     params.set("tab", newTab);
-    router.push(`?${params.toString()}`, { scroll: false });
+    // Use native router with full pathname to avoid path resolution issues
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
   return (
