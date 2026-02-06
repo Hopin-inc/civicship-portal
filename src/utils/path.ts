@@ -16,6 +16,18 @@ export const decodeURIComponentWithType = <T extends EncodedURIComponent | null>
   return decodeURIComponent(param) as DecodeResult<T>;
 };
 
+/**
+ * Normalize pathname by removing /community/{communityId} prefix
+ * e.g., /community/neo88/admin -> /admin
+ */
+export const normalizePathname = (pathname: string): string => {
+  const match = pathname.match(/^\/community\/[a-zA-Z0-9-]+(.*)$/);
+  if (match) {
+    return match[1] || "/";
+  }
+  return pathname;
+};
+
 export const matchPaths = (pathname: string, ...pathPatterns: string[]) => {
   const pathOnly = pathname.split(/[?#]/, 1)[0];
   return pathPatterns.some((path) => micromatch.isMatch(pathOnly, path));
