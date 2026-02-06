@@ -2,15 +2,15 @@
 
 import { useState, useMemo } from "react";
 import { useAppRouter } from "@/lib/navigation";
-import { buildSearchResultParams, formatDateRange } from "@/app/search/data/presenter";
-import SearchTabs, { SearchTabType } from "@/app/search/components/Tabs";
-import { SearchFilterType } from "@/app/search/hooks/useSearch";
+import { buildSearchResultParams, formatDateRange } from "@/app/community/[communityId]/search/data/presenter";
+import SearchTabs, { SearchTabType } from "@/app/community/[communityId]/search/components/Tabs";
+import { SearchFilterType } from "@/app/community/[communityId]/search/hooks/useSearch";
 import { prefectureOptions } from "@/shared/prefectures/constants";
-import { useSearchForm } from "@/app/search/hooks/useSearchForm";
-import SearchForm from "@/app/search/components/SearchForm";
-import SearchFilters from "@/app/search/components/SearchFilters";
-import SearchFooter from "@/app/search/components/Footer";
-import SearchFilterSheets from "@/app/search/components/SearchFilterSheet";
+import { useSearchForm } from "@/app/community/[communityId]/search/hooks/useSearchForm";
+import SearchForm from "@/app/community/[communityId]/search/components/SearchForm";
+import SearchFilters from "@/app/community/[communityId]/search/components/SearchFilters";
+import SearchFooter from "@/app/community/[communityId]/search/components/Footer";
+import SearchFilterSheets from "@/app/community/[communityId]/search/components/SearchFilterSheet";
 import { useFeatureCheck } from "@/hooks/useFeatureCheck";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";

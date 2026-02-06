@@ -13,11 +13,11 @@ export const selectBadge = (hasReservableTicket: boolean | null, pointsRequired:
   }
 }
 
-export const getLink = (id: string, communityId: string, category: GqlOpportunityCategory) => {
+export const getLink = (id: string, category: GqlOpportunityCategory) => {
   if (category === GqlOpportunityCategory.Activity) {
-    return `/opportunities/${id}?community_id=${communityId}&type=activity`;
+    return `/opportunities/${id}?type=activity`;
   } else if (category === GqlOpportunityCategory.Quest) {
-    return `/opportunities/${id}?community_id=${communityId}&type=quest`;
+    return `/opportunities/${id}?type=quest`;
   }
   return "";
 }

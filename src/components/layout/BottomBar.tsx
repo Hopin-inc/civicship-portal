@@ -5,7 +5,7 @@ import { Globe, Home, Search, User } from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
 import React from "react";
 import { cn } from "@/lib/utils";
-import { matchPaths } from "@/utils/path";
+import { matchPaths, normalizePathname } from "@/utils/path";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
 import { useAuthEnvironment } from "@/hooks/useAuthEnvironment";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
@@ -17,7 +17,8 @@ interface HeaderProps {
 
 const BottomBar: React.FC<HeaderProps> = ({ className }) => {
   const t = useTranslations();
-  const pathname = usePathname();
+  const rawPathname = usePathname();
+  const pathname = normalizePathname(rawPathname);
   const searchParams = useSearchParams();
   const placeId = searchParams.get("placeId");
   const communityConfig = useCommunityConfig();

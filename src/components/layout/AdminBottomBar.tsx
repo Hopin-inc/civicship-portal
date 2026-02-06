@@ -5,7 +5,7 @@ import { Book, ClipboardList, Settings, Ticket } from "lucide-react";
 import { usePathname } from "next/navigation";
 import React from "react";
 import { cn } from "@/lib/utils";
-import { matchPaths } from "@/utils/path";
+import { matchPaths, normalizePathname } from "@/utils/path";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { useTranslations } from "next-intl";
 
@@ -15,7 +15,8 @@ interface AdminBottomBarProps {
 
 const AdminBottomBar: React.FC<AdminBottomBarProps> = ({ className }) => {
   const t = useTranslations();
-  const pathname = usePathname();
+  const rawPathname = usePathname();
+  const pathname = normalizePathname(rawPathname);
   const communityConfig = useCommunityConfig();
   const enabledFeatures = communityConfig?.enableFeatures ?? [];
 

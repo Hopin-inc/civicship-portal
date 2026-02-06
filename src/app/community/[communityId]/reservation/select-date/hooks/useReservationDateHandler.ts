@@ -1,0 +1,43 @@
+import { useCallback } from "react";
+import { useAppRouter } from "@/lib/navigation";
+import { ActivitySlot } from "@/app/community/[communityId]/reservation/data/type/opportunitySlot";
+import { buildReservationParams } from "@/app/community/[communityId]/reservation/data/presenter/opportunitySlot";
+
+export const useReservationDateHandler = ({
+  opportunityId,
+  selectedDate,
+  selectedGuests,
+  setSelectedDate,
+}: {
+  opportunityId: string;
+  selectedDate: string | null;
+  selectedGuests: number;
+  setSelectedDate: (value: string) => void;
+}) => {
+  const router = useAppRouter();
+
+  const handleReservation = useCallback(
+    (slot: ActivitySlot) => {
+      if (!selectedDate) {
+        const date = new Date(slot.startsAt);
+        const dateLabel = date.toLocaleDateString("ja-JP", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          weekday: "long",
+        });
+        setSelectedDate(dateLabel);
+      }
+
+      const params = buildReservationParams(opportunityId, slot, selectedGuests);
+      router.push(`/reservation/confirm?${params.toString()}`);
+    },
+    [opportunityId, selectedGuests, selectedDate, setSelectedDate, router],
+  );
+
+  return {
+    handleReservation,
+    isSlotAvailable: (slot: ActivitySlot) =>
+      slot.remainingCapacity != null && slot.remainingCapacity >= selectedGuests,
+  };
+};

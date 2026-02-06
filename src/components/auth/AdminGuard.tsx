@@ -9,7 +9,7 @@ import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { GqlMembership, GqlRole } from "@/types/graphql";
 import { AuthRedirectService } from "@/lib/auth/service/auth-redirect-service";
 import { logger } from "@/lib/logging";
-import { AdminRoleContext } from "@/app/admin/context/AdminRoleContext";
+import { AdminRoleContext } from "@/app/community/[communityId]/admin/context/AdminRoleContext";
 import { AccessPolicy } from "@/lib/auth/core/access-policy";
 
 interface AdminGuardProps {

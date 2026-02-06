@@ -45,8 +45,8 @@ const OpportunityInfo: React.FC<OpportunityInfoProps> = ({
   );
   const link =
     opportunity.category === GqlOpportunityCategory.Quest
-      ? `/quests/${opportunity.id}?community_id=${opportunity.communityId}`
-      : `/activities/${opportunity.id}?community_id=${opportunity.communityId}`;
+      ? `/opportunities/${opportunity.id}?type=quest`
+      : `/opportunities/${opportunity.id}?type=activity`;
 
   return (
     <div
