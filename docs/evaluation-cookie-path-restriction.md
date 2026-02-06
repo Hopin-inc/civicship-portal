@@ -204,6 +204,29 @@ Cookie path 制限の目的がコミュニティ間のセッション分離で�
 | MiddlewareでのCookieチェック | **問題なし** | Middlewareは認証チェックを行わない |
 | localStorageとの整合性 | **問題なし** | 現時点ではcommunityId依存のキーは不要 |
 
-**最終判定: No-Go**
+**最終判定: No-Go（Cookie path 制限の場合）**
 
 ログアウト時のCookie削除が不可能になる問題は致命的であり、この修正なしでの Cookie path 制限導入は推奨しません。上記「必須修正」の3項目を対応した上で再評価してください。代替案Aの方がフロントエンド修正コストが低く、推奨です。
+
+---
+
+## 補足: PR 3 で採用された方針（バックエンド論理隔離）
+
+上記評価を踏まえ、PR 3 では以下の方針が採用されました：
+
+- **Cookie の `path` は `"/"` を維持**（フロントエンドの破壊的変更を回避）
+- **Cookie 名 `__session` も維持**
+- **バックエンド側でテナント隔離を論理的に実施**:
+  - `handleFirebaseAuth` でセッションCookieのテナントIDと `X-Community-Id` から特定されるテナントIDの一致を検証
+  - `handleSessionLogin` で `auth.tenantManager().authForTenant(tenantId)` を使用してテナント固有のセッションCookieを発行
+
+### フロントエンド側の対応（本PR）
+
+バックエンドのテナント隔離を有効にするため、以下のフロントエンド修正を実施：
+
+| # | ファイル | 修正内容 |
+|---|---|---|
+| 1 | `src/app/api/sessionLogin/route.ts` | ミドルウェアが設定する `x-community-id` ヘッダーをバックエンドへ転送 |
+| 2 | `src/app/api/sessionLogout/route.ts` | `x-community-id` の監査ログ出力を追加 |
+| 3 | `src/lib/auth/init/helper.ts` | クライアント側 `createSession` で `X-Community-Id` ヘッダーを送信 |
+| 4 | `src/lib/apollo.ts` | Apollo エラーリンクに "Tenant mismatch" エラー検知を追加 |

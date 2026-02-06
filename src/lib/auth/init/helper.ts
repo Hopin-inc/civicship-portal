@@ -106,9 +106,17 @@ export async function establishSessionFromFirebaseUser(
 }
 
 async function createSession(idToken: string) {
+  const communityId = getCommunityIdClient();
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  if (communityId) {
+    headers["X-Community-Id"] = communityId;
+  }
+
   const res = await fetch("/api/sessionLogin", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify({ idToken }),
     credentials: "include",
   });

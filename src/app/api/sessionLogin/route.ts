@@ -7,13 +7,23 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Missing idToken" }, { status: 400 });
   }
 
+  // ミドルウェアが設定した x-community-id を取得してバックエンドへ転送
+  const communityId = request.headers.get("x-community-id");
+
   const apiEndpoint = process.env.NEXT_PUBLIC_API_ENDPOINT!;
   const apiBase = apiEndpoint.replace(/\/graphql\/?$/, "");
 
   try {
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+    if (communityId) {
+      headers["X-Community-Id"] = communityId;
+    }
+
     const res = await fetch(`${apiBase}/sessionLogin`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers,
       body: JSON.stringify({ idToken }),
       credentials: "include",
     });

@@ -105,7 +105,8 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
         error.message.includes("Authentication required") ||
         error.message.includes("Invalid token") ||
         error.message.includes("Token expired") ||
-        error.message.includes("Unauthorized")
+        error.message.includes("Unauthorized") ||
+        error.message.includes("Tenant mismatch")
       ) {
         if (typeof window !== "undefined") {
           window.dispatchEvent(
