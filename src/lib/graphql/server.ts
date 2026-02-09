@@ -92,15 +92,31 @@ export async function executeServerGraphQLQuery<
     (key) => key.toLowerCase() === "x-community-id"
   );
   const communityId = communityIdKey ? resolvedHeaders[communityIdKey] : undefined;
+
+  // クエリ名を抽出 (例: "query CommunityPortalConfig" → "CommunityPortalConfig")
+  const queryNameMatch = query.match(/(?:query|mutation)\s+(\w+)/);
+  const queryName = queryNameMatch?.[1] ?? query.substring(0, 60);
+
+  const communityIdSource = Object.keys(providedHeaders).some(
+    (key) => key.toLowerCase() === "x-community-id"
+  )
+    ? "provided"
+    : communityId
+      ? "auto-resolved"
+      : "missing";
+
   if (!communityId) {
     logger.warn("[executeServerGraphQLQuery] No X-Community-Id in headers", {
-      query: query.substring(0, 100),
+      queryName,
+      communityIdSource,
+      hasCookie: Object.keys(resolvedHeaders).some((k) => k.toLowerCase() === "cookie"),
       component: "executeServerGraphQLQuery",
     });
   } else {
-    logger.debug("[executeServerGraphQLQuery] Request with communityId", {
+    logger.info("[executeServerGraphQLQuery] Request", {
       communityId,
-      query: query.substring(0, 100),
+      queryName,
+      communityIdSource,
       component: "executeServerGraphQLQuery",
     });
   }

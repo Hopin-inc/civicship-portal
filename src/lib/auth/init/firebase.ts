@@ -9,15 +9,35 @@ export async function initializeFirebase(
   environment: AuthEnvironment,
   tenantId?: string | null,
 ): Promise<User | null> {
+  logger.info("[initializeFirebase] Starting", {
+    environment,
+    tenantId,
+    tenantIdType: typeof tenantId,
+    component: "initializeFirebase",
+  });
+
   if (environment === AuthEnvironment.LIFF) {
     try {
       await liffService.initialize();
       const liffState = liffService.getState();
+
+      logger.info("[initializeFirebase] LIFF state after init", {
+        isLoggedIn: liffState.isLoggedIn,
+        isInitialized: liffState.isInitialized,
+        hasError: !!liffState.error,
+        tenantId,
+        component: "initializeFirebase",
+      });
+
       if (liffState.isLoggedIn) {
         try {
           await liffService.signInWithLiffToken(tenantId);
         } catch (signInErr) {
-          logger.warn("LIFF sign-in with token failed", { err: signInErr });
+          logger.warn("LIFF sign-in with token failed", {
+            err: signInErr instanceof Error ? signInErr.message : String(signInErr),
+            tenantId,
+            component: "initializeFirebase",
+          });
         }
       }
     } catch (initErr) {

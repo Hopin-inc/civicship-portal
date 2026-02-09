@@ -39,17 +39,22 @@ interface CommunityConfigProviderProps {
 export function CommunityConfigProvider({ children, config, isFromDatabase }: CommunityConfigProviderProps) {
   // Zustand store に communityId を同期
   useEffect(() => {
+    const storeBefore = useCommunityStore.getState().state.communityId;
+
     if (config?.communityId) {
-      logger.debug("[CommunityConfigProvider] Syncing communityId to store", {
+      logger.info("[CommunityConfigProvider] Syncing communityId to store", {
         communityId: config.communityId,
         isFromDatabase,
+        storeStateBefore: storeBefore,
+        firebaseTenantId: config.firebaseTenantId,
         component: "CommunityConfigProvider",
       });
       useCommunityStore.getState().setCommunityId(config.communityId, "ssr");
     } else {
-      logger.warn("[CommunityConfigProvider] No communityId in config", {
+      logger.warn("[CommunityConfigProvider] No communityId in config — store not synced", {
         hasConfig: !!config,
         isFromDatabase,
+        storeStateBefore: storeBefore,
         component: "CommunityConfigProvider",
       });
     }

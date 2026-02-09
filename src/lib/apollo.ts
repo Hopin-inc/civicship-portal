@@ -70,14 +70,22 @@ const requestLink = setContext(async (operation, prevContext) => {
   // Community ID の取得（Client Side のみ）
   const communityId = isBrowser ? getCommunityIdClient() : null;
 
-  logger.debug("[Apollo] Request context", {
-    operationName: operation.operationName,
-    communityId,
-    isBrowser,
-    hasToken: !!token,
-    authMode,
-    component: "ApolloRequestLink",
-  });
+  if (isBrowser && !communityId) {
+    logger.warn("[Apollo] X-Community-Id is empty on client-side request", {
+      operationName: operation.operationName,
+      communityId,
+      component: "ApolloRequestLink",
+    });
+  } else {
+    logger.debug("[Apollo] Request context", {
+      operationName: operation.operationName,
+      communityId,
+      isBrowser,
+      hasToken: !!token,
+      authMode,
+      component: "ApolloRequestLink",
+    });
+  }
 
   const headers = {
     ...prevContext.headers,
