@@ -3,6 +3,7 @@
 import React from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { AppLink, useAppRouter } from "@/lib/navigation";
+import { normalizePathname } from "@/utils/path";
 import Image from "next/image";
 import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -21,7 +22,8 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
   const { config } = useHeader();
   const { navigateBack } = useHierarchicalNavigation();
   const { isInLine } = useAuthEnvironment();
-  const pathname = usePathname();
+  const rawPathname = usePathname();
+  const pathname = normalizePathname(rawPathname);
   const searchParams = useSearchParams();
   const router = useAppRouter();
   const communityConfig = useCommunityConfig();

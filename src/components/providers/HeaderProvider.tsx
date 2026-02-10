@@ -2,6 +2,7 @@
 
 import React, { ReactNode, useState, useEffect, createContext, useContext, useCallback, useMemo } from "react";
 import { usePathname } from "next/navigation";
+import { normalizePathname } from "@/utils/path";
 
 export interface HeaderConfig {
   title?: string;
@@ -71,7 +72,8 @@ const PAGE_TYPES = {
 const HeaderProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [config, setConfig] = useState<HeaderConfig>(defaultConfig);
   const [lastVisitedUrls, setLastVisitedUrls] = useState<Record<string, string>>({});
-  const pathname = usePathname();
+  const rawPathname = usePathname();
+  const pathname = normalizePathname(rawPathname);
 
   const updateConfig = useCallback((newConfig: Partial<HeaderConfig>) => {
     setConfig((prevConfig: HeaderConfig) => ({
