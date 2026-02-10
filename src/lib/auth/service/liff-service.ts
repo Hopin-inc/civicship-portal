@@ -238,24 +238,26 @@ export class LiffService {
 
         const tokenTenantId = this.decodeTokenTenantId(customToken);
 
-        // ❌ TENANT_ID_MISMATCH 防止: トークン発行時のテナントIDと一致させる
-        logger.info("[LiffService] Custom token response received, preparing sign-in", {
-          hasCustomToken: !!customToken,
+        // 要件 Section 3: 解決結果の比較
+        // Target Community ID (URL由来) vs Actual User Tenant ID (トークン由来)
+        logger.info("[LiffService] Custom token received — comparing tenant IDs", {
+          targetCommunityId: communityId,
           tokenTenantId,
+          initTenantId: tenantId,
+          lineAuthTenantId: lineAuth.tenantId,
           profileUserId: profile?.userId,
-          targetTenantId: tenantId,
-          authInstanceTenantIdBeforeUpdate: lineAuth.tenantId,
           component: "LiffService",
         });
 
-        // 🔍 DEBUG: トークンから取得したテナントIDをログ出力
-        logger.info("[LiffService] 🔍 DEBUG: Decoded token tenant ID", {
-          tokenTenantId,
-          tokenTenantIdType: typeof tokenTenantId,
-          tokenTenantIdIsNull: tokenTenantId === null,
-          tokenTenantIdIsUndefined: tokenTenantId === undefined,
-          component: "LiffService",
-        });
+        if (tokenTenantId && tenantId && tokenTenantId !== tenantId) {
+          logger.warn("[LiffService] TENANT_MISMATCH: Token tenant ID does not match init tenant ID", {
+            targetCommunityId: communityId,
+            tokenTenantId,
+            initTenantId: tenantId,
+            lineAuthTenantId: lineAuth.tenantId,
+            component: "LiffService",
+          });
+        }
 
         if (tenantId !== undefined) {
           lineAuth.tenantId = tenantId;

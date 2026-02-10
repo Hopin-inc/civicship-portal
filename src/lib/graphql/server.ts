@@ -105,16 +105,38 @@ export async function executeServerGraphQLQuery<
       ? "auto-resolved"
       : "missing";
 
+  // Cookie内の x-community-id を抽出して比較
+  const cookieHeader = Object.keys(resolvedHeaders).find(
+    (k) => k.toLowerCase() === "cookie"
+  );
+  const cookieString = cookieHeader ? resolvedHeaders[cookieHeader] : "";
+  const cookieCommunityIdMatch = cookieString.match(/(?:^|;\s*)x-community-id=([^;]*)/i);
+  const cookieCommunityId = cookieCommunityIdMatch
+    ? decodeURIComponent(cookieCommunityIdMatch[1])
+    : undefined;
+
   if (!communityId) {
     logger.warn("[executeServerGraphQLQuery] No X-Community-Id in headers", {
       queryName,
       communityIdSource,
-      hasCookie: Object.keys(resolvedHeaders).some((k) => k.toLowerCase() === "cookie"),
+      cookieCommunityId,
+      hasCookie: !!cookieHeader,
       component: "executeServerGraphQLQuery",
     });
   } else {
-    logger.info("[executeServerGraphQLQuery] Request", {
+    logger.debug("[executeServerGraphQLQuery] Request", {
       communityId,
+      queryName,
+      communityIdSource,
+      component: "executeServerGraphQLQuery",
+    });
+  }
+
+  // 要件 Section 3: ヘッダーとCookieのcommunityIdが食い違った場合にWARNING
+  if (communityId && cookieCommunityId && communityId !== cookieCommunityId) {
+    logger.warn("[executeServerGraphQLQuery] TENANT_MISMATCH: Header and cookie community IDs differ", {
+      headerCommunityId: communityId,
+      cookieCommunityId,
       queryName,
       communityIdSource,
       component: "executeServerGraphQLQuery",
