@@ -5,18 +5,6 @@
  */
 
 /**
- * Get community ID from environment variable (for local development)
- */
-export function getCommunityIdFromEnv(): string {
-  const communityId = process.env.LOCAL_COMMUNITY_ID;
-  if (!communityId) {
-    console.warn("LOCAL_COMMUNITY_ID is not set, using 'default'");
-    return "default";
-  }
-  return communityId;
-}
-
-/**
  * Minimal config type for middleware/edge runtime use
  */
 export interface EdgeCommunityConfig {
