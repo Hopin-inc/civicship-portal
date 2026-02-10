@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { executeServerGraphQLQuery } from "@/lib/graphql/server";
 import { COMMUNITY_LOCAL_CONFIGS } from "@/lib/communities/constants";
+import { logger } from "@/lib/logging";
 
 /**
  * Community portal configuration fetched from the database
@@ -116,9 +117,37 @@ export const getCommunityConfig = cache(
         { communityId },
       );
 
-      return data.communityPortalConfig;
+      const config = data.communityPortalConfig;
+
+      if (!config) {
+        logger.warn("[getCommunityConfig] DB returned null for communityPortalConfig", {
+          communityId,
+          component: "getCommunityConfig",
+        });
+      } else {
+        const nullFields = (
+          ["firebaseTenantId", "liffId", "liffAppId", "liffBaseUrl", "regionName", "regionKey"] as const
+        ).filter((field) => config[field] == null);
+
+        logger.info("[getCommunityConfig] Config fetched from DB", {
+          communityId,
+          configCommunityId: config.communityId,
+          firebaseTenantId: config.firebaseTenantId,
+          liffId: config.liffId,
+          liffAppId: config.liffAppId,
+          nullFields: nullFields.length > 0 ? nullFields : undefined,
+          component: "getCommunityConfig",
+        });
+      }
+
+      return config;
     } catch (error) {
-      console.error(`Failed to fetch community config for ${communityId}:`, error);
+      logger.error("[getCommunityConfig] Failed to fetch config from DB", {
+        communityId,
+        error: error instanceof Error ? error.message : String(error),
+        errorType: error instanceof Error ? error.constructor.name : typeof error,
+        component: "getCommunityConfig",
+      });
       return null;
     }
   },

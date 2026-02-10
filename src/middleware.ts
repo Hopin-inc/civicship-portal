@@ -20,13 +20,41 @@ const EXCLUDED_REDIRECT_PATTERNS = [
 
 export async function middleware(request: NextRequest) {
   const host = request.headers.get("host");
+  const origin = request.headers.get("origin");
+  const referer = request.headers.get("referer");
   const pathname = request.nextUrl.pathname;
 
   // 1. コミュニティIDの特定（サブドメインまたはパスから）
   let communityId = getCommunityIdFromPath(pathname);
+  const communityIdSource = communityId ? "path" : "host";
 
   if (!communityId) {
     communityId = getCommunityIdFromHost(host);
+  }
+
+  // テナント解決の入力パラメータを記録（要件: Section 3 - テナント解決プロセスの可視化）
+  console.log("[Middleware] Tenant resolution input", {
+    host,
+    origin,
+    referer,
+    pathname,
+    resolvedCommunityId: communityId,
+    communityIdSource,
+  });
+
+  // セッションCookieの存在確認と、communityIdの不一致を早期検出
+  const sessionCookie = request.cookies.get("session")?.value || request.cookies.get("__session")?.value;
+  const previousCommunityId = request.cookies.get("x-community-id")?.value;
+
+  if (previousCommunityId && previousCommunityId !== communityId) {
+    console.warn("[Middleware] TENANT_MISMATCH: x-community-id cookie differs from resolved communityId", {
+      previousCommunityId,
+      resolvedCommunityId: communityId,
+      communityIdSource,
+      hasSessionCookie: !!sessionCookie,
+      host,
+      pathname,
+    });
   }
 
   // 2. パスベースリダイレクト判定
@@ -82,8 +110,10 @@ export async function middleware(request: NextRequest) {
   console.log(`[Middleware] communityId resolved`, {
     host,
     communityId,
+    communityIdSource,
     pathname,
     method: request.method,
+    hasSessionCookie: !!sessionCookie,
   });
   return res;
 }

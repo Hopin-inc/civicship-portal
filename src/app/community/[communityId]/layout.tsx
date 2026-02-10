@@ -98,11 +98,23 @@ const CommunityLayout = async ({ children, params }: CommunityLayoutProps) => {
     if (communityConfig) {
       isFromDatabase = true;
     }
+
+    logger.info("[CommunityLayout] Config resolved", {
+      communityId,
+      hasConfig: !!communityConfig,
+      isFromDatabase,
+      configCommunityId: communityConfig?.communityId,
+      hasFirebaseTenantId: !!communityConfig?.firebaseTenantId,
+      hasLiffId: !!communityConfig?.liffId,
+      hasLiffAppId: !!communityConfig?.liffAppId,
+      component: "CommunityLayout",
+    });
   } catch (error) {
-    logger.error(
-      `[CommunityConfig] Failed to fetch config for ${communityId} from database`,
-      { error: error instanceof Error ? error.message : String(error) },
-    );
+    logger.error("[CommunityLayout] Failed to fetch config from database", {
+      communityId,
+      error: error instanceof Error ? error.message : String(error),
+      component: "CommunityLayout",
+    });
   }
 
   return (

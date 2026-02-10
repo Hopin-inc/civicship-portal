@@ -43,14 +43,21 @@ export default getRequestConfig(async ({ requestLocale }) => {
     locale = savedLocale as Locale;
   } else {
     const headersList = await headers();
-    const communityId = headersList.get('x-community-id') || 'default';
-    const enabledFeatures = await getEnabledFeatures(communityId);
-    const hasLanguageSwitcher = enabledFeatures.includes('languageSwitcher');
-    
-    if (hasLanguageSwitcher) {
-      const acceptLanguage = headersList.get('accept-language');
-      locale = detectPreferredLocale(acceptLanguage, locales, defaultLocale);
+    const communityId = headersList.get('x-community-id');
+
+    if (communityId) {
+      const enabledFeatures = await getEnabledFeatures(communityId);
+      const hasLanguageSwitcher = enabledFeatures.includes('languageSwitcher');
+
+      if (hasLanguageSwitcher) {
+        const acceptLanguage = headersList.get('accept-language');
+        locale = detectPreferredLocale(acceptLanguage, locales, defaultLocale);
+      } else {
+        locale = defaultLocale;
+      }
     } else {
+      // x-community-id ヘッダーがない場合（middlewareを経由しないリクエスト等）は
+      // バックエンドへのリクエストを送らずデフォルトlocaleを使用
       locale = defaultLocale;
     }
   }
