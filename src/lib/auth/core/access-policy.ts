@@ -118,9 +118,9 @@ export class AccessPolicy {
         membershipIds: user.memberships?.map(m => m.community?.id) ?? [],
         component: "AccessPolicy",
       });
-      return "/sign-up/phone-verification";
+      return "/";
     }
-    
+
     return "/";
   }
 }
