@@ -4,6 +4,7 @@ import { encodeURIComponentWithType, matchPaths, RawURIComponent } from "@/utils
 import { AccessPolicy } from "@/lib/auth/core/access-policy";
 import { AuthenticationState } from "@/types/auth";
 import { logger } from "@/lib/logging";
+import { getCommunityIdClient } from "@/lib/community/get-community-id-client";
 
 export class AuthRedirectService {
   private static instance: AuthRedirectService;
@@ -49,6 +50,7 @@ export class AuthRedirectService {
       authState,
       next,
       nextParam,
+      currentUser,
     );
     if (redirectFromLogin) {
       logger.debug("[AUTH] AuthRedirectService: redirect from handleAuthEntryFlow", {
@@ -92,6 +94,7 @@ export class AuthRedirectService {
     authState: AuthenticationState,
     next?: string | null,
     nextParam?: string,
+    currentUser?: GqlUser | null,
   ): RawURIComponent | null {
     if (!this.isAuthEntryPath(basePath)) return null;
 
@@ -114,12 +117,28 @@ export class AuthRedirectService {
         }
         return null;
 
-      case "user_registered":
+      case "user_registered": {
+        // membershipが無い場合は /sign-up/phone-verification に留まることを許可
+        if (basePath === "/sign-up/phone-verification" && currentUser) {
+          const communityId = getCommunityIdClient();
+          const hasMembership = currentUser.memberships?.some(
+            (m) => m.community?.id === communityId,
+          );
+          if (!hasMembership) {
+            logger.debug("[AUTH] handleAuthEntryFlow: user_registered without membership, staying on phone-verification", {
+              userId: currentUser.id,
+              communityId,
+              component: "AuthRedirectService",
+            });
+            return null;
+          }
+        }
         // 登録済みユーザーが sign-up 系や login に来たらトップ or nextへ
         if (next?.startsWith("/") && !next.startsWith("/login") && !next.startsWith("/sign-up")) {
           return next as RawURIComponent;
         }
         return "/" as RawURIComponent;
+      }
 
       default:
         return null;
