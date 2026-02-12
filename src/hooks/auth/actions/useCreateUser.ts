@@ -3,6 +3,7 @@ import { logger } from "@/lib/logging";
 import { GqlCurrentPrefecture, GqlLanguage, GqlUser, useUserSignUpMutation } from "@/types/graphql";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { useAuth } from "@/contexts/AuthProvider";
+import { getCommunityIdClient } from "@/lib/community/get-community-id-client";
 
 const getLanguageCookie = (): string | null => {
   if (typeof document === "undefined") return null;
@@ -33,6 +34,15 @@ export const useCreateUser = () => {
         const languageCookie = getLanguageCookie();
         const preferredLanguage = mapLanguageToEnum(languageCookie);
 
+        const communityId = getCommunityIdClient();
+        logger.debug("[AUTH] useCreateUser: calling userSignUp", {
+          communityId,
+          phoneUid,
+          hasLineRefreshToken: !!lineTokens.refreshToken,
+          hasPhoneAccessToken: !!phoneTokens.accessToken,
+          component: "useCreateUser",
+        });
+
         const { data } = await userSignUp({
           variables: {
             input: {
@@ -48,6 +58,14 @@ export const useCreateUser = () => {
               preferredLanguage,
             },
           },
+        });
+
+        logger.debug("[AUTH] useCreateUser: userSignUp response", {
+          hasData: !!data,
+          userId: data?.userSignUp?.user?.id,
+          userName: data?.userSignUp?.user?.name,
+          communityId,
+          component: "useCreateUser",
         });
 
         if (data?.userSignUp?.user) {
