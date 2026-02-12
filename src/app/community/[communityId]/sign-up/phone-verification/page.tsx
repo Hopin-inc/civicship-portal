@@ -5,6 +5,7 @@ import { useAppRouter } from "@/lib/navigation";
 import { useEffect, useRef } from "react";
 import { PhoneVerificationForm } from "./components/PhoneVerificationForm";
 import { useAuthEnvironment } from "@/hooks/useAuthEnvironment";
+import { logger } from "@/lib/logging";
 
 export default function PhoneVerificationPage() {
   const router = useAppRouter();
@@ -22,6 +23,11 @@ export default function PhoneVerificationPage() {
       const redirectUrl = nextParam
         ? `/sign-up/phone-verification/line-browser?next=${nextParam}`
         : "/sign-up/phone-verification/line-browser";
+      logger.debug("[AUTH] PhoneVerificationPage: redirecting to line-browser", {
+        redirectUrl,
+        nextParam,
+        component: "PhoneVerificationPage",
+      });
       router.replace(redirectUrl);
     }
   }, [nextParam, router, isLineBrowser]);

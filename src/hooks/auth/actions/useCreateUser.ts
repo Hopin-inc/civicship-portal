@@ -52,15 +52,30 @@ export const useCreateUser = () => {
 
         if (data?.userSignUp?.user) {
           const user = await updateAuthState();
+          logger.debug("[AUTH] useCreateUser: updateAuthState result", {
+            hasUser: !!user,
+            userId: user?.id,
+            memberships: user?.memberships?.map((m: any) => m.community?.id) ?? [],
+            membershipsCount: user?.memberships?.length ?? 0,
+            component: "useCreateUser",
+          });
           if (user) {
             useAuthStore.getState().setState({
               firebaseUser,
               authenticationState: "user_registered",
               currentUser: user,
             });
+            logger.debug("[AUTH] useCreateUser: state set to user_registered", {
+              userId: user.id,
+              component: "useCreateUser",
+            });
             return firebaseUser;
           }
         }
+        logger.warn("[AUTH] useCreateUser: userSignUp returned no user or updateAuthState failed", {
+          hasSignUpUser: !!data?.userSignUp?.user,
+          component: "useCreateUser",
+        });
         return null;
       } catch (error) {
         const msg = error instanceof Error ? error.message : String(error);
