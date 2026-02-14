@@ -73,7 +73,7 @@ export const useCreateUser = () => {
           logger.debug("[AUTH] useCreateUser: updateAuthState result", {
             hasUser: !!user,
             userId: user?.id,
-            memberships: user?.memberships?.map((m: any) => m.community?.id) ?? [],
+            memberships: user?.memberships?.map((m) => m.community?.id) ?? [],
             membershipsCount: user?.memberships?.length ?? 0,
             component: "useCreateUser",
           });

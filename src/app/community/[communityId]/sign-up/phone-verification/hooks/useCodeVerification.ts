@@ -155,7 +155,7 @@ export function useCodeVerification(
               redirectPath: homeRedirectPath || "/",
               nextParam,
               userId: updatedUser.id,
-              memberships: updatedUser.memberships?.map((m: any) => m.community?.id) ?? [],
+              memberships: updatedUser.memberships?.map((m) => m.community?.id) ?? [],
               component: "useCodeVerification",
             });
             return {
@@ -182,7 +182,7 @@ export function useCodeVerification(
               redirectPath: crossCommunityRedirectPath || "/",
               nextParam,
               userId: updatedUserCross.id,
-              memberships: updatedUserCross.memberships?.map((m: any) => m.community?.id) ?? [],
+              memberships: updatedUserCross.memberships?.map((m) => m.community?.id) ?? [],
               component: "useCodeVerification",
             });
             return {
