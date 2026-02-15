@@ -50,10 +50,15 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
 
     const normalized = normalizePathname(pathname);
     const pathWithParams = searchParams.size ? `${normalized}?${searchParams.toString()}` : normalized;
-    
+
+    const decodedNext = decodeURIComponentWithType(nextParam);
+    const normalizedNext = decodedNext
+      ? (normalizePathname(decodedNext) as RawURIComponent)
+      : undefined;
+
     const redirectPath = authRedirectService.getRedirectPath(
       pathWithParams as RawURIComponent,
-      decodeURIComponentWithType(nextParam),
+      normalizedNext,
       currentUser,
     );
 

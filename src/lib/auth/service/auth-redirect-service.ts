@@ -134,7 +134,7 @@ export class AuthRedirectService {
           }
         }
         // 登録済みユーザーが sign-up 系や login に来たらトップ or nextへ
-        if (next?.startsWith("/") && !next.startsWith("//") && !next.startsWith("/login") && !next.startsWith("/sign-up")) {
+        if (next?.startsWith("/") && !next.startsWith("//") && !next.startsWith("/\\") && !next.startsWith("/login") && !next.startsWith("/sign-up")) {
           return next as RawURIComponent;
         }
         return "/" as RawURIComponent;
