@@ -120,7 +120,7 @@ export class AccessPolicy {
       });
       return "/sign-up/phone-verification";
     }
-    
+
     return "/";
   }
 }
