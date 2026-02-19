@@ -10,6 +10,7 @@ import { LoginView } from "@/app/community/[communityId]/login/components/LoginV
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { useLogin } from "@/hooks/auth/actions/useLogin";
 import { useAuthDependencies } from "@/hooks/auth/init/useAuthDependencies";
+import { logger } from "@/lib/logging";
 
 export default function LoginPage() {
   const searchParams = useSearchParams();
@@ -50,6 +51,11 @@ export default function LoginPage() {
   };
 
   if (isAuthenticating || authenticationState !== "unauthenticated") {
+    logger.debug("[AUTH] LoginPage: showing LoadingIndicator", {
+      isAuthenticating,
+      authenticationState,
+      component: "LoginPage",
+    });
     return <LoadingIndicator />;
   }
 

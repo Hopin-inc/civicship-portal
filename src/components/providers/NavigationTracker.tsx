@@ -4,6 +4,7 @@
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useCallback } from "react";
 import { useHeader } from "@/components/providers/HeaderProvider";
+import { normalizePathname } from "@/utils/path";
 
 const PAGE_TYPES = {
   ACTIVITIES: "activities",
@@ -14,7 +15,8 @@ const PAGE_TYPES = {
 };
 
 const NavigationTracker: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const pathname = usePathname();
+  const rawPathname = usePathname();
+  const pathname = normalizePathname(rawPathname);
   const searchParams = useSearchParams();
   const { addToHistory } = useHeader();
 

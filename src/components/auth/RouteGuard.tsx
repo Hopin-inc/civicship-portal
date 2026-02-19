@@ -5,7 +5,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useAppRouter } from "@/lib/navigation";
 import { useAuth } from "@/contexts/AuthProvider";
 import { AuthRedirectService } from "@/lib/auth/service/auth-redirect-service";
-import { decodeURIComponentWithType, EncodedURIComponent, RawURIComponent } from "@/utils/path";
+import { decodeURIComponentWithType, EncodedURIComponent, normalizePathname, RawURIComponent } from "@/utils/path";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { logger } from "@/lib/logging";
@@ -48,11 +48,17 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       }
     }
 
-    const pathWithParams = searchParams.size ? `${pathname}?${searchParams.toString()}` : pathname;
-    
+    const normalized = normalizePathname(pathname);
+    const pathWithParams = searchParams.size ? `${normalized}?${searchParams.toString()}` : normalized;
+
+    const decodedNext = decodeURIComponentWithType(nextParam);
+    const normalizedNext = decodedNext
+      ? (normalizePathname(decodedNext) as RawURIComponent)
+      : undefined;
+
     const redirectPath = authRedirectService.getRedirectPath(
       pathWithParams as RawURIComponent,
-      decodeURIComponentWithType(nextParam),
+      normalizedNext,
       currentUser,
     );
 

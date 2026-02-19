@@ -8,6 +8,7 @@ import BottomBar from "@/components/layout/BottomBar";
 import { RouteGuard } from "@/components/auth/RouteGuard";
 import AdminBottomBar from "@/components/layout/AdminBottomBar";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
+import { normalizePathname } from "@/utils/path";
 
 interface MainContentProps {
   children: React.ReactNode;
@@ -15,7 +16,8 @@ interface MainContentProps {
 
 const MainContent: React.FC<MainContentProps> = ({ children }) => {
   const { config } = useHeader();
-  const pathname = usePathname();
+  const rawPathname = usePathname();
+  const pathname = normalizePathname(rawPathname);
   const searchParams = useSearchParams();
   const placeId = searchParams.get("placeId");
   const communityConfig = useCommunityConfig();

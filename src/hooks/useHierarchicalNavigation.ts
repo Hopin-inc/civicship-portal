@@ -4,7 +4,7 @@ import React, { useCallback } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useAppRouter } from "@/lib/navigation";
 import { useHeader } from "@/components/providers/HeaderProvider";
-import { matchPaths } from "@/utils/path";
+import { matchPaths, normalizePathname } from "@/utils/path";
 
 interface PathHierarchy {
   [path: string]: string;
@@ -40,7 +40,8 @@ export const PAGE_TYPES = {
  * 現在のパスから親階層のパスを特定します
  */
 export const useHierarchicalNavigation = () => {
-  const pathname = usePathname();
+  const rawPathname = usePathname();
+  const pathname = normalizePathname(rawPathname);
   const router = useAppRouter();
   const searchParams = useSearchParams();
   const { config, lastVisitedUrls } = useHeader() as any;

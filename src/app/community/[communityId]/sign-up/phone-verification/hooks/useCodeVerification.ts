@@ -118,9 +118,19 @@ export function useCodeVerification(
           };
         }
 
+        logger.debug("[AUTH] useCodeVerification: identityCheckPhoneUser result", {
+          status,
+          nextParam,
+          component: "useCodeVerification",
+        });
+
         switch (status) {
           case GqlPhoneUserStatus.NewUser:
             setAuthState({ isAuthInProgress: false });
+            logger.debug("[AUTH] useCodeVerification: NewUser, redirecting to sign-up", {
+              redirectPath: `/sign-up${nextParam}`,
+              component: "useCodeVerification",
+            });
             return {
               success: true,
               redirectPath: `/sign-up${nextParam}`,
@@ -129,18 +139,25 @@ export function useCodeVerification(
 
           case GqlPhoneUserStatus.ExistingSameCommunity:
             const updatedUser = await updateAuthState();
-            
+
             // Defensive: handle case where updateAuthState returns null
             if (!updatedUser) {
               return handleUpdateAuthStateNull(GqlPhoneUserStatus.ExistingSameCommunity);
             }
-            
+
             setAuthState({ authenticationState: "user_registered", isAuthInProgress: false });
             const homeRedirectPath = authRedirectService.getRedirectPath(
               "/" as RawURIComponent,
               nextParam as RawURIComponent,
               updatedUser,
             );
+            logger.debug("[AUTH] useCodeVerification: ExistingSameCommunity", {
+              redirectPath: homeRedirectPath || "/",
+              nextParam,
+              userId: updatedUser.id,
+              memberships: updatedUser.memberships?.map((m) => m.community?.id) ?? [],
+              component: "useCodeVerification",
+            });
             return {
               success: true,
               redirectPath: homeRedirectPath || "/",
@@ -149,18 +166,25 @@ export function useCodeVerification(
 
           case GqlPhoneUserStatus.ExistingDifferentCommunity:
             const updatedUserCross = await updateAuthState();
-            
+
             // Defensive: handle case where updateAuthState returns null
             if (!updatedUserCross) {
               return handleUpdateAuthStateNull(GqlPhoneUserStatus.ExistingDifferentCommunity);
             }
-            
+
             setAuthState({ authenticationState: "user_registered", isAuthInProgress: false });
             const crossCommunityRedirectPath = authRedirectService.getRedirectPath(
               "/" as RawURIComponent,
               nextParam as RawURIComponent,
               updatedUserCross,
             );
+            logger.debug("[AUTH] useCodeVerification: ExistingDifferentCommunity", {
+              redirectPath: crossCommunityRedirectPath || "/",
+              nextParam,
+              userId: updatedUserCross.id,
+              memberships: updatedUserCross.memberships?.map((m) => m.community?.id) ?? [],
+              component: "useCodeVerification",
+            });
             return {
               success: true,
               redirectPath: crossCommunityRedirectPath || "/",

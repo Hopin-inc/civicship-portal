@@ -19,6 +19,7 @@ import { useTranslations } from "next-intl";
 import { useStartPhoneVerification } from "@/hooks/auth/actions/useStartPhoneVerification";
 import { useVerifyPhoneCode } from "@/hooks/auth/actions/useVerifyPhoneCode";
 import { useAuthDependencies } from "@/hooks/auth/init/useAuthDependencies";
+import { logger } from "@/lib/logging";
 
 export function PhoneVerificationForm() {
   const t = useTranslations();
@@ -124,6 +125,11 @@ export function PhoneVerificationForm() {
         toast.success(result.message);
       }
       if (result.redirectPath) {
+        logger.debug("[AUTH] PhoneVerificationForm: redirecting after code verification", {
+          redirectPath: result.redirectPath,
+          nextParam,
+          component: "PhoneVerificationForm",
+        });
         router.push(result.redirectPath);
       }
     } else if (result.error) {
