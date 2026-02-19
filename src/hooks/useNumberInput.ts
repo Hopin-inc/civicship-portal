@@ -64,7 +64,7 @@ export const useNumberInput = ({
       // 即座に親に通知（リアルタイム更新）
       onChange(numValue);
     },
-    [onChange, max, onMaxExceeded]
+    [onChange, min, max, onMaxExceeded]
   );
 
   // フォーカスアウト時のハンドラ（空の場合デフォルト値を設定）
