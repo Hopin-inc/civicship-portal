@@ -1484,6 +1484,7 @@ export type GqlOpportunitySlotSortInput = {
 };
 
 export type GqlOpportunitySlotUpdateInput = {
+  capacity?: InputMaybe<Scalars["Int"]["input"]>;
   endsAt: Scalars["Datetime"]["input"];
   id: Scalars["ID"]["input"];
   startsAt: Scalars["Datetime"]["input"];

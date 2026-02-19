@@ -12628,6 +12628,18 @@
         "fields": null,
         "inputFields": [
           {
+            "name": "capacity",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "endsAt",
             "description": null,
             "type": {
