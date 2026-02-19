@@ -80,6 +80,10 @@ export const useOpportunitySave = ({
         toast.error(`画像は最大${MAX_IMAGES}枚までです`);
         return;
       }
+      if (slotManager.slots.length === 0) {
+        toast.error("開催枠を1つ以上登録してください");
+        return;
+      }
       if (slotManager.slots.some((slot) => !slot.startAt || !slot.endAt)) {
         toast.error("すべての開催枠の日時を入力してください");
         return;
