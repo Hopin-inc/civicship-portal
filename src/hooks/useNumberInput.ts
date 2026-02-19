@@ -47,6 +47,11 @@ export const useNumberInput = ({
         return;
       }
 
+      // 最小値チェック
+      if (min !== undefined && numValue < min) {
+        return;
+      }
+
       // 最大値チェック（入力値を制限）
       if (max !== undefined && numValue > max) {
         onMaxExceeded?.();

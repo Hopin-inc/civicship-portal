@@ -13,7 +13,7 @@ export function presentOpportunityForEdit(
 
   // capacity を先に取得（slots より前）
   const firstSlot = (opportunity.slots || []).find((slot) => slot != null);
-  const capacity = firstSlot?.capacity || DEFAULT_CAPACITY;
+  const capacity = firstSlot?.capacity ?? DEFAULT_CAPACITY;
 
   // slots の型安全な変換
   const slots = (opportunity.slots || [])
