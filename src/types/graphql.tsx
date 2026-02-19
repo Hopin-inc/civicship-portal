@@ -624,7 +624,7 @@ export type GqlImageInput = {
 export type GqlIncentiveGrant = {
   __typename?: "IncentiveGrant";
   attemptCount: Scalars["Int"]["output"];
-  community: GqlCommunity;
+  community?: Maybe<GqlCommunity>;
   createdAt: Scalars["Datetime"]["output"];
   failureCode?: Maybe<GqlIncentiveGrantFailureCode>;
   id: Scalars["ID"]["output"];
@@ -635,7 +635,7 @@ export type GqlIncentiveGrant = {
   transaction?: Maybe<GqlTransaction>;
   type: GqlIncentiveGrantType;
   updatedAt: Scalars["Datetime"]["output"];
-  user: GqlUser;
+  user?: Maybe<GqlUser>;
 };
 
 export type GqlIncentiveGrantEdge = GqlEdge & {
@@ -3195,7 +3195,7 @@ export type GqlGetFailedIncentiveGrantsQuery = {
         lastError?: string | null;
         attemptCount: number;
         lastAttemptedAt?: Date | null;
-        user: { __typename?: "User"; id: string; name: string; image?: string | null };
+        user?: { __typename?: "User"; id: string; name: string; image?: string | null } | null;
       } | null;
     } | null> | null;
   };
