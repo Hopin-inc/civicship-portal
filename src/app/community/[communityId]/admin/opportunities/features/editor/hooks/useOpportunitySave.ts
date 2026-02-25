@@ -94,12 +94,13 @@ export const useOpportunitySave = ({
           capacity,
         }));
 
-      // スロット変換（update用：capacityを含まない）
+      // スロット変換（update用：capacityを含む）
       const slotsInputForUpdate = slotManager.slots
         .filter((slot): slot is typeof slot & { id: string } => !!slot.id)
         .map((slot) => ({
           id: slot.id,
           ...convertSlotToDates(slot),
+          capacity,
         }));
 
       // 画像変換（新規画像のみ送信）

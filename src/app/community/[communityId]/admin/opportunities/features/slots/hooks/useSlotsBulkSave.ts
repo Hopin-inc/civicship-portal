@@ -35,6 +35,7 @@ export const useSlotsBulkSave = ({
         .map((slot) => ({
           id: slot.id,
           ...convertSlotToDates(slot),
+          capacity,
         }));
 
       try {
