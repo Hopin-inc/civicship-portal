@@ -24,12 +24,26 @@ export async function middleware(request: NextRequest) {
   const referer = request.headers.get("referer");
   const pathname = request.nextUrl.pathname;
 
-  // 1. コミュニティIDの特定（サブドメインまたはパスから）
+  // 1. コミュニティIDの特定（パス → ホスト → クッキー の順で解決）
   let communityId = getCommunityIdFromPath(pathname);
-  const communityIdSource = communityId ? "path" : "host";
+  let communityIdSource = communityId ? "path" : null;
 
   if (!communityId) {
     communityId = getCommunityIdFromHost(host);
+    if (communityId) communityIdSource = "host";
+  }
+
+  // API ルートはクッキーからフォールバック
+  // （ページリクエスト時に middleware がセットした x-community-id を再利用）
+  if (!communityId && pathname.startsWith("/api/")) {
+    communityId = request.cookies.get("x-community-id")?.value ?? null;
+    if (communityId) {
+      communityIdSource = "cookie";
+      console.log("[Middleware] API route: communityId resolved from cookie", {
+        communityId,
+        pathname,
+      });
+    }
   }
 
   if (!communityId) {
