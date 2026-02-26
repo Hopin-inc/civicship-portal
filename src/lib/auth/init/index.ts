@@ -168,7 +168,7 @@ async function initAuthFull({
       return;
     }
 
-    const sessionOk = await establishSessionFromFirebaseUser(firebaseUser, setState);
+    const sessionOk = await establishSessionFromFirebaseUser(firebaseUser, setState, communityConfig?.firebaseTenantId);
     if (!sessionOk) {
       finalizeAuthState("unauthenticated", undefined, setState, authStateManager);
       return;
