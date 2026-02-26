@@ -2,7 +2,7 @@ import { useEffect, useMemo } from "react";
 import { LiffService } from "@/lib/auth/service/liff-service";
 import { PhoneAuthService } from "@/lib/auth/service/phone-auth-service";
 import { AuthStateManager } from "@/lib/auth/core/auth-state-manager";
-import { setLineAuthTenantId } from "@/lib/auth/core/firebase-config";
+import { setLineAuthTenantId, setPhoneAuthTenantId } from "@/lib/auth/core/firebase-config";
 import { CommunityPortalConfig } from "@/lib/communities/config";
 import { logger } from "@/lib/logging";
 
@@ -25,7 +25,10 @@ export function useAuthDependencies(communityConfig: CommunityPortalConfig | nul
     return LiffService.getInstance(liffAppId);
   }, [liffAppId, firebaseTenantId]);
 
-  const phoneAuthService = useMemo(() => PhoneAuthService.getInstance(), []);
+  const phoneAuthService = useMemo(() => {
+    setPhoneAuthTenantId(firebaseTenantId);
+    return PhoneAuthService.getInstance();
+  }, [firebaseTenantId]);
   const authStateManager = useMemo(() => {
     if (typeof window === "undefined") return null;
     return AuthStateManager.getInstance();
