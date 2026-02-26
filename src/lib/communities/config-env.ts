@@ -26,10 +26,9 @@ const MINIMAL_CONFIG_QUERY = `
 
 /**
  * In-memory cache for community config to avoid repeated API calls
- * This is a simple cache that persists for the lifetime of the edge function
+ * Keyed by communityId so multiple communities don't share the same cache entry
  */
-let configCache: EdgeCommunityConfig | null = null;
-let configCacheTimestamp: number = 0;
+const configCacheMap = new Map<string, { config: EdgeCommunityConfig; timestamp: number }>();
 const CACHE_TTL_MS = 60000; // 1 minute cache
 
 /**
@@ -39,10 +38,11 @@ const CACHE_TTL_MS = 60000; // 1 minute cache
 export async function fetchCommunityConfigForEdge(
   communityId: string,
 ): Promise<EdgeCommunityConfig | null> {
-  // Check cache first
+  // Check cache first (per communityId)
   const now = Date.now();
-  if (configCache && now - configCacheTimestamp < CACHE_TTL_MS) {
-    return configCache;
+  const cached = configCacheMap.get(communityId);
+  if (cached && now - cached.timestamp < CACHE_TTL_MS) {
+    return cached.config;
   }
 
   const apiEndpoint = process.env.NEXT_PUBLIC_API_ENDPOINT;
@@ -51,8 +51,11 @@ export async function fetchCommunityConfigForEdge(
     return null;
   }
 
+  // NEXT_PUBLIC_API_ENDPOINT already points to the GraphQL endpoint
+  const graphqlUrl = apiEndpoint.endsWith("/graphql") ? apiEndpoint : `${apiEndpoint}/graphql`;
+
   try {
-    const response = await fetch(`${apiEndpoint}/graphql`, {
+    const response = await fetch(graphqlUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -73,13 +76,12 @@ export async function fetchCommunityConfigForEdge(
     const config = data?.data?.communityPortalConfig;
 
     if (config) {
-      // Update cache
-      configCache = {
+      const entry: EdgeCommunityConfig = {
         enableFeatures: config.enableFeatures || [],
         rootPath: config.rootPath || "/",
       };
-      configCacheTimestamp = now;
-      return configCache;
+      configCacheMap.set(communityId, { config: entry, timestamp: now });
+      return entry;
     }
 
     return null;
