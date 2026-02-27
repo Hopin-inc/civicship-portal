@@ -33,13 +33,15 @@ export async function middleware(request: NextRequest) {
     if (communityId) communityIdSource = "host";
   }
 
-  // API ルートはクッキーからフォールバック
-  // （ページリクエスト時に middleware がセットした x-community-id を再利用）
-  if (!communityId && pathname.startsWith("/api/")) {
+  // パスとホストで解決できない場合はクッキーからフォールバック
+  // （LIFFコールバックなど、ルートURLへのリダイレクト後に使用）
+  // LIFF の redirect_uri は登録済みエンドポイント URL（例: https://dev.civicship.app）に固定されるため、
+  // コールバックがルート "/" に来ても communityId を特定できる必要がある。
+  if (!communityId) {
     communityId = request.cookies.get("x-community-id")?.value ?? null;
     if (communityId) {
       communityIdSource = "cookie";
-      console.log("[Middleware] API route: communityId resolved from cookie", {
+      console.log("[Middleware] communityId resolved from cookie", {
         communityId,
         pathname,
       });

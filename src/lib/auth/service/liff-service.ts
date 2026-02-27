@@ -114,10 +114,20 @@ export class LiffService {
       if (liff.isInClient()) {
         this.state.isLoggedIn = true;
       } else {
-        const redirectUri =
+        // redirectPath が /community/ プレフィックスを持たない場合（例: '/users/me'）、
+      // コミュニティIDを前置してフルパスを構築する。
+      // LIFF redirect_uri は登録済みエンドポイント URL に固定されるため、
+      // コールバック後に正しいコミュニティパスへ遷移させるために必要。
+      const communityId = getCommunityIdClient();
+      const resolvedRedirectPath =
+        redirectPath && communityId && !redirectPath.startsWith("/community/")
+          ? `/community/${communityId}${redirectPath}`
+          : redirectPath;
+
+      const redirectUri =
           typeof window !== "undefined"
-            ? redirectPath
-              ? window.location.origin + redirectPath
+            ? resolvedRedirectPath
+              ? window.location.origin + resolvedRedirectPath
               : window.location.origin + window.location.pathname // コミュニティパス（/community/{id}/...）を保持する
             : undefined;
 
