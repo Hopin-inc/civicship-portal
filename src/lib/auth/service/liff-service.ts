@@ -53,14 +53,20 @@ export class LiffService {
   }
 
   public static getInstance(liffId?: string): LiffService {
-    if (!LiffService.instance) {
-      // Use empty string if liffId is not provided - initialization will fail gracefully
-      // and the error will be captured in the state for proper handling
-      LiffService.instance = new LiffService(liffId || "");
-      if (!liffId) {
-        // Set error state immediately if LIFF ID is missing
+    const targetId = liffId || "";
+    // liffId が変わった場合（コミュニティ遷移）はインスタンスを再生成する。
+    // 古いインスタンスを使い続けると、前コミュニティの LIFF チャネルで
+    // トークンが発行され、別テナントの sessionLogin に送信されてしまう。
+    if (!LiffService.instance || LiffService.instance.liffId !== targetId) {
+      LiffService.instance = new LiffService(targetId);
+      if (!targetId) {
         LiffService.instance.state.error = new Error("LIFF ID is not configured");
         logger.warn("LiffService initialized without LIFF ID - LIFF features will be disabled", {
+          component: "LiffService",
+        });
+      } else {
+        logger.info("[LiffService] New instance created for liffId", {
+          liffId: targetId,
           component: "LiffService",
         });
       }
