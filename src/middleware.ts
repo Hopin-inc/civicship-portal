@@ -161,7 +161,7 @@ export async function middleware(request: NextRequest) {
     communityIdSource,
     pathname,
     method: request.method,
-    hasSessionCookie: !!sessionCookie,
+    hasLegacySessionCookie: !!legacySessionCookie,
   });
   return res;
 }
