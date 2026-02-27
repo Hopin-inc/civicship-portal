@@ -101,7 +101,6 @@ export async function establishSessionFromFirebaseUser(
     const tokenResult = await firebaseUser.getIdTokenResult();
 
     await createSession(idToken);
-    TokenManager.saveLineAuthFlag(true);
 
     setState({
       lineTokens: {

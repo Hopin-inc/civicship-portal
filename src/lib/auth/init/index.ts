@@ -99,7 +99,6 @@ async function initAuthFast({
       setState,
       authStateManager,
     );
-    TokenManager.saveLineAuthFlag(true);
     if (ssrPhoneAuthenticated) TokenManager.savePhoneAuthFlag(true);
     await authStateManager.handleUserRegistrationStateChange(!!ssrPhoneAuthenticated, {
       ssrMode: true,

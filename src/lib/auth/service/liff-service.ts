@@ -364,8 +364,6 @@ export class LiffService {
           },
         });
 
-        TokenManager.saveLineAuthFlag(true);
-
         const isPhoneVerified = TokenManager.phoneVerified();
         if (isPhoneVerified) {
           TokenManager.savePhoneAuthFlag(true);
