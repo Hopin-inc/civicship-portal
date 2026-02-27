@@ -68,8 +68,12 @@ export async function middleware(request: NextRequest) {
   const sessionCookie = request.cookies.get("session")?.value || request.cookies.get("__session")?.value;
   const previousCommunityId = request.cookies.get("x-community-id")?.value;
 
+  // コミュニティが切り替わったことを検出: 前のコミュニティのセッション Cookie が残っている場合は
+  // Next.js レスポンスで即座に expire させる。
+  // これにより「バックエンドに himeji の __session が届く → verifySessionCookie 失敗」を未然に防ぐ。
+  let shouldClearSessionCookies = false;
   if (previousCommunityId && previousCommunityId !== communityId) {
-    console.warn("[Middleware] TENANT_MISMATCH: x-community-id cookie differs from resolved communityId", {
+    console.warn("[Middleware] TENANT_MISMATCH: community changed, clearing stale session cookies", {
       previousCommunityId,
       resolvedCommunityId: communityId,
       communityIdSource,
@@ -77,6 +81,9 @@ export async function middleware(request: NextRequest) {
       host,
       pathname,
     });
+    if (sessionCookie) {
+      shouldClearSessionCookies = true;
+    }
   }
 
   // 2. パスベースリダイレクト判定
@@ -132,6 +139,17 @@ export async function middleware(request: NextRequest) {
 
   // 6. 言語設定処理
   handleLanguageSetting(request, res, enabledFeatures);
+
+  // コミュニティ変化による stale session Cookie を expire させる。
+  // バックエンドへのリクエストに古いテナントの Cookie が乗らないようにする。
+  if (shouldClearSessionCookies) {
+    res.cookies.set("session", "", { expires: new Date(0), path: "/" });
+    res.cookies.set("__session", "", { expires: new Date(0), path: "/" });
+    console.info("[Middleware] Cleared stale session cookies due to community change", {
+      previousCommunityId,
+      communityId,
+    });
+  }
 
   console.log(`[Middleware] communityId resolved`, {
     host,
