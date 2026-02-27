@@ -67,12 +67,18 @@ export async function middleware(request: NextRequest) {
   });
 
   // セッションCookieの存在確認と、communityIdの不一致を早期検出
-  const sessionCookie = request.cookies.get("session")?.value || request.cookies.get("__session")?.value;
+  // バックエンドは __session_{communityId} 形式に移行済み。
+  // 旧形式（session / __session）も後方互換のためフォールバックとして確認する。
   const previousCommunityId = request.cookies.get("x-community-id")?.value;
+  const legacySessionCookie = request.cookies.get("session")?.value || request.cookies.get("__session")?.value;
+  const previousCommunitySessionCookie = previousCommunityId
+    ? request.cookies.get(`__session_${previousCommunityId}`)?.value
+    : null;
+  const sessionCookie = legacySessionCookie || previousCommunitySessionCookie;
 
   // コミュニティが切り替わったことを検出: 前のコミュニティのセッション Cookie が残っている場合は
   // Next.js レスポンスで即座に expire させる。
-  // これにより「バックエンドに himeji の __session が届く → verifySessionCookie 失敗」を未然に防ぐ。
+  // これにより「バックエンドに himeji の __session_{himeji-ymca} が届く → verifySessionCookie 失敗」を未然に防ぐ。
   let shouldClearSessionCookies = false;
   if (previousCommunityId && previousCommunityId !== communityId) {
     console.warn("[Middleware] TENANT_MISMATCH: community changed, clearing stale session cookies", {
@@ -145,11 +151,17 @@ export async function middleware(request: NextRequest) {
   // コミュニティ変化による stale session Cookie を expire させる。
   // バックエンドへのリクエストに古いテナントの Cookie が乗らないようにする。
   if (shouldClearSessionCookies) {
+    // 旧形式の legacy cookie を削除
     res.cookies.set("session", "", { expires: new Date(0), path: "/" });
     res.cookies.set("__session", "", { expires: new Date(0), path: "/" });
+    // 新形式 __session_{previousCommunityId} を削除（現コミュニティの cookie は残す）
+    if (previousCommunityId) {
+      res.cookies.set(`__session_${previousCommunityId}`, "", { expires: new Date(0), path: "/" });
+    }
     console.info("[Middleware] Cleared stale session cookies due to community change", {
       previousCommunityId,
       communityId,
+      clearedCookies: ["session", "__session", `__session_${previousCommunityId}`],
     });
   }
 
