@@ -118,7 +118,7 @@ export class LiffService {
           typeof window !== "undefined"
             ? redirectPath
               ? window.location.origin + redirectPath
-              : window.location.origin
+              : window.location.origin + window.location.pathname // コミュニティパス（/community/{id}/...）を保持する
             : undefined;
 
         liff.login({ redirectUri });
