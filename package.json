@@ -96,7 +96,7 @@
     "retry": "^0.13.1",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
-    "undici": "^7.9.0",
+    "undici": "^7.22.0",
     "unified": "^11.0.5",
     "utility-types": "^3.11.0",
     "winston": "^3.17.0",
@@ -150,5 +150,14 @@
     "tsx": "^4.20.6",
     "typescript": "^5.8.3",
     "vitest": "^3.2.4"
+  },
+  "pnpm": {
+    "overrides": {
+      "js-yaml": ">=4.1.1",
+      "jws": ">=4.0.1",
+      "lodash": ">=4.17.23",
+      "mdast-util-to-hast": ">=13.2.1",
+      "axios": ">=1.13.5"
+    }
   }
 }
