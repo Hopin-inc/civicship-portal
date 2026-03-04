@@ -107,8 +107,7 @@ export async function middleware(request: NextRequest) {
 
     const redirectResponse = NextResponse.redirect(redirectUrl, 301);
     if (shouldClearSessionCookies) {
-      redirectResponse.cookies.set("session", "", { expires: new Date(0), path: "/" });
-      redirectResponse.cookies.set("__session", "", { expires: new Date(0), path: "/" });
+      clearLegacySessionCookies(redirectResponse);
     }
     return redirectResponse;
   }
@@ -153,8 +152,7 @@ export async function middleware(request: NextRequest) {
   if (shouldClearSessionCookies) {
     // 旧形式（session / __session）のみ削除。
     // 新形式 __session_{communityId} はコミュニティ別に独立しているため削除しない。
-    res.cookies.set("session", "", { expires: new Date(0), path: "/" });
-    res.cookies.set("__session", "", { expires: new Date(0), path: "/" });
+    clearLegacySessionCookies(res);
     console.info("[Middleware] Cleared legacy session cookies due to community change", {
       previousCommunityId,
       communityId,
@@ -314,6 +312,13 @@ function handleLanguageSetting(request: NextRequest, res: NextResponse, enabledF
       maxAge: 60 * 60 * 24 * 365,
       sameSite: "lax",
     });
+  }
+}
+
+function clearLegacySessionCookies(response: NextResponse) {
+  const LEGACY_SESSION_COOKIE_NAMES = ["session", "__session"];
+  for (const cookieName of LEGACY_SESSION_COOKIE_NAMES) {
+    response.cookies.set(cookieName, "", { expires: new Date(0), path: "/" });
   }
 }
 
