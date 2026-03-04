@@ -74,7 +74,7 @@
     "lucide-react": "^0.427.0",
     "markdown-to-txt": "^2.0.1",
     "micromatch": "^4.0.8",
-    "next": "^15.5.9",
+    "next": "^16.1.5",
     "next-client-cookies": "^2.1.0",
     "next-intl": "^4.4.0",
     "next-themes": "^0.3.0",
@@ -113,7 +113,7 @@
     "@graphql-codegen/typescript": "^4.1.6",
     "@graphql-eslint/eslint-plugin": "^4.4.0",
     "@graphql-typed-document-node/core": "^3.2.0",
-    "@next/bundle-analyzer": "^15.5.4",
+    "@next/bundle-analyzer": "^16.1.5",
     "@playwright/test": "^1.56.1",
     "@storybook/addon-a11y": "^9.0.17",
     "@storybook/addon-docs": "^9.0.17",
@@ -134,7 +134,7 @@
     "@vitest/browser": "^3.2.4",
     "@vitest/coverage-v8": "^3.2.4",
     "eslint": "^8.57.1",
-    "eslint-config-next": "14.2.5",
+    "eslint-config-next": "^16.0.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-local-rules": "^3.0.2",
     "eslint-plugin-storybook": "^9.0.17",
@@ -151,8 +151,17 @@
     "typescript": "^5.8.3",
     "vitest": "^3.2.4"
   },
+  "overrides": {
+    "@apollo/server": ">=4.13.0",
+    "js-yaml": ">=4.1.1",
+    "jws": ">=4.0.1",
+    "lodash": ">=4.17.23",
+    "mdast-util-to-hast": ">=13.2.1",
+    "axios": ">=1.13.6"
+  },
   "pnpm": {
     "overrides": {
+      "@apollo/server": ">=4.13.0",
       "js-yaml": ">=4.1.1",
       "jws": ">=4.0.1",
       "lodash": ">=4.17.23",
