@@ -1,0 +1,48 @@
+defaultService: https://www.googleapis.com/compute/v1/projects/co-creation-dao-prod/global/backendServices/prod-civicship-backend
+hostRules:
+- hosts:
+  - api.civicship.app
+  pathMatcher: api-matcher
+- hosts:
+  - cms.civicship.app
+  pathMatcher: cms-matcher
+- hosts:
+  - www.neo88.app
+  pathMatcher: integrated-matcher
+- hosts:
+  - kibotcha.civicship.app
+  pathMatcher: integrated-matcher
+- hosts:
+  - dais.civicship.app
+  pathMatcher: integrated-matcher
+- hosts:
+  - kotohira.civicship.app
+  pathMatcher: integrated-matcher
+- hosts:
+  - himeji-ymca.civicship.app
+  pathMatcher: integrated-matcher
+- hosts:
+  - izu.civicship.app
+  pathMatcher: integrated-matcher
+- hosts:
+  - ubuyama.civicship.app
+  pathMatcher: integrated-matcher
+pathMatchers:
+- defaultService: https://www.googleapis.com/compute/v1/projects/co-creation-dao-prod/global/backendServices/prod-civicship-backend
+  name: api-matcher
+  pathRules:
+  - paths:
+    - /*
+    service: https://www.googleapis.com/compute/v1/projects/co-creation-dao-prod/global/backendServices/prod-civicship-backend
+- defaultService: https://www.googleapis.com/compute/v1/projects/co-creation-dao-prod/global/backendServices/prod-civicship-cms-backend
+  name: cms-matcher
+  pathRules:
+  - paths:
+    - /*
+    service: https://www.googleapis.com/compute/v1/projects/co-creation-dao-prod/global/backendServices/prod-civicship-cms-backend
+- defaultService: https://www.googleapis.com/compute/v1/projects/co-creation-dao-prod/global/backendServices/prod-civicship-portal-backend-integrated
+  name: integrated-matcher
+  pathRules:
+  - paths:
+    - /*
+    service: https://www.googleapis.com/compute/v1/projects/co-creation-dao-prod/global/backendServices/prod-civicship-portal-backend-integrated

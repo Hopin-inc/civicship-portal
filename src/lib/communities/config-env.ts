@@ -43,6 +43,8 @@ export async function fetchCommunityConfigForEdge(
   const cached = configCacheMap.get(communityId);
   if (cached && now - cached.timestamp < CACHE_TTL_MS) {
     return cached.config;
+  } else if (cached) {
+    configCacheMap.delete(communityId);
   }
 
   const apiEndpoint = process.env.NEXT_PUBLIC_API_ENDPOINT;
@@ -52,7 +54,10 @@ export async function fetchCommunityConfigForEdge(
   }
 
   // NEXT_PUBLIC_API_ENDPOINT already points to the GraphQL endpoint
-  const graphqlUrl = apiEndpoint.endsWith("/graphql") ? apiEndpoint : `${apiEndpoint}/graphql`;
+  const normalizedApiEndpoint = apiEndpoint.replace(/\/+$/, "");
+  const graphqlUrl = normalizedApiEndpoint.endsWith("/graphql")
+    ? normalizedApiEndpoint
+    : `${normalizedApiEndpoint}/graphql`;
 
   try {
     const response = await fetch(graphqlUrl, {
