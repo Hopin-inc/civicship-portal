@@ -38,8 +38,9 @@ export async function middleware(request: NextRequest) {
   // LIFF の redirect_uri は登録済みエンドポイント URL（例: https://dev.civicship.app）に固定されるため、
   // コールバックがルート "/" に来ても communityId を特定できる必要がある。
   if (!communityId) {
-    communityId = request.cookies.get("x-community-id")?.value ?? null;
-    if (communityId) {
+    const cookieValue = request.cookies.get("x-community-id")?.value ?? null;
+    if (cookieValue && /^[a-zA-Z0-9-]+$/.test(cookieValue)) {
+      communityId = cookieValue;
       communityIdSource = "cookie";
       console.log("[Middleware] communityId resolved from cookie", {
         communityId,
@@ -104,7 +105,12 @@ export async function middleware(request: NextRequest) {
       communityId,
     });
 
-    return NextResponse.redirect(redirectUrl, 301);
+    const redirectResponse = NextResponse.redirect(redirectUrl, 301);
+    if (shouldClearSessionCookies) {
+      redirectResponse.cookies.set("session", "", { expires: new Date(0), path: "/" });
+      redirectResponse.cookies.set("__session", "", { expires: new Date(0), path: "/" });
+    }
+    return redirectResponse;
   }
 
   const requestHeaders = new Headers(request.headers);
@@ -321,9 +327,11 @@ function getCommunityIdFromHost(host: string | null): string | null {
   const hostName = host.split(":")[0];
 
   if (hostName.includes("localhost") || hostName.includes("127.0.0.1")) {
-    const localId = process.env.LOCAL_COMMUNITY_ID ?? null;
-    console.log(`[Middleware Debug] Local environment detected: ${hostName} -> ${localId ?? "(none)"}`);
-    return localId;
+    const localIdFromEnv = process.env.LOCAL_COMMUNITY_ID ?? null;
+    const fallbackLocalId = (ACTIVE_COMMUNITY_IDS as readonly string[])[0] ?? null;
+    const resolvedLocalId = localIdFromEnv ?? fallbackLocalId;
+    console.log(`[Middleware Debug] Local environment detected: ${hostName} -> ${resolvedLocalId ?? "(none)"}${!localIdFromEnv && fallbackLocalId ? " (ACTIVE_COMMUNITY_IDS fallback)" : ""}`);
+    return resolvedLocalId;
   }
 
   // 逆順スキャン方式でホワイトラベルとcivicship.app両方に対応
@@ -351,5 +359,5 @@ function getCommunityIdFromHost(host: string | null): string | null {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|robots.txt).*)"],
 };
