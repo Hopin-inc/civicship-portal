@@ -28,7 +28,6 @@ WORKDIR /app
 
 # 依存関係の定義ファイルを先にコピー (キャッシュのため)
 COPY package.json pnpm-lock.yaml ./
-COPY patches/ ./patches/
 
 # 依存関係をインストール
 RUN pnpm install
