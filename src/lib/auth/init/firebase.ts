@@ -18,7 +18,7 @@ export async function initializeFirebase(
 
   // Level 1: 水源の浄化
   // キャッシュされているユーザーのテナントが期待するテナントと異なる場合は
-  // IndexedDB ごと物理削除し、クリーンな状態で認証を開始する。
+  // いったんサインアウトしてクリーンな状態から認証を開始する。
   if (tenantId != null && lineAuth.currentUser && lineAuth.currentUser.tenantId !== tenantId) {
     logger.info("[initializeFirebase] Stale cached user detected, signing out before auth", {
       cachedTenantId: lineAuth.currentUser.tenantId,

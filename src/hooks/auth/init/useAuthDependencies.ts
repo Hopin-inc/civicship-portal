@@ -25,9 +25,10 @@ export function useAuthDependencies(communityConfig: CommunityPortalConfig | nul
     return LiffService.getInstance(liffAppId);
   }, [liffAppId, firebaseTenantId]);
 
-  const phoneAuthService = useMemo(() => {
+  const phoneAuthService = useMemo(() => PhoneAuthService.getInstance(), []);
+
+  useEffect(() => {
     setPhoneAuthTenantId(firebaseTenantId);
-    return PhoneAuthService.getInstance();
   }, [firebaseTenantId]);
   const authStateManager = useMemo(() => {
     if (typeof window === "undefined") return null;
