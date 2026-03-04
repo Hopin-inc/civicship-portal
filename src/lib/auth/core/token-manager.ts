@@ -1,13 +1,8 @@
 "use client";
 
 export class TokenManager {
-  private static readonly LINE_AUTHENTICATED_KEY = "line_authenticated";
   private static readonly PHONE_AUTHENTICATED_KEY = "phone_authenticated";
   private static readonly PHONE_ACCESS_TOKEN_KEY = "phone_auth_token";
-
-  static saveLineAuthFlag(isAuthenticated: boolean): void {
-    this.setCookie(this.LINE_AUTHENTICATED_KEY, isAuthenticated.toString());
-  }
 
   static savePhoneAuthFlag(isAuthenticated: boolean): void {
     this.setCookie(this.PHONE_AUTHENTICATED_KEY, isAuthenticated.toString());
@@ -22,16 +17,11 @@ export class TokenManager {
     return accessToken !== null;
   }
 
-  static clearLineAuthFlag(): void {
-    this.deleteCookie(this.LINE_AUTHENTICATED_KEY);
-  }
-
   static clearPhoneAuthFlag(): void {
     this.deleteCookie(this.PHONE_AUTHENTICATED_KEY);
   }
 
   static clearAllAuthFlags(): void {
-    this.clearLineAuthFlag();
     this.clearPhoneAuthFlag();
   }
 

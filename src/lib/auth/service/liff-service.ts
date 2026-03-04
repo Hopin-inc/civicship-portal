@@ -53,14 +53,20 @@ export class LiffService {
   }
 
   public static getInstance(liffId?: string): LiffService {
-    if (!LiffService.instance) {
-      // Use empty string if liffId is not provided - initialization will fail gracefully
-      // and the error will be captured in the state for proper handling
-      LiffService.instance = new LiffService(liffId || "");
-      if (!liffId) {
-        // Set error state immediately if LIFF ID is missing
+    const targetId = liffId || "";
+    // liffId が変わった場合（コミュニティ遷移）はインスタンスを再生成する。
+    // 古いインスタンスを使い続けると、前コミュニティの LIFF チャネルで
+    // トークンが発行され、別テナントの sessionLogin に送信されてしまう。
+    if (!LiffService.instance || LiffService.instance.liffId !== targetId) {
+      LiffService.instance = new LiffService(targetId);
+      if (!targetId) {
         LiffService.instance.state.error = new Error("LIFF ID is not configured");
         logger.warn("LiffService initialized without LIFF ID - LIFF features will be disabled", {
+          component: "LiffService",
+        });
+      } else {
+        logger.info("[LiffService] New instance created for liffId", {
+          liffId: targetId,
           component: "LiffService",
         });
       }
@@ -108,11 +114,21 @@ export class LiffService {
       if (liff.isInClient()) {
         this.state.isLoggedIn = true;
       } else {
-        const redirectUri =
+        // redirectPath が /community/ プレフィックスを持たない場合（例: '/users/me'）、
+      // コミュニティIDを前置してフルパスを構築する。
+      // LIFF redirect_uri は登録済みエンドポイント URL に固定されるため、
+      // コールバック後に正しいコミュニティパスへ遷移させるために必要。
+      const communityId = getCommunityIdClient();
+      const resolvedRedirectPath =
+        redirectPath && communityId && !redirectPath.startsWith("/community/")
+          ? `/community/${communityId}${redirectPath}`
+          : redirectPath;
+
+      const redirectUri =
           typeof window !== "undefined"
-            ? redirectPath
-              ? window.location.origin + redirectPath
-              : window.location.origin
+            ? resolvedRedirectPath
+              ? window.location.origin + resolvedRedirectPath
+              : window.location.origin + window.location.pathname // コミュニティパス（/community/{id}/...）を保持する
             : undefined;
 
         liff.login({ redirectUri });
@@ -347,8 +363,6 @@ export class LiffService {
             expiresAt,
           },
         });
-
-        TokenManager.saveLineAuthFlag(true);
 
         const isPhoneVerified = TokenManager.phoneVerified();
         if (isPhoneVerified) {

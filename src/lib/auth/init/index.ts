@@ -99,7 +99,6 @@ async function initAuthFast({
       setState,
       authStateManager,
     );
-    TokenManager.saveLineAuthFlag(true);
     if (ssrPhoneAuthenticated) TokenManager.savePhoneAuthFlag(true);
     await authStateManager.handleUserRegistrationStateChange(!!ssrPhoneAuthenticated, {
       ssrMode: true,
@@ -168,7 +167,7 @@ async function initAuthFull({
       return;
     }
 
-    const sessionOk = await establishSessionFromFirebaseUser(firebaseUser, setState);
+    const sessionOk = await establishSessionFromFirebaseUser(firebaseUser, setState, communityConfig?.firebaseTenantId);
     if (!sessionOk) {
       finalizeAuthState("unauthenticated", undefined, setState, authStateManager);
       return;

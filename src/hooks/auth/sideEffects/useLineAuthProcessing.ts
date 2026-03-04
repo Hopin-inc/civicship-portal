@@ -79,7 +79,6 @@ export const useLineAuthProcessing = ({
 
         const user = await refetchUser();
         if (!user) {
-          TokenManager.saveLineAuthFlag(true);
           setState({
             authenticationState: "line_authenticated",
             isAuthenticating: false,

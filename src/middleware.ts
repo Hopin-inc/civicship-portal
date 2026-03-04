@@ -24,12 +24,36 @@ export async function middleware(request: NextRequest) {
   const referer = request.headers.get("referer");
   const pathname = request.nextUrl.pathname;
 
-  // 1. コミュニティIDの特定（サブドメインまたはパスから）
+  // 1. コミュニティIDの特定（パス → ホスト → クッキー の順で解決）
   let communityId = getCommunityIdFromPath(pathname);
-  const communityIdSource = communityId ? "path" : "host";
+  let communityIdSource = communityId ? "path" : null;
 
   if (!communityId) {
     communityId = getCommunityIdFromHost(host);
+    if (communityId) communityIdSource = "host";
+  }
+
+  // パスとホストで解決できない場合はクッキーからフォールバック
+  // （LIFFコールバックなど、ルートURLへのリダイレクト後に使用）
+  // LIFF の redirect_uri は登録済みエンドポイント URL（例: https://dev.civicship.app）に固定されるため、
+  // コールバックがルート "/" に来ても communityId を特定できる必要がある。
+  if (!communityId) {
+    communityId = request.cookies.get("x-community-id")?.value ?? null;
+    if (communityId) {
+      communityIdSource = "cookie";
+      console.log("[Middleware] communityId resolved from cookie", {
+        communityId,
+        pathname,
+      });
+    }
+  }
+
+  if (!communityId) {
+    console.warn("[Middleware] Could not resolve communityId from path or host", {
+      host,
+      pathname,
+    });
+    return new NextResponse("Community not found", { status: 404 });
   }
 
   // テナント解決の入力パラメータを記録（要件: Section 3 - テナント解決プロセスの可視化）
@@ -43,18 +67,25 @@ export async function middleware(request: NextRequest) {
   });
 
   // セッションCookieの存在確認と、communityIdの不一致を早期検出
-  const sessionCookie = request.cookies.get("session")?.value || request.cookies.get("__session")?.value;
+  // __session_{communityId} 形式はコミュニティ別に独立しているため、切り替え時も削除しない。
+  // 旧形式（session / __session）は communityId を含まず複数コミュニティで混在するため、
+  // コミュニティ切り替え時のみクリア対象とする。
   const previousCommunityId = request.cookies.get("x-community-id")?.value;
+  const legacySessionCookie = request.cookies.get("session")?.value || request.cookies.get("__session")?.value;
 
+  let shouldClearSessionCookies = false;
   if (previousCommunityId && previousCommunityId !== communityId) {
-    console.warn("[Middleware] TENANT_MISMATCH: x-community-id cookie differs from resolved communityId", {
+    console.warn("[Middleware] TENANT_MISMATCH: community changed, clearing stale session cookies", {
       previousCommunityId,
       resolvedCommunityId: communityId,
       communityIdSource,
-      hasSessionCookie: !!sessionCookie,
+      hasLegacySessionCookie: !!legacySessionCookie,
       host,
       pathname,
     });
+    if (legacySessionCookie) {
+      shouldClearSessionCookies = true;
+    }
   }
 
   // 2. パスベースリダイレクト判定
@@ -91,10 +122,14 @@ export async function middleware(request: NextRequest) {
     httpOnly: false, // JS から読み取り可能
   });
 
-  // 3. DBから動的設定を取得
+  // 3. DBから動的設定を取得（存在しないコミュニティは404）
   const config = await fetchCommunityConfigForEdge(communityId);
-  const enabledFeatures = config?.enableFeatures || [];
-  const rootPath = config?.rootPath || "/";
+  if (!config) {
+    console.warn("[Middleware] Community not found in DB", { communityId, host, pathname });
+    return new NextResponse("Community not found", { status: 404 });
+  }
+  const enabledFeatures = config.enableFeatures;
+  const rootPath = config.rootPath;
 
   // 4. ルートリダイレクト処理（/community/{communityId} へのアクセス時）
   const redirectRes = handleRootRedirect(request, pathname, rootPath, communityId);
@@ -107,13 +142,26 @@ export async function middleware(request: NextRequest) {
   // 6. 言語設定処理
   handleLanguageSetting(request, res, enabledFeatures);
 
+  // コミュニティ変化による stale session Cookie を expire させる。
+  // バックエンドへのリクエストに古いテナントの Cookie が乗らないようにする。
+  if (shouldClearSessionCookies) {
+    // 旧形式（session / __session）のみ削除。
+    // 新形式 __session_{communityId} はコミュニティ別に独立しているため削除しない。
+    res.cookies.set("session", "", { expires: new Date(0), path: "/" });
+    res.cookies.set("__session", "", { expires: new Date(0), path: "/" });
+    console.info("[Middleware] Cleared legacy session cookies due to community change", {
+      previousCommunityId,
+      communityId,
+    });
+  }
+
   console.log(`[Middleware] communityId resolved`, {
     host,
     communityId,
     communityIdSource,
     pathname,
     method: request.method,
-    hasSessionCookie: !!sessionCookie,
+    hasLegacySessionCookie: !!legacySessionCookie,
   });
   return res;
 }
@@ -121,16 +169,11 @@ export async function middleware(request: NextRequest) {
 /**
  * パスから communityId を抽出
  * /community/{communityId}/... 形式の場合に communityId を返す
+ * ホワイトリストチェックは行わず、DB検証に委ねる
  */
 function getCommunityIdFromPath(pathname: string): string | null {
   const match = pathname.match(/^\/community\/([a-zA-Z0-9-]+)/);
-  if (match) {
-    const extractedId = match[1];
-    if ((ACTIVE_COMMUNITY_IDS as readonly string[]).includes(extractedId)) {
-      return extractedId;
-    }
-  }
-  return null;
+  return match ? match[1] : null;
 }
 
 /**
@@ -268,46 +311,43 @@ function handleLanguageSetting(request: NextRequest, res: NextResponse, enabledF
   }
 }
 
-function getCommunityIdFromHost(host: string | null): string {
-  const DEFAULT_ID = "himeji-ymca";
-  let communityId = DEFAULT_ID;
-
+function getCommunityIdFromHost(host: string | null): string | null {
   if (!host) {
-    console.warn(`[Middleware Debug] No host header. Using default: ${DEFAULT_ID}`);
-  } else {
-    // ポート番号が含まれている場合は除去（例: localhost:3000 -> localhost）
-    const hostName = host.split(":")[0];
+    console.warn("[Middleware Debug] No host header.");
+    return null;
+  }
 
-    if (hostName.includes("localhost") || hostName.includes("127.0.0.1")) {
-      communityId = process.env.LOCAL_COMMUNITY_ID || DEFAULT_ID;
-      console.log(`[Middleware Debug] Local environment detected: ${hostName} -> ${communityId}`);
-    } else {
-      // 逆順スキャン方式でホワイトラベルとcivicship.app両方に対応
-      const parts = hostName.split(".");
-      const reversedParts = [...parts].reverse();
-      const ignoreWords = ["app", "civicship", "dev", "www"];
+  // ポート番号が含まれている場合は除去（例: localhost:3000 -> localhost）
+  const hostName = host.split(":")[0];
 
-      let extractedId = "";
-      for (const part of reversedParts) {
-        if (!ignoreWords.includes(part.toLowerCase())) {
-          extractedId = part;
-          break;
-        }
-      }
+  if (hostName.includes("localhost") || hostName.includes("127.0.0.1")) {
+    const localId = process.env.LOCAL_COMMUNITY_ID ?? null;
+    console.log(`[Middleware Debug] Local environment detected: ${hostName} -> ${localId ?? "(none)"}`);
+    return localId;
+  }
 
-      if (extractedId && (ACTIVE_COMMUNITY_IDS as readonly string[]).includes(extractedId)) {
-        communityId = extractedId;
-        console.log(`[Middleware Debug] Community ID resolved: ${hostName} -> ${communityId}`);
-      } else {
-        console.warn(
-          `[Middleware Debug] Unknown or missing community ID from host: ${hostName} (extracted: ${extractedId || "(none)"}). Falling back to default: ${DEFAULT_ID}`,
-        );
-        communityId = DEFAULT_ID;
-      }
+  // 逆順スキャン方式でホワイトラベルとcivicship.app両方に対応
+  const parts = hostName.split(".");
+  const reversedParts = [...parts].reverse();
+  const ignoreWords = ["app", "civicship", "dev", "www"];
+
+  let extractedId = "";
+  for (const part of reversedParts) {
+    if (!ignoreWords.includes(part.toLowerCase())) {
+      extractedId = part;
+      break;
     }
   }
 
-  return communityId;
+  if (extractedId && (ACTIVE_COMMUNITY_IDS as readonly string[]).includes(extractedId)) {
+    console.log(`[Middleware Debug] Community ID resolved: ${hostName} -> ${extractedId}`);
+    return extractedId;
+  }
+
+  console.warn(
+    `[Middleware Debug] Unknown community ID from host: ${hostName} (extracted: ${extractedId || "(none)"})`,
+  );
+  return null;
 }
 
 export const config = {

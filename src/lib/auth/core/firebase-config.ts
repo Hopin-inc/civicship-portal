@@ -39,9 +39,11 @@ export const getPhoneAuth = (): Auth => {
   const app =
     getApps().find((a) => a.name === "phone-auth-app") ??
     initializeApp(firebaseConfig, "phone-auth-app");
-  const auth = getAuth(app);
-  auth.tenantId = null;
-  return auth;
+  return getAuth(app);
+};
+
+export const setPhoneAuthTenantId = (tenantId: string | null) => {
+  getPhoneAuth().tenantId = tenantId;
 };
 
 let analyticsInstance: Analytics | undefined;

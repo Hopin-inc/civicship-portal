@@ -2,7 +2,7 @@ import { lineAuth } from "@/lib/auth/core/firebase-config";
 import { AuthEnvironment } from "@/lib/auth/core/environment-detector";
 import { logger } from "@/lib/logging";
 import { LiffService } from "@/lib/auth/service/liff-service";
-import { User } from "@firebase/auth";
+import { User, signOut } from "@firebase/auth";
 
 export async function initializeFirebase(
   liffService: LiffService,
@@ -15,6 +15,18 @@ export async function initializeFirebase(
     tenantIdType: typeof tenantId,
     component: "initializeFirebase",
   });
+
+  // Level 1: 水源の浄化
+  // キャッシュされているユーザーのテナントが期待するテナントと異なる場合は
+  // IndexedDB ごと物理削除し、クリーンな状態で認証を開始する。
+  if (tenantId != null && lineAuth.currentUser && lineAuth.currentUser.tenantId !== tenantId) {
+    logger.info("[initializeFirebase] Stale cached user detected, signing out before auth", {
+      cachedTenantId: lineAuth.currentUser.tenantId,
+      expectedTenantId: tenantId,
+      component: "initializeFirebase",
+    });
+    await signOut(lineAuth);
+  }
 
   if (environment === AuthEnvironment.LIFF) {
     try {
@@ -30,14 +42,16 @@ export async function initializeFirebase(
       });
 
       if (liffState.isLoggedIn) {
-        try {
-          await liffService.signInWithLiffToken(tenantId);
-        } catch (signInErr) {
-          logger.warn("LIFF sign-in with token failed", {
-            err: signInErr instanceof Error ? signInErr.message : String(signInErr),
+        // Level 2: ゲートキーパー
+        // LIFF サインインが成功した者だけを「認証済み」として通過させる。
+        // 失敗時に古い currentUser へフォールバックすることを禁止する。
+        const signInSuccess = await liffService.signInWithLiffToken(tenantId);
+        if (!signInSuccess) {
+          logger.warn("[initializeFirebase] LIFF sign-in failed — returning null to block stale session", {
             tenantId,
             component: "initializeFirebase",
           });
+          return null;
         }
       }
     } catch (initErr) {

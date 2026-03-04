@@ -54,7 +54,6 @@ export const useFirebaseAuthState = ({
                 : stateRef.current.authenticationState,
           });
 
-          TokenManager.saveLineAuthFlag(true);
         } catch (error) {
           logger.warn("Failed to sync Firebase token", {
             error: error instanceof Error ? error.message : String(error),
@@ -62,7 +61,6 @@ export const useFirebaseAuthState = ({
           });
         }
       } else {
-        TokenManager.clearLineAuthFlag();
         setState({
           firebaseUser: null,
           authenticationState: "unauthenticated",
