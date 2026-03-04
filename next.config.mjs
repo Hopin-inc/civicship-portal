@@ -10,9 +10,6 @@ const withBundleAnalyzer = bundleAnalyzer({
 });
 
 const nextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -41,6 +38,7 @@ const nextConfig = {
     webpackBuildWorker: true,
     parallelServerBuildTraces: true,
     parallelServerCompiles: true,
+    turbopackUseSystemTlsCerts: true,
   },
   compress: true,
   webpack(config) {
