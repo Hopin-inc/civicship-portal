@@ -21,9 +21,7 @@ interface ClientLayoutProps {
 }
 
 export function ClientLayout({ children, ssrUser }: ClientLayoutProps) {
-  const authenticationState = useAuthStore((s) => s.state.authenticationState);
-  const isAuthenticating = useAuthStore((s) => s.state.isAuthenticating);
-  const isAuthInProgress = useAuthStore((s) => s.state.isAuthInProgress);
+  const { authenticationState, isAuthenticating, isAuthInProgress } = useAuthStore((s) => s.state);
 
   const isAuthLoading =
     isAuthenticating ||
@@ -32,7 +30,8 @@ export function ClientLayout({ children, ssrUser }: ClientLayoutProps) {
     authenticationState === "authenticating";
 
   const { data, loading, error } = useQuery<CurrentUserProfileQueryResult>(GET_CURRENT_USER_PROFILE, {
-    skip: !!ssrUser || isAuthLoading || authenticationState === "unauthenticated",
+    // csrUser が存在しうる "user_registered" 状態のみクエリ実行
+    skip: !!ssrUser || authenticationState !== "user_registered",
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
   });
@@ -70,8 +69,10 @@ export function ClientLayout({ children, ssrUser }: ClientLayoutProps) {
     return <LoadingIndicator />;
   }
 
-  if (authenticationState === "unauthenticated") {
-    logger.debug("[AUTH] /users/me ClientLayout: unauthenticated, deferring to RouteGuard", {
+  if (authenticationState !== "user_registered") {
+    // unauthenticated / line_authenticated / phone_authenticated → RouteGuard に委ねる
+    logger.debug("[AUTH] /users/me ClientLayout: deferring to RouteGuard", {
+      authenticationState,
       component: "ClientLayout",
     });
     return <LoadingIndicator />;
