@@ -138,7 +138,22 @@ export async function middleware(request: NextRequest) {
 
   // 4. ルートリダイレクト処理（/community/{communityId} へのアクセス時）
   const redirectRes = handleRootRedirect(request, pathname, rootPath, communityId);
-  if (redirectRes) return redirectRes;
+  if (redirectRes) {
+    redirectRes.cookies.set("x-community-id", communityId, {
+      path: "/",
+      maxAge: 60 * 60 * 24, // 24時間
+      sameSite: "lax",
+      httpOnly: false,
+    });
+    if (shouldClearSessionCookies) {
+      clearLegacySessionCookies(redirectRes);
+      console.info("[Middleware] Cleared legacy session cookies on root redirect", {
+        previousCommunityId,
+        communityId,
+      });
+    }
+    return redirectRes;
+  }
 
   // 5. セキュリティヘッダー (CSP) の設定
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
