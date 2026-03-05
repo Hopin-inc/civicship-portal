@@ -7,6 +7,9 @@ hostRules:
   - cms.civicship.app
   pathMatcher: cms-matcher
 - hosts:
+  - civicship.app
+  pathMatcher: integrated-matcher
+- hosts:
   - www.neo88.app
   pathMatcher: integrated-matcher
 - hosts:
