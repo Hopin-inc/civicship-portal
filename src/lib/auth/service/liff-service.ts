@@ -260,6 +260,7 @@ export class LiffService {
           logger.error("[LiffService] signInWithCustomToken failed", {
             error: signInError?.message || String(signInError),
             errorCode: signInError?.code,
+            errorName: signInError?.name,
             component: "LiffService",
           });
           throw signInError;
@@ -316,6 +317,8 @@ export class LiffService {
         logger.error("[LiffService] signInWithLiffToken attempt failed", {
           error: processedError.message,
           errorCode: errorDetails?.code,
+          errorName: errorDetails?.name,
+          errorStack: errorDetails?.stack?.split('\n').slice(0, 3).join('\n'),
           attempt,
           component: "LiffService",
         });
