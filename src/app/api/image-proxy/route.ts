@@ -20,15 +20,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const host = request.headers.get('host') || '';
-    const proto = request.headers.get('x-forwarded-proto') || 'https';
-    const origin = host ? `${proto}://${host}` : '';
-
-    const response = await fetch(url, {
-      headers: {
-        ...(origin ? { 'Origin': origin } : {}),
-      },
-    });
+    const response = await fetch(url);
 
     if (!response.ok) {
       throw new Error(`Failed to fetch image: ${response.status}`);
