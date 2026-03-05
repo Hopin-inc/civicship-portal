@@ -7,6 +7,7 @@ import { GET_CURRENT_USER_PROFILE } from "@/graphql/account/user/client-query";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { notFound } from "next/navigation";
 import { logger } from "@/lib/logging";
+import { useAuthStore } from "@/lib/auth/core/auth-store";
 
 interface CurrentUserProfileQueryResult {
   currentUser?: {
@@ -20,8 +21,18 @@ interface ClientLayoutProps {
 }
 
 export function ClientLayout({ children, ssrUser }: ClientLayoutProps) {
+  const authenticationState = useAuthStore((s) => s.state.authenticationState);
+  const isAuthenticating = useAuthStore((s) => s.state.isAuthenticating);
+  const isAuthInProgress = useAuthStore((s) => s.state.isAuthInProgress);
+
+  const isAuthLoading =
+    isAuthenticating ||
+    isAuthInProgress ||
+    authenticationState === "loading" ||
+    authenticationState === "authenticating";
+
   const { data, loading, error } = useQuery<CurrentUserProfileQueryResult>(GET_CURRENT_USER_PROFILE, {
-    skip: !!ssrUser,
+    skip: !!ssrUser || isAuthLoading || authenticationState === "unauthenticated",
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
   });
@@ -32,6 +43,8 @@ export function ClientLayout({ children, ssrUser }: ClientLayoutProps) {
   logger.debug("[AUTH] /users/me ClientLayout state", {
     hasSsrUser: !!ssrUser,
     ssrUserId: ssrUser?.id,
+    authenticationState,
+    isAuthLoading,
     loading,
     hasCsrUser: !!csrUser,
     csrUserId: csrUser?.id,
@@ -47,12 +60,18 @@ export function ClientLayout({ children, ssrUser }: ClientLayoutProps) {
     return <>{children}</>;
   }
 
-  if (loading && !csrUser) {
+  if (isAuthLoading || loading) {
     logger.debug("[AUTH] /users/me ClientLayout: loading spinner", {
+      isAuthLoading,
+      authenticationState,
       loading,
-      hasCsrUser: !!csrUser,
-      hasError: !!error,
-      errorMessage: error?.message,
+      component: "ClientLayout",
+    });
+    return <LoadingIndicator />;
+  }
+
+  if (authenticationState === "unauthenticated") {
+    logger.debug("[AUTH] /users/me ClientLayout: unauthenticated, deferring to RouteGuard", {
       component: "ClientLayout",
     });
     return <LoadingIndicator />;
@@ -60,6 +79,7 @@ export function ClientLayout({ children, ssrUser }: ClientLayoutProps) {
 
   if (!csrUser) {
     logger.debug("[AUTH] /users/me ClientLayout: notFound", {
+      authenticationState,
       component: "ClientLayout",
     });
     return notFound();
