@@ -379,5 +379,5 @@ function getCommunityIdFromHost(host: string | null): string | null {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|robots.txt).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|robots.txt|images/|icons/).*)"],
 };
