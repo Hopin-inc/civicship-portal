@@ -20,11 +20,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const response = await fetch(url, {
-      headers: {
-        'Origin': process.env.NEXT_PUBLIC_SITE_URL || 'https://www.neo88.app',
-      },
-    });
+    const response = await fetch(url);
 
     if (!response.ok) {
       throw new Error(`Failed to fetch image: ${response.status}`);
