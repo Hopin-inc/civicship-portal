@@ -98,7 +98,6 @@ export const GET_COMMUNITY_PORTAL_CONFIG = gql`
       regionKey
       liffId
       liffBaseUrl
-      firebaseTenantId
     }
   }
 `;

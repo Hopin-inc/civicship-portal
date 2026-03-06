@@ -112,7 +112,6 @@ async function initAuthFast({
           const firebaseUser = await initializeFirebase(
             liffService,
             environment,
-            communityConfig?.firebaseTenantId,
           );
           if (firebaseUser) {
             useAuthStore.getState().setState({ firebaseUser });
@@ -154,7 +153,6 @@ async function initAuthFull({
     const firebaseUser = await initializeFirebase(
       liffService,
       environment,
-      communityConfig?.firebaseTenantId,
     );
     if (!firebaseUser) {
       const shouldContinue = handleUnauthenticatedBranch(
@@ -167,7 +165,7 @@ async function initAuthFull({
       return;
     }
 
-    const sessionOk = await establishSessionFromFirebaseUser(firebaseUser, setState, communityConfig?.firebaseTenantId);
+    const sessionOk = await establishSessionFromFirebaseUser(firebaseUser, setState);
     if (!sessionOk) {
       finalizeAuthState("unauthenticated", undefined, setState, authStateManager);
       return;

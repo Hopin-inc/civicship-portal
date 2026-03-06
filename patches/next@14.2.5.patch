@@ -1,0 +1,24 @@
+diff --git a/dist/client/on-recoverable-error.js b/dist/client/on-recoverable-error.js
+index 535e1bd374e43c3be767d8024bb50c94f6635afd..c6b47fa7bfb7a8dda69007b0057a15647248363b 100644
+--- a/dist/client/on-recoverable-error.js
++++ b/dist/client/on-recoverable-error.js
+@@ -18,6 +18,7 @@ function onRecoverableError(err) {
+     };
+     // Skip certain custom errors which are not expected to be reported on client
+     if ((0, _bailouttocsr.isBailoutToCSRError)(err)) return;
++    if (err.message.startsWith('POSTPONE:')) return;
+     defaultOnRecoverableError(err);
+ }
+ 
+diff --git a/dist/esm/client/on-recoverable-error.js b/dist/esm/client/on-recoverable-error.js
+index 299e9c25f7064d01d2ecaee4eb723c93a1ded8d6..e772ee9c503ac779164dde89d85710243a519a10 100644
+--- a/dist/esm/client/on-recoverable-error.js
++++ b/dist/esm/client/on-recoverable-error.js
+@@ -8,6 +8,7 @@ export default function onRecoverableError(err) {
+     };
+     // Skip certain custom errors which are not expected to be reported on client
+     if (isBailoutToCSRError(err)) return;
++    if (err.message.startsWith('POSTPONE:')) return;
+     defaultOnRecoverableError(err);
+ }
+ 
