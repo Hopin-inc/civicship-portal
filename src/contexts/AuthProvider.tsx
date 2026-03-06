@@ -66,6 +66,40 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     return data?.currentUser?.user ?? null;
   }, [refetch]);
 
+  // auth:token-expired イベントをキャッチしてセッションをクリアし、LIFF 再認証を行う
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    let isHandling = false;
+
+    const handleTokenExpired = async (event: Event) => {
+      if (isHandling) return;
+      isHandling = true;
+      logger.warn("[AuthProvider] Stale session detected — clearing and re-authenticating", {
+        detail: (event as CustomEvent).detail,
+      });
+      try {
+        await fetch("/api/sessionLogout", { method: "POST" });
+      } catch (e) {
+        logger.warn("[AuthProvider] Failed to clear session cookie", { error: e });
+      }
+      if (authStateManager) {
+        hasInitialized.current = false;
+        void initAuth({
+          communityConfig,
+          liffService,
+          authStateManager,
+          ssrCurrentUser: null,
+          ssrLineAuthenticated: false,
+          ssrPhoneAuthenticated: false,
+        });
+      }
+      isHandling = false;
+    };
+
+    window.addEventListener("auth:token-expired", handleTokenExpired);
+    return () => window.removeEventListener("auth:token-expired", handleTokenExpired);
+  }, [authStateManager, communityConfig, liffService]);
+
   useAuthSideEffects({ authStateManager, liffService, refetchUser, hasFullAuth });
 
   const { logout } = useAuthActions({
