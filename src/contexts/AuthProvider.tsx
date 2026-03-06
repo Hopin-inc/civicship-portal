@@ -74,26 +74,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     const handleTokenExpired = async (event: Event) => {
       if (isHandling) return;
       isHandling = true;
-      logger.warn("[AuthProvider] Stale session detected — clearing and re-authenticating", {
-        detail: (event as CustomEvent).detail,
-      });
       try {
-        await fetch("/api/sessionLogout", { method: "POST" });
-      } catch (e) {
-        logger.warn("[AuthProvider] Failed to clear session cookie", { error: e });
-      }
-      if (authStateManager) {
-        hasInitialized.current = false;
-        void initAuth({
-          communityConfig,
-          liffService,
-          authStateManager,
-          ssrCurrentUser: null,
-          ssrLineAuthenticated: false,
-          ssrPhoneAuthenticated: false,
+        logger.warn("[AuthProvider] Stale session detected — clearing and re-authenticating", {
+          detail: (event as CustomEvent).detail,
         });
+        try {
+          await fetch("/api/sessionLogout", { method: "POST" });
+        } catch (e) {
+          logger.warn("[AuthProvider] Failed to clear session cookie", { error: e });
+        }
+        if (authStateManager) {
+          hasInitialized.current = false;
+          await initAuth({
+            communityConfig,
+            liffService,
+            authStateManager,
+            ssrCurrentUser: null,
+            ssrLineAuthenticated: false,
+            ssrPhoneAuthenticated: false,
+          });
+        }
+      } finally {
+        isHandling = false;
       }
-      isHandling = false;
     };
 
     window.addEventListener("auth:token-expired", handleTokenExpired);
