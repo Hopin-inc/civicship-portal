@@ -173,6 +173,21 @@ async function initAuthFull({
 
     const user = await restoreUserSession(communityConfig, ssrCurrentUser, firebaseUser, setState);
     if (!user) {
+      // セッションcookieが残存している場合はステールとしてクリア
+      // （バックエンドがauth/user-not-foundでfallback anonymousした可能性）
+      if (
+        typeof document !== "undefined" &&
+        document.cookie.split(";").some((c) => c.trim().startsWith("__session"))
+      ) {
+        logger.warn("[AUTH] User not found with session cookie present - clearing stale session", {
+          component: "initAuthFull",
+        });
+        try {
+          await fetch("/api/sessionLogout", { method: "POST" });
+        } catch (e) {
+          logger.warn("[AUTH] Failed to clear stale session cookie", { error: e });
+        }
+      }
       finalizeAuthState("unauthenticated", undefined, setState, authStateManager);
       return;
     }
