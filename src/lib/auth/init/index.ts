@@ -112,7 +112,6 @@ async function initAuthFast({
           const firebaseUser = await initializeFirebase(
             liffService,
             environment,
-            communityConfig?.firebaseTenantId,
           );
           if (firebaseUser) {
             useAuthStore.getState().setState({ firebaseUser });
@@ -154,7 +153,6 @@ async function initAuthFull({
     const firebaseUser = await initializeFirebase(
       liffService,
       environment,
-      communityConfig?.firebaseTenantId,
     );
     if (!firebaseUser) {
       const shouldContinue = handleUnauthenticatedBranch(
@@ -167,7 +165,7 @@ async function initAuthFull({
       return;
     }
 
-    const sessionOk = await establishSessionFromFirebaseUser(firebaseUser, setState, communityConfig?.firebaseTenantId);
+    const sessionOk = await establishSessionFromFirebaseUser(firebaseUser, setState);
     if (!sessionOk) {
       finalizeAuthState("unauthenticated", undefined, setState, authStateManager);
       return;
@@ -175,6 +173,21 @@ async function initAuthFull({
 
     const user = await restoreUserSession(communityConfig, ssrCurrentUser, firebaseUser, setState);
     if (!user) {
+      // セッションcookieが残存している場合はステールとしてクリア
+      // （バックエンドがauth/user-not-foundでfallback anonymousした可能性）
+      if (
+        typeof document !== "undefined" &&
+        document.cookie.split(";").some((c) => c.trim().startsWith("__session"))
+      ) {
+        logger.warn("[AUTH] User not found with session cookie present - clearing stale session", {
+          component: "initAuthFull",
+        });
+        try {
+          await fetch("/api/sessionLogout", { method: "POST" });
+        } catch (e) {
+          logger.warn("[AUTH] Failed to clear stale session cookie", { error: e });
+        }
+      }
       finalizeAuthState("unauthenticated", undefined, setState, authStateManager);
       return;
     }

@@ -21,10 +21,6 @@ export const defaultApp = initializeApp(firebaseConfigWithAppId);
 export const lineApp = initializeApp(firebaseConfig, "line-auth-app");
 export const lineAuth: Auth = getAuth(lineApp);
 
-export const setLineAuthTenantId = (tenantId: string | null) => {
-  lineAuth.tenantId = tenantId;
-};
-
 // Use localStorage instead of IndexedDB for persistence
 // IndexedDB can hang in LIFF WebView environments (WKWebView on iOS, WebView on Android)
 // See: https://github.com/firebase/firebase-js-sdk/issues/6791
@@ -40,10 +36,6 @@ export const getPhoneAuth = (): Auth => {
     getApps().find((a) => a.name === "phone-auth-app") ??
     initializeApp(firebaseConfig, "phone-auth-app");
   return getAuth(app);
-};
-
-export const setPhoneAuthTenantId = (tenantId: string | null) => {
-  getPhoneAuth().tenantId = tenantId;
 };
 
 let analyticsInstance: Analytics | undefined;
