@@ -6,20 +6,26 @@ import { CommunityPortalConfig } from "@/lib/communities/config";
 import { logger } from "@/lib/logging";
 
 export function useAuthDependencies(communityConfig: CommunityPortalConfig | null) {
-  const liffAppId = communityConfig?.liffAppId ?? undefined;
+  const miniAppLiffId = process.env.NEXT_PUBLIC_MINI_APP_LIFF_ID;
 
   useEffect(() => {
+    if (!miniAppLiffId) {
+      logger.error(
+        "[useAuthDependencies] NEXT_PUBLIC_MINI_APP_LIFF_ID is not configured. LIFF/Mini App features will be unavailable.",
+        { component: "useAuthDependencies" },
+      );
+    }
     logger.info("[useAuthDependencies] Resolving auth dependencies", {
       configIsNull: communityConfig === null,
       communityId: communityConfig?.communityId,
-      liffAppId,
+      miniAppLiffId,
       component: "useAuthDependencies",
     });
-  }, [communityConfig, liffAppId]);
+  }, [communityConfig, miniAppLiffId]);
 
   const liffService = useMemo(() => {
-    return LiffService.getInstance(liffAppId);
-  }, [liffAppId]);
+    return LiffService.getInstance(miniAppLiffId);
+  }, [miniAppLiffId]);
 
   const phoneAuthService = useMemo(() => PhoneAuthService.getInstance(), []);
 

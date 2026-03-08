@@ -24,9 +24,6 @@ export interface CommunityPortalConfig {
   commonDocumentOverrides: CommonDocumentOverridesConfig | null;
   regionName: string | null;
   regionKey: string | null;
-  liffId: string | null;
-  liffAppId: string | null;
-  liffBaseUrl: string | null;
 }
 
 export interface CommunityDocumentConfig {
@@ -83,9 +80,6 @@ const COMMUNITY_PORTAL_CONFIG_QUERY = `
       }
       regionName
       regionKey
-      liffId
-      liffAppId
-      liffBaseUrl
     }
   }
 `;
@@ -124,14 +118,12 @@ export const getCommunityConfig = cache(
         });
       } else {
         const nullFields = (
-          ["liffId", "liffAppId", "liffBaseUrl", "regionName", "regionKey"] as const
+          ["regionName", "regionKey"] as const
         ).filter((field) => config[field] == null);
 
         logger.info("[getCommunityConfig] Config fetched from DB", {
           communityId,
           configCommunityId: config.communityId,
-          liffId: config.liffId,
-          liffAppId: config.liffAppId,
           nullFields: nullFields.length > 0 ? nullFields : undefined,
           component: "getCommunityConfig",
         });

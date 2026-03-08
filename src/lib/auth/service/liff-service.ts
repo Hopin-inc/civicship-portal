@@ -44,7 +44,7 @@ export class LiffService {
   }
 
   public getLiffUrl(redirectPath?: string): string {
-    const baseUrl = `https://liff.line.me/${this.liffId}`;
+    const baseUrl = `https://miniapp.line.me/${this.liffId}`;
     if (!redirectPath) return baseUrl;
 
     const encodedNext = encodeURIComponent(redirectPath);
