@@ -9,6 +9,12 @@ export function useAuthDependencies(communityConfig: CommunityPortalConfig | nul
   const miniAppLiffId = process.env.NEXT_PUBLIC_MINI_APP_LIFF_ID;
 
   useEffect(() => {
+    if (!miniAppLiffId) {
+      logger.error(
+        "[useAuthDependencies] NEXT_PUBLIC_MINI_APP_LIFF_ID is not configured. LIFF/Mini App features will be unavailable.",
+        { component: "useAuthDependencies" },
+      );
+    }
     logger.info("[useAuthDependencies] Resolving auth dependencies", {
       configIsNull: communityConfig === null,
       communityId: communityConfig?.communityId,
