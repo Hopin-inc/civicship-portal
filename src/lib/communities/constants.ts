@@ -47,7 +47,4 @@ export const COMMUNITY_LOCAL_CONFIGS: CommunityPortalConfig = {
   regionKey: null,
 
   firebaseTenantId: "himeji-ymca-5pdjx",
-  liffId: "2007838818",
-  liffAppId: "2007838818-VR4yRvgL",
-  liffBaseUrl: "https://liff.line.me/2007838818-VR4yRvgL",
 };

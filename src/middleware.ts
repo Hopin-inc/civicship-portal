@@ -267,6 +267,7 @@ function setSecurityHeaders(res: NextResponse, nonce: string) {
     "https://identitytoolkit.googleapis.com",
     "https://securetoken.googleapis.com",
     "https://liffsdk.line-scdn.net",
+    "https://miniapp.line-scdn.net",
     "https://www.google.com",
     "https://maps.googleapis.com",
     "https://firebase.googleapis.com",

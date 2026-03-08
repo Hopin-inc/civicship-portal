@@ -7,7 +7,7 @@ import { CommunityPortalConfig } from "@/lib/communities/config";
 import { logger } from "@/lib/logging";
 
 export function useAuthDependencies(communityConfig: CommunityPortalConfig | null) {
-  const liffAppId = communityConfig?.liffAppId ?? undefined;
+  const miniAppLiffId = process.env.NEXT_PUBLIC_MINI_APP_LIFF_ID;
   const firebaseTenantId = communityConfig?.firebaseTenantId ?? null;
 
   useEffect(() => {
@@ -15,15 +15,15 @@ export function useAuthDependencies(communityConfig: CommunityPortalConfig | nul
       configIsNull: communityConfig === null,
       communityId: communityConfig?.communityId,
       firebaseTenantId,
-      liffAppId,
+      miniAppLiffId,
       component: "useAuthDependencies",
     });
-  }, [communityConfig, firebaseTenantId, liffAppId]);
+  }, [communityConfig, firebaseTenantId, miniAppLiffId]);
 
   const liffService = useMemo(() => {
     setLineAuthTenantId(firebaseTenantId);
-    return LiffService.getInstance(liffAppId);
-  }, [liffAppId, firebaseTenantId]);
+    return LiffService.getInstance(miniAppLiffId);
+  }, [miniAppLiffId, firebaseTenantId]);
 
   const phoneAuthService = useMemo(() => PhoneAuthService.getInstance(), []);
 
