@@ -46,7 +46,6 @@ export function CommunityConfigProvider({ children, config, isFromDatabase }: Co
         communityId: config.communityId,
         isFromDatabase,
         storeStateBefore: storeBefore,
-        firebaseTenantId: config.firebaseTenantId,
         component: "CommunityConfigProvider",
       });
       useCommunityStore.getState().setCommunityId(config.communityId, "ssr");

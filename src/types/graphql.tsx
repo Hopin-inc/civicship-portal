@@ -353,7 +353,6 @@ export type GqlCommunityPortalConfig = {
   domain: Scalars["String"]["output"];
   enableFeatures: Array<Scalars["String"]["output"]>;
   faviconPrefix: Scalars["String"]["output"];
-  firebaseTenantId?: Maybe<Scalars["String"]["output"]>;
   liffAppId?: Maybe<Scalars["String"]["output"]>;
   liffBaseUrl?: Maybe<Scalars["String"]["output"]>;
   liffId?: Maybe<Scalars["String"]["output"]>;
@@ -3227,7 +3226,6 @@ export type GqlGetCommunityPortalConfigQuery = {
     regionKey?: string | null;
     liffId?: string | null;
     liffBaseUrl?: string | null;
-    firebaseTenantId?: string | null;
     documents?: Array<{
       __typename?: "CommunityDocument";
       id: string;
@@ -7533,7 +7531,6 @@ export const GetCommunityPortalConfigDocument = gql`
       regionKey
       liffId
       liffBaseUrl
-      firebaseTenantId
     }
   }
 `;
