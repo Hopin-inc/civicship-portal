@@ -104,8 +104,6 @@ const CommunityLayout = async ({ children, params }: CommunityLayoutProps) => {
       hasConfig: !!communityConfig,
       isFromDatabase,
       configCommunityId: communityConfig?.communityId,
-      hasLiffId: !!communityConfig?.liffId,
-      hasLiffAppId: !!communityConfig?.liffAppId,
       component: "CommunityLayout",
     });
   } catch (error) {
