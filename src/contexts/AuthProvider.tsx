@@ -8,7 +8,6 @@ import { useAuthDependencies } from "@/hooks/auth/init/useAuthDependencies";
 import { applySsrAuthState } from "@/lib/auth/init/applySsrAuthState";
 import { useAuthActions } from "@/hooks/auth/actions";
 import { useAuthSideEffects } from "@/hooks/auth/sideEffects";
-import { useStaleSessionRecovery } from "@/hooks/auth/sideEffects/useStaleSessionRecovery";
 import { useAuthValue } from "@/hooks/auth/init/useAuthValue";
 import { useLanguageSync } from "@/hooks/useLanguageSync";
 import { logger } from "@/lib/logging";
@@ -66,8 +65,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     const { data } = await refetch();
     return data?.currentUser?.user ?? null;
   }, [refetch]);
-
-  useStaleSessionRecovery({ authStateManager, liffService, communityConfig, hasInitialized });
 
   useAuthSideEffects({ authStateManager, liffService, refetchUser, hasFullAuth });
 

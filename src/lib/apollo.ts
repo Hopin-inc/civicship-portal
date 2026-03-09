@@ -168,24 +168,6 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
         );
       }
     }
-
-    if ("statusCode" in networkError && networkError.statusCode === 500) {
-      // 旧セッションcookieが存在する場合のみ発火（セッション無効化による500の可能性）
-      const hasSessionCookie =
-        typeof document !== "undefined" &&
-        document.cookie.split(";").some((c) => c.trim().startsWith("__session"));
-      if (hasSessionCookie && typeof window !== "undefined") {
-        logger.warn("Network 500 with session cookie - possible stale session", {
-          component: "ApolloErrorLink",
-          operation: operation.operationName,
-        });
-        window.dispatchEvent(
-          new CustomEvent("auth:token-expired", {
-            detail: { source: "network", status: 500 },
-          }),
-        );
-      }
-    }
   }
 });
 

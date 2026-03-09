@@ -4,7 +4,8 @@ import { GqlUser } from "@/types/graphql";
 import { AuthStateManager } from "@/lib/auth/core/auth-state-manager";
 import { fetchCurrentUserClient } from "@/lib/auth/init/fetchCurrentUser";
 import { TokenManager } from "@/lib/auth/core/token-manager";
-import { User } from "firebase/auth";
+import { User, signOut } from "firebase/auth";
+import { lineAuth } from "@/lib/auth/core/firebase-config";
 import { LiffService } from "@/lib/auth/service/liff-service";
 import { AuthEnvironment } from "@/lib/auth/core/environment-detector";
 import { logger } from "@/lib/logging";
@@ -83,7 +84,18 @@ export function handleUnauthenticatedBranch(
 export async function establishSessionFromFirebaseUser(
   firebaseUser: User,
   setState: ReturnType<typeof useAuthStore.getState>["setState"],
+  expectedTenantId?: string | null,
 ): Promise<boolean> {
+  // 別コミュニティのキャッシュセッションが残っている場合はサインアウトして終了
+  if (expectedTenantId !== undefined && firebaseUser.tenantId !== expectedTenantId) {
+    logger.warn("[establishSessionFromFirebaseUser] Tenant mismatch, signing out stale session", {
+      userTenantId: firebaseUser.tenantId,
+      expectedTenantId,
+    });
+    await signOut(lineAuth);
+    return false;
+  }
+
   try {
     const idToken = await firebaseUser.getIdToken(true);
     const tokenResult = await firebaseUser.getIdTokenResult();
