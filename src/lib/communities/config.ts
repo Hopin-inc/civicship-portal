@@ -27,6 +27,7 @@ export interface CommunityPortalConfig {
   liffId: string | null;
   liffAppId: string | null;
   liffBaseUrl: string | null;
+  firebaseTenantId: string | null;
 }
 
 export interface CommunityDocumentConfig {
@@ -86,6 +87,7 @@ const COMMUNITY_PORTAL_CONFIG_QUERY = `
       liffId
       liffAppId
       liffBaseUrl
+      firebaseTenantId
     }
   }
 `;
@@ -124,12 +126,13 @@ export const getCommunityConfig = cache(
         });
       } else {
         const nullFields = (
-          ["liffId", "liffAppId", "liffBaseUrl", "regionName", "regionKey"] as const
+          ["firebaseTenantId", "liffId", "liffAppId", "liffBaseUrl", "regionName", "regionKey"] as const
         ).filter((field) => config[field] == null);
 
         logger.info("[getCommunityConfig] Config fetched from DB", {
           communityId,
           configCommunityId: config.communityId,
+          firebaseTenantId: config.firebaseTenantId,
           liffId: config.liffId,
           liffAppId: config.liffAppId,
           nullFields: nullFields.length > 0 ? nullFields : undefined,
