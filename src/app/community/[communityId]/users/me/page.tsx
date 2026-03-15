@@ -19,6 +19,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useTranslations } from "next-intl";
 import { ArrowLeftRight, Check } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 
 export default function MyProfilePage() {
   const { gqlUser, isOwner, portfolios } = useUserProfileContext();
@@ -68,13 +70,25 @@ export default function MyProfilePage() {
               const isJoined = joinedCommunityIds.has(community?.id);
               return (
                 <DropdownMenuItem key={community?.id} asChild disabled={isCurrent}>
-                  <AppLink href="/users/me" communityId={community?.id}>
-                    {isCurrent && <Check className="w-4 h-4 mr-2 shrink-0" />}
-                    <span className={isCurrent ? "" : "ml-6"}>{community?.name}</span>
+                  <AppLink href="/users/me" communityId={community?.id} className="flex items-center gap-3 py-2">
+                    <div className="relative shrink-0">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={community?.image ?? undefined} alt={community?.name ?? ""} />
+                        <AvatarFallback className="text-xs font-medium">
+                          {community?.name?.charAt(0) ?? "?"}
+                        </AvatarFallback>
+                      </Avatar>
+                      {isCurrent && (
+                        <span className="absolute -bottom-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary ring-2 ring-background">
+                          <Check className="h-2.5 w-2.5 text-primary-foreground" />
+                        </span>
+                      )}
+                    </div>
+                    <span className="flex-1 truncate text-sm">{community?.name}</span>
                     {!isJoined && (
-                      <span className="ml-auto text-xs text-muted-foreground">
+                      <Badge variant="outline" size="sm" className="shrink-0 text-muted-foreground">
                         {t("users.profileHeader.notJoined")}
-                      </span>
+                      </Badge>
                     )}
                   </AppLink>
                 </DropdownMenuItem>
