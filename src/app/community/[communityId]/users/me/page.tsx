@@ -86,7 +86,7 @@ export default function MyProfilePage() {
                     </div>
                     <span className="flex-1 truncate text-sm">{community?.name}</span>
                     {!isJoined && (
-                      <Badge variant="outline" size="sm" className="shrink-0 text-muted-foreground">
+                      <Badge variant="outline" size="sm" className="shrink-0 text-muted-foreground px-1.5 py-0 text-[10px]">
                         {t("users.profileHeader.notJoined")}
                       </Badge>
                     )}
