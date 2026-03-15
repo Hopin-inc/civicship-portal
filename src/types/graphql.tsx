@@ -252,7 +252,6 @@ export type GqlCommunityConfig = {
 };
 
 export type GqlCommunityConfigInput = {
-  firebaseConfig?: InputMaybe<GqlCommunityFirebaseConfigInput>;
   lineConfig?: InputMaybe<GqlCommunityLineConfigInput>;
 };
 
@@ -306,10 +305,6 @@ export type GqlCommunityFilterInput = {
 export type GqlCommunityFirebaseConfig = {
   __typename?: "CommunityFirebaseConfig";
   tenantId?: Maybe<Scalars["String"]["output"]>;
-};
-
-export type GqlCommunityFirebaseConfigInput = {
-  tenantId: Scalars["String"]["input"];
 };
 
 export type GqlCommunityLineConfig = {
