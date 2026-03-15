@@ -37,10 +37,13 @@ export default function MyProfilePage() {
 
   const { data: communitiesData } = useGetCommunitiesQuery();
   const allCommunities = useMemo(() => {
-    const communities = communitiesData?.communities?.edges?.map((e) => e?.node) ?? [];
+    const communities =
+      communitiesData?.communities?.edges
+        ?.map((e) => e?.node)
+        .filter((c): c is NonNullable<typeof c> => !!c) ?? [];
     return [...communities].sort((a, b) => {
-      const aJoined = joinedCommunityIds.has(a?.id) ? 0 : 1;
-      const bJoined = joinedCommunityIds.has(b?.id) ? 0 : 1;
+      const aJoined = joinedCommunityIds.has(a.id) ? 0 : 1;
+      const bJoined = joinedCommunityIds.has(b.id) ? 0 : 1;
       return aJoined - bJoined;
     });
   }, [communitiesData, joinedCommunityIds]);
@@ -70,16 +73,16 @@ export default function MyProfilePage() {
             <DropdownMenuLabel>{t("users.profileHeader.switchLabel")}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             {allCommunities.map((community) => {
-              const isCurrent = community?.id === communityId;
-              const isJoined = joinedCommunityIds.has(community?.id);
+              const isCurrent = community.id === communityId;
+              const isJoined = joinedCommunityIds.has(community.id);
               return (
-                <DropdownMenuItem key={community?.id} asChild disabled={isCurrent}>
-                  <AppLink href="/users/me" communityId={community?.id} className="flex items-center gap-3 py-2">
+                <DropdownMenuItem key={community.id} asChild disabled={isCurrent}>
+                  <AppLink href="/users/me" communityId={community.id} className="flex items-center gap-3 py-2">
                     <div className="relative shrink-0">
                       <Avatar className="h-8 w-8">
-                        <AvatarImage src={community?.image ?? undefined} alt={community?.name ?? ""} />
+                        <AvatarImage src={community.image ?? undefined} alt={community.name ?? ""} />
                         <AvatarFallback className="text-xs font-medium">
-                          {community?.name?.charAt(0) ?? "?"}
+                          {community.name?.charAt(0) ?? "?"}
                         </AvatarFallback>
                       </Avatar>
                       {isCurrent && (
@@ -88,7 +91,7 @@ export default function MyProfilePage() {
                         </span>
                       )}
                     </div>
-                    <span className="flex-1 truncate text-sm">{community?.name}</span>
+                    <span className="flex-1 truncate text-sm">{community.name}</span>
                     {!isJoined && (
                       <Badge variant="outline" size="sm" className="shrink-0 text-muted-foreground px-1.5 py-0 text-[10px]">
                         {t("users.profileHeader.notJoined")}
