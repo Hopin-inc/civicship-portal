@@ -36,10 +36,14 @@ export default function MyProfilePage() {
   );
 
   const { data: communitiesData } = useGetCommunitiesQuery();
-  const allCommunities = useMemo(
-    () => communitiesData?.communities?.edges?.map((e) => e?.node) ?? [],
-    [communitiesData],
-  );
+  const allCommunities = useMemo(() => {
+    const communities = communitiesData?.communities?.edges?.map((e) => e?.node) ?? [];
+    return [...communities].sort((a, b) => {
+      const aJoined = joinedCommunityIds.has(a?.id) ? 0 : 1;
+      const bJoined = joinedCommunityIds.has(b?.id) ? 0 : 1;
+      return aJoined - bJoined;
+    });
+  }, [communitiesData, joinedCommunityIds]);
 
   // 管理者権限チェック（現在のコミュニティ）
   const hasAdminRole = useMemo(() => {
