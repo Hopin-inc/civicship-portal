@@ -27,11 +27,17 @@ export default function MyProfilePage() {
   const communityId = communityConfig?.communityId;
   const t = useTranslations();
 
-  const memberships = currentUser?.memberships ?? [];
-  const joinedCommunityIds = new Set(memberships.map((m: GqlMembership) => m.community?.id));
+  const memberships = useMemo(() => currentUser?.memberships ?? [], [currentUser?.memberships]);
+  const joinedCommunityIds = useMemo(
+    () => new Set(memberships.map((m: GqlMembership) => m.community?.id)),
+    [memberships],
+  );
 
   const { data: communitiesData } = useGetCommunitiesQuery();
-  const allCommunities = communitiesData?.communities?.edges?.map((e) => e?.node) ?? [];
+  const allCommunities = useMemo(
+    () => communitiesData?.communities?.edges?.map((e) => e?.node) ?? [],
+    [communitiesData],
+  );
 
   // 管理者権限チェック（現在のコミュニティ）
   const hasAdminRole = useMemo(() => {
