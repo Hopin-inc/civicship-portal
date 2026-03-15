@@ -31,7 +31,7 @@ export default function MyProfilePage() {
 
   const memberships = useMemo(() => currentUser?.memberships ?? [], [currentUser?.memberships]);
   const joinedCommunityIds = useMemo(
-    () => new Set(memberships.map((m: GqlMembership) => m.community?.id)),
+    () => new Set(memberships.map((m: GqlMembership) => m.community?.id).filter((id): id is string => !!id)),
     [memberships],
   );
 
