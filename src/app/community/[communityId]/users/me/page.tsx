@@ -57,7 +57,7 @@ export default function MyProfilePage() {
     return membership?.role === GqlRole.Owner || membership?.role === GqlRole.Manager;
   }, [memberships, communityId]);
 
-  const showSwitcher = allCommunities.length > 1 || hasAdminRole;
+  const showSwitcher = joinedCommunityIds.size > 1 || hasAdminRole;
 
   // ヘッダー設定
   const headerConfig = useMemo(
