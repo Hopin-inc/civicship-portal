@@ -35,7 +35,19 @@ export default function MyProfilePage() {
     [memberships],
   );
 
-  const { data: communitiesData } = useGetCommunitiesQuery();
+  // 管理者権限チェック（現在のコミュニティ）
+  const hasAdminRole = useMemo(() => {
+    const membership = memberships.find(
+      (m: GqlMembership) => m.community?.id === communityId,
+    );
+    return membership?.role === GqlRole.Owner || membership?.role === GqlRole.Manager;
+  }, [memberships, communityId]);
+
+  const showSwitcher = joinedCommunityIds.size > 1 || hasAdminRole;
+
+  const { data: communitiesData, loading: communitiesLoading } = useGetCommunitiesQuery({
+    skip: !showSwitcher,
+  });
   const allCommunities = useMemo(() => {
     const communities =
       communitiesData?.communities?.edges?.flatMap((e) => (e?.node ? [e.node] : [])) ?? [];
@@ -49,23 +61,13 @@ export default function MyProfilePage() {
     });
   }, [communitiesData, joinedCommunityIds]);
 
-  // 管理者権限チェック（現在のコミュニティ）
-  const hasAdminRole = useMemo(() => {
-    const membership = memberships.find(
-      (m: GqlMembership) => m.community?.id === communityId,
-    );
-    return membership?.role === GqlRole.Owner || membership?.role === GqlRole.Manager;
-  }, [memberships, communityId]);
-
-  const showSwitcher = joinedCommunityIds.size > 1 || hasAdminRole;
-
   // ヘッダー設定
   const headerConfig = useMemo(
     () => ({
       action: showSwitcher ? (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="tertiary" size="sm">
+            <Button variant="tertiary" size="sm" disabled={communitiesLoading}>
               {t("users.profileHeader.switchButton")}
               <ArrowLeftRight className="w-4 h-4 ml-1" />
             </Button>
@@ -116,7 +118,7 @@ export default function MyProfilePage() {
         </DropdownMenu>
       ) : undefined,
     }),
-    [showSwitcher, allCommunities, joinedCommunityIds, communityId, hasAdminRole, t],
+    [showSwitcher, allCommunities, joinedCommunityIds, communityId, hasAdminRole, t, communitiesLoading],
   );
 
   useHeaderConfig(headerConfig);

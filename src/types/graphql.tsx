@@ -7190,6 +7190,7 @@ export const GetCommunitiesDocument = gql`
         node {
           id
           name
+          image
         }
       }
       totalCount
