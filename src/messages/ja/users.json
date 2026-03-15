@@ -3,6 +3,7 @@
   "users.profileHeader.adminButton": "管理画面",
   "users.profileHeader.switchButton": "切り替え",
   "users.profileHeader.switchLabel": "コミュニティを切り替える",
+  "users.profileHeader.notJoined": "未参加",
   "users.profileHeader.readMore": "もっと見る",
   "users.profileView.certificatesTitle": "証明書",
   "users.portfolio.sectionTitle": "これまでの関わり",

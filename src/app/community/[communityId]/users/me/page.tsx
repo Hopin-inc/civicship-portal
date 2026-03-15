@@ -4,7 +4,7 @@ import { presentUserProfile, useUserProfileContext } from "@/app/community/[comm
 import { UserProfileView } from "@/app/community/[communityId]/users/features/profile";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
-import { GqlMembership, GqlRole } from "@/types/graphql";
+import { GqlMembership, GqlRole, useGetCommunitiesQuery } from "@/types/graphql";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useMemo } from "react";
 import { AppLink } from "@/lib/navigation";
@@ -28,6 +28,10 @@ export default function MyProfilePage() {
   const t = useTranslations();
 
   const memberships = currentUser?.memberships ?? [];
+  const joinedCommunityIds = new Set(memberships.map((m: GqlMembership) => m.community?.id));
+
+  const { data: communitiesData } = useGetCommunitiesQuery();
+  const allCommunities = communitiesData?.communities?.edges?.map((e) => e?.node) ?? [];
 
   // 管理者権限チェック（現在のコミュニティ）
   const hasAdminRole = useMemo(() => {
@@ -37,7 +41,7 @@ export default function MyProfilePage() {
     return membership?.role === GqlRole.Owner || membership?.role === GqlRole.Manager;
   }, [memberships, communityId]);
 
-  const showSwitcher = memberships.length > 1 || hasAdminRole;
+  const showSwitcher = allCommunities.length > 1 || hasAdminRole;
 
   // ヘッダー設定
   const headerConfig = useMemo(
@@ -53,13 +57,19 @@ export default function MyProfilePage() {
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>{t("users.profileHeader.switchLabel")}</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {memberships.map((m: GqlMembership) => {
-              const isCurrent = m.community?.id === communityId;
+            {allCommunities.map((community) => {
+              const isCurrent = community?.id === communityId;
+              const isJoined = joinedCommunityIds.has(community?.id);
               return (
-                <DropdownMenuItem key={m.community?.id} asChild disabled={isCurrent}>
-                  <AppLink href="/users/me" communityId={m.community?.id}>
+                <DropdownMenuItem key={community?.id} asChild disabled={isCurrent}>
+                  <AppLink href="/users/me" communityId={community?.id}>
                     {isCurrent && <Check className="w-4 h-4 mr-2 shrink-0" />}
-                    <span className={isCurrent ? "" : "ml-6"}>{m.community?.name}</span>
+                    <span className={isCurrent ? "" : "ml-6"}>{community?.name}</span>
+                    {!isJoined && (
+                      <span className="ml-auto text-xs text-muted-foreground">
+                        {t("users.profileHeader.notJoined")}
+                      </span>
+                    )}
                   </AppLink>
                 </DropdownMenuItem>
               );
@@ -78,7 +88,7 @@ export default function MyProfilePage() {
         </DropdownMenu>
       ) : undefined,
     }),
-    [showSwitcher, memberships, communityId, hasAdminRole, t],
+    [showSwitcher, allCommunities, joinedCommunityIds, communityId, hasAdminRole, t],
   );
 
   useHeaderConfig(headerConfig);
