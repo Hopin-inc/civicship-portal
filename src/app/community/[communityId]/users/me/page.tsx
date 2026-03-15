@@ -38,13 +38,14 @@ export default function MyProfilePage() {
   const { data: communitiesData } = useGetCommunitiesQuery();
   const allCommunities = useMemo(() => {
     const communities =
-      communitiesData?.communities?.edges
-        ?.map((e) => e?.node)
-        .filter((c): c is NonNullable<typeof c> => !!c) ?? [];
-    return [...communities].sort((a, b) => {
-      const aJoined = joinedCommunityIds.has(a.id) ? 0 : 1;
-      const bJoined = joinedCommunityIds.has(b.id) ? 0 : 1;
-      return aJoined - bJoined;
+      communitiesData?.communities?.edges?.flatMap((e) => (e?.node ? [e.node] : [])) ?? [];
+    return communities.sort((a, b) => {
+      const aJoined = joinedCommunityIds.has(a.id);
+      const bJoined = joinedCommunityIds.has(b.id);
+      if (aJoined !== bJoined) {
+        return aJoined ? -1 : 1;
+      }
+      return (a.name ?? "").localeCompare(b.name ?? "");
     });
   }, [communitiesData, joinedCommunityIds]);
 
