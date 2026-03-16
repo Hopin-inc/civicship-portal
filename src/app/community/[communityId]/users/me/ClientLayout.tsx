@@ -26,6 +26,7 @@ export function ClientLayout({ children, ssrUser }: ClientLayoutProps) {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
   });
+  const authenticationState = useAuthStore((s) => s.state.authenticationState);
 
   const csrUser = data?.currentUser?.user ?? null;
 
@@ -60,18 +61,17 @@ export function ClientLayout({ children, ssrUser }: ClientLayoutProps) {
   }
 
   if (!csrUser) {
-    const authState = useAuthStore.getState().state.authenticationState;
     // During authentication, the CSR query may return null because the request is anonymous.
     // Wait for auth to complete before deciding the user doesn't exist.
-    if (authState === "loading" || authState === "authenticating" || authState === "line_authenticated") {
+    if (authenticationState === "loading" || authenticationState === "authenticating" || authenticationState === "line_authenticated") {
       logger.debug("[AUTH] /users/me ClientLayout: auth still in progress, showing loader", {
-        authenticationState: authState,
+        authenticationState,
         component: "ClientLayout",
       });
       return <LoadingIndicator />;
     }
     logger.debug("[AUTH] /users/me ClientLayout: notFound", {
-      authenticationState: authState,
+      authenticationState,
       component: "ClientLayout",
     });
     return notFound();
