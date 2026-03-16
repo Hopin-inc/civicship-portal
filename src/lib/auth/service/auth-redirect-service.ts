@@ -53,24 +53,33 @@ export class AuthRedirectService {
       currentUser,
     );
     if (redirectFromLogin) {
-      logger.debug("[AUTH] AuthRedirectService: redirect from handleAuthEntryFlow", {
+      logger.warn("[AUTH] AuthRedirectService 🔍 redirect from handleAuthEntryFlow", {
+        pathname,
+        authState,
         redirectPath: redirectFromLogin,
+        component: "AuthRedirectService",
       });
       return redirectFromLogin;
     }
 
     const redirectFromUserPath = this.handleUserPath(basePath, authState, currentUser, nextParam);
     if (redirectFromUserPath) {
-      logger.debug("[AUTH] AuthRedirectService: redirect from handleUserPath", {
+      logger.warn("[AUTH] AuthRedirectService 🔍 redirect from handleUserPath", {
+        pathname,
+        authState,
         redirectPath: redirectFromUserPath,
+        component: "AuthRedirectService",
       });
       return redirectFromUserPath;
     }
 
     const redirectByRole = this.handleRoleRestriction(currentUser, basePath);
     if (redirectByRole) {
-      logger.debug("[AUTH] AuthRedirectService: redirect from handleRoleRestriction", {
+      logger.warn("[AUTH] AuthRedirectService 🔍 redirect from handleRoleRestriction", {
+        pathname,
+        authState,
         redirectPath: redirectByRole,
+        component: "AuthRedirectService",
       });
       return redirectByRole;
     }

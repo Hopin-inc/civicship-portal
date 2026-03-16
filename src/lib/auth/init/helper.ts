@@ -236,4 +236,12 @@ export function finalizeAuthState(
   });
 
   authStateManager.updateState(newState);
+
+  logger.warn("[AUTH] finalizeAuthState 🔍 complete", {
+    newState,
+    hasUser: !!user,
+    userId: user?.id,
+    currentAuthState: useAuthStore.getState().state.authenticationState,
+    component: "finalizeAuthState",
+  });
 }

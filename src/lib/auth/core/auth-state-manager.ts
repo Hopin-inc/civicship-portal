@@ -91,7 +91,7 @@ export class AuthStateManager {
         return;
       }
 
-      logger.debug("[AUTH] AuthStateManager.updateState: transitioning", {
+      logger.warn("[AUTH] AuthStateManager 🔍 transitioning", {
         from: current,
         to: newState,
         reason,
