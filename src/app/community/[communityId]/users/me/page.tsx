@@ -7,7 +7,7 @@ import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { GqlMembership, GqlRole, useGetCommunitiesQuery } from "@/types/graphql";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useMemo } from "react";
-import { CommunitySwitcher } from "./CommunitySwitcher";
+import { CommunitySwitcher } from "@/app/community/[communityId]/users/features/profile";
 
 export default function MyProfilePage() {
   const { gqlUser, isOwner, portfolios } = useUserProfileContext();
