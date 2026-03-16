@@ -10,6 +10,9 @@ const withBundleAnalyzer = bundleAnalyzer({
 });
 
 const nextConfig = {
+  env: {
+    ENV: process.env.ENV,
+  },
   eslint: {
     ignoreDuringBuilds: true,
   },
