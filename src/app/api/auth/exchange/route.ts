@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     // CSRF protection: only accept requests from the same origin
     const origin = request.headers.get("origin");
     const host = request.headers.get("host");
-    if (origin && host && !origin.includes(host)) {
+    if (origin && host && new URL(origin).host !== host) {
       logger.warn("[auth/exchange] Origin mismatch", { origin, host, component: "auth/exchange" });
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }

@@ -44,7 +44,7 @@ export const useFirebaseAuthState = ({
           setState({
             firebaseUser: user,
             lineTokens: {
-              accessToken: idToken,
+              idToken: idToken,
               refreshToken,
               expiresAt: expirationTime,
             },
