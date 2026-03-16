@@ -178,10 +178,10 @@ async function initAuthFull({
         component: "initAuthFull",
       });
       if (lineTokens.accessToken) {
-        logger.warn("[initAuthFull] lineTokens present without Firebase user, restoring session via cookie", {
+        logger.warn("[initAuthFull] lineTokens present without Firebase user, fetching user with idToken", {
           component: "initAuthFull",
         });
-        const user = await fetchCurrentUserClient(communityConfig, null);
+        const user = await fetchCurrentUserClient(communityConfig, null, lineTokens.accessToken);
         logger.warn("[initAuthFull] 🔍 fetchCurrentUserClient result", {
           hasUser: !!user,
           userId: user?.id,

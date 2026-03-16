@@ -7,6 +7,7 @@ import { CommunityPortalConfig } from "@/lib/communities/config";
 export async function fetchCurrentUserClient(
   communityConfig: CommunityPortalConfig | null,
   firebaseUser?: User | null,
+  idToken?: string,
 ): Promise<GqlCurrentUserPayload["user"] | null> {
   try {
     const apiEndpoint = process.env.NEXT_PUBLIC_API_ENDPOINT;
@@ -20,7 +21,7 @@ export async function fetchCurrentUserClient(
       return null;
     }
 
-    const authMode = firebaseUser ? "id_token" : "session";
+    const authMode = (firebaseUser || idToken) ? "id_token" : "session";
 
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
@@ -31,6 +32,8 @@ export async function fetchCurrentUserClient(
     if (firebaseUser) {
       const token = await firebaseUser.getIdToken();
       headers["Authorization"] = `Bearer ${token}`;
+    } else if (idToken) {
+      headers["Authorization"] = `Bearer ${idToken}`;
     }
 
     const response = await fetch(apiEndpoint, {
