@@ -59,10 +59,11 @@ const requestLink = setContext(async (operation, prevContext) => {
       }
     } else {
       // Query実行時にfirebaseUserがない場合を記録
-      logger.info("GraphQL request without firebase user", {
+      logger.warn("[Apollo] 🔍 GraphQL request without firebase user", {
         operationName: operation.operationName,
         isMutation,
         authenticationState,
+        component: "ApolloRequestLink",
       });
     }
   }
