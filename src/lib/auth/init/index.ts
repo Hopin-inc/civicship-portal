@@ -160,14 +160,14 @@ async function initAuthFull({
     if (!firebaseUser) {
       // Server-side exchange 経由で signInWithLiffToken が成功した場合、
       // Firebase SDK の signInWithCustomToken をクライアントで呼ばないため
-      // lineAuth.currentUser は null のまま。lineTokens.accessToken が存在すれば
+      // lineAuth.currentUser は null のまま。lineTokens.idToken が存在すれば
       // exchange 済みと判断して cookie セッション経由でユーザー復元へ進む。
       const { lineTokens } = useAuthStore.getState().state;
-      if (lineTokens.accessToken) {
+      if (lineTokens.idToken) {
         logger.info("[initAuthFull] Exchange-based session restore (no Firebase SDK user)", {
           component: "initAuthFull",
         });
-        const user = await fetchCurrentUserClient(communityConfig, null);
+        const user = await fetchCurrentUserClient(communityConfig, null, lineTokens.idToken);
         if (!user) {
           finalizeAuthState("line_authenticated", undefined, setState, authStateManager);
           return;

@@ -317,7 +317,7 @@ export class LiffService {
 
         useAuthStore.getState().setState({
           lineTokens: {
-            accessToken: idToken,
+            idToken: idToken,
             refreshToken,
             expiresAt,
           },

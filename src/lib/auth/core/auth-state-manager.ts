@@ -173,7 +173,7 @@ export class AuthStateManager {
 
     const { lineTokens } = state;
     const hasValidLineToken =
-      !!lineTokens.accessToken &&
+      !!lineTokens.idToken &&
       !!lineTokens.expiresAt &&
       Number(lineTokens.expiresAt) - Date.now() > 5 * 60 * 1000;
 

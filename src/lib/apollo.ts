@@ -42,8 +42,8 @@ const requestLink = setContext(async (operation, prevContext) => {
         throw new Error("認証情報を読み込み中です。少し待ってから再度お試しください");
       }
 
-      // firebaseUser または lineTokens.accessToken（exchange 経由）のいずれかが必要
-      if (!firebaseUser && !lineTokens.accessToken) {
+      // firebaseUser または lineTokens.idToken（exchange 経由）のいずれかが必要
+      if (!firebaseUser && !lineTokens.idToken) {
         throw new Error("認証情報が取得できませんでした。ページをリロードしてください");
       }
     }
@@ -58,9 +58,9 @@ const requestLink = setContext(async (operation, prevContext) => {
           throw new Error("認証トークンの取得に失敗しました");
         }
       }
-    } else if (lineTokens.accessToken) {
-      // Server-side exchange 経由: firebaseUser なし → session cookie で認証
-      authMode = "session";
+    } else if (lineTokens.idToken) {
+      // Server-side exchange 経由: firebaseUser なし → exchange で取得した idToken を直接使用
+      token = lineTokens.idToken;
     }
   }
 
