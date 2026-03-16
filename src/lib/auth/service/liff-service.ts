@@ -1,7 +1,6 @@
 "use client";
 
 import liff from "@line/liff";
-import { signInWithCustomToken, updateProfile } from "firebase/auth";
 import { lineAuth } from "../core/firebase-config";
 import { TokenManager } from "../core/token-manager";
 import { logger } from "@/lib/logging";
@@ -312,63 +311,23 @@ export class LiffService {
           }
         }
 
-        // 🔍 DEBUG: signInWithCustomToken実行直前の状態を記録
-        logger.info("[LiffService] 🔍 DEBUG: About to call signInWithCustomToken", {
-          lineAuthTenantId: lineAuth.tenantId,
-          tokenTenantId,
-          tenantIdMatch: lineAuth.tenantId === tokenTenantId,
-          component: "LiffService",
+        // BFF 経由で exchange（identitytoolkit への直接通信を LIFF がブロックするため回避）
+        const exchangeRes = await fetch("/api/auth/exchange", {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+            "x-community-id": communityId ?? "",
+          },
+          body: JSON.stringify({ customToken }),
         });
 
-        let userCredential;
-        try {
-          userCredential = await signInWithCustomToken(lineAuth, customToken);
-          logger.info("[LiffService] ✅ signInWithCustomToken success", {
-            uid: userCredential.user.uid,
-            tenantIdOnUser: userCredential.user.tenantId,
-            lineAuthTenantId: lineAuth.tenantId,
-            component: "LiffService",
-          });
-        } catch (signInError: any) {
-          // 🔍 DEBUG: signInWithCustomTokenのエラーを詳細にログ出力
-          logger.error("[LiffService] ❌ signInWithCustomToken failed", {
-            error: signInError?.message || String(signInError),
-            errorCode: signInError?.code,
-            errorName: signInError?.name,
-            lineAuthTenantId: lineAuth.tenantId,
-            tokenTenantId,
-            tenantIdMismatch: lineAuth.tenantId !== tokenTenantId,
-            customTokenPreview: customToken?.substring(0, 50) + "...",
-            component: "LiffService",
-          });
-          throw signInError;
+        if (!exchangeRes.ok) {
+          throw new Error(`Token exchange failed: ${exchangeRes.status}`);
         }
 
-        await Promise.race([
-          new Promise<void>((resolve) => {
-            const unsub = lineAuth.onAuthStateChanged((u) => {
-              if (u) {
-                unsub();
-                resolve();
-              }
-            });
-          }),
-          new Promise<void>((resolve) => {
-            setTimeout(() => {
-              resolve();
-            }, 5000);
-          }),
-        ]);
-
-        await updateProfile(userCredential.user, {
-          displayName: profile.displayName,
-          photoURL: profile.pictureUrl,
-        });
-
-        const idToken = await userCredential.user.getIdToken();
-        const refreshToken = userCredential.user.refreshToken;
-        const tokenResult = await userCredential.user.getIdTokenResult();
-        const expiresAt = String(new Date(tokenResult.expirationTime).getTime());
+        const { idToken, refreshToken, expiresAt } = await exchangeRes.json();
+        // session cookie は /api/auth/exchange → /api/sessionLogin で発行済み
 
         useAuthStore.getState().setState({
           lineTokens: {
