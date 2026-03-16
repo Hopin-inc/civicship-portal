@@ -51,16 +51,21 @@ export async function POST(request: NextRequest) {
     });
 
     if (!firebaseRes.ok) {
-      const errorBody = await firebaseRes.text();
+      const errorText = await firebaseRes.text();
       logger.error("[auth/phone-verify] Identity Toolkit error", {
         status: firebaseRes.status,
-        body: errorBody.substring(0, 500),
+        body: errorText.substring(0, 500),
         component: "auth/phone-verify",
       });
-      return NextResponse.json(
-        { error: "Phone verification failed" },
-        { status: firebaseRes.status },
-      );
+      try {
+        const errorJson = JSON.parse(errorText);
+        return NextResponse.json(errorJson, { status: firebaseRes.status });
+      } catch {
+        return NextResponse.json(
+          { error: "Phone verification failed" },
+          { status: firebaseRes.status },
+        );
+      }
     }
 
     const firebaseData = await firebaseRes.json();
