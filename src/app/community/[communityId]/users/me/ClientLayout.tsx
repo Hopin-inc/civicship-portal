@@ -7,6 +7,7 @@ import { GET_CURRENT_USER_PROFILE } from "@/graphql/account/user/client-query";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { notFound } from "next/navigation";
 import { logger } from "@/lib/logging";
+import { useAuthStore } from "@/lib/auth/core/auth-store";
 
 interface CurrentUserProfileQueryResult {
   currentUser?: {
@@ -59,7 +60,18 @@ export function ClientLayout({ children, ssrUser }: ClientLayoutProps) {
   }
 
   if (!csrUser) {
+    const authState = useAuthStore.getState().state.authenticationState;
+    // During authentication, the CSR query may return null because the request is anonymous.
+    // Wait for auth to complete before deciding the user doesn't exist.
+    if (authState === "loading" || authState === "authenticating" || authState === "line_authenticated") {
+      logger.debug("[AUTH] /users/me ClientLayout: auth still in progress, showing loader", {
+        authenticationState: authState,
+        component: "ClientLayout",
+      });
+      return <LoadingIndicator />;
+    }
     logger.debug("[AUTH] /users/me ClientLayout: notFound", {
+      authenticationState: authState,
       component: "ClientLayout",
     });
     return notFound();
