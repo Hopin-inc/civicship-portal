@@ -11,11 +11,19 @@ import { logger } from "@/lib/logging";
  * Flow:
  *   1. Decode tenant_id from customToken JWT payload
  *   2. POST to identitytoolkit REST API → { idToken, refreshToken, expiresIn }
- *   3. Create session cookie via /api/sessionLogin proxy
+ *   3. Create session cookie via backend /sessionLogin endpoint
  *   4. Return tokens + forward Set-Cookie header to client
  */
 export async function POST(request: NextRequest) {
   try {
+    // CSRF protection: only accept requests from the same origin
+    const origin = request.headers.get("origin");
+    const host = request.headers.get("host");
+    if (origin && host && !origin.includes(host)) {
+      logger.warn("[auth/exchange] Origin mismatch", { origin, host, component: "auth/exchange" });
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     const { customToken } = await request.json();
     if (!customToken) {
       return NextResponse.json({ error: "Missing customToken" }, { status: 400 });
@@ -33,10 +41,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Decode tenant_id from customToken JWT payload (no verification needed — backend signed it)
+    // JWT uses base64url encoding: replace -→+ and _→/, then add padding
     let tenantId: string | null = null;
     try {
-      const payloadBase64 = customToken.split(".")[1];
-      const payloadJson = Buffer.from(payloadBase64, "base64").toString("utf-8");
+      const payloadBase64Url = customToken.split(".")[1];
+      const payloadBase64 = payloadBase64Url.replace(/-/g, "+").replace(/_/g, "/");
+      const padded = payloadBase64 + "=".repeat((4 - (payloadBase64.length % 4)) % 4);
+      const payloadJson = Buffer.from(padded, "base64").toString("utf-8");
       const payload = JSON.parse(payloadJson);
       tenantId = payload.tenant_id || null;
     } catch {
@@ -84,7 +95,11 @@ export async function POST(request: NextRequest) {
     const expiresAt = String(Date.now() + Number(expiresIn) * 1000);
 
     // Create session cookie via backend /sessionLogin
-    const apiEndpoint = process.env.NEXT_PUBLIC_API_ENDPOINT!;
+    const apiEndpoint = process.env.NEXT_PUBLIC_API_ENDPOINT;
+    if (!apiEndpoint) {
+      logger.error("[auth/exchange] Missing NEXT_PUBLIC_API_ENDPOINT");
+      return NextResponse.json({ error: "Server configuration error" }, { status: 500 });
+    }
     const apiBase = apiEndpoint.replace(/\/graphql\/?$/, "");
 
     const sessionRes = await fetch(`${apiBase}/sessionLogin`, {
@@ -110,10 +125,16 @@ export async function POST(request: NextRequest) {
         response.headers.set("set-cookie", setCookie);
       }
     } else {
-      logger.warn("[auth/exchange] Session creation failed, but token exchange succeeded", {
+      // Session cookie is required for subsequent GraphQL requests in session mode.
+      // If session creation fails, return error to prevent silent auth failure.
+      logger.error("[auth/exchange] Session creation failed", {
         sessionStatus: sessionRes.status,
         component: "auth/exchange",
       });
+      return NextResponse.json(
+        { error: "Session creation failed" },
+        { status: 502 },
+      );
     }
 
     logger.info("[auth/exchange] Token exchange successful", {
