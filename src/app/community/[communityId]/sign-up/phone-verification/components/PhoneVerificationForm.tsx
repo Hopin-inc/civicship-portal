@@ -19,7 +19,6 @@ import { useTranslations } from "next-intl";
 import { useStartPhoneVerification } from "@/hooks/auth/actions/useStartPhoneVerification";
 import { useVerifyPhoneCode } from "@/hooks/auth/actions/useVerifyPhoneCode";
 import { useAuthDependencies } from "@/hooks/auth/init/useAuthDependencies";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { logger } from "@/lib/logging";
 
 export function PhoneVerificationForm() {
@@ -33,8 +32,7 @@ export function PhoneVerificationForm() {
   const [verificationCode, setVerificationCode] = useState("");
   const [step, setStep] = useState<VerificationStep>("phone");
 
-  const communityConfig = useCommunityConfig();
-  const { phoneAuthService, authStateManager } = useAuthDependencies(communityConfig);
+  const { phoneAuthService, authStateManager } = useAuthDependencies();
   const { phoneAuth } = useAuthStore.getState();
   const startPhoneVerification = useStartPhoneVerification(phoneAuthService);
   const verifyPhoneCode = useVerifyPhoneCode(phoneAuthService, authStateManager);
