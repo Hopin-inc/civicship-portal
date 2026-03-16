@@ -29,6 +29,7 @@ export class LiffService {
   private liffId: string;
   private state: LiffState;
   private initializationPromise: Promise<boolean> | null = null;
+  private signInInFlight: Promise<boolean> | null = null;
 
   private constructor(liffId: string) {
     this.liffId = liffId;
@@ -216,6 +217,19 @@ export class LiffService {
   }
 
   public async signInWithLiffToken(tenantId?: string | null): Promise<boolean> {
+    if (this.signInInFlight) {
+      logger.info("[LiffService] signInWithLiffToken already in-flight, awaiting existing promise", {
+        component: "LiffService",
+      });
+      return this.signInInFlight;
+    }
+    this.signInInFlight = this._doSignIn(tenantId).finally(() => {
+      this.signInInFlight = null;
+    });
+    return this.signInInFlight;
+  }
+
+  private async _doSignIn(tenantId?: string | null): Promise<boolean> {
     const accessToken = this.getAccessToken();
     if (!accessToken) return false;
 
@@ -392,7 +406,12 @@ export class LiffService {
           component: "LiffService",
         });
 
-        if (processedError.message.includes("401") || processedError.message.includes("network") || processedError.message.includes("fetch")) {
+        const isRetryable =
+          processedError.message.includes("401") ||
+          processedError.message.includes("network") ||
+          processedError.message.includes("fetch") ||
+          errorDetails?.code === "auth/network-request-failed";
+        if (isRetryable) {
           await new Promise((r) => setTimeout(r, attempt * 1000)); // 1s,2s,3s
           continue;
         }
