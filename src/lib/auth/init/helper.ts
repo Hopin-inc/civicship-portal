@@ -104,7 +104,7 @@ export async function establishSessionFromFirebaseUser(
 
     setState({
       lineTokens: {
-        accessToken: idToken,
+        idToken: idToken,
         refreshToken: firebaseUser.refreshToken ?? null,
         expiresAt: String(new Date(tokenResult.expirationTime).getTime()),
       },
@@ -149,7 +149,7 @@ export async function restoreUserSession(
   useAuthStore.getState().setState({
     firebaseUser,
     lineTokens: {
-      accessToken: tokenResult.token,
+      idToken: tokenResult.token,
       refreshToken: firebaseUser.refreshToken ?? null,
       expiresAt: String(new Date(tokenResult.expirationTime).getTime()),
     },

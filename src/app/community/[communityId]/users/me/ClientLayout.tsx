@@ -7,6 +7,7 @@ import { GET_CURRENT_USER_PROFILE } from "@/graphql/account/user/client-query";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { notFound } from "next/navigation";
 import { logger } from "@/lib/logging";
+import { useAuthStore } from "@/lib/auth/core/auth-store";
 
 interface CurrentUserProfileQueryResult {
   currentUser?: {
@@ -20,8 +21,17 @@ interface ClientLayoutProps {
 }
 
 export function ClientLayout({ children, ssrUser }: ClientLayoutProps) {
+  const authenticationState = useAuthStore((s) => s.state.authenticationState);
+
+  // 認証完了前のクエリ発火を抑制する。
+  // ssrUser がない場合でも、認証が loading/authenticating の間は
+  // Bearer トークンなしの匿名リクエストになるためスキップする。
+  const shouldSkipQuery = !!ssrUser
+    || authenticationState === "loading"
+    || authenticationState === "authenticating";
+
   const { data, loading, error } = useQuery<CurrentUserProfileQueryResult>(GET_CURRENT_USER_PROFILE, {
-    skip: !!ssrUser,
+    skip: shouldSkipQuery,
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
   });
@@ -59,7 +69,17 @@ export function ClientLayout({ children, ssrUser }: ClientLayoutProps) {
   }
 
   if (!csrUser) {
+    // During authentication, the CSR query may return null because the request is anonymous.
+    // Wait for auth to complete before deciding the user doesn't exist.
+    if (authenticationState === "loading" || authenticationState === "authenticating" || authenticationState === "line_authenticated") {
+      logger.debug("[AUTH] /users/me ClientLayout: auth still in progress, showing loader", {
+        authenticationState,
+        component: "ClientLayout",
+      });
+      return <LoadingIndicator />;
+    }
     logger.debug("[AUTH] /users/me ClientLayout: notFound", {
+      authenticationState,
       component: "ClientLayout",
     });
     return notFound();

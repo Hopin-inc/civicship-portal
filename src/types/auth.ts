@@ -21,7 +21,7 @@ export type AuthState = {
   isAuthenticating: boolean;
   isAuthInProgress: boolean;
   lineTokens: {
-    accessToken: string | null;
+    idToken: string | null;
     refreshToken: string | null;
     expiresAt: string | null;
   };

@@ -1,7 +1,6 @@
 "use client";
 
 import liff from "@line/liff";
-import { signInWithCustomToken, updateProfile } from "firebase/auth";
 import { lineAuth } from "../core/firebase-config";
 import { TokenManager } from "../core/token-manager";
 import { logger } from "@/lib/logging";
@@ -298,67 +297,27 @@ export class LiffService {
           }
         }
 
-        // 🔍 DEBUG: signInWithCustomToken実行直前の状態を記録
-        logger.info("[LiffService] 🔍 DEBUG: About to call signInWithCustomToken", {
-          lineAuthTenantId: lineAuth.tenantId,
-          tokenTenantId,
-          tenantIdMatch: lineAuth.tenantId === tokenTenantId,
-          component: "LiffService",
+        // Server-side token exchange via BFF
+        // identitytoolkit.googleapis.com への直接通信を回避（LIFF WebView でブロックされるため）
+        const exchangeRes = await fetch("/api/auth/exchange", {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+            "x-community-id": communityId ?? "",
+          },
+          body: JSON.stringify({ customToken }),
         });
 
-        let userCredential;
-        try {
-          userCredential = await signInWithCustomToken(lineAuth, customToken);
-          logger.info("[LiffService] ✅ signInWithCustomToken success", {
-            uid: userCredential.user.uid,
-            tenantIdOnUser: userCredential.user.tenantId,
-            lineAuthTenantId: lineAuth.tenantId,
-            component: "LiffService",
-          });
-        } catch (signInError: any) {
-          // 🔍 DEBUG: signInWithCustomTokenのエラーを詳細にログ出力
-          logger.error("[LiffService] ❌ signInWithCustomToken failed", {
-            error: signInError?.message || String(signInError),
-            errorCode: signInError?.code,
-            errorName: signInError?.name,
-            lineAuthTenantId: lineAuth.tenantId,
-            tokenTenantId,
-            tenantIdMismatch: lineAuth.tenantId !== tokenTenantId,
-            customTokenPreview: customToken?.substring(0, 50) + "...",
-            component: "LiffService",
-          });
-          throw signInError;
+        if (!exchangeRes.ok) {
+          throw new Error(`Token exchange failed: ${exchangeRes.status}`);
         }
 
-        await Promise.race([
-          new Promise<void>((resolve) => {
-            const unsub = lineAuth.onAuthStateChanged((u) => {
-              if (u) {
-                unsub();
-                resolve();
-              }
-            });
-          }),
-          new Promise<void>((resolve) => {
-            setTimeout(() => {
-              resolve();
-            }, 5000);
-          }),
-        ]);
-
-        await updateProfile(userCredential.user, {
-          displayName: profile.displayName,
-          photoURL: profile.pictureUrl,
-        });
-
-        const idToken = await userCredential.user.getIdToken();
-        const refreshToken = userCredential.user.refreshToken;
-        const tokenResult = await userCredential.user.getIdTokenResult();
-        const expiresAt = String(new Date(tokenResult.expirationTime).getTime());
+        const { idToken, refreshToken, expiresAt } = await exchangeRes.json();
 
         useAuthStore.getState().setState({
           lineTokens: {
-            accessToken: idToken,
+            idToken: idToken,
             refreshToken,
             expiresAt,
           },
@@ -378,17 +337,10 @@ export class LiffService {
       } catch (error) {
         const processedError = error instanceof Error ? error : new Error(String(error));
 
-        // 🔍 DEBUG: エラーの詳細情報を記録
-        const errorDetails: any = error;
-        logger.error("[LiffService] ❌ signInWithLiffToken attempt failed", {
+        logger.error("[LiffService] signInWithLiffToken attempt failed", {
           error: processedError.message,
-          errorCode: errorDetails?.code,
-          errorName: errorDetails?.name,
-          errorStack: errorDetails?.stack?.split('\n').slice(0, 3).join('\n'),
           tenantId,
-          lineAuthTenantId: lineAuth.tenantId,
           attempt,
-          isTenantIdMismatch: processedError.message.includes('TENANT_ID_MISMATCH'),
           component: "LiffService",
         });
 

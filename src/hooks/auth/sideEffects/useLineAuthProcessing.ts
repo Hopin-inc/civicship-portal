@@ -33,6 +33,15 @@ export const useLineAuthProcessing = ({
   useEffect(() => {
     if (!shouldProcessRedirect || processedRef.current || !authStateManager) return;
 
+    // initAuth が既に実行中の場合は二重処理を防ぐ
+    const { isAuthInProgress } = useAuthStore.getState().state;
+    if (isAuthInProgress) {
+      logger.debug("initAuth already in progress, skipping useLineAuthProcessing", {
+        component: "useLineAuthProcessing",
+      });
+      return;
+    }
+
     const handleLineAuthRedirect = async () => {
       processedRef.current = true;
 
@@ -61,9 +70,13 @@ export const useLineAuthProcessing = ({
         const { isLoggedIn } = liffService.getState();
         if (!isLoggedIn) return;
 
-        if (lineAuth.currentUser) {
-          logger.debug("Firebase already authenticated, skipping signInWithLiffToken", {
+        // lineAuth.currentUser または lineTokens.idToken（exchange 経由）があればスキップ
+        const { lineTokens } = useAuthStore.getState().state;
+        if (lineAuth.currentUser || lineTokens.idToken) {
+          logger.debug("Already authenticated (Firebase user or exchange token), skipping signInWithLiffToken", {
             authType: "liff",
+            hasFirebaseUser: !!lineAuth.currentUser,
+            hasExchangeToken: !!lineTokens.idToken,
             component: "useLineAuthProcessing",
           });
         } else {

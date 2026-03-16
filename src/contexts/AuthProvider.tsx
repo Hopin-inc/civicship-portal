@@ -12,6 +12,7 @@ import { useAuthValue } from "@/hooks/auth/init/useAuthValue";
 import { useLanguageSync } from "@/hooks/useLanguageSync";
 import { logger } from "@/lib/logging";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
+import { useAuthStore } from "@/lib/auth/core/auth-store";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -56,8 +57,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     });
   }, [authStateManager, liffService, ssrCurrentUser, ssrLineAuthenticated, ssrPhoneAuthenticated]);
 
+  // 認証が完了するまでクエリの自動発火を抑制する。
+  // loading/authenticating 中に発火すると Bearer トークンなしの匿名リクエストになり、
+  // Apollo の正規化キャッシュに currentUser: null が書き込まれて
+  // ClientLayout 等の後続クエリ結果を汚染する。
+  const authenticationState = useAuthStore((s) => s.state.authenticationState);
+  const shouldSkipQuery = Boolean(ssrCurrentUser)
+    || authenticationState === "loading"
+    || authenticationState === "authenticating";
+
   const { refetch } = useCurrentUserServerQuery({
-    skip: Boolean(ssrCurrentUser),
+    skip: shouldSkipQuery,
     fetchPolicy: "network-only",
   });
 
