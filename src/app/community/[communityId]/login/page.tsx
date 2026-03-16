@@ -40,7 +40,7 @@ export default function LoginPage() {
     try {
       await loginWithLiff(nextPath ?? undefined);
     } catch (err) {
-      const { title, description } = getLiffLoginErrorMessage(error);
+      const { title, description } = getLiffLoginErrorMessage(err);
       toast.error(
         <div>
           <div className="font-bold">{title}</div>
