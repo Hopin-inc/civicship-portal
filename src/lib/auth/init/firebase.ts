@@ -53,6 +53,20 @@ export async function initializeFirebase(
           });
           return null;
         }
+
+        // 新フロー（/api/auth/exchange 経由）では Firebase SDK の
+        // signInWithCustomToken をクライアント側で呼ばないため、
+        // lineAuth.currentUser は null のまま。
+        // onAuthStateChanged を待つと永久にハングするので即座に null を返す。
+        // 呼び出し元 initAuthFull は lineTokens.accessToken の存在で
+        // cookie 経由セッション復元にフォールバックする。
+        if (!lineAuth.currentUser) {
+          logger.info("[initializeFirebase] LIFF sign-in succeeded via exchange but no Firebase SDK user — returning null for cookie-based session restore", {
+            tenantId,
+            component: "initializeFirebase",
+          });
+          return null;
+        }
       }
     } catch (initErr) {
       logger.warn("LIFF initialization failed", { err: initErr });
