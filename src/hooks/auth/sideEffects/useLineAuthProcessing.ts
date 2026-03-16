@@ -36,6 +36,24 @@ export const useLineAuthProcessing = ({
     const handleLineAuthRedirect = async () => {
       processedRef.current = true;
 
+      // 🔍 DEBUG: initAuthFull 実行中かどうかを確認
+      const { state: currentState } = useAuthStore.getState();
+      logger.info("[useLineAuthProcessing] 🔍 DEBUG: handleLineAuthRedirect started", {
+        isAuthInProgress: currentState.isAuthInProgress,
+        isAuthenticating: currentState.isAuthenticating,
+        authenticationState: currentState.authenticationState,
+        hasFullAuth,
+        component: "useLineAuthProcessing",
+      });
+
+      // initAuthFull が実行中の場合はそちらに任せて早期リターン（重複する auth state 管理を防止）
+      if (currentState.isAuthInProgress) {
+        logger.debug("[useLineAuthProcessing] initAuth is in progress, skipping duplicate auth flow", {
+          component: "useLineAuthProcessing",
+        });
+        return;
+      }
+
       // SSR で user/line/phone そろってるなら、LIFF 初期化も含めて全てスキップ
       if (hasFullAuth) {
         logger.debug("SSR full auth detected; skipping all LIFF processing", {
@@ -68,6 +86,14 @@ export const useLineAuthProcessing = ({
           });
         } else {
           const success = await liffService.signInWithLiffToken();
+          // 🔍 DEBUG: sign-in 結果後の状態を確認
+          const { state: afterSignIn } = useAuthStore.getState();
+          logger.info("[useLineAuthProcessing] 🔍 DEBUG: after signInWithLiffToken", {
+            success,
+            isAuthInProgress: afterSignIn.isAuthInProgress,
+            authenticationState: afterSignIn.authenticationState,
+            component: "useLineAuthProcessing",
+          });
           if (!success) {
             logger.warn("signInWithLiffToken failed", {
               authType: "liff",
