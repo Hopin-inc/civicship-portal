@@ -52,6 +52,11 @@ export async function initAuth(params: InitAuthParams) {
   });
 
   if (ssrCurrentUser && ssrLineAuthenticated) {
+    logger.warn("[initAuth] 🔍 taking initAuthFast path", {
+      ssrPhoneAuthenticated,
+      ssrCurrentUserId: ssrCurrentUser?.id,
+      component: "initAuth",
+    });
     return await initAuthFast({
       communityConfig,
       ssrCurrentUser,
@@ -63,6 +68,11 @@ export async function initAuth(params: InitAuthParams) {
     });
   }
 
+  logger.warn("[initAuth] 🔍 taking initAuthFull path - setting isAuthInProgress=true", {
+    environment,
+    ssrCurrentUser: !!ssrCurrentUser,
+    component: "initAuth",
+  });
   setState({ isAuthInProgress: true, isAuthenticating: true });
   return await initAuthFull({
     communityConfig,

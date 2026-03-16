@@ -384,7 +384,7 @@ export class LiffService {
         }
 
         // 🔍 DEBUG: _doSignIn 完了直前の auth state を確認
-        logger.info("[LiffService] 🔍 DEBUG: _doSignIn completing, about to update auth state", {
+        logger.warn("[LiffService] 🔍 _doSignIn completing, about to update auth state", {
           lineAuthTenantId: lineAuth.tenantId,
           currentAuthState: useAuthStore.getState().state.authenticationState,
           isAuthInProgress: useAuthStore.getState().state.isAuthInProgress,
