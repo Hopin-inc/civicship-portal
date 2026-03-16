@@ -120,9 +120,9 @@ export async function POST(request: NextRequest) {
 
     // Forward session cookie from backend to client
     if (sessionRes.ok) {
-      const setCookie = sessionRes.headers.get("set-cookie");
-      if (setCookie) {
-        response.headers.set("set-cookie", setCookie);
+      const setCookies = sessionRes.headers.getSetCookie();
+      for (const cookie of setCookies) {
+        response.headers.append("set-cookie", cookie);
       }
     } else {
       // Session cookie is required for subsequent GraphQL requests in session mode.
