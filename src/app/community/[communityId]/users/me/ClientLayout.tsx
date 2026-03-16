@@ -7,6 +7,7 @@ import { GET_CURRENT_USER_PROFILE } from "@/graphql/account/user/client-query";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { notFound } from "next/navigation";
 import { logger } from "@/lib/logging";
+import { useAuthStore } from "@/lib/auth/core/auth-store";
 
 interface CurrentUserProfileQueryResult {
   currentUser?: {
@@ -20,6 +21,8 @@ interface ClientLayoutProps {
 }
 
 export function ClientLayout({ children, ssrUser }: ClientLayoutProps) {
+  const storeCurrentUser = useAuthStore((s) => s.state.currentUser);
+
   const { data, loading, error } = useQuery<CurrentUserProfileQueryResult>(GET_CURRENT_USER_PROFILE, {
     skip: !!ssrUser,
     fetchPolicy: "network-only",
@@ -27,57 +30,53 @@ export function ClientLayout({ children, ssrUser }: ClientLayoutProps) {
   });
 
   const csrUser = data?.currentUser?.user ?? null;
+  const effectiveUser = csrUser ?? storeCurrentUser;
 
-  // Log the current state for debugging
-  logger.debug("[AUTH] /users/me ClientLayout state", {
+  logger.warn("[AUTH] /users/me ClientLayout 🔍 state", {
     hasSsrUser: !!ssrUser,
-    ssrUserId: ssrUser?.id,
     loading,
     hasCsrUser: !!csrUser,
-    csrUserId: csrUser?.id,
+    hasStoreUser: !!storeCurrentUser,
+    hasEffectiveUser: !!effectiveUser,
     hasError: !!error,
     errorMessage: error?.message,
     component: "ClientLayout",
   });
 
   if (ssrUser) {
-    logger.debug("[AUTH] /users/me ClientLayout: using ssrUser", {
-      component: "ClientLayout",
-    });
     return <>{children}</>;
   }
 
-  if (loading && !csrUser) {
-    logger.debug("[AUTH] /users/me ClientLayout: loading spinner", {
-      loading,
-      hasCsrUser: !!csrUser,
-      hasError: !!error,
-      errorMessage: error?.message,
-      component: "ClientLayout",
-    });
+  if (loading && !effectiveUser) {
     return <LoadingIndicator />;
   }
 
-  if (!csrUser) {
-    logger.debug("[AUTH] /users/me ClientLayout: notFound", {
+  if (!effectiveUser) {
+    logger.warn("[AUTH] /users/me ClientLayout 🔍 calling notFound()", {
+      hasCsrUser: !!csrUser,
+      hasStoreUser: !!storeCurrentUser,
+      hasError: !!error,
+      errorMessage: error?.message,
       component: "ClientLayout",
     });
     return notFound();
   }
 
-  logger.debug("[AUTH] /users/me ClientLayout: rendering with csrUser", {
-    csrUserId: csrUser.id,
+  logger.warn("[AUTH] /users/me ClientLayout 🔍 rendering", {
+    userId: effectiveUser.id,
+    source: csrUser ? "apollo" : "store",
+    hasPortfolios: !!(effectiveUser.portfolios?.length),
     component: "ClientLayout",
   });
 
-  const portfolios = (csrUser.portfolios ?? []).map(mapGqlPortfolio);
+  const portfolios = (effectiveUser.portfolios ?? []).map(mapGqlPortfolio);
 
   return (
     <UserProfileProvider
       value={{
-        userId: csrUser.id,
+        userId: effectiveUser.id,
         isOwner: true,
-        gqlUser: csrUser,
+        gqlUser: effectiveUser,
         portfolios,
       }}
     >
