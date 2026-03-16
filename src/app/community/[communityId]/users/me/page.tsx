@@ -20,7 +20,6 @@ import {
 import { useTranslations } from "next-intl";
 import { ArrowLeftRight, Check } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 
 export default function MyProfilePage() {
   const { gqlUser, isOwner, portfolios } = useUserProfileContext();
@@ -48,17 +47,12 @@ export default function MyProfilePage() {
   const { data: communitiesData, loading: communitiesLoading } = useGetCommunitiesQuery({
     skip: !showSwitcher,
   });
-  const allCommunities = useMemo(() => {
+  const joinedCommunities = useMemo(() => {
     const communities =
       communitiesData?.communities?.edges?.flatMap((e) => (e?.node ? [e.node] : [])) ?? [];
-    return communities.sort((a, b) => {
-      const aJoined = joinedCommunityIds.has(a.id);
-      const bJoined = joinedCommunityIds.has(b.id);
-      if (aJoined !== bJoined) {
-        return aJoined ? -1 : 1;
-      }
-      return (a.name ?? "").localeCompare(b.name ?? "");
-    });
+    return communities
+      .filter((c) => joinedCommunityIds.has(c.id))
+      .sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
   }, [communitiesData, joinedCommunityIds]);
 
   // ヘッダー設定
@@ -75,9 +69,8 @@ export default function MyProfilePage() {
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>{t("users.profileHeader.switchLabel")}</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {allCommunities.map((community) => {
+            {joinedCommunities.map((community) => {
               const isCurrent = community.id === communityId;
-              const isJoined = joinedCommunityIds.has(community.id);
               return (
                 <DropdownMenuItem key={community.id} asChild disabled={isCurrent}>
                   <AppLink href="/users/me" communityId={community.id} className="flex items-center gap-3 py-2">
@@ -95,11 +88,6 @@ export default function MyProfilePage() {
                       )}
                     </div>
                     <span className="flex-1 truncate text-sm">{community.name}</span>
-                    {!isJoined && (
-                      <Badge variant="outline" size="sm" className="shrink-0 text-muted-foreground px-1.5 py-0 text-[10px]">
-                        {t("users.profileHeader.notJoined")}
-                      </Badge>
-                    )}
                   </AppLink>
                 </DropdownMenuItem>
               );
@@ -118,7 +106,7 @@ export default function MyProfilePage() {
         </DropdownMenu>
       ) : undefined,
     }),
-    [showSwitcher, allCommunities, joinedCommunityIds, communityId, hasAdminRole, t, communitiesLoading],
+    [showSwitcher, joinedCommunities, communityId, hasAdminRole, t, communitiesLoading],
   );
 
   useHeaderConfig(headerConfig);
