@@ -167,7 +167,7 @@ async function initAuthFull({
         logger.info("[initAuthFull] Exchange-based session restore (no Firebase SDK user)", {
           component: "initAuthFull",
         });
-        const user = await fetchCurrentUserClient(communityConfig, null);
+        const user = await fetchCurrentUserClient(communityConfig, null, lineTokens.accessToken);
         if (!user) {
           finalizeAuthState("line_authenticated", undefined, setState, authStateManager);
           return;

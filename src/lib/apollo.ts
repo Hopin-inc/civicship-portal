@@ -59,8 +59,8 @@ const requestLink = setContext(async (operation, prevContext) => {
         }
       }
     } else if (lineTokens.accessToken) {
-      // Server-side exchange 経由: firebaseUser なし → session cookie で認証
-      authMode = "session";
+      // Server-side exchange 経由: firebaseUser なし → exchange で取得した idToken を直接使用
+      token = lineTokens.accessToken;
     }
   }
 

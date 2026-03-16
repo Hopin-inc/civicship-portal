@@ -33,6 +33,15 @@ export const useLineAuthProcessing = ({
   useEffect(() => {
     if (!shouldProcessRedirect || processedRef.current || !authStateManager) return;
 
+    // initAuth が既に実行中の場合は二重処理を防ぐ
+    const { isAuthInProgress } = useAuthStore.getState().state;
+    if (isAuthInProgress) {
+      logger.debug("initAuth already in progress, skipping useLineAuthProcessing", {
+        component: "useLineAuthProcessing",
+      });
+      return;
+    }
+
     const handleLineAuthRedirect = async () => {
       processedRef.current = true;
 
