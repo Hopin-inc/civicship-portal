@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useAppRouter } from "@/lib/navigation";
+import { normalizePathname } from "@/utils/path";
 import { logger } from "@/lib/logging";
 
 /**
@@ -31,9 +32,10 @@ export const useLiffDeepLinkHandler = () => {
     // Only process once
     if (hasProcessedRef.current) return;
 
-    // Only handle root path to avoid interfering with other pages that might use liff.state
+    // Only handle community root path to avoid interfering with other pages that might use liff.state
     // (e.g., sign-up/phone-verification uses it as a fallback for "next" parameter)
-    if (pathname !== "/") return;
+    // normalizePathname strips the /community/{communityId} prefix for path-based routing
+    if (normalizePathname(pathname) !== "/") return;
 
     // Get the liff.state parameter
     const liffState = searchParams.get("liff.state");
