@@ -172,11 +172,21 @@ async function initAuthFull({
       // Firebase SDK へのサインインがないため lineAuth.currentUser = null になる。
       // lineTokens.accessToken が存在すれば exchange 済みと判断してセッション復元へ進む。
       const { lineTokens } = useAuthStore.getState().state;
+      logger.warn("[initAuthFull] 🔍 firebaseUser is null, checking lineTokens", {
+        hasLineTokenAccessToken: !!lineTokens.accessToken,
+        lineTokenAccessTokenLength: lineTokens.accessToken?.length ?? 0,
+        component: "initAuthFull",
+      });
       if (lineTokens.accessToken) {
-        logger.info("[initAuthFull] lineTokens present without Firebase user, restoring session via cookie", {
+        logger.warn("[initAuthFull] lineTokens present without Firebase user, restoring session via cookie", {
           component: "initAuthFull",
         });
         const user = await fetchCurrentUserClient(communityConfig, null);
+        logger.warn("[initAuthFull] 🔍 fetchCurrentUserClient result", {
+          hasUser: !!user,
+          userId: user?.id,
+          component: "initAuthFull",
+        });
         if (!user) {
           finalizeAuthState("line_authenticated", undefined, setState, authStateManager);
           return;
