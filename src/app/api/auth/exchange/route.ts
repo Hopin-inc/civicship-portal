@@ -55,18 +55,17 @@ export async function POST(request: NextRequest) {
 
   const { idToken, refreshToken, expiresIn } = await exchangeRes.json();
 
-  // 2. 既存の /api/sessionLogin プロキシをそのまま利用
-  const sessionRes = await fetch(
-    new URL("/api/sessionLogin", request.nextUrl.origin).toString(),
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(communityId ? { "x-community-id": communityId } : {}),
-      },
-      body: JSON.stringify({ idToken }),
+  // 2. バックエンドの /sessionLogin を直接呼ぶ（自己参照の SSL 問題を回避）
+  const apiEndpoint = process.env.NEXT_PUBLIC_API_ENDPOINT!;
+  const apiBase = apiEndpoint.replace(/\/graphql\/?$/, "");
+  const sessionRes = await fetch(`${apiBase}/sessionLogin`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(communityId ? { "X-Community-Id": communityId } : {}),
     },
-  );
+    body: JSON.stringify({ idToken }),
+  });
 
   if (!sessionRes.ok) {
     logger.warn("[exchange] sessionLogin failed", { status: sessionRes.status, communityId });
