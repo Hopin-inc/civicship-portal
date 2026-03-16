@@ -62,14 +62,18 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       currentUser,
     );
 
-    logger.debug("[AUTH] RouteGuard redirect check", {
+    logger.warn("[AUTH] RouteGuard 🔍 redirect check", {
       pathname,
       pathWithParams,
+      normalizedPath: normalized,
       authenticationState: authState.authenticationState,
+      isAuthenticating: authState.isAuthenticating,
+      isAuthInProgress: authState.isAuthInProgress,
       currentUser: !!currentUser,
       currentUserId: currentUser?.id,
       redirectPath,
       willRedirect: !!(redirectPath && redirectPath !== pathWithParams),
+      component: "RouteGuard",
     });
 
     if (redirectPath && redirectPath !== pathWithParams) {

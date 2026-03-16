@@ -50,8 +50,9 @@ export const useLiffDeepLinkHandler = () => {
       return;
     }
 
-    logger.debug("[AUTH-LIFF] Processing LIFF deep link", {
+    logger.warn("[AUTH-LIFF] 🔍 Processing LIFF deep link", {
       liffState,
+      currentPathname: pathname,
       component: "useLiffDeepLinkHandler",
     });
 
