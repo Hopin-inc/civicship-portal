@@ -30,7 +30,13 @@ const requestLink = setContext(async (operation, prevContext) => {
   let authMode: "session" | "id_token" = isBrowser ? "id_token" : "session";
 
   if (isBrowser) {
-    const { firebaseUser, authenticationState } = useAuthStore.getState().state;
+    const { firebaseUser, lineTokens, authenticationState } = useAuthStore.getState().state;
+
+    // LIFF 環境では firebaseUser なし・session cookie 発行済みのため session mode に切り替え
+    const hasLineTokenOnly = !firebaseUser && !!lineTokens?.accessToken;
+    if (hasLineTokenOnly) {
+      authMode = "session";
+    }
 
     // Mutation の場合は認証を厳格にチェック
     const isMutation = operation.query.definitions.some(
@@ -42,12 +48,13 @@ const requestLink = setContext(async (operation, prevContext) => {
         throw new Error("認証情報を読み込み中です。少し待ってから再度お試しください");
       }
 
-      if (!firebaseUser) {
+      if (!firebaseUser && !lineTokens?.accessToken) {
         throw new Error("認証情報が取得できませんでした。ページをリロードしてください");
       }
     }
 
-    // firebaseUser がある場合はトークンを取得
+    // firebaseUser がある場合はトークンを取得（通常ブラウザ / phone 認証フロー）
+    // LIFF 環境は session mode で session cookie を使うため Bearer token 不要
     if (firebaseUser) {
       try {
         token = await firebaseUser.getIdToken();
@@ -57,7 +64,7 @@ const requestLink = setContext(async (operation, prevContext) => {
           throw new Error("認証トークンの取得に失敗しました");
         }
       }
-    } else {
+    } else if (!hasLineTokenOnly) {
       // Query実行時にfirebaseUserがない場合を記録
       logger.warn("[Apollo] 🔍 GraphQL request without firebase user", {
         operationName: operation.operationName,
