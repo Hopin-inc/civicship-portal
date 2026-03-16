@@ -21,12 +21,20 @@ interface ClientLayoutProps {
 }
 
 export function ClientLayout({ children, ssrUser }: ClientLayoutProps) {
+  const authenticationState = useAuthStore((s) => s.state.authenticationState);
+
+  // 認証完了前のクエリ発火を抑制する。
+  // ssrUser がない場合でも、認証が loading/authenticating の間は
+  // Bearer トークンなしの匿名リクエストになるためスキップする。
+  const shouldSkipQuery = !!ssrUser
+    || authenticationState === "loading"
+    || authenticationState === "authenticating";
+
   const { data, loading, error } = useQuery<CurrentUserProfileQueryResult>(GET_CURRENT_USER_PROFILE, {
-    skip: !!ssrUser,
+    skip: shouldSkipQuery,
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
   });
-  const authenticationState = useAuthStore((s) => s.state.authenticationState);
 
   const csrUser = data?.currentUser?.user ?? null;
 
