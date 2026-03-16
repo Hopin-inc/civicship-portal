@@ -18,7 +18,7 @@ const initialAuthState: AuthState = {
   isAuthenticating: false,
   isAuthInProgress: false,
   lineTokens: {
-    accessToken: null,
+    idToken: null,
     refreshToken: null,
     expiresAt: null,
   },

@@ -70,13 +70,13 @@ export const useLineAuthProcessing = ({
         const { isLoggedIn } = liffService.getState();
         if (!isLoggedIn) return;
 
-        // lineAuth.currentUser または lineTokens.accessToken（exchange 経由）があればスキップ
+        // lineAuth.currentUser または lineTokens.idToken（exchange 経由）があればスキップ
         const { lineTokens } = useAuthStore.getState().state;
-        if (lineAuth.currentUser || lineTokens.accessToken) {
+        if (lineAuth.currentUser || lineTokens.idToken) {
           logger.debug("Already authenticated (Firebase user or exchange token), skipping signInWithLiffToken", {
             authType: "liff",
             hasFirebaseUser: !!lineAuth.currentUser,
-            hasExchangeToken: !!lineTokens.accessToken,
+            hasExchangeToken: !!lineTokens.idToken,
             component: "useLineAuthProcessing",
           });
         } else {
