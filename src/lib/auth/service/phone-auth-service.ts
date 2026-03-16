@@ -1,9 +1,7 @@
 "use client";
 
 import {
-  PhoneAuthProvider,
   RecaptchaVerifier,
-  signInWithCredential,
   signInWithPhoneNumber,
 } from "firebase/auth";
 import { TokenManager } from "../core/token-manager";
@@ -148,28 +146,37 @@ export class PhoneAuthService {
     }
 
     try {
-      const credential = PhoneAuthProvider.credential(
-        phoneAuthState.verificationId,
-        verificationCode,
-      );
-      const userCredential = await signInWithCredential(getPhoneAuth(), credential);
+      // Server-side verification via /api/auth/phone-verify
+      // Bypasses LIFF WebView restrictions that block client-side
+      // communication with identitytoolkit.googleapis.com
+      const res = await fetch("/api/auth/phone-verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          verificationId: phoneAuthState.verificationId,
+          verificationCode,
+        }),
+      });
 
-      if (!userCredential.user) {
+      if (!res.ok) {
+        const errorBody = await res.json().catch(() => ({}));
+        logger.warn("[PhoneAuthService] Server-side phone verification failed", {
+          status: res.status,
+          error: errorBody.error,
+          component: "PhoneAuthService",
+        });
         return { success: false };
       }
 
-      const idToken = await userCredential.user.getIdToken();
-      const refreshToken = userCredential.user.refreshToken;
-      const tokenResult = await userCredential.user.getIdTokenResult();
-      const expiresAt = String(new Date(tokenResult.expirationTime).getTime());
+      const data = await res.json();
 
       return {
         success: true,
-        phoneUid: userCredential.user.uid,
+        phoneUid: data.phoneUid,
         tokens: {
-          accessToken: idToken,
-          refreshToken,
-          expiresAt,
+          accessToken: data.idToken,
+          refreshToken: data.refreshToken,
+          expiresAt: data.expiresAt,
         },
       };
     } catch (error) {

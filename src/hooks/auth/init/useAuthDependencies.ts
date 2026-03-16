@@ -28,8 +28,11 @@ export function useAuthDependencies(communityConfig: CommunityPortalConfig | nul
   const phoneAuthService = useMemo(() => PhoneAuthService.getInstance(), []);
 
   useEffect(() => {
-    setPhoneAuthTenantId(firebaseTenantId);
-  }, [firebaseTenantId]);
+    // Phone auth uses the parent Firebase project (no tenant),
+    // matching backend's validateFirebasePhoneAuth which uses auth.verifyIdToken() without tenant.
+    // Setting tenantId on phone auth causes auth/unsupported-tenant-operation.
+    setPhoneAuthTenantId(null);
+  }, []);
   const authStateManager = useMemo(() => {
     if (typeof window === "undefined") return null;
     return AuthStateManager.getInstance();
