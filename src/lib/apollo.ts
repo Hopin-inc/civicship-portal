@@ -25,8 +25,6 @@ const httpLink = createUploadLink({
 const requestLink = setContext(async (operation, prevContext) => {
   const isBrowser = typeof window !== "undefined";
   let token: string | null = null;
-  // Browser uses id_token mode only (session mode is SSR-only via executeServerGraphQLQuery)
-  // Server keeps session mode for any server-side Apollo usage
   let authMode: "session" | "id_token" = isBrowser ? "id_token" : "session";
 
   if (isBrowser) {
@@ -37,12 +35,15 @@ const requestLink = setContext(async (operation, prevContext) => {
       (def) => def.kind === "OperationDefinition" && def.operation === "mutation",
     );
 
+    const { lineTokens } = useAuthStore.getState().state;
+
     if (isMutation) {
       if (authenticationState === "loading") {
         throw new Error("認証情報を読み込み中です。少し待ってから再度お試しください");
       }
 
-      if (!firebaseUser) {
+      // firebaseUser または lineTokens.accessToken（exchange 経由）のいずれかが必要
+      if (!firebaseUser && !lineTokens.accessToken) {
         throw new Error("認証情報が取得できませんでした。ページをリロードしてください");
       }
     }
@@ -57,13 +58,9 @@ const requestLink = setContext(async (operation, prevContext) => {
           throw new Error("認証トークンの取得に失敗しました");
         }
       }
-    } else {
-      // Query実行時にfirebaseUserがない場合を記録
-      logger.info("GraphQL request without firebase user", {
-        operationName: operation.operationName,
-        isMutation,
-        authenticationState,
-      });
+    } else if (lineTokens.accessToken) {
+      // Server-side exchange 経由: firebaseUser なし → session cookie で認証
+      authMode = "session";
     }
   }
 

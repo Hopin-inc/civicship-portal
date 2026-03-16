@@ -53,6 +53,17 @@ export async function initializeFirebase(
           });
           return null;
         }
+
+        // Server-side exchange では signInWithCustomToken をクライアントで呼ばないため
+        // lineAuth.currentUser は null のまま。onAuthStateChanged を待つとハングするので
+        // 即座に null を返し、呼び出し元 initAuthFull の cookie セッション復元に委ねる。
+        if (!lineAuth.currentUser) {
+          logger.info("[initializeFirebase] LIFF sign-in succeeded via exchange — returning null for session-based restore", {
+            tenantId,
+            component: "initializeFirebase",
+          });
+          return null;
+        }
       }
     } catch (initErr) {
       logger.warn("LIFF initialization failed", { err: initErr });

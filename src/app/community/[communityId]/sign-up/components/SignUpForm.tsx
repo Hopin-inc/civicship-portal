@@ -44,7 +44,7 @@ export function SignUpForm() {
   const communityConfig = useCommunityConfig();
 
   const [isLoading, setIsLoading] = useState(false);
-  const firebaseUser = useAuthStore((s) => s.state.firebaseUser);
+  const authenticationState = useAuthStore((s) => s.state.authenticationState);
   const phoneAuth = useAuthStore((s) => s.phoneAuth);
 
   const FormSchema = createFormSchema((key: string) => t(`auth.signup.${key}`));
@@ -61,7 +61,11 @@ export function SignUpForm() {
   const onSubmit = async (values: FormValues) => {
     setIsLoading(true);
     try {
-      if (!firebaseUser) {
+      // SignUpForm は phone_authenticated 以上のユーザーのみ到達するため
+      // LINE認証は必ず完了済み。server-side exchange 時は firebaseUser が null なので
+      // authenticationState で LINE 認証済みを確認する。
+      const isLineAuthenticated = ["phone_authenticated", "user_registered"].includes(authenticationState);
+      if (!isLineAuthenticated) {
         toast.error(t("auth.signup.lineAuthRequired"));
         return null;
       }

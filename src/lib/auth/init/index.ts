@@ -14,6 +14,7 @@ import {
   restoreUserSession,
 } from "@/lib/auth/init/helper";
 import { initializeFirebase } from "@/lib/auth/init/firebase";
+import { fetchCurrentUserClient } from "@/lib/auth/init/fetchCurrentUser";
 import { CommunityPortalConfig } from "@/lib/communities/config";
 
 interface InitAuthParams {
@@ -157,6 +158,25 @@ async function initAuthFull({
       communityConfig?.firebaseTenantId,
     );
     if (!firebaseUser) {
+      // Server-side exchange 経由で signInWithLiffToken が成功した場合、
+      // Firebase SDK の signInWithCustomToken をクライアントで呼ばないため
+      // lineAuth.currentUser は null のまま。lineTokens.accessToken が存在すれば
+      // exchange 済みと判断して cookie セッション経由でユーザー復元へ進む。
+      const { lineTokens } = useAuthStore.getState().state;
+      if (lineTokens.accessToken) {
+        logger.info("[initAuthFull] Exchange-based session restore (no Firebase SDK user)", {
+          component: "initAuthFull",
+        });
+        const user = await fetchCurrentUserClient(communityConfig, null);
+        if (!user) {
+          finalizeAuthState("line_authenticated", undefined, setState, authStateManager);
+          return;
+        }
+        setState({ currentUser: user });
+        await evaluateUserRegistrationState(user, ssrPhoneAuthenticated, setState, authStateManager);
+        return;
+      }
+
       const shouldContinue = handleUnauthenticatedBranch(
         liffService,
         environment,
