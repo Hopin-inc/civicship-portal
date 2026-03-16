@@ -31,6 +31,14 @@ export const useLineAuthProcessing = ({
   const communityId = communityConfig?.communityId;
 
   useEffect(() => {
+    // 🔍 DEBUG: shouldProcessRedirect の値を確認（ハンドラが呼ばれるか判断）
+    logger.warn("[useLineAuthProcessing] 🔍 useEffect triggered", {
+      shouldProcessRedirect,
+      processedRefCurrent: processedRef.current,
+      hasAuthStateManager: !!authStateManager,
+      component: "useLineAuthProcessing",
+    });
+
     if (!shouldProcessRedirect || processedRef.current || !authStateManager) return;
 
     const handleLineAuthRedirect = async () => {
@@ -38,7 +46,7 @@ export const useLineAuthProcessing = ({
 
       // 🔍 DEBUG: initAuthFull 実行中かどうかを確認
       const { state: currentState } = useAuthStore.getState();
-      logger.info("[useLineAuthProcessing] 🔍 DEBUG: handleLineAuthRedirect started", {
+      logger.warn("[useLineAuthProcessing] 🔍 handleLineAuthRedirect started", {
         isAuthInProgress: currentState.isAuthInProgress,
         isAuthenticating: currentState.isAuthenticating,
         authenticationState: currentState.authenticationState,
@@ -48,7 +56,7 @@ export const useLineAuthProcessing = ({
 
       // initAuthFull が実行中の場合はそちらに任せて早期リターン（重複する auth state 管理を防止）
       if (currentState.isAuthInProgress) {
-        logger.debug("[useLineAuthProcessing] initAuth is in progress, skipping duplicate auth flow", {
+        logger.warn("[useLineAuthProcessing] 🔍 initAuth is in progress, skipping duplicate auth flow", {
           component: "useLineAuthProcessing",
         });
         return;
@@ -88,7 +96,7 @@ export const useLineAuthProcessing = ({
           const success = await liffService.signInWithLiffToken();
           // 🔍 DEBUG: sign-in 結果後の状態を確認
           const { state: afterSignIn } = useAuthStore.getState();
-          logger.info("[useLineAuthProcessing] 🔍 DEBUG: after signInWithLiffToken", {
+          logger.warn("[useLineAuthProcessing] 🔍 after signInWithLiffToken", {
             success,
             isAuthInProgress: afterSignIn.isAuthInProgress,
             authenticationState: afterSignIn.authenticationState,

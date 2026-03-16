@@ -181,11 +181,12 @@ export async function evaluateUserRegistrationState(
   const hasPhoneIdentity = !!user.identities?.some((i) => i.platform?.toUpperCase() === "PHONE");
   const communityId = getCommunityIdClient();
 
-  logger.debug("[evaluateUserRegistrationState] Checking membership", {
+  logger.warn("[evaluateUserRegistrationState] 🔍 Checking membership", {
     communityId,
     userId: user.id,
     hasPhoneIdentity,
     membershipsCount: user.memberships?.length ?? 0,
+    membershipCommunityIds: user.memberships?.map((m) => m.community?.id) ?? [],
     component: "evaluateUserRegistrationState",
   });
 
@@ -195,6 +196,17 @@ export async function evaluateUserRegistrationState(
 
   const isPhoneVerified = ssrPhoneAuthenticated || hasPhoneIdentity || TokenManager.phoneVerified();
   const isRegistered = isPhoneVerified && hasMembershipInCurrentCommunity;
+
+  logger.warn("[evaluateUserRegistrationState] 🔍 Result", {
+    isRegistered,
+    isPhoneVerified,
+    ssrPhoneAuthenticated,
+    hasPhoneIdentity,
+    tokenManagerPhoneVerified: TokenManager.phoneVerified(),
+    hasMembershipInCurrentCommunity,
+    willSetState: isRegistered ? "user_registered" : "line_authenticated",
+    component: "evaluateUserRegistrationState",
+  });
 
   if (isRegistered) {
     TokenManager.savePhoneAuthFlag(true);
