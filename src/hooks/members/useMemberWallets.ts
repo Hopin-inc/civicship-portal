@@ -19,8 +19,7 @@ export interface UseMemberWalletsResult {
 
 export const useMemberWallets = (): UseMemberWalletsResult => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const { state } = useAuthStore();
-  const hasAuth = !!state.firebaseUser || !!state.lineTokens.idToken;
+  const hasAuth = useAuthStore((s) => !!s.state.firebaseUser || !!s.state.lineTokens.idToken);
   const communityConfig = useCommunityConfig();
   const communityId = communityConfig?.communityId ?? "";
 
