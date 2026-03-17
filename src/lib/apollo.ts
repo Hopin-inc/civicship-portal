@@ -60,7 +60,50 @@ const requestLink = setContext(async (operation, prevContext) => {
       }
     } else if (lineTokens.idToken) {
       // Server-side exchange 経由: firebaseUser なし → exchange で取得した idToken を直接使用
-      token = lineTokens.idToken;
+      // idToken の期限が切れている（または残り5分以内）場合はリフレッシュを試みる
+      const isNearExpiry =
+        !lineTokens.expiresAt ||
+        Number(lineTokens.expiresAt) - Date.now() < 5 * 60 * 1000;
+
+      if (isNearExpiry && lineTokens.refreshToken) {
+        try {
+          const communityId = getCommunityIdClient();
+          const refreshRes = await fetch("/api/auth/refresh", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...(communityId ? { "X-Community-Id": communityId } : {}),
+            },
+            body: JSON.stringify({ refreshToken: lineTokens.refreshToken }),
+          });
+
+          if (refreshRes.ok) {
+            const refreshed = await refreshRes.json();
+            useAuthStore.getState().setState({
+              lineTokens: {
+                idToken: refreshed.idToken,
+                refreshToken: refreshed.refreshToken,
+                expiresAt: refreshed.expiresAt,
+              },
+            });
+            token = refreshed.idToken;
+          } else {
+            logger.warn("[Apollo] Token refresh failed, using existing token", {
+              status: refreshRes.status,
+              component: "ApolloRequestLink",
+            });
+            token = lineTokens.idToken;
+          }
+        } catch (error) {
+          logger.warn("[Apollo] Token refresh error, using existing token", {
+            error,
+            component: "ApolloRequestLink",
+          });
+          token = lineTokens.idToken;
+        }
+      } else {
+        token = lineTokens.idToken;
+      }
     }
   }
 
