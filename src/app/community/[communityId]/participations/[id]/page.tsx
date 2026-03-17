@@ -111,16 +111,11 @@ export default function ParticipationPage() {
     if (currentStatus?.status !== GqlReservationStatus.Accepted) {
       return false;
     }
-    const relevantDateString = dateTimeInfo?.endTime ?? dateTimeInfo?.startTime;
+    const relevantDateString = dateTimeInfo?.endDateTime ?? dateTimeInfo?.startDateTime;
     if (!relevantDateString) {
       return false;
     }
-    // Handle time-only strings (e.g. "09:00") by prefixing with today's date
-    const timeOnlyPattern = /^\d{1,2}:\d{2}(:\d{2})?$/;
-    const dateString = timeOnlyPattern.test(relevantDateString)
-      ? `${new Date().toISOString().split("T")[0]}T${relevantDateString}`
-      : relevantDateString;
-    const eventDate = new Date(dateString);
+    const eventDate = new Date(relevantDateString);
     if (isNaN(eventDate.getTime())) {
       logger.debug("Invalid date string for participation check", {
         relevantDateString,
