@@ -20,7 +20,7 @@ export interface UseMemberWalletsResult {
 export const useMemberWallets = (): UseMemberWalletsResult => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const { state } = useAuthStore();
-  const hasFirebaseUser = !!state.firebaseUser;
+  const hasAuth = !!state.firebaseUser || !!state.lineTokens.idToken;
   const communityConfig = useCommunityConfig();
   const communityId = communityConfig?.communityId ?? "";
 
@@ -34,7 +34,7 @@ export const useMemberWallets = (): UseMemberWalletsResult => {
     },
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
-    skip: !hasFirebaseUser, // Wait for Firebase auth before querying
+    skip: !hasAuth, // Wait for Firebase auth or exchange session before querying
   });
 
   const wallets = data?.wallets || {
