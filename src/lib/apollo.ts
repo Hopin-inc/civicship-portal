@@ -14,6 +14,15 @@ import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { setContext } from "@apollo/client/link/context";
 import { getCommunityIdClient } from "@/lib/community/get-community-id-client";
 
+/** 残り時間がこの値を下回ったらリフレッシュを試みる */
+const TOKEN_REFRESH_THRESHOLD_MS = 5 * 60 * 1000;
+
+/**
+ * 同時に複数のリクエストが期限切れトークンを検知したとき、
+ * リフレッシュを1回だけ実行するための Promise キャッシュ
+ */
+let refreshPromise: Promise<string> | null = null;
+
 const httpLink = createUploadLink({
   uri: process.env.NEXT_PUBLIC_API_ENDPOINT,
   credentials: "include",
@@ -60,40 +69,46 @@ const requestLink = setContext(async (operation, prevContext) => {
       }
     } else if (lineTokens.idToken) {
       // Server-side exchange 経由: firebaseUser なし → exchange で取得した idToken を直接使用
-      // idToken の期限が切れている（または残り5分以内）場合はリフレッシュを試みる
+      // expiresAt が存在し、残り TOKEN_REFRESH_THRESHOLD_MS 以内の場合はリフレッシュを試みる
       const isNearExpiry =
-        !lineTokens.expiresAt ||
-        Number(lineTokens.expiresAt) - Date.now() < 5 * 60 * 1000;
+        !!lineTokens.expiresAt &&
+        Number(lineTokens.expiresAt) - Date.now() < TOKEN_REFRESH_THRESHOLD_MS;
 
       if (isNearExpiry && lineTokens.refreshToken) {
-        try {
+        // 同時リクエストが複数ある場合でも1回だけリフレッシュするよう Promise をキャッシュ
+        if (!refreshPromise) {
           const communityId = getCommunityIdClient();
-          const refreshRes = await fetch("/api/auth/refresh", {
+          refreshPromise = fetch("/api/auth/refresh", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
               ...(communityId ? { "X-Community-Id": communityId } : {}),
             },
             body: JSON.stringify({ refreshToken: lineTokens.refreshToken }),
-          });
+          })
+            .then(async (res) => {
+              if (!res.ok) {
+                throw new Error(`Token refresh failed: ${res.status}`);
+              }
+              return res.json();
+            })
+            .then((refreshed) => {
+              useAuthStore.getState().setState({
+                lineTokens: {
+                  idToken: refreshed.idToken,
+                  refreshToken: refreshed.refreshToken ?? lineTokens.refreshToken,
+                  expiresAt: refreshed.expiresAt,
+                },
+              });
+              return refreshed.idToken as string;
+            })
+            .finally(() => {
+              refreshPromise = null;
+            });
+        }
 
-          if (refreshRes.ok) {
-            const refreshed = await refreshRes.json();
-            useAuthStore.getState().setState({
-              lineTokens: {
-                idToken: refreshed.idToken,
-                refreshToken: refreshed.refreshToken,
-                expiresAt: refreshed.expiresAt,
-              },
-            });
-            token = refreshed.idToken;
-          } else {
-            logger.warn("[Apollo] Token refresh failed, using existing token", {
-              status: refreshRes.status,
-              component: "ApolloRequestLink",
-            });
-            token = lineTokens.idToken;
-          }
+        try {
+          token = await refreshPromise;
         } catch (error) {
           logger.warn("[Apollo] Token refresh error, using existing token", {
             error,

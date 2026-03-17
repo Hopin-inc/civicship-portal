@@ -38,9 +38,10 @@ export async function POST(request: NextRequest) {
       request.cookies.get("x-community-id")?.value ||
       "";
 
-    const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
+    // サーバー専用変数を優先し、なければ公開変数にフォールバック
+    const apiKey = process.env.FIREBASE_API_KEY ?? process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
     if (!apiKey) {
-      logger.error("[auth/refresh] Missing NEXT_PUBLIC_FIREBASE_API_KEY");
+      logger.error("[auth/refresh] Missing FIREBASE_API_KEY / NEXT_PUBLIC_FIREBASE_API_KEY");
       return NextResponse.json({ error: "Server configuration error" }, { status: 500 });
     }
 
@@ -62,7 +63,9 @@ export async function POST(request: NextRequest) {
         body: errorBody.substring(0, 500),
         component: "auth/refresh",
       });
-      return NextResponse.json({ error: "Token refresh failed" }, { status: firebaseRes.status });
+      // Firebase の 5xx をそのまま返すとクライアントが誤解するため 502 に正規化
+      const status = firebaseRes.status >= 500 ? 502 : firebaseRes.status;
+      return NextResponse.json({ error: "Token refresh failed" }, { status });
     }
 
     const firebaseData = await firebaseRes.json();
@@ -71,6 +74,12 @@ export async function POST(request: NextRequest) {
 
     if (!idToken) {
       logger.error("[auth/refresh] No id_token in Secure Token API response");
+      return NextResponse.json({ error: "Token refresh failed" }, { status: 500 });
+    }
+    // refreshToken が返されない場合（Firebase API の仕様変更等）はエラーにする
+    // クライアント側で undefined を保存してしまうのを防ぐため
+    if (!newRefreshToken) {
+      logger.error("[auth/refresh] No refresh_token in Secure Token API response");
       return NextResponse.json({ error: "Token refresh failed" }, { status: 500 });
     }
 
