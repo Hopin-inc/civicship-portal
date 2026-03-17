@@ -194,11 +194,6 @@ export async function middleware(request: NextRequest) {
 }
 
 /**
- * パスから communityId を抽出
- * /community/{communityId}/... 形式の場合に communityId を返す
- * ホワイトリストチェックは行わず、DB検証に委ねる
- */
-/**
  * Validate communityId format: alphanumeric, hyphens, and underscores only.
  * Rejects values like ".env" or other invalid/malicious inputs.
  * Consistent with API-side validation in extractAuthHeaders.
@@ -207,8 +202,13 @@ function isValidCommunityId(value: string): boolean {
   return /^[a-zA-Z0-9_-]+$/.test(value);
 }
 
+/**
+ * パスから communityId を抽出
+ * /community/{communityId}/... 形式の場合に communityId を返す
+ * ホワイトリストチェックは行わず、DB検証に委ねる
+ */
 function getCommunityIdFromPath(pathname: string): string | null {
-  const match = pathname.match(/^\/community\/([a-zA-Z0-9-]+)/);
+  const match = pathname.match(/^\/community\/([a-zA-Z0-9_-]+)/);
   return match ? match[1] : null;
 }
 
