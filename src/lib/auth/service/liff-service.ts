@@ -60,7 +60,7 @@ export class LiffService {
       LiffService.instance = new LiffService(targetId);
       if (!targetId) {
         LiffService.instance.state.error = new Error("LIFF ID is not configured");
-        logger.warn("LiffService initialized without LIFF ID - LIFF features will be disabled", {
+        logger.info("LiffService initialized without LIFF ID - LIFF features will be disabled", {
           component: "LiffService",
         });
       } else {
@@ -169,7 +169,7 @@ export class LiffService {
 
     if (isEnvironmentConstraint) {
       const warnMessage = `LIFF environment ${operation} limitation`;
-      logger.warn(warnMessage, {
+      logger.info(warnMessage, {
         ...logContext,
         errorCategory: "environment_constraint",
         expected: true,
