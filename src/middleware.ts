@@ -29,8 +29,16 @@ export async function middleware(request: NextRequest) {
   let communityIdSource = communityId ? "path" : null;
 
   if (!communityId) {
-    communityId = getCommunityIdFromHost(host);
-    if (communityId) communityIdSource = "host";
+    const hostCommunityId = getCommunityIdFromHost(host);
+    if (hostCommunityId && isValidCommunityId(hostCommunityId)) {
+      communityId = hostCommunityId;
+      communityIdSource = "host";
+    } else if (hostCommunityId) {
+      console.warn("[Middleware] Invalid communityId format from host, rejecting", {
+        hostCommunityId,
+        host,
+      });
+    }
   }
 
   // パスとホストで解決できない場合はクッキーからフォールバック
@@ -39,7 +47,7 @@ export async function middleware(request: NextRequest) {
   // コールバックがルート "/" に来ても communityId を特定できる必要がある。
   if (!communityId) {
     const cookieValue = request.cookies.get("x-community-id")?.value ?? null;
-    if (cookieValue && /^[a-zA-Z0-9-]+$/.test(cookieValue)) {
+    if (cookieValue && isValidCommunityId(cookieValue)) {
       communityId = cookieValue;
       communityIdSource = "cookie";
       console.log("[Middleware] communityId resolved from cookie", {
@@ -190,6 +198,15 @@ export async function middleware(request: NextRequest) {
  * /community/{communityId}/... 形式の場合に communityId を返す
  * ホワイトリストチェックは行わず、DB検証に委ねる
  */
+/**
+ * Validate communityId format: alphanumeric, hyphens, and underscores only.
+ * Rejects values like ".env" or other invalid/malicious inputs.
+ * Consistent with API-side validation in extractAuthHeaders.
+ */
+function isValidCommunityId(value: string): boolean {
+  return /^[a-zA-Z0-9_-]+$/.test(value);
+}
+
 function getCommunityIdFromPath(pathname: string): string | null {
   const match = pathname.match(/^\/community\/([a-zA-Z0-9-]+)/);
   return match ? match[1] : null;
