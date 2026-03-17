@@ -27,12 +27,12 @@ interface GrantPointInput {
 
 type Result<T> = { success: true; data: T } | { success: false; code: GqlErrorCode };
 
-// firebaseUserが初期化されているかチェック
-// CSRからのミューテーションはfirebaseUserのidTokenが必要
+// 認証チェック: firebaseUser または exchange経由のlineTokens.idTokenが必要
+// apollo.ts の requestLink と同じロジックを使用
 const checkFirebaseAuth = (): { success: false; code: GqlErrorCode } | null => {
-  const { firebaseUser } = useAuthStore.getState().state;
-  if (!firebaseUser) {
-    logger.warn("Transaction mutation blocked: firebaseUser not initialized", {
+  const { firebaseUser, lineTokens } = useAuthStore.getState().state;
+  if (!firebaseUser && !lineTokens.idToken) {
+    logger.warn("Transaction mutation blocked: not authenticated (no firebaseUser or lineTokens.idToken)", {
       component: "useTransactionMutations",
       errorCategory: "auth",
     });
@@ -42,9 +42,10 @@ const checkFirebaseAuth = (): { success: false; code: GqlErrorCode } | null => {
 };
 
 export const useTransactionMutations = () => {
-  // firebaseUserの状態をsubscribeして、UIが反応的に更新されるようにする
+  // firebaseUser または exchange経由のlineTokens.idTokenをsubscribeしてUIが反応的に更新されるようにする
   const firebaseUser = useAuthStore((s) => s.state.firebaseUser);
-  const isAuthReady = !!firebaseUser;
+  const lineIdToken = useAuthStore((s) => s.state.lineTokens.idToken);
+  const isAuthReady = !!firebaseUser || !!lineIdToken;
 
   // Apollo Hooks
   const [issuePointMutation, { loading: loadingIssue }] = usePointIssueMutation();
