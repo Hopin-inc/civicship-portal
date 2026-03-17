@@ -45,10 +45,13 @@ export async function getMembershipListServer(
       connection: res.memberships,
     };
   } catch (error) {
-    logger.warn("⚠️ Failed to fetch membership list on server:", {
+    logger.warn("[getMembershipListServer] Failed to fetch membership list on server", {
       message: (error as Error).message,
-      stack: (error as Error).stack,
+      component: "getMembershipListServer",
     });
-    throw error;
+    // Graceful fallback: return null instead of throwing to avoid page errors
+    return {
+      connection: null,
+    };
   }
 }

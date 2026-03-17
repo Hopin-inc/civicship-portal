@@ -31,7 +31,7 @@ export async function getUserServer(): Promise<{
     const res = await executeServerGraphQLQuery<
       GqlCurrentUserServerQuery,
       GqlCurrentUserServerQueryVariables
-    >(GET_CURRENT_USER_SERVER_QUERY, {});
+    >(GET_CURRENT_USER_SERVER_QUERY, {}, {}, 8000); // Critical query: extended timeout (8s)
 
     const user: GqlUser | null = res.currentUser?.user ?? null;
     const hasPhoneIdentity = !!user?.identities?.some((i) => i.platform?.toUpperCase() === "PHONE");

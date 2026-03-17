@@ -111,13 +111,30 @@ export const getCommunityConfig = cache(
       console.log(`[LOCAL] Response Local Config for ${communityId}, using static config.`);
       return COMMUNITY_LOCAL_CONFIGS;
     }
-    try {
+    const fetchConfig = async (): Promise<CommunityPortalConfig | null> => {
       const data = await executeServerGraphQLQuery<CommunityPortalConfigResponse>(
         COMMUNITY_PORTAL_CONFIG_QUERY,
         { communityId },
+        {},
+        8000, // Critical query: extended timeout (8s)
       );
+      return data.communityPortalConfig;
+    };
 
-      const config = data.communityPortalConfig;
+    try {
+      let config: CommunityPortalConfig | null;
+      try {
+        config = await fetchConfig();
+      } catch (firstError) {
+        // Retry once after 1s for transient failures (timeout, network errors)
+        logger.warn("[getCommunityConfig] First attempt failed, retrying after 1s", {
+          communityId,
+          error: firstError instanceof Error ? firstError.message : String(firstError),
+          component: "getCommunityConfig",
+        });
+        await new Promise((r) => setTimeout(r, 1000));
+        config = await fetchConfig();
+      }
 
       if (!config) {
         logger.warn("[getCommunityConfig] DB returned null for communityPortalConfig", {
@@ -142,7 +159,7 @@ export const getCommunityConfig = cache(
 
       return config;
     } catch (error) {
-      logger.error("[getCommunityConfig] Failed to fetch config from DB", {
+      logger.error("[getCommunityConfig] Failed to fetch config from DB (after retry)", {
         communityId,
         error: error instanceof Error ? error.message : String(error),
         errorType: error instanceof Error ? error.constructor.name : typeof error,
