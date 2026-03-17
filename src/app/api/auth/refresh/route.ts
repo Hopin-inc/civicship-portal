@@ -38,10 +38,9 @@ export async function POST(request: NextRequest) {
       request.cookies.get("x-community-id")?.value ||
       "";
 
-    // サーバー専用変数を優先し、なければ公開変数にフォールバック
-    const apiKey = process.env.FIREBASE_API_KEY ?? process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
+    const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
     if (!apiKey) {
-      logger.error("[auth/refresh] Missing FIREBASE_API_KEY / NEXT_PUBLIC_FIREBASE_API_KEY");
+      logger.error("[auth/refresh] Missing NEXT_PUBLIC_FIREBASE_API_KEY");
       return NextResponse.json({ error: "Server configuration error" }, { status: 500 });
     }
 
