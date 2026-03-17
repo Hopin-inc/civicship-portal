@@ -120,6 +120,8 @@ export async function POST(request: NextRequest) {
           status: first.status,
           component: "auth/exchange",
         });
+        // Drain the response body to release the connection back to the pool
+        await first.text().catch(() => {});
         await new Promise((r) => setTimeout(r, 2000));
         return doFetch();
       }
