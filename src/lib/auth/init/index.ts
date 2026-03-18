@@ -105,26 +105,27 @@ async function initAuthFast({
       ssrMode: true,
     });
 
-    // Initialize Firebase in background for CSR (non-blocking)
-    // This ensures firebaseUser is available for client-side Apollo queries
+    // Initialize Firebase for CSR and await completion before returning.
+    // Invariant: when initAuthFast returns, lineTokens.idToken is guaranteed to be set
+    // (as a side effect of signInWithLiffToken inside initializeFirebase).
+    // Fire-and-forget caused a race condition where mutations were sent without a Bearer
+    // token when the user acted before background initialization completed.
     if (typeof window !== "undefined") {
-      (async () => {
-        try {
-          const firebaseUser = await initializeFirebase(
-            liffService,
-            environment,
-            communityConfig?.firebaseTenantId,
-          );
-          if (firebaseUser) {
-            useAuthStore.getState().setState({ firebaseUser });
-            logger.debug("[AUTH] initAuthFast: Firebase user hydrated for CSR", {
-              uid: firebaseUser.uid,
-            });
-          }
-        } catch (error) {
-          logger.warn("[AUTH] initAuthFast: Failed to hydrate Firebase user", { error });
+      try {
+        const firebaseUser = await initializeFirebase(
+          liffService,
+          environment,
+          communityConfig?.firebaseTenantId,
+        );
+        if (firebaseUser) {
+          useAuthStore.getState().setState({ firebaseUser });
+          logger.debug("[AUTH] initAuthFast: Firebase user hydrated for CSR", {
+            uid: firebaseUser.uid,
+          });
         }
-      })();
+      } catch (error) {
+        logger.warn("[AUTH] initAuthFast: Failed to hydrate Firebase user", { error });
+      }
     }
   } catch (e) {
     logger.error("initAuthFast failed", { error: e });
