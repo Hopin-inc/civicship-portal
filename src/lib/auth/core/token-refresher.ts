@@ -24,12 +24,15 @@ export async function getValidLineIdToken(): Promise<string | null> {
 
   if (!lineTokens.idToken) return null;
 
+  // expiresAt がない場合は期限情報なし → 有効とみなしてそのまま返す
+  if (!lineTokens.expiresAt) {
+    return lineTokens.idToken;
+  }
+
   // 有効期限あり → 残り時間を確認
-  if (lineTokens.expiresAt) {
-    const expiresAt = Number(lineTokens.expiresAt);
-    if (expiresAt - Date.now() > REFRESH_THRESHOLD_MS) {
-      return lineTokens.idToken;
-    }
+  const expiresAt = Number(lineTokens.expiresAt);
+  if (expiresAt - Date.now() > REFRESH_THRESHOLD_MS) {
+    return lineTokens.idToken;
   }
 
   // refreshToken がない場合はそのまま返して API 側に判断を委ねる
