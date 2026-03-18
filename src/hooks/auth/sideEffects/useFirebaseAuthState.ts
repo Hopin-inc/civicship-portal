@@ -61,14 +61,6 @@ export const useFirebaseAuthState = ({
               component: "useFirebaseAuthState",
             });
           }
-          // signOut 後に return するだけでは setState が呼ばれず、
-          // onAuthStateChanged(null) が来ても早期 return に引っかかって loading のまま固まるため、
-          // ここで確実に未認証状態へ遷移させる。
-          setState({ firebaseUser: null, authenticationState: "unauthenticated" });
-          const currentAuthStateManager = authStateManagerRef.current;
-          if (currentAuthStateManager && !stateRef.current.isAuthenticating) {
-            void currentAuthStateManager.handleLineAuthStateChange(false);
-          }
           return;
         }
 
