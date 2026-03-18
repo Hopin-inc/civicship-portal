@@ -1,7 +1,7 @@
 import winston from "winston";
 import { LoggingWinston } from "@google-cloud/logging-winston";
 import { ILogger } from "@/lib/logging/type";
-import { isProduction, isLocal } from "@/lib/environment";
+import { isLocal } from "@/lib/environment";
 
 const severity = winston.format((log) => {
   log.severity = log.level.toUpperCase();
@@ -46,7 +46,9 @@ if (isLocal) {
 }
 
 const winstonLogger = winston.createLogger({
-  level: isProduction ? "warn" : (process.env.NEXT_PUBLIC_LOG_LEVEL || "debug"),
+  level: (["debug", "info", "warn", "error"].includes(process.env.NEXT_PUBLIC_LOG_LEVEL ?? "")
+    ? process.env.NEXT_PUBLIC_LOG_LEVEL
+    : "warn") as string,
   format: winston.format.combine(...format),
   transports,
 });

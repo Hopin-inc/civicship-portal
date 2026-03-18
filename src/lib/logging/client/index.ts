@@ -2,9 +2,14 @@
 
 import { ILogger } from "@/lib/logging/type";
 import { createAuthLogContext, generateSessionId } from "@/lib/logging/client/utils";
-import { isProduction } from "@/lib/environment";
 
 const cachedSessionId = generateSessionId();
+
+const LOG_LEVELS = ["debug", "info", "warn", "error"];
+const configuredLevel = process.env.NEXT_PUBLIC_LOG_LEVEL ?? "";
+const configuredLevelIndex = LOG_LEVELS.includes(configuredLevel)
+  ? LOG_LEVELS.indexOf(configuredLevel)
+  : LOG_LEVELS.indexOf("warn");
 
 const logThrottle = new Map<string, number>();
 const THROTTLE_DURATION = 5 * 60 * 1000;
@@ -23,8 +28,7 @@ const shouldThrottle = (message: string, level: string): boolean => {
 };
 
 const forwardLogToServer = async (level: string, message: string, meta?: Record<string, any>) => {
-  // In production, only forward warn/error logs to server
-  if (isProduction && (level === "debug" || level === "info")) {
+  if (LOG_LEVELS.indexOf(level) < configuredLevelIndex) {
     return;
   }
 
