@@ -6,6 +6,8 @@ import { TokenManager } from "@/lib/auth/core/token-manager";
 import { AuthStateManager } from "@/lib/auth/core/auth-state-manager";
 import { logger } from "@/lib/logging";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
+import { signOut } from "firebase/auth";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 interface UseFirebaseAuthStateProps {
   authStateManager: AuthStateManager | null;
@@ -18,12 +20,15 @@ export const useFirebaseAuthState = ({
 }: UseFirebaseAuthStateProps) => {
   const setState = useAuthStore((s) => s.setState);
   const state = useAuthStore((s) => s.state);
+  const communityConfig = useCommunityConfig();
 
   const authStateManagerRef = useRef(authStateManager);
   const stateRef = useRef(state);
+  const expectedTenantIdRef = useRef(communityConfig?.firebaseTenantId ?? null);
 
   authStateManagerRef.current = authStateManager;
   stateRef.current = state;
+  expectedTenantIdRef.current = communityConfig?.firebaseTenantId ?? null;
 
   useEffect(() => {
     // 🚫 SSRで full-auth の場合は何もしない
@@ -35,6 +40,20 @@ export const useFirebaseAuthState = ({
       if (prevUser?.uid === user?.uid) return;
 
       if (user) {
+        // テナント不一致チェック: localStorage にキャッシュされた別コミュニティの
+        // ユーザーが復元された場合、トークンを上書きせずサインアウトする。
+        const expectedTenantId = expectedTenantIdRef.current;
+        if (expectedTenantId && user.tenantId !== expectedTenantId) {
+          logger.warn("[useFirebaseAuthState] Tenant mismatch — cached user belongs to a different community, signing out", {
+            expectedTenantId,
+            actualTenantId: user.tenantId,
+            uid: user.uid,
+            component: "useFirebaseAuthState",
+          });
+          await signOut(lineAuth);
+          return;
+        }
+
         try {
           const idToken = await user.getIdToken();
           const refreshToken = user.refreshToken;
