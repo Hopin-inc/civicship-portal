@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from "react";
 import { lineAuth } from "@/lib/auth/core/firebase-config";
-import { TokenManager } from "@/lib/auth/core/token-manager";
 import { AuthStateManager } from "@/lib/auth/core/auth-state-manager";
 import { logger } from "@/lib/logging";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
@@ -24,7 +23,7 @@ export const useFirebaseAuthState = ({
 
   const authStateManagerRef = useRef(authStateManager);
   const stateRef = useRef(state);
-  const expectedTenantIdRef = useRef(communityConfig?.firebaseTenantId ?? null);
+  const expectedTenantIdRef = useRef<string | null>(null);
 
   authStateManagerRef.current = authStateManager;
   stateRef.current = state;
@@ -50,7 +49,17 @@ export const useFirebaseAuthState = ({
             uid: user.uid,
             component: "useFirebaseAuthState",
           });
-          await signOut(lineAuth);
+          try {
+            await signOut(lineAuth);
+          } catch (error) {
+            logger.error("[useFirebaseAuthState] Failed to sign out after tenant mismatch", {
+              error: error instanceof Error ? error.message : String(error),
+              expectedTenantId,
+              actualTenantId: user.tenantId,
+              uid: user.uid,
+              component: "useFirebaseAuthState",
+            });
+          }
           return;
         }
 
