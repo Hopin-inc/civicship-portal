@@ -168,8 +168,8 @@ export class LiffService {
     };
 
     if (isEnvironmentConstraint) {
-      const warnMessage = `LIFF environment ${operation} limitation`;
-      logger.info(warnMessage, {
+      const infoMessage = `LIFF environment ${operation} limitation`;
+      logger.info(infoMessage, {
         ...logContext,
         errorCategory: "environment_constraint",
         expected: true,
