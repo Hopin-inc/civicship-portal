@@ -12,7 +12,6 @@ const LOG_LEVELS: Record<string, number> = {
   error: 3,
 };
 
-const AUTH_MIN_LOG_LEVEL = "info";
 const configuredLevel = process.env.NEXT_PUBLIC_LOG_LEVEL || "debug";
 
 const logThrottle = new Map<string, number>();
@@ -37,11 +36,6 @@ const forwardLogToServer = async (level: string, message: string, meta?: Record<
   }
 
   const { authType = "general", ...restMeta } = meta ?? {};
-
-  const isAuthLog = authType !== "general";
-  if (isAuthLog && (LOG_LEVELS[level] ?? 0) < (LOG_LEVELS[AUTH_MIN_LOG_LEVEL] ?? 1)) {
-    return;
-  }
 
   const isBrowserIssue =
     message.includes("IndexedDB") ||
