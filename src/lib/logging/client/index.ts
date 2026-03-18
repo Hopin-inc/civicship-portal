@@ -13,7 +13,7 @@ const LOG_LEVELS: Record<string, number> = {
 };
 
 const AUTH_MIN_LOG_LEVEL = "info";
-const configuredLevel = process.env.NEXT_PUBLIC_LOG_LEVEL || "info";
+const configuredLevel = process.env.NEXT_PUBLIC_LOG_LEVEL || "debug";
 
 const logThrottle = new Map<string, number>();
 const THROTTLE_DURATION = 5 * 60 * 1000;
