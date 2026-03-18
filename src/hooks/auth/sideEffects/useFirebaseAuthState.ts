@@ -36,7 +36,8 @@ export const useFirebaseAuthState = ({
     const unsubscribe = lineAuth.onAuthStateChanged(async (user) => {
       const prevUser = stateRef.current.firebaseUser;
 
-      if (prevUser?.uid === user?.uid) return;
+      // 同一ユーザー・同一テナントの場合のみ早期 return（null===null でスキップしないよう両者が非 null の場合に限定）
+      if (prevUser && user && prevUser.uid === user.uid && prevUser.tenantId === user.tenantId) return;
 
       if (user) {
         // テナント不一致チェック: localStorage にキャッシュされた別コミュニティの
