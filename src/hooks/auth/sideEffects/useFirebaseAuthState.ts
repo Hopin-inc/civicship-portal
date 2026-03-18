@@ -24,6 +24,7 @@ export const useFirebaseAuthState = ({
   const authStateManagerRef = useRef(authStateManager);
   const stateRef = useRef(state);
   const expectedTenantIdRef = useRef<string | null>(null);
+  const ignoreNextNullAuthEventRef = useRef(false);
 
   authStateManagerRef.current = authStateManager;
   stateRef.current = state;
@@ -51,10 +52,13 @@ export const useFirebaseAuthState = ({
             component: "useFirebaseAuthState",
           });
           try {
+            ignoreNextNullAuthEventRef.current = true;
             await signOut(lineAuth);
           } catch (error) {
+            ignoreNextNullAuthEventRef.current = false;
             logger.error("[useFirebaseAuthState] Failed to sign out after tenant mismatch", {
               error: error instanceof Error ? error.message : String(error),
+              errorCode: (error as any)?.code,
               expectedTenantId,
               actualTenantId: user.tenantId,
               uid: user.uid,
@@ -90,6 +94,10 @@ export const useFirebaseAuthState = ({
           });
         }
       } else {
+        if (ignoreNextNullAuthEventRef.current) {
+          ignoreNextNullAuthEventRef.current = false;
+          return;
+        }
         setState({
           firebaseUser: null,
           authenticationState: "unauthenticated",
