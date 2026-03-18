@@ -46,7 +46,9 @@ if (isLocal) {
 }
 
 const winstonLogger = winston.createLogger({
-  level: process.env.NEXT_PUBLIC_LOG_LEVEL || "warn",
+  level: (["debug", "info", "warn", "error"].includes(process.env.NEXT_PUBLIC_LOG_LEVEL ?? "")
+    ? process.env.NEXT_PUBLIC_LOG_LEVEL
+    : "warn") as string,
   format: winston.format.combine(...format),
   transports,
 });

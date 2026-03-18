@@ -6,8 +6,10 @@ import { createAuthLogContext, generateSessionId } from "@/lib/logging/client/ut
 const cachedSessionId = generateSessionId();
 
 const LOG_LEVELS = ["debug", "info", "warn", "error"];
-const configuredLevel = process.env.NEXT_PUBLIC_LOG_LEVEL || "warn";
-const configuredLevelIndex = LOG_LEVELS.indexOf(configuredLevel);
+const configuredLevel = process.env.NEXT_PUBLIC_LOG_LEVEL ?? "";
+const configuredLevelIndex = LOG_LEVELS.includes(configuredLevel)
+  ? LOG_LEVELS.indexOf(configuredLevel)
+  : LOG_LEVELS.indexOf("warn");
 
 const logThrottle = new Map<string, number>();
 const THROTTLE_DURATION = 5 * 60 * 1000;
