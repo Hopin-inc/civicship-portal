@@ -171,27 +171,57 @@ describe("getValidLineIdToken", () => {
     expect(mockFetch).not.toHaveBeenCalled();
   });
 
+  it("リフレッシュ成功 → API が refreshToken を返さない場合は既存 refreshToken を維持する", async () => {
+    const expiresAt = String(Date.now() + FIVE_MIN_MS - 10_000);
+    const { mockSetState } = setupStore(makeTokens({ expiresAt }));
+    // API が refreshToken を返さないレスポンス
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            idToken: "new-id-token",
+            // refreshToken: 意図的に省略
+            expiresAt: String(Date.now() + 3_600_000),
+          }),
+      }),
+    );
+
+    await getValidLineIdToken();
+
+    expect(mockSetState).toHaveBeenCalledWith(
+      expect.objectContaining({
+        lineTokens: expect.objectContaining({
+          // 新しいトークンが来なかった場合は元の refreshToken を維持
+          refreshToken: "current-refresh-token",
+        }),
+      }),
+    );
+  });
+
   // =========================================================================
-  // リフレッシュ失敗
+  // リフレッシュ失敗（→ 既存トークンにフォールバック）
   // =========================================================================
-  it("/api/auth/refresh が non-OK → null を返す", async () => {
+  it("/api/auth/refresh が non-OK → null ではなく既存 idToken を返す", async () => {
     const expiresAt = String(Date.now() + FIVE_MIN_MS - 10_000);
     setupStore(makeTokens({ expiresAt }));
     mockFetchFailure(401);
 
     const result = await getValidLineIdToken();
 
-    expect(result).toBeNull();
+    // Authorization ヘッダを欠落させない：既存トークンを返してサーバーに判断させる
+    expect(result).toBe("current-id-token");
   });
 
-  it("/api/auth/refresh がネットワークエラー → null を返す", async () => {
+  it("/api/auth/refresh がネットワークエラー → null ではなく既存 idToken を返す", async () => {
     const expiresAt = String(Date.now() + FIVE_MIN_MS - 10_000);
     setupStore(makeTokens({ expiresAt }));
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("Network error")));
 
     const result = await getValidLineIdToken();
 
-    expect(result).toBeNull();
+    expect(result).toBe("current-id-token");
   });
 
   // =========================================================================

@@ -50,7 +50,12 @@ export async function getValidLineIdToken(): Promise<string | null> {
     });
   }
 
-  return refreshPromise;
+  // リフレッシュ失敗（null）の場合は既存トークンにフォールバックする。
+  // null を返すと Apollo requestLink の mutation pre-check（idToken が truthy）を
+  // 通過した後に Authorization ヘッダなしでリクエストが送られてしまい、
+  // サーバーが匿名扱いにして auth:token-expired が発火しない状態になるため。
+  const refreshed = await refreshPromise;
+  return refreshed ?? lineTokens.idToken;
 }
 
 async function doRefresh(refreshToken: string): Promise<string | null> {
@@ -84,7 +89,8 @@ async function doRefresh(refreshToken: string): Promise<string | null> {
     useAuthStore.getState().setState({
       lineTokens: {
         idToken,
-        refreshToken: newRefreshToken,
+        // API がリフレッシュトークンを返さないケースに備えて既存トークンを維持する
+        refreshToken: newRefreshToken || refreshToken,
         expiresAt,
       },
     });

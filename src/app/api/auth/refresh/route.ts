@@ -15,6 +15,37 @@ import { logger } from "@/lib/logging";
  */
 export async function POST(request: NextRequest) {
   try {
+    // CSRF protection: /api/auth/exchange と同様に Origin の一致を確認する。
+    // このエンドポイントはクライアントサイドの fetch からのみ呼ばれるため
+    // Origin ヘッダが存在しないリクエストも拒否する。
+    // host は request.nextUrl.host から取得する（Host ヘッダは Fetch API の
+    // forbidden header のためリクエストオブジェクトから直接読み取れないため）。
+    const origin = request.headers.get("origin");
+    const host = new URL(request.url).host;
+    if (!origin) {
+      logger.warn("[auth/refresh] CSRF check failed: missing origin", {
+        host,
+        component: "auth/refresh",
+      });
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    try {
+      if (new URL(origin).host !== host) {
+        logger.warn("[auth/refresh] CSRF check failed: origin mismatch", {
+          origin,
+          host,
+          component: "auth/refresh",
+        });
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
+    } catch {
+      logger.warn("[auth/refresh] CSRF check failed: invalid origin", {
+        origin,
+        component: "auth/refresh",
+      });
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     const { refreshToken } = await request.json();
     if (!refreshToken) {
       return NextResponse.json({ error: "Missing refreshToken" }, { status: 400 });

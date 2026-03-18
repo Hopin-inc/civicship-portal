@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 
 vi.mock("@/lib/logging", () => ({
   logger: { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() },
@@ -11,12 +11,39 @@ import { POST } from "@/app/api/auth/refresh/route";
 // 共通ヘルパー
 // ────────────────────────────────────────────────────────────────────────────
 
-function makeRequest(body: Record<string, unknown>, headers: Record<string, string> = {}) {
-  return new NextRequest("http://localhost/api/auth/refresh", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...headers },
-    body: JSON.stringify(body),
-  });
+/**
+ * NextRequest の mock を生成する。
+ *
+ * `origin` は Fetch API の forbidden header のため new NextRequest() では設定できない。
+ * mock オブジェクトを使うことでテスト側から自由にヘッダーを制御する。
+ *
+ * - デフォルトで origin: "http://localhost"（request.url と同一ホスト）を設定し
+ *   CSRF チェックを通過させる。
+ * - 特定のヘッダーを除外したい場合は headerOverrides でそのキーを undefined にする。
+ */
+function makeRequest(
+  body: Record<string, unknown>,
+  headerOverrides: Record<string, string | undefined> = {},
+): NextRequest {
+  const headers: Record<string, string> = {
+    "content-type": "application/json",
+    "origin": "http://localhost",
+  };
+
+  for (const [key, value] of Object.entries(headerOverrides)) {
+    if (value === undefined) {
+      delete headers[key.toLowerCase()];
+    } else {
+      headers[key.toLowerCase()] = value;
+    }
+  }
+
+  return {
+    url: "http://localhost/api/auth/refresh",
+    headers: { get: (name: string) => headers[name.toLowerCase()] ?? null },
+    json: () => Promise.resolve(body),
+    cookies: { get: () => undefined },
+  } as unknown as NextRequest;
 }
 
 /**
@@ -77,6 +104,31 @@ describe("POST /api/auth/refresh", () => {
   });
 
   // =========================================================================
+  // CSRF 保護
+  // =========================================================================
+  it("Origin ヘッダなし → 403 を返す", async () => {
+    const req = makeRequest({ refreshToken: "r-token" }, { "origin": undefined });
+    const res = await POST(req);
+    expect(res.status).toBe(403);
+  });
+
+  it("Origin と Host が不一致 → 403 を返す", async () => {
+    const req = makeRequest(
+      { refreshToken: "r-token" },
+      { "origin": "http://evil.example.com" }, // URL の host は "localhost" と不一致
+    );
+    const res = await POST(req);
+    expect(res.status).toBe(403);
+  });
+
+  it("Origin と Host が一致 → CSRF チェックを通過する", async () => {
+    mockFetchSequence({ ok: true }, { ok: true });
+    const req = makeRequest({ refreshToken: "r-token" }); // origin: "http://localhost"
+    const res = await POST(req);
+    expect(res.status).toBe(200);
+  });
+
+  // =========================================================================
   // バリデーション
   // =========================================================================
   it("refreshToken なし → 400 を返す", async () => {
@@ -94,7 +146,6 @@ describe("POST /api/auth/refresh", () => {
 
   it("NEXT_PUBLIC_API_ENDPOINT 未設定 → 500 を返す", async () => {
     delete process.env.NEXT_PUBLIC_API_ENDPOINT;
-    // securetoken は成功させる
     vi.stubGlobal(
       "fetch",
       vi.fn().mockResolvedValueOnce({
@@ -134,7 +185,7 @@ describe("POST /api/auth/refresh", () => {
       "fetch",
       vi.fn().mockResolvedValueOnce({
         ok: true,
-        json: () => Promise.resolve({}), // id_token 欠落
+        json: () => Promise.resolve({}),
       } as any),
     );
     const req = makeRequest({ refreshToken: "r-token" });
@@ -146,10 +197,7 @@ describe("POST /api/auth/refresh", () => {
   // sessionLogin エラー
   // =========================================================================
   it("sessionLogin が失敗 → 502 を返す", async () => {
-    mockFetchSequence(
-      { ok: true },
-      { ok: false, status: 503 },
-    );
+    mockFetchSequence({ ok: true }, { ok: false, status: 503 });
     const req = makeRequest({ refreshToken: "r-token" });
     const res = await POST(req);
     expect(res.status).toBe(502);
