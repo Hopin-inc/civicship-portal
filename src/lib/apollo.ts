@@ -13,6 +13,7 @@ import { logger } from "@/lib/logging";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { setContext } from "@apollo/client/link/context";
 import { getCommunityIdClient } from "@/lib/community/get-community-id-client";
+import { getValidLineIdToken } from "@/lib/auth/core/token-refresher";
 
 const httpLink = createUploadLink({
   uri: process.env.NEXT_PUBLIC_API_ENDPOINT,
@@ -59,8 +60,8 @@ const requestLink = setContext(async (operation, prevContext) => {
         }
       }
     } else if (lineTokens.idToken) {
-      // Server-side exchange 経由: firebaseUser なし → exchange で取得した idToken を直接使用
-      token = lineTokens.idToken;
+      // Server-side exchange 経由: firebaseUser なし → 期限切れなら自動リフレッシュして使用
+      token = await getValidLineIdToken();
     }
   }
 

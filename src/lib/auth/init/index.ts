@@ -94,6 +94,36 @@ async function initAuthFast({
   setState: ReturnType<typeof useAuthStore.getState>["setState"];
 }) {
   try {
+    // Step 1: トークンを確保してからUIを解放する（問題3対応）
+    // finalizeAuthState より先に initializeFirebase を完了させることで、
+    // UIが解放された直後にミューテーションが発火しても Bearer トークンが
+    // 必ず存在することを保証する。
+    if (typeof window !== "undefined") {
+      const firebaseUser = await initializeFirebase(
+        liffService,
+        environment,
+        communityConfig?.firebaseTenantId,
+      );
+      if (firebaseUser) {
+        useAuthStore.getState().setState({ firebaseUser });
+        logger.debug("[AUTH] initAuthFast: Firebase user hydrated for CSR", {
+          uid: firebaseUser.uid,
+        });
+      } else {
+        // Exchange 経由の場合は lineTokens.idToken が signInWithLiffToken でセット済み。
+        // どちらも存在しない場合はトークンなしとみなして未認証に遷移する。
+        const { lineTokens } = useAuthStore.getState().state;
+        if (!lineTokens.idToken) {
+          logger.error("[AUTH] initAuthFast: No token after Firebase init — falling back to unauthenticated", {
+            component: "initAuthFast",
+          });
+          finalizeAuthState("unauthenticated", undefined, setState, authStateManager);
+          return;
+        }
+      }
+    }
+
+    // Step 2: トークン確認済み — UIを解放する
     finalizeAuthState(
       ssrPhoneAuthenticated ? "user_registered" : "line_authenticated",
       ssrCurrentUser,
@@ -104,29 +134,6 @@ async function initAuthFast({
     await authStateManager.handleUserRegistrationStateChange(!!ssrPhoneAuthenticated, {
       ssrMode: true,
     });
-
-    // Initialize Firebase for CSR and await completion before returning.
-    // Invariant: when initAuthFast returns, lineTokens.idToken is guaranteed to be set
-    // (as a side effect of signInWithLiffToken inside initializeFirebase).
-    // Fire-and-forget caused a race condition where mutations were sent without a Bearer
-    // token when the user acted before background initialization completed.
-    if (typeof window !== "undefined") {
-      try {
-        const firebaseUser = await initializeFirebase(
-          liffService,
-          environment,
-          communityConfig?.firebaseTenantId,
-        );
-        if (firebaseUser) {
-          useAuthStore.getState().setState({ firebaseUser });
-          logger.debug("[AUTH] initAuthFast: Firebase user hydrated for CSR", {
-            uid: firebaseUser.uid,
-          });
-        }
-      } catch (error) {
-        logger.warn("[AUTH] initAuthFast: Failed to hydrate Firebase user", { error });
-      }
-    }
   } catch (e) {
     logger.error("initAuthFast failed", { error: e });
     finalizeAuthState("unauthenticated", undefined, setState, authStateManager);
