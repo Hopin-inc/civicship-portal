@@ -30,6 +30,7 @@ jobs:
       NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT: ${{ secrets.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT }}
       NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}
       NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+      NEXT_PUBLIC_LOG_LEVEL: ${{ vars.NEXT_PUBLIC_LOG_LEVEL }}
 
     steps:
       - name: Checkout code
@@ -71,7 +72,8 @@ jobs:
             --build-arg NEXT_PUBLIC_DOMAIN=${{ env.NEXT_PUBLIC_DOMAIN }} \
             --build-arg NEXT_PUBLIC_API_ENDPOINT=${{ env.NEXT_PUBLIC_API_ENDPOINT }} \
             --build-arg NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT=${{ env.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT }} \
-            --build-arg NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=${{ env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}
+            --build-arg NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=${{ env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }} \
+            --build-arg NEXT_PUBLIC_LOG_LEVEL=${{ env.NEXT_PUBLIC_LOG_LEVEL }}
 
       - name: Push image to Artifact Registry
         run: |
