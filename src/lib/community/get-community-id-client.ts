@@ -11,7 +11,7 @@ export function getCommunityIdClient(): string | null {
   const isBrowser = typeof window !== "undefined";
 
   if (!isBrowser) {
-    logger.debug("[getCommunityIdClient] Called on server side - returning null", {
+    logger.warn("[getCommunityIdClient] Called on server side - returning null", {
       component: "getCommunityIdClient",
     });
     return null;
@@ -45,7 +45,7 @@ export function getCommunityIdClient(): string | null {
   const allCookies = typeof document !== "undefined" ? document.cookie : "N/A";
   const hasMultipleCookies = allCookies.includes("x-community-id");
 
-  logger.debug("[getCommunityIdClient] No communityId available", {
+  logger.warn("[getCommunityIdClient] No communityId available", {
     storeState: useCommunityStore.getState().state,
     hasCookies: allCookies !== "N/A" && allCookies.length > 0,
     cookieFoundByRegex: hasMultipleCookies,

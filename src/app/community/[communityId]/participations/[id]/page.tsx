@@ -111,13 +111,13 @@ export default function ParticipationPage() {
     if (currentStatus?.status !== GqlReservationStatus.Accepted) {
       return false;
     }
-    const relevantDateString = dateTimeInfo?.endDateTime ?? dateTimeInfo?.startDateTime;
+    const relevantDateString = dateTimeInfo?.endTime ?? dateTimeInfo?.startTime;
     if (!relevantDateString) {
       return false;
     }
     const eventDate = new Date(relevantDateString);
     if (isNaN(eventDate.getTime())) {
-      logger.debug("Invalid date string for participation check", {
+      logger.warn("Invalid date string for participation check", {
         relevantDateString,
         component: "ParticipationPage",
       });
