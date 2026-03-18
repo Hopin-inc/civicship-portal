@@ -60,7 +60,7 @@ export const useLineAuthProcessing = ({
         const initialized = await liffService.initialize();
 
         if (!initialized) {
-          logger.info("LIFF init failed", {
+          logger.warn("LIFF init failed", {
             authType: "liff",
             component: "useLineAuthProcessing",
           });

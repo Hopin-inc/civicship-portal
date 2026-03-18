@@ -270,8 +270,6 @@ export const presenterReservationDateTimeInfo = (
       minute: "2-digit",
       hour12: false,
     }),
-    startDateTime: startDate.toISOString(),
-    endDateTime: endDate.toISOString(),
     dateDiffLabel: getCrossDayLabel(startDate, endDate),
     participantCount,
     paidParticipantCount,
