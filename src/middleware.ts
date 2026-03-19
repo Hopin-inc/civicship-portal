@@ -299,7 +299,7 @@ function setSecurityHeaders(res: NextResponse, nonce: string) {
     `font-src 'self' https: data:`,
     `connect-src ${connectSrc}`,
     `frame-src ${frameSrc}`,
-    `frame-ancestors 'none'`,
+    `frame-ancestors 'self' https://hopin.co.jp https://civicship.jp`,
     `form-action 'self'`,
   ].join("; ");
 
