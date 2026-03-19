@@ -299,7 +299,7 @@ function setSecurityHeaders(res: NextResponse, nonce: string) {
     `font-src 'self' https: data:`,
     `connect-src ${connectSrc}`,
     `frame-src ${frameSrc}`,
-    `frame-ancestors 'none'`,
+    `frame-ancestors 'self' ${process.env.NEXT_PUBLIC_ALLOWED_FRAME_ANCESTORS ?? ""}`.trimEnd(),
     `form-action 'self'`,
   ].join("; ");
 
