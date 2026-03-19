@@ -11,8 +11,8 @@ interface TransactionMessageCardProps {
  */
 const linkifyText = (text: string) => {
   // URL検出用の正規表現（http, https, www で始まるURL）
-  // 末尾の句読点を除外してURLの境界をより正確に検出
-  const urlRegex = /(https?:\/\/[^"'`()\[\]{}<>,;.!?\s]+|www\.[^"'`()\[\]{}<>,;.!?\s]+)/g;
+  // ドットや?は含めて広くマッチさせ、末尾の句読点は後で除去する
+  const urlRegex = /(https?:\/\/[^\s"'`()\[\]{}<>]+|www\.[^\s"'`()\[\]{}<>]+)/g;
   const parts = text.split(urlRegex);
 
   return parts.map((part, index) => {
@@ -27,8 +27,11 @@ const linkifyText = (text: string) => {
         return part;
       }
 
+      // 末尾の句読点を除去（文章末にURLが来る場合に対応）
+      const trimmedPart = part.replace(/[.,;!?)\]]+$/, '');
+
       // スキーム検証: http または https のみ許可
-      const normalizedHref = part.startsWith('www.') ? `https://${part}` : part;
+      const normalizedHref = trimmedPart.startsWith('www.') ? `https://${trimmedPart}` : trimmedPart;
 
       try {
         const url = new URL(normalizedHref);
@@ -54,26 +57,30 @@ const linkifyText = (text: string) => {
         }
 
         const href = url.toString();
+        // 末尾に句読点があった場合は、リンク後にテキストとして追加
+        const trailingText = part.slice(trimmedPart.length);
         return (
-          <span
-            key={index}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              window.open(href, '_blank', 'noopener,noreferrer');
-            }}
-            className="text-primary underline hover:text-primary/80 cursor-pointer"
-            role="link"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
+          <span key={index}>
+            <span
+              onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 window.open(href, '_blank', 'noopener,noreferrer');
-              }
-            }}
-          >
-            {part}
+              }}
+              className="text-primary underline hover:text-primary/80 cursor-pointer"
+              role="link"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  window.open(href, '_blank', 'noopener,noreferrer');
+                }
+              }}
+            >
+              {trimmedPart}
+            </span>
+            {trailingText}
           </span>
         );
       } catch (error) {
