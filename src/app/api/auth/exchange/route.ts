@@ -94,6 +94,22 @@ export async function POST(request: NextRequest) {
 
     const expiresAt = String(Date.now() + Number(expiresIn) * 1000);
 
+    // Decode returned idToken to verify its embedded tenant
+    let returnedTenantId: string | null = null;
+    try {
+      const retPayloadB64Url = idToken.split(".")[1];
+      const retPayloadB64 = retPayloadB64Url.replace(/-/g, "+").replace(/_/g, "/");
+      const retPayload = JSON.parse(
+        Buffer.from(
+          retPayloadB64 + "=".repeat((4 - (retPayloadB64.length % 4)) % 4),
+          "base64",
+        ).toString("utf-8"),
+      );
+      returnedTenantId = retPayload?.firebase?.tenant ?? null;
+    } catch {
+      logger.warn("[auth/exchange] Failed to decode returned idToken tenant");
+    }
+
     // Create session cookie via backend /sessionLogin
     const apiEndpoint = process.env.NEXT_PUBLIC_API_ENDPOINT;
     if (!apiEndpoint) {
@@ -137,8 +153,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (returnedTenantId && tenantId !== returnedTenantId) {
+      logger.warn("[auth/exchange] Tenant ID mismatch between customToken and returned idToken", {
+        expected: tenantId,
+        returned: returnedTenantId,
+        communityId,
+        component: "auth/exchange",
+      });
+    }
+
     logger.info("[auth/exchange] Token exchange successful", {
       tenantId,
+      returnedTenantId,
+      tenantMatch: tenantId === returnedTenantId,
+      communityId,
       hasSessionCookie: sessionRes.ok,
       component: "auth/exchange",
     });
