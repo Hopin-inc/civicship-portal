@@ -26,6 +26,8 @@ const requestLink = setContext(async (operation, prevContext) => {
   const isBrowser = typeof window !== "undefined";
   let token: string | null = null;
   let authMode: "session" | "id_token" = isBrowser ? "id_token" : "session";
+  let authSource: "firebaseUser" | "lineTokens" | "none" = "none";
+  let firebaseUserTenantId: string | null = null;
 
   if (isBrowser) {
     const { firebaseUser, authenticationState } = useAuthStore.getState().state;
@@ -52,6 +54,8 @@ const requestLink = setContext(async (operation, prevContext) => {
     if (firebaseUser) {
       try {
         token = await firebaseUser.getIdToken();
+        authSource = "firebaseUser";
+        firebaseUserTenantId = firebaseUser.tenantId ?? null;
       } catch (error) {
         logger.warn("Failed to get ID token", { error });
         if (isMutation) {
@@ -61,6 +65,7 @@ const requestLink = setContext(async (operation, prevContext) => {
     } else if (lineTokens.idToken) {
       // Server-side exchange 経由: firebaseUser なし → exchange で取得した idToken を直接使用
       token = lineTokens.idToken;
+      authSource = "lineTokens";
     }
   }
 
@@ -80,6 +85,8 @@ const requestLink = setContext(async (operation, prevContext) => {
       isBrowser,
       hasToken: !!token,
       authMode,
+      authSource,
+      firebaseUserTenantId,
       component: "ApolloRequestLink",
     });
   }

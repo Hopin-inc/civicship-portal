@@ -41,6 +41,14 @@ export const useFirebaseAuthState = ({
           const tokenResult = await user.getIdTokenResult();
           const expirationTime = String(new Date(tokenResult.expirationTime).getTime());
 
+          logger.info("[useFirebaseAuthState] onAuthStateChanged: user set", {
+            tenantId: user.tenantId ?? null,
+            uid: user.uid,
+            prevTenantId: stateRef.current.firebaseUser?.tenantId ?? null,
+            authenticationState: stateRef.current.authenticationState,
+            component: "useFirebaseAuthState",
+          });
+
           setState({
             firebaseUser: user,
             lineTokens: {
@@ -61,6 +69,13 @@ export const useFirebaseAuthState = ({
           });
         }
       } else {
+        logger.info("[useFirebaseAuthState] onAuthStateChanged: user cleared", {
+          prevTenantId: stateRef.current.firebaseUser?.tenantId ?? null,
+          hasStaleLineToken: !!stateRef.current.lineTokens.idToken,
+          authenticationState: stateRef.current.authenticationState,
+          component: "useFirebaseAuthState",
+        });
+
         setState({
           firebaseUser: null,
           authenticationState: "unauthenticated",

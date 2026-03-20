@@ -94,6 +94,21 @@ export async function POST(request: NextRequest) {
 
     const expiresAt = String(Date.now() + Number(expiresIn) * 1000);
 
+    // Decode returned idToken to verify its embedded tenant
+    let returnedTenantId: string | null = null;
+    try {
+      const retPayload = JSON.parse(
+        Buffer.from(
+          idToken.split(".")[1].replace(/-/g, "+").replace(/_/g, "/") +
+            "==".slice((idToken.split(".")[1].length * 6) % 8 ? 1 : 0),
+          "base64",
+        ).toString("utf-8"),
+      );
+      returnedTenantId = retPayload?.firebase?.tenant ?? null;
+    } catch {
+      logger.warn("[auth/exchange] Failed to decode returned idToken tenant");
+    }
+
     // Create session cookie via backend /sessionLogin
     const apiEndpoint = process.env.NEXT_PUBLIC_API_ENDPOINT;
     if (!apiEndpoint) {
@@ -139,6 +154,9 @@ export async function POST(request: NextRequest) {
 
     logger.info("[auth/exchange] Token exchange successful", {
       tenantId,
+      returnedTenantId,
+      tenantMatch: tenantId === returnedTenantId,
+      communityId,
       hasSessionCookie: sessionRes.ok,
       component: "auth/exchange",
     });
