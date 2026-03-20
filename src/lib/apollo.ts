@@ -25,42 +25,53 @@ const httpLink = createUploadLink({
 const requestLink = setContext(async (operation, prevContext) => {
   const isBrowser = typeof window !== "undefined";
   let token: string | null = null;
-  let authMode: "session" | "id_token" = isBrowser ? "id_token" : "session";
+  let authMode: "session" | "id_token" = "session";
 
   if (isBrowser) {
-    const { firebaseUser, authenticationState } = useAuthStore.getState().state;
+    const { firebaseUser, lineTokens, authenticationState } = useAuthStore.getState().state;
+
+    // lineTokens.idToken の有効期限チェック（Firebase ID token は1時間で失効）
+    const isLineTokenValid =
+      !!lineTokens.idToken &&
+      !!lineTokens.expiresAt &&
+      Number(lineTokens.expiresAt) > Date.now();
+
+    // id_token モードは firebaseUser か有効な lineTokens.idToken がある場合のみ
+    // それ以外はセッションCookieを使う session モードにフォールバック
+    authMode = firebaseUser || isLineTokenValid ? "id_token" : "session";
 
     // Mutation の場合は認証を厳格にチェック
     const isMutation = operation.query.definitions.some(
       (def) => def.kind === "OperationDefinition" && def.operation === "mutation",
     );
 
-    const { lineTokens } = useAuthStore.getState().state;
-
     if (isMutation) {
       if (authenticationState === "loading") {
         throw new Error("認証情報を読み込み中です。少し待ってから再度お試しください");
       }
 
-      // firebaseUser または lineTokens.idToken（exchange 経由）のいずれかが必要
-      if (!firebaseUser && !lineTokens.idToken) {
+      // id_token モードで認証情報がない場合はエラー
+      // session モードの場合はセッションCookieで認証するためここではエラーにしない
+      if (authMode === "id_token" && !firebaseUser && !isLineTokenValid) {
         throw new Error("認証情報が取得できませんでした。ページをリロードしてください");
       }
     }
 
-    // firebaseUser がある場合はトークンを取得
-    if (firebaseUser) {
-      try {
-        token = await firebaseUser.getIdToken();
-      } catch (error) {
-        logger.warn("Failed to get ID token", { error });
-        if (isMutation) {
-          throw new Error("認証トークンの取得に失敗しました");
+    // id_token モードのときのみトークンを取得
+    if (authMode === "id_token") {
+      if (firebaseUser) {
+        try {
+          token = await firebaseUser.getIdToken();
+        } catch (error) {
+          logger.warn("Failed to get ID token", { error });
+          if (isMutation) {
+            throw new Error("認証トークンの取得に失敗しました");
+          }
         }
+      } else if (isLineTokenValid) {
+        // Server-side exchange 経由: firebaseUser なし → exchange で取得した有効な idToken を使用
+        token = lineTokens.idToken;
       }
-    } else if (lineTokens.idToken) {
-      // Server-side exchange 経由: firebaseUser なし → exchange で取得した idToken を直接使用
-      token = lineTokens.idToken;
     }
   }
 

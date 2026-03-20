@@ -27,12 +27,21 @@ interface GrantPointInput {
 
 type Result<T> = { success: true; data: T } | { success: false; code: GqlErrorCode };
 
-// 認証チェック: firebaseUser または exchange経由のlineTokens.idTokenが必要
+// 認証チェック: firebaseUser / 有効な lineTokens.idToken / セッションCookieのいずれかが必要
 // apollo.ts の requestLink と同じロジックを使用
 const checkAuth = (): { success: false; code: GqlErrorCode } | null => {
-  const { firebaseUser, lineTokens } = useAuthStore.getState().state;
-  if (!firebaseUser && !lineTokens.idToken) {
-    logger.warn("Transaction mutation blocked: not authenticated (no firebaseUser or lineTokens.idToken)", {
+  const { firebaseUser, lineTokens, authenticationState } = useAuthStore.getState().state;
+
+  const isLineTokenValid =
+    !!lineTokens.idToken &&
+    !!lineTokens.expiresAt &&
+    Number(lineTokens.expiresAt) > Date.now();
+
+  // 明示的に未認証の場合のみブロック
+  // lineTokens.idToken が期限切れでも authenticationState が authenticated であれば
+  // セッションCookieで認証できるため通過させる
+  if (!firebaseUser && !isLineTokenValid && authenticationState === "unauthenticated") {
+    logger.warn("Transaction mutation blocked: not authenticated", {
       component: "useTransactionMutations",
       errorCategory: "auth",
     });
@@ -42,8 +51,19 @@ const checkAuth = (): { success: false; code: GqlErrorCode } | null => {
 };
 
 export const useTransactionMutations = () => {
-  // firebaseUser または exchange経由のlineTokens.idTokenをsubscribeしてUIが反応的に更新されるようにする
-  const isAuthReady = useAuthStore((s) => !!s.state.firebaseUser || !!s.state.lineTokens.idToken);
+  // 認証済み状態（firebaseUser / 有効なlineToken / セッションCookie経由の認証済み状態）を確認
+  const isAuthReady = useAuthStore((s) => {
+    const { firebaseUser, lineTokens, authenticationState } = s.state;
+    const isLineTokenValid =
+      !!lineTokens.idToken &&
+      !!lineTokens.expiresAt &&
+      Number(lineTokens.expiresAt) > Date.now();
+    return (
+      !!firebaseUser ||
+      isLineTokenValid ||
+      (authenticationState !== "loading" && authenticationState !== "unauthenticated")
+    );
+  });
 
   // Apollo Hooks
   const [issuePointMutation, { loading: loadingIssue }] = usePointIssueMutation();
