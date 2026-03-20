@@ -97,10 +97,11 @@ export async function POST(request: NextRequest) {
     // Decode returned idToken to verify its embedded tenant
     let returnedTenantId: string | null = null;
     try {
+      const retPayloadB64Url = idToken.split(".")[1];
+      const retPayloadB64 = retPayloadB64Url.replace(/-/g, "+").replace(/_/g, "/");
       const retPayload = JSON.parse(
         Buffer.from(
-          idToken.split(".")[1].replace(/-/g, "+").replace(/_/g, "/") +
-            "==".slice((idToken.split(".")[1].length * 6) % 8 ? 1 : 0),
+          retPayloadB64 + "=".repeat((4 - (retPayloadB64.length % 4)) % 4),
           "base64",
         ).toString("utf-8"),
       );
@@ -150,6 +151,15 @@ export async function POST(request: NextRequest) {
         { error: "Session creation failed" },
         { status: 502 },
       );
+    }
+
+    if (returnedTenantId && tenantId !== returnedTenantId) {
+      logger.warn("[auth/exchange] Tenant ID mismatch between customToken and returned idToken", {
+        expected: tenantId,
+        returned: returnedTenantId,
+        communityId,
+        component: "auth/exchange",
+      });
     }
 
     logger.info("[auth/exchange] Token exchange successful", {
