@@ -9,6 +9,7 @@ lineAuth.onAuthStateChanged((user) => {
   logger.debug("[Firebase] onAuthStateChanged fired", {
     uid: user?.uid ?? null,
     tenantId: user?.tenantId ?? null,
+    lineAuthTenantId: lineAuth.tenantId,
     component: "onAuthStateChanged",
   });
 });
@@ -22,8 +23,19 @@ export async function initializeFirebase(
     environment,
     tenantId,
     tenantIdType: typeof tenantId,
+    lineAuthTenantId: lineAuth.tenantId,
+    currentUserTenantId: lineAuth.currentUser?.tenantId ?? null,
     component: "initializeFirebase",
   });
+
+  if (tenantId == null) {
+    logger.warn("[initializeFirebase] tenantId is null/undefined — stale user guards will be SKIPPED", {
+      tenantId,
+      lineAuthTenantId: lineAuth.tenantId,
+      currentUserTenantId: lineAuth.currentUser?.tenantId ?? null,
+      component: "initializeFirebase",
+    });
+  }
 
   // Level 1: 水源の浄化
   // キャッシュされているユーザーのテナントが期待するテナントと異なる場合は
@@ -63,6 +75,7 @@ export async function initializeFirebase(
         logger.debug("[initializeFirebase] currentUser after signInWithLiffToken", {
           currentUserTenantId: lineAuth.currentUser?.tenantId ?? null,
           currentUserUid: lineAuth.currentUser?.uid ?? null,
+          lineAuthTenantId: lineAuth.tenantId,
           component: "initializeFirebase",
         });
         if (!signInSuccess) {

@@ -111,7 +111,14 @@ export async function establishSessionFromFirebaseUser(
     });
 
     return true;
-  } catch {
+  } catch (e) {
+    logger.error("[establishSessionFromFirebaseUser] Failed to establish session", {
+      error: e instanceof Error ? e.message : String(e),
+      errorCode: (e as any)?.code ?? null,
+      uid: firebaseUser.uid,
+      tenantId: firebaseUser.tenantId ?? null,
+      component: "establishSessionFromFirebaseUser",
+    });
     return false;
   }
 }
@@ -126,13 +133,15 @@ async function createSession(idToken: string) {
 
   if (!res.ok) {
     const errText = await res.text();
-    console.error("createSession failed", res.status, errText);
+    logger.error("[createSession] Failed to create session cookie", {
+      status: res.status,
+      body: errText.substring(0, 300),
+      component: "createSession",
+    });
     throw new Error(`Failed to create session cookie (${res.status})`);
   }
 
-  if (process.env.NODE_ENV !== "production") {
-    console.info("✅ Session cookie successfully created (via proxy)");
-  }
+  logger.info("[createSession] Session cookie created", { component: "createSession" });
   return true;
 }
 
