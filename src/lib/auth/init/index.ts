@@ -121,6 +121,7 @@ async function initAuthFast({
           useAuthStore.getState().setState({ firebaseUser });
           logger.debug("[AUTH] initAuthFast: Firebase user hydrated for CSR", {
             uid: firebaseUser.uid,
+            tenantId: firebaseUser.tenantId ?? null,
           });
         }
       } catch (error) {

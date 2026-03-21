@@ -4,6 +4,15 @@ import { logger } from "@/lib/logging";
 import { LiffService } from "@/lib/auth/service/liff-service";
 import { User, signOut } from "@firebase/auth";
 
+// モジュールレベルで常駐させ、currentUser がいつセットされるかを追跡する
+lineAuth.onAuthStateChanged((user) => {
+  logger.debug("[Firebase] onAuthStateChanged fired", {
+    uid: user?.uid ?? null,
+    tenantId: user?.tenantId ?? null,
+    component: "onAuthStateChanged",
+  });
+});
+
 export async function initializeFirebase(
   liffService: LiffService,
   environment: AuthEnvironment,
@@ -45,13 +54,39 @@ export async function initializeFirebase(
         // Level 2: ゲートキーパー
         // LIFF サインインが成功した者だけを「認証済み」として通過させる。
         // 失敗時に古い currentUser へフォールバックすることを禁止する。
+        logger.debug("[initializeFirebase] currentUser before signInWithLiffToken", {
+          currentUserTenantId: lineAuth.currentUser?.tenantId ?? null,
+          currentUserUid: lineAuth.currentUser?.uid ?? null,
+          component: "initializeFirebase",
+        });
         const signInSuccess = await liffService.signInWithLiffToken(tenantId);
+        logger.debug("[initializeFirebase] currentUser after signInWithLiffToken", {
+          currentUserTenantId: lineAuth.currentUser?.tenantId ?? null,
+          currentUserUid: lineAuth.currentUser?.uid ?? null,
+          component: "initializeFirebase",
+        });
         if (!signInSuccess) {
           logger.warn("[initializeFirebase] LIFF sign-in failed — returning null to block stale session", {
             tenantId,
             component: "initializeFirebase",
           });
           return null;
+        }
+
+        // signInWithLiffToken 完了後、Firebase SDK が localStorage から別テナントの
+        // ユーザーを非同期復元していた場合、lineAuth.currentUser が stale になっている。
+        // tenantId が一致しない currentUser はここでサインアウトして排除する。
+        if (
+          lineAuth.currentUser &&
+          tenantId != null &&
+          lineAuth.currentUser.tenantId !== tenantId
+        ) {
+          logger.warn("[initializeFirebase] Stale user detected after signInWithLiffToken — signing out", {
+            cachedTenantId: lineAuth.currentUser.tenantId,
+            expectedTenantId: tenantId,
+            component: "initializeFirebase",
+          });
+          await signOut(lineAuth);
         }
 
         // Server-side exchange では signInWithCustomToken をクライアントで呼ばないため
