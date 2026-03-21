@@ -43,6 +43,7 @@ export const useFirebaseAuthState = ({
 
           logger.info("[useFirebaseAuthState] onAuthStateChanged: user set", {
             tenantId: user.tenantId ?? null,
+            lineAuthTenantId: lineAuth.tenantId,
             uid: user.uid,
             prevTenantId: stateRef.current.firebaseUser?.tenantId ?? null,
             authenticationState: stateRef.current.authenticationState,
