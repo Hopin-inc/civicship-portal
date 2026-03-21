@@ -146,6 +146,11 @@ export async function restoreUserSession(
   setState: ReturnType<typeof useAuthStore.getState>["setState"],
 ) {
   const tokenResult = await firebaseUser.getIdTokenResult();
+  logger.debug("[restoreUserSession] Setting firebaseUser in auth store", {
+    uid: firebaseUser.uid,
+    tenantId: firebaseUser.tenantId ?? null,
+    component: "restoreUserSession",
+  });
   useAuthStore.getState().setState({
     firebaseUser,
     lineTokens: {
