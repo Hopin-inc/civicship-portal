@@ -4,6 +4,15 @@ import { logger } from "@/lib/logging";
 import { LiffService } from "@/lib/auth/service/liff-service";
 import { User, signOut } from "@firebase/auth";
 
+// モジュールレベルで常駐させ、currentUser がいつセットされるかを追跡する
+lineAuth.onAuthStateChanged((user) => {
+  logger.debug("[Firebase] onAuthStateChanged fired", {
+    uid: user?.uid ?? null,
+    tenantId: user?.tenantId ?? null,
+    component: "onAuthStateChanged",
+  });
+});
+
 export async function initializeFirebase(
   liffService: LiffService,
   environment: AuthEnvironment,
