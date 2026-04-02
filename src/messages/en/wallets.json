@@ -9,6 +9,7 @@
   "wallets.card.refreshButton": "Reload",
   "wallets.donate.selectRecipient": "Select Recipient",
   "wallets.donate.errorMembers": "Could not fetch recipients",
+  "wallets.donate.errorBalance": "Could not fetch wallet balance",
   "wallets.shared.tabs.history": "History",
   "wallets.shared.tabs.member": "Members",
   "wallets.shared.search.placeholder": "Enter name or DID",

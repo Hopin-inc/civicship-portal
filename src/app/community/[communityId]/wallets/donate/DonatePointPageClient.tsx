@@ -26,7 +26,7 @@ export default function DonatePointPageClient() {
   const communityId = communityConfig?.communityId ?? "";
   const [activeTab, setActiveTab] = useState<Tabs>(Tabs.History);
 
-  const { currentPoint, loading: isBalanceLoading } = useMyWalletBalance();
+  const { currentPoint, loading: isBalanceLoading, error: balanceError } = useMyWalletBalance();
 
   // Grant と同じパターン: Client Component でデータ取得
   const { members, loading: areMembersLoading, error, refetch, walletsConnection } =
@@ -71,6 +71,9 @@ export default function DonatePointPageClient() {
   if (areMembersLoading || isBalanceLoading) {
     return <LoadingIndicator />;
   }
+
+  if (balanceError)
+    return <ErrorState title={t("wallets.donate.errorBalance")} refetchRef={refetchRef} />;
 
   if (error)
     return <ErrorState title={t("wallets.donate.errorMembers")} refetchRef={refetchRef} />;
