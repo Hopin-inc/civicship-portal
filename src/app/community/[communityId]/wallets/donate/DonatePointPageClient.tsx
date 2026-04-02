@@ -63,10 +63,18 @@ export default function DonatePointPageClient() {
     refetchRef.current = refetch;
   }, [refetch]);
 
+  const recipientUserId = searchParams.get("recipientUserId");
+
   const { selectedUser, setSelectedUser, handleDonate, isLoading, isAuthReady } = useDonateFlow(
     user,
     currentPoint,
   );
+
+  useEffect(() => {
+    if (!recipientUserId || selectedUser || members.length === 0) return;
+    const member = members.find((m) => m.user.id === recipientUserId);
+    if (member) setSelectedUser(member.user);
+  }, [recipientUserId, members, selectedUser, setSelectedUser]);
 
   if (loading) {
     return <LoadingIndicator />;
