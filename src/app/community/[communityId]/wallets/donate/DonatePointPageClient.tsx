@@ -26,10 +26,10 @@ export default function DonatePointPageClient() {
   const communityId = communityConfig?.communityId ?? "";
   const [activeTab, setActiveTab] = useState<Tabs>(Tabs.History);
 
-  const { currentPoint } = useMyWalletBalance();
+  const { currentPoint, loading: isBalanceLoading } = useMyWalletBalance();
 
   // Grant と同じパターン: Client Component でデータ取得
-  const { members, loading, error, refetch, walletsConnection } =
+  const { members, loading: areMembersLoading, error, refetch, walletsConnection } =
     useDonateMembers(user?.id);
 
   // members から initialConnection を作成（元のpageInfoを保持）
@@ -68,7 +68,7 @@ export default function DonatePointPageClient() {
     currentPoint,
   );
 
-  if (loading) {
+  if (areMembersLoading || isBalanceLoading) {
     return <LoadingIndicator />;
   }
 
