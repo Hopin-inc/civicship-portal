@@ -1,7 +1,6 @@
 {
   "wallets.overview.headerTitle": "保有ポイント",
   "wallets.overview.giveButton": "送る",
-  "wallets.overview.receiveButton": "受け取る",
   "wallets.overview.refreshSuccess": "ウォレット情報を更新しました",
   "wallets.overview.refreshError": "再読み込みに失敗しました",
   "wallets.overview.errorTitle": "ウォレット",
