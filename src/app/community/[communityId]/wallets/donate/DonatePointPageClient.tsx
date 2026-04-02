@@ -26,7 +26,7 @@ export default function DonatePointPageClient() {
   const communityId = communityConfig?.communityId ?? "";
   const [activeTab, setActiveTab] = useState<Tabs>(Tabs.History);
 
-  const { currentPoint, loading: isBalanceLoading, error: balanceError } = useMyWalletBalance();
+  const { currentPoint, loading: isBalanceLoading, error: balanceError, refetch: refetchBalance } = useMyWalletBalance();
 
   // Grant と同じパターン: Client Component でデータ取得
   const { members, loading: areMembersLoading, error, refetch, walletsConnection } =
@@ -63,6 +63,11 @@ export default function DonatePointPageClient() {
     refetchRef.current = refetch;
   }, [refetch]);
 
+  const balanceRefetchRef = useRef<(() => void) | null>(null);
+  useEffect(() => {
+    balanceRefetchRef.current = refetchBalance;
+  }, [refetchBalance]);
+
   const { selectedUser, setSelectedUser, handleDonate, isLoading, isAuthReady } = useDonateFlow(
     user,
     currentPoint,
@@ -73,7 +78,7 @@ export default function DonatePointPageClient() {
   }
 
   if (balanceError)
-    return <ErrorState title={t("wallets.donate.errorBalance")} refetchRef={refetchRef} />;
+    return <ErrorState title={t("wallets.donate.errorBalance")} refetchRef={balanceRefetchRef} />;
 
   if (error)
     return <ErrorState title={t("wallets.donate.errorMembers")} refetchRef={refetchRef} />;
