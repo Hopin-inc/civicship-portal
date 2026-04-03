@@ -1,19 +1,5 @@
 import { gql } from "@apollo/client";
 
-export const GET_MY_WALLET_BALANCE = gql`
-  query GetMyWalletBalance {
-    myWallet {
-      id
-      currentPointView {
-        currentPoint
-      }
-      user {
-        id
-      }
-    }
-  }
-`;
-
 export const GET_WALLETS_WITH_TRANSACTION = gql`
   query GetWalletsWithTransaction($filter: WalletFilterInput, $first: Int, $cursor: String) {
     wallets(filter: $filter, first: $first, cursor: $cursor) {

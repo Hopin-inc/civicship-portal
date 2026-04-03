@@ -9,7 +9,6 @@
   "wallets.card.refreshButton": "再読み込み",
   "wallets.donate.selectRecipient": "送り先を選ぶ",
   "wallets.donate.errorMembers": "送信先のメンバーを取得できませんでした",
-  "wallets.donate.errorBalance": "ウォレット残高を取得できませんでした",
   "wallets.shared.tabs.history": "履歴",
   "wallets.shared.tabs.member": "メンバー",
   "wallets.shared.search.placeholder": "名前・DIDを入力してください",

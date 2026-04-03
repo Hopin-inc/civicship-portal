@@ -4089,18 +4089,6 @@ export type GqlWalletFieldsFragment = {
   currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
 };
 
-export type GqlGetMyWalletBalanceQueryVariables = Exact<{ [key: string]: never }>;
-
-export type GqlGetMyWalletBalanceQuery = {
-  __typename?: "Query";
-  myWallet?: {
-    __typename?: "Wallet";
-    id: string;
-    currentPointView?: { __typename?: "CurrentPointView"; currentPoint: any } | null;
-    user?: { __typename?: "User"; id: string } | null;
-  } | null;
-};
-
 export type GqlGetWalletsWithTransactionQueryVariables = Exact<{
   filter?: InputMaybe<GqlWalletFilterInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
@@ -9017,85 +9005,6 @@ export type GetUserWalletSuspenseQueryHookResult = ReturnType<typeof useGetUserW
 export type GetUserWalletQueryResult = Apollo.QueryResult<
   GqlGetUserWalletQuery,
   GqlGetUserWalletQueryVariables
->;
-export const GetMyWalletBalanceDocument = gql`
-  query GetMyWalletBalance {
-    myWallet {
-      id
-      currentPointView {
-        currentPoint
-      }
-      user {
-        id
-      }
-    }
-  }
-`;
-
-/**
- * __useGetMyWalletBalanceQuery__
- *
- * To run a query within a React component, call `useGetMyWalletBalanceQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetMyWalletBalanceQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetMyWalletBalanceQuery({
- *   variables: {
- *   },
- * });
- */
-export function useGetMyWalletBalanceQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    GqlGetMyWalletBalanceQuery,
-    GqlGetMyWalletBalanceQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GqlGetMyWalletBalanceQuery, GqlGetMyWalletBalanceQueryVariables>(
-    GetMyWalletBalanceDocument,
-    options,
-  );
-}
-export function useGetMyWalletBalanceLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    GqlGetMyWalletBalanceQuery,
-    GqlGetMyWalletBalanceQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GqlGetMyWalletBalanceQuery, GqlGetMyWalletBalanceQueryVariables>(
-    GetMyWalletBalanceDocument,
-    options,
-  );
-}
-export function useGetMyWalletBalanceSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        GqlGetMyWalletBalanceQuery,
-        GqlGetMyWalletBalanceQueryVariables
-      >,
-) {
-  const options =
-    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<GqlGetMyWalletBalanceQuery, GqlGetMyWalletBalanceQueryVariables>(
-    GetMyWalletBalanceDocument,
-    options,
-  );
-}
-export type GetMyWalletBalanceQueryHookResult = ReturnType<typeof useGetMyWalletBalanceQuery>;
-export type GetMyWalletBalanceLazyQueryHookResult = ReturnType<
-  typeof useGetMyWalletBalanceLazyQuery
->;
-export type GetMyWalletBalanceSuspenseQueryHookResult = ReturnType<
-  typeof useGetMyWalletBalanceSuspenseQuery
->;
-export type GetMyWalletBalanceQueryResult = Apollo.QueryResult<
-  GqlGetMyWalletBalanceQuery,
-  GqlGetMyWalletBalanceQueryVariables
 >;
 export const GetWalletsWithTransactionDocument = gql`
   query GetWalletsWithTransaction($filter: WalletFilterInput, $first: Int, $cursor: String) {
