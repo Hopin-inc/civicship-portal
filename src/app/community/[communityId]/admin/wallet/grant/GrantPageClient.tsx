@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { GqlMembershipsConnection, GqlUser, GqlWallet, useGetCommunityWalletQuery } from "@/types/graphql";
-import { toPointNumber } from "@/utils/bigint";
+import { parseGraphQLBigInt } from "@/utils/bigint";
 import { useTransactionMutations } from "@/app/community/[communityId]/admin/wallet/hooks/useTransactionMutations";
 import UserSelectStep from "./components/UserSelectStep";
 import { useSearchParams } from "next/navigation";
@@ -37,16 +37,12 @@ export default function GrantPageClient({ initialConnection }: GrantPageClientPr
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab");
 
-  const { data: walletData } = useGetCommunityWalletQuery({
+  const { data: walletData, loading: loadingWallet } = useGetCommunityWalletQuery({
     variables: { communityId },
     skip: !communityId,
   });
-  const communityWallet: GqlWallet | undefined | null = walletData?.wallets?.edges?.find(
-    (w) => w?.node?.community?.id === communityId,
-  )?.node;
-  const currentPoint = BigInt(
-    toPointNumber(communityWallet?.currentPointView?.currentPoint, 0),
-  );
+  const communityWallet: GqlWallet | undefined | null = walletData?.wallets?.edges?.[0]?.node;
+  const currentPoint = parseGraphQLBigInt(communityWallet?.currentPointView?.currentPoint, 0n);
   const [activeTab, setActiveTab] = useState<Tabs>(() => {
     if (tabParam && isValidTab(tabParam)) {
       return tabParam;
@@ -125,7 +121,7 @@ export default function GrantPageClient({ initialConnection }: GrantPageClientPr
       } => !!member.user,
     );
 
-  if (loading) {
+  if (loading || loadingWallet) {
     return <LoadingIndicator />;
   }
 

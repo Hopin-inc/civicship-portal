@@ -28,8 +28,12 @@ export function ReceiveQRSheet({ userId, open, onClose }: ReceiveQRSheetProps) {
 
   const handleCopy = async () => {
     if (!url) return;
-    await navigator.clipboard.writeText(url);
-    toast.success(t("wallets.receive.copySuccess"));
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success(t("wallets.receive.copySuccess"));
+    } catch {
+      toast.error(t("wallets.receive.copyFailed"));
+    }
   };
 
   return (

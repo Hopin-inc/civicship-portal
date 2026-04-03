@@ -6,6 +6,7 @@
   "wallets.receive.description": "QRコードをスキャンするか、リンクを共有してください",
   "wallets.receive.copyLink": "リンクをコピー",
   "wallets.receive.copySuccess": "コピーしました",
+  "wallets.receive.copyFailed": "コピーに失敗しました",
   "wallets.overview.refreshSuccess": "ウォレット情報を更新しました",
   "wallets.overview.refreshError": "再読み込みに失敗しました",
   "wallets.overview.errorTitle": "ウォレット",

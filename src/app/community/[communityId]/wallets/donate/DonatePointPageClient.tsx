@@ -20,7 +20,7 @@ import {
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 interface DonatePointPageClientProps {
-  initialCurrentPoint: number;
+  initialCurrentPoint: string;
 }
 
 export default function DonatePointPageClient({ initialCurrentPoint }: DonatePointPageClientProps) {
@@ -30,7 +30,7 @@ export default function DonatePointPageClient({ initialCurrentPoint }: DonatePoi
   const communityId = communityConfig?.communityId ?? "";
   const searchParams = useSearchParams();
   const recipientId = searchParams.get("recipientId");
-  const currentPoint = BigInt(Number.isFinite(initialCurrentPoint) ? Math.floor(initialCurrentPoint) : 0);
+  const currentPoint = BigInt(initialCurrentPoint);
   const [activeTab, setActiveTab] = useState<Tabs>(Tabs.History);
 
   // Grant と同じパターン: Client Component でデータ取得
