@@ -1,6 +1,11 @@
 {
   "wallets.overview.headerTitle": "保有ポイント",
   "wallets.overview.giveButton": "送る",
+  "wallets.overview.receiveButton": "もらう",
+  "wallets.receive.title": "ポイントを受け取る",
+  "wallets.receive.description": "QRコードをスキャンするか、リンクを共有してください",
+  "wallets.receive.copyLink": "リンクをコピー",
+  "wallets.receive.copySuccess": "コピーしました",
   "wallets.overview.refreshSuccess": "ウォレット情報を更新しました",
   "wallets.overview.refreshError": "再読み込みに失敗しました",
   "wallets.overview.errorTitle": "ウォレット",

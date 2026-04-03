@@ -1,6 +1,11 @@
 {
   "wallets.overview.headerTitle": "Points Balance",
   "wallets.overview.giveButton": "Send",
+  "wallets.overview.receiveButton": "Receive",
+  "wallets.receive.title": "Receive Points",
+  "wallets.receive.description": "Scan the QR code or share the link",
+  "wallets.receive.copyLink": "Copy Link",
+  "wallets.receive.copySuccess": "Copied!",
   "wallets.overview.refreshSuccess": "Wallet information updated",
   "wallets.overview.refreshError": "Failed to reload",
   "wallets.overview.errorTitle": "Wallet",
