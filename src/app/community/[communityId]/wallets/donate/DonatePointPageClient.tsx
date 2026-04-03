@@ -16,6 +16,7 @@ import {
   GqlRole,
   GqlMembershipStatus,
   GqlMembershipStatusReason,
+  useGetUserFlexibleQuery,
 } from "@/types/graphql";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
@@ -73,6 +74,7 @@ export default function DonatePointPageClient({ initialCurrentPoint }: DonatePoi
     currentPoint,
   );
 
+  const [notFoundInMembers, setNotFoundInMembers] = useState(false);
   const hasTriedPrefill = useRef(false);
   useEffect(() => {
     if (!recipientId || loading || hasTriedPrefill.current) return;
@@ -80,8 +82,20 @@ export default function DonatePointPageClient({ initialCurrentPoint }: DonatePoi
     const found = members.find((m) => m.user.id === recipientId);
     if (found) {
       setSelectedUser(found.user);
+    } else {
+      setNotFoundInMembers(true);
     }
   }, [recipientId, loading, members, setSelectedUser]);
+
+  const { data: fallbackUserData } = useGetUserFlexibleQuery({
+    variables: { id: recipientId ?? "", withDidIssuanceRequests: true },
+    skip: !notFoundInMembers || !recipientId,
+  });
+  useEffect(() => {
+    if (fallbackUserData?.user && !selectedUser) {
+      setSelectedUser(fallbackUserData.user);
+    }
+  }, [fallbackUserData, selectedUser, setSelectedUser]);
 
   if (loading) {
     return <LoadingIndicator />;
