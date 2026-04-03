@@ -3,7 +3,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
-import { GqlMembershipsConnection, GqlUser } from "@/types/graphql";
+import { GqlMembershipsConnection, GqlUser, GqlWallet, useGetCommunityWalletQuery } from "@/types/graphql";
+import { toPointNumber } from "@/utils/bigint";
 import { useTransactionMutations } from "@/app/community/[communityId]/admin/wallet/hooks/useTransactionMutations";
 import UserSelectStep from "./components/UserSelectStep";
 import { useSearchParams } from "next/navigation";
@@ -34,8 +35,18 @@ export default function GrantPageClient({ initialConnection }: GrantPageClientPr
   const communityId = communityConfig?.communityId ?? "";
 
   const searchParams = useSearchParams();
-  const currentPoint = BigInt(searchParams.get("currentPoint") ?? "0");
   const tabParam = searchParams.get("tab");
+
+  const { data: walletData } = useGetCommunityWalletQuery({
+    variables: { communityId },
+    skip: !communityId,
+  });
+  const communityWallet: GqlWallet | undefined | null = walletData?.wallets.edges?.find(
+    (w) => w?.node?.community?.id === communityId,
+  )?.node;
+  const currentPoint = BigInt(
+    toPointNumber(communityWallet?.currentPointView?.currentPoint, 0),
+  );
   const [activeTab, setActiveTab] = useState<Tabs>(() => {
     if (tabParam && isValidTab(tabParam)) {
       return tabParam;

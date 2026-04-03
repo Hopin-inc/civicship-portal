@@ -1,7 +1,6 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthProvider";
-import { useSearchParams } from "next/navigation";
 import { DonateUserSelect } from "@/app/community/[communityId]/wallets/features/donate/components";
 import TransferInputStep from "@/app/community/[communityId]/admin/wallet/grant/components/TransferInputStep";
 import { useDonateFlow } from "@/app/community/[communityId]/wallets/features/donate/hooks/useDonateFlow";
@@ -19,13 +18,16 @@ import {
 } from "@/types/graphql";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
-export default function DonatePointPageClient() {
+interface DonatePointPageClientProps {
+  initialCurrentPoint: number;
+}
+
+export default function DonatePointPageClient({ initialCurrentPoint }: DonatePointPageClientProps) {
   const t = useTranslations();
   const { user } = useAuth();
   const communityConfig = useCommunityConfig();
   const communityId = communityConfig?.communityId ?? "";
-  const searchParams = useSearchParams();
-  const currentPoint = BigInt(searchParams.get("currentPoint") ?? "0");
+  const currentPoint = BigInt(initialCurrentPoint);
   const [activeTab, setActiveTab] = useState<Tabs>(Tabs.History);
 
   // Grant と同じパターン: Client Component でデータ取得

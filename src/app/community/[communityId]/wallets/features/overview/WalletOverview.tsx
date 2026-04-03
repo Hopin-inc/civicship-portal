@@ -29,7 +29,7 @@ export function WalletOverview() {
   useHeaderConfig(headerConfig);
 
   const handleNavigateToGive = () =>
-    router.push(`/wallets/donate?currentPoint=${currentPoint}&tab=history`);
+    router.push("/wallets/donate?tab=history");
 
   if (isLoadingWallet) return <LoadingIndicator />;
   if (error) return <ErrorState title={t("wallets.overview.errorTitle")} />;
