@@ -41,7 +41,9 @@ export default function GrantPageClient({ initialConnection }: GrantPageClientPr
     variables: { communityId },
     skip: !communityId,
   });
-  const communityWallet: GqlWallet | undefined | null = walletData?.wallets?.edges?.[0]?.node;
+  const communityWallet: GqlWallet | undefined | null = walletData?.wallets?.edges?.find(
+    (edge) => edge?.node?.community?.id === communityId,
+  )?.node;
   const currentPoint = parseGraphQLBigInt(communityWallet?.currentPointView?.currentPoint, 0n);
   const [activeTab, setActiveTab] = useState<Tabs>(() => {
     if (tabParam && isValidTab(tabParam)) {
