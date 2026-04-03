@@ -2,7 +2,7 @@
   "wallets.overview.headerTitle": "保有ポイント",
   "wallets.overview.giveButton": "送る",
   "wallets.overview.receiveButton": "もらう",
-  "wallets.receive.title": "ポイントを受け取る",
+  "wallets.receive.title": "ポイントをもらう",
   "wallets.receive.description": "QRコードをスキャンするか、リンクを共有してください",
   "wallets.receive.copyLink": "リンクをコピー",
   "wallets.receive.copySuccess": "コピーしました",

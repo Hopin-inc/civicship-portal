@@ -41,7 +41,7 @@ export function ReceiveQRSheet({ userId, open, onClose }: ReceiveQRSheetProps) {
       <SheetContent side="bottom" className="pb-10">
         <SheetHeader className="mb-6">
           <SheetTitle>{t("wallets.receive.title")}</SheetTitle>
-          <SheetDescription>{t("wallets.receive.description")}</SheetDescription>
+          <SheetDescription className="text-xs">{t("wallets.receive.description")}</SheetDescription>
         </SheetHeader>
 
         <div className="flex flex-col items-center gap-6">
