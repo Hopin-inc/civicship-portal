@@ -41,7 +41,7 @@ export default function GrantPageClient({ initialConnection }: GrantPageClientPr
     variables: { communityId },
     skip: !communityId,
   });
-  const communityWallet: GqlWallet | undefined | null = walletData?.wallets.edges?.find(
+  const communityWallet: GqlWallet | undefined | null = walletData?.wallets?.edges?.find(
     (w) => w?.node?.community?.id === communityId,
   )?.node;
   const currentPoint = BigInt(

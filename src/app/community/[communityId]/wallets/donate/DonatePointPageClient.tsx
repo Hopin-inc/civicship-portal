@@ -30,7 +30,7 @@ export default function DonatePointPageClient({ initialCurrentPoint }: DonatePoi
   const communityId = communityConfig?.communityId ?? "";
   const searchParams = useSearchParams();
   const recipientId = searchParams.get("recipientId");
-  const currentPoint = BigInt(initialCurrentPoint);
+  const currentPoint = BigInt(Number.isFinite(initialCurrentPoint) ? Math.floor(initialCurrentPoint) : 0);
   const [activeTab, setActiveTab] = useState<Tabs>(Tabs.History);
 
   // Grant と同じパターン: Client Component でデータ取得
