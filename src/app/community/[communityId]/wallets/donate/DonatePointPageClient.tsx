@@ -6,6 +6,7 @@ import TransferInputStep from "@/app/community/[communityId]/admin/wallet/grant/
 import { useDonateFlow } from "@/app/community/[communityId]/wallets/features/donate/hooks/useDonateFlow";
 import { useDonateMembers } from "@/app/community/[communityId]/wallets/features/donate/hooks/useDonateMembers";
 import { Tabs } from "@/app/community/[communityId]/admin/wallet/grant/types/tabs";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";
@@ -27,6 +28,8 @@ export default function DonatePointPageClient({ initialCurrentPoint }: DonatePoi
   const { user } = useAuth();
   const communityConfig = useCommunityConfig();
   const communityId = communityConfig?.communityId ?? "";
+  const searchParams = useSearchParams();
+  const recipientId = searchParams.get("recipientId");
   const currentPoint = BigInt(initialCurrentPoint);
   const [activeTab, setActiveTab] = useState<Tabs>(Tabs.History);
 
