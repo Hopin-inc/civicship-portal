@@ -1,13 +1,12 @@
 "use client";
 
-import { useQuery } from "@apollo/client";
-import { GET_MY_WALLET_BALANCE } from "@/graphql/account/wallet/query";
+import { useGetMyWalletBalanceQuery } from "@/types/graphql";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 
 export function useMyWalletBalance() {
   const hasAuth = useAuthStore((s) => !!s.state.firebaseUser || !!s.state.lineTokens.idToken);
 
-  const { data, loading, error, refetch } = useQuery(GET_MY_WALLET_BALANCE, {
+  const { data, loading, error, refetch } = useGetMyWalletBalanceQuery({
     fetchPolicy: "network-only",
     skip: !hasAuth,
   });
