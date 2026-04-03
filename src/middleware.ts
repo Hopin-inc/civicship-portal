@@ -42,6 +42,10 @@ export async function middleware(request: NextRequest) {
     if (cookieValue && /^[a-zA-Z0-9-]+$/.test(cookieValue)) {
       communityId = cookieValue;
       communityIdSource = "cookie";
+      console.log("[Middleware] communityId resolved from cookie", {
+        communityId,
+        pathname,
+      });
     }
   }
 
@@ -52,6 +56,16 @@ export async function middleware(request: NextRequest) {
     });
     return new NextResponse("Community not found", { status: 404 });
   }
+
+  // テナント解決の入力パラメータを記録（要件: Section 3 - テナント解決プロセスの可視化）
+  console.log("[Middleware] Tenant resolution input", {
+    host,
+    origin,
+    referer,
+    pathname,
+    resolvedCommunityId: communityId,
+    communityIdSource,
+  });
 
   // セッションCookieの存在確認と、communityIdの不一致を早期検出
   // __session_{communityId} 形式はコミュニティ別に独立しているため、切り替え時も削除しない。
@@ -84,6 +98,12 @@ export async function middleware(request: NextRequest) {
       : `/community/${communityId}${pathname}`;
     const redirectUrl = new URL(newPath, request.url);
     redirectUrl.search = request.nextUrl.search;
+
+    console.log(`[Middleware] Redirecting to path-based URL`, {
+      from: pathname,
+      to: newPath,
+      communityId,
+    });
 
     const redirectResponse = NextResponse.redirect(redirectUrl, 301);
     if (shouldClearSessionCookies) {
@@ -127,6 +147,10 @@ export async function middleware(request: NextRequest) {
     });
     if (shouldClearSessionCookies) {
       clearLegacySessionCookies(redirectRes);
+      console.info("[Middleware] Cleared legacy session cookies on root redirect", {
+        previousCommunityId,
+        communityId,
+      });
     }
     return redirectRes;
   }
@@ -144,8 +168,20 @@ export async function middleware(request: NextRequest) {
     // 旧形式（session / __session）のみ削除。
     // 新形式 __session_{communityId} はコミュニティ別に独立しているため削除しない。
     clearLegacySessionCookies(res);
+    console.info("[Middleware] Cleared legacy session cookies due to community change", {
+      previousCommunityId,
+      communityId,
+    });
   }
 
+  console.log(`[Middleware] communityId resolved`, {
+    host,
+    communityId,
+    communityIdSource,
+    pathname,
+    method: request.method,
+    hasLegacySessionCookie: !!legacySessionCookie,
+  });
   return res;
 }
 
@@ -314,6 +350,7 @@ function getCommunityIdFromHost(host: string | null): string | null {
     const localIdFromEnv = process.env.LOCAL_COMMUNITY_ID ?? null;
     const fallbackLocalId = (ACTIVE_COMMUNITY_IDS as readonly string[])[0] ?? null;
     const resolvedLocalId = localIdFromEnv ?? fallbackLocalId;
+    console.log(`[Middleware Debug] Local environment detected: ${hostName} -> ${resolvedLocalId ?? "(none)"}${!localIdFromEnv && fallbackLocalId ? " (ACTIVE_COMMUNITY_IDS fallback)" : ""}`);
     return resolvedLocalId;
   }
 
@@ -331,6 +368,7 @@ function getCommunityIdFromHost(host: string | null): string | null {
   }
 
   if (extractedId && (ACTIVE_COMMUNITY_IDS as readonly string[]).includes(extractedId)) {
+    console.log(`[Middleware Debug] Community ID resolved: ${hostName} -> ${extractedId}`);
     return extractedId;
   }
 
