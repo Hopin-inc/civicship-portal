@@ -8,6 +8,7 @@ export function useMyWalletBalance() {
 
   const { data, loading, error, refetch } = useGetMyWalletBalanceQuery({
     fetchPolicy: "network-only",
+    nextFetchPolicy: "network-only",
     skip: !hasAuth,
   });
 

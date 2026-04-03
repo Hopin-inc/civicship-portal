@@ -1,6 +1,7 @@
 {
   "wallets.overview.headerTitle": "Points Balance",
   "wallets.overview.giveButton": "Send",
+  "wallets.overview.receiveButton": "Receive",
   "wallets.overview.refreshSuccess": "Wallet information updated",
   "wallets.overview.refreshError": "Failed to reload",
   "wallets.overview.errorTitle": "Wallet",

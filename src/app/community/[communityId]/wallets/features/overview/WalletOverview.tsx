@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import WalletCard from "@/components/shared/WalletCard";
 import { Button } from "@/components/ui/button";
-import { Gift } from "lucide-react";
+import { Gift, HandCoins } from "lucide-react";
 import { toast } from "react-toastify";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";
@@ -15,7 +15,7 @@ import { useWalletContext } from "@/app/community/[communityId]/wallets/features
 export function WalletOverview() {
   const router = useAppRouter();
   const t = useTranslations();
-  const { currentPoint, isLoadingWallet, error, refresh } = useWalletContext();
+  const { currentPoint, userId, isLoadingWallet, error, refresh } = useWalletContext();
 
   const headerConfig = useMemo(
     () => ({
@@ -28,8 +28,10 @@ export function WalletOverview() {
   );
   useHeaderConfig(headerConfig);
 
-  const handleNavigateToGive = () =>
-    router.push(`/wallets/donate?currentPoint=${currentPoint}&tab=history`);
+  const handleNavigateToGive = () => router.push(`/wallets/donate?tab=history`);
+
+  const handleNavigateToReceive = () =>
+    router.push(`/wallets/donate?recipientUserId=${userId}&tab=member`);
 
   if (isLoadingWallet) return <LoadingIndicator />;
   if (error) return <ErrorState title={t("wallets.overview.errorTitle")} />;
@@ -49,7 +51,7 @@ export function WalletOverview() {
         }}
       />
 
-      <div className="flex justify-center">
+      <div className="flex justify-center gap-3">
         <Button
           onClick={handleNavigateToGive}
           variant="secondary"
@@ -59,6 +61,16 @@ export function WalletOverview() {
         >
           <Gift className="w-4 h-4 shrink-0" />
           <span className="text-base whitespace-nowrap">{t("wallets.overview.giveButton")}</span>
+        </Button>
+        <Button
+          onClick={handleNavigateToReceive}
+          variant="secondary"
+          size="sm"
+          disabled={!userId}
+          className="h-12 px-4"
+        >
+          <HandCoins className="w-4 h-4 shrink-0" />
+          <span className="text-base whitespace-nowrap">{t("wallets.overview.receiveButton")}</span>
         </Button>
       </div>
     </div>
