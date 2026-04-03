@@ -73,6 +73,16 @@ export default function DonatePointPageClient({ initialCurrentPoint }: DonatePoi
     currentPoint,
   );
 
+  const hasTriedPrefill = useRef(false);
+  useEffect(() => {
+    if (!recipientId || loading || hasTriedPrefill.current) return;
+    hasTriedPrefill.current = true;
+    const found = members.find((m) => m.user.id === recipientId);
+    if (found) {
+      setSelectedUser(found.user);
+    }
+  }, [recipientId, loading, members, setSelectedUser]);
+
   if (loading) {
     return <LoadingIndicator />;
   }
