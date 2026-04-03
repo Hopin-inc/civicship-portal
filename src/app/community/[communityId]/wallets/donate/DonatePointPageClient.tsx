@@ -91,11 +91,13 @@ export default function DonatePointPageClient({ initialCurrentPoint }: DonatePoi
     variables: { id: recipientId ?? "", withDidIssuanceRequests: true },
     skip: !notFoundInMembers || !recipientId,
   });
+  const hasSetFallbackUser = useRef(false);
   useEffect(() => {
-    if (fallbackUserData?.user && !selectedUser) {
+    if (fallbackUserData?.user && !hasSetFallbackUser.current) {
+      hasSetFallbackUser.current = true;
       setSelectedUser(fallbackUserData.user);
     }
-  }, [fallbackUserData, selectedUser, setSelectedUser]);
+  }, [fallbackUserData, setSelectedUser]);
 
   if (loading) {
     return <LoadingIndicator />;
