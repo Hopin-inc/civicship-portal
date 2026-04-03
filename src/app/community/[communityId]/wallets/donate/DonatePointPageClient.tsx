@@ -1,7 +1,6 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthProvider";
-import { useSearchParams } from "next/navigation";
 import { DonateUserSelect } from "@/app/community/[communityId]/wallets/features/donate/components";
 import TransferInputStep from "@/app/community/[communityId]/admin/wallet/grant/components/TransferInputStep";
 import { useDonateFlow } from "@/app/community/[communityId]/wallets/features/donate/hooks/useDonateFlow";
@@ -25,8 +24,6 @@ export default function DonatePointPageClient() {
   const { user } = useAuth();
   const communityConfig = useCommunityConfig();
   const communityId = communityConfig?.communityId ?? "";
-  const searchParams = useSearchParams();
-  const recipientUserId = searchParams.get("recipientUserId");
   const [activeTab, setActiveTab] = useState<Tabs>(Tabs.History);
 
   const { currentPoint, loading: isBalanceLoading, error: balanceError, refetch: refetchBalance } = useMyWalletBalance();
@@ -75,12 +72,6 @@ export default function DonatePointPageClient() {
     user,
     currentPoint,
   );
-
-  useEffect(() => {
-    if (!recipientUserId || selectedUser || members.length === 0) return;
-    const member = members.find((m) => m.user.id === recipientUserId);
-    if (member) setSelectedUser(member.user);
-  }, [recipientUserId, members, selectedUser, setSelectedUser]);
 
   if (areMembersLoading || isBalanceLoading) {
     return <LoadingIndicator />;
