@@ -37,7 +37,7 @@ export default function GrantPageClient({ initialConnection }: GrantPageClientPr
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab");
 
-  const { data: walletData, loading: loadingWallet } = useGetCommunityWalletQuery({
+  const { data: walletData, loading: loadingWallet, error: walletError } = useGetCommunityWalletQuery({
     variables: { communityId },
     skip: !communityId,
   });
@@ -125,6 +125,10 @@ export default function GrantPageClient({ initialConnection }: GrantPageClientPr
 
   if (loading || loadingWallet) {
     return <LoadingIndicator />;
+  }
+
+  if (walletError) {
+    return <ErrorState title={t("adminWallet.grant.membersLoadError")} />;
   }
 
   if (error) {
