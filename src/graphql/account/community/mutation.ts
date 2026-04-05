@@ -1,5 +1,32 @@
 import { gql } from "@apollo/client";
 
+export const COMMUNITY_CREATE = gql`
+  mutation CommunityCreate($input: CommunityCreateInput!) {
+    communityCreate(input: $input) {
+      ... on CommunityCreateSuccess {
+        community {
+          id
+          name
+          image
+          bio
+          website
+          pointName
+          establishedAt
+          config {
+            lineConfig {
+              accessToken
+              channelId
+              channelSecret
+              liffBaseUrl
+              liffId
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const UPDATE_SIGNUP_BONUS_CONFIG = gql`
   mutation UpdateSignupBonusConfig($input: UpdateSignupBonusConfigInput!, $communityId: ID!) {
     updateSignupBonusConfig(input: $input, permission: { communityId: $communityId }) {
