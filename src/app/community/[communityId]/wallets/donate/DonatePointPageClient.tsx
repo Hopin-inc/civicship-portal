@@ -75,10 +75,11 @@ export default function DonatePointPageClient({ initialCurrentPoint }: DonatePoi
   );
 
   const [notFoundInMembers, setNotFoundInMembers] = useState(false);
-  const hasTriedPrefill = useRef(false);
+  const lastProcessedRecipientId = useRef<string | null>(null);
   useEffect(() => {
-    if (!recipientId || loading || hasTriedPrefill.current) return;
-    hasTriedPrefill.current = true;
+    if (!recipientId || loading || lastProcessedRecipientId.current === recipientId) return;
+    lastProcessedRecipientId.current = recipientId;
+    setNotFoundInMembers(false);
     const found = members.find((m) => m.user.id === recipientId);
     if (found) {
       setSelectedUser(found.user);
@@ -91,10 +92,10 @@ export default function DonatePointPageClient({ initialCurrentPoint }: DonatePoi
     variables: { id: recipientId ?? "", withDidIssuanceRequests: true },
     skip: !notFoundInMembers || !recipientId,
   });
-  const hasSetFallbackUser = useRef(false);
+  const lastSetFallbackId = useRef<string | null>(null);
   useEffect(() => {
-    if (fallbackUserData?.user && !hasSetFallbackUser.current) {
-      hasSetFallbackUser.current = true;
+    if (fallbackUserData?.user && lastSetFallbackId.current !== fallbackUserData.user.id) {
+      lastSetFallbackId.current = fallbackUserData.user.id;
       setSelectedUser(fallbackUserData.user);
     }
   }, [fallbackUserData, setSelectedUser]);
