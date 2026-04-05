@@ -90,7 +90,7 @@ export default function DonatePointPageClient({ initialCurrentPoint }: DonatePoi
 
   const { data: fallbackUserData } = useGetUserFlexibleQuery({
     variables: { id: recipientId ?? "", withDidIssuanceRequests: true },
-    skip: !notFoundInMembers || !recipientId,
+    skip: !notFoundInMembers || !recipientId || recipientId === user?.id,
   });
   const lastSetFallbackId = useRef<string | null>(null);
   useEffect(() => {

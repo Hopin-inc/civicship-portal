@@ -11,11 +11,11 @@ export function useReceiveUrl(userId: string): { url: string } {
     return { url: "" };
   }
 
-  const donatePath = `/wallets/donate?recipientId=${userId}`;
+  const donatePath = `/wallets/donate?recipientId=${encodeURIComponent(userId)}`;
 
   const url = liffBaseUrl
     ? `${liffBaseUrl}?liff.state=${encodeURIComponent(donatePath)}`
-    : `${window.location.origin}/community/${communityId}${donatePath}`;
+    : `${window.location.origin}/community/${encodeURIComponent(communityId)}${donatePath}`;
 
   return { url };
 }
