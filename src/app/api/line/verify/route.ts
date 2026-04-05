@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
       const data = await response.json().catch(() => ({}));
       return NextResponse.json(
         { ok: false, error: data.message ?? `LINE API returned ${response.status}` },
-        { status: 200 },
+        { status: 502 },
       );
     }
 
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       { ok: false, error: error instanceof Error ? error.message : "Network error" },
-      { status: 200 },
+      { status: 500 },
     );
   }
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, useRef } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -22,7 +22,17 @@ export function BasicInfoSection({
   onClearError,
 }: BasicInfoSectionProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const imagePreviewUrl = formData.imageFile ? URL.createObjectURL(formData.imageFile) : null;
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!formData.imageFile) {
+      setImagePreviewUrl(null);
+      return;
+    }
+    const url = URL.createObjectURL(formData.imageFile);
+    setImagePreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [formData.imageFile]);
 
   const handleImageSelect = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] ?? null;

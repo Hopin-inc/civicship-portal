@@ -45,11 +45,11 @@ export function useCommunityCreate() {
         config: hasLineConfig
           ? {
               lineConfig: {
-                accessToken: formData.lineAccessToken,
-                channelId: formData.lineChannelId,
-                channelSecret: formData.lineChannelSecret,
-                liffBaseUrl: formData.lineLiffBaseUrl,
-                liffId: formData.lineLiffId,
+                accessToken: formData.lineAccessToken.trim(),
+                channelId: formData.lineChannelId.trim(),
+                channelSecret: formData.lineChannelSecret.trim(),
+                liffBaseUrl: formData.lineLiffBaseUrl.trim(),
+                liffId: formData.lineLiffId.trim(),
                 richMenus: [],
               },
             }
