@@ -19,6 +19,15 @@ const config = {
   		}
   	},
   	extend: {
+  		spacing: {
+  			'xs':  'var(--spacing-xs)',
+  			'sm':  'var(--spacing-sm)',
+  			'md':  'var(--spacing-md)',
+  			'lg':  'var(--spacing-lg)',
+  			'xl':  'var(--spacing-xl)',
+  			'2xl': 'var(--spacing-2xl)',
+  			'3xl': 'var(--spacing-3xl)',
+  		},
   		colors: {
   			border: 'hsl(var(--border))',
   			input: 'hsl(var(--input))',
@@ -81,6 +90,13 @@ const config = {
   			card: {
   				DEFAULT: 'hsl(var(--card))',
   				foreground: 'hsl(var(--card-foreground))'
+  			},
+  			'warning-subtle': 'hsl(var(--warning-subtle))',
+  			info: {
+  				DEFAULT: 'hsl(var(--info))',
+  				hover: 'hsl(var(--info-hover))',
+  				foreground: 'hsl(var(--info-foreground))',
+  				subtle: 'hsl(var(--info-subtle))',
   			},
   			status: {
   				pending: {
@@ -262,10 +278,17 @@ const config = {
   				}
   			}
   		},
+  		height: {
+  			'header': 'var(--header-height)',
+  			'footer': 'var(--footer-height)',
+  		},
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
-  			sm: 'calc(var(--radius) - 4px)'
+  			sm: 'calc(var(--radius) - 4px)',
+  			xl: 'var(--radius-xl)',
+  			'2xl': 'var(--radius-2xl)',
+  			full: 'var(--radius-full)',
   		},
   		boxShadow: {
   			sm: 'var(--shadow-sm)',

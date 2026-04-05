@@ -20,8 +20,8 @@ export const NoticeCard = ({ title, description, variant = "warning" }: NoticeCa
       <div
         className={cn(
           "flex items-start p-4 rounded-lg border",
-          isWarning && "bg-yellow-50 border-warning",
-          isInfo && "bg-blue-50 border-primary",
+          isWarning && "bg-warning-subtle border-warning",
+          isInfo && "bg-info-subtle border-info",
         )}
       >
         <IconWrapper color={isWarning ? "warning" : "primary"}>
@@ -33,7 +33,7 @@ export const NoticeCard = ({ title, description, variant = "warning" }: NoticeCa
         </IconWrapper>
 
         <div className="ml-2">
-          <p className="text-sm font-bold mt-[2px]">{title}</p>
+          <p className="text-sm font-bold">{title}</p>
           <p className="text-sm pt-2 text-caption">{description}</p>
         </div>
       </div>

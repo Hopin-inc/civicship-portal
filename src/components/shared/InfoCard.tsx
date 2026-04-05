@@ -130,12 +130,12 @@ export const InfoCard = ({
   if (layout === 'vertical') {
     const content = displayValue == null || displayValue === '' ? (fallbackText ?? t('common.noData')) : displayValue;
     return (
-      <Card className="rounded-2xl border border-gray-200 bg-card shadow-none">
+      <Card className="rounded-2xl border border-border bg-card shadow-none">
         <CardHeader className="flex flex-col gap-1 py-4 px-6">
-          <div className="text-gray-400 text-xs">
+          <div className="text-muted-foreground text-xs">
             {label}
           </div>
-          <div className="text-sm text-black font-bold whitespace-pre-wrap break-words text-left">
+          <div className="text-sm text-foreground font-bold whitespace-pre-wrap break-words text-left">
             {renderValue(content)}
           </div>
         </CardHeader>
@@ -144,14 +144,14 @@ export const InfoCard = ({
   }
 
   return (
-    <Card className="rounded-2xl border border-gray-200 bg-card shadow-none">
+    <Card className="rounded-2xl border border-border bg-card shadow-none">
       <CardHeader className="flex flex-row items-center gap-4 py-4 px-6">
-        <div className="text-gray-400 text-xs whitespace-pre-wrap shrink-0">
+        <div className="text-muted-foreground text-xs whitespace-pre-wrap shrink-0">
           {label}
         </div>
         {hasSecondaryContent ? (
           <div className={`flex-1 flex flex-col break-words ${valueAlign === 'left' ? 'items-start text-left' : 'items-end text-right'}`}>
-            <div className="text-sm text-black font-bold flex items-center">
+            <div className="text-sm text-foreground font-bold flex items-center">
               {renderValue(displayValue)}
               <ExternalLinkButton
                 externalLink={externalLink}
@@ -159,7 +159,7 @@ export const InfoCard = ({
                 secondaryLabel={secondaryLabel}
               />
             </div>
-            <div className="flex items-center text-gray-400 text-sm mt-1">
+            <div className="flex items-center text-muted-foreground text-sm mt-1">
               {isWarning && warningText && <WarningDisplay warningText={warningText} />}
               <ActionButtons
                 showCopy={showCopy}
@@ -173,7 +173,7 @@ export const InfoCard = ({
             </div>
           </div>
         ) : (
-          <div className={`flex-1 flex items-center text-gray-400 text-sm ${valueAlign === 'left' ? 'justify-start text-left' : 'justify-end text-right'}`}>
+          <div className={`flex-1 flex items-center text-muted-foreground text-sm ${valueAlign === 'left' ? 'justify-start text-left' : 'justify-end text-right'}`}>
             {isWarning && warningText && <WarningDisplay warningText={warningText} />}
             <ActionButtons
               showCopy={showCopy}
@@ -183,7 +183,7 @@ export const InfoCard = ({
             />
             {renderValue(
               displayValue == null || displayValue === '' ? (fallbackText ?? t('common.noData')) : displayValue,
-              `break-words ${isWarning ? "text-gray-400" : "font-bold text-black"}`
+              `break-words ${isWarning ? "text-muted-foreground" : "font-bold text-foreground"}`
             )}
             <ExternalLinkButton
               externalLink={externalLink}
