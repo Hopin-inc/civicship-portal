@@ -282,8 +282,9 @@ const config = {
   			}
   		},
   		height: {
-  			'header': 'var(--header-height)',
-  			'footer': 'var(--footer-height)',
+  			'header':          'var(--header-height)',
+  			'header-expanded': 'var(--header-height-expanded)',
+  			'footer':          'var(--footer-height)',
   		},
   		borderRadius: {
   			lg: 'var(--radius)',

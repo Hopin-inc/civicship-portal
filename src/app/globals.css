@@ -401,7 +401,7 @@
 
     /* Layout */
     --header-height: var(--spacing-3xl);          /* 64px = h-16 */
-    --header-height-expanded: 5rem;               /* 80px = h-20（検索フォーム表示時） */
+    --header-height-expanded: 5rem;               /* 80px = h-20 (when search form is visible) */
     --footer-height: var(--spacing-3xl);          /* 64px = h-16 */
 
     /* Radius */
