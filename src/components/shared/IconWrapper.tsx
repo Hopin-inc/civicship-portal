@@ -4,7 +4,7 @@ import React from 'react';
 
 interface IconWrapperProps {
   children: React.ReactNode;
-  color?: 'default' | 'warning' | 'primary';
+  color?: 'default' | 'warning' | 'primary' | 'info';
 }
 
 /**
@@ -19,6 +19,8 @@ const IconWrapper: React.FC<IconWrapperProps> = ({
       ? 'text-[#F0B03C]'
       : color === 'primary'
       ? 'text-primary'
+      : color === 'info'
+      ? 'text-info'
       : 'text-muted-foreground';
 
   return (

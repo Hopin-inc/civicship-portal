@@ -400,8 +400,9 @@
     --info-subtle: var(--blue-50);
 
     /* Layout */
-    --header-height: var(--spacing-3xl);   /* 64px = h-16 */
-    --footer-height: var(--spacing-3xl);   /* 64px = h-16 */
+    --header-height: var(--spacing-3xl);          /* 64px = h-16 */
+    --header-height-expanded: 5rem;               /* 80px = h-20（検索フォーム表示時） */
+    --footer-height: var(--spacing-3xl);          /* 64px = h-16 */
 
     /* Radius */
     --radius-xl: 0.75rem;    /* 12px */

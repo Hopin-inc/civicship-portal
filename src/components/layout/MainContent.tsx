@@ -62,7 +62,7 @@ const MainContent: React.FC<MainContentProps> = ({ children }) => {
     <div className="min-h-screen flex flex-col max-w-mobile-l mx-auto w-full bg-background">
       <Header />
       <main
-        className={`w-full flex-grow ${showHeader ? "pt-header" : ""} ${showFooter ? "pb-footer" : ""} overflow-y-auto`}
+        className={`w-full flex-grow ${showHeader ? (config?.showSearchForm ? "pt-header-expanded" : "pt-header") : ""} ${showFooter ? "pb-footer" : ""} overflow-y-auto`}
       >
         <RouteGuard>{children}</RouteGuard>
       </main>

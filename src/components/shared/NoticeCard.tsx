@@ -24,7 +24,7 @@ export const NoticeCard = ({ title, description, variant = "warning" }: NoticeCa
           isInfo && "bg-info-subtle border-info",
         )}
       >
-        <IconWrapper color={isWarning ? "warning" : "primary"}>
+        <IconWrapper color={isWarning ? "warning" : "info"}>
           {isWarning ? (
             <AlertCircle size={20} strokeWidth={2.5} />
           ) : (

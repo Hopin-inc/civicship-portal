@@ -27,6 +27,9 @@ const config = {
   			'xl':  'var(--spacing-xl)',
   			'2xl': 'var(--spacing-2xl)',
   			'3xl': 'var(--spacing-3xl)',
+  			'header':          'var(--header-height)',
+  			'header-expanded': 'var(--header-height-expanded)',
+  			'footer':          'var(--footer-height)',
   		},
   		colors: {
   			border: 'hsl(var(--border))',
