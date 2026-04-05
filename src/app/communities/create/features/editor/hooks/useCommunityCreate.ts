@@ -26,12 +26,20 @@ export function useCommunityCreate() {
         return undefined;
       }
 
-      const hasLineConfig =
-        formData.lineAccessToken.trim() ||
-        formData.lineChannelId.trim() ||
-        formData.lineChannelSecret.trim() ||
-        formData.lineLiffBaseUrl.trim() ||
-        formData.lineLiffId.trim();
+      // LINE設定の全フィールド入力チェック（Tier2: 部分入力を防止）
+      const lineFields = [
+        formData.lineAccessToken.trim(),
+        formData.lineChannelId.trim(),
+        formData.lineChannelSecret.trim(),
+        formData.lineLiffBaseUrl.trim(),
+        formData.lineLiffId.trim(),
+      ];
+      const filledCount = lineFields.filter(Boolean).length;
+      if (filledCount > 0 && filledCount < lineFields.length) {
+        toast.error("LINE設定を使用する場合はすべてのフィールドを入力してください");
+        return undefined;
+      }
+      const hasLineConfig = filledCount === lineFields.length;
 
       const input: GqlCommunityCreateInput = {
         name: formData.name.trim(),
@@ -39,7 +47,7 @@ export function useCommunityCreate() {
         bio: formData.bio.trim() || undefined,
         website: formData.website.trim() || undefined,
         image: formData.imageFile ? { file: formData.imageFile } : undefined,
-        establishedAt: formData.establishedAt || undefined,
+        establishedAt: formData.establishedAt ? new Date(formData.establishedAt) : undefined,
         originalId: formData.originalId.trim() || undefined,
         createdBy: formData.createdBy.trim() || undefined,
         config: hasLineConfig
