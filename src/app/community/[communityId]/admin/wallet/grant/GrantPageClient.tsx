@@ -128,7 +128,7 @@ export default function GrantPageClient({ initialConnection }: GrantPageClientPr
   }
 
   if (walletError) {
-    return <ErrorState title={t("adminWallet.grant.membersLoadError")} />;
+    return <ErrorState title={t("adminWallet.grant.walletLoadError")} />;
   }
 
   if (error) {
