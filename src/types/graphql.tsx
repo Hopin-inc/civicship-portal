@@ -3108,6 +3108,38 @@ export type GqlCommunityFieldsFragment = {
   image?: string | null;
 };
 
+export type GqlCommunityCreateMutationVariables = Exact<{
+  input: GqlCommunityCreateInput;
+}>;
+
+export type GqlCommunityCreateMutation = {
+  __typename?: "Mutation";
+  communityCreate?: {
+    __typename?: "CommunityCreateSuccess";
+    community: {
+      __typename?: "Community";
+      id: string;
+      name?: string | null;
+      image?: string | null;
+      bio?: string | null;
+      website?: string | null;
+      pointName?: string | null;
+      establishedAt?: Date | null;
+      config?: {
+        __typename?: "CommunityConfig";
+        lineConfig?: {
+          __typename?: "CommunityLineConfig";
+          accessToken?: string | null;
+          channelId?: string | null;
+          channelSecret?: string | null;
+          liffBaseUrl?: string | null;
+          liffId?: string | null;
+        } | null;
+      } | null;
+    };
+  } | null;
+};
+
 export type GqlUpdateSignupBonusConfigMutationVariables = Exact<{
   input: GqlUpdateSignupBonusConfigInput;
   communityId: Scalars["ID"]["input"];
@@ -7068,6 +7100,72 @@ export type GetCitiesSuspenseQueryHookResult = ReturnType<typeof useGetCitiesSus
 export type GetCitiesQueryResult = Apollo.QueryResult<
   GqlGetCitiesQuery,
   GqlGetCitiesQueryVariables
+>;
+export const CommunityCreateDocument = gql`
+  mutation CommunityCreate($input: CommunityCreateInput!) {
+    communityCreate(input: $input) {
+      ... on CommunityCreateSuccess {
+        community {
+          id
+          name
+          image
+          bio
+          website
+          pointName
+          establishedAt
+          config {
+            lineConfig {
+              accessToken
+              channelId
+              channelSecret
+              liffBaseUrl
+              liffId
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+export type GqlCommunityCreateMutationFn = Apollo.MutationFunction<
+  GqlCommunityCreateMutation,
+  GqlCommunityCreateMutationVariables
+>;
+
+/**
+ * __useCommunityCreateMutation__
+ *
+ * To run a mutation, you first call `useCommunityCreateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCommunityCreateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [communityCreateMutation, { data, loading, error }] = useCommunityCreateMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCommunityCreateMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlCommunityCreateMutation,
+    GqlCommunityCreateMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlCommunityCreateMutation, GqlCommunityCreateMutationVariables>(
+    CommunityCreateDocument,
+    options,
+  );
+}
+export type CommunityCreateMutationHookResult = ReturnType<typeof useCommunityCreateMutation>;
+export type CommunityCreateMutationResult = Apollo.MutationResult<GqlCommunityCreateMutation>;
+export type CommunityCreateMutationOptions = Apollo.BaseMutationOptions<
+  GqlCommunityCreateMutation,
+  GqlCommunityCreateMutationVariables
 >;
 export const UpdateSignupBonusConfigDocument = gql`
   mutation UpdateSignupBonusConfig($input: UpdateSignupBonusConfigInput!, $communityId: ID!) {
