@@ -23,7 +23,7 @@ export function useLineVerify() {
       const res = await fetch("/api/line/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ accessToken }),
+        body: JSON.stringify({ accessToken: accessToken.trim() }),
       });
 
       const data = await res.json();
