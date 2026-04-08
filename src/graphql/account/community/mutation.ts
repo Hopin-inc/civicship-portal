@@ -8,19 +8,6 @@ export const COMMUNITY_CREATE = gql`
           id
           name
           image
-          bio
-          website
-          pointName
-          establishedAt
-          config {
-            lineConfig {
-              accessToken
-              channelId
-              channelSecret
-              liffBaseUrl
-              liffId
-            }
-          }
         }
       }
     }
