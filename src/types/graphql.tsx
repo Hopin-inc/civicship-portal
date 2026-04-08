@@ -3121,21 +3121,6 @@ export type GqlCommunityCreateMutation = {
       id: string;
       name?: string | null;
       image?: string | null;
-      bio?: string | null;
-      website?: string | null;
-      pointName?: string | null;
-      establishedAt?: Date | null;
-      config?: {
-        __typename?: "CommunityConfig";
-        lineConfig?: {
-          __typename?: "CommunityLineConfig";
-          accessToken?: string | null;
-          channelId?: string | null;
-          channelSecret?: string | null;
-          liffBaseUrl?: string | null;
-          liffId?: string | null;
-        } | null;
-      } | null;
     };
   } | null;
 };
@@ -7109,19 +7094,6 @@ export const CommunityCreateDocument = gql`
           id
           name
           image
-          bio
-          website
-          pointName
-          establishedAt
-          config {
-            lineConfig {
-              accessToken
-              channelId
-              channelSecret
-              liffBaseUrl
-              liffId
-            }
-          }
         }
       }
     }
