@@ -319,6 +319,7 @@
     --spacing-xl: 2rem;      /* 32px ≈ gap-8, p-8 */
     --spacing-2xl: 3rem;     /* 48px ≈ gap-12, p-12 */
     --spacing-3xl: 4rem;     /* 64px ≈ gap-16 */
+    --spacing-4xl: 5rem;     /* 80px ≈ h-20 */
   }
 
   :root {
@@ -401,7 +402,7 @@
 
     /* Layout */
     --header-height: var(--spacing-3xl);          /* 64px = h-16 */
-    --header-height-expanded: 5rem;               /* 80px = h-20 (when search form is visible) */
+    --header-height-expanded: var(--spacing-4xl);  /* 80px = h-20 (when search form is visible) */
     --footer-height: var(--spacing-3xl);          /* 64px = h-16 */
 
     /* Radius */

@@ -16,7 +16,7 @@ const IconWrapper: React.FC<IconWrapperProps> = ({
 }) => {
   const colorClass =
     color === 'warning'
-      ? 'text-[#F0B03C]'
+      ? 'text-warning'
       : color === 'primary'
       ? 'text-primary'
       : color === 'info'

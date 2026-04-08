@@ -27,6 +27,7 @@ const config = {
   			'xl':  'var(--spacing-xl)',
   			'2xl': 'var(--spacing-2xl)',
   			'3xl': 'var(--spacing-3xl)',
+  			'4xl': 'var(--spacing-4xl)',
   			'header':          'var(--header-height)',
   			'header-expanded': 'var(--header-height-expanded)',
   			'footer':          'var(--footer-height)',
@@ -280,11 +281,6 @@ const config = {
   					}
   				}
   			}
-  		},
-  		height: {
-  			'header':          'var(--header-height)',
-  			'header-expanded': 'var(--header-height-expanded)',
-  			'footer':          'var(--footer-height)',
   		},
   		borderRadius: {
   			lg: 'var(--radius)',
