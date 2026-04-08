@@ -13,29 +13,27 @@ export function useCommunityCreate() {
 
   const handleSave = useCallback(
     async (formData: CommunityFormData): Promise<string | undefined> => {
+      const name = formData.name.trim();
+      const accessToken = formData.lineAccessToken.trim();
+      const channelId = formData.lineChannelId.trim();
+      const channelSecret = formData.lineChannelSecret.trim();
       const liffId = formData.lineLiffId.trim();
+      const originalId = formData.originalId.trim();
 
-      if (
-        !validateForm(formData.name, {
-          accessToken: formData.lineAccessToken.trim(),
-          channelId: formData.lineChannelId.trim(),
-          channelSecret: formData.lineChannelSecret.trim(),
-          liffId,
-        })
-      ) {
+      if (!validateForm(name, { accessToken, channelId, channelSecret, liffId })) {
         return undefined;
       }
 
       const input: GqlCommunityCreateInput = {
-        name: formData.name.trim(),
-        pointName: formData.name.trim(),
+        name,
+        pointName: name,
         image: formData.imageFile ? { file: formData.imageFile } : undefined,
-        originalId: formData.originalId.trim() || undefined,
+        originalId: originalId || undefined,
         config: {
           lineConfig: {
-            accessToken: formData.lineAccessToken.trim(),
-            channelId: formData.lineChannelId.trim(),
-            channelSecret: formData.lineChannelSecret.trim(),
+            accessToken,
+            channelId,
+            channelSecret,
             liffBaseUrl: `https://liff.line.me/${liffId}`,
             liffId,
             richMenus: [],

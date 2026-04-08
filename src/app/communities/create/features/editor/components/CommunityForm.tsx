@@ -12,23 +12,18 @@ interface CommunityFormProps {
 export function CommunityForm({ editor, onSubmit }: CommunityFormProps) {
   return (
     <form onSubmit={onSubmit} className="space-y-8">
-      {/* === セクション1: 基本情報 === */}
       <BasicInfoSection
         formData={editor.formData}
         onChange={editor.setField}
         errors={editor.errors}
         onClearError={editor.clearError}
       />
-
-      {/* === セクション2: LINE設定 === */}
       <LineConfigSection
         formData={editor.formData}
         onChange={editor.setField}
         errors={editor.errors}
         onClearError={editor.clearError}
       />
-
-      {/* 送信ボタン */}
       <div className="w-full max-w-[345px] mx-auto pb-8">
         <Button
           type="submit"

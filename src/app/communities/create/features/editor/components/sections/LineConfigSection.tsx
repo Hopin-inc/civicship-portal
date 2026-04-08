@@ -3,7 +3,7 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, XCircle, Loader2 } from "lucide-react";
-import { CommunityFormData, ValidationErrors } from "../../types/form";
+import { CommunityFormData, ValidationErrors, ValidationErrorField } from "../../types/form";
 import { useLineVerify } from "../../hooks/useLineVerify";
 
 interface LineConfigSectionProps {
@@ -12,6 +12,25 @@ interface LineConfigSectionProps {
   errors?: ValidationErrors;
   onClearError?: (field: keyof ValidationErrors) => void;
 }
+
+type LineFieldKey = Extract<
+  keyof CommunityFormData,
+  "lineAccessToken" | "lineChannelId" | "lineChannelSecret" | "lineLiffId"
+>;
+
+const LINE_FIELDS: { key: LineFieldKey; label: string; placeholder: string; type?: string }[] = [
+  { key: "lineAccessToken", label: "Access Token", placeholder: "Channel Access Token" },
+  { key: "lineChannelId", label: "Channel ID", placeholder: "Channel ID" },
+  { key: "lineChannelSecret", label: "Channel Secret", placeholder: "Channel Secret", type: "password" },
+  { key: "lineLiffId", label: "LIFF ID", placeholder: "LIFF App ID" },
+];
+
+const ERROR_FIELD_MAP: Partial<Record<LineFieldKey, ValidationErrorField>> = {
+  lineAccessToken: "lineAccessToken",
+  lineChannelId: "lineChannelId",
+  lineChannelSecret: "lineChannelSecret",
+  lineLiffId: "lineLiffId",
+};
 
 export function LineConfigSection({ formData, onChange, errors, onClearError }: LineConfigSectionProps) {
   const { state, verify } = useLineVerify();
@@ -25,70 +44,26 @@ export function LineConfigSection({ formData, onChange, errors, onClearError }: 
         </span>
       </div>
 
-      <div className="space-y-1">
-        <span className="text-sm text-muted-foreground px-1">Access Token</span>
-        <Input
-          value={formData.lineAccessToken}
-          onChange={(e) => {
-            onChange("lineAccessToken", e.target.value);
-            if (errors?.lineAccessToken) onClearError?.("lineAccessToken");
-          }}
-          placeholder="Channel Access Token"
-          className={`placeholder:text-sm ${errors?.lineAccessToken ? "border-destructive focus-visible:ring-destructive" : ""}`}
-        />
-        {errors?.lineAccessToken && (
-          <p className="text-xs text-destructive px-1">{errors.lineAccessToken}</p>
-        )}
-      </div>
-
-      <div className="space-y-1">
-        <span className="text-sm text-muted-foreground px-1">Channel ID</span>
-        <Input
-          value={formData.lineChannelId}
-          onChange={(e) => {
-            onChange("lineChannelId", e.target.value);
-            if (errors?.lineChannelId) onClearError?.("lineChannelId");
-          }}
-          placeholder="Channel ID"
-          className={`placeholder:text-sm ${errors?.lineChannelId ? "border-destructive focus-visible:ring-destructive" : ""}`}
-        />
-        {errors?.lineChannelId && (
-          <p className="text-xs text-destructive px-1">{errors.lineChannelId}</p>
-        )}
-      </div>
-
-      <div className="space-y-1">
-        <span className="text-sm text-muted-foreground px-1">Channel Secret</span>
-        <Input
-          value={formData.lineChannelSecret}
-          onChange={(e) => {
-            onChange("lineChannelSecret", e.target.value);
-            if (errors?.lineChannelSecret) onClearError?.("lineChannelSecret");
-          }}
-          placeholder="Channel Secret"
-          type="password"
-          className={`placeholder:text-sm ${errors?.lineChannelSecret ? "border-destructive focus-visible:ring-destructive" : ""}`}
-        />
-        {errors?.lineChannelSecret && (
-          <p className="text-xs text-destructive px-1">{errors.lineChannelSecret}</p>
-        )}
-      </div>
-
-      <div className="space-y-1">
-        <span className="text-sm text-muted-foreground px-1">LIFF ID</span>
-        <Input
-          value={formData.lineLiffId}
-          onChange={(e) => {
-            onChange("lineLiffId", e.target.value);
-            if (errors?.lineLiffId) onClearError?.("lineLiffId");
-          }}
-          placeholder="LIFF App ID"
-          className={`placeholder:text-sm ${errors?.lineLiffId ? "border-destructive focus-visible:ring-destructive" : ""}`}
-        />
-        {errors?.lineLiffId && (
-          <p className="text-xs text-destructive px-1">{errors.lineLiffId}</p>
-        )}
-      </div>
+      {LINE_FIELDS.map(({ key, label, placeholder, type }) => {
+        const errorKey = ERROR_FIELD_MAP[key];
+        const errorMsg = errorKey ? errors?.[errorKey] : undefined;
+        return (
+          <div key={key} className="space-y-1">
+            <span className="text-sm text-muted-foreground px-1">{label}</span>
+            <Input
+              value={formData[key] as string}
+              onChange={(e) => {
+                onChange(key, e.target.value);
+                if (errorKey && errorMsg) onClearError?.(errorKey);
+              }}
+              placeholder={placeholder}
+              type={type}
+              className={`placeholder:text-sm ${errorMsg ? "border-destructive focus-visible:ring-destructive" : ""}`}
+            />
+            {errorMsg && <p className="text-xs text-destructive px-1">{errorMsg}</p>}
+          </div>
+        );
+      })}
 
       <div className="flex items-center gap-3 pt-1">
         <Button
