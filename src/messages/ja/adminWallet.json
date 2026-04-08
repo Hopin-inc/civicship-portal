@@ -16,6 +16,7 @@
   "adminWallet.grant.errorWithCode": "送信に失敗しました: {code}",
   "adminWallet.grant.errorGeneric": "送信に失敗しました",
   "adminWallet.grant.membersLoadError": "メンバーを読み込めませんでした",
+  "adminWallet.grant.walletLoadError": "コミュニティウォレットを読み込めませんでした",
 
   "adminWallet.issue.title": "ポイントの発行",
   "adminWallet.issue.submit": "発行",

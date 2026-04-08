@@ -14,6 +14,7 @@
   "adminWallet.grant.errorWithCode": "Failed to send: {code}",
   "adminWallet.grant.errorGeneric": "Failed to send points",
   "adminWallet.grant.membersLoadError": "Failed to load members",
+  "adminWallet.grant.walletLoadError": "Failed to load community wallet",
   "adminWallet.issue.title": "Issue Points",
   "adminWallet.issue.submit": "Issue",
   "adminWallet.issue.validation.min": "Please specify 0 or more",
