@@ -1,14 +1,10 @@
 export type CommunityFormData = {
   // 基本情報
+  originalId: string;
   name: string;
-  pointName: string;
-  bio: string;
-  website: string;
   imageFile: File | null;
 
   // メタ情報
-  establishedAt: string; // ISO date string or empty
-  originalId: string;
   createdBy: string;
 
   // LINE設定
@@ -19,7 +15,13 @@ export type CommunityFormData = {
   lineLiffId: string;
 };
 
-export type ValidationErrorField = "name" | "pointName";
+export type ValidationErrorField =
+  | "name"
+  | "lineAccessToken"
+  | "lineChannelId"
+  | "lineChannelSecret"
+  | "lineLiffBaseUrl"
+  | "lineLiffId";
 
 export type ValidationErrors = {
   [K in ValidationErrorField]?: string;

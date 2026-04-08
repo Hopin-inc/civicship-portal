@@ -5,13 +5,9 @@ import { CommunityFormData } from "../types/form";
 import { useCommunityCreate } from "./useCommunityCreate";
 
 const initialFormData: CommunityFormData = {
-  name: "",
-  pointName: "",
-  bio: "",
-  website: "",
-  imageFile: null,
-  establishedAt: "",
   originalId: "",
+  name: "",
+  imageFile: null,
   createdBy: "",
   lineAccessToken: "",
   lineChannelId: "",

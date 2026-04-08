@@ -2,7 +2,6 @@
 
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Item, ItemActions, ItemContent, ItemTitle } from "@/components/ui/item";
 import { X } from "lucide-react";
@@ -43,6 +42,16 @@ export function BasicInfoSection({
   return (
     <section className="space-y-2">
       <div className="space-y-1">
+        <span className="text-sm text-muted-foreground px-1">コミュニティID</span>
+        <Input
+          value={formData.originalId}
+          onChange={(e) => onChange("originalId", e.target.value)}
+          placeholder="コミュニティID"
+          className="placeholder:text-sm"
+        />
+      </div>
+
+      <div className="space-y-1">
         <div className="flex items-center gap-2 px-1">
           <span className="text-sm text-muted-foreground">コミュニティ名</span>
           <span className="text-primary text-xs font-bold bg-primary-foreground px-1 py-0.5 rounded">
@@ -59,48 +68,6 @@ export function BasicInfoSection({
           className={`placeholder:text-sm ${errors?.name ? "border-destructive focus-visible:ring-destructive" : ""}`}
         />
         {errors?.name && <p className="text-xs text-destructive px-1">{errors.name}</p>}
-      </div>
-
-      <div className="space-y-1">
-        <div className="flex items-center gap-2 px-1">
-          <span className="text-sm text-muted-foreground">ポイント名称</span>
-          <span className="text-primary text-xs font-bold bg-primary-foreground px-1 py-0.5 rounded">
-            必須
-          </span>
-        </div>
-        <Input
-          value={formData.pointName}
-          onChange={(e) => {
-            onChange("pointName", e.target.value);
-            if (errors?.pointName) onClearError?.("pointName");
-          }}
-          placeholder="例: シビックポイント"
-          className={`placeholder:text-sm ${errors?.pointName ? "border-destructive focus-visible:ring-destructive" : ""}`}
-        />
-        {errors?.pointName && (
-          <p className="text-xs text-destructive px-1">{errors.pointName}</p>
-        )}
-      </div>
-
-      <div className="space-y-1">
-        <span className="text-sm text-muted-foreground px-1">説明</span>
-        <Textarea
-          value={formData.bio}
-          onChange={(e) => onChange("bio", e.target.value)}
-          placeholder="コミュニティの説明を入力"
-          className="min-h-[80px] placeholder:text-sm"
-        />
-      </div>
-
-      <div className="space-y-1">
-        <span className="text-sm text-muted-foreground px-1">Webサイト</span>
-        <Input
-          value={formData.website}
-          onChange={(e) => onChange("website", e.target.value)}
-          placeholder="https://example.com"
-          type="url"
-          className="placeholder:text-sm"
-        />
       </div>
 
       <Item size="sm" variant="outline">

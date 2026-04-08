@@ -13,46 +13,34 @@ export function useCommunityCreate() {
 
   const handleSave = useCallback(
     async (formData: CommunityFormData): Promise<string | undefined> => {
-      if (!validateForm(formData.name, formData.pointName)) {
+      if (
+        !validateForm(formData.name, {
+          accessToken: formData.lineAccessToken.trim(),
+          channelId: formData.lineChannelId.trim(),
+          channelSecret: formData.lineChannelSecret.trim(),
+          liffBaseUrl: formData.lineLiffBaseUrl.trim(),
+          liffId: formData.lineLiffId.trim(),
+        })
+      ) {
         return undefined;
       }
-
-      // LINE設定の全フィールド入力チェック（Tier2: 部分入力を防止）
-      const lineFields = [
-        formData.lineAccessToken.trim(),
-        formData.lineChannelId.trim(),
-        formData.lineChannelSecret.trim(),
-        formData.lineLiffBaseUrl.trim(),
-        formData.lineLiffId.trim(),
-      ];
-      const filledCount = lineFields.filter(Boolean).length;
-      if (filledCount > 0 && filledCount < lineFields.length) {
-        toast.error("LINE設定を使用する場合はすべてのフィールドを入力してください");
-        return undefined;
-      }
-      const hasLineConfig = filledCount === lineFields.length;
 
       const input: GqlCommunityCreateInput = {
         name: formData.name.trim(),
-        pointName: formData.pointName.trim(),
-        bio: formData.bio.trim() || undefined,
-        website: formData.website.trim() || undefined,
+        pointName: formData.name.trim(),
         image: formData.imageFile ? { file: formData.imageFile } : undefined,
-        establishedAt: formData.establishedAt ? new Date(formData.establishedAt) : undefined,
         originalId: formData.originalId.trim() || undefined,
         createdBy: formData.createdBy.trim() || undefined,
-        config: hasLineConfig
-          ? {
-              lineConfig: {
-                accessToken: formData.lineAccessToken.trim(),
-                channelId: formData.lineChannelId.trim(),
-                channelSecret: formData.lineChannelSecret.trim(),
-                liffBaseUrl: formData.lineLiffBaseUrl.trim(),
-                liffId: formData.lineLiffId.trim(),
-                richMenus: [],
-              },
-            }
-          : undefined,
+        config: {
+          lineConfig: {
+            accessToken: formData.lineAccessToken.trim(),
+            channelId: formData.lineChannelId.trim(),
+            channelSecret: formData.lineChannelSecret.trim(),
+            liffBaseUrl: formData.lineLiffBaseUrl.trim(),
+            liffId: formData.lineLiffId.trim(),
+            richMenus: [],
+          },
+        },
       };
 
       try {

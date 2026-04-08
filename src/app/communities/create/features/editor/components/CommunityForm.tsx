@@ -25,7 +25,12 @@ export function CommunityForm({ editor, onSubmit }: CommunityFormProps) {
       <MetaSection formData={editor.formData} onChange={editor.setField} />
 
       {/* === セクション3: LINE設定 === */}
-      <LineConfigSection formData={editor.formData} onChange={editor.setField} />
+      <LineConfigSection
+        formData={editor.formData}
+        onChange={editor.setField}
+        errors={editor.errors}
+        onClearError={editor.clearError}
+      />
 
       {/* 送信ボタン */}
       <div className="w-full max-w-[345px] mx-auto pb-8">
