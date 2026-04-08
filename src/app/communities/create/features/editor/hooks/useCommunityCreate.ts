@@ -13,13 +13,14 @@ export function useCommunityCreate() {
 
   const handleSave = useCallback(
     async (formData: CommunityFormData): Promise<string | undefined> => {
+      const liffId = formData.lineLiffId.trim();
+
       if (
         !validateForm(formData.name, {
           accessToken: formData.lineAccessToken.trim(),
           channelId: formData.lineChannelId.trim(),
           channelSecret: formData.lineChannelSecret.trim(),
-          liffBaseUrl: formData.lineLiffBaseUrl.trim(),
-          liffId: formData.lineLiffId.trim(),
+          liffId,
         })
       ) {
         return undefined;
@@ -30,14 +31,13 @@ export function useCommunityCreate() {
         pointName: formData.name.trim(),
         image: formData.imageFile ? { file: formData.imageFile } : undefined,
         originalId: formData.originalId.trim() || undefined,
-        createdBy: formData.createdBy.trim() || undefined,
         config: {
           lineConfig: {
             accessToken: formData.lineAccessToken.trim(),
             channelId: formData.lineChannelId.trim(),
             channelSecret: formData.lineChannelSecret.trim(),
-            liffBaseUrl: formData.lineLiffBaseUrl.trim(),
-            liffId: formData.lineLiffId.trim(),
+            liffBaseUrl: `https://liff.line.me/${liffId}`,
+            liffId,
             richMenus: [],
           },
         },

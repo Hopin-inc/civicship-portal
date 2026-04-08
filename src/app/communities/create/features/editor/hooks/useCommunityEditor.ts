@@ -8,11 +8,9 @@ const initialFormData: CommunityFormData = {
   originalId: "",
   name: "",
   imageFile: null,
-  createdBy: "",
   lineAccessToken: "",
   lineChannelId: "",
   lineChannelSecret: "",
-  lineLiffBaseUrl: "",
   lineLiffId: "",
 };
 

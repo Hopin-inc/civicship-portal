@@ -6,7 +6,6 @@ type LineConfigFields = {
   accessToken: string;
   channelId: string;
   channelSecret: string;
-  liffBaseUrl: string;
   liffId: string;
 };
 
@@ -28,9 +27,6 @@ export function useCommunityValidation() {
       }
       if (!lineConfig.channelSecret) {
         newErrors.lineChannelSecret = "入力してください";
-      }
-      if (!lineConfig.liffBaseUrl) {
-        newErrors.lineLiffBaseUrl = "入力してください";
       }
       if (!lineConfig.liffId) {
         newErrors.lineLiffId = "入力してください";

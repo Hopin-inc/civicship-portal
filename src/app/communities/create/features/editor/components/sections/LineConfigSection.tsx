@@ -75,23 +75,6 @@ export function LineConfigSection({ formData, onChange, errors, onClearError }: 
       </div>
 
       <div className="space-y-1">
-        <span className="text-sm text-muted-foreground px-1">LIFF Base URL</span>
-        <Input
-          value={formData.lineLiffBaseUrl}
-          onChange={(e) => {
-            onChange("lineLiffBaseUrl", e.target.value);
-            if (errors?.lineLiffBaseUrl) onClearError?.("lineLiffBaseUrl");
-          }}
-          placeholder="https://liff.line.me/..."
-          type="url"
-          className={`placeholder:text-sm ${errors?.lineLiffBaseUrl ? "border-destructive focus-visible:ring-destructive" : ""}`}
-        />
-        {errors?.lineLiffBaseUrl && (
-          <p className="text-xs text-destructive px-1">{errors.lineLiffBaseUrl}</p>
-        )}
-      </div>
-
-      <div className="space-y-1">
         <span className="text-sm text-muted-foreground px-1">LIFF ID</span>
         <Input
           value={formData.lineLiffId}

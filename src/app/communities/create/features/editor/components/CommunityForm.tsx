@@ -1,7 +1,6 @@
 import { FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { BasicInfoSection } from "./sections/BasicInfoSection";
-import { MetaSection } from "./sections/MetaSection";
 import { LineConfigSection } from "./sections/LineConfigSection";
 import { useCommunityEditor } from "../hooks/useCommunityEditor";
 
@@ -21,10 +20,7 @@ export function CommunityForm({ editor, onSubmit }: CommunityFormProps) {
         onClearError={editor.clearError}
       />
 
-      {/* === セクション2: メタ情報 === */}
-      <MetaSection formData={editor.formData} onChange={editor.setField} />
-
-      {/* === セクション3: LINE設定 === */}
+      {/* === セクション2: LINE設定 === */}
       <LineConfigSection
         formData={editor.formData}
         onChange={editor.setField}

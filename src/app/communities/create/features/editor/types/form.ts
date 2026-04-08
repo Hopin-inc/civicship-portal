@@ -4,14 +4,10 @@ export type CommunityFormData = {
   name: string;
   imageFile: File | null;
 
-  // メタ情報
-  createdBy: string;
-
   // LINE設定
   lineAccessToken: string;
   lineChannelId: string;
   lineChannelSecret: string;
-  lineLiffBaseUrl: string;
   lineLiffId: string;
 };
 
@@ -20,7 +16,6 @@ export type ValidationErrorField =
   | "lineAccessToken"
   | "lineChannelId"
   | "lineChannelSecret"
-  | "lineLiffBaseUrl"
   | "lineLiffId";
 
 export type ValidationErrors = {
