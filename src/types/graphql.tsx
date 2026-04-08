@@ -3108,6 +3108,23 @@ export type GqlCommunityFieldsFragment = {
   image?: string | null;
 };
 
+export type GqlCommunityCreateMutationVariables = Exact<{
+  input: GqlCommunityCreateInput;
+}>;
+
+export type GqlCommunityCreateMutation = {
+  __typename?: "Mutation";
+  communityCreate?: {
+    __typename?: "CommunityCreateSuccess";
+    community: {
+      __typename?: "Community";
+      id: string;
+      name?: string | null;
+      image?: string | null;
+    };
+  } | null;
+};
+
 export type GqlUpdateSignupBonusConfigMutationVariables = Exact<{
   input: GqlUpdateSignupBonusConfigInput;
   communityId: Scalars["ID"]["input"];
@@ -3469,6 +3486,7 @@ export type GqlGetSingleMembershipQuery = {
       currentPrefecture?: GqlCurrentPrefecture | null;
       phoneNumber?: string | null;
       preferredLanguage?: GqlLanguage | null;
+      sysRole?: GqlSysRole | null;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
@@ -3666,6 +3684,7 @@ export type GqlGetCurrentUserProfileQuery = {
       currentPrefecture?: GqlCurrentPrefecture | null;
       phoneNumber?: string | null;
       preferredLanguage?: GqlLanguage | null;
+      sysRole?: GqlSysRole | null;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
@@ -3707,6 +3726,7 @@ export type GqlGetCurrentUserProfileQuery = {
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
           preferredLanguage?: GqlLanguage | null;
+          sysRole?: GqlSysRole | null;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -3768,6 +3788,7 @@ export type GqlUserFieldsFragment = {
   currentPrefecture?: GqlCurrentPrefecture | null;
   phoneNumber?: string | null;
   preferredLanguage?: GqlLanguage | null;
+  sysRole?: GqlSysRole | null;
   urlFacebook?: string | null;
   urlInstagram?: string | null;
   urlX?: string | null;
@@ -3807,6 +3828,7 @@ export type GqlUserPortfolioFieldsFragment = {
     currentPrefecture?: GqlCurrentPrefecture | null;
     phoneNumber?: string | null;
     preferredLanguage?: GqlLanguage | null;
+    sysRole?: GqlSysRole | null;
     urlFacebook?: string | null;
     urlInstagram?: string | null;
     urlX?: string | null;
@@ -3862,6 +3884,7 @@ export type GqlGetUserFlexibleQuery = {
     currentPrefecture?: GqlCurrentPrefecture | null;
     phoneNumber?: string | null;
     preferredLanguage?: GqlLanguage | null;
+    sysRole?: GqlSysRole | null;
     urlFacebook?: string | null;
     urlInstagram?: string | null;
     urlX?: string | null;
@@ -3898,6 +3921,7 @@ export type GqlGetUserFlexibleQuery = {
         currentPrefecture?: GqlCurrentPrefecture | null;
         phoneNumber?: string | null;
         preferredLanguage?: GqlLanguage | null;
+        sysRole?: GqlSysRole | null;
         urlFacebook?: string | null;
         urlInstagram?: string | null;
         urlX?: string | null;
@@ -4012,6 +4036,7 @@ export type GqlGetUserWalletQuery = {
     currentPrefecture?: GqlCurrentPrefecture | null;
     phoneNumber?: string | null;
     preferredLanguage?: GqlLanguage | null;
+    sysRole?: GqlSysRole | null;
     urlFacebook?: string | null;
     urlInstagram?: string | null;
     urlX?: string | null;
@@ -4135,6 +4160,7 @@ export type GqlGetWalletsWithTransactionQuery = {
               currentPrefecture?: GqlCurrentPrefecture | null;
               phoneNumber?: string | null;
               preferredLanguage?: GqlLanguage | null;
+              sysRole?: GqlSysRole | null;
               urlFacebook?: string | null;
               urlInstagram?: string | null;
               urlX?: string | null;
@@ -4155,6 +4181,7 @@ export type GqlGetWalletsWithTransactionQuery = {
               currentPrefecture?: GqlCurrentPrefecture | null;
               phoneNumber?: string | null;
               preferredLanguage?: GqlLanguage | null;
+              sysRole?: GqlSysRole | null;
               urlFacebook?: string | null;
               urlInstagram?: string | null;
               urlX?: string | null;
@@ -4352,6 +4379,7 @@ export type GqlGetArticlesQuery = {
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
           preferredLanguage?: GqlLanguage | null;
+          sysRole?: GqlSysRole | null;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -4388,6 +4416,7 @@ export type GqlGetArticleQuery = {
       currentPrefecture?: GqlCurrentPrefecture | null;
       phoneNumber?: string | null;
       preferredLanguage?: GqlLanguage | null;
+      sysRole?: GqlSysRole | null;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
@@ -4437,6 +4466,7 @@ export type GqlGetArticleQuery = {
       currentPrefecture?: GqlCurrentPrefecture | null;
       phoneNumber?: string | null;
       preferredLanguage?: GqlLanguage | null;
+      sysRole?: GqlSysRole | null;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
@@ -4475,6 +4505,7 @@ export type GqlGetArticleQuery = {
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
           preferredLanguage?: GqlLanguage | null;
+          sysRole?: GqlSysRole | null;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -5180,6 +5211,7 @@ export type GqlGetOpportunitySlotWithParticipationsQuery = {
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
           preferredLanguage?: GqlLanguage | null;
+          sysRole?: GqlSysRole | null;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -5339,6 +5371,7 @@ export type GqlGetParticipationQuery = {
             currentPrefecture?: GqlCurrentPrefecture | null;
             phoneNumber?: string | null;
             preferredLanguage?: GqlLanguage | null;
+            sysRole?: GqlSysRole | null;
             urlFacebook?: string | null;
             urlInstagram?: string | null;
             urlX?: string | null;
@@ -5404,6 +5437,7 @@ export type GqlGetParticipationQuery = {
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
           preferredLanguage?: GqlLanguage | null;
+          sysRole?: GqlSysRole | null;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -5478,6 +5512,7 @@ export type GqlGetParticipationQuery = {
         currentPrefecture?: GqlCurrentPrefecture | null;
         phoneNumber?: string | null;
         preferredLanguage?: GqlLanguage | null;
+        sysRole?: GqlSysRole | null;
         urlFacebook?: string | null;
         urlInstagram?: string | null;
         urlX?: string | null;
@@ -5493,6 +5528,7 @@ export type GqlGetParticipationQuery = {
       currentPrefecture?: GqlCurrentPrefecture | null;
       phoneNumber?: string | null;
       preferredLanguage?: GqlLanguage | null;
+      sysRole?: GqlSysRole | null;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
@@ -5626,6 +5662,7 @@ export type GqlGetReservationsQuery = {
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
           preferredLanguage?: GqlLanguage | null;
+          sysRole?: GqlSysRole | null;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -5686,6 +5723,7 @@ export type GqlGetReservationQuery = {
       currentPrefecture?: GqlCurrentPrefecture | null;
       phoneNumber?: string | null;
       preferredLanguage?: GqlLanguage | null;
+      sysRole?: GqlSysRole | null;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
@@ -5744,6 +5782,7 @@ export type GqlGetReservationQuery = {
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
           preferredLanguage?: GqlLanguage | null;
+          sysRole?: GqlSysRole | null;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -5798,6 +5837,7 @@ export type GqlGetReservationQuery = {
         currentPrefecture?: GqlCurrentPrefecture | null;
         phoneNumber?: string | null;
         preferredLanguage?: GqlLanguage | null;
+        sysRole?: GqlSysRole | null;
         urlFacebook?: string | null;
         urlInstagram?: string | null;
         urlX?: string | null;
@@ -6028,6 +6068,7 @@ export type GqlGetPlacesQuery = {
               currentPrefecture?: GqlCurrentPrefecture | null;
               phoneNumber?: string | null;
               preferredLanguage?: GqlLanguage | null;
+              sysRole?: GqlSysRole | null;
               urlFacebook?: string | null;
               urlInstagram?: string | null;
               urlX?: string | null;
@@ -6107,6 +6148,7 @@ export type GqlGetPlaceQuery = {
         currentPrefecture?: GqlCurrentPrefecture | null;
         phoneNumber?: string | null;
         preferredLanguage?: GqlLanguage | null;
+        sysRole?: GqlSysRole | null;
         urlFacebook?: string | null;
         urlInstagram?: string | null;
         urlX?: string | null;
@@ -6142,6 +6184,7 @@ export type GqlGetPlaceQuery = {
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
           preferredLanguage?: GqlLanguage | null;
+          sysRole?: GqlSysRole | null;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -6256,6 +6299,7 @@ export type GqlGetTicketsQuery = {
               currentPrefecture?: GqlCurrentPrefecture | null;
               phoneNumber?: string | null;
               preferredLanguage?: GqlLanguage | null;
+              sysRole?: GqlSysRole | null;
               urlFacebook?: string | null;
               urlInstagram?: string | null;
               urlX?: string | null;
@@ -6761,6 +6805,7 @@ export const UserFieldsFragmentDoc = gql`
     currentPrefecture
     phoneNumber
     preferredLanguage
+    sysRole
     nftWallet {
       id
       walletAddress
@@ -7068,6 +7113,59 @@ export type GetCitiesSuspenseQueryHookResult = ReturnType<typeof useGetCitiesSus
 export type GetCitiesQueryResult = Apollo.QueryResult<
   GqlGetCitiesQuery,
   GqlGetCitiesQueryVariables
+>;
+export const CommunityCreateDocument = gql`
+  mutation CommunityCreate($input: CommunityCreateInput!) {
+    communityCreate(input: $input) {
+      ... on CommunityCreateSuccess {
+        community {
+          id
+          name
+          image
+        }
+      }
+    }
+  }
+`;
+export type GqlCommunityCreateMutationFn = Apollo.MutationFunction<
+  GqlCommunityCreateMutation,
+  GqlCommunityCreateMutationVariables
+>;
+
+/**
+ * __useCommunityCreateMutation__
+ *
+ * To run a mutation, you first call `useCommunityCreateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCommunityCreateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [communityCreateMutation, { data, loading, error }] = useCommunityCreateMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCommunityCreateMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlCommunityCreateMutation,
+    GqlCommunityCreateMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlCommunityCreateMutation, GqlCommunityCreateMutationVariables>(
+    CommunityCreateDocument,
+    options,
+  );
+}
+export type CommunityCreateMutationHookResult = ReturnType<typeof useCommunityCreateMutation>;
+export type CommunityCreateMutationResult = Apollo.MutationResult<GqlCommunityCreateMutation>;
+export type CommunityCreateMutationOptions = Apollo.BaseMutationOptions<
+  GqlCommunityCreateMutation,
+  GqlCommunityCreateMutationVariables
 >;
 export const UpdateSignupBonusConfigDocument = gql`
   mutation UpdateSignupBonusConfig($input: UpdateSignupBonusConfigInput!, $communityId: ID!) {

@@ -5,6 +5,7 @@ export const GET_CURRENT_USER_SERVER_QUERY = `
         id
         name
         preferredLanguage
+        sysRole
         identities {
           uid
           platform
@@ -32,6 +33,7 @@ export const FETCH_PROFILE_SERVER_QUERY = `
         bio
         currentPrefecture
         phoneNumber
+        sysRole
         urlFacebook
         urlInstagram
         urlX
