@@ -15,17 +15,15 @@ export function useCommunityCreate() {
     async (formData: CommunityFormData): Promise<string | undefined> => {
       const name = formData.name.trim();
       const accessToken = formData.lineAccessToken.trim();
-      const liffId = formData.lineLiffId.trim();
       const channelId = formData.lineChannelId.trim();
       const channelSecret = formData.lineChannelSecret.trim();
+      const liffId = formData.lineLiffId.trim();
       const originalId = formData.originalId.trim();
 
-      if (!validateForm(name, { accessToken, liffId, channelId, channelSecret })) {
+      if (!validateForm(name, { accessToken, channelId, channelSecret, liffId })) {
         return undefined;
       }
 
-      // TODO: バックエンドスキーマのchannelId/channelSecretは現在Messaging API用の名称だが
-      //       実態はLINE Login Channel ID/Secretを格納している。スキーマ更新後に名称を合わせる。
       const input: GqlCommunityCreateInput = {
         name,
         pointName: name,

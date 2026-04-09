@@ -7,7 +7,7 @@ type VerifyResult = VerifySuccess | VerifyFailure;
 const LINE_TOKEN_URL = "https://api.line.me/oauth2/v2.1/token";
 const LINE_REVOKE_URL = "https://api.line.me/oauth2/v2.1/revoke";
 
-async function issueAndRevokeToken(channelId: string, channelSecret: string): Promise<boolean> {
+async function issueToken(channelId: string, channelSecret: string): Promise<string | null> {
   const res = await fetch(LINE_TOKEN_URL, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -18,31 +18,30 @@ async function issueAndRevokeToken(channelId: string, channelSecret: string): Pr
     }),
   });
 
-  if (!res.ok) return false;
+  if (!res.ok) return null;
 
   const { access_token } = await res.json();
-  if (access_token) {
-    // 検証目的で発行したトークンは即時失効
-    await fetch(LINE_REVOKE_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({
-        client_id: channelId,
-        client_secret: channelSecret,
-        access_token,
-      }),
-    });
-  }
+  return access_token ?? null;
+}
 
-  return true;
+async function revokeToken(channelId: string, channelSecret: string, accessToken: string) {
+  await fetch(LINE_REVOKE_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      client_id: channelId,
+      client_secret: channelSecret,
+      access_token: accessToken,
+    }),
+  });
 }
 
 export async function POST(request: NextRequest): Promise<NextResponse<VerifyResult>> {
   let body: {
     accessToken?: string;
-    liffId?: string;
     channelId?: string;
     channelSecret?: string;
+    liffId?: string;
   };
 
   try {
@@ -54,16 +53,16 @@ export async function POST(request: NextRequest): Promise<NextResponse<VerifyRes
     );
   }
 
-  const { accessToken, liffId, channelId, channelSecret } = body;
+  const { accessToken, channelId, channelSecret } = body;
 
-  if (!accessToken || !liffId || !channelId || !channelSecret) {
+  if (!accessToken || !channelId || !channelSecret) {
     return NextResponse.json(
       { ok: false, failedCheck: "", error: "全てのフィールドを入力してください" },
       { status: 400 },
     );
   }
 
-  // Step 1: Access Token の有効性確認
+  // Step 1: Messaging API Access Token の有効性確認
   let botName = "LINE Bot";
   try {
     const res = await fetch("https://api.line.me/v2/bot/info", {
@@ -85,52 +84,27 @@ export async function POST(request: NextRequest): Promise<NextResponse<VerifyRes
     );
   }
 
-  // Step 2: LIFF ID の存在確認
+  // Step 2: Channel ID + Secret の有効性確認（トークン発行 → 即失効）
+  let issuedToken: string | null = null;
   try {
-    const res = await fetch("https://api.line.me/liff/v1/apps", {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
-    if (!res.ok) {
-      return NextResponse.json<VerifyResult>({
-        ok: false,
-        failedCheck: "lineLiffId",
-        error: "LIFF アプリの取得に失敗しました",
-      });
-    }
-    const data = await res.json();
-    const exists = (data.apps as { liffId: string }[] | undefined)?.some(
-      (app) => app.liffId === liffId,
-    );
-    if (!exists) {
-      return NextResponse.json<VerifyResult>({
-        ok: false,
-        failedCheck: "lineLiffId",
-        error: "LIFF ID が見つかりません",
-      });
-    }
+    issuedToken = await issueToken(channelId, channelSecret);
   } catch {
     return NextResponse.json<VerifyResult>(
-      { ok: false, failedCheck: "lineLiffId", error: "LIFF ID 確認中にエラーが発生しました" },
+      { ok: false, failedCheck: "lineChannelId", error: "Channel ID / Secret 確認中にエラーが発生しました" },
       { status: 500 },
     );
   }
 
-  // Step 3: LINE Login Channel ID + Secret の有効性確認（トークン発行 → 即失効）
-  try {
-    const ok = await issueAndRevokeToken(channelId, channelSecret);
-    if (!ok) {
-      return NextResponse.json<VerifyResult>({
-        ok: false,
-        failedCheck: "lineChannelSecret",
-        error: "LINE Login の Channel ID または Channel Secret が無効です",
-      });
-    }
-  } catch {
-    return NextResponse.json<VerifyResult>(
-      { ok: false, failedCheck: "lineChannelId", error: "LINE Login 確認中にエラーが発生しました" },
-      { status: 500 },
-    );
+  if (!issuedToken) {
+    return NextResponse.json<VerifyResult>({
+      ok: false,
+      failedCheck: "lineChannelSecret",
+      error: "Channel ID または Channel Secret が無効です",
+    });
   }
+
+  // 発行したトークンを即時失効（ベストエフォート）
+  revokeToken(channelId, channelSecret, issuedToken).catch(() => {});
 
   return NextResponse.json<VerifyResult>({ ok: true, botName });
 }

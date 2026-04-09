@@ -4,9 +4,9 @@ import { useState, useCallback } from "react";
 
 export type LineVerifyConfig = {
   accessToken: string;
+  channelId: string;
+  channelSecret: string;
   liffId: string;
-  channelId: string;    // LINE Login Channel ID
-  channelSecret: string; // LINE Login Channel Secret
 };
 
 type VerifyState =
@@ -32,9 +32,9 @@ export function useLineVerify() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           accessToken: config.accessToken.trim(),
-          liffId: config.liffId.trim(),
           channelId: config.channelId.trim(),
           channelSecret: config.channelSecret.trim(),
+          liffId: config.liffId.trim(),
         }),
       });
 
