@@ -23,9 +23,9 @@ type FieldConfig = {
 
 const LINE_FIELDS: FieldConfig[] = [
   { key: "lineAccessToken", errorKey: "lineAccessToken", label: "Access Token", placeholder: "Channel Access Token" },
+  { key: "lineChannelId", errorKey: "lineChannelId", label: "Channel ID", placeholder: "Messaging API Channel ID" },
+  { key: "lineChannelSecret", errorKey: "lineChannelSecret", label: "Channel Secret", placeholder: "Messaging API Channel Secret", type: "password" },
   { key: "lineLiffId", errorKey: "lineLiffId", label: "LIFF ID", placeholder: "LIFF App ID" },
-  { key: "lineChannelId", errorKey: "lineChannelId", label: "Channel ID", placeholder: "LINE Login Channel ID" },
-  { key: "lineChannelSecret", errorKey: "lineChannelSecret", label: "Channel Secret", placeholder: "LINE Login Channel Secret", type: "password" },
 ];
 
 function FieldRow({
@@ -65,9 +65,9 @@ export function LineConfigSection({ formData, onChange, errors, onClearError }: 
   const handleVerify = () => {
     verify({
       accessToken: formData.lineAccessToken,
-      liffId: formData.lineLiffId,
       channelId: formData.lineChannelId,
       channelSecret: formData.lineChannelSecret,
+      liffId: formData.lineLiffId,
     });
   };
 

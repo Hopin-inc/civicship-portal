@@ -6,17 +6,17 @@ export type CommunityFormData = {
 
   // LINE設定
   lineAccessToken: string;
+  lineChannelId: string;
+  lineChannelSecret: string;
   lineLiffId: string;
-  lineChannelId: string;    // LINE Login Channel ID
-  lineChannelSecret: string; // LINE Login Channel Secret
 };
 
 export type ValidationErrorField =
   | "name"
   | "lineAccessToken"
-  | "lineLiffId"
   | "lineChannelId"
-  | "lineChannelSecret";
+  | "lineChannelSecret"
+  | "lineLiffId";
 
 export type ValidationErrors = {
   [K in ValidationErrorField]?: string;

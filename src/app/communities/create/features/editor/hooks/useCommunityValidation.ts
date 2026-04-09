@@ -4,9 +4,9 @@ import { ValidationErrors, ValidationErrorField } from "../types/form";
 
 type LineConfigFields = {
   accessToken: string;
-  liffId: string;
   channelId: string;
   channelSecret: string;
+  liffId: string;
 };
 
 export function useCommunityValidation() {
@@ -22,14 +22,14 @@ export function useCommunityValidation() {
       if (!lineConfig.accessToken) {
         newErrors.lineAccessToken = "入力してください";
       }
-      if (!lineConfig.liffId) {
-        newErrors.lineLiffId = "入力してください";
-      }
       if (!lineConfig.channelId) {
         newErrors.lineChannelId = "入力してください";
       }
       if (!lineConfig.channelSecret) {
         newErrors.lineChannelSecret = "入力してください";
+      }
+      if (!lineConfig.liffId) {
+        newErrors.lineLiffId = "入力してください";
       }
 
       setErrors(newErrors);
