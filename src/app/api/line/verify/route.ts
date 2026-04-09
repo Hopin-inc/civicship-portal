@@ -22,11 +22,11 @@ export async function POST(request: NextRequest): Promise<NextResponse<VerifyRes
     );
   }
 
-  const { accessToken, channelId, channelSecret } = body;
+  const { accessToken } = body;
 
-  if (!accessToken || !channelId || !channelSecret) {
+  if (!accessToken) {
     return NextResponse.json(
-      { ok: false, failedCheck: "", error: "全てのフィールドを入力してください" },
+      { ok: false, failedCheck: "lineAccessToken", error: "Access Token を入力してください" },
       { status: 400 },
     );
   }
@@ -49,33 +49,6 @@ export async function POST(request: NextRequest): Promise<NextResponse<VerifyRes
   } catch {
     return NextResponse.json<VerifyResult>(
       { ok: false, failedCheck: "lineAccessToken", error: "Access Token 確認中にエラーが発生しました" },
-      { status: 500 },
-    );
-  }
-
-  // Step 2: Access Token の client_id と入力 channelId を照合
-  try {
-    const res = await fetch(
-      `https://api.line.me/oauth2/v2.1/verify?access_token=${encodeURIComponent(accessToken)}`,
-    );
-    if (!res.ok) {
-      return NextResponse.json<VerifyResult>({
-        ok: false,
-        failedCheck: "lineAccessToken",
-        error: "Access Token の検証に失敗しました",
-      });
-    }
-    const data = await res.json();
-    if (data.client_id !== channelId) {
-      return NextResponse.json<VerifyResult>({
-        ok: false,
-        failedCheck: "lineChannelId",
-        error: "Access Token と Channel ID が一致しません",
-      });
-    }
-  } catch {
-    return NextResponse.json<VerifyResult>(
-      { ok: false, failedCheck: "lineChannelId", error: "Channel ID 確認中にエラーが発生しました" },
       { status: 500 },
     );
   }
