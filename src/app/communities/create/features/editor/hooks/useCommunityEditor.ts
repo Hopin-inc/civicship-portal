@@ -9,11 +9,9 @@ const initialFormData: CommunityFormData = {
   name: "",
   imageFile: null,
   lineAccessToken: "",
+  lineLiffId: "",
   lineChannelId: "",
   lineChannelSecret: "",
-  lineLiffId: "",
-  lineLoginChannelId: "",
-  lineLoginChannelSecret: "",
 };
 
 export function useCommunityEditor() {

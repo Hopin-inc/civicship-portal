@@ -21,16 +21,11 @@ type FieldConfig = {
   type?: string;
 };
 
-const MESSAGING_API_FIELDS: FieldConfig[] = [
+const LINE_FIELDS: FieldConfig[] = [
   { key: "lineAccessToken", errorKey: "lineAccessToken", label: "Access Token", placeholder: "Channel Access Token" },
-  { key: "lineChannelId", errorKey: "lineChannelId", label: "Channel ID", placeholder: "Channel ID" },
-  { key: "lineChannelSecret", errorKey: "lineChannelSecret", label: "Channel Secret", placeholder: "Channel Secret", type: "password" },
   { key: "lineLiffId", errorKey: "lineLiffId", label: "LIFF ID", placeholder: "LIFF App ID" },
-];
-
-const LINE_LOGIN_FIELDS: FieldConfig[] = [
-  { key: "lineLoginChannelId", errorKey: "lineLoginChannelId", label: "Channel ID", placeholder: "LINE Login Channel ID" },
-  { key: "lineLoginChannelSecret", errorKey: "lineLoginChannelSecret", label: "Channel Secret", placeholder: "LINE Login Channel Secret", type: "password" },
+  { key: "lineChannelId", errorKey: "lineChannelId", label: "Channel ID", placeholder: "LINE Login Channel ID" },
+  { key: "lineChannelSecret", errorKey: "lineChannelSecret", label: "Channel Secret", placeholder: "LINE Login Channel Secret", type: "password" },
 ];
 
 function FieldRow({
@@ -70,57 +65,32 @@ export function LineConfigSection({ formData, onChange, errors, onClearError }: 
   const handleVerify = () => {
     verify({
       accessToken: formData.lineAccessToken,
+      liffId: formData.lineLiffId,
       channelId: formData.lineChannelId,
       channelSecret: formData.lineChannelSecret,
-      liffId: formData.lineLiffId,
-      loginChannelId: formData.lineLoginChannelId,
-      loginChannelSecret: formData.lineLoginChannelSecret,
     });
   };
 
   return (
-    <section className="space-y-4">
-      {/* Messaging API */}
-      <div className="space-y-2">
-        <div className="flex items-center gap-2 px-1">
-          <span className="text-sm text-muted-foreground">Messaging API</span>
-          <span className="text-primary text-xs font-bold bg-primary-foreground px-1 py-0.5 rounded">
-            必須
-          </span>
-        </div>
-        {MESSAGING_API_FIELDS.map((field) => (
-          <FieldRow
-            key={field.key as string}
-            field={field}
-            value={formData[field.key] as string}
-            errorMsg={errors?.[field.errorKey]}
-            onChange={onChange}
-            onClearError={onClearError}
-          />
-        ))}
+    <section className="space-y-2">
+      <div className="flex items-center gap-2 px-1">
+        <span className="text-sm text-muted-foreground">LINE設定</span>
+        <span className="text-primary text-xs font-bold bg-primary-foreground px-1 py-0.5 rounded">
+          必須
+        </span>
       </div>
 
-      {/* LINE Login */}
-      <div className="space-y-2">
-        <div className="flex items-center gap-2 px-1">
-          <span className="text-sm text-muted-foreground">LINE Login</span>
-          <span className="text-primary text-xs font-bold bg-primary-foreground px-1 py-0.5 rounded">
-            必須
-          </span>
-        </div>
-        {LINE_LOGIN_FIELDS.map((field) => (
-          <FieldRow
-            key={field.key as string}
-            field={field}
-            value={formData[field.key] as string}
-            errorMsg={errors?.[field.errorKey]}
-            onChange={onChange}
-            onClearError={onClearError}
-          />
-        ))}
-      </div>
+      {LINE_FIELDS.map((field) => (
+        <FieldRow
+          key={field.key as string}
+          field={field}
+          value={formData[field.key] as string}
+          errorMsg={errors?.[field.errorKey]}
+          onChange={onChange}
+          onClearError={onClearError}
+        />
+      ))}
 
-      {/* 接続確認 */}
       <div className="flex items-center gap-3 pt-1">
         <Button
           type="button"

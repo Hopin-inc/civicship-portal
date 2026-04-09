@@ -4,11 +4,9 @@ import { useState, useCallback } from "react";
 
 export type LineVerifyConfig = {
   accessToken: string;
-  channelId: string;
-  channelSecret: string;
   liffId: string;
-  loginChannelId: string;
-  loginChannelSecret: string;
+  channelId: string;    // LINE Login Channel ID
+  channelSecret: string; // LINE Login Channel Secret
 };
 
 type VerifyState =
@@ -21,11 +19,8 @@ export function useLineVerify() {
   const [state, setState] = useState<VerifyState>({ status: "idle" });
 
   const verify = useCallback(async (config: LineVerifyConfig) => {
-    const { accessToken, channelId, channelSecret, liffId, loginChannelId, loginChannelSecret } =
-      config;
-
-    if (!accessToken.trim()) {
-      setState({ status: "error", message: "Access Token を入力してください", failedCheck: "accessToken" });
+    if (!config.accessToken.trim()) {
+      setState({ status: "error", message: "Access Token を入力してください", failedCheck: "lineAccessToken" });
       return;
     }
 
@@ -36,12 +31,10 @@ export function useLineVerify() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          accessToken: accessToken.trim(),
-          channelId: channelId.trim(),
-          channelSecret: channelSecret.trim(),
-          liffId: liffId.trim(),
-          loginChannelId: loginChannelId.trim(),
-          loginChannelSecret: loginChannelSecret.trim(),
+          accessToken: config.accessToken.trim(),
+          liffId: config.liffId.trim(),
+          channelId: config.channelId.trim(),
+          channelSecret: config.channelSecret.trim(),
         }),
       });
 
