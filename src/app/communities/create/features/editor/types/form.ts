@@ -4,11 +4,15 @@ export type CommunityFormData = {
   name: string;
   imageFile: File | null;
 
-  // LINE設定
+  // Messaging API
   lineAccessToken: string;
   lineChannelId: string;
   lineChannelSecret: string;
   lineLiffId: string;
+
+  // LINE Login
+  lineLoginChannelId: string;
+  lineLoginChannelSecret: string;
 };
 
 export type ValidationErrorField =
@@ -16,7 +20,9 @@ export type ValidationErrorField =
   | "lineAccessToken"
   | "lineChannelId"
   | "lineChannelSecret"
-  | "lineLiffId";
+  | "lineLiffId"
+  | "lineLoginChannelId"
+  | "lineLoginChannelSecret";
 
 export type ValidationErrors = {
   [K in ValidationErrorField]?: string;

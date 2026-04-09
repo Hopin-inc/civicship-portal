@@ -7,6 +7,8 @@ type LineConfigFields = {
   channelId: string;
   channelSecret: string;
   liffId: string;
+  loginChannelId: string;
+  loginChannelSecret: string;
 };
 
 export function useCommunityValidation() {
@@ -30,6 +32,12 @@ export function useCommunityValidation() {
       }
       if (!lineConfig.liffId) {
         newErrors.lineLiffId = "入力してください";
+      }
+      if (!lineConfig.loginChannelId) {
+        newErrors.lineLoginChannelId = "入力してください";
+      }
+      if (!lineConfig.loginChannelSecret) {
+        newErrors.lineLoginChannelSecret = "入力してください";
       }
 
       setErrors(newErrors);

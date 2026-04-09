@@ -12,6 +12,8 @@ const initialFormData: CommunityFormData = {
   lineChannelId: "",
   lineChannelSecret: "",
   lineLiffId: "",
+  lineLoginChannelId: "",
+  lineLoginChannelSecret: "",
 };
 
 export function useCommunityEditor() {

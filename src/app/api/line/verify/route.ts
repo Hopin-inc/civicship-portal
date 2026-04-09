@@ -1,40 +1,183 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(request: NextRequest) {
-  let accessToken: string;
+type VerifySuccess = { ok: true; botName: string };
+type VerifyFailure = { ok: false; failedCheck: string; error: string };
+type VerifyResult = VerifySuccess | VerifyFailure;
 
-  try {
-    const body = await request.json();
-    accessToken = body.accessToken;
-  } catch {
-    return NextResponse.json({ ok: false, error: "Invalid request body" }, { status: 400 });
-  }
+const LINE_TOKEN_URL = "https://api.line.me/oauth2/v2.1/token";
+const LINE_REVOKE_URL = "https://api.line.me/oauth2/v2.1/revoke";
 
-  if (!accessToken || typeof accessToken !== "string") {
-    return NextResponse.json({ ok: false, error: "accessToken is required" }, { status: 400 });
-  }
+async function issueAndRevokeToken(
+  channelId: string,
+  channelSecret: string,
+): Promise<{ ok: boolean }> {
+  const res = await fetch(LINE_TOKEN_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      grant_type: "client_credentials",
+      client_id: channelId,
+      client_secret: channelSecret,
+    }),
+  });
 
-  try {
-    const response = await fetch("https://api.line.me/v2/bot/info", {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
+  if (!res.ok) return { ok: false };
+
+  const { access_token } = await res.json();
+  if (access_token) {
+    // 検証目的で発行したトークンは即時失効
+    await fetch(LINE_REVOKE_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        client_id: channelId,
+        client_secret: channelSecret,
+        access_token,
+      }),
     });
+  }
 
-    if (!response.ok) {
-      const data = await response.json().catch(() => ({}));
-      return NextResponse.json(
-        { ok: false, error: data.message ?? `LINE API returned ${response.status}` },
-        { status: 502 },
-      );
-    }
+  return { ok: true };
+}
 
-    const data = await response.json();
-    return NextResponse.json({ ok: true, botName: data.displayName ?? data.basicId });
-  } catch (error) {
+export async function POST(request: NextRequest): Promise<NextResponse<VerifyResult>> {
+  let body: {
+    accessToken?: string;
+    channelId?: string;
+    channelSecret?: string;
+    liffId?: string;
+    loginChannelId?: string;
+    loginChannelSecret?: string;
+  };
+
+  try {
+    body = await request.json();
+  } catch {
     return NextResponse.json(
-      { ok: false, error: error instanceof Error ? error.message : "Network error" },
+      { ok: false, failedCheck: "", error: "Invalid request body" },
+      { status: 400 },
+    );
+  }
+
+  const { accessToken, channelId, channelSecret, liffId, loginChannelId, loginChannelSecret } =
+    body;
+
+  if (
+    !accessToken ||
+    !channelId ||
+    !channelSecret ||
+    !liffId ||
+    !loginChannelId ||
+    !loginChannelSecret
+  ) {
+    return NextResponse.json(
+      { ok: false, failedCheck: "", error: "全てのフィールドを入力してください" },
+      { status: 400 },
+    );
+  }
+
+  // Step 1: Access Token の有効性確認 + Channel ID との照合
+  try {
+    const res = await fetch(
+      `https://api.line.me/oauth2/v2.1/verify?access_token=${encodeURIComponent(accessToken)}`,
+    );
+    if (!res.ok) {
+      return NextResponse.json<VerifyResult>({
+        ok: false,
+        failedCheck: "lineAccessToken",
+        error: "Access Token が無効です",
+      });
+    }
+    const data = await res.json();
+    if (data.client_id !== channelId) {
+      return NextResponse.json<VerifyResult>({
+        ok: false,
+        failedCheck: "lineChannelId",
+        error: "Access Token と Channel ID が一致しません",
+      });
+    }
+  } catch {
+    return NextResponse.json<VerifyResult>(
+      { ok: false, failedCheck: "lineAccessToken", error: "Access Token 確認中にエラーが発生しました" },
       { status: 500 },
     );
+  }
+
+  // Step 2: Channel Secret の有効性確認（トークン発行 → 即失効）
+  try {
+    const { ok } = await issueAndRevokeToken(channelId, channelSecret);
+    if (!ok) {
+      return NextResponse.json<VerifyResult>({
+        ok: false,
+        failedCheck: "lineChannelSecret",
+        error: "Channel Secret が無効です",
+      });
+    }
+  } catch {
+    return NextResponse.json<VerifyResult>(
+      { ok: false, failedCheck: "lineChannelSecret", error: "Channel Secret 確認中にエラーが発生しました" },
+      { status: 500 },
+    );
+  }
+
+  // Step 3: LIFF ID の存在確認
+  try {
+    const res = await fetch("https://api.line.me/liff/v1/apps", {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    if (!res.ok) {
+      return NextResponse.json<VerifyResult>({
+        ok: false,
+        failedCheck: "lineLiffId",
+        error: "LIFF アプリの取得に失敗しました",
+      });
+    }
+    const data = await res.json();
+    const exists = (data.apps as { liffId: string }[] | undefined)?.some(
+      (app) => app.liffId === liffId,
+    );
+    if (!exists) {
+      return NextResponse.json<VerifyResult>({
+        ok: false,
+        failedCheck: "lineLiffId",
+        error: "LIFF ID が見つかりません",
+      });
+    }
+  } catch {
+    return NextResponse.json<VerifyResult>(
+      { ok: false, failedCheck: "lineLiffId", error: "LIFF ID 確認中にエラーが発生しました" },
+      { status: 500 },
+    );
+  }
+
+  // Step 4: LINE Login Channel の有効性確認（トークン発行 → 即失効）
+  try {
+    const { ok } = await issueAndRevokeToken(loginChannelId, loginChannelSecret);
+    if (!ok) {
+      return NextResponse.json<VerifyResult>({
+        ok: false,
+        failedCheck: "lineLoginChannelSecret",
+        error: "LINE Login の Channel ID または Channel Secret が無効です",
+      });
+    }
+  } catch {
+    return NextResponse.json<VerifyResult>(
+      { ok: false, failedCheck: "lineLoginChannelId", error: "LINE Login 確認中にエラーが発生しました" },
+      { status: 500 },
+    );
+  }
+
+  // 全チェック通過 — Bot 名を取得
+  try {
+    const res = await fetch("https://api.line.me/v2/bot/info", {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    const data = await res.json();
+    return NextResponse.json<VerifyResult>({
+      ok: true,
+      botName: data.displayName ?? data.basicId ?? "LINE Bot",
+    });
+  } catch {
+    return NextResponse.json<VerifyResult>({ ok: true, botName: "LINE Bot" });
   }
 }

@@ -13,65 +13,121 @@ interface LineConfigSectionProps {
   onClearError?: (field: keyof ValidationErrors) => void;
 }
 
-type LineFieldKey = Extract<
-  keyof CommunityFormData,
-  "lineAccessToken" | "lineChannelId" | "lineChannelSecret" | "lineLiffId"
->;
+type FieldConfig = {
+  key: keyof CommunityFormData;
+  errorKey: ValidationErrorField;
+  label: string;
+  placeholder: string;
+  type?: string;
+};
 
-const LINE_FIELDS: { key: LineFieldKey; label: string; placeholder: string; type?: string }[] = [
-  { key: "lineAccessToken", label: "Access Token", placeholder: "Channel Access Token" },
-  { key: "lineChannelId", label: "Channel ID", placeholder: "Channel ID" },
-  { key: "lineChannelSecret", label: "Channel Secret", placeholder: "Channel Secret", type: "password" },
-  { key: "lineLiffId", label: "LIFF ID", placeholder: "LIFF App ID" },
+const MESSAGING_API_FIELDS: FieldConfig[] = [
+  { key: "lineAccessToken", errorKey: "lineAccessToken", label: "Access Token", placeholder: "Channel Access Token" },
+  { key: "lineChannelId", errorKey: "lineChannelId", label: "Channel ID", placeholder: "Channel ID" },
+  { key: "lineChannelSecret", errorKey: "lineChannelSecret", label: "Channel Secret", placeholder: "Channel Secret", type: "password" },
+  { key: "lineLiffId", errorKey: "lineLiffId", label: "LIFF ID", placeholder: "LIFF App ID" },
 ];
 
-const ERROR_FIELD_MAP: Partial<Record<LineFieldKey, ValidationErrorField>> = {
-  lineAccessToken: "lineAccessToken",
-  lineChannelId: "lineChannelId",
-  lineChannelSecret: "lineChannelSecret",
-  lineLiffId: "lineLiffId",
-};
+const LINE_LOGIN_FIELDS: FieldConfig[] = [
+  { key: "lineLoginChannelId", errorKey: "lineLoginChannelId", label: "Channel ID", placeholder: "LINE Login Channel ID" },
+  { key: "lineLoginChannelSecret", errorKey: "lineLoginChannelSecret", label: "Channel Secret", placeholder: "LINE Login Channel Secret", type: "password" },
+];
+
+function FieldRow({
+  field,
+  value,
+  errorMsg,
+  onChange,
+  onClearError,
+}: {
+  field: FieldConfig;
+  value: string;
+  errorMsg?: string;
+  onChange: (key: keyof CommunityFormData, value: string) => void;
+  onClearError?: (key: ValidationErrorField) => void;
+}) {
+  return (
+    <div className="space-y-1">
+      <span className="text-sm text-muted-foreground px-1">{field.label}</span>
+      <Input
+        value={value}
+        onChange={(e) => {
+          onChange(field.key, e.target.value);
+          if (errorMsg) onClearError?.(field.errorKey);
+        }}
+        placeholder={field.placeholder}
+        type={field.type}
+        className={`placeholder:text-sm ${errorMsg ? "border-destructive focus-visible:ring-destructive" : ""}`}
+      />
+      {errorMsg && <p className="text-xs text-destructive px-1">{errorMsg}</p>}
+    </div>
+  );
+}
 
 export function LineConfigSection({ formData, onChange, errors, onClearError }: LineConfigSectionProps) {
   const { state, verify } = useLineVerify();
 
+  const handleVerify = () => {
+    verify({
+      accessToken: formData.lineAccessToken,
+      channelId: formData.lineChannelId,
+      channelSecret: formData.lineChannelSecret,
+      liffId: formData.lineLiffId,
+      loginChannelId: formData.lineLoginChannelId,
+      loginChannelSecret: formData.lineLoginChannelSecret,
+    });
+  };
+
   return (
-    <section className="space-y-2">
-      <div className="flex items-center gap-2 px-1">
-        <span className="text-sm text-muted-foreground">LINE設定</span>
-        <span className="text-primary text-xs font-bold bg-primary-foreground px-1 py-0.5 rounded">
-          必須
-        </span>
+    <section className="space-y-4">
+      {/* Messaging API */}
+      <div className="space-y-2">
+        <div className="flex items-center gap-2 px-1">
+          <span className="text-sm text-muted-foreground">Messaging API</span>
+          <span className="text-primary text-xs font-bold bg-primary-foreground px-1 py-0.5 rounded">
+            必須
+          </span>
+        </div>
+        {MESSAGING_API_FIELDS.map((field) => (
+          <FieldRow
+            key={field.key as string}
+            field={field}
+            value={formData[field.key] as string}
+            errorMsg={errors?.[field.errorKey]}
+            onChange={onChange}
+            onClearError={onClearError}
+          />
+        ))}
       </div>
 
-      {LINE_FIELDS.map(({ key, label, placeholder, type }) => {
-        const errorKey = ERROR_FIELD_MAP[key];
-        const errorMsg = errorKey ? errors?.[errorKey] : undefined;
-        return (
-          <div key={key} className="space-y-1">
-            <span className="text-sm text-muted-foreground px-1">{label}</span>
-            <Input
-              value={formData[key] as string}
-              onChange={(e) => {
-                onChange(key, e.target.value);
-                if (errorKey && errorMsg) onClearError?.(errorKey);
-              }}
-              placeholder={placeholder}
-              type={type}
-              className={`placeholder:text-sm ${errorMsg ? "border-destructive focus-visible:ring-destructive" : ""}`}
-            />
-            {errorMsg && <p className="text-xs text-destructive px-1">{errorMsg}</p>}
-          </div>
-        );
-      })}
+      {/* LINE Login */}
+      <div className="space-y-2">
+        <div className="flex items-center gap-2 px-1">
+          <span className="text-sm text-muted-foreground">LINE Login</span>
+          <span className="text-primary text-xs font-bold bg-primary-foreground px-1 py-0.5 rounded">
+            必須
+          </span>
+        </div>
+        {LINE_LOGIN_FIELDS.map((field) => (
+          <FieldRow
+            key={field.key as string}
+            field={field}
+            value={formData[field.key] as string}
+            errorMsg={errors?.[field.errorKey]}
+            onChange={onChange}
+            onClearError={onClearError}
+          />
+        ))}
+      </div>
 
+      {/* 接続確認 */}
       <div className="flex items-center gap-3 pt-1">
         <Button
           type="button"
           variant="outline"
           size="sm"
           disabled={state.status === "loading"}
-          onClick={() => verify(formData.lineAccessToken)}
+          onClick={handleVerify}
         >
           {state.status === "loading" ? (
             <Loader2 className="h-4 w-4 animate-spin" />

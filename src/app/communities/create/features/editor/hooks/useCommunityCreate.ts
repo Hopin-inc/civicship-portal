@@ -19,11 +19,23 @@ export function useCommunityCreate() {
       const channelSecret = formData.lineChannelSecret.trim();
       const liffId = formData.lineLiffId.trim();
       const originalId = formData.originalId.trim();
+      const loginChannelId = formData.lineLoginChannelId.trim();
+      const loginChannelSecret = formData.lineLoginChannelSecret.trim();
 
-      if (!validateForm(name, { accessToken, channelId, channelSecret, liffId })) {
+      if (
+        !validateForm(name, {
+          accessToken,
+          channelId,
+          channelSecret,
+          liffId,
+          loginChannelId,
+          loginChannelSecret,
+        })
+      ) {
         return undefined;
       }
 
+      // TODO: lineLoginChannelId / lineLoginChannelSecret はバックエンドスキーマ対応後に追加
       const input: GqlCommunityCreateInput = {
         name,
         pointName: name,
