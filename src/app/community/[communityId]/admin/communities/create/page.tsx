@@ -1,15 +1,24 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useMemo } from "react";
 import { CommunityFormEditor } from "./features/editor/components/CommunityFormEditor";
-import { CommunityEditorLayout } from "./features/editor/components/CommunityEditorLayout";
+import useHeaderConfig from "@/hooks/useHeaderConfig";
 
 export default function CreateCommunityPage() {
   const router = useRouter();
 
+  const headerConfig = useMemo(
+    () => ({
+      title: "コミュニティを作成",
+      showLogo: false,
+      showBackButton: true,
+    }),
+    [],
+  );
+  useHeaderConfig(headerConfig);
+
   return (
-    <CommunityEditorLayout>
-      <CommunityFormEditor onSuccess={(id) => router.push(`/community/${id}/users/me`)} />
-    </CommunityEditorLayout>
+    <CommunityFormEditor onSuccess={(id) => router.push(`/community/${id}/users/me`)} />
   );
 }
