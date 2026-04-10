@@ -44,14 +44,9 @@ const requestLink = setContext(async (operation, prevContext) => {
         throw new Error("認証情報を読み込み中です。少し待ってから再度お試しください");
       }
 
+      // firebaseUser または lineTokens.idToken（exchange 経由）のいずれかが必要
       if (!firebaseUser && !lineTokens.idToken) {
-        if (authenticationState === "unauthenticated") {
-          // 明示的に未認証 → エラー
-          throw new Error("認証情報が取得できませんでした。ページをリロードしてください");
-        }
-        // SSR で認証済みだがクライアント側トークンなし（community コンテキスト外など）
-        // → セッション cookie ベース認証にフォールバック
-        authMode = "session";
+        throw new Error("認証情報が取得できませんでした。ページをリロードしてください");
       }
     }
 
