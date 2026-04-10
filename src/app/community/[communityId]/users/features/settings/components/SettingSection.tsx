@@ -9,8 +9,6 @@ import { useTranslations } from "next-intl";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { useUserProfileContext } from "@/app/community/[communityId]/users/features/shared/contexts/UserProfileContext";
 import { GqlSysRole } from "@/types/graphql";
-import Link from "next/link";
-
 export default function SettingSection() {
   const t = useTranslations();
   const communityConfig = useCommunityConfig();
@@ -42,15 +40,15 @@ export default function SettingSection() {
               <PlusCircle className="w-5 h-5" />
               <span className="font-bold text-sm">コミュニティを作成</span>
             </div>
-            <Link
-              href="/communities/create"
+            <AppLink
+              href="/admin/communities/create"
               className={cn(
                 buttonVariants({ variant: "tertiary", size: "sm" }),
                 "ml-auto text-black w-24",
               )}
             >
               作成
-            </Link>
+            </AppLink>
           </div>
         )}
 
