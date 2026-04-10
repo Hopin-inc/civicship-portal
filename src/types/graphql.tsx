@@ -216,6 +216,11 @@ export type GqlCommonDocumentOverrides = {
   terms?: Maybe<GqlCommunityDocument>;
 };
 
+export type GqlCommonDocumentOverridesInput = {
+  privacy?: InputMaybe<GqlCommunityDocumentInput>;
+  terms?: InputMaybe<GqlCommunityDocumentInput>;
+};
+
 export type GqlCommunitiesConnection = {
   __typename?: "CommunitiesConnection";
   edges?: Maybe<Array<GqlCommunityEdge>>;
@@ -253,6 +258,7 @@ export type GqlCommunityConfig = {
 
 export type GqlCommunityConfigInput = {
   lineConfig?: InputMaybe<GqlCommunityLineConfigInput>;
+  portalConfig?: InputMaybe<GqlCommunityPortalConfigInput>;
 };
 
 export type GqlCommunityCreateInput = {
@@ -290,6 +296,14 @@ export type GqlCommunityDocument = {
   type: Scalars["String"]["output"];
 };
 
+export type GqlCommunityDocumentInput = {
+  id: Scalars["String"]["input"];
+  order?: InputMaybe<Scalars["Int"]["input"]>;
+  path: Scalars["String"]["input"];
+  title: Scalars["String"]["input"];
+  type: Scalars["String"]["input"];
+};
+
 export type GqlCommunityEdge = GqlEdge & {
   __typename?: "CommunityEdge";
   cursor: Scalars["String"]["output"];
@@ -322,6 +336,7 @@ export type GqlCommunityLineConfigInput = {
   accessToken: Scalars["String"]["input"];
   channelId: Scalars["String"]["input"];
   channelSecret: Scalars["String"]["input"];
+  liffAppId?: InputMaybe<Scalars["String"]["input"]>;
   liffBaseUrl: Scalars["String"]["input"];
   liffId: Scalars["String"]["input"];
   richMenus: Array<GqlCommunityLineRichMenuConfigInput>;
@@ -361,6 +376,25 @@ export type GqlCommunityPortalConfig = {
   squareLogoPath: Scalars["String"]["output"];
   title: Scalars["String"]["output"];
   tokenName: Scalars["String"]["output"];
+};
+
+export type GqlCommunityPortalConfigInput = {
+  adminRootPath?: InputMaybe<Scalars["String"]["input"]>;
+  commonDocumentOverrides?: InputMaybe<GqlCommonDocumentOverridesInput>;
+  description?: InputMaybe<Scalars["String"]["input"]>;
+  documents?: InputMaybe<Array<GqlCommunityDocumentInput>>;
+  domain?: InputMaybe<Scalars["String"]["input"]>;
+  enableFeatures?: InputMaybe<Array<Scalars["String"]["input"]>>;
+  faviconPrefix?: InputMaybe<Scalars["String"]["input"]>;
+  logoPath?: InputMaybe<Scalars["String"]["input"]>;
+  ogImagePath?: InputMaybe<Scalars["String"]["input"]>;
+  regionKey?: InputMaybe<Scalars["String"]["input"]>;
+  regionName?: InputMaybe<Scalars["String"]["input"]>;
+  rootPath?: InputMaybe<Scalars["String"]["input"]>;
+  shortDescription?: InputMaybe<Scalars["String"]["input"]>;
+  squareLogoPath?: InputMaybe<Scalars["String"]["input"]>;
+  title?: InputMaybe<Scalars["String"]["input"]>;
+  tokenName?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type GqlCommunitySignupBonusConfig = {
@@ -909,6 +943,7 @@ export type GqlMutation = {
   transactionDonateSelfPoint?: Maybe<GqlTransactionDonateSelfPointPayload>;
   transactionGrantCommunityPoint?: Maybe<GqlTransactionGrantCommunityPointPayload>;
   transactionIssueCommunityPoint?: Maybe<GqlTransactionIssueCommunityPointPayload>;
+  updatePortalConfig: GqlCommunityPortalConfig;
   updateSignupBonusConfig: GqlCommunitySignupBonusConfig;
   userDeleteMe?: Maybe<GqlUserDeletePayload>;
   userSignUp?: Maybe<GqlCurrentUserPayload>;
@@ -1150,6 +1185,11 @@ export type GqlMutationTransactionGrantCommunityPointArgs = {
 
 export type GqlMutationTransactionIssueCommunityPointArgs = {
   input: GqlTransactionIssueCommunityPointInput;
+  permission: GqlCheckCommunityPermissionInput;
+};
+
+export type GqlMutationUpdatePortalConfigArgs = {
+  input: GqlCommunityPortalConfigInput;
   permission: GqlCheckCommunityPermissionInput;
 };
 
