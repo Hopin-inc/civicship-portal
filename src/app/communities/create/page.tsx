@@ -9,7 +9,7 @@ export default function CreateCommunityPage() {
 
   return (
     <CommunityEditorLayout>
-      <CommunityFormEditor onSuccess={(id) => router.push(`/community/${id}/admin`)} />
+      <CommunityFormEditor onSuccess={(id) => router.push(`/community/${id}/users/me`)} />
     </CommunityEditorLayout>
   );
 }
