@@ -22,14 +22,22 @@ async function resolveServerHeaders(
     const { headers, cookies } = await import("next/headers");
 
     // X-Community-Id が未設定の場合、headers() から自動取得
+    // ミドルウェアがスキップされるパス（/communities/* 等）ではヘッダーがないため Cookie にフォールバック
     const hasCommunityId = Object.keys(resolved).some(
       (key) => key.toLowerCase() === "x-community-id"
     );
     if (!hasCommunityId) {
       const headersList = await headers();
-      const communityId = headersList.get("x-community-id");
-      if (communityId) {
-        resolved["X-Community-Id"] = communityId;
+      const communityIdFromHeader = headersList.get("x-community-id");
+      if (communityIdFromHeader) {
+        resolved["X-Community-Id"] = communityIdFromHeader;
+      } else {
+        // ミドルウェアがスキップされた場合（/communities/* など）は Cookie から取得
+        const cookieStore = await cookies();
+        const communityIdFromCookie = cookieStore.get("x-community-id")?.value;
+        if (communityIdFromCookie) {
+          resolved["X-Community-Id"] = communityIdFromCookie;
+        }
       }
     }
 

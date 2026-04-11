@@ -16,6 +16,7 @@ const EXCLUDED_REDIRECT_PATTERNS = [
   "/images",    // 静的アセット
   "/communities", // コミュニティアセット
   "/icons",     // アイコン
+  "/create",    // コミュニティ作成ページ（SYS_ADMIN 専用）
 ];
 
 export async function middleware(request: NextRequest) {
