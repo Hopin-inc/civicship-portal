@@ -42,7 +42,7 @@ export default function WalletPage() {
   useHeaderConfig(headerConfig);
   const handleNavigateToIssue = () => router.push("/admin/wallet/issue");
   const handleNavigateToGrant = () =>
-    router.push(`/admin/wallet/grant?currentPoint=${currentPoint}&tab=history`);
+    router.push("/admin/wallet/grant?tab=history");
 
   const {
     data: walletData,

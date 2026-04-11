@@ -1,12 +1,12 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthProvider";
-import { useSearchParams } from "next/navigation";
 import { DonateUserSelect } from "@/app/community/[communityId]/wallets/features/donate/components";
 import TransferInputStep from "@/app/community/[communityId]/admin/wallet/grant/components/TransferInputStep";
 import { useDonateFlow } from "@/app/community/[communityId]/wallets/features/donate/hooks/useDonateFlow";
 import { useDonateMembers } from "@/app/community/[communityId]/wallets/features/donate/hooks/useDonateMembers";
 import { Tabs } from "@/app/community/[communityId]/admin/wallet/grant/types/tabs";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";
@@ -16,16 +16,22 @@ import {
   GqlRole,
   GqlMembershipStatus,
   GqlMembershipStatusReason,
+  useGetUserFlexibleQuery,
 } from "@/types/graphql";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
-export default function DonatePointPageClient() {
+interface DonatePointPageClientProps {
+  initialCurrentPoint: string;
+}
+
+export default function DonatePointPageClient({ initialCurrentPoint }: DonatePointPageClientProps) {
   const t = useTranslations();
   const { user } = useAuth();
   const communityConfig = useCommunityConfig();
   const communityId = communityConfig?.communityId ?? "";
   const searchParams = useSearchParams();
-  const currentPoint = BigInt(searchParams.get("currentPoint") ?? "0");
+  const recipientId = searchParams.get("recipientId");
+  const currentPoint = BigInt(initialCurrentPoint);
   const [activeTab, setActiveTab] = useState<Tabs>(Tabs.History);
 
   // Grant と同じパターン: Client Component でデータ取得
@@ -67,6 +73,32 @@ export default function DonatePointPageClient() {
     user,
     currentPoint,
   );
+
+  const [notFoundInMembers, setNotFoundInMembers] = useState(false);
+  const lastProcessedRecipientId = useRef<string | null>(null);
+  useEffect(() => {
+    if (!recipientId || loading || lastProcessedRecipientId.current === recipientId) return;
+    lastProcessedRecipientId.current = recipientId;
+    setNotFoundInMembers(false);
+    const found = members.find((m) => m.user.id === recipientId);
+    if (found) {
+      setSelectedUser(found.user);
+    } else {
+      setNotFoundInMembers(true);
+    }
+  }, [recipientId, loading, members, setSelectedUser]);
+
+  const { data: fallbackUserData } = useGetUserFlexibleQuery({
+    variables: { id: recipientId ?? "", withDidIssuanceRequests: true },
+    skip: !notFoundInMembers || !recipientId || recipientId === user?.id,
+  });
+  const lastSetFallbackId = useRef<string | null>(null);
+  useEffect(() => {
+    if (fallbackUserData?.user && lastSetFallbackId.current !== fallbackUserData.user.id) {
+      lastSetFallbackId.current = fallbackUserData.user.id;
+      setSelectedUser(fallbackUserData.user);
+    }
+  }, [fallbackUserData, setSelectedUser]);
 
   if (loading) {
     return <LoadingIndicator />;
