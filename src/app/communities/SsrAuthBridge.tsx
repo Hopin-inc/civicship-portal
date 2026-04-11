@@ -70,6 +70,7 @@ export function SsrAuthBridge({
         });
         useAuthStore.getState().setState({
           firebaseUser: user,
+          authenticationState: "line_authenticated",
           lineTokens: {
             idToken,
             refreshToken: user.refreshToken,
