@@ -22,7 +22,7 @@ export function CommunityEditorLayout({ children }: CommunityEditorLayoutProps) 
           <h1 className="text-title-sm truncate max-w-[80vw] text-center">コミュニティを作成</h1>
         </div>
       </header>
-      <main className="px-6 max-w-mobile-l mx-auto">{children}</main>
+      <main className="pt-16 px-6 max-w-mobile-l mx-auto">{children}</main>
     </div>
   );
 }
