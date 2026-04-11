@@ -1,15 +1,14 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "react-toastify";
-import { useCommunityCreateMutation, GqlCommunityCreateInput } from "@/types/graphql";
 import { CommunityFormData } from "../types/form";
 import { useCommunityValidation } from "./useCommunityValidation";
+import { createCommunityAction } from "../actions/communityCreate";
 
 export function useCommunityCreate() {
   const { errors, validateForm, clearError } = useCommunityValidation();
-
-  const [communityCreate, { loading }] = useCommunityCreateMutation();
+  const [saving, setSaving] = useState(false);
 
   const handleSave = useCallback(
     async (formData: CommunityFormData): Promise<string | undefined> => {
@@ -24,42 +23,34 @@ export function useCommunityCreate() {
         return undefined;
       }
 
-      const input: GqlCommunityCreateInput = {
-        name,
-        pointName: name,
-        image: formData.imageFile ? { file: formData.imageFile } : undefined,
-        originalId: originalId || undefined,
-        config: {
-          lineConfig: {
-            accessToken,
-            channelId,
-            channelSecret,
-            liffBaseUrl: `https://liff.line.me/${liffId}`,
-            liffId,
-            richMenus: [],
-          },
-        },
-      };
-
+      setSaving(true);
       try {
-        const result = await communityCreate({ variables: { input } });
-        const community = result.data?.communityCreate?.community ?? null;
+        const result = await createCommunityAction({
+          name,
+          originalId: originalId || undefined,
+          lineAccessToken: accessToken,
+          lineChannelId: channelId,
+          lineChannelSecret: channelSecret,
+          lineLiffId: liffId,
+        });
 
-        if (!community) {
-          toast.error("コミュニティの作成に失敗しました");
+        if (result.error) {
+          toast.error(result.error);
           return undefined;
         }
 
         toast.success("コミュニティを作成しました");
-        return community.id;
+        return result.communityId;
       } catch (error) {
         console.error(error);
         toast.error("コミュニティの作成に失敗しました");
         return undefined;
+      } finally {
+        setSaving(false);
       }
     },
-    [validateForm, communityCreate],
+    [validateForm],
   );
 
-  return { handleSave, saving: loading, errors, clearError };
+  return { handleSave, saving, errors, clearError };
 }
