@@ -1,19 +1,17 @@
 import { ReactNode } from "react";
-import { cookies } from "next/headers";
 import ApolloProvider from "@/components/providers/ApolloProvider";
 import { Toaster } from "@/components/ui/toast";
 import { getCommunityConfig } from "@/lib/communities/config";
 import { SsrAuthBridge } from "./SsrAuthBridge";
+import { headers } from "next/headers";
 
-export default async function CommunitiesLayout({ children }: { children: ReactNode }) {
-  // /communities/* はミドルウェアがスキップされるため X-Community-Id ヘッダーが付かない。
-  // Cookie から communityId を取得して firebaseTenantId を解決する。
-  const cookieStore = await cookies();
-  const communityId = cookieStore.get("x-community-id")?.value ?? null;
+export default async function CreateLayout({ children }: { children: ReactNode }) {
+  // ミドルウェアが X-Community-Id ヘッダーをセットするため、headers() から取得できる
+  const headersList = await headers();
+  const communityId = headersList.get("x-community-id") ?? null;
 
   let firebaseTenantId: string | null = null;
   if (communityId) {
-    // getCommunityConfig は communityId を GraphQL 変数として渡すためヘッダー不要
     const config = await getCommunityConfig(communityId);
     firebaseTenantId = config?.firebaseTenantId ?? null;
   }
