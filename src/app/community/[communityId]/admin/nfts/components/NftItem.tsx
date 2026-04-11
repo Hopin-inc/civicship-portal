@@ -2,7 +2,7 @@
 
 import { Item, ItemContent, ItemFooter, ItemTitle } from "@/components/ui/item";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
+import { SafeImage } from "@/components/ui/safe-image";
 import { PLACEHOLDER_IMAGE } from "@/utils";
 import { getNftImageUrl } from "@/lib/nfts/image-helper";
 
@@ -62,12 +62,13 @@ export function NftItem({ nftInstance }: NftItemProps) {
 
         {/* --- RIGHT IMAGE (正方形) --- */}
         <div className="shrink-0 w-14 h-14 overflow-hidden rounded-md relative bg-muted">
-          <Image
-            src={imageUrl!}
+          <SafeImage
+            src={imageUrl}
             alt={nftInstance.name || "NFT"}
             fill
             className="object-cover"
             sizes="56px"
+            fallbackSrc={PLACEHOLDER_IMAGE}
           />
         </div>
       </a>
