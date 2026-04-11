@@ -94,7 +94,6 @@
     "remark-parse": "^11.0.0",
     "remark-rehype": "^11.1.2",
     "retry": "^0.13.1",
-    "sharp": "^0.34.5",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
     "undici": "^7.22.0",
@@ -159,8 +158,7 @@
       "lodash": ">=4.17.23",
       "mdast-util-to-hast": ">=13.2.1",
       "axios": "1.14.0"
-    },
-    "onlyBuiltDependencies": ["sharp"]
+    }
   },
   "engines": {
     "node": ">=20.18.1"

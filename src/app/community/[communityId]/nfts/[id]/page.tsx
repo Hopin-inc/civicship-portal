@@ -4,8 +4,7 @@ import { useGetNftInstanceWithDidQuery } from "@/types/graphql";
 import { ErrorState, InfoCard } from "@/components/shared";
 import { InfoCardProps } from "@/types";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { SafeImage } from "@/components/ui/safe-image";
-import { PLACEHOLDER_IMAGE } from "@/utils";
+import Image from "next/image";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { Button } from "@/components/ui/button";
 import { useNftDetailData } from "./lib/useNftDetailData";
@@ -88,13 +87,12 @@ export default function NftPage({ params }: { params: Promise<{ id: string }> })
     <>
       <div className="flex justify-center mt-10">
         <div>
-          <SafeImage
+          <Image
             src={getNftImageUrl(basic.imageUrl, basic.instanceId, basic.communityId)}
             alt={basic.instanceName ?? "証明書"}
             width={120}
             height={120}
             className="object-cover border-none shadow-none mx-auto rounded-sm"
-            fallbackSrc={PLACEHOLDER_IMAGE}
           />
           <h1 className="text-title-sm font-bold w-[70%] mx-auto mt-4 text-center">
             {basic.instanceName}
