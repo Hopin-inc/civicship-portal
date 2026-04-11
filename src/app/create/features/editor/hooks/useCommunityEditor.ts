@@ -7,7 +7,6 @@ import { useCommunityCreate } from "./useCommunityCreate";
 const initialFormData: CommunityFormData = {
   originalId: "",
   name: "",
-  imageFile: null,
   lineAccessToken: "",
   lineChannelId: "",
   lineChannelSecret: "",

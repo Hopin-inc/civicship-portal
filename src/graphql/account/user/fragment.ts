@@ -9,7 +9,6 @@ export const USER_FRAGMENT = gql`
     currentPrefecture
     phoneNumber
     preferredLanguage
-    sysRole
     nftWallet {
       id
       walletAddress
