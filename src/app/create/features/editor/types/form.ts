@@ -2,7 +2,6 @@ export type CommunityFormData = {
   // 基本情報
   originalId: string;
   name: string;
-  imageFile: File | null;
 
   // LINE設定
   lineAccessToken: string;
