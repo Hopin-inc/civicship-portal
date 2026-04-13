@@ -147,7 +147,7 @@ function TransferInputStep({
   }
 
   return (
-    <div className="flex flex-col h-[calc(100dvh-4rem)] overflow-hidden">
+    <div className="fixed inset-x-0 top-16 bottom-0 flex flex-col overflow-hidden bg-background">
       {/* 金額入力エリア（60%） */}
       <div className="flex-[3] flex flex-col items-center justify-center gap-4 px-4">
         <div className="flex flex-col items-center gap-1">
