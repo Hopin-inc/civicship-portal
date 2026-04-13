@@ -117,6 +117,13 @@ export async function middleware(request: NextRequest) {
   });
 
   // 3. DBから動的設定を取得（存在しないコミュニティは404）
+  // /create はコミュニティスコープ外のため DB 設定チェックをスキップ
+  if (pathname === "/create" || pathname.startsWith("/create/")) {
+    const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
+    setSecurityHeaders(res, nonce);
+    return res;
+  }
+
   const config = await fetchCommunityConfigForEdge(communityId);
   if (!config) {
     console.warn("[Middleware] Community not found in DB", { communityId, host, pathname });
