@@ -21,6 +21,7 @@ export type TranslationKey =
   | "adminWallet.grant.submit"
   | "adminWallet.grant.success"
   | "adminWallet.grant.title"
+  | "adminWallet.issue.errorGeneric"
   | "adminWallet.issue.submit"
   | "adminWallet.issue.success"
   | "adminWallet.issue.title"

@@ -75,7 +75,7 @@ export default function IssuePointPage() {
         router.push("/admin/wallet?refresh=true");
       }
     } catch {
-      toast.error(t("adminWallet.issue.validation.max"));
+      toast.error(t("adminWallet.issue.errorGeneric"));
     } finally {
       setIsLoading(false);
     }
