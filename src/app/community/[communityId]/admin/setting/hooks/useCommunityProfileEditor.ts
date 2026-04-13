@@ -1,60 +1,67 @@
 "use client";
 
 import { useState, useEffect, FormEvent } from "react";
+import { useMutation } from "@apollo/client";
 import { toast } from "react-toastify";
 import { useTranslations } from "next-intl";
+import { UPDATE_PORTAL_CONFIG } from "@/graphql/account/community/mutation";
 import {
-  useCommunityUpdateProfileMutation,
-  useGetCommunityProfileQuery,
+  useGetCommunityPortalConfigQuery,
+  GqlCommunityPortalConfig,
+  GqlMutationUpdatePortalConfigArgs,
 } from "@/types/graphql";
 
 interface FormState {
-  name: string;
-  pointName: string;
-  bio: string;
-  website: string;
-  establishedAt: string;
+  title: string;
+  description: string;
+  shortDescription: string;
+  tokenName: string;
+  logoPath: string;
+  squareLogoPath: string;
 }
 
 interface FormErrors {
-  name?: string;
-  pointName?: string;
+  title?: string;
+  tokenName?: string;
 }
 
 export function useCommunityProfileEditor(communityId: string | undefined) {
   const t = useTranslations();
 
-  const { data, loading: queryLoading } = useGetCommunityProfileQuery({
-    variables: { id: communityId ?? "" },
+  const { data, loading: queryLoading } = useGetCommunityPortalConfigQuery({
+    variables: { communityId: communityId ?? "" },
     skip: !communityId,
   });
 
   const [formState, setFormState] = useState<FormState>({
-    name: "",
-    pointName: "",
-    bio: "",
-    website: "",
-    establishedAt: "",
+    title: "",
+    description: "",
+    shortDescription: "",
+    tokenName: "",
+    logoPath: "",
+    squareLogoPath: "",
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
 
   useEffect(() => {
-    if (data?.community) {
-      const c = data.community;
+    if (data?.communityPortalConfig) {
+      const c = data.communityPortalConfig as GqlCommunityPortalConfig;
       setFormState({
-        name: c.name ?? "",
-        pointName: c.pointName ?? "",
-        bio: c.bio ?? "",
-        website: c.website ?? "",
-        establishedAt: c.establishedAt
-          ? new Date(c.establishedAt).toISOString().split("T")[0]
-          : "",
+        title: c.title ?? "",
+        description: c.description ?? "",
+        shortDescription: c.shortDescription ?? "",
+        tokenName: c.tokenName ?? "",
+        logoPath: c.logoPath ?? "",
+        squareLogoPath: c.squareLogoPath ?? "",
       });
     }
   }, [data]);
 
-  const [updateProfile, { loading: saving }] = useCommunityUpdateProfileMutation();
+  const [updatePortalConfig, { loading: saving }] = useMutation<
+    { updatePortalConfig: GqlCommunityPortalConfig },
+    GqlMutationUpdatePortalConfigArgs
+  >(UPDATE_PORTAL_CONFIG);
 
   function updateField<K extends keyof FormState>(key: K, value: FormState[K]) {
     setFormState((prev) => ({ ...prev, [key]: value }));
@@ -65,11 +72,11 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
 
   function validate(): boolean {
     const newErrors: FormErrors = {};
-    if (!formState.name.trim()) {
-      newErrors.name = t("adminSetting.form.error.nameRequired");
+    if (!formState.title.trim()) {
+      newErrors.title = t("adminSetting.form.error.titleRequired");
     }
-    if (!formState.pointName.trim()) {
-      newErrors.pointName = t("adminSetting.form.error.pointNameRequired");
+    if (!formState.tokenName.trim()) {
+      newErrors.tokenName = t("adminSetting.form.error.tokenNameRequired");
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -80,18 +87,16 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
     if (!communityId || !validate()) return;
 
     try {
-      await updateProfile({
+      await updatePortalConfig({
         variables: {
-          id: communityId,
           communityId,
           input: {
-            name: formState.name.trim(),
-            pointName: formState.pointName.trim(),
-            bio: formState.bio.trim() || undefined,
-            website: formState.website.trim() || undefined,
-            establishedAt: formState.establishedAt
-              ? new Date(formState.establishedAt)
-              : undefined,
+            title: formState.title.trim(),
+            tokenName: formState.tokenName.trim(),
+            description: formState.description.trim() || undefined,
+            shortDescription: formState.shortDescription.trim() || undefined,
+            logoPath: formState.logoPath.trim() || undefined,
+            squareLogoPath: formState.squareLogoPath.trim() || undefined,
           },
         },
       });

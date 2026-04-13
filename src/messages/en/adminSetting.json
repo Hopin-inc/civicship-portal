@@ -1,14 +1,15 @@
 {
   "adminSetting.page.title": "Community Settings",
-  "adminSetting.form.name": "Community Name",
-  "adminSetting.form.pointName": "Point Name",
-  "adminSetting.form.bio": "Description",
-  "adminSetting.form.website": "Website",
-  "adminSetting.form.establishedAt": "Established Date",
+  "adminSetting.form.title": "Title",
+  "adminSetting.form.description": "Description",
+  "adminSetting.form.shortDescription": "Short Description",
+  "adminSetting.form.tokenName": "Token Name",
+  "adminSetting.form.logoPath": "Logo Image Path",
+  "adminSetting.form.squareLogoPath": "Square Logo Image Path",
   "adminSetting.form.submit": "Save",
   "adminSetting.form.saving": "Saving...",
-  "adminSetting.form.success": "Community information updated",
-  "adminSetting.form.error.nameRequired": "Community name is required",
-  "adminSetting.form.error.pointNameRequired": "Point name is required",
+  "adminSetting.form.success": "Community settings updated",
+  "adminSetting.form.error.titleRequired": "Title is required",
+  "adminSetting.form.error.tokenNameRequired": "Token name is required",
   "adminSetting.form.error.submit": "Failed to update. Please try again"
 }
