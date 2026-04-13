@@ -2,17 +2,15 @@
 
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { GqlDidIssuanceStatus, GqlUser } from "@/types/graphql";
+import { GqlUser } from "@/types/graphql";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { HeaderConfig } from "@/contexts/HeaderContext";
 import { toast } from "react-toastify";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/textarea";
-import { truncateText } from "@/utils/stringUtils";
 import { useTranslations } from "next-intl";
-import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from "@/components/ui/item";
-import { useNumberInput } from "@/hooks/useNumberInput";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Delete } from "lucide-react";
 
 interface Props {
   user: GqlUser;
@@ -29,23 +27,27 @@ interface Props {
 
 const INT_LIMIT = 2000000000;
 
+const NUMPAD_KEYS = [
+  ["1", "2", "3"],
+  ["4", "5", "6"],
+  ["7", "8", "9"],
+  ["AC", "0", "backspace"],
+] as const;
+
 function TransferInputStep({
   user,
   currentPoint,
   isLoading,
   isAuthReady = true,
-  onBack,
   onSubmit,
   title,
   submitLabel,
-  backLabel,
   amountLabel,
 }: Props) {
   const t = useTranslations();
 
   const finalTitle = title ?? t("wallets.shared.transfer.pageTitle");
   const finalSubmitLabel = submitLabel ?? t("wallets.shared.transfer.submitLabel");
-  const finalBackLabel = backLabel ?? t("wallets.shared.transfer.backLabel");
 
   const headerConfig: HeaderConfig = useMemo(
     () => ({
@@ -57,132 +59,133 @@ function TransferInputStep({
   );
   useHeaderConfig(headerConfig);
 
-  const didValue = user.didIssuanceRequests?.find(
-    (req) => req?.status === GqlDidIssuanceStatus.Completed,
-  )?.didValue;
+  const [inputStr, setInputStr] = useState("");
+  const [comment, setComment] = useState("");
+  const [sheetOpen, setSheetOpen] = useState(false);
 
-  const [amount, setAmount] = useState<number>(0);
-  const [comment, setComment] = useState<string>("");
+  const numericAmount = parseInt(inputStr || "0", 10);
+  const maxAmount = Math.min(Number(currentPoint), INT_LIMIT);
+  const isAmountValid = numericAmount > 0 && numericAmount <= maxAmount;
 
-  // useNumberInput フックを使用
-  const amountInput = useNumberInput({
-    value: amount,
-    onChange: (newValue: number) => {
-      setAmount(newValue);
-    },
-    onMaxExceeded: () => {
-      // どちらの制限に引っかかったか判定
-      if (Number(currentPoint) < INT_LIMIT) {
-        toast.error(t("wallets.shared.transfer.errorExceedsBalance"));
-      } else {
-        toast.error(t("wallets.shared.transfer.errorExceedsLimit"));
-      }
-    },
-    min: 1,
-    max: Math.min(Number(currentPoint), INT_LIMIT),
-    defaultValue: 1,
-  });
+  const handleKey = (key: string) => {
+    if (key === "AC") {
+      setInputStr("");
+      return;
+    }
+    if (key === "backspace") {
+      setInputStr((prev) => prev.slice(0, -1));
+      return;
+    }
+    const next = String(parseInt((inputStr || "") + key, 10));
+    const parsed = parseInt(next, 10);
+    if (parsed > Number(currentPoint)) {
+      toast.error(t("wallets.shared.transfer.errorExceedsBalance"));
+      return;
+    }
+    if (parsed > INT_LIMIT) {
+      toast.error(t("wallets.shared.transfer.errorExceedsLimit"));
+      return;
+    }
+    setInputStr(next);
+  };
 
   return (
     <>
-      <main className="flex items-center justify-center px-4">
-        <div className="flex flex-col space-y-6 max-w-xl w-full">
-          {/* 送付相手（確認情報） */}
-          <div className="flex flex-col items-center gap-2 w-full text-center">
-            <Avatar className="w-10 h-10 rounded-full border">
-              <AvatarImage src={user.image || ""} alt={user.name || ""} />
-              <AvatarFallback>{user.name?.[0] ?? "U"}</AvatarFallback>
-            </Avatar>
+      {/* Colored header section */}
+      <div className="bg-primary flex flex-col items-center justify-center gap-4 px-4 py-8 min-h-[45vh]">
+        <div className="flex flex-col items-center gap-1">
+          <Avatar className="w-10 h-10 border-2 border-white/30">
+            <AvatarImage src={user.image || ""} alt={user.name || ""} />
+            <AvatarFallback className="bg-primary-foreground/20 text-white text-sm">
+              {user.name?.[0] ?? "U"}
+            </AvatarFallback>
+          </Avatar>
+          <p className="text-sm text-primary-foreground/80">
+            {t("wallets.shared.transfer.sendTo", {
+              name: user.name ?? t("adminWallet.common.notSet"),
+            })}
+          </p>
+        </div>
 
-            <div className="flex flex-col gap-1">
-              <div className="text-sm font-medium">
-                {t("wallets.shared.transfer.sendTo", { name: user.name ?? t("adminWallet.common.notSet") })}
-              </div>
+        <div className="flex items-baseline gap-2">
+          <span className="text-6xl font-bold text-white tabular-nums tracking-tight">
+            {numericAmount.toLocaleString()}
+          </span>
+          <span className="text-2xl text-primary-foreground/70 font-medium">pt</span>
+        </div>
 
-              {didValue && (
-                <div className="text-xs text-muted-foreground">
-                  {truncateText(didValue, 20, "middle")}
-                </div>
-              )}
+        <p className="text-xs text-primary-foreground/60">
+          {t("wallets.shared.transfer.balance")} {currentPoint.toLocaleString()} pt
+        </p>
+
+        <Button
+          onClick={() => setSheetOpen(true)}
+          disabled={!isAmountValid}
+          className="bg-white text-primary hover:bg-white/90 font-semibold px-10 mt-2"
+        >
+          {t("wallets.shared.transfer.nextLabel")}
+        </Button>
+      </div>
+
+      {/* Numpad */}
+      <div className="bg-background px-6 pt-5 pb-6">
+        <div className="grid grid-cols-3 gap-3 max-w-xs mx-auto">
+          {NUMPAD_KEYS.flat().map((key) => (
+            <button
+              key={key}
+              onClick={() => handleKey(key)}
+              className="flex items-center justify-center h-16 rounded-2xl bg-muted text-xl font-semibold text-foreground active:bg-muted/60 transition-colors select-none"
+            >
+              {key === "backspace" ? <Delete className="w-5 h-5" /> : key}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Confirmation bottom sheet */}
+      <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+        <SheetContent side="bottom" className="rounded-t-2xl max-h-[80vh]">
+          <SheetHeader className="mb-4">
+            <SheetTitle>{t("wallets.shared.transfer.commentLabel")}</SheetTitle>
+          </SheetHeader>
+
+          <div className="flex flex-col gap-4">
+            <div className="flex justify-between items-center py-3 border-b text-sm">
+              <span className="text-muted-foreground">
+                {amountLabel ?? t("wallets.shared.transfer.amountLabel")}
+              </span>
+              <span className="font-semibold">{numericAmount.toLocaleString()} pt</span>
             </div>
-          </div>
 
-          {/* ポイント数（条件） */}
-          <div className="space-y-3 w-full">
-            <Item size="sm" variant={"outline"}>
-              <ItemContent>
-                <ItemTitle>{amountLabel ?? t("wallets.shared.transfer.amountLabel")}</ItemTitle>
-                <ItemDescription className="text-xs text-muted-foreground">
-                  {t("wallets.shared.transfer.balance")} {currentPoint.toLocaleString()} pt
-                </ItemDescription>
-              </ItemContent>
-              <ItemActions>
-                <Input
-                  type="number"
-                  min="1"
-                  value={amountInput.displayValue}
-                  onChange={amountInput.handleChange}
-                  onBlur={amountInput.handleBlur}
-                  onFocus={(e) => e.target.select()}
-                  autoFocus
-                  className="w-32 text-right"
-                />
-                <span className="text-sm text-muted-foreground">pt</span>
-              </ItemActions>
-            </Item>
-          </div>
-
-          {/* コメント */}
-          <div className="w-full">
-            <div className="text-sm font-medium mb-3">
-              {t("wallets.shared.transfer.commentLabel")}
-            </div>
             <div className="relative">
               <Textarea
                 maxLength={100}
                 placeholder={t("wallets.shared.transfer.commentPlaceholder")}
                 value={comment}
                 onChange={(e) => {
-                  const newValue = e.target.value;
-                  if (newValue.length > 100) {
+                  if (e.target.value.length > 100) {
                     toast.error(t("wallets.shared.transfer.commentError"));
                     return;
                   }
-                  setComment(newValue);
+                  setComment(e.target.value);
                 }}
-                className="focus:outline-none focus:ring-0 shadow-none min-h-[160px] pr-12"
+                className="focus:outline-none focus:ring-0 shadow-none min-h-[120px] pr-12 resize-none"
               />
               <div className="absolute bottom-2 right-2 text-xs text-muted-foreground">
                 {comment.length}/100
               </div>
             </div>
-          </div>
 
-          {/* ボタン */}
-          <div className="flex flex-col gap-2 w-full">
             <Button
-              onClick={() => {
-                if (amount > 0 && amount <= Number(currentPoint)) {
-                  onSubmit(amount, comment.trim() || undefined);
-                }
-              }}
-              disabled={
-                amount <= 0 ||
-                amount > Number(currentPoint) ||
-                amount > INT_LIMIT ||
-                isLoading ||
-                !isAuthReady
-              }
+              onClick={() => onSubmit(numericAmount, comment.trim() || undefined)}
+              disabled={isLoading || !isAuthReady}
               className="w-full"
             >
               {finalSubmitLabel}
             </Button>
-            <Button variant="text" size="sm" onClick={onBack} className="w-full">
-              {finalBackLabel}
-            </Button>
           </div>
-        </div>
-      </main>
+        </SheetContent>
+      </Sheet>
     </>
   );
 }
