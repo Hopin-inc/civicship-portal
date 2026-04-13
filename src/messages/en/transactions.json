@@ -82,5 +82,7 @@
   "transactions.detail.editSheet.photoLimit": "You can add up to {max} photos",
   "transactions.detail.editSheet.saveSuccess": "Updated",
   "transactions.detail.editSheet.saveError": "Failed to update",
-  "transactions.detail.editSheet.removePhoto": "Remove photo {index}"
+  "transactions.detail.editSheet.removePhoto": "Remove photo {index}",
+  "transactions.detail.editSheet.imageLoadError": "Failed to load an existing image. Please try again.",
+  "transactions.detail.photo": "Photo {index}/{total}"
 }

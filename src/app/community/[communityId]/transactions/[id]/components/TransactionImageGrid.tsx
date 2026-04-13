@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 interface Props {
   images: string[];
 }
@@ -13,13 +15,15 @@ interface Props {
  *   4枚以上: 2×2グリッド（+N バッジ付き）
  */
 export function TransactionImageGrid({ images }: Props) {
+  const t = useTranslations();
   const count = images.length;
+  const alt = (i: number) => t("transactions.detail.photo", { index: i + 1, total: count });
 
   if (count === 1) {
     return (
       <div className="aspect-[4/3] w-full overflow-hidden rounded-xl">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={images[0]} alt="" className="h-full w-full object-cover" />
+        <img src={images[0]} alt={alt(0)} className="h-full w-full object-cover" />
       </div>
     );
   }
@@ -30,7 +34,7 @@ export function TransactionImageGrid({ images }: Props) {
         {images.map((url, i) => (
           <div key={i} className="aspect-square overflow-hidden rounded-xl">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={url} alt="" className="h-full w-full object-cover" />
+            <img src={url} alt={alt(i)} className="h-full w-full object-cover" />
           </div>
         ))}
       </div>
@@ -42,13 +46,13 @@ export function TransactionImageGrid({ images }: Props) {
       <div className="flex flex-col gap-1">
         <div className="aspect-[2/1] overflow-hidden rounded-xl">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={images[0]} alt="" className="h-full w-full object-cover" />
+          <img src={images[0]} alt={alt(0)} className="h-full w-full object-cover" />
         </div>
         <div className="grid grid-cols-2 gap-1">
           {images.slice(1).map((url, i) => (
             <div key={i} className="aspect-square overflow-hidden rounded-xl">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={url} alt="" className="h-full w-full object-cover" />
+              <img src={url} alt={alt(i + 1)} className="h-full w-full object-cover" />
             </div>
           ))}
         </div>
@@ -65,7 +69,7 @@ export function TransactionImageGrid({ images }: Props) {
       {displayed.map((url, i) => (
         <div key={i} className="relative aspect-square overflow-hidden rounded-xl">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={url} alt="" className="h-full w-full object-cover" />
+          <img src={url} alt={alt(i)} className="h-full w-full object-cover" />
           {i === 3 && remaining > 0 && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-xl">
               <span className="text-xl font-bold text-white">+{remaining}</span>

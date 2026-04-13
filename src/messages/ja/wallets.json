@@ -34,7 +34,7 @@
   "wallets.shared.transfer.required": "必須",
   "wallets.shared.transfer.balance": "残高",
   "wallets.shared.transfer.commentLabel": "メッセージ",
-  "wallets.shared.transfer.commentPlaceholder": "メッセージを入力して下さい",
+  "wallets.shared.transfer.commentPlaceholder": "メッセージを入力してください",
   "wallets.shared.transfer.nextLabel": "次へ",
   "wallets.shared.transfer.addPhoto": "写真を追加",
   "wallets.shared.transfer.removePhoto": "写真{index}を削除",

@@ -20,11 +20,19 @@ interface Props {
   onSuccess: () => void;
 }
 
-async function urlToFile(url: string): Promise<File> {
-  const res = await fetch(url);
-  const blob = await res.blob();
-  const fileName = url.split("/").pop()?.split("?")[0] ?? "image.jpg";
-  return new File([blob], fileName, { type: blob.type });
+async function urlToFile(url: string, onError: (msg: string) => void): Promise<File> {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}`);
+    }
+    const blob = await res.blob();
+    const fileName = url.split("/").pop()?.split("?")[0] ?? "image.jpg";
+    return new File([blob], fileName, { type: blob.type });
+  } catch (error) {
+    onError(url);
+    throw error instanceof Error ? error : new Error("Failed to reconstruct existing image");
+  }
 }
 
 export function TransactionMetadataEditSheet({
@@ -87,7 +95,11 @@ export function TransactionMetadataEditSheet({
 
       let images: File[] | undefined;
       if (hasImageChanges) {
-        const keptFiles = await Promise.all(existingImages.map(urlToFile));
+        const keptFiles = await Promise.all(
+          existingImages.map((url) =>
+            urlToFile(url, () => toast.error(t("transactions.detail.editSheet.imageLoadError"))),
+          ),
+        );
         images = [...keptFiles, ...newImages];
       }
 
@@ -143,7 +155,7 @@ export function TransactionMetadataEditSheet({
                   <button
                     type="button"
                     aria-label={t("transactions.detail.editSheet.removePhoto", { index: i + 1 })}
-                    onClick={() => setExistingImages((prev) => prev.filter((u) => u !== url))}
+                    onClick={() => setExistingImages((prev) => prev.filter((_, idx) => idx !== i))}
                     className="absolute -top-1 -right-1 w-5 h-5 bg-foreground text-background rounded-full flex items-center justify-center"
                   >
                     <X className="w-3 h-3" aria-hidden="true" />
