@@ -67,5 +67,16 @@
   "transactions.detail.verification.rootHash": "ルートハッシュ",
   "transactions.detail.verification.result": "この交換内容は、後から変更されていません",
   "transactions.detail.verification.resultDescription": "ブロックチェーン上の記録と照合し、内容が書き換えられていないことを確認しています。",
-  "transactions.detail.verification.openExplorer": "ブロックチェーンで確認"
+  "transactions.detail.verification.openExplorer": "ブロックチェーンで確認",
+  "transactions.detail.actions.edit": "編集",
+  "transactions.detail.actions.addMessage": "メッセージを追加",
+  "transactions.detail.editSheet.title": "メッセージを編集",
+  "transactions.detail.editSheet.placeholder": "メッセージを入力してください",
+  "transactions.detail.editSheet.save": "保存",
+  "transactions.detail.editSheet.saving": "保存中...",
+  "transactions.detail.editSheet.addPhoto": "写真を追加",
+  "transactions.detail.editSheet.photoLimit": "画像は{max}枚まで追加できます",
+  "transactions.detail.editSheet.saveSuccess": "更新しました",
+  "transactions.detail.editSheet.saveError": "更新に失敗しました",
+  "transactions.detail.editSheet.removePhoto": "写真{index}を削除"
 }

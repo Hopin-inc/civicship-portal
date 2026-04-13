@@ -71,5 +71,16 @@
   "transactions.detail.verification.rootHash": "Root Hash",
   "transactions.detail.verification.result": "This exchange content has not been modified",
   "transactions.detail.verification.resultDescription": "The content has been verified by cross-checking it with records stored on the blockchain.",
-  "transactions.detail.verification.openExplorer": "View on blockchain"
+  "transactions.detail.verification.openExplorer": "View on blockchain",
+  "transactions.detail.actions.edit": "Edit",
+  "transactions.detail.actions.addMessage": "Add message",
+  "transactions.detail.editSheet.title": "Edit Message",
+  "transactions.detail.editSheet.placeholder": "Enter your message",
+  "transactions.detail.editSheet.save": "Save",
+  "transactions.detail.editSheet.saving": "Saving...",
+  "transactions.detail.editSheet.addPhoto": "Add photo",
+  "transactions.detail.editSheet.photoLimit": "You can add up to {max} photos",
+  "transactions.detail.editSheet.saveSuccess": "Updated",
+  "transactions.detail.editSheet.saveError": "Failed to update",
+  "transactions.detail.editSheet.removePhoto": "Remove photo {index}"
 }

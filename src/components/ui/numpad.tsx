@@ -24,10 +24,12 @@ function Numpad({ onKey, className }: NumpadProps) {
         {NUMPAD_KEYS.flat().map((key) => (
           <button
             key={key}
+            type="button"
             onClick={() => onKey(key)}
+            aria-label={key === "backspace" ? "Backspace" : undefined}
             className="flex items-center justify-center w-full h-full rounded-2xl bg-background text-xl font-semibold text-foreground active:bg-muted transition-colors select-none shadow-sm"
           >
-            {key === "backspace" ? <Delete className="w-6 h-6" aria-label="Backspace" /> : key}
+            {key === "backspace" ? <Delete className="w-6 h-6" aria-hidden="true" /> : key}
           </button>
         ))}
       </div>

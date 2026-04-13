@@ -96,10 +96,12 @@ function TransferInputStep({
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
+    if (images.length + files.length > MAX_IMAGES) {
+      toast.error(t("wallets.shared.transfer.photoLimit", { max: MAX_IMAGES }));
+    }
     setImages((prev) => {
       const combined = [...prev, ...files];
       if (combined.length > MAX_IMAGES) {
-        toast.error(t("wallets.shared.transfer.photoLimit", { max: MAX_IMAGES }));
         return combined.slice(0, MAX_IMAGES);
       }
       return combined;
@@ -188,14 +190,16 @@ function TransferInputStep({
                 <div key={i} className="relative w-20 h-20 shrink-0">
                   <img
                     src={url}
-                    alt={`preview-${i}`}
+                    alt=""
                     className="w-full h-full object-cover rounded-xl"
                   />
                   <button
+                    type="button"
+                    aria-label={t("wallets.shared.transfer.removePhoto", { index: i + 1 })}
                     onClick={() => removeImage(i)}
                     className="absolute -top-1 -right-1 w-5 h-5 bg-foreground text-background rounded-full flex items-center justify-center"
                   >
-                    <X className="w-3 h-3" />
+                    <X className="w-3 h-3" aria-hidden="true" />
                   </button>
                 </div>
               ))}
