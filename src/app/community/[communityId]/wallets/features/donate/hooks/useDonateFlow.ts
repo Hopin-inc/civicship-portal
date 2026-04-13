@@ -32,7 +32,7 @@ export function useDonateFlow(currentUser?: GqlUser | null, currentPoint?: bigin
       if (res.success) {
         const transactionId = res.data.transactionDonateSelfPoint?.transaction.id;
         if (transactionId && images && images.length > 0) {
-          await updateTransactionMetadata(transactionId, images);
+          await updateTransactionMetadata(transactionId, { images });
         }
 
         track({

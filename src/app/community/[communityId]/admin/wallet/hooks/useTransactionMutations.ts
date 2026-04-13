@@ -166,13 +166,13 @@ export const useTransactionMutations = () => {
 
   const updateTransactionMetadata = async (
     transactionId: string,
-    images: File[],
+    payload: { comment?: string; images?: File[] },
   ): Promise<Result<GqlTransactionUpdateMetadataMutation>> => {
     if (!currentUserId) {
       return { success: false, code: GqlErrorCode.Unauthenticated };
     }
 
-    const imagesInput: GqlImageInput[] = images.map((file) => ({
+    const imagesInput: GqlImageInput[] | undefined = payload.images?.map((file) => ({
       file,
       alt: "",
       caption: "",
@@ -182,7 +182,10 @@ export const useTransactionMutations = () => {
       const { data } = await updateMetadataMutation({
         variables: {
           id: transactionId,
-          input: { images: imagesInput },
+          input: {
+            ...(payload.comment !== undefined && { comment: payload.comment }),
+            ...(imagesInput !== undefined && { images: imagesInput }),
+          },
           permission: { userId: currentUserId },
         },
       });
