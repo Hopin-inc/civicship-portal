@@ -8,11 +8,21 @@ export async function POST(request: NextRequest): Promise<NextResponse<VerifyRes
   // CSRF protection: only accept requests from the same origin
   const origin = request.headers.get("origin");
   const host = request.headers.get("host");
-  if (origin && host && new URL(origin).host !== host) {
-    return NextResponse.json(
-      { ok: false, failedCheck: "", error: "Forbidden" },
-      { status: 403 },
-    );
+  if (origin && host) {
+    try {
+      if (new URL(origin).host !== host) {
+        return NextResponse.json(
+          { ok: false, failedCheck: "", error: "Forbidden" },
+          { status: 403 },
+        );
+      }
+    } catch {
+      // malformed Origin header (e.g. "null" from sandboxed iframes) → reject
+      return NextResponse.json(
+        { ok: false, failedCheck: "", error: "Forbidden" },
+        { status: 403 },
+      );
+    }
   }
 
   let body: {
