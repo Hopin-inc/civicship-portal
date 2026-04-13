@@ -147,9 +147,9 @@ function TransferInputStep({
   }
 
   return (
-    <>
-      {/* 金額入力ヘッダー */}
-      <div className="flex flex-col items-center justify-center gap-4 px-4 py-8 min-h-[45vh]">
+    <div className="flex flex-col h-[calc(100dvh-4rem)] overflow-hidden">
+      {/* 金額入力エリア（60%） */}
+      <div className="flex-[3] flex flex-col items-center justify-center gap-4 px-4">
         <div className="flex flex-col items-center gap-1">
           <Avatar className="w-10 h-10 border">
             <AvatarImage src={user.image || ""} alt={user.name || ""} />
@@ -178,11 +178,11 @@ function TransferInputStep({
         </Button>
       </div>
 
-      {/* テンキー */}
-      <div className="bg-muted/30">
+      {/* テンキー（40%） */}
+      <div className="flex-[2] bg-muted/30">
         <Numpad onKey={handleKey} />
       </div>
-    </>
+    </div>
   );
 }
 

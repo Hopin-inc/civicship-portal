@@ -19,13 +19,13 @@ interface NumpadProps {
 
 function Numpad({ onKey, className }: NumpadProps) {
   return (
-    <div className={cn("px-4 pt-5 pb-6", className)}>
-      <div className="grid grid-cols-3 gap-3 max-w-sm mx-auto">
+    <div className={cn("h-full px-10 py-4", className)}>
+      <div className="grid grid-cols-3 grid-rows-4 gap-2 h-full max-w-sm mx-auto">
         {NUMPAD_KEYS.flat().map((key) => (
           <button
             key={key}
             onClick={() => onKey(key)}
-            className="flex items-center justify-center aspect-square rounded-2xl bg-background text-xl font-semibold text-foreground active:bg-muted transition-colors select-none shadow-sm"
+            className="flex items-center justify-center w-full h-full rounded-2xl bg-background text-xl font-semibold text-foreground active:bg-muted transition-colors select-none shadow-sm"
           >
             {key === "backspace" ? <Delete className="w-6 h-6" /> : key}
           </button>
