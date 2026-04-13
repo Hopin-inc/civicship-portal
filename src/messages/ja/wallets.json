@@ -36,6 +36,8 @@
   "wallets.shared.transfer.commentLabel": "メッセージ",
   "wallets.shared.transfer.commentPlaceholder": "メッセージを入力して下さい",
   "wallets.shared.transfer.nextLabel": "次へ",
+  "wallets.shared.transfer.addPhoto": "写真を追加",
+  "wallets.shared.transfer.photoLimit": "画像は{max}枚まで追加できます",
   "wallets.shared.transfer.commentError": "100文字以内で入力してください",
   "wallets.action.donation.to": "{name}に送った",
   "wallets.action.donation.from": "{name}から受け取り",

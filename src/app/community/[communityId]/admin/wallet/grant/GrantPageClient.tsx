@@ -64,7 +64,7 @@ export default function GrantPageClient({ initialConnection }: GrantPageClientPr
   const [selectedUser, setSelectedUser] = useState<GqlUser | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleGrantPoint = async (amount: number, comment?: string) => {
+  const handleGrantPoint = async (amount: number, comment?: string, _images?: File[]) => {
     if (!selectedUser) return;
     setIsLoading(true);
     try {
