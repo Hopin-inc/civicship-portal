@@ -16,6 +16,7 @@ const EXCLUDED_REDIRECT_PATTERNS = [
   "/images",    // 静的アセット
   "/communities", // コミュニティアセット
   "/icons",     // アイコン
+  "/create",    // コミュニティ作成ページ（SYS_ADMIN 専用）
 ];
 
 export async function middleware(request: NextRequest) {
@@ -43,6 +44,14 @@ export async function middleware(request: NextRequest) {
       communityId = cookieValue;
       communityIdSource = "cookie";
     }
+  }
+
+  // /create はコミュニティスコープ外の SYS_ADMIN 専用ページ。
+  // ホストやクッキーで communityId を解決できない場合は最初の active community を
+  // 認証コンテキスト用フォールバックとして使用する（SYS_ADMIN は全テナントで有効）。
+  if (!communityId && (pathname === "/create" || pathname.startsWith("/create/"))) {
+    communityId = (ACTIVE_COMMUNITY_IDS as readonly string[])[0] ?? null;
+    if (communityId) communityIdSource = "fallback";
   }
 
   if (!communityId) {
@@ -99,6 +108,18 @@ export async function middleware(request: NextRequest) {
     request: { headers: requestHeaders },
   });
 
+  // 3. DBから動的設定を取得（存在しないコミュニティは404）
+  // /create はコミュニティスコープ外のため DB 設定チェックをスキップ。
+  // Cookie の設定より前に early return することで x-community-id cookie を汚染しない。
+  if (pathname === "/create" || pathname.startsWith("/create/")) {
+    if (shouldClearSessionCookies) {
+      clearLegacySessionCookies(res);
+    }
+    const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
+    setSecurityHeaders(res, nonce);
+    return res;
+  }
+
   // Cookie にも設定（Client JS から参照可能にする）
   res.cookies.set("x-community-id", communityId, {
     path: "/",
@@ -107,7 +128,6 @@ export async function middleware(request: NextRequest) {
     httpOnly: false, // JS から読み取り可能
   });
 
-  // 3. DBから動的設定を取得（存在しないコミュニティは404）
   const config = await fetchCommunityConfigForEdge(communityId);
   if (!config) {
     console.warn("[Middleware] Community not found in DB", { communityId, host, pathname });
@@ -341,5 +361,5 @@ function getCommunityIdFromHost(host: string | null): string | null {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|robots.txt|images/|icons/|communities/).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|robots.txt|images/|icons/|communities/|api/).*)"],
 };
