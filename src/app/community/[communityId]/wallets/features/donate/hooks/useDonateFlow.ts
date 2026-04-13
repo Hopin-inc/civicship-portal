@@ -16,7 +16,7 @@ export function useDonateFlow(currentUser?: GqlUser | null, currentPoint?: bigin
   const { donate, isLoading, isAuthReady } = useDonatePoint();
   const [selectedUser, setSelectedUser] = useState<GqlUser | null>(null);
 
-  const handleDonate = async (amount: number, comment?: string) => {
+  const handleDonate = async (amount: number, comment?: string, _images?: File[]) => {
     if (!selectedUser || !currentUser?.id) return;
 
     try {

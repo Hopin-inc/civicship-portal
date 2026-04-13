@@ -36,6 +36,8 @@
   "wallets.shared.transfer.commentLabel": "Message",
   "wallets.shared.transfer.commentPlaceholder": "Enter a message",
   "wallets.shared.transfer.nextLabel": "Next",
+  "wallets.shared.transfer.addPhoto": "Add photo",
+  "wallets.shared.transfer.photoLimit": "You can add up to {max} photos",
   "wallets.shared.transfer.commentError": "Please enter within 100 characters",
   "wallets.action.donation.to": "Sent to {name}",
   "wallets.action.donation.from": "Received from {name}",
