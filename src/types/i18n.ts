@@ -289,6 +289,7 @@ export type TranslationKey =
   | "wallets.shared.tabs.history"
   | "wallets.shared.tabs.member"
   | "wallets.shared.transfer.amountLabel"
+  | "wallets.shared.transfer.backLabel"
   | "wallets.shared.transfer.balance"
   | "wallets.shared.transfer.commentError"
   | "wallets.shared.transfer.commentLabel"
@@ -296,7 +297,11 @@ export type TranslationKey =
   | "wallets.shared.transfer.didPending"
   | "wallets.shared.transfer.errorExceedsBalance"
   | "wallets.shared.transfer.errorExceedsLimit"
-  | "wallets.shared.transfer.required";
+  | "wallets.shared.transfer.nextLabel"
+  | "wallets.shared.transfer.pageTitle"
+  | "wallets.shared.transfer.required"
+  | "wallets.shared.transfer.sendTo"
+  | "wallets.shared.transfer.submitLabel";
 
 /**
  * Type-safe translation function

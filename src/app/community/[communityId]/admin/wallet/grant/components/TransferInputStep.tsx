@@ -134,7 +134,7 @@ function TransferInputStep({
 
         <Button
           onClick={() => onSubmit(numericAmount, comment.trim() || undefined)}
-          disabled={isLoading || !isAuthReady}
+          disabled={isLoading || !isAuthReady || !isAmountValid}
           className="w-full"
         >
           {finalSubmitLabel}
