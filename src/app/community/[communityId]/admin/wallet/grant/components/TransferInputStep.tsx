@@ -20,8 +20,6 @@ interface Props {
   onSubmit: (amount: number, comment?: string) => void;
   title?: string;
   submitLabel?: string;
-  backLabel?: string;
-  amountLabel?: string;
 }
 
 const INT_LIMIT = 2000000000;
@@ -69,8 +67,8 @@ function TransferInputStep({
       setInputStr((prev) => prev.slice(0, -1));
       return;
     }
-    const next = String(parseInt((inputStr || "") + key, 10));
-    const parsed = parseInt(next, 10);
+    const parsed = parseInt((inputStr || "") + key, 10);
+    const next = String(parsed);
     if (parsed > Number(currentPoint)) {
       toast.error(t("wallets.shared.transfer.errorExceedsBalance"));
       return;
