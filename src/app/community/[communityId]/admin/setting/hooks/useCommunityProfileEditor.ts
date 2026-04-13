@@ -15,14 +15,13 @@ interface FormState {
   title: string;
   description: string;
   shortDescription: string;
-  tokenName: string;
   logoPath: string;
   squareLogoPath: string;
+  faviconPrefix: string;
 }
 
 interface FormErrors {
   title?: string;
-  tokenName?: string;
 }
 
 export function useCommunityProfileEditor(communityId: string | undefined) {
@@ -37,9 +36,9 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
     title: "",
     description: "",
     shortDescription: "",
-    tokenName: "",
     logoPath: "",
     squareLogoPath: "",
+    faviconPrefix: "",
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
@@ -51,9 +50,9 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
         title: c.title ?? "",
         description: c.description ?? "",
         shortDescription: c.shortDescription ?? "",
-        tokenName: c.tokenName ?? "",
         logoPath: c.logoPath ?? "",
         squareLogoPath: c.squareLogoPath ?? "",
+        faviconPrefix: c.faviconPrefix ?? "",
       });
     }
   }, [data]);
@@ -75,9 +74,6 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
     if (!formState.title.trim()) {
       newErrors.title = t("adminSetting.form.error.titleRequired");
     }
-    if (!formState.tokenName.trim()) {
-      newErrors.tokenName = t("adminSetting.form.error.tokenNameRequired");
-    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }
@@ -92,11 +88,11 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
           communityId,
           input: {
             title: formState.title.trim(),
-            tokenName: formState.tokenName.trim(),
             description: formState.description.trim() || undefined,
             shortDescription: formState.shortDescription.trim() || undefined,
             logoPath: formState.logoPath.trim() || undefined,
             squareLogoPath: formState.squareLogoPath.trim() || undefined,
+            faviconPrefix: formState.faviconPrefix.trim() || undefined,
           },
         },
       });

@@ -7,6 +7,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useCommunityProfileEditor } from "../hooks/useCommunityProfileEditor";
 
+interface CommunitySettingFormProps {
+  editor: ReturnType<typeof useCommunityProfileEditor>;
+  onSubmit: (e: FormEvent) => void;
+}
+
 function RequiredBadge() {
   return (
     <span className="text-primary text-xs font-bold bg-primary-foreground px-1 py-0.5 rounded">
@@ -15,13 +20,34 @@ function RequiredBadge() {
   );
 }
 
-interface CommunitySettingFormProps {
-  editor: ReturnType<typeof useCommunityProfileEditor>;
-  onSubmit: (e: FormEvent) => void;
+interface ImagePreviewProps {
+  src: string;
+  alt: string;
+  className?: string;
+}
+
+function ImagePreview({ src, alt, className = "" }: ImagePreviewProps) {
+  if (!src) return null;
+  return (
+    <div className="mt-2">
+      <img
+        src={src}
+        alt={alt}
+        className={`rounded border border-border object-contain bg-muted ${className}`}
+        onError={(e) => {
+          (e.currentTarget as HTMLImageElement).style.display = "none";
+        }}
+      />
+    </div>
+  );
 }
 
 export function CommunitySettingForm({ editor, onSubmit }: CommunitySettingFormProps) {
   const t = useTranslations();
+
+  const faviconPreviewSrc = editor.formState.faviconPrefix
+    ? `${editor.formState.faviconPrefix}/favicon.ico`
+    : "";
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
@@ -67,23 +93,6 @@ export function CommunitySettingForm({ editor, onSubmit }: CommunitySettingFormP
         />
       </div>
 
-      {/* トークン名 */}
-      <div className="space-y-1">
-        <div className="flex items-center gap-2 px-1">
-          <span className="text-sm text-muted-foreground">{t("adminSetting.form.tokenName")}</span>
-          <RequiredBadge />
-        </div>
-        <Input
-          value={editor.formState.tokenName}
-          onChange={(e) => editor.updateField("tokenName", e.target.value)}
-          placeholder={t("adminSetting.form.tokenName")}
-          className={editor.errors.tokenName ? "border-destructive focus-visible:ring-destructive" : ""}
-        />
-        {editor.errors.tokenName && (
-          <p className="text-xs text-destructive px-1">{editor.errors.tokenName}</p>
-        )}
-      </div>
-
       {/* ロゴ画像パス */}
       <div className="space-y-1">
         <div className="flex items-center gap-2 px-1">
@@ -92,7 +101,12 @@ export function CommunitySettingForm({ editor, onSubmit }: CommunitySettingFormP
         <Input
           value={editor.formState.logoPath}
           onChange={(e) => editor.updateField("logoPath", e.target.value)}
-          placeholder="/logos/logo.png"
+          placeholder="https://example.com/logo.png"
+        />
+        <ImagePreview
+          src={editor.formState.logoPath}
+          alt="ロゴプレビュー"
+          className="h-16 w-auto"
         />
       </div>
 
@@ -104,7 +118,29 @@ export function CommunitySettingForm({ editor, onSubmit }: CommunitySettingFormP
         <Input
           value={editor.formState.squareLogoPath}
           onChange={(e) => editor.updateField("squareLogoPath", e.target.value)}
-          placeholder="/logos/logo-square.png"
+          placeholder="https://example.com/logo-square.png"
+        />
+        <ImagePreview
+          src={editor.formState.squareLogoPath}
+          alt="正方形ロゴプレビュー"
+          className="h-12 w-12"
+        />
+      </div>
+
+      {/* Favicon プレフィックス */}
+      <div className="space-y-1">
+        <div className="flex items-center gap-2 px-1">
+          <span className="text-sm text-muted-foreground">{t("adminSetting.form.faviconPrefix")}</span>
+        </div>
+        <Input
+          value={editor.formState.faviconPrefix}
+          onChange={(e) => editor.updateField("faviconPrefix", e.target.value)}
+          placeholder="https://example.com/favicons"
+        />
+        <ImagePreview
+          src={faviconPreviewSrc}
+          alt="Faviconプレビュー"
+          className="h-8 w-8"
         />
       </div>
 

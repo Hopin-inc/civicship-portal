@@ -49,9 +49,9 @@ export const UPDATE_PORTAL_CONFIG = gql`
       title
       description
       shortDescription
-      tokenName
       logoPath
       squareLogoPath
+      faviconPrefix
     }
   }
 `;

@@ -3,13 +3,12 @@
   "adminSetting.form.title": "Title",
   "adminSetting.form.description": "Description",
   "adminSetting.form.shortDescription": "Short Description",
-  "adminSetting.form.tokenName": "Token Name",
   "adminSetting.form.logoPath": "Logo Image Path",
   "adminSetting.form.squareLogoPath": "Square Logo Image Path",
+  "adminSetting.form.faviconPrefix": "Favicon Prefix",
   "adminSetting.form.submit": "Save",
   "adminSetting.form.saving": "Saving...",
   "adminSetting.form.success": "Community settings updated",
   "adminSetting.form.error.titleRequired": "Title is required",
-  "adminSetting.form.error.tokenNameRequired": "Token name is required",
   "adminSetting.form.error.submit": "Failed to update. Please try again"
 }
