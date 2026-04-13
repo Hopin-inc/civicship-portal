@@ -64,32 +64,30 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
       label: t("transactions.detail.pointAmount"),
       value: `${detail.pointAmount.toLocaleString()}pt`,
     },
-    ...(detail.comment
-      ? [
-          {
-            label: t("transactions.detail.comment"),
-            value: detail.comment,
-            showTruncate: false,
-            layout: "vertical" as const,
-          },
-        ]
-      : []),
   ];
 
   const images = transaction.images ?? [];
+  const hasMessage = !!detail.comment || images.length > 0;
 
   return (
-    <div className="p-4">
+    <div className="p-4 space-y-4">
       <div className="grid grid-cols-1 gap-1">
         {infoCards.map((card) => (
           <InfoCard key={card.label} {...card} />
         ))}
       </div>
-      {images.length > 0 && (
-        <div className="mt-4">
-          <TransactionImageGrid images={images} />
+
+      {hasMessage && (
+        <div className="space-y-3 px-1">
+          {detail.comment && (
+            <p className="text-sm whitespace-pre-line break-words leading-relaxed">
+              {detail.comment}
+            </p>
+          )}
+          {images.length > 0 && <TransactionImageGrid images={images} />}
         </div>
       )}
+
       <VerificationSection transactionId={id} />
     </div>
   );
