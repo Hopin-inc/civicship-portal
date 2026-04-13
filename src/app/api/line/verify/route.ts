@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getUserServer } from "@/lib/auth/init/getUserServer";
 
 type VerifySuccess = { ok: true; botName: string };
 type VerifyFailure = { ok: false; failedCheck: string; error: string };
 type VerifyResult = VerifySuccess | VerifyFailure;
+
+const LINE_API_TIMEOUT_MS = 8000;
 
 export async function POST(request: NextRequest): Promise<NextResponse<VerifyResult>> {
   // CSRF protection: only accept requests from the same origin
@@ -23,6 +26,15 @@ export async function POST(request: NextRequest): Promise<NextResponse<VerifyRes
         { status: 403 },
       );
     }
+  }
+
+  // 認証・認可チェック: SYS_ADMIN のみ使用可能
+  const { user } = await getUserServer();
+  if (!user || user.sysRole !== "SYS_ADMIN") {
+    return NextResponse.json(
+      { ok: false, failedCheck: "", error: "Forbidden" },
+      { status: 403 },
+    );
   }
 
   let body: {
@@ -50,12 +62,22 @@ export async function POST(request: NextRequest): Promise<NextResponse<VerifyRes
     );
   }
 
-  // Step 1: Access Token の有効性確認 + botName 取得
+  // Access Token の有効性確認 + botName 取得
   let botName = "LINE Bot";
   try {
-    const res = await fetch("https://api.line.me/v2/bot/info", {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), LINE_API_TIMEOUT_MS);
+
+    let res: Response;
+    try {
+      res = await fetch("https://api.line.me/v2/bot/info", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+        signal: controller.signal,
+      });
+    } finally {
+      clearTimeout(timeoutId);
+    }
+
     if (!res.ok) {
       return NextResponse.json<VerifyResult>({
         ok: false,
@@ -70,10 +92,15 @@ export async function POST(request: NextRequest): Promise<NextResponse<VerifyRes
       // レスポンスのパースに失敗した場合はデフォルト名を使用
     }
     botName = data.displayName ?? data.basicId ?? "LINE Bot";
-  } catch {
+  } catch (error) {
+    const isTimeout = error instanceof Error && error.name === "AbortError";
     return NextResponse.json<VerifyResult>(
-      { ok: false, failedCheck: "lineAccessToken", error: "Access Token 確認中にエラーが発生しました" },
-      { status: 500 },
+      {
+        ok: false,
+        failedCheck: "lineAccessToken",
+        error: isTimeout ? "LINE API の応答がタイムアウトしました" : "Access Token 確認中にエラーが発生しました",
+      },
+      { status: isTimeout ? 504 : 500 },
     );
   }
 

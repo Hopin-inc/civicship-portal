@@ -20,6 +20,7 @@ export function useCommunityCreate() {
       const originalId = formData.originalId.trim();
 
       if (!validateForm(name, { accessToken, channelId, channelSecret, liffId })) {
+        toast.error("必須項目を入力してください");
         return undefined;
       }
 
