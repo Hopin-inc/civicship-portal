@@ -107,7 +107,7 @@ export function TransactionMetadataEditSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="rounded-t-2xl max-h-[85vh] flex flex-col p-0">
+      <SheetContent side="bottom" className="rounded-t-2xl max-h-[85vh] flex flex-col p-0 max-w-md mx-auto">
         <SheetHeader className="px-4 pt-4 pb-2 shrink-0">
           <SheetTitle className="text-base">メッセージを編集</SheetTitle>
         </SheetHeader>
