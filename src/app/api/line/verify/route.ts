@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getUserServer } from "@/lib/auth/init/getUserServer";
 
 type VerifySuccess = { ok: true; botName: string };
 type VerifyFailure = { ok: false; failedCheck: string; error: string };
@@ -26,15 +25,6 @@ export async function POST(request: NextRequest): Promise<NextResponse<VerifyRes
         { status: 403 },
       );
     }
-  }
-
-  // 認証・認可チェック: SYS_ADMIN のみ使用可能
-  const { user } = await getUserServer();
-  if (!user || user.sysRole !== "SYS_ADMIN") {
-    return NextResponse.json(
-      { ok: false, failedCheck: "", error: "Forbidden" },
-      { status: 403 },
-    );
   }
 
   let body: {

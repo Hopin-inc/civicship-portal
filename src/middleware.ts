@@ -108,6 +108,18 @@ export async function middleware(request: NextRequest) {
     request: { headers: requestHeaders },
   });
 
+  // 3. DBから動的設定を取得（存在しないコミュニティは404）
+  // /create はコミュニティスコープ外のため DB 設定チェックをスキップ。
+  // Cookie の設定より前に early return することで x-community-id cookie を汚染しない。
+  if (pathname === "/create" || pathname.startsWith("/create/")) {
+    if (shouldClearSessionCookies) {
+      clearLegacySessionCookies(res);
+    }
+    const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
+    setSecurityHeaders(res, nonce);
+    return res;
+  }
+
   // Cookie にも設定（Client JS から参照可能にする）
   res.cookies.set("x-community-id", communityId, {
     path: "/",
@@ -115,14 +127,6 @@ export async function middleware(request: NextRequest) {
     sameSite: "lax",
     httpOnly: false, // JS から読み取り可能
   });
-
-  // 3. DBから動的設定を取得（存在しないコミュニティは404）
-  // /create はコミュニティスコープ外のため DB 設定チェックをスキップ
-  if (pathname === "/create" || pathname.startsWith("/create/")) {
-    const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
-    setSecurityHeaders(res, nonce);
-    return res;
-  }
 
   const config = await fetchCommunityConfigForEdge(communityId);
   if (!config) {
@@ -357,5 +361,5 @@ function getCommunityIdFromHost(host: string | null): string | null {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|robots.txt|images/|icons/|communities/).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|robots.txt|images/|icons/|communities/|api/).*)"],
 };
