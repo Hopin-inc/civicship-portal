@@ -1,15 +1,11 @@
 "use client";
 
 import { useState, useEffect, FormEvent } from "react";
-import { useMutation, useQuery } from "@apollo/client";
 import { toast } from "react-toastify";
 import { useTranslations } from "next-intl";
-import { COMMUNITY_UPDATE_PROFILE } from "@/graphql/account/community/mutation";
-import { GET_COMMUNITY_PROFILE } from "@/graphql/account/community/query";
 import {
-  GqlCommunityUpdateProfilePayload,
-  GqlMutationCommunityUpdateProfileArgs,
-  GqlCommunity,
+  useCommunityUpdateProfileMutation,
+  useGetCommunityProfileQuery,
 } from "@/types/graphql";
 
 interface FormState {
@@ -28,13 +24,10 @@ interface FormErrors {
 export function useCommunityProfileEditor(communityId: string | undefined) {
   const t = useTranslations();
 
-  const { data, loading: queryLoading } = useQuery<{ community: GqlCommunity }>(
-    GET_COMMUNITY_PROFILE,
-    {
-      variables: { id: communityId ?? "" },
-      skip: !communityId,
-    },
-  );
+  const { data, loading: queryLoading } = useGetCommunityProfileQuery({
+    variables: { id: communityId ?? "" },
+    skip: !communityId,
+  });
 
   const [formState, setFormState] = useState<FormState>({
     name: "",
@@ -61,10 +54,7 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
     }
   }, [data]);
 
-  const [updateProfile, { loading: saving }] = useMutation<
-    { communityUpdateProfile: GqlCommunityUpdateProfilePayload },
-    GqlMutationCommunityUpdateProfileArgs
-  >(COMMUNITY_UPDATE_PROFILE);
+  const [updateProfile, { loading: saving }] = useCommunityUpdateProfileMutation();
 
   function updateField<K extends keyof FormState>(key: K, value: FormState[K]) {
     setFormState((prev) => ({ ...prev, [key]: value }));
