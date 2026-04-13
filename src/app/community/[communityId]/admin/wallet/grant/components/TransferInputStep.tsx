@@ -114,9 +114,6 @@ function TransferInputStep({
 
         {/* コメント */}
         <div className="w-full">
-          <div className="text-sm font-medium mb-3">
-            {t("wallets.shared.transfer.commentLabel")}
-          </div>
           <div className="relative">
             <Textarea
               maxLength={100}
