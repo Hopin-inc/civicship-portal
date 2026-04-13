@@ -52,7 +52,7 @@ export async function createCommunityAction(
       {
         input: {
           name: input.name,
-          pointName: input.name,
+          pointName: "pt",
           originalId: input.originalId || undefined,
           config: {
             lineConfig: {

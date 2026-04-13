@@ -4,8 +4,27 @@ type VerifySuccess = { ok: true; botName: string };
 type VerifyFailure = { ok: false; failedCheck: string; error: string };
 type VerifyResult = VerifySuccess | VerifyFailure;
 
-
 export async function POST(request: NextRequest): Promise<NextResponse<VerifyResult>> {
+  // CSRF protection: only accept requests from the same origin
+  const origin = request.headers.get("origin");
+  const host = request.headers.get("host");
+  if (origin && host) {
+    try {
+      if (new URL(origin).host !== host) {
+        return NextResponse.json(
+          { ok: false, failedCheck: "", error: "Forbidden" },
+          { status: 403 },
+        );
+      }
+    } catch {
+      // malformed Origin header (e.g. "null" from sandboxed iframes) → reject
+      return NextResponse.json(
+        { ok: false, failedCheck: "", error: "Forbidden" },
+        { status: 403 },
+      );
+    }
+  }
+
   let body: {
     accessToken?: string;
     channelId?: string;
@@ -44,7 +63,12 @@ export async function POST(request: NextRequest): Promise<NextResponse<VerifyRes
         error: "Access Token が無効です",
       });
     }
-    const data = await res.json();
+    let data: { displayName?: string; basicId?: string } = {};
+    try {
+      data = await res.json();
+    } catch {
+      // レスポンスのパースに失敗した場合はデフォルト名を使用
+    }
     botName = data.displayName ?? data.basicId ?? "LINE Bot";
   } catch {
     return NextResponse.json<VerifyResult>(
