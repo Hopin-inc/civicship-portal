@@ -54,7 +54,7 @@ export default function GrantPageClient({ initialConnection }: GrantPageClientPr
 
   const { data, loading, error, refetch, loadMoreRef, isLoadingMore } = useMemberWallets();
 
-  const { grantPoint, isAuthReady } = useTransactionMutations();
+  const { grantPoint, updateTransactionMetadata, isAuthReady } = useTransactionMutations();
 
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
@@ -64,7 +64,7 @@ export default function GrantPageClient({ initialConnection }: GrantPageClientPr
   const [selectedUser, setSelectedUser] = useState<GqlUser | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleGrantPoint = async (amount: number, comment?: string, _images?: File[]) => {
+  const handleGrantPoint = async (amount: number, comment?: string, images?: File[]) => {
     if (!selectedUser) return;
     setIsLoading(true);
     try {
@@ -74,6 +74,11 @@ export default function GrantPageClient({ initialConnection }: GrantPageClientPr
       });
 
       if (res.success) {
+        const transactionId = res.data.transactionGrantCommunityPoint?.transaction.id;
+        if (transactionId && images && images.length > 0) {
+          await updateTransactionMetadata(transactionId, images);
+        }
+
         track({
           name: "grant_point",
           params: {

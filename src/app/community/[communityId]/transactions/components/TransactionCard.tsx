@@ -72,6 +72,34 @@ export const TransactionCard = ({
     ? computeTransactionHref(transaction.id)
     : null;
 
+  const images = transaction.images ?? [];
+
+  const messageCard =
+    info.comment || images.length > 0 ? (
+      <div>
+        {info.comment && <TransactionMessageCard comment={info.comment} />}
+        {images.length > 0 && (
+          <div className="flex gap-1.5 mt-2 flex-wrap">
+            {images.slice(0, 4).map((url, i) => (
+              <div key={i} className="relative w-16 h-16 shrink-0">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={url}
+                  alt=""
+                  className="w-full h-full object-cover rounded-lg"
+                />
+                {i === 3 && images.length > 4 && (
+                  <div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center">
+                    <span className="text-white text-sm font-bold">+{images.length - 4}</span>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    ) : undefined;
+
   return (
     <TransactionTimelineItem
       avatar={
@@ -87,9 +115,7 @@ export const TransactionCard = ({
         />
       }
       actionLabel={<TransactionActionLabel data={actionLabelData} />}
-      messageCard={
-        info.comment ? <TransactionMessageCard comment={info.comment} /> : undefined
-      }
+      messageCard={messageCard}
       href={transactionHref}
       isFirst={isFirst}
       isLast={isLast}
