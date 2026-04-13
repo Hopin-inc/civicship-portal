@@ -141,7 +141,7 @@ function TransferInputStep({
     return (
       <div className="fixed inset-x-0 top-16 bottom-0 max-w-mobile-l mx-auto flex flex-col overflow-hidden bg-background">
         {/* コンパクトサマリー */}
-        <div className="shrink-0 px-4 py-3 border-b flex items-center justify-between">
+        <div className="shrink-0 px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Avatar className="w-8 h-8 border">
               <AvatarImage src={user.image || ""} alt={user.name || ""} />
@@ -223,7 +223,7 @@ function TransferInputStep({
         </div>
 
         {/* 送信ボタン（下部固定） */}
-        <div className="shrink-0 px-4 py-3 border-t bg-background">
+        <div className="shrink-0 px-4 py-3 bg-background">
           <Button
             onClick={() => onSubmit(numericAmount, comment.trim() || undefined, images.length > 0 ? images : undefined)}
             disabled={isLoading || !isAuthReady || !isAmountValid}
