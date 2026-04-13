@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, FormEvent } from "react";
+import { useState, useEffect, useRef, FormEvent, ChangeEvent } from "react";
 import { useMutation } from "@apollo/client";
 import { toast } from "react-toastify";
 import { useTranslations } from "next-intl";
@@ -11,12 +11,16 @@ import {
   GqlMutationUpdatePortalConfigArgs,
 } from "@/types/graphql";
 
+// 単一画像フィールドの状態
+type ImageField =
+  | { type: "new"; file: File; previewUrl: string }
+  | { type: "existing"; url: string }
+  | null;
+
 interface FormState {
   title: string;
   description: string;
   shortDescription: string;
-  logoPath: string;
-  squareLogoPath: string;
   faviconPrefix: string;
 }
 
@@ -36,12 +40,14 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
     title: "",
     description: "",
     shortDescription: "",
-    logoPath: "",
-    squareLogoPath: "",
     faviconPrefix: "",
   });
-
+  const [logoImage, setLogoImage] = useState<ImageField>(null);
+  const [squareLogoImage, setSquareLogoImage] = useState<ImageField>(null);
   const [errors, setErrors] = useState<FormErrors>({});
+
+  const logoInputRef = useRef<HTMLInputElement>(null);
+  const squareLogoInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (data?.communityPortalConfig) {
@@ -50,10 +56,14 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
         title: c.title ?? "",
         description: c.description ?? "",
         shortDescription: c.shortDescription ?? "",
-        logoPath: c.logoPath ?? "",
-        squareLogoPath: c.squareLogoPath ?? "",
         faviconPrefix: c.faviconPrefix ?? "",
       });
+      if (c.logoPath) {
+        setLogoImage({ type: "existing", url: c.logoPath });
+      }
+      if (c.squareLogoPath) {
+        setSquareLogoImage({ type: "existing", url: c.squareLogoPath });
+      }
     }
   }, [data]);
 
@@ -67,6 +77,28 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
     if (errors[key as keyof FormErrors]) {
       setErrors((prev) => ({ ...prev, [key]: undefined }));
     }
+  }
+
+  function handleImageSelect(
+    field: "logo" | "squareLogo",
+    e: ChangeEvent<HTMLInputElement>,
+  ) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const previewUrl = URL.createObjectURL(file);
+    const imageField: ImageField = { type: "new", file, previewUrl };
+    if (field === "logo") {
+      setLogoImage(imageField);
+    } else {
+      setSquareLogoImage(imageField);
+    }
+    // input をリセットして同じファイルを再選択できるようにする
+    e.target.value = "";
+  }
+
+  function getPreviewUrl(image: ImageField): string | null {
+    if (!image) return null;
+    return image.type === "new" ? image.previewUrl : image.url;
   }
 
   function validate(): boolean {
@@ -83,19 +115,23 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
     if (!communityId || !validate()) return;
 
     try {
-      await updatePortalConfig({
-        variables: {
-          communityId,
-          input: {
-            title: formState.title.trim(),
-            description: formState.description.trim() || undefined,
-            shortDescription: formState.shortDescription.trim() || undefined,
-            logoPath: formState.logoPath.trim() || undefined,
-            squareLogoPath: formState.squareLogoPath.trim() || undefined,
-            faviconPrefix: formState.faviconPrefix.trim() || undefined,
-          },
-        },
-      });
+      // バックエンドが logo/squareLogo: ImageInput に対応後、型は codegen で更新される
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const input: any = {
+        title: formState.title.trim(),
+        description: formState.description.trim() || undefined,
+        shortDescription: formState.shortDescription.trim() || undefined,
+        faviconPrefix: formState.faviconPrefix.trim() || undefined,
+      };
+
+      if (logoImage?.type === "new") {
+        input.logo = { file: logoImage.file };
+      }
+      if (squareLogoImage?.type === "new") {
+        input.squareLogo = { file: squareLogoImage.file };
+      }
+
+      await updatePortalConfig({ variables: { communityId, input } });
       toast.success(t("adminSetting.form.success"));
     } catch {
       toast.error(t("adminSetting.form.error.submit"));
@@ -106,6 +142,12 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
     formState,
     errors,
     updateField,
+    logoImage,
+    squareLogoImage,
+    logoInputRef,
+    squareLogoInputRef,
+    handleImageSelect,
+    getPreviewUrl,
     onSubmit,
     saving,
     queryLoading,

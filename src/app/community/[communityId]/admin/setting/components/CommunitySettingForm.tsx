@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Item, ItemContent, ItemActions } from "@/components/ui/item";
 import { useCommunityProfileEditor } from "../hooks/useCommunityProfileEditor";
 
 interface CommunitySettingFormProps {
@@ -20,23 +21,55 @@ function RequiredBadge() {
   );
 }
 
-interface ImagePreviewProps {
-  src: string;
-  alt: string;
-  className?: string;
+interface ImagePickerFieldProps {
+  label: string;
+  previewUrl: string | null;
+  onPickerClick: () => void;
+  inputRef: React.RefObject<HTMLInputElement | null>;
+  onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  previewClassName?: string;
 }
 
-function ImagePreview({ src, alt, className = "" }: ImagePreviewProps) {
-  if (!src) return null;
+function ImagePickerField({
+  label,
+  previewUrl,
+  onPickerClick,
+  inputRef,
+  onFileChange,
+  previewClassName = "h-16 w-auto",
+}: ImagePickerFieldProps) {
   return (
-    <div className="mt-2">
-      <img
-        src={src}
-        alt={alt}
-        className={`rounded border border-border object-contain bg-muted ${className}`}
-        onError={(e) => {
-          (e.currentTarget as HTMLImageElement).style.display = "none";
-        }}
+    <div className="space-y-1">
+      <div className="flex items-center gap-2 px-1">
+        <span className="text-sm text-muted-foreground">{label}</span>
+      </div>
+      <Item size="sm" variant="outline">
+        <ItemContent>
+          {previewUrl ? (
+            <img
+              src={previewUrl}
+              alt={label}
+              className={`rounded object-contain bg-muted ${previewClassName}`}
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).style.display = "none";
+              }}
+            />
+          ) : (
+            <p className="text-xs text-muted-foreground">未設定</p>
+          )}
+        </ItemContent>
+        <ItemActions className="self-center">
+          <Button type="button" variant="text" size="sm" onClick={onPickerClick}>
+            画像を変更
+          </Button>
+        </ItemActions>
+      </Item>
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={onFileChange}
       />
     </div>
   );
@@ -93,39 +126,25 @@ export function CommunitySettingForm({ editor, onSubmit }: CommunitySettingFormP
         />
       </div>
 
-      {/* ロゴ画像パス */}
-      <div className="space-y-1">
-        <div className="flex items-center gap-2 px-1">
-          <span className="text-sm text-muted-foreground">{t("adminSetting.form.logoPath")}</span>
-        </div>
-        <Input
-          value={editor.formState.logoPath}
-          onChange={(e) => editor.updateField("logoPath", e.target.value)}
-          placeholder="https://example.com/logo.png"
-        />
-        <ImagePreview
-          src={editor.formState.logoPath}
-          alt="ロゴプレビュー"
-          className="h-16 w-auto"
-        />
-      </div>
+      {/* ロゴ画像 */}
+      <ImagePickerField
+        label={t("adminSetting.form.logoPath")}
+        previewUrl={editor.getPreviewUrl(editor.logoImage)}
+        onPickerClick={() => editor.logoInputRef.current?.click()}
+        inputRef={editor.logoInputRef}
+        onFileChange={(e) => editor.handleImageSelect("logo", e)}
+        previewClassName="h-16 w-auto"
+      />
 
-      {/* 正方形ロゴ画像パス */}
-      <div className="space-y-1">
-        <div className="flex items-center gap-2 px-1">
-          <span className="text-sm text-muted-foreground">{t("adminSetting.form.squareLogoPath")}</span>
-        </div>
-        <Input
-          value={editor.formState.squareLogoPath}
-          onChange={(e) => editor.updateField("squareLogoPath", e.target.value)}
-          placeholder="https://example.com/logo-square.png"
-        />
-        <ImagePreview
-          src={editor.formState.squareLogoPath}
-          alt="正方形ロゴプレビュー"
-          className="h-12 w-12"
-        />
-      </div>
+      {/* 正方形ロゴ画像 */}
+      <ImagePickerField
+        label={t("adminSetting.form.squareLogoPath")}
+        previewUrl={editor.getPreviewUrl(editor.squareLogoImage)}
+        onPickerClick={() => editor.squareLogoInputRef.current?.click()}
+        inputRef={editor.squareLogoInputRef}
+        onFileChange={(e) => editor.handleImageSelect("squareLogo", e)}
+        previewClassName="h-12 w-12"
+      />
 
       {/* Favicon プレフィックス */}
       <div className="space-y-1">
@@ -137,11 +156,18 @@ export function CommunitySettingForm({ editor, onSubmit }: CommunitySettingFormP
           onChange={(e) => editor.updateField("faviconPrefix", e.target.value)}
           placeholder="https://example.com/favicons"
         />
-        <ImagePreview
-          src={faviconPreviewSrc}
-          alt="Faviconプレビュー"
-          className="h-8 w-8"
-        />
+        {faviconPreviewSrc && (
+          <div className="mt-2">
+            <img
+              src={faviconPreviewSrc}
+              alt="Faviconプレビュー"
+              className="h-8 w-8 rounded border border-border object-contain bg-muted"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).style.display = "none";
+              }}
+            />
+          </div>
+        )}
       </div>
 
       {/* 送信ボタン */}
