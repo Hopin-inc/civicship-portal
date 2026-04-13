@@ -59,8 +59,11 @@ export async function createCommunityAction(
               accessToken: input.lineAccessToken,
               channelId: input.lineChannelId,
               channelSecret: input.lineChannelSecret,
+              // liffAppId はフル形式（例: 2009756673-s2ldhFgl）
+              // liffId は数字部分のみ（例: 2009756673）
+              liffAppId: input.lineLiffId,
+              liffId: input.lineLiffId.split("-")[0],
               liffBaseUrl: `https://liff.line.me/${input.lineLiffId}`,
-              liffId: input.lineLiffId,
               richMenus: [],
             },
           },

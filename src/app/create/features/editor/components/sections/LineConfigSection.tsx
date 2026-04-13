@@ -25,7 +25,7 @@ const LINE_FIELDS: FieldConfig[] = [
   { key: "lineAccessToken", errorKey: "lineAccessToken", label: "Access Token", placeholder: "Channel Access Token" },
   { key: "lineChannelId", errorKey: "lineChannelId", label: "Channel ID", placeholder: "Messaging API Channel ID" },
   { key: "lineChannelSecret", errorKey: "lineChannelSecret", label: "Channel Secret", placeholder: "Messaging API Channel Secret", type: "password" },
-  { key: "lineLiffId", errorKey: "lineLiffId", label: "LIFF ID", placeholder: "LIFF App ID" },
+  { key: "lineLiffId", errorKey: "lineLiffId", label: "LIFF ID", placeholder: "例: 2009756673-s2ldhFgl" },
 ];
 
 function FieldRow({
