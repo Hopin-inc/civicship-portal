@@ -1,6 +1,8 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { executeServerGraphQLQuery } from "@/lib/graphql/server";
+import { ACTIVE_COMMUNITY_IDS } from "@/lib/communities/constants";
 
 const COMMUNITY_CREATE_MUTATION = `
   mutation CommunityCreate($input: CommunityCreateInput!) {
@@ -51,6 +53,21 @@ export async function createCommunityAction(
     return { error: "LIFF ID の形式が正しくありません（例: 2009756673-s2ldhFgl）" };
   }
 
+  // __session_{communityId} cookie からセッションが有効なコミュニティIDを取得し
+  // X-Community-Id として明示的に渡す。
+  // auto-resolve に任せると middleware が cookie の stale な communityId（削除済み等）を
+  // ヘッダーにセットしてしまい、バックエンドの Firebase テナント検索が失敗するため。
+  const cookieStore = await cookies();
+  const authCommunityId = cookieStore
+    .getAll()
+    .filter((c) => c.name.startsWith("__session_"))
+    .map((c) => c.name.replace("__session_", ""))
+    .find((id) => (ACTIVE_COMMUNITY_IDS as readonly string[]).includes(id)) ?? "";
+
+  if (!authCommunityId) {
+    return { error: "有効なセッションが見つかりません。いずれかのコミュニティにログインしてから再試行してください" };
+  }
+
   try {
     const data = await executeServerGraphQLQuery<
       CommunityCreateResponse,
@@ -77,7 +94,7 @@ export async function createCommunityAction(
           },
         },
       },
-      {},
+      { "X-Community-Id": authCommunityId },
       30000,
     );
 
