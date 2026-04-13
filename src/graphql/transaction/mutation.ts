@@ -44,3 +44,20 @@ export const DONATE_POINT = gql`
     }
   }
 `;
+
+export const TRANSACTION_UPDATE_METADATA = gql`
+  mutation TransactionUpdateMetadata(
+    $id: ID!
+    $input: TransactionUpdateMetadataInput!
+    $permission: CheckIsSelfPermissionInput!
+  ) {
+    transactionUpdateMetadata(id: $id, input: $input, permission: $permission) {
+      ... on TransactionUpdateMetadataSuccess {
+        transaction {
+          id
+          images
+        }
+      }
+    }
+  }
+`;

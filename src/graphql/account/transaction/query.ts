@@ -24,6 +24,7 @@ export const GET_TRANSACTIONS_SERVER_QUERY = `
           id
           reason
           comment
+          images
           fromPointChange
           toPointChange
           createdAt

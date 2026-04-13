@@ -6573,6 +6573,7 @@ export type GqlTransactionFieldsFragment = {
   id: string;
   reason: GqlTransactionReason;
   comment?: string | null;
+  images?: string[] | null;
   fromPointChange?: number | null;
   toPointChange?: number | null;
   createdAt?: Date | null;
@@ -6741,6 +6742,7 @@ export type GqlGetTransactionDetailQuery = {
     id: string;
     reason: GqlTransactionReason;
     comment?: string | null;
+    images?: string[] | null;
     fromPointChange?: number | null;
     toPointChange?: number | null;
     createdAt?: Date | null;
@@ -7000,6 +7002,7 @@ export const TransactionFieldsFragmentDoc = gql`
     id
     reason
     comment
+    images
     fromPointChange
     toPointChange
     createdAt
@@ -13467,6 +13470,52 @@ export type PointDonateMutationOptions = Apollo.BaseMutationOptions<
   GqlPointDonateMutation,
   GqlPointDonateMutationVariables
 >;
+
+export type GqlTransactionUpdateMetadataMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+  input: GqlTransactionUpdateMetadataInput;
+  permission: GqlCheckIsSelfPermissionInput;
+}>;
+
+export type GqlTransactionUpdateMetadataMutation = {
+  __typename?: "Mutation";
+  transactionUpdateMetadata?: {
+    __typename?: "TransactionUpdateMetadataSuccess";
+    transaction: {
+      __typename?: "Transaction";
+      id: string;
+      images?: string[] | null;
+    };
+  } | null;
+};
+
+export const TransactionUpdateMetadataDocument = gql`
+  mutation TransactionUpdateMetadata(
+    $id: ID!
+    $input: TransactionUpdateMetadataInput!
+    $permission: CheckIsSelfPermissionInput!
+  ) {
+    transactionUpdateMetadata(id: $id, input: $input, permission: $permission) {
+      ... on TransactionUpdateMetadataSuccess {
+        transaction {
+          id
+          images
+        }
+      }
+    }
+  }
+`;
+
+export function useTransactionUpdateMetadataMutation(
+  baseOptions?: Apollo.MutationHookOptions<GqlTransactionUpdateMetadataMutation, GqlTransactionUpdateMetadataMutationVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlTransactionUpdateMetadataMutation, GqlTransactionUpdateMetadataMutationVariables>(
+    TransactionUpdateMetadataDocument,
+    options,
+  );
+}
+
 export const GetTransactionsDocument = gql`
   query getTransactions(
     $filter: TransactionFilterInput

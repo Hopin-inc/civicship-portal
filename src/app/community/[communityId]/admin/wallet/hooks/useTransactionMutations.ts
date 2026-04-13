@@ -1,15 +1,18 @@
 import { ApolloError } from "@apollo/client";
 import {
   GqlErrorCode,
+  GqlImageInput,
   GqlMutationTransactionDonateSelfPointArgs,
   GqlMutationTransactionGrantCommunityPointArgs,
   GqlMutationTransactionIssueCommunityPointArgs,
   GqlPointDonateMutation,
   GqlPointGrantMutation,
   GqlPointIssueMutation,
+  GqlTransactionUpdateMetadataMutation,
   usePointDonateMutation,
   usePointGrantMutation,
   usePointIssueMutation,
+  useTransactionUpdateMetadataMutation,
 } from "@/types/graphql";
 import { logger } from "@/lib/logging";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
@@ -44,11 +47,13 @@ const checkAuth = (): { success: false; code: GqlErrorCode } | null => {
 export const useTransactionMutations = () => {
   // firebaseUser または exchange経由のlineTokens.idTokenをsubscribeしてUIが反応的に更新されるようにする
   const isAuthReady = useAuthStore((s) => !!s.state.firebaseUser || !!s.state.lineTokens.idToken);
+  const currentUserId = useAuthStore((s) => s.state.currentUser?.id ?? null);
 
   // Apollo Hooks
   const [issuePointMutation, { loading: loadingIssue }] = usePointIssueMutation();
   const [grantPointMutation, { loading: loadingGrant }] = usePointGrantMutation();
   const [donatePointMutation, { loading: loadingDonate }] = usePointDonateMutation();
+  const [updateMetadataMutation] = useTransactionUpdateMetadataMutation();
 
   // -----------------------
   // 明示的に定義: ポイント発行
@@ -159,10 +164,54 @@ export const useTransactionMutations = () => {
     }
   };
 
+  const updateTransactionMetadata = async (
+    transactionId: string,
+    images: File[],
+  ): Promise<Result<GqlTransactionUpdateMetadataMutation>> => {
+    if (!currentUserId) {
+      return { success: false, code: GqlErrorCode.Unauthenticated };
+    }
+
+    const imagesInput: GqlImageInput[] = images.map((file) => ({
+      file,
+      alt: "",
+      caption: "",
+    }));
+
+    try {
+      const { data } = await updateMetadataMutation({
+        variables: {
+          id: transactionId,
+          input: { images: imagesInput },
+          permission: { userId: currentUserId },
+        },
+      });
+
+      if (data != null) {
+        return { success: true, data };
+      } else {
+        return { success: false, code: GqlErrorCode.Unknown };
+      }
+    } catch (e) {
+      if (e instanceof ApolloError) {
+        const gqlError = e.graphQLErrors[0];
+        const code = gqlError?.extensions?.code as GqlErrorCode | undefined;
+        return { success: false, code: code ?? GqlErrorCode.Unknown };
+      }
+      logger.warn("Update transaction metadata failed", {
+        error: e instanceof Error ? e.message : String(e),
+        component: "useTransactionMutations",
+        errorCategory: "system",
+      });
+      return { success: false, code: GqlErrorCode.Unknown };
+    }
+  };
+
   return {
     issuePoint,
     grantPoint,
     donatePoint,
+    updateTransactionMetadata,
     isLoading: loadingIssue || loadingGrant || loadingDonate,
     isAuthReady,
   };

@@ -5,9 +5,10 @@ export const TRANSACTION_FRAGMENT = gql`
     id
     reason
     comment
+    images
     fromPointChange
     toPointChange
 
     createdAt
   }
-`; 
+`;
