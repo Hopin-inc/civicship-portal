@@ -10,6 +10,7 @@ import { useTranslations } from "next-intl";
 import { useLocaleDateTimeFormat } from "@/utils/i18n";
 import { useTransactionDetailData } from "./lib/useTransactionDetailData";
 import { VerificationSection } from "../components/VerificationSection";
+import { TransactionImageGrid } from "./components/TransactionImageGrid";
 
 export default function TransactionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -85,17 +86,8 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
         ))}
       </div>
       {images.length > 0 && (
-        <div className="mt-4 flex gap-2 flex-wrap">
-          {images.map((url, i) => (
-            <div key={i} className="relative w-24 h-24 shrink-0">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={url}
-                alt=""
-                className="w-full h-full object-cover rounded-xl"
-              />
-            </div>
-          ))}
+        <div className="mt-4">
+          <TransactionImageGrid images={images} />
         </div>
       )}
       <VerificationSection transactionId={id} />
