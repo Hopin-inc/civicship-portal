@@ -17,6 +17,7 @@ import { TransactionTimelineItem } from "@/shared/transactions/components/timeli
 import { TransactionHeader } from "@/shared/transactions/components/timeline/TransactionHeader";
 import { TransactionActionLabel } from "@/shared/transactions/components/timeline/TransactionActionLabel";
 import { TransactionMessageCard } from "@/shared/transactions/components/timeline/TransactionMessageCard";
+import AsymmetricImageGrid from "@/components/ui/asymmetric-image-grid";
 
 interface TransactionCardProps {
   transaction: GqlTransaction;
@@ -73,28 +74,16 @@ export const TransactionCard = ({
     : null;
 
   const images = transaction.images ?? [];
+  const displayImages = images.slice(0, 4).map((url) => ({ url, alt: "" }));
+  const remainingCount = images.length > 4 ? images.length - 4 : undefined;
 
   const messageCard =
     info.comment || images.length > 0 ? (
       <div>
         {info.comment && <TransactionMessageCard comment={info.comment} />}
         {images.length > 0 && (
-          <div className="flex gap-1.5 mt-2 flex-wrap">
-            {images.slice(0, 4).map((url, i) => (
-              <div key={i} className="relative w-16 h-16 shrink-0">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={url}
-                  alt=""
-                  className="w-full h-full object-cover rounded-lg"
-                />
-                {i === 3 && images.length > 4 && (
-                  <div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center">
-                    <span className="text-white text-sm font-bold">+{images.length - 4}</span>
-                  </div>
-                )}
-              </div>
-            ))}
+          <div className={`mt-2 h-32 ${info.comment ? "mt-3" : ""}`}>
+            <AsymmetricImageGrid images={displayImages} remainingCount={remainingCount} />
           </div>
         )}
       </div>
