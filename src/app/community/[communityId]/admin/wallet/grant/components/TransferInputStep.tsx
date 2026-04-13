@@ -9,8 +9,8 @@ import { toast } from "react-toastify";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/textarea";
 import { useTranslations } from "next-intl";
-import { Delete } from "lucide-react";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from "@/components/ui/item";
+import Numpad, { NumpadKey } from "@/components/ui/numpad";
 
 interface Props {
   user: GqlUser;
@@ -26,13 +26,6 @@ interface Props {
 }
 
 const INT_LIMIT = 2000000000;
-
-const NUMPAD_KEYS = [
-  ["1", "2", "3"],
-  ["4", "5", "6"],
-  ["7", "8", "9"],
-  ["AC", "0", "backspace"],
-] as const;
 
 function TransferInputStep({
   user,
@@ -70,7 +63,7 @@ function TransferInputStep({
   const maxAmount = Math.min(Number(currentPoint), INT_LIMIT);
   const isAmountValid = numericAmount > 0 && numericAmount <= maxAmount;
 
-  const handleKey = (key: string) => {
+  const handleKey = (key: NumpadKey) => {
     if (key === "AC") {
       setInputStr("");
       return;
@@ -186,18 +179,8 @@ function TransferInputStep({
       </div>
 
       {/* テンキー */}
-      <div className="bg-muted/30 px-6 pt-5 pb-6">
-        <div className="grid grid-cols-3 gap-3 max-w-xs mx-auto">
-          {NUMPAD_KEYS.flat().map((key) => (
-            <button
-              key={key}
-              onClick={() => handleKey(key)}
-              className="flex items-center justify-center h-16 rounded-2xl bg-background text-xl font-semibold text-foreground active:bg-muted transition-colors select-none shadow-sm"
-            >
-              {key === "backspace" ? <Delete className="w-5 h-5" /> : key}
-            </button>
-          ))}
-        </div>
+      <div className="bg-muted/30">
+        <Numpad onKey={handleKey} />
       </div>
     </>
   );
