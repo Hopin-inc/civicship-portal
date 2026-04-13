@@ -9,6 +9,7 @@
 
 import Link, { LinkProps } from "next/link";
 import { forwardRef, ReactNode, useMemo } from "react";
+import { usePathname } from "next/navigation";
 
 import { getCommunityIdClient } from "@/lib/community";
 import { resolvePath } from "./path-resolver";
@@ -28,6 +29,16 @@ type AppLinkProps = Omit<LinkProps, "href"> & {
    */
   communityId?: string | null;
 };
+
+/**
+ * URLのパス名から communityId を抽出する
+ * /community/{communityId}/... の形式にマッチ
+ * SSR とクライアントで一貫した値が得られるため hydration mismatch を防ぐ
+ */
+function getCommunityIdFromPathname(pathname: string): string | null {
+  const match = pathname.match(/^\/community\/([a-zA-Z0-9-]+)/);
+  return match ? match[1] : null;
+}
 
 /**
  * AppLink コンポーネント
@@ -55,14 +66,21 @@ export const AppLink = forwardRef<HTMLAnchorElement, AppLinkProps>(
     },
     ref
   ) {
+    const pathname = usePathname();
+
     const resolvedHref = useMemo(() => {
       if (skipPathResolution) {
         return href;
       }
 
-      const communityId = explicitCommunityId ?? getCommunityIdClient();
+      // usePathname() は SSR とクライアントで同じ値を返すため hydration mismatch が起きない
+      // getCommunityIdClient() (Cookie/Store) は SSR では null になるためフォールバックとして使用
+      const communityId =
+        explicitCommunityId ??
+        getCommunityIdFromPathname(pathname) ??
+        getCommunityIdClient();
       return resolvePath(href, communityId);
-    }, [href, skipPathResolution, explicitCommunityId]);
+    }, [href, skipPathResolution, explicitCommunityId, pathname]);
 
     return (
       <Link ref={ref} href={resolvedHref} {...props}>
