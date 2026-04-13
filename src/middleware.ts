@@ -46,6 +46,14 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // /create はコミュニティスコープ外の SYS_ADMIN 専用ページ。
+  // ホストやクッキーで communityId を解決できない場合は最初の active community を
+  // 認証コンテキスト用フォールバックとして使用する（SYS_ADMIN は全テナントで有効）。
+  if (!communityId && (pathname === "/create" || pathname.startsWith("/create/"))) {
+    communityId = (ACTIVE_COMMUNITY_IDS as readonly string[])[0] ?? null;
+    if (communityId) communityIdSource = "fallback";
+  }
+
   if (!communityId) {
     console.warn("[Middleware] Could not resolve communityId from path or host", {
       host,
