@@ -1,0 +1,14 @@
+{
+  "adminSetting.page.title": "Community Settings",
+  "adminSetting.form.name": "Community Name",
+  "adminSetting.form.pointName": "Point Name",
+  "adminSetting.form.bio": "Description",
+  "adminSetting.form.website": "Website",
+  "adminSetting.form.establishedAt": "Established Date",
+  "adminSetting.form.submit": "Save",
+  "adminSetting.form.saving": "Saving...",
+  "adminSetting.form.success": "Community information updated",
+  "adminSetting.form.error.nameRequired": "Community name is required",
+  "adminSetting.form.error.pointNameRequired": "Point name is required",
+  "adminSetting.form.error.submit": "Failed to update. Please try again"
+}

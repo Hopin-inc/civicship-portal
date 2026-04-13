@@ -41,3 +41,25 @@ export const INCENTIVE_GRANT_RETRY = gql`
     }
   }
 `;
+
+export const COMMUNITY_UPDATE_PROFILE = gql`
+  mutation CommunityUpdateProfile(
+    $id: ID!
+    $input: CommunityUpdateProfileInput!
+    $communityId: ID!
+  ) {
+    communityUpdateProfile(id: $id, input: $input, permission: { communityId: $communityId }) {
+      ... on CommunityUpdateProfileSuccess {
+        community {
+          id
+          name
+          bio
+          website
+          pointName
+          image
+          establishedAt
+        }
+      }
+    }
+  }
+`;

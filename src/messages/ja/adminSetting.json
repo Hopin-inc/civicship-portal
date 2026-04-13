@@ -1,0 +1,14 @@
+{
+  "adminSetting.page.title": "コミュニティ設定",
+  "adminSetting.form.name": "コミュニティ名",
+  "adminSetting.form.pointName": "ポイント名",
+  "adminSetting.form.bio": "紹介文",
+  "adminSetting.form.website": "ウェブサイト",
+  "adminSetting.form.establishedAt": "設立日",
+  "adminSetting.form.submit": "保存",
+  "adminSetting.form.saving": "保存中...",
+  "adminSetting.form.success": "コミュニティ情報を更新しました",
+  "adminSetting.form.error.nameRequired": "コミュニティ名は必須です",
+  "adminSetting.form.error.pointNameRequired": "ポイント名は必須です",
+  "adminSetting.form.error.submit": "更新に失敗しました。もう一度お試しください"
+}

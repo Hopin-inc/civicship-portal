@@ -12,6 +12,7 @@ import {
   Image,
   MapPin,
   MegaphoneIcon,
+  Settings,
   Ticket,
   Users,
   Wallet,
@@ -26,6 +27,11 @@ import { useTranslations } from "next-intl";
 type FeaturesType = string;
 
 const adminSettings = [
+  {
+    title: "コミュニティ設定",
+    href: "/admin/setting",
+    icon: Settings,
+  },
   {
     title: "メンバー管理",
     href: "/admin/members",
