@@ -146,29 +146,15 @@ export function CommunitySettingForm({ editor, onSubmit }: CommunitySettingFormP
         previewClassName="h-12 w-12"
       />
 
-      {/* Favicon プレフィックス */}
-      <div className="space-y-1">
-        <div className="flex items-center gap-2 px-1">
-          <span className="text-sm text-muted-foreground">{t("adminSetting.form.faviconPrefix")}</span>
-        </div>
-        <Input
-          value={editor.formState.faviconPrefix}
-          onChange={(e) => editor.updateField("faviconPrefix", e.target.value)}
-          placeholder="https://example.com/favicons"
-        />
-        {faviconPreviewSrc && (
-          <div className="mt-2">
-            <img
-              src={faviconPreviewSrc}
-              alt="Faviconプレビュー"
-              className="h-8 w-8 rounded border border-border object-contain bg-muted"
-              onError={(e) => {
-                (e.currentTarget as HTMLImageElement).style.display = "none";
-              }}
-            />
-          </div>
-        )}
-      </div>
+      {/* Favicon */}
+      <ImagePickerField
+        label={t("adminSetting.form.faviconPrefix")}
+        previewUrl={editor.getPreviewUrl(editor.faviconImage)}
+        onPickerClick={() => editor.faviconInputRef.current?.click()}
+        inputRef={editor.faviconInputRef}
+        onFileChange={(e) => editor.handleImageSelect("favicon", e)}
+        previewClassName="h-8 w-8"
+      />
 
       {/* 送信ボタン */}
       <div className="w-full max-w-[345px] mx-auto pt-4">

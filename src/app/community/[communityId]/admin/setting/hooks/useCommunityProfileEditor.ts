@@ -21,7 +21,6 @@ interface FormState {
   title: string;
   description: string;
   shortDescription: string;
-  faviconPrefix: string;
 }
 
 interface FormErrors {
@@ -40,14 +39,15 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
     title: "",
     description: "",
     shortDescription: "",
-    faviconPrefix: "",
   });
   const [logoImage, setLogoImage] = useState<ImageField>(null);
   const [squareLogoImage, setSquareLogoImage] = useState<ImageField>(null);
+  const [faviconImage, setFaviconImage] = useState<ImageField>(null);
   const [errors, setErrors] = useState<FormErrors>({});
 
   const logoInputRef = useRef<HTMLInputElement>(null);
   const squareLogoInputRef = useRef<HTMLInputElement>(null);
+  const faviconInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (data?.communityPortalConfig) {
@@ -56,13 +56,16 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
         title: c.title ?? "",
         description: c.description ?? "",
         shortDescription: c.shortDescription ?? "",
-        faviconPrefix: c.faviconPrefix ?? "",
       });
       if (c.logoPath) {
         setLogoImage({ type: "existing", url: c.logoPath });
       }
       if (c.squareLogoPath) {
         setSquareLogoImage({ type: "existing", url: c.squareLogoPath });
+      }
+      if (c.faviconPrefix) {
+        // faviconPrefix はディレクトリ prefix。favicon.ico をプレビューとして使用
+        setFaviconImage({ type: "existing", url: `${c.faviconPrefix}/favicon.ico` });
       }
     }
   }, [data]);
@@ -80,7 +83,7 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
   }
 
   function handleImageSelect(
-    field: "logo" | "squareLogo",
+    field: "logo" | "squareLogo" | "favicon",
     e: ChangeEvent<HTMLInputElement>,
   ) {
     const file = e.target.files?.[0];
@@ -89,8 +92,10 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
     const imageField: ImageField = { type: "new", file, previewUrl };
     if (field === "logo") {
       setLogoImage(imageField);
-    } else {
+    } else if (field === "squareLogo") {
       setSquareLogoImage(imageField);
+    } else {
+      setFaviconImage(imageField);
     }
     // input をリセットして同じファイルを再選択できるようにする
     e.target.value = "";
@@ -121,7 +126,6 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
         title: formState.title.trim(),
         description: formState.description.trim() || undefined,
         shortDescription: formState.shortDescription.trim() || undefined,
-        faviconPrefix: formState.faviconPrefix.trim() || undefined,
       };
 
       if (logoImage?.type === "new") {
@@ -129,6 +133,9 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
       }
       if (squareLogoImage?.type === "new") {
         input.squareLogo = { file: squareLogoImage.file };
+      }
+      if (faviconImage?.type === "new") {
+        input.favicon = { file: faviconImage.file };
       }
 
       await updatePortalConfig({ variables: { communityId, input } });
@@ -144,8 +151,10 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
     updateField,
     logoImage,
     squareLogoImage,
+    faviconImage,
     logoInputRef,
     squareLogoInputRef,
+    faviconInputRef,
     handleImageSelect,
     getPreviewUrl,
     onSubmit,
