@@ -1,10 +1,8 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useAppRouter } from "@/lib/navigation";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "react-toastify";
 import { useTransactionMutations } from "@/app/community/[communityId]/admin/wallet/hooks/useTransactionMutations";
@@ -12,6 +10,7 @@ import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 import { useTranslations } from "next-intl";
+import Numpad, { NumpadKey } from "@/components/ui/numpad";
 
 const INT_LIMIT = 2000000000;
 
@@ -20,128 +19,127 @@ export default function IssuePointPage() {
   const communityConfig = useCommunityConfig();
   const communityId = communityConfig?.communityId ?? "";
   const router = useAppRouter();
+  const track = useAnalytics();
+
+  const [step, setStep] = useState<"numpad" | "confirm">("numpad");
+  const [inputStr, setInputStr] = useState("");
+  const [comment, setComment] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const headerConfig = useMemo(
     () => ({
       title: t("adminWallet.issue.title"),
       showLogo: false,
       showBackButton: true,
+      onBackClick: step === "confirm" ? () => setStep("numpad") : undefined,
     }),
-    [t],
+    [t, step],
   );
   useHeaderConfig(headerConfig);
 
-  const track = useAnalytics();
-
-  const [amount, setAmount] = useState<number | null>(null);
-  const [displayValue, setDisplayValue] = useState<string>("");
-  const [comment, setComment] = useState<string>("");
-
   const { issuePoint } = useTransactionMutations();
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value;
-    if (raw === "") {
-      setAmount(null);
-      setDisplayValue("");
-      return;
-    }
+  const numericAmount = parseInt(inputStr || "0", 10);
+  const isAmountValid = numericAmount > 0 && numericAmount <= INT_LIMIT;
 
-    const num = Number(raw);
-    if (isNaN(num)) return;
-    if (num < 0) {
-      toast.error(t("adminWallet.issue.validation.min"));
+  const handleKey = (key: NumpadKey) => {
+    if (key === "AC") {
+      setInputStr("");
       return;
     }
-    if (num > INT_LIMIT) {
+    if (key === "backspace") {
+      setInputStr((prev) => prev.slice(0, -1));
+      return;
+    }
+    const parsed = parseInt((inputStr || "") + key, 10);
+    const next = String(parsed);
+    if (parsed > INT_LIMIT) {
       toast.error(t("adminWallet.issue.validation.max"));
       return;
     }
-    setAmount(num);
-    setDisplayValue(raw);
+    setInputStr(next);
   };
 
   const handleIssuePoint = async () => {
-    if (!amount || amount <= 0) return;
+    if (!isAmountValid) return;
+    setIsLoading(true);
     try {
       const res = await issuePoint({
-        input: { transferPoints: amount, comment: comment.trim() || undefined },
+        input: { transferPoints: numericAmount, comment: comment.trim() || undefined },
         permission: { communityId },
       });
 
       if (res.success) {
-        track({
-          name: "issue_point",
-          params: { amount },
-        });
+        track({ name: "issue_point", params: { amount: numericAmount } });
         toast.success(t("adminWallet.issue.success"));
         router.push("/admin/wallet?refresh=true");
       }
-    } catch (err) {
-      toast.error;
+    } catch {
+      toast.error(t("adminWallet.issue.validation.max"));
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  return (
-    <>
-      <main className="flex items-center justify-center px-4">
-        <div className="flex flex-col items-center space-y-6 max-w-xl w-full">
-          <section className="w-full">
-            <div>
-              <Label className="text-label-md font-medium">
-                {t("wallets.shared.transfer.amountLabel")}
-              </Label>
-              <span className="text-label-xs rounded-full px-2 py-[2px] ml-2 bg-primary-foreground text-primary font-bold">
-                {t("wallets.shared.transfer.required")}
-              </span>
-            </div>
-            <Input
-              type="text"
-              placeholder="1000pt"
-              value={displayValue}
-              onChange={handleInputChange}
-              inputMode="numeric"
-              className="mt-3 focus:outline-none focus:ring-0 shadow-none"
+  const amountSection = (
+    <div className="flex flex-col items-center gap-3">
+      <p className="text-sm text-muted-foreground">{t("adminWallet.issue.title")}</p>
+      <div className="flex items-baseline gap-2">
+        <span className="text-6xl font-bold tabular-nums tracking-tight">
+          {numericAmount.toLocaleString()}
+        </span>
+        <span className="text-2xl text-muted-foreground font-medium">pt</span>
+      </div>
+    </div>
+  );
+
+  if (step === "confirm") {
+    return (
+      <main className="flex flex-col items-center px-4 pt-8 gap-6 max-w-xl mx-auto w-full">
+        {amountSection}
+
+        <div className="w-full">
+          <div className="relative">
+            <Textarea
+              maxLength={100}
+              placeholder={t("wallets.shared.transfer.commentPlaceholder")}
+              value={comment}
+              onChange={(e) => {
+                if (e.target.value.length > 100) {
+                  toast.error(t("wallets.shared.transfer.commentError"));
+                  return;
+                }
+                setComment(e.target.value);
+              }}
+              className="focus:outline-none focus:ring-0 shadow-none min-h-[160px] pr-12 resize-none"
             />
-
-            <div className="mt-6">
-              <Label className="text-label-md font-medium">
-                {t("wallets.shared.transfer.commentLabel")}
-              </Label>
-              <div className="relative mt-3">
-                <Textarea
-                  maxLength={100}
-                  placeholder={t("wallets.shared.transfer.commentPlaceholder")}
-                  value={comment}
-                  onChange={(e) => {
-                    const newValue = e.target.value;
-                    if (newValue.length > 100) {
-                      toast.error(t("wallets.shared.transfer.commentError"));
-                      return;
-                    }
-                    setComment(newValue);
-                  }}
-                  className="focus:outline-none focus:ring-0 shadow-none min-h-[120px] pr-12"
-                />
-                <div className="absolute bottom-2 right-2 text-xs text-muted-foreground">
-                  {comment.length}/100
-                </div>
-              </div>
+            <div className="absolute bottom-2 right-2 text-xs text-muted-foreground">
+              {comment.length}/100
             </div>
-          </section>
-
-          <div className="flex flex-col gap-2 w-full mt-6">
-            <Button
-              size="lg"
-              className="w-full"
-              onClick={handleIssuePoint}
-              disabled={!amount || amount <= 0 || amount > INT_LIMIT}
-            >
-              {t("adminWallet.issue.submit")}
-            </Button>
           </div>
         </div>
+
+        <Button onClick={handleIssuePoint} disabled={isLoading} className="w-full">
+          {t("adminWallet.issue.submit")}
+        </Button>
       </main>
-    </>
+    );
+  }
+
+  return (
+    <div className="fixed inset-x-0 top-16 bottom-0 max-w-mobile-l mx-auto flex flex-col overflow-hidden bg-background">
+      {/* 金額入力エリア（60%） */}
+      <div className="flex-[3] flex flex-col items-center justify-center gap-4 px-4">
+        {amountSection}
+        <Button onClick={() => setStep("confirm")} disabled={!isAmountValid} className="px-10 mt-2">
+          {t("wallets.shared.transfer.nextLabel")}
+        </Button>
+      </div>
+
+      {/* テンキー（40%） */}
+      <div className="flex-[2] bg-muted/30">
+        <Numpad onKey={handleKey} />
+      </div>
+    </div>
   );
 }
