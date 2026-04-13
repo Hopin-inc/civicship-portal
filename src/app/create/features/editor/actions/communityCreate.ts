@@ -1,7 +1,6 @@
 "use server";
 
 import { executeServerGraphQLQuery } from "@/lib/graphql/server";
-import { getUserServer } from "@/lib/auth/init/getUserServer";
 
 const COMMUNITY_CREATE_MUTATION = `
   mutation CommunityCreate($input: CommunityCreateInput!) {
@@ -47,12 +46,6 @@ const LIFF_ID_PATTERN = /^\d+-[A-Za-z0-9]+$/;
 export async function createCommunityAction(
   input: CommunityCreateServerInput,
 ): Promise<CommunityCreateServerResult> {
-  // 権限チェック: SYS_ADMIN のみ実行可能
-  const { user } = await getUserServer();
-  if (!user || user.sysRole !== "SYS_ADMIN") {
-    return { error: "この操作を実行する権限がありません" };
-  }
-
   // LIFF ID 形式バリデーション
   if (!LIFF_ID_PATTERN.test(input.lineLiffId)) {
     return { error: "LIFF ID の形式が正しくありません（例: 2009756673-s2ldhFgl）" };
