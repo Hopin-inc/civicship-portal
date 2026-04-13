@@ -943,6 +943,7 @@ export type GqlMutation = {
   transactionDonateSelfPoint?: Maybe<GqlTransactionDonateSelfPointPayload>;
   transactionGrantCommunityPoint?: Maybe<GqlTransactionGrantCommunityPointPayload>;
   transactionIssueCommunityPoint?: Maybe<GqlTransactionIssueCommunityPointPayload>;
+  transactionUpdateMetadata?: Maybe<GqlTransactionUpdateMetadataPayload>;
   updatePortalConfig: GqlCommunityPortalConfig;
   updateSignupBonusConfig: GqlCommunitySignupBonusConfig;
   userDeleteMe?: Maybe<GqlUserDeletePayload>;
@@ -1186,6 +1187,12 @@ export type GqlMutationTransactionGrantCommunityPointArgs = {
 export type GqlMutationTransactionIssueCommunityPointArgs = {
   input: GqlTransactionIssueCommunityPointInput;
   permission: GqlCheckCommunityPermissionInput;
+};
+
+export type GqlMutationTransactionUpdateMetadataArgs = {
+  id: Scalars["ID"]["input"];
+  input: GqlTransactionUpdateMetadataInput;
+  permission: GqlCheckIsSelfPermissionInput;
 };
 
 export type GqlMutationUpdatePortalConfigArgs = {
@@ -2662,6 +2669,7 @@ export type GqlTransaction = {
   fromPointChange?: Maybe<Scalars["Int"]["output"]>;
   fromWallet?: Maybe<GqlWallet>;
   id: Scalars["ID"]["output"];
+  images?: Maybe<Array<Scalars["String"]["output"]>>;
   participation?: Maybe<GqlParticipation>;
   reason: GqlTransactionReason;
   reservation?: Maybe<GqlReservation>;
@@ -2750,6 +2758,18 @@ export const GqlTransactionReason = {
 export type GqlTransactionReason = (typeof GqlTransactionReason)[keyof typeof GqlTransactionReason];
 export type GqlTransactionSortInput = {
   createdAt?: InputMaybe<GqlSortDirection>;
+};
+
+export type GqlTransactionUpdateMetadataInput = {
+  comment?: InputMaybe<Scalars["String"]["input"]>;
+  images?: InputMaybe<Array<GqlImageInput>>;
+};
+
+export type GqlTransactionUpdateMetadataPayload = GqlTransactionUpdateMetadataSuccess;
+
+export type GqlTransactionUpdateMetadataSuccess = {
+  __typename?: "TransactionUpdateMetadataSuccess";
+  transaction: GqlTransaction;
 };
 
 export type GqlTransactionVerificationResult = {
@@ -3526,7 +3546,6 @@ export type GqlGetSingleMembershipQuery = {
       currentPrefecture?: GqlCurrentPrefecture | null;
       phoneNumber?: string | null;
       preferredLanguage?: GqlLanguage | null;
-      sysRole?: GqlSysRole | null;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
@@ -3724,7 +3743,6 @@ export type GqlGetCurrentUserProfileQuery = {
       currentPrefecture?: GqlCurrentPrefecture | null;
       phoneNumber?: string | null;
       preferredLanguage?: GqlLanguage | null;
-      sysRole?: GqlSysRole | null;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
@@ -3766,7 +3784,6 @@ export type GqlGetCurrentUserProfileQuery = {
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
           preferredLanguage?: GqlLanguage | null;
-          sysRole?: GqlSysRole | null;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -3828,7 +3845,6 @@ export type GqlUserFieldsFragment = {
   currentPrefecture?: GqlCurrentPrefecture | null;
   phoneNumber?: string | null;
   preferredLanguage?: GqlLanguage | null;
-  sysRole?: GqlSysRole | null;
   urlFacebook?: string | null;
   urlInstagram?: string | null;
   urlX?: string | null;
@@ -3868,7 +3884,6 @@ export type GqlUserPortfolioFieldsFragment = {
     currentPrefecture?: GqlCurrentPrefecture | null;
     phoneNumber?: string | null;
     preferredLanguage?: GqlLanguage | null;
-    sysRole?: GqlSysRole | null;
     urlFacebook?: string | null;
     urlInstagram?: string | null;
     urlX?: string | null;
@@ -3924,7 +3939,6 @@ export type GqlGetUserFlexibleQuery = {
     currentPrefecture?: GqlCurrentPrefecture | null;
     phoneNumber?: string | null;
     preferredLanguage?: GqlLanguage | null;
-    sysRole?: GqlSysRole | null;
     urlFacebook?: string | null;
     urlInstagram?: string | null;
     urlX?: string | null;
@@ -3961,7 +3975,6 @@ export type GqlGetUserFlexibleQuery = {
         currentPrefecture?: GqlCurrentPrefecture | null;
         phoneNumber?: string | null;
         preferredLanguage?: GqlLanguage | null;
-        sysRole?: GqlSysRole | null;
         urlFacebook?: string | null;
         urlInstagram?: string | null;
         urlX?: string | null;
@@ -4076,7 +4089,6 @@ export type GqlGetUserWalletQuery = {
     currentPrefecture?: GqlCurrentPrefecture | null;
     phoneNumber?: string | null;
     preferredLanguage?: GqlLanguage | null;
-    sysRole?: GqlSysRole | null;
     urlFacebook?: string | null;
     urlInstagram?: string | null;
     urlX?: string | null;
@@ -4200,7 +4212,6 @@ export type GqlGetWalletsWithTransactionQuery = {
               currentPrefecture?: GqlCurrentPrefecture | null;
               phoneNumber?: string | null;
               preferredLanguage?: GqlLanguage | null;
-              sysRole?: GqlSysRole | null;
               urlFacebook?: string | null;
               urlInstagram?: string | null;
               urlX?: string | null;
@@ -4221,7 +4232,6 @@ export type GqlGetWalletsWithTransactionQuery = {
               currentPrefecture?: GqlCurrentPrefecture | null;
               phoneNumber?: string | null;
               preferredLanguage?: GqlLanguage | null;
-              sysRole?: GqlSysRole | null;
               urlFacebook?: string | null;
               urlInstagram?: string | null;
               urlX?: string | null;
@@ -4419,7 +4429,6 @@ export type GqlGetArticlesQuery = {
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
           preferredLanguage?: GqlLanguage | null;
-          sysRole?: GqlSysRole | null;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -4456,7 +4465,6 @@ export type GqlGetArticleQuery = {
       currentPrefecture?: GqlCurrentPrefecture | null;
       phoneNumber?: string | null;
       preferredLanguage?: GqlLanguage | null;
-      sysRole?: GqlSysRole | null;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
@@ -4506,7 +4514,6 @@ export type GqlGetArticleQuery = {
       currentPrefecture?: GqlCurrentPrefecture | null;
       phoneNumber?: string | null;
       preferredLanguage?: GqlLanguage | null;
-      sysRole?: GqlSysRole | null;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
@@ -4545,7 +4552,6 @@ export type GqlGetArticleQuery = {
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
           preferredLanguage?: GqlLanguage | null;
-          sysRole?: GqlSysRole | null;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -5251,7 +5257,6 @@ export type GqlGetOpportunitySlotWithParticipationsQuery = {
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
           preferredLanguage?: GqlLanguage | null;
-          sysRole?: GqlSysRole | null;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -5411,7 +5416,6 @@ export type GqlGetParticipationQuery = {
             currentPrefecture?: GqlCurrentPrefecture | null;
             phoneNumber?: string | null;
             preferredLanguage?: GqlLanguage | null;
-            sysRole?: GqlSysRole | null;
             urlFacebook?: string | null;
             urlInstagram?: string | null;
             urlX?: string | null;
@@ -5477,7 +5481,6 @@ export type GqlGetParticipationQuery = {
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
           preferredLanguage?: GqlLanguage | null;
-          sysRole?: GqlSysRole | null;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -5552,7 +5555,6 @@ export type GqlGetParticipationQuery = {
         currentPrefecture?: GqlCurrentPrefecture | null;
         phoneNumber?: string | null;
         preferredLanguage?: GqlLanguage | null;
-        sysRole?: GqlSysRole | null;
         urlFacebook?: string | null;
         urlInstagram?: string | null;
         urlX?: string | null;
@@ -5568,7 +5570,6 @@ export type GqlGetParticipationQuery = {
       currentPrefecture?: GqlCurrentPrefecture | null;
       phoneNumber?: string | null;
       preferredLanguage?: GqlLanguage | null;
-      sysRole?: GqlSysRole | null;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
@@ -5702,7 +5703,6 @@ export type GqlGetReservationsQuery = {
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
           preferredLanguage?: GqlLanguage | null;
-          sysRole?: GqlSysRole | null;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -5763,7 +5763,6 @@ export type GqlGetReservationQuery = {
       currentPrefecture?: GqlCurrentPrefecture | null;
       phoneNumber?: string | null;
       preferredLanguage?: GqlLanguage | null;
-      sysRole?: GqlSysRole | null;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
@@ -5822,7 +5821,6 @@ export type GqlGetReservationQuery = {
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
           preferredLanguage?: GqlLanguage | null;
-          sysRole?: GqlSysRole | null;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -5877,7 +5875,6 @@ export type GqlGetReservationQuery = {
         currentPrefecture?: GqlCurrentPrefecture | null;
         phoneNumber?: string | null;
         preferredLanguage?: GqlLanguage | null;
-        sysRole?: GqlSysRole | null;
         urlFacebook?: string | null;
         urlInstagram?: string | null;
         urlX?: string | null;
@@ -6108,7 +6105,6 @@ export type GqlGetPlacesQuery = {
               currentPrefecture?: GqlCurrentPrefecture | null;
               phoneNumber?: string | null;
               preferredLanguage?: GqlLanguage | null;
-              sysRole?: GqlSysRole | null;
               urlFacebook?: string | null;
               urlInstagram?: string | null;
               urlX?: string | null;
@@ -6188,7 +6184,6 @@ export type GqlGetPlaceQuery = {
         currentPrefecture?: GqlCurrentPrefecture | null;
         phoneNumber?: string | null;
         preferredLanguage?: GqlLanguage | null;
-        sysRole?: GqlSysRole | null;
         urlFacebook?: string | null;
         urlInstagram?: string | null;
         urlX?: string | null;
@@ -6224,7 +6219,6 @@ export type GqlGetPlaceQuery = {
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
           preferredLanguage?: GqlLanguage | null;
-          sysRole?: GqlSysRole | null;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -6339,7 +6333,6 @@ export type GqlGetTicketsQuery = {
               currentPrefecture?: GqlCurrentPrefecture | null;
               phoneNumber?: string | null;
               preferredLanguage?: GqlLanguage | null;
-              sysRole?: GqlSysRole | null;
               urlFacebook?: string | null;
               urlInstagram?: string | null;
               urlX?: string | null;
@@ -6845,7 +6838,6 @@ export const UserFieldsFragmentDoc = gql`
     currentPrefecture
     phoneNumber
     preferredLanguage
-    sysRole
     nftWallet {
       id
       walletAddress
