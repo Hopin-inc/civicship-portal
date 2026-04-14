@@ -6651,8 +6651,7 @@ export type GqlPointDonateMutation = {
 export type GqlTransactionUpdateMetadataMutationVariables = Exact<{
   id: Scalars["ID"]["input"];
   input: GqlTransactionUpdateMetadataInput;
-  permission?: InputMaybe<GqlCheckIsSelfPermissionInput>;
-  communityPermission?: InputMaybe<GqlCheckCommunityPermissionInput>;
+  permission: GqlCheckIsSelfPermissionInput;
 }>;
 
 export type GqlTransactionUpdateMetadataMutation = {
@@ -13501,10 +13500,9 @@ export const TransactionUpdateMetadataDocument = gql`
   mutation TransactionUpdateMetadata(
     $id: ID!
     $input: TransactionUpdateMetadataInput!
-    $permission: CheckIsSelfPermissionInput
-    $communityPermission: CheckCommunityPermissionInput
+    $permission: CheckIsSelfPermissionInput!
   ) {
-    transactionUpdateMetadata(id: $id, input: $input, permission: $permission, communityPermission: $communityPermission) {
+    transactionUpdateMetadata(id: $id, input: $input, permission: $permission) {
       ... on TransactionUpdateMetadataSuccess {
         transaction {
           id

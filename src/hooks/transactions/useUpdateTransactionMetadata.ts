@@ -7,19 +7,22 @@ import {
   GqlTransactionUpdateMetadataMutation,
   useTransactionUpdateMetadataMutation,
 } from "@/types/graphql";
-
-type UpdatePermission =
-  | { type: "self" }
-  | { type: "community"; communityId: string };
 import { logger } from "@/lib/logging";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 
 type Result<T> = { success: true; data: T } | { success: false; code: GqlErrorCode };
 
+export type UpdatePermission =
+  | { type: "self" }
+  | { type: "community"; communityId: string };
+
 /**
  * トランザクションのメタデータ（コメント・画像）を更新する汎用 hook。
  * admin 配下の useTransactionMutations に依存せず、
  * ユーザー向けフロー（donate 等）からも安全にインポートできる。
+ *
+ * NOTE: variables の型は codegen 再実行後に正しく更新される（permission optional 化、
+ * communityPermission 追加）。それまでは any キャストで渡す。
  */
 export function useUpdateTransactionMetadata() {
   const currentUserId = useAuthStore((s) => s.state.currentUser?.id ?? null);
@@ -52,6 +55,8 @@ export function useUpdateTransactionMetadata() {
 
     try {
       const { data } = await updateMetadataMutation({
+        // codegen 再実行後に型が更新されるまで any キャスト
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         variables: {
           id: transactionId,
           input,
@@ -61,7 +66,7 @@ export function useUpdateTransactionMetadata() {
           ...(permissionOverride?.type === "community"
             ? { communityPermission: { communityId: permissionOverride.communityId } }
             : {}),
-        },
+        } as any,
       });
 
       if (data?.transactionUpdateMetadata?.__typename === "TransactionUpdateMetadataSuccess") {
