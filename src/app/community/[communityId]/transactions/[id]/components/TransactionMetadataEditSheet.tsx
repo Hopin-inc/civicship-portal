@@ -107,7 +107,9 @@ export function TransactionMetadataEditSheet({
           toast.error(t("transactions.detail.editSheet.imageLoadError"));
           return;
         }
-        const keptFiles = results.map((r) => (r as PromiseFulfilledResult<File>).value);
+        const keptFiles = results
+          .filter((r): r is PromiseFulfilledResult<File> => r.status === "fulfilled")
+          .map((r) => r.value);
         images = [...keptFiles, ...newImages];
       }
 
