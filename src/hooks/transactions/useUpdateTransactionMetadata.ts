@@ -36,7 +36,9 @@ export function useUpdateTransactionMetadata() {
       return { success: false, code: GqlErrorCode.Unauthenticated };
     }
 
-    if (!currentUserId) {
+    // currentUserId is only required for self-permission flows
+    const isCommunityPermission = permissionOverride?.type === "community";
+    if (!isCommunityPermission && !currentUserId) {
       return { success: false, code: GqlErrorCode.Unauthenticated };
     }
 
@@ -57,7 +59,7 @@ export function useUpdateTransactionMetadata() {
           id: transactionId,
           input,
           ...(!permissionOverride || permissionOverride.type === "self"
-            ? { permission: { userId: currentUserId } }
+            ? { permission: { userId: currentUserId! } }
             : {}),
           ...(permissionOverride?.type === "community"
             ? { communityPermission: { communityId: permissionOverride.communityId } }
