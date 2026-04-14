@@ -119,6 +119,12 @@ export function TransactionMetadataEditSheet({
             ? null
             : normalizedComment;
 
+      // コメントも画像も変更がなければミューテーションをスキップして閉じる
+      if (nextComment === undefined && images === undefined) {
+        onOpenChange(false);
+        return;
+      }
+
       const res = await updateTransactionMetadata(transactionId, {
         comment: nextComment,
         images,
