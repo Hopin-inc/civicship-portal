@@ -82,6 +82,10 @@
   "transactions.detail.editSheet.photoLimit": "You can add up to {max} photos",
   "transactions.detail.editSheet.saveSuccess": "Updated",
   "transactions.detail.editSheet.saveError": "Failed to update",
+  "transactions.detail.lightbox.close": "Close",
+  "transactions.detail.lightbox.prev": "Previous photo",
+  "transactions.detail.lightbox.next": "Next photo",
+  "transactions.detail.lightbox.indicator": "{current}/{total}",
   "transactions.detail.editSheet.removePhoto": "Remove photo {index}",
   "transactions.detail.editSheet.imageLoadError": "Failed to load an existing image. Please try again.",
   "transactions.detail.photo": "Photo {index}/{total}"
