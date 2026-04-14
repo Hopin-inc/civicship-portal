@@ -168,6 +168,9 @@ export const useTransactionMutations = () => {
     transactionId: string,
     payload: { comment?: string | null; images?: File[] },
   ): Promise<Result<GqlTransactionUpdateMetadataMutation>> => {
+    const authError = checkAuth();
+    if (authError) return authError;
+
     if (!currentUserId) {
       return { success: false, code: GqlErrorCode.Unauthenticated };
     }
