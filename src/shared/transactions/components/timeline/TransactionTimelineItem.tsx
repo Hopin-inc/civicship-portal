@@ -39,12 +39,33 @@ export const TransactionTimelineItem = ({
     isLast && "timeline-avatar-last",
   );
 
-  const content = (
-    <div className="relative flex gap-3 pb-10 timeline-item">
-      {/* Avatar - 疑似要素で縦線を描画 */}
-      <div className={avatarClasses}>{avatar}</div>
+  if (href) {
+    // Render <a> around only the non-interactive content (header + actionLabel).
+    // messageCard may contain <button> elements (e.g. image grid), so it must
+    // sit outside the <a> to avoid invalid nested interactive elements.
+    return (
+      <div className="relative flex gap-3 pb-10 timeline-item">
+        <div className={avatarClasses}>{avatar}</div>
+        <div className="flex-1 min-w-0">
+          <a
+            href={href}
+            className={cn(
+              "block cursor-pointer rounded-lg transition-colors",
+              "hover:bg-zinc-50 dark:hover:bg-zinc-800/50",
+            )}
+          >
+            {header}
+            <div className="mt-1">{actionLabel}</div>
+          </a>
+          {messageCard && <div className="mt-2">{messageCard}</div>}
+        </div>
+      </div>
+    );
+  }
 
-      {/* Content エリア */}
+  return (
+    <div className="relative flex gap-3 pb-10 timeline-item">
+      <div className={avatarClasses}>{avatar}</div>
       <div className="flex-1 min-w-0">
         {header}
         <div className="mt-1">{actionLabel}</div>
@@ -52,20 +73,4 @@ export const TransactionTimelineItem = ({
       </div>
     </div>
   );
-
-  if (href) {
-    return (
-      <a
-        href={href}
-        className={cn(
-          "block cursor-pointer rounded-lg transition-colors",
-          "hover:bg-zinc-50 dark:hover:bg-zinc-800/50",
-        )}
-      >
-        {content}
-      </a>
-    );
-  }
-
-  return content;
 };
