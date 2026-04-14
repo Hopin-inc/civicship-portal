@@ -63,7 +63,7 @@ export function TransactionImageGrid({ images }: Props) {
   // 4枚: 2×2グリッド
   return (
     <div className="grid grid-cols-2 gap-1">
-      {images.map((url, i) => (
+      {images.slice(0, 4).map((url, i) => (
         <div key={i} className="aspect-square overflow-hidden rounded-xl">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={url} alt={alt(i)} className="h-full w-full object-cover" />
