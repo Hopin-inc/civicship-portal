@@ -82,7 +82,6 @@ function TransferInputStep({
       return;
     }
     const parsed = parseInt((inputStr || "") + key, 10);
-    const next = String(parsed);
     if (parsed > Number(currentPoint)) {
       toast.error(t("wallets.shared.transfer.errorExceedsBalance"));
       return;
@@ -91,7 +90,11 @@ function TransferInputStep({
       toast.error(t("wallets.shared.transfer.errorExceedsLimit"));
       return;
     }
-    setInputStr(next);
+    setInputStr((prev) => {
+      const next = parseInt((prev || "") + key, 10);
+      if (next > Number(currentPoint) || next > INT_LIMIT) return prev;
+      return String(next);
+    });
   };
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
