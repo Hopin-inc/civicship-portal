@@ -37,6 +37,7 @@ export const GET_MY_WALLET_WITH_TRANSACTIONS_SERVER_QUERY = `
             id
             reason
             comment
+            images
             fromPointChange
             toPointChange
             createdAt
