@@ -22,7 +22,8 @@
   "adminWallet.issue.title": "ポイントの発行",
   "adminWallet.issue.submit": "発行",
   "adminWallet.issue.validation.min": "0以上を指定してください",
-  "adminWallet.issue.validation.max": "20億以下を指定してください",
+  "adminWallet.issue.validation.max": "999万9999以下を指定してください",
+  "adminWallet.issue.imageUploadWarning": "発行しましたが、画像のアップロードに失敗しました",
   "adminWallet.issue.success": "ポイントを発行しました",
   "adminWallet.issue.errorGeneric": "ポイントを発行できませんでした",
 

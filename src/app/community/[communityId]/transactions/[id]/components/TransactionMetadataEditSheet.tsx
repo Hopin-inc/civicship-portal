@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ImagePlus, X } from "lucide-react";
 import { toast } from "react-toastify";
-import { useTransactionMutations } from "@/app/community/[communityId]/admin/wallet/hooks/useTransactionMutations";
+import { useUpdateTransactionMetadata } from "@/hooks/transactions/useUpdateTransactionMetadata";
 import { useTranslations } from "next-intl";
 
 const MAX_IMAGES = 4;
@@ -45,7 +45,7 @@ export function TransactionMetadataEditSheet({
   onSuccess,
 }: Props) {
   const t = useTranslations();
-  const { updateTransactionMetadata } = useTransactionMutations();
+  const { updateTransactionMetadata } = useUpdateTransactionMetadata();
 
   const [comment, setComment] = useState(initialComment ?? "");
   const [existingImages, setExistingImages] = useState<string[]>(initialImages);
