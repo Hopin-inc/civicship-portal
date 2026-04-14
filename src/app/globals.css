@@ -465,6 +465,12 @@ li {
 }
 
 /* React-Toastify Custom Styles */
+.Toastify__toast-container--top-center {
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: min(90vw, 425px);
+}
+
 .Toastify__toast {
   font-family: inherit;
   border-radius: 0.5rem;
