@@ -110,7 +110,7 @@ export default function IssuePointPage() {
       if (res.success) {
         track({ name: "issue_point", params: { amount: numericAmount } });
         toast.success(t("adminWallet.issue.success"));
-        router.push("/admin/wallet?refresh=true");
+        router.push("/admin/wallet");
       } else {
         const errorMessage = errorMessages[res.code] ?? t("adminWallet.issue.errorGeneric");
         toast.error(errorMessage);
