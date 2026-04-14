@@ -13,7 +13,7 @@ import { useTranslations } from "next-intl";
 import Numpad, { NumpadKey } from "@/components/ui/numpad";
 import { errorMessages } from "@/utils/errorMessage";
 
-const INT_LIMIT = 2000000000;
+const INT_LIMIT = 9_999_999;
 
 export default function IssuePointPage() {
   const t = useTranslations();
