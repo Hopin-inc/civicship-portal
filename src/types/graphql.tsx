@@ -6651,7 +6651,8 @@ export type GqlPointDonateMutation = {
 export type GqlTransactionUpdateMetadataMutationVariables = Exact<{
   id: Scalars["ID"]["input"];
   input: GqlTransactionUpdateMetadataInput;
-  permission: GqlCheckIsSelfPermissionInput;
+  permission?: InputMaybe<GqlCheckIsSelfPermissionInput>;
+  communityPermission?: InputMaybe<GqlCheckCommunityPermissionInput>;
 }>;
 
 export type GqlTransactionUpdateMetadataMutation = {
@@ -13500,9 +13501,15 @@ export const TransactionUpdateMetadataDocument = gql`
   mutation TransactionUpdateMetadata(
     $id: ID!
     $input: TransactionUpdateMetadataInput!
-    $permission: CheckIsSelfPermissionInput!
+    $permission: CheckIsSelfPermissionInput
+    $communityPermission: CheckCommunityPermissionInput
   ) {
-    transactionUpdateMetadata(id: $id, input: $input, permission: $permission) {
+    transactionUpdateMetadata(
+      id: $id
+      input: $input
+      permission: $permission
+      communityPermission: $communityPermission
+    ) {
       ... on TransactionUpdateMetadataSuccess {
         transaction {
           id
@@ -13534,6 +13541,7 @@ export type GqlTransactionUpdateMetadataMutationFn = Apollo.MutationFunction<
  *      id: // value for 'id'
  *      input: // value for 'input'
  *      permission: // value for 'permission'
+ *      communityPermission: // value for 'communityPermission'
  *   },
  * });
  */
