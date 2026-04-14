@@ -943,6 +943,7 @@ export type GqlMutation = {
   transactionDonateSelfPoint?: Maybe<GqlTransactionDonateSelfPointPayload>;
   transactionGrantCommunityPoint?: Maybe<GqlTransactionGrantCommunityPointPayload>;
   transactionIssueCommunityPoint?: Maybe<GqlTransactionIssueCommunityPointPayload>;
+  transactionUpdateMetadata?: Maybe<GqlTransactionUpdateMetadataPayload>;
   updatePortalConfig: GqlCommunityPortalConfig;
   updateSignupBonusConfig: GqlCommunitySignupBonusConfig;
   userDeleteMe?: Maybe<GqlUserDeletePayload>;
@@ -1186,6 +1187,13 @@ export type GqlMutationTransactionGrantCommunityPointArgs = {
 export type GqlMutationTransactionIssueCommunityPointArgs = {
   input: GqlTransactionIssueCommunityPointInput;
   permission: GqlCheckCommunityPermissionInput;
+};
+
+export type GqlMutationTransactionUpdateMetadataArgs = {
+  communityPermission?: InputMaybe<GqlCheckCommunityPermissionInput>;
+  id: Scalars["ID"]["input"];
+  input: GqlTransactionUpdateMetadataInput;
+  permission?: InputMaybe<GqlCheckIsSelfPermissionInput>;
 };
 
 export type GqlMutationUpdatePortalConfigArgs = {
@@ -2662,6 +2670,7 @@ export type GqlTransaction = {
   fromPointChange?: Maybe<Scalars["Int"]["output"]>;
   fromWallet?: Maybe<GqlWallet>;
   id: Scalars["ID"]["output"];
+  images?: Maybe<Array<Scalars["String"]["output"]>>;
   participation?: Maybe<GqlParticipation>;
   reason: GqlTransactionReason;
   reservation?: Maybe<GqlReservation>;
@@ -2674,6 +2683,7 @@ export type GqlTransaction = {
 export type GqlTransactionDonateSelfPointInput = {
   comment?: InputMaybe<Scalars["String"]["input"]>;
   communityId: Scalars["ID"]["input"];
+  images?: InputMaybe<Array<GqlImageInput>>;
   toUserId: Scalars["ID"]["input"];
   transferPoints: Scalars["Int"]["input"];
 };
@@ -2711,6 +2721,7 @@ export type GqlTransactionFilterInput = {
 
 export type GqlTransactionGrantCommunityPointInput = {
   comment?: InputMaybe<Scalars["String"]["input"]>;
+  images?: InputMaybe<Array<GqlImageInput>>;
   toUserId: Scalars["ID"]["input"];
   transferPoints: Scalars["Int"]["input"];
 };
@@ -2724,6 +2735,7 @@ export type GqlTransactionGrantCommunityPointSuccess = {
 
 export type GqlTransactionIssueCommunityPointInput = {
   comment?: InputMaybe<Scalars["String"]["input"]>;
+  images?: InputMaybe<Array<GqlImageInput>>;
   transferPoints: Scalars["Int"]["input"];
 };
 
@@ -2750,6 +2762,18 @@ export const GqlTransactionReason = {
 export type GqlTransactionReason = (typeof GqlTransactionReason)[keyof typeof GqlTransactionReason];
 export type GqlTransactionSortInput = {
   createdAt?: InputMaybe<GqlSortDirection>;
+};
+
+export type GqlTransactionUpdateMetadataInput = {
+  comment?: InputMaybe<Scalars["String"]["input"]>;
+  images?: InputMaybe<Array<GqlImageInput>>;
+};
+
+export type GqlTransactionUpdateMetadataPayload = GqlTransactionUpdateMetadataSuccess;
+
+export type GqlTransactionUpdateMetadataSuccess = {
+  __typename?: "TransactionUpdateMetadataSuccess";
+  transaction: GqlTransaction;
 };
 
 export type GqlTransactionVerificationResult = {
@@ -3526,7 +3550,6 @@ export type GqlGetSingleMembershipQuery = {
       currentPrefecture?: GqlCurrentPrefecture | null;
       phoneNumber?: string | null;
       preferredLanguage?: GqlLanguage | null;
-      sysRole?: GqlSysRole | null;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
@@ -3724,7 +3747,6 @@ export type GqlGetCurrentUserProfileQuery = {
       currentPrefecture?: GqlCurrentPrefecture | null;
       phoneNumber?: string | null;
       preferredLanguage?: GqlLanguage | null;
-      sysRole?: GqlSysRole | null;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
@@ -3766,7 +3788,6 @@ export type GqlGetCurrentUserProfileQuery = {
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
           preferredLanguage?: GqlLanguage | null;
-          sysRole?: GqlSysRole | null;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -3828,7 +3849,6 @@ export type GqlUserFieldsFragment = {
   currentPrefecture?: GqlCurrentPrefecture | null;
   phoneNumber?: string | null;
   preferredLanguage?: GqlLanguage | null;
-  sysRole?: GqlSysRole | null;
   urlFacebook?: string | null;
   urlInstagram?: string | null;
   urlX?: string | null;
@@ -3868,7 +3888,6 @@ export type GqlUserPortfolioFieldsFragment = {
     currentPrefecture?: GqlCurrentPrefecture | null;
     phoneNumber?: string | null;
     preferredLanguage?: GqlLanguage | null;
-    sysRole?: GqlSysRole | null;
     urlFacebook?: string | null;
     urlInstagram?: string | null;
     urlX?: string | null;
@@ -3924,7 +3943,6 @@ export type GqlGetUserFlexibleQuery = {
     currentPrefecture?: GqlCurrentPrefecture | null;
     phoneNumber?: string | null;
     preferredLanguage?: GqlLanguage | null;
-    sysRole?: GqlSysRole | null;
     urlFacebook?: string | null;
     urlInstagram?: string | null;
     urlX?: string | null;
@@ -3961,7 +3979,6 @@ export type GqlGetUserFlexibleQuery = {
         currentPrefecture?: GqlCurrentPrefecture | null;
         phoneNumber?: string | null;
         preferredLanguage?: GqlLanguage | null;
-        sysRole?: GqlSysRole | null;
         urlFacebook?: string | null;
         urlInstagram?: string | null;
         urlX?: string | null;
@@ -4076,7 +4093,6 @@ export type GqlGetUserWalletQuery = {
     currentPrefecture?: GqlCurrentPrefecture | null;
     phoneNumber?: string | null;
     preferredLanguage?: GqlLanguage | null;
-    sysRole?: GqlSysRole | null;
     urlFacebook?: string | null;
     urlInstagram?: string | null;
     urlX?: string | null;
@@ -4095,6 +4111,7 @@ export type GqlGetUserWalletQuery = {
         id: string;
         reason: GqlTransactionReason;
         comment?: string | null;
+        images?: Array<string> | null;
         fromPointChange?: number | null;
         toPointChange?: number | null;
         createdAt?: Date | null;
@@ -4184,6 +4201,7 @@ export type GqlGetWalletsWithTransactionQuery = {
           id: string;
           reason: GqlTransactionReason;
           comment?: string | null;
+          images?: Array<string> | null;
           fromPointChange?: number | null;
           toPointChange?: number | null;
           createdAt?: Date | null;
@@ -4200,7 +4218,6 @@ export type GqlGetWalletsWithTransactionQuery = {
               currentPrefecture?: GqlCurrentPrefecture | null;
               phoneNumber?: string | null;
               preferredLanguage?: GqlLanguage | null;
-              sysRole?: GqlSysRole | null;
               urlFacebook?: string | null;
               urlInstagram?: string | null;
               urlX?: string | null;
@@ -4221,7 +4238,6 @@ export type GqlGetWalletsWithTransactionQuery = {
               currentPrefecture?: GqlCurrentPrefecture | null;
               phoneNumber?: string | null;
               preferredLanguage?: GqlLanguage | null;
-              sysRole?: GqlSysRole | null;
               urlFacebook?: string | null;
               urlInstagram?: string | null;
               urlX?: string | null;
@@ -4419,7 +4435,6 @@ export type GqlGetArticlesQuery = {
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
           preferredLanguage?: GqlLanguage | null;
-          sysRole?: GqlSysRole | null;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -4456,7 +4471,6 @@ export type GqlGetArticleQuery = {
       currentPrefecture?: GqlCurrentPrefecture | null;
       phoneNumber?: string | null;
       preferredLanguage?: GqlLanguage | null;
-      sysRole?: GqlSysRole | null;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
@@ -4506,7 +4520,6 @@ export type GqlGetArticleQuery = {
       currentPrefecture?: GqlCurrentPrefecture | null;
       phoneNumber?: string | null;
       preferredLanguage?: GqlLanguage | null;
-      sysRole?: GqlSysRole | null;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
@@ -4545,7 +4558,6 @@ export type GqlGetArticleQuery = {
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
           preferredLanguage?: GqlLanguage | null;
-          sysRole?: GqlSysRole | null;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -5251,7 +5263,6 @@ export type GqlGetOpportunitySlotWithParticipationsQuery = {
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
           preferredLanguage?: GqlLanguage | null;
-          sysRole?: GqlSysRole | null;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -5411,7 +5422,6 @@ export type GqlGetParticipationQuery = {
             currentPrefecture?: GqlCurrentPrefecture | null;
             phoneNumber?: string | null;
             preferredLanguage?: GqlLanguage | null;
-            sysRole?: GqlSysRole | null;
             urlFacebook?: string | null;
             urlInstagram?: string | null;
             urlX?: string | null;
@@ -5477,7 +5487,6 @@ export type GqlGetParticipationQuery = {
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
           preferredLanguage?: GqlLanguage | null;
-          sysRole?: GqlSysRole | null;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -5552,7 +5561,6 @@ export type GqlGetParticipationQuery = {
         currentPrefecture?: GqlCurrentPrefecture | null;
         phoneNumber?: string | null;
         preferredLanguage?: GqlLanguage | null;
-        sysRole?: GqlSysRole | null;
         urlFacebook?: string | null;
         urlInstagram?: string | null;
         urlX?: string | null;
@@ -5568,7 +5576,6 @@ export type GqlGetParticipationQuery = {
       currentPrefecture?: GqlCurrentPrefecture | null;
       phoneNumber?: string | null;
       preferredLanguage?: GqlLanguage | null;
-      sysRole?: GqlSysRole | null;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
@@ -5702,7 +5709,6 @@ export type GqlGetReservationsQuery = {
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
           preferredLanguage?: GqlLanguage | null;
-          sysRole?: GqlSysRole | null;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -5763,7 +5769,6 @@ export type GqlGetReservationQuery = {
       currentPrefecture?: GqlCurrentPrefecture | null;
       phoneNumber?: string | null;
       preferredLanguage?: GqlLanguage | null;
-      sysRole?: GqlSysRole | null;
       urlFacebook?: string | null;
       urlInstagram?: string | null;
       urlX?: string | null;
@@ -5822,7 +5827,6 @@ export type GqlGetReservationQuery = {
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
           preferredLanguage?: GqlLanguage | null;
-          sysRole?: GqlSysRole | null;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -5877,7 +5881,6 @@ export type GqlGetReservationQuery = {
         currentPrefecture?: GqlCurrentPrefecture | null;
         phoneNumber?: string | null;
         preferredLanguage?: GqlLanguage | null;
-        sysRole?: GqlSysRole | null;
         urlFacebook?: string | null;
         urlInstagram?: string | null;
         urlX?: string | null;
@@ -6108,7 +6111,6 @@ export type GqlGetPlacesQuery = {
               currentPrefecture?: GqlCurrentPrefecture | null;
               phoneNumber?: string | null;
               preferredLanguage?: GqlLanguage | null;
-              sysRole?: GqlSysRole | null;
               urlFacebook?: string | null;
               urlInstagram?: string | null;
               urlX?: string | null;
@@ -6188,7 +6190,6 @@ export type GqlGetPlaceQuery = {
         currentPrefecture?: GqlCurrentPrefecture | null;
         phoneNumber?: string | null;
         preferredLanguage?: GqlLanguage | null;
-        sysRole?: GqlSysRole | null;
         urlFacebook?: string | null;
         urlInstagram?: string | null;
         urlX?: string | null;
@@ -6224,7 +6225,6 @@ export type GqlGetPlaceQuery = {
           currentPrefecture?: GqlCurrentPrefecture | null;
           phoneNumber?: string | null;
           preferredLanguage?: GqlLanguage | null;
-          sysRole?: GqlSysRole | null;
           urlFacebook?: string | null;
           urlInstagram?: string | null;
           urlX?: string | null;
@@ -6339,7 +6339,6 @@ export type GqlGetTicketsQuery = {
               currentPrefecture?: GqlCurrentPrefecture | null;
               phoneNumber?: string | null;
               preferredLanguage?: GqlLanguage | null;
-              sysRole?: GqlSysRole | null;
               urlFacebook?: string | null;
               urlInstagram?: string | null;
               urlX?: string | null;
@@ -6580,6 +6579,7 @@ export type GqlTransactionFieldsFragment = {
   id: string;
   reason: GqlTransactionReason;
   comment?: string | null;
+  images?: Array<string> | null;
   fromPointChange?: number | null;
   toPointChange?: number | null;
   createdAt?: Date | null;
@@ -6599,6 +6599,7 @@ export type GqlPointIssueMutation = {
       id: string;
       reason: GqlTransactionReason;
       comment?: string | null;
+      images?: Array<string> | null;
       fromPointChange?: number | null;
       toPointChange?: number | null;
       createdAt?: Date | null;
@@ -6620,6 +6621,7 @@ export type GqlPointGrantMutation = {
       id: string;
       reason: GqlTransactionReason;
       comment?: string | null;
+      images?: Array<string> | null;
       fromPointChange?: number | null;
       toPointChange?: number | null;
       createdAt?: Date | null;
@@ -6641,9 +6643,30 @@ export type GqlPointDonateMutation = {
       id: string;
       reason: GqlTransactionReason;
       comment?: string | null;
+      images?: Array<string> | null;
       fromPointChange?: number | null;
       toPointChange?: number | null;
       createdAt?: Date | null;
+    };
+  } | null;
+};
+
+export type GqlTransactionUpdateMetadataMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+  input: GqlTransactionUpdateMetadataInput;
+  permission?: InputMaybe<GqlCheckIsSelfPermissionInput>;
+  communityPermission?: InputMaybe<GqlCheckCommunityPermissionInput>;
+}>;
+
+export type GqlTransactionUpdateMetadataMutation = {
+  __typename?: "Mutation";
+  transactionUpdateMetadata?: {
+    __typename?: "TransactionUpdateMetadataSuccess";
+    transaction: {
+      __typename?: "Transaction";
+      id: string;
+      comment?: string | null;
+      images?: Array<string> | null;
     };
   } | null;
 };
@@ -6676,6 +6699,7 @@ export type GqlGetTransactionsQuery = {
         id: string;
         reason: GqlTransactionReason;
         comment?: string | null;
+        images?: Array<string> | null;
         fromPointChange?: number | null;
         toPointChange?: number | null;
         createdAt?: Date | null;
@@ -6748,6 +6772,7 @@ export type GqlGetTransactionDetailQuery = {
     id: string;
     reason: GqlTransactionReason;
     comment?: string | null;
+    images?: Array<string> | null;
     fromPointChange?: number | null;
     toPointChange?: number | null;
     createdAt?: Date | null;
@@ -6845,7 +6870,6 @@ export const UserFieldsFragmentDoc = gql`
     currentPrefecture
     phoneNumber
     preferredLanguage
-    sysRole
     nftWallet {
       id
       walletAddress
@@ -7008,6 +7032,7 @@ export const TransactionFieldsFragmentDoc = gql`
     id
     reason
     comment
+    images
     fromPointChange
     toPointChange
     createdAt
@@ -13474,6 +13499,75 @@ export type PointDonateMutationResult = Apollo.MutationResult<GqlPointDonateMuta
 export type PointDonateMutationOptions = Apollo.BaseMutationOptions<
   GqlPointDonateMutation,
   GqlPointDonateMutationVariables
+>;
+export const TransactionUpdateMetadataDocument = gql`
+  mutation TransactionUpdateMetadata(
+    $id: ID!
+    $input: TransactionUpdateMetadataInput!
+    $permission: CheckIsSelfPermissionInput
+    $communityPermission: CheckCommunityPermissionInput
+  ) {
+    transactionUpdateMetadata(
+      id: $id
+      input: $input
+      permission: $permission
+      communityPermission: $communityPermission
+    ) {
+      ... on TransactionUpdateMetadataSuccess {
+        transaction {
+          id
+          comment
+          images
+        }
+      }
+    }
+  }
+`;
+export type GqlTransactionUpdateMetadataMutationFn = Apollo.MutationFunction<
+  GqlTransactionUpdateMetadataMutation,
+  GqlTransactionUpdateMetadataMutationVariables
+>;
+
+/**
+ * __useTransactionUpdateMetadataMutation__
+ *
+ * To run a mutation, you first call `useTransactionUpdateMetadataMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useTransactionUpdateMetadataMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [transactionUpdateMetadataMutation, { data, loading, error }] = useTransactionUpdateMetadataMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      input: // value for 'input'
+ *      permission: // value for 'permission'
+ *      communityPermission: // value for 'communityPermission'
+ *   },
+ * });
+ */
+export function useTransactionUpdateMetadataMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlTransactionUpdateMetadataMutation,
+    GqlTransactionUpdateMetadataMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    GqlTransactionUpdateMetadataMutation,
+    GqlTransactionUpdateMetadataMutationVariables
+  >(TransactionUpdateMetadataDocument, options);
+}
+export type TransactionUpdateMetadataMutationHookResult = ReturnType<
+  typeof useTransactionUpdateMetadataMutation
+>;
+export type TransactionUpdateMetadataMutationResult =
+  Apollo.MutationResult<GqlTransactionUpdateMetadataMutation>;
+export type TransactionUpdateMetadataMutationOptions = Apollo.BaseMutationOptions<
+  GqlTransactionUpdateMetadataMutation,
+  GqlTransactionUpdateMetadataMutationVariables
 >;
 export const GetTransactionsDocument = gql`
   query getTransactions(

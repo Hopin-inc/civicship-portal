@@ -13,5 +13,7 @@
   "common.errorState.defaultTitle": "ページを読み込めませんでした",
   "common.errorState.description": "以下のボタンから再読み込みをお試しください。再試行しても改善しない場合は、時間をおいて再度アクセスするか、トップページにお戻りください。",
   "common.errorState.retryButton": "再度読み込み",
-  "common.errorState.homeButton": "トップに戻る"
+  "common.errorState.homeButton": "トップに戻る",
+  "common.numpad.backspace": "バックスペース",
+  "common.numpad.clear": "クリア"
 }

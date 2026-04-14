@@ -13,11 +13,13 @@ export function useDonateFlow(currentUser?: GqlUser | null, currentPoint?: bigin
   const t = useTranslations();
   const router = useAppRouter();
   const track = useAnalytics();
-  const { donate, isLoading, isAuthReady } = useDonatePoint();
+  const { donate, isLoading: isDonating, isAuthReady } = useDonatePoint();
   const [selectedUser, setSelectedUser] = useState<GqlUser | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleDonate = async (amount: number, comment?: string) => {
+  const handleDonate = async (amount: number, comment?: string, images?: File[]) => {
     if (!selectedUser || !currentUser?.id) return;
+    setIsSubmitting(true);
 
     try {
       const res = await donate({
@@ -25,6 +27,7 @@ export function useDonateFlow(currentUser?: GqlUser | null, currentPoint?: bigin
         amount,
         comment,
         fromUserId: currentUser.id,
+        images,
       });
 
       if (res.success) {
@@ -45,6 +48,8 @@ export function useDonateFlow(currentUser?: GqlUser | null, currentPoint?: bigin
       }
     } catch {
       toast.error(t("wallets.donate.toast.genericError"));
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -52,7 +57,7 @@ export function useDonateFlow(currentUser?: GqlUser | null, currentPoint?: bigin
     selectedUser,
     setSelectedUser,
     handleDonate,
-    isLoading,
+    isLoading: isDonating || isSubmitting,
     isAuthReady,
     currentPoint,
   };

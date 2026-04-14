@@ -9,6 +9,7 @@ interface DonatePointInput {
   amount: number;
   comment?: string;
   fromUserId: string;
+  images?: File[];
 }
 
 export function useDonatePoint() {
@@ -17,15 +18,17 @@ export function useDonatePoint() {
   const communityId = communityConfig?.communityId ?? "";
   const { donatePoint, isAuthReady } = useTransactionMutations();
 
-  const donate = async ({ toUserId, amount, comment, fromUserId }: DonatePointInput) => {
+  const donate = async ({ toUserId, amount, comment, fromUserId, images }: DonatePointInput) => {
     setIsLoading(true);
     try {
+      const imagesInput = images?.map((file) => ({ file, alt: "", caption: "" }));
       return await donatePoint({
         input: {
           communityId,
           transferPoints: amount,
           toUserId,
           comment,
+          images: imagesInput && imagesInput.length > 0 ? imagesInput : undefined,
         },
         permission: { userId: fromUserId },
       });

@@ -14,17 +14,6 @@ import {
 import { logger } from "@/lib/logging";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 
-interface IssuePointInput {
-  communityId: string;
-  amount: number;
-}
-
-interface GrantPointInput {
-  communityId: string;
-  userId: string;
-  amount: number;
-}
-
 type Result<T> = { success: true; data: T } | { success: false; code: GqlErrorCode };
 
 // 認証チェック: firebaseUser または exchange経由のlineTokens.idTokenが必要

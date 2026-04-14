@@ -64,12 +64,18 @@ export default function GrantPageClient({ initialConnection }: GrantPageClientPr
   const [selectedUser, setSelectedUser] = useState<GqlUser | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleGrantPoint = async (amount: number, comment?: string) => {
+  const handleGrantPoint = async (amount: number, comment?: string, images?: File[]) => {
     if (!selectedUser) return;
     setIsLoading(true);
     try {
+      const imagesInput = images?.map((file) => ({ file, alt: "", caption: "" }));
       const res = await grantPoint({
-        input: { transferPoints: amount, toUserId: selectedUser.id, comment },
+        input: {
+          transferPoints: amount,
+          toUserId: selectedUser.id,
+          comment,
+          images: imagesInput && imagesInput.length > 0 ? imagesInput : undefined,
+        },
         permission: { communityId },
       });
 
@@ -86,7 +92,7 @@ export default function GrantPageClient({ initialConnection }: GrantPageClientPr
         });
 
         toast.success(t("adminWallet.grant.success", { amount: amount.toLocaleString() }));
-        router.push("/admin/wallet?refresh=true");
+        router.push("/admin/wallet");
       } else {
         const errorMessage = errorMessages[res.code] ?? t("adminWallet.grant.errorGeneric");
         toast.error(errorMessage);

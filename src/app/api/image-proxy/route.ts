@@ -4,6 +4,7 @@ import serverLogger from '@/lib/logging/server';
 const ALLOWED_BUCKETS = [
   'prod-civicship-storage-public',
   'kyoso-dev-civicship-storage-public',
+  'kyoso-local-civicship-storage-public',
 ];
 
 export async function GET(request: NextRequest) {
