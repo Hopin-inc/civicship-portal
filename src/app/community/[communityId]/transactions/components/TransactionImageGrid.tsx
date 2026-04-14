@@ -25,46 +25,43 @@ export function TransactionImageGrid({ images }: Props) {
 
   const alt = (i: number) => t("transactions.detail.photo", { index: i + 1, total: count });
 
-  const imgProps = (i: number) => ({
-    role: "button" as const,
-    tabIndex: 0,
-    onClick: (e: React.MouseEvent) => { e.preventDefault(); e.stopPropagation(); setLightboxIndex(i); },
-    onKeyDown: (e: React.KeyboardEvent) => e.key === "Enter" && setLightboxIndex(i),
-    className: "cursor-pointer",
-  });
+  const imgButton = (i: number, extraClass: string, children: React.ReactNode) => (
+    <button
+      key={i}
+      type="button"
+      onClick={(e) => { e.preventDefault(); e.stopPropagation(); setLightboxIndex(i); }}
+      className={`overflow-hidden rounded-xl cursor-pointer ${extraClass}`}
+    >
+      {children}
+    </button>
+  );
 
   return (
     <>
-      {count === 1 && (
-        <div className="aspect-[4/3] w-full overflow-hidden rounded-xl" {...imgProps(0)}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={displayed[0]} alt={alt(0)} className="h-full w-full object-cover" />
-        </div>
+      {count === 1 && imgButton(0, "aspect-[4/3] w-full",
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={displayed[0]} alt={alt(0)} className="h-full w-full object-cover" />
       )}
 
       {count === 2 && (
         <div className="grid grid-cols-2 gap-1">
-          {displayed.map((url, i) => (
-            <div key={i} className="aspect-square overflow-hidden rounded-xl" {...imgProps(i)}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={url} alt={alt(i)} className="h-full w-full object-cover" />
-            </div>
+          {displayed.map((url, i) => imgButton(i, "aspect-square",
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={url} alt={alt(i)} className="h-full w-full object-cover" />
           ))}
         </div>
       )}
 
       {count === 3 && (
         <div className="flex flex-col gap-1">
-          <div className="aspect-[2/1] overflow-hidden rounded-xl" {...imgProps(0)}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
+          {imgButton(0, "aspect-[2/1] w-full",
+            // eslint-disable-next-line @next/next/no-img-element
             <img src={displayed[0]} alt={alt(0)} className="h-full w-full object-cover" />
-          </div>
+          )}
           <div className="grid grid-cols-2 gap-1">
-            {displayed.slice(1).map((url, i) => (
-              <div key={i} className="aspect-square overflow-hidden rounded-xl" {...imgProps(i + 1)}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={url} alt={alt(i + 1)} className="h-full w-full object-cover" />
-              </div>
+            {displayed.slice(1).map((url, i) => imgButton(i + 1, "aspect-square",
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={url} alt={alt(i + 1)} className="h-full w-full object-cover" />
             ))}
           </div>
         </div>
@@ -72,11 +69,9 @@ export function TransactionImageGrid({ images }: Props) {
 
       {count === 4 && (
         <div className="grid grid-cols-2 gap-1">
-          {displayed.map((url, i) => (
-            <div key={i} className="aspect-square overflow-hidden rounded-xl" {...imgProps(i)}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={url} alt={alt(i)} className="h-full w-full object-cover" />
-            </div>
+          {displayed.map((url, i) => imgButton(i, "aspect-square",
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={url} alt={alt(i)} className="h-full w-full object-cover" />
           ))}
         </div>
       )}

@@ -36,7 +36,7 @@ export function ImageLightbox({ images, index, onClose, onPrev, onNext }: Props)
         type="button"
         aria-label={t("transactions.detail.lightbox.close")}
         className="absolute right-4 top-4 text-white/80 hover:text-white"
-        onClick={onClose}
+        onClick={(e) => { e.stopPropagation(); onClose(); }}
       >
         <X className="w-7 h-7" />
       </button>
