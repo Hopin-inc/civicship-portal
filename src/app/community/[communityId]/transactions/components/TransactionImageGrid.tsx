@@ -28,7 +28,7 @@ export function TransactionImageGrid({ images }: Props) {
   const imgProps = (i: number) => ({
     role: "button" as const,
     tabIndex: 0,
-    onClick: () => setLightboxIndex(i),
+    onClick: (e: React.MouseEvent) => { e.preventDefault(); e.stopPropagation(); setLightboxIndex(i); },
     onKeyDown: (e: React.KeyboardEvent) => e.key === "Enter" && setLightboxIndex(i),
     className: "cursor-pointer",
   });
