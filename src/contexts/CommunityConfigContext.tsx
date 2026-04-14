@@ -25,6 +25,15 @@ export function useCommunityConfig(): CommunityPortalConfig | null {
   return config;
 }
 
+/**
+ * CommunityConfigContext が存在しない場合も null を返す安全なバージョン
+ * AppLink など Provider 外でも使われる可能性があるコンポーネント向け
+ */
+export function useCommunityConfigOptional(): CommunityPortalConfig | null {
+  const context = useContext(CommunityConfigContext);
+  return context?.config ?? null;
+}
+
 export function useIsConfigFromDatabase(): boolean {
   const { isFromDatabase } = useCommunityConfigContext();
   return isFromDatabase;
