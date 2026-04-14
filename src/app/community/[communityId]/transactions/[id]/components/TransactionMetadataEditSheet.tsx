@@ -22,7 +22,8 @@ interface Props {
 
 async function urlToFile(url: string, onError: (msg: string) => void): Promise<File> {
   try {
-    const res = await fetch(url);
+    const proxyUrl = `/api/image-proxy?url=${encodeURIComponent(url)}`;
+    const res = await fetch(proxyUrl);
     if (!res.ok) {
       throw new Error(`HTTP ${res.status}`);
     }
