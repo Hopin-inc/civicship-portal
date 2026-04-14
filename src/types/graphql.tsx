@@ -1190,9 +1190,10 @@ export type GqlMutationTransactionIssueCommunityPointArgs = {
 };
 
 export type GqlMutationTransactionUpdateMetadataArgs = {
+  communityPermission?: InputMaybe<GqlCheckCommunityPermissionInput>;
   id: Scalars["ID"]["input"];
   input: GqlTransactionUpdateMetadataInput;
-  permission: GqlCheckIsSelfPermissionInput;
+  permission?: InputMaybe<GqlCheckIsSelfPermissionInput>;
 };
 
 export type GqlMutationUpdatePortalConfigArgs = {
@@ -4107,6 +4108,7 @@ export type GqlGetUserWalletQuery = {
         id: string;
         reason: GqlTransactionReason;
         comment?: string | null;
+        images?: Array<string> | null;
         fromPointChange?: number | null;
         toPointChange?: number | null;
         createdAt?: Date | null;
@@ -4196,6 +4198,7 @@ export type GqlGetWalletsWithTransactionQuery = {
           id: string;
           reason: GqlTransactionReason;
           comment?: string | null;
+          images?: Array<string> | null;
           fromPointChange?: number | null;
           toPointChange?: number | null;
           createdAt?: Date | null;
@@ -6573,7 +6576,7 @@ export type GqlTransactionFieldsFragment = {
   id: string;
   reason: GqlTransactionReason;
   comment?: string | null;
-  images?: string[] | null;
+  images?: Array<string> | null;
   fromPointChange?: number | null;
   toPointChange?: number | null;
   createdAt?: Date | null;
@@ -6593,7 +6596,7 @@ export type GqlPointIssueMutation = {
       id: string;
       reason: GqlTransactionReason;
       comment?: string | null;
-      images?: string[] | null;
+      images?: Array<string> | null;
       fromPointChange?: number | null;
       toPointChange?: number | null;
       createdAt?: Date | null;
@@ -6615,7 +6618,7 @@ export type GqlPointGrantMutation = {
       id: string;
       reason: GqlTransactionReason;
       comment?: string | null;
-      images?: string[] | null;
+      images?: Array<string> | null;
       fromPointChange?: number | null;
       toPointChange?: number | null;
       createdAt?: Date | null;
@@ -6637,10 +6640,29 @@ export type GqlPointDonateMutation = {
       id: string;
       reason: GqlTransactionReason;
       comment?: string | null;
-      images?: string[] | null;
+      images?: Array<string> | null;
       fromPointChange?: number | null;
       toPointChange?: number | null;
       createdAt?: Date | null;
+    };
+  } | null;
+};
+
+export type GqlTransactionUpdateMetadataMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+  input: GqlTransactionUpdateMetadataInput;
+  permission: GqlCheckIsSelfPermissionInput;
+}>;
+
+export type GqlTransactionUpdateMetadataMutation = {
+  __typename?: "Mutation";
+  transactionUpdateMetadata?: {
+    __typename?: "TransactionUpdateMetadataSuccess";
+    transaction: {
+      __typename?: "Transaction";
+      id: string;
+      comment?: string | null;
+      images?: Array<string> | null;
     };
   } | null;
 };
@@ -6673,6 +6695,7 @@ export type GqlGetTransactionsQuery = {
         id: string;
         reason: GqlTransactionReason;
         comment?: string | null;
+        images?: Array<string> | null;
         fromPointChange?: number | null;
         toPointChange?: number | null;
         createdAt?: Date | null;
@@ -6745,7 +6768,7 @@ export type GqlGetTransactionDetailQuery = {
     id: string;
     reason: GqlTransactionReason;
     comment?: string | null;
-    images?: string[] | null;
+    images?: Array<string> | null;
     fromPointChange?: number | null;
     toPointChange?: number | null;
     createdAt?: Date | null;
@@ -13473,26 +13496,6 @@ export type PointDonateMutationOptions = Apollo.BaseMutationOptions<
   GqlPointDonateMutation,
   GqlPointDonateMutationVariables
 >;
-
-export type GqlTransactionUpdateMetadataMutationVariables = Exact<{
-  id: Scalars["ID"]["input"];
-  input: GqlTransactionUpdateMetadataInput;
-  permission: GqlCheckIsSelfPermissionInput;
-}>;
-
-export type GqlTransactionUpdateMetadataMutation = {
-  __typename?: "Mutation";
-  transactionUpdateMetadata?: {
-    __typename?: "TransactionUpdateMetadataSuccess";
-    transaction: {
-      __typename?: "Transaction";
-      id: string;
-      comment?: string | null;
-      images?: string[] | null;
-    };
-  } | null;
-};
-
 export const TransactionUpdateMetadataDocument = gql`
   mutation TransactionUpdateMetadata(
     $id: ID!
@@ -13510,17 +13513,51 @@ export const TransactionUpdateMetadataDocument = gql`
     }
   }
 `;
+export type GqlTransactionUpdateMetadataMutationFn = Apollo.MutationFunction<
+  GqlTransactionUpdateMetadataMutation,
+  GqlTransactionUpdateMetadataMutationVariables
+>;
 
+/**
+ * __useTransactionUpdateMetadataMutation__
+ *
+ * To run a mutation, you first call `useTransactionUpdateMetadataMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useTransactionUpdateMetadataMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [transactionUpdateMetadataMutation, { data, loading, error }] = useTransactionUpdateMetadataMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      input: // value for 'input'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
 export function useTransactionUpdateMetadataMutation(
-  baseOptions?: Apollo.MutationHookOptions<GqlTransactionUpdateMetadataMutation, GqlTransactionUpdateMetadataMutationVariables>,
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlTransactionUpdateMetadataMutation,
+    GqlTransactionUpdateMetadataMutationVariables
+  >,
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<GqlTransactionUpdateMetadataMutation, GqlTransactionUpdateMetadataMutationVariables>(
-    TransactionUpdateMetadataDocument,
-    options,
-  );
+  return Apollo.useMutation<
+    GqlTransactionUpdateMetadataMutation,
+    GqlTransactionUpdateMetadataMutationVariables
+  >(TransactionUpdateMetadataDocument, options);
 }
-
+export type TransactionUpdateMetadataMutationHookResult = ReturnType<
+  typeof useTransactionUpdateMetadataMutation
+>;
+export type TransactionUpdateMetadataMutationResult =
+  Apollo.MutationResult<GqlTransactionUpdateMetadataMutation>;
+export type TransactionUpdateMetadataMutationOptions = Apollo.BaseMutationOptions<
+  GqlTransactionUpdateMetadataMutation,
+  GqlTransactionUpdateMetadataMutationVariables
+>;
 export const GetTransactionsDocument = gql`
   query getTransactions(
     $filter: TransactionFilterInput
