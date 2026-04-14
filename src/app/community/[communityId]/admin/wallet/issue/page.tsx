@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useAppRouter } from "@/lib/navigation";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -24,6 +24,7 @@ export default function IssuePointPage() {
 
   const [step, setStep] = useState<"numpad" | "confirm">("numpad");
   const [inputStr, setInputStr] = useState("");
+  const inputStrRef = useRef("");
   const [comment, setComment] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -38,31 +39,32 @@ export default function IssuePointPage() {
   );
   useHeaderConfig(headerConfig);
 
-  const { issuePoint } = useTransactionMutations();
+  const { issuePoint, isAuthReady } = useTransactionMutations();
 
   const numericAmount = parseInt(inputStr || "0", 10);
   const isAmountValid = numericAmount > 0 && numericAmount <= INT_LIMIT;
 
   const handleKey = (key: NumpadKey) => {
     if (key === "AC") {
+      inputStrRef.current = "";
       setInputStr("");
       return;
     }
     if (key === "backspace") {
-      setInputStr((prev) => prev.slice(0, -1));
+      const next = inputStrRef.current.slice(0, -1);
+      inputStrRef.current = next;
+      setInputStr(next);
       return;
     }
-    // Validate against current render value first (for toast), then update
-    // functionally from prev to avoid stale closure on rapid taps
-    const parsed = parseInt((inputStr || "") + key, 10);
-    if (parsed > INT_LIMIT) {
+    // ref を使って常に最新値から次値を計算することで、連打時のステイルクロージャを防ぐ
+    const next = parseInt((inputStrRef.current || "") + key, 10);
+    if (next > INT_LIMIT) {
       toast.error(t("adminWallet.issue.validation.max"));
       return;
     }
-    setInputStr((prev) => {
-      const next = parseInt((prev || "") + key, 10);
-      return next > INT_LIMIT ? prev : String(next);
-    });
+    const nextStr = String(next);
+    inputStrRef.current = nextStr;
+    setInputStr(nextStr);
   };
 
   const handleIssuePoint = async () => {
@@ -127,7 +129,7 @@ export default function IssuePointPage() {
           </div>
         </div>
 
-        <Button onClick={handleIssuePoint} disabled={isLoading} className="w-full">
+        <Button onClick={handleIssuePoint} disabled={isLoading || !isAuthReady} className="w-full">
           {t("adminWallet.issue.submit")}
         </Button>
       </main>
