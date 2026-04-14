@@ -109,6 +109,7 @@ export function AdminWalletClient({ initialWallet, initialTransactions }: Props)
           <InfiniteTransactionList
             key={listKey}
             initialTransactions={initialTransactions}
+            walletId={initialWallet.id}
             perspectiveWalletId={initialWallet.id}
             showSignedAmount={true}
             showDid={true}
