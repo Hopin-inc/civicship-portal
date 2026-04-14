@@ -55,6 +55,7 @@ export const TRANSACTION_UPDATE_METADATA = gql`
       ... on TransactionUpdateMetadataSuccess {
         transaction {
           id
+          comment
           images
         }
       }
