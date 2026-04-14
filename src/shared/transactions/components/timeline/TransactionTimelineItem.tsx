@@ -25,7 +25,7 @@ interface TransactionTimelineItemProps {
  *
  * リンクが指定された場合、Header + ActionLabel のみを `<AppLink>` でラップする。
  * MessageCard は `<button>` 等のインタラクティブ要素を含む可能性があるため、
- * HTML 仕様上の「リンク内にインタラクティブ要素」を避けるために `<a>` の外に配置する。
+ * HTML 仕様上の「リンク内にインタラクティブ要素」を避けるために `<AppLink>` の外に配置する。
  */
 export const TransactionTimelineItem = ({
   avatar,
@@ -45,7 +45,7 @@ export const TransactionTimelineItem = ({
   if (href) {
     // Render <AppLink> around only the non-interactive content (header + actionLabel).
     // messageCard may contain <button> elements (e.g. image grid), so it must
-    // sit outside the <a> to avoid invalid nested interactive elements.
+    // sit outside the <AppLink> to avoid invalid nested interactive elements.
     return (
       <div className="relative flex gap-3 pb-10 timeline-item">
         <div className={avatarClasses}>{avatar}</div>
