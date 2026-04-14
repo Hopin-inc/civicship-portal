@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useAppRouter } from "@/lib/navigation";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 import { useDonatePoint } from "@/app/community/[communityId]/wallets/features/donate/hooks/index";
-import { useTransactionMutations } from "@/app/community/[communityId]/admin/wallet/hooks/useTransactionMutations";
+import { useUpdateTransactionMetadata } from "@/hooks/transactions/useUpdateTransactionMetadata";
 import { toast } from "react-toastify";
 import { GqlUser } from "@/types/graphql";
 import { useTranslations } from "next-intl";
@@ -15,7 +15,7 @@ export function useDonateFlow(currentUser?: GqlUser | null, currentPoint?: bigin
   const router = useAppRouter();
   const track = useAnalytics();
   const { donate, isLoading: isDonating, isAuthReady } = useDonatePoint();
-  const { updateTransactionMetadata } = useTransactionMutations();
+  const { updateTransactionMetadata } = useUpdateTransactionMetadata();
   const [selectedUser, setSelectedUser] = useState<GqlUser | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
