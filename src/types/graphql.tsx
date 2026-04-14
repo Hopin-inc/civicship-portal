@@ -1190,9 +1190,10 @@ export type GqlMutationTransactionIssueCommunityPointArgs = {
 };
 
 export type GqlMutationTransactionUpdateMetadataArgs = {
+  communityPermission?: InputMaybe<GqlCheckCommunityPermissionInput>;
   id: Scalars["ID"]["input"];
   input: GqlTransactionUpdateMetadataInput;
-  permission: GqlCheckIsSelfPermissionInput;
+  permission?: InputMaybe<GqlCheckIsSelfPermissionInput>;
 };
 
 export type GqlMutationUpdatePortalConfigArgs = {
