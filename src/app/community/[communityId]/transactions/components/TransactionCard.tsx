@@ -17,6 +17,7 @@ import { TransactionTimelineItem } from "@/shared/transactions/components/timeli
 import { TransactionHeader } from "@/shared/transactions/components/timeline/TransactionHeader";
 import { TransactionActionLabel } from "@/shared/transactions/components/timeline/TransactionActionLabel";
 import { TransactionMessageCard } from "@/shared/transactions/components/timeline/TransactionMessageCard";
+import { TransactionImageGrid } from "@/app/community/[communityId]/transactions/components/TransactionImageGrid";
 
 interface TransactionCardProps {
   transaction: GqlTransaction;
@@ -72,6 +73,20 @@ export const TransactionCard = ({
     ? computeTransactionHref(transaction.id)
     : null;
 
+  const images = transaction.images ?? [];
+
+  const messageCard =
+    info.comment || images.length > 0 ? (
+      <div>
+        {info.comment && <TransactionMessageCard comment={info.comment} />}
+        {images.length > 0 && (
+          <div className={info.comment ? "mt-2" : ""}>
+            <TransactionImageGrid images={images} />
+          </div>
+        )}
+      </div>
+    ) : undefined;
+
   return (
     <TransactionTimelineItem
       avatar={
@@ -87,9 +102,7 @@ export const TransactionCard = ({
         />
       }
       actionLabel={<TransactionActionLabel data={actionLabelData} />}
-      messageCard={
-        info.comment ? <TransactionMessageCard comment={info.comment} /> : undefined
-      }
+      messageCard={messageCard}
       href={transactionHref}
       isFirst={isFirst}
       isLast={isLast}

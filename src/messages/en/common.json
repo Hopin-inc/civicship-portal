@@ -13,5 +13,7 @@
   "common.errorState.defaultTitle": "Failed to load page",
   "common.errorState.description": "Please try reloading using the button below. If the issue persists after retrying, please wait a moment and try again, or return to the top page.",
   "common.errorState.retryButton": "Reload",
-  "common.errorState.homeButton": "Back to Home"
+  "common.errorState.homeButton": "Back to Home",
+  "common.numpad.backspace": "Backspace",
+  "common.numpad.clear": "Clear"
 }

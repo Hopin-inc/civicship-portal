@@ -9,9 +9,8 @@
 
 import Link, { LinkProps } from "next/link";
 import { forwardRef, ReactNode, useMemo } from "react";
-import { usePathname } from "next/navigation";
 
-import { getCommunityIdClient } from "@/lib/community";
+import { useCommunityConfigOptional } from "@/contexts/CommunityConfigContext";
 import { resolvePath } from "./path-resolver";
 
 type AppLinkProps = Omit<LinkProps, "href"> & {
@@ -29,16 +28,6 @@ type AppLinkProps = Omit<LinkProps, "href"> & {
    */
   communityId?: string | null;
 };
-
-/**
- * URLのパス名から communityId を抽出する
- * /community/{communityId}/... の形式にマッチ
- * SSR とクライアントで一貫した値が得られるため hydration mismatch を防ぐ
- */
-function getCommunityIdFromPathname(pathname: string): string | null {
-  const match = pathname.match(/^\/community\/([a-zA-Z0-9-]+)/);
-  return match ? match[1] : null;
-}
 
 /**
  * AppLink コンポーネント
@@ -66,21 +55,19 @@ export const AppLink = forwardRef<HTMLAnchorElement, AppLinkProps>(
     },
     ref
   ) {
-    const pathname = usePathname();
+    // Context から取得した communityId は SSR と hydration の両方で一貫している。
+    // getCommunityIdClient() は typeof window !== "undefined" チェックを持つため、
+    // SSR では null を返すが hydration 時には cookie から値を読むため不一致が生じる。
+    const communityConfig = useCommunityConfigOptional();
 
     const resolvedHref = useMemo(() => {
       if (skipPathResolution) {
         return href;
       }
 
-      // usePathname() は SSR とクライアントで同じ値を返すため hydration mismatch が起きない
-      // getCommunityIdClient() (Cookie/Store) は SSR では null になるためフォールバックとして使用
-      const communityId =
-        explicitCommunityId ??
-        getCommunityIdFromPathname(pathname) ??
-        getCommunityIdClient();
+      const communityId = explicitCommunityId ?? communityConfig?.communityId ?? null;
       return resolvePath(href, communityId);
-    }, [href, skipPathResolution, explicitCommunityId, pathname]);
+    }, [href, skipPathResolution, explicitCommunityId, communityConfig?.communityId]);
 
     return (
       <Link ref={ref} href={resolvedHref} {...props}>

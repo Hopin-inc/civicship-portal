@@ -27,6 +27,8 @@ export const formatTransactionDescription = (
   }
 
   const actionType = mapping.actionType!;
+  // "grant" is treated the same as "donation" in translation keys
+  const effectiveActionType = actionType === 'grant' ? 'donation' : actionType;
 
   if (perspectiveWalletId && transaction) {
     const isOutgoing = transaction.fromWallet?.id === perspectiveWalletId;
@@ -34,13 +36,13 @@ export const formatTransactionDescription = (
     const direction = isOutgoing ? "to" : "from";
 
     if (locale === 'en') {
-      const baseKey = direction === 'from' 
-        ? `transactions.action.${actionType}.from.default`
-        : `transactions.action.${actionType}.${direction}`;
-      
+      const baseKey = direction === 'from'
+        ? `transactions.action.${effectiveActionType}.from`
+        : `transactions.action.${effectiveActionType}.${direction}`;
+
       const combinedKey =
         !isOutgoing && useReceivedPhrasing
-          ? `transactions.action.${actionType}.from.received`
+          ? `transactions.action.${effectiveActionType}.fromReceived`
           : baseKey;
 
       return {
@@ -52,11 +54,11 @@ export const formatTransactionDescription = (
 
     const actionKey =
       !isOutgoing && useReceivedPhrasing
-        ? `transactions.parts.action.${actionType}.from.received.action`
-        : `transactions.parts.action.${actionType}.${direction}.action`;
+        ? `transactions.parts.action.${effectiveActionType}.from.received.action`
+        : `transactions.parts.action.${effectiveActionType}.${direction}.action`;
 
     return {
-      displayName: t(`transactions.parts.action.${actionType}.${direction}.name`, {
+      displayName: t(`transactions.parts.action.${effectiveActionType}.${direction}.name`, {
         name: counterpartyName,
       }),
       displayAction: t(actionKey),
@@ -67,14 +69,14 @@ export const formatTransactionDescription = (
   if (locale === 'en') {
     return {
       displayName: null,
-      displayAction: t(`transactions.action.${actionType}.from.default`, { name: from }),
+      displayAction: t(`transactions.action.${effectiveActionType}.from`, { name: from }),
       to: to,
     };
   }
 
   return {
-    displayName: t(`transactions.parts.action.${actionType}.from.name`, { name: from }),
-    displayAction: t(`transactions.parts.action.${actionType}.from.action`),
+    displayName: t(`transactions.parts.action.${effectiveActionType}.from.name`, { name: from }),
+    displayAction: t(`transactions.parts.action.${effectiveActionType}.from.action`),
     to: to,
   };
 };
