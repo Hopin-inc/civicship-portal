@@ -10,6 +10,7 @@
   "transactions.name.onboarding": "新規加入特典",
   "transactions.name.move": "ポイント移動",
   "transactions.status.donation": "送信先",
+  "transactions.status.grant": "支給先",
   "transactions.status.pay": "支払い先",
   "transactions.status.refund": "払い戻し先",
   "transactions.status.return": "返品先",
