@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useTranslations } from "next-intl";
 
@@ -26,7 +27,7 @@ export function ImageLightbox({ images, index, onClose, onPrev, onNext }: Props)
     return () => window.removeEventListener("keydown", handleKey);
   }, [onClose, onPrev, onNext]);
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
       onClick={onClose}
@@ -82,6 +83,7 @@ export function ImageLightbox({ images, index, onClose, onPrev, onNext }: Props)
           <ChevronRight className="w-9 h-9" />
         </button>
       )}
-    </div>
+    </div>,
+    document.body
   );
 }
