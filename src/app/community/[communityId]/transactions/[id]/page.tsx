@@ -15,6 +15,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ArrowRight, Pencil } from "lucide-react";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { useAppRouter } from "@/lib/navigation";
+import { useAuth } from "@/contexts/AuthProvider";
+import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
+import { GqlMembership, GqlRole, GqlWalletType } from "@/types/graphql";
 
 export default function TransactionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -25,6 +28,12 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
     variables: { id },
   });
   const currentUserId = useAuthStore((s) => s.state.currentUser?.id);
+  const { user: currentUser } = useAuth();
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId ?? "";
+  const currentUserRole = currentUser?.memberships?.find(
+    (m: GqlMembership) => m.community?.id === communityId,
+  )?.role;
   const router = useAppRouter();
   const [editOpen, setEditOpen] = useState(false);
 
@@ -53,8 +62,11 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
   const fromImage = transaction.fromWallet?.user?.image ?? transaction.fromWallet?.community?.image ?? undefined;
   const toImage = transaction.toWallet?.user?.image ?? transaction.toWallet?.community?.image ?? undefined;
 
-  // 送信者本人のみ編集可
-  const canEdit = !!(currentUserId && transaction.fromWallet?.user?.id === currentUserId);
+  // 送信者本人、またはコミュニティウォレット発の場合はコミュニティオーナー
+  const isSender = !!(currentUserId && transaction.fromWallet?.user?.id === currentUserId);
+  const isFromCommunityWallet = transaction.fromWallet?.type === GqlWalletType.Community;
+  const isOwner = currentUserRole === GqlRole.Owner;
+  const canEdit = isSender || (isOwner && isFromCommunityWallet);
 
   return (
     <div className="p-4 space-y-6">

@@ -1,17 +1,21 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useAppRouter } from "@/lib/navigation";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "react-toastify";
 import { useTransactionMutations } from "@/app/community/[communityId]/admin/wallet/hooks/useTransactionMutations";
+import { useUpdateTransactionMetadata } from "@/hooks/transactions/useUpdateTransactionMetadata";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 import { useTranslations } from "next-intl";
 import Numpad, { NumpadKey } from "@/components/ui/numpad";
 import { errorMessages } from "@/utils/errorMessage";
+import { ImagePlus, X } from "lucide-react";
+
+const MAX_IMAGES = 4;
 
 const INT_LIMIT = 9_999_999;
 
@@ -26,6 +30,9 @@ export default function IssuePointPage() {
   const [inputStr, setInputStr] = useState("");
   const inputStrRef = useRef("");
   const [comment, setComment] = useState("");
+  const [images, setImages] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const headerConfig = useMemo(
@@ -40,6 +47,27 @@ export default function IssuePointPage() {
   useHeaderConfig(headerConfig);
 
   const { issuePoint, isAuthReady } = useTransactionMutations();
+  const { updateTransactionMetadata } = useUpdateTransactionMetadata();
+
+  // プレビューURL の生成と cleanup
+  useEffect(() => {
+    const urls = images.map((file) => URL.createObjectURL(file));
+    setImagePreviews(urls);
+    return () => { urls.forEach((url) => URL.revokeObjectURL(url)); };
+  }, [images]);
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    const remaining = MAX_IMAGES - images.length;
+    if (files.length > remaining) {
+      toast.error(t("wallets.shared.transfer.photoLimit", { max: MAX_IMAGES }));
+    }
+    setImages((prev) => {
+      const combined = [...prev, ...files];
+      return combined.length > MAX_IMAGES ? combined.slice(0, MAX_IMAGES) : combined;
+    });
+    e.target.value = "";
+  };
 
   const numericAmount = parseInt(inputStr || "0", 10);
   const isAmountValid = numericAmount > 0 && numericAmount <= INT_LIMIT;
@@ -77,6 +105,13 @@ export default function IssuePointPage() {
       });
 
       if (res.success) {
+        const transactionId = res.data.transactionIssueCommunityPoint?.transaction.id;
+        if (transactionId && images.length > 0) {
+          const metaRes = await updateTransactionMetadata(transactionId, { images });
+          if (!metaRes.success) {
+            toast.warn(t("adminWallet.issue.imageUploadWarning"));
+          }
+        }
         track({ name: "issue_point", params: { amount: numericAmount } });
         toast.success(t("adminWallet.issue.success"));
         router.push("/admin/wallet?refresh=true");
@@ -105,12 +140,14 @@ export default function IssuePointPage() {
 
   if (step === "confirm") {
     return (
-      <main className="flex flex-col items-center px-4 pt-8 gap-6 max-w-xl mx-auto w-full">
-        {amountSection}
+      <div className="fixed inset-x-0 top-16 bottom-0 max-w-mobile-l mx-auto flex flex-col overflow-hidden bg-background">
+        {/* スクロール可能なコンテンツ */}
+        <div className="flex-1 overflow-y-auto px-4 pt-4 pb-2 space-y-4">
+          {amountSection}
 
-        <div className="w-full">
           <div className="relative">
             <Textarea
+              autoFocus
               maxLength={100}
               placeholder={t("wallets.shared.transfer.commentPlaceholder")}
               value={comment}
@@ -121,18 +158,61 @@ export default function IssuePointPage() {
                 }
                 setComment(e.target.value);
               }}
-              className="focus:outline-none focus:ring-0 shadow-none min-h-[160px] pr-12 resize-none"
+              className="focus:outline-none focus:ring-0 shadow-none min-h-[120px] pr-12 resize-none"
             />
             <div className="absolute bottom-2 right-2 text-xs text-muted-foreground">
               {comment.length}/100
             </div>
           </div>
+
+          {/* 画像サムネイル */}
+          {imagePreviews.length > 0 && (
+            <div className="flex gap-2 flex-wrap">
+              {imagePreviews.map((url, i) => (
+                <div key={i} className="relative w-20 h-20 shrink-0">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={url} alt="" className="w-full h-full object-cover rounded-xl" />
+                  <button
+                    type="button"
+                    aria-label={t("wallets.shared.transfer.removePhoto", { index: i + 1 })}
+                    onClick={() => setImages((prev) => prev.filter((_, idx) => idx !== i))}
+                    className="absolute -top-1 -right-1 w-5 h-5 bg-foreground text-background rounded-full flex items-center justify-center"
+                  >
+                    <X className="w-3 h-3" aria-hidden="true" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* 写真追加ボタン */}
+          {images.length < MAX_IMAGES && (
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="flex items-center gap-2 text-sm text-muted-foreground"
+            >
+              <ImagePlus className="w-4 h-4" />
+              {t("wallets.shared.transfer.addPhoto")}
+            </button>
+          )}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            hidden
+            onChange={handleImageSelect}
+          />
         </div>
 
-        <Button onClick={handleIssuePoint} disabled={isLoading || !isAuthReady} className="w-full">
-          {t("adminWallet.issue.submit")}
-        </Button>
-      </main>
+        {/* 送信ボタン（下部固定） */}
+        <div className="shrink-0 px-4 py-3 bg-background">
+          <Button onClick={handleIssuePoint} disabled={isLoading || !isAuthReady} className="w-full">
+            {t("adminWallet.issue.submit")}
+          </Button>
+        </div>
+      </div>
     );
   }
 

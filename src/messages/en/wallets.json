@@ -29,7 +29,7 @@
   "wallets.shared.transfer.sendTo": "Send to {name}",
   "wallets.shared.transfer.didPending": "DID issuance in progress",
   "wallets.shared.transfer.errorExceedsBalance": "Exceeds available balance",
-  "wallets.shared.transfer.errorExceedsLimit": "Please specify 2 billion or less",
+  "wallets.shared.transfer.errorExceedsLimit": "Please specify 9,999,999 or less",
   "wallets.shared.transfer.amountLabel": "Amount",
   "wallets.shared.transfer.required": "Required",
   "wallets.shared.transfer.balance": "Balance",
