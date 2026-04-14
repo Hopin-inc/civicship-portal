@@ -12,7 +12,7 @@ import { useTranslations } from "next-intl";
 import Numpad, { NumpadKey } from "@/components/ui/numpad";
 import { ImagePlus, X } from "lucide-react";
 
-const INT_LIMIT = 2000000000;
+const INT_LIMIT = 9_999_999;
 const MAX_IMAGES = 4;
 
 interface Props {

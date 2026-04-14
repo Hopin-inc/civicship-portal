@@ -6593,6 +6593,7 @@ export type GqlPointIssueMutation = {
       id: string;
       reason: GqlTransactionReason;
       comment?: string | null;
+      images?: string[] | null;
       fromPointChange?: number | null;
       toPointChange?: number | null;
       createdAt?: Date | null;
@@ -6614,6 +6615,7 @@ export type GqlPointGrantMutation = {
       id: string;
       reason: GqlTransactionReason;
       comment?: string | null;
+      images?: string[] | null;
       fromPointChange?: number | null;
       toPointChange?: number | null;
       createdAt?: Date | null;
@@ -6635,6 +6637,7 @@ export type GqlPointDonateMutation = {
       id: string;
       reason: GqlTransactionReason;
       comment?: string | null;
+      images?: string[] | null;
       fromPointChange?: number | null;
       toPointChange?: number | null;
       createdAt?: Date | null;

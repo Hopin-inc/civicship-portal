@@ -74,16 +74,15 @@ export function TransactionMetadataEditSheet({
 
   const handleAddImages = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
-    const willExceed = existingImages.length + newImages.length + files.length > MAX_IMAGES;
-    if (willExceed) {
+    // existingImages.length をイベント発火時点でキャプチャしてクロージャに渡す
+    const existingCount = existingImages.length;
+    const remaining = MAX_IMAGES - existingCount;
+    if (newImages.length + files.length > remaining) {
       toast.error(t("transactions.detail.editSheet.photoLimit", { max: MAX_IMAGES }));
     }
     setNewImages((prev) => {
       const combined = [...prev, ...files];
-      if (existingImages.length + combined.length > MAX_IMAGES) {
-        return combined.slice(0, MAX_IMAGES - existingImages.length);
-      }
-      return combined;
+      return combined.length > remaining ? combined.slice(0, remaining) : combined;
     });
     e.target.value = "";
   };
