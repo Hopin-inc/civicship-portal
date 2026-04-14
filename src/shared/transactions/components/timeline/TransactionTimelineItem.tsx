@@ -22,7 +22,9 @@ interface TransactionTimelineItemProps {
  * - ActionLabel: アクション情報（矢印/符号 + 名前 + ポイント）
  * - MessageCard: メッセージ（オプション）
  *
- * リンクが指定された場合、全体をリンクでラップ
+ * リンクが指定された場合、Header + ActionLabel のみを `<a>` でラップする。
+ * MessageCard は `<button>` 等のインタラクティブ要素を含む可能性があるため、
+ * HTML 仕様上の「リンク内にインタラクティブ要素」を避けるために `<a>` の外に配置する。
  */
 export const TransactionTimelineItem = ({
   avatar,
