@@ -13,6 +13,7 @@
   "adminWallet.grant.success": "Sent {amount} pt",
   "adminWallet.grant.errorWithCode": "Failed to send: {code}",
   "adminWallet.grant.errorGeneric": "Failed to send points",
+  "adminWallet.grant.imageUploadWarning": "Points sent, but image upload failed",
   "adminWallet.grant.membersLoadError": "Failed to load members",
   "adminWallet.grant.walletLoadError": "Failed to load community wallet",
   "adminWallet.issue.title": "Issue Points",

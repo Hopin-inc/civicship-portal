@@ -76,7 +76,10 @@ export default function GrantPageClient({ initialConnection }: GrantPageClientPr
       if (res.success) {
         const transactionId = res.data.transactionGrantCommunityPoint?.transaction.id;
         if (transactionId && images && images.length > 0) {
-          await updateTransactionMetadata(transactionId, { images });
+          const metaRes = await updateTransactionMetadata(transactionId, { images });
+          if (!metaRes.success) {
+            toast.warn(t("adminWallet.grant.imageUploadWarning"));
+          }
         }
 
         track({

@@ -11,6 +11,7 @@ import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 import { useTranslations } from "next-intl";
 import Numpad, { NumpadKey } from "@/components/ui/numpad";
+import { errorMessages } from "@/utils/errorMessage";
 
 const INT_LIMIT = 2000000000;
 
@@ -73,6 +74,9 @@ export default function IssuePointPage() {
         track({ name: "issue_point", params: { amount: numericAmount } });
         toast.success(t("adminWallet.issue.success"));
         router.push("/admin/wallet?refresh=true");
+      } else {
+        const errorMessage = errorMessages[res.code] ?? t("adminWallet.issue.errorGeneric");
+        toast.error(errorMessage);
       }
     } catch {
       toast.error(t("adminWallet.issue.errorGeneric"));

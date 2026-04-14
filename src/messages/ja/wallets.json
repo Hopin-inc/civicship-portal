@@ -34,9 +34,10 @@
   "wallets.shared.transfer.required": "必須",
   "wallets.shared.transfer.balance": "残高",
   "wallets.shared.transfer.commentLabel": "メッセージ",
-  "wallets.shared.transfer.commentPlaceholder": "メッセージを入力して下さい",
+  "wallets.shared.transfer.commentPlaceholder": "メッセージを入力してください",
   "wallets.shared.transfer.nextLabel": "次へ",
   "wallets.shared.transfer.addPhoto": "写真を追加",
+  "wallets.shared.transfer.removePhoto": "写真{index}を削除",
   "wallets.shared.transfer.photoLimit": "画像は{max}枚まで追加できます",
   "wallets.shared.transfer.commentError": "100文字以内で入力してください",
   "wallets.action.donation.to": "{name}に送った",
@@ -44,6 +45,7 @@
   "wallets.donate.toast.success": "{amount}ptを送りました",
   "wallets.donate.toast.errorWithCode": "送信失敗: {code}",
   "wallets.donate.toast.genericError": "ポイントを送れませんでした",
+  "wallets.donate.toast.imageUploadWarning": "送信しましたが、画像のアップロードに失敗しました",
   "wallets.meta.title": "{communityName} - ウォレット",
   "wallets.meta.description": "ポイントの残高を確認したり、誰かに送ったりできます。"
 }

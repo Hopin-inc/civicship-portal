@@ -37,6 +37,7 @@
   "wallets.shared.transfer.commentPlaceholder": "Enter a message",
   "wallets.shared.transfer.nextLabel": "Next",
   "wallets.shared.transfer.addPhoto": "Add photo",
+  "wallets.shared.transfer.removePhoto": "Remove photo {index}",
   "wallets.shared.transfer.photoLimit": "You can add up to {max} photos",
   "wallets.shared.transfer.commentError": "Please enter within 100 characters",
   "wallets.action.donation.to": "Sent to {name}",
@@ -44,6 +45,7 @@
   "wallets.donate.toast.success": "Sent {amount} pt",
   "wallets.donate.toast.errorWithCode": "Transfer failed: {code}",
   "wallets.donate.toast.genericError": "Failed to send points",
+  "wallets.donate.toast.imageUploadWarning": "Points sent, but image upload failed",
   "wallets.meta.title": "{communityName} - Wallet",
   "wallets.meta.description": "Check your points balance and send to others."
 }

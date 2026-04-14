@@ -53,7 +53,7 @@ export const useTransactionMutations = () => {
   const [issuePointMutation, { loading: loadingIssue }] = usePointIssueMutation();
   const [grantPointMutation, { loading: loadingGrant }] = usePointGrantMutation();
   const [donatePointMutation, { loading: loadingDonate }] = usePointDonateMutation();
-  const [updateMetadataMutation] = useTransactionUpdateMetadataMutation();
+  const [updateMetadataMutation, { loading: loadingUpdateMetadata }] = useTransactionUpdateMetadataMutation();
 
   // -----------------------
   // 明示的に定義: ポイント発行
@@ -190,7 +190,7 @@ export const useTransactionMutations = () => {
         },
       });
 
-      if (data != null) {
+      if (data?.transactionUpdateMetadata?.__typename === "TransactionUpdateMetadataSuccess") {
         return { success: true, data };
       } else {
         return { success: false, code: GqlErrorCode.Unknown };
@@ -215,7 +215,7 @@ export const useTransactionMutations = () => {
     grantPoint,
     donatePoint,
     updateTransactionMetadata,
-    isLoading: loadingIssue || loadingGrant || loadingDonate,
+    isLoading: loadingIssue || loadingGrant || loadingDonate || loadingUpdateMetadata,
     isAuthReady,
   };
 };

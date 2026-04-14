@@ -108,7 +108,9 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
             className="flex items-center gap-1.5 text-sm text-muted-foreground"
           >
             <Pencil className="w-3.5 h-3.5" />
-            {hasMessage ? "編集" : "メッセージを追加"}
+            {hasMessage
+              ? t("transactions.detail.actions.edit")
+              : t("transactions.detail.actions.addMessage")}
           </button>
         )}
       </div>
