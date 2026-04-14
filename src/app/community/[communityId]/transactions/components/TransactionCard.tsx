@@ -17,6 +17,7 @@ import { TransactionTimelineItem } from "@/shared/transactions/components/timeli
 import { TransactionHeader } from "@/shared/transactions/components/timeline/TransactionHeader";
 import { TransactionActionLabel } from "@/shared/transactions/components/timeline/TransactionActionLabel";
 import { TransactionMessageCard } from "@/shared/transactions/components/timeline/TransactionMessageCard";
+import { TransactionImageGrid } from "@/app/community/[communityId]/transactions/components/TransactionImageGrid";
 
 interface TransactionCardProps {
   transaction: GqlTransaction;
@@ -79,18 +80,8 @@ export const TransactionCard = ({
       <div>
         {info.comment && <TransactionMessageCard comment={info.comment} />}
         {images.length > 0 && (
-          <div className={`flex gap-1.5 flex-wrap ${info.comment ? "mt-2" : ""}`}>
-            {images.slice(0, 4).map((url, i) => (
-              <div key={i} className="relative w-14 h-14 shrink-0 overflow-hidden rounded-lg">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={url} alt="" className="w-full h-full object-cover" />
-                {i === 3 && images.length > 4 && (
-                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                    <span className="text-white text-xs font-bold">+{images.length - 4}</span>
-                  </div>
-                )}
-              </div>
-            ))}
+          <div className={info.comment ? "mt-2" : ""}>
+            <TransactionImageGrid images={images} />
           </div>
         )}
       </div>

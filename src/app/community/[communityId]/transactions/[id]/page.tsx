@@ -9,7 +9,7 @@ import { useTranslations } from "next-intl";
 import { useLocaleDateTimeFormat } from "@/utils/i18n";
 import { useTransactionDetailData } from "./lib/useTransactionDetailData";
 import { VerificationSection } from "../components/VerificationSection";
-import { TransactionImageGrid } from "./components/TransactionImageGrid";
+import { TransactionImageGrid } from "../components/TransactionImageGrid";
 import { TransactionMetadataEditSheet } from "./components/TransactionMetadataEditSheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ArrowRight, Pencil } from "lucide-react";

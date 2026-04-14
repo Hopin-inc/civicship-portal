@@ -96,16 +96,31 @@ export function TransactionMetadataEditSheet({
 
       let images: File[] | undefined;
       if (hasImageChanges) {
-        const keptFiles = await Promise.all(
+        const results = await Promise.allSettled(
           existingImages.map((url) =>
-            urlToFile(url, () => toast.error(t("transactions.detail.editSheet.imageLoadError"))),
+            urlToFile(url, () => {}),
           ),
         );
+        if (results.some((r) => r.status === "rejected")) {
+          toast.error(t("transactions.detail.editSheet.imageLoadError"));
+          return;
+        }
+        const keptFiles = results.map((r) => (r as PromiseFulfilledResult<File>).value);
         images = [...keptFiles, ...newImages];
       }
 
+      // 変更なし=undefined、削除=null、新規/更新=文字列 で区別
+      const normalizedInitial = initialComment?.trim() ?? "";
+      const normalizedComment = comment.trim();
+      const nextComment =
+        normalizedComment === normalizedInitial
+          ? undefined
+          : normalizedComment === ""
+            ? null
+            : normalizedComment;
+
       const res = await updateTransactionMetadata(transactionId, {
-        comment: comment.trim() || undefined,
+        comment: nextComment,
         images,
       });
 

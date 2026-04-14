@@ -166,7 +166,7 @@ export const useTransactionMutations = () => {
 
   const updateTransactionMetadata = async (
     transactionId: string,
-    payload: { comment?: string; images?: File[] },
+    payload: { comment?: string | null; images?: File[] },
   ): Promise<Result<GqlTransactionUpdateMetadataMutation>> => {
     if (!currentUserId) {
       return { success: false, code: GqlErrorCode.Unauthenticated };
