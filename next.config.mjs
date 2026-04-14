@@ -38,10 +38,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "ipfs.io",
       },
-      {
-        protocol: "https",
-        hostname: "picsum.photos",
-      },
+      // ローカル開発用モックデータのみ（本番には含めない）
+      ...(process.env.NODE_ENV === "development"
+        ? [{ protocol: "https", hostname: "picsum.photos" }]
+        : []),
     ],
   },
   experimental: {
