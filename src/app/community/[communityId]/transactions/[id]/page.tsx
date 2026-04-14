@@ -17,7 +17,7 @@ import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { useAppRouter } from "@/lib/navigation";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
-import { GqlMembership, GqlRole, GqlWalletType } from "@/types/graphql";
+import { GqlMembership, GqlRole, GqlTransactionReason, GqlWalletType } from "@/types/graphql";
 
 export default function TransactionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -68,35 +68,40 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
   const isOwner = currentUserRole === GqlRole.Owner;
   const canEdit = isSender || (isOwner && isFromCommunityWallet);
 
+  const isIssued = transaction.reason === GqlTransactionReason.PointIssued;
+
   return (
     <div className="p-4 space-y-6">
       {/* ── ヘッダーサマリー（ポイント入力画面風） ── */}
       <div className="flex flex-col items-center gap-4 pt-4 pb-2">
         <div className="flex items-center gap-4">
-          {/* from: ユーザーならタップでプロフィールへ、コミュニティなら非インタラクティブ */}
-          {detail.fromUserId ? (
-            <button
-              type="button"
-              onClick={() => router.push(`/users/${detail.fromUserId}`)}
-              className="flex flex-col items-center gap-1"
-            >
-              <Avatar className="w-10 h-10 border">
-                <AvatarImage src={fromImage ?? ""} alt={detail.fromName} />
-                <AvatarFallback className="text-sm">{detail.fromName?.[0]?.toUpperCase() ?? "U"}</AvatarFallback>
-              </Avatar>
-              <p className="text-xs text-muted-foreground max-w-[72px] truncate text-center">{detail.fromName}</p>
-            </button>
-          ) : (
-            <div className="flex flex-col items-center gap-1">
-              <Avatar className="w-10 h-10 border">
-                <AvatarImage src={fromImage ?? ""} alt={detail.fromName} />
-                <AvatarFallback className="text-sm">{detail.fromName?.[0]?.toUpperCase() ?? "U"}</AvatarFallback>
-              </Avatar>
-              <p className="text-xs text-muted-foreground max-w-[72px] truncate text-center">{detail.fromName}</p>
-            </div>
+          {/* 発行トランザクションは from を非表示（送信元なし） */}
+          {!isIssued && (
+            <>
+              {detail.fromUserId ? (
+                <button
+                  type="button"
+                  onClick={() => router.push(`/users/${detail.fromUserId}`)}
+                  className="flex flex-col items-center gap-1"
+                >
+                  <Avatar className="w-10 h-10 border">
+                    <AvatarImage src={fromImage ?? ""} alt={detail.fromName} />
+                    <AvatarFallback className="text-sm">{detail.fromName?.[0]?.toUpperCase() ?? "U"}</AvatarFallback>
+                  </Avatar>
+                  <p className="text-xs text-muted-foreground max-w-[72px] truncate text-center">{detail.fromName}</p>
+                </button>
+              ) : (
+                <div className="flex flex-col items-center gap-1">
+                  <Avatar className="w-10 h-10 border">
+                    <AvatarImage src={fromImage ?? ""} alt={detail.fromName} />
+                    <AvatarFallback className="text-sm">{detail.fromName?.[0]?.toUpperCase() ?? "U"}</AvatarFallback>
+                  </Avatar>
+                  <p className="text-xs text-muted-foreground max-w-[72px] truncate text-center">{detail.fromName}</p>
+                </div>
+              )}
+              <ArrowRight className="w-4 h-4 text-muted-foreground mb-4" />
+            </>
           )}
-
-          <ArrowRight className="w-4 h-4 text-muted-foreground mb-4" />
 
           {/* to: ユーザーならタップでプロフィールへ、コミュニティなら非インタラクティブ */}
           {detail.toUserId ? (
