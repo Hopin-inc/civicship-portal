@@ -107,7 +107,7 @@ export default function IssuePointPage() {
       if (res.success) {
         const transactionId = res.data.transactionIssueCommunityPoint?.transaction?.id;
         if (transactionId && images.length > 0) {
-          const metaRes = await updateTransactionMetadata(transactionId, { images });
+          const metaRes = await updateTransactionMetadata(transactionId, { images }, { type: "community", communityId });
           if (!metaRes.success) {
             toast.warn(t("adminWallet.issue.imageUploadWarning"));
           }
