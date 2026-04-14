@@ -74,7 +74,7 @@ export default function GrantPageClient({ initialConnection }: GrantPageClientPr
       });
 
       if (res.success) {
-        const transactionId = res.data.transactionGrantCommunityPoint?.transaction.id;
+        const transactionId = res.data.transactionGrantCommunityPoint?.transaction?.id;
         if (transactionId && images && images.length > 0) {
           const metaRes = await updateTransactionMetadata(transactionId, { images });
           if (!metaRes.success) {
