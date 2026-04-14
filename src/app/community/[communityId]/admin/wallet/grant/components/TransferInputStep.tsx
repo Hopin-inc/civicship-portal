@@ -253,7 +253,11 @@ function TransferInputStep({
 
       {/* テンキー（40%） */}
       <div className="flex-[2] bg-muted/30">
-        <Numpad onKey={handleKey} />
+        <Numpad
+          onKey={handleKey}
+          backspaceLabel={t("common.numpad.backspace")}
+          clearLabel={t("common.numpad.clear")}
+        />
       </div>
     </div>
   );

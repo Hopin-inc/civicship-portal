@@ -16,7 +16,7 @@ interface Props {
  */
 export function TransactionImageGrid({ images }: Props) {
   const t = useTranslations();
-  const count = images.length;
+  const count = Math.min(images.length, 4);
   const alt = (i: number) => t("transactions.detail.photo", { index: i + 1, total: count });
 
   if (count === 1) {
