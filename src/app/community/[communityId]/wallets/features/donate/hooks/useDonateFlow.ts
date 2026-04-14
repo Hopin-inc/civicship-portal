@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useAppRouter } from "@/lib/navigation";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 import { useDonatePoint } from "@/app/community/[communityId]/wallets/features/donate/hooks/index";
-import { useUpdateTransactionMetadata } from "@/hooks/transactions/useUpdateTransactionMetadata";
 import { toast } from "react-toastify";
 import { GqlUser } from "@/types/graphql";
 import { useTranslations } from "next-intl";
@@ -15,7 +14,6 @@ export function useDonateFlow(currentUser?: GqlUser | null, currentPoint?: bigin
   const router = useAppRouter();
   const track = useAnalytics();
   const { donate, isLoading: isDonating, isAuthReady } = useDonatePoint();
-  const { updateTransactionMetadata } = useUpdateTransactionMetadata();
   const [selectedUser, setSelectedUser] = useState<GqlUser | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -29,17 +27,10 @@ export function useDonateFlow(currentUser?: GqlUser | null, currentPoint?: bigin
         amount,
         comment,
         fromUserId: currentUser.id,
+        images,
       });
 
       if (res.success) {
-        const transactionId = res.data.transactionDonateSelfPoint?.transaction?.id;
-        if (transactionId && images && images.length > 0) {
-          const metaRes = await updateTransactionMetadata(transactionId, { images });
-          if (!metaRes.success) {
-            toast.warn(t("wallets.donate.toast.imageUploadWarning"));
-          }
-        }
-
         track({
           name: "donate_point",
           params: {

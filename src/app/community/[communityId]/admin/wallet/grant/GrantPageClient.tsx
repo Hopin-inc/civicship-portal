@@ -54,7 +54,7 @@ export default function GrantPageClient({ initialConnection }: GrantPageClientPr
 
   const { data, loading, error, refetch, loadMoreRef, isLoadingMore } = useMemberWallets();
 
-  const { grantPoint, updateTransactionMetadata, isAuthReady } = useTransactionMutations();
+  const { grantPoint, isAuthReady } = useTransactionMutations();
 
   const refetchRef = useRef<(() => void) | null>(null);
   useEffect(() => {
@@ -68,20 +68,18 @@ export default function GrantPageClient({ initialConnection }: GrantPageClientPr
     if (!selectedUser) return;
     setIsLoading(true);
     try {
+      const imagesInput = images?.map((file) => ({ file, alt: "", caption: "" }));
       const res = await grantPoint({
-        input: { transferPoints: amount, toUserId: selectedUser.id, comment },
+        input: {
+          transferPoints: amount,
+          toUserId: selectedUser.id,
+          comment,
+          images: imagesInput && imagesInput.length > 0 ? imagesInput : undefined,
+        },
         permission: { communityId },
       });
 
       if (res.success) {
-        const transactionId = res.data.transactionGrantCommunityPoint?.transaction?.id;
-        if (transactionId && images && images.length > 0) {
-          const metaRes = await updateTransactionMetadata(transactionId, { images }, { type: "community", communityId });
-          if (!metaRes.success) {
-            toast.warn(t("adminWallet.grant.imageUploadWarning"));
-          }
-        }
-
         track({
           name: "grant_point",
           params: {

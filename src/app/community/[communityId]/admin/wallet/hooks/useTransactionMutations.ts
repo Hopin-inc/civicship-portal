@@ -13,7 +13,6 @@ import {
 } from "@/types/graphql";
 import { logger } from "@/lib/logging";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
-import { useUpdateTransactionMetadata } from "@/hooks/transactions/useUpdateTransactionMetadata";
 
 type Result<T> = { success: true; data: T } | { success: false; code: GqlErrorCode };
 
@@ -39,9 +38,6 @@ export const useTransactionMutations = () => {
   const [issuePointMutation, { loading: loadingIssue }] = usePointIssueMutation();
   const [grantPointMutation, { loading: loadingGrant }] = usePointGrantMutation();
   const [donatePointMutation, { loading: loadingDonate }] = usePointDonateMutation();
-
-  // メタデータ更新は共通 hook に委譲
-  const { updateTransactionMetadata } = useUpdateTransactionMetadata();
 
   // -----------------------
   // 明示的に定義: ポイント発行
@@ -156,7 +152,6 @@ export const useTransactionMutations = () => {
     issuePoint,
     grantPoint,
     donatePoint,
-    updateTransactionMetadata,
     isLoading: loadingIssue || loadingGrant || loadingDonate,
     isAuthReady,
   };

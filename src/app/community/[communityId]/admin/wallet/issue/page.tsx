@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "react-toastify";
 import { useTransactionMutations } from "@/app/community/[communityId]/admin/wallet/hooks/useTransactionMutations";
-import { useUpdateTransactionMetadata } from "@/hooks/transactions/useUpdateTransactionMetadata";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
@@ -47,7 +46,6 @@ export default function IssuePointPage() {
   useHeaderConfig(headerConfig);
 
   const { issuePoint, isAuthReady } = useTransactionMutations();
-  const { updateTransactionMetadata } = useUpdateTransactionMetadata();
 
   // プレビューURL の生成と cleanup
   useEffect(() => {
@@ -99,19 +97,17 @@ export default function IssuePointPage() {
     if (!isAmountValid) return;
     setIsLoading(true);
     try {
+      const imagesInput = images.map((file) => ({ file, alt: "", caption: "" }));
       const res = await issuePoint({
-        input: { transferPoints: numericAmount, comment: comment.trim() || undefined },
+        input: {
+          transferPoints: numericAmount,
+          comment: comment.trim() || undefined,
+          images: imagesInput.length > 0 ? imagesInput : undefined,
+        },
         permission: { communityId },
       });
 
       if (res.success) {
-        const transactionId = res.data.transactionIssueCommunityPoint?.transaction?.id;
-        if (transactionId && images.length > 0) {
-          const metaRes = await updateTransactionMetadata(transactionId, { images }, { type: "community", communityId });
-          if (!metaRes.success) {
-            toast.warn(t("adminWallet.issue.imageUploadWarning"));
-          }
-        }
         track({ name: "issue_point", params: { amount: numericAmount } });
         toast.success(t("adminWallet.issue.success"));
         router.push("/admin/wallet?refresh=true");
