@@ -43,6 +43,7 @@ function TransferInputStep({
 
   const [step, setStep] = useState<"numpad" | "confirm">("numpad");
   const [inputStr, setInputStr] = useState("");
+  const inputStrRef = useRef("");
   const [comment, setComment] = useState("");
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
@@ -74,27 +75,29 @@ function TransferInputStep({
 
   const handleKey = (key: NumpadKey) => {
     if (key === "AC") {
+      inputStrRef.current = "";
       setInputStr("");
       return;
     }
     if (key === "backspace") {
-      setInputStr((prev) => prev.slice(0, -1));
+      const next = inputStrRef.current.slice(0, -1);
+      inputStrRef.current = next;
+      setInputStr(next);
       return;
     }
-    const parsed = parseInt((inputStr || "") + key, 10);
-    if (parsed > Number(currentPoint)) {
+    // ref を使って常に最新値から次値を計算することで、連打時のステイルクロージャを防ぐ
+    const next = parseInt((inputStrRef.current || "") + key, 10);
+    if (next > Number(currentPoint)) {
       toast.error(t("wallets.shared.transfer.errorExceedsBalance"));
       return;
     }
-    if (parsed > INT_LIMIT) {
+    if (next > INT_LIMIT) {
       toast.error(t("wallets.shared.transfer.errorExceedsLimit"));
       return;
     }
-    setInputStr((prev) => {
-      const next = parseInt((prev || "") + key, 10);
-      if (next > Number(currentPoint) || next > INT_LIMIT) return prev;
-      return String(next);
-    });
+    const nextStr = String(next);
+    inputStrRef.current = nextStr;
+    setInputStr(nextStr);
   };
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -14,6 +14,7 @@ import { TransactionMetadataEditSheet } from "./components/TransactionMetadataEd
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ArrowRight, Pencil } from "lucide-react";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
+import { useAppRouter } from "@/lib/navigation";
 
 export default function TransactionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -24,6 +25,7 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
     variables: { id },
   });
   const currentUserId = useAuthStore((s) => s.state.currentUser?.id);
+  const router = useAppRouter();
   const [editOpen, setEditOpen] = useState(false);
 
   const headerConfig = useMemo(
@@ -59,21 +61,53 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
       {/* ── ヘッダーサマリー（ポイント入力画面風） ── */}
       <div className="flex flex-col items-center gap-4 pt-4 pb-2">
         <div className="flex items-center gap-4">
-          <div className="flex flex-col items-center gap-1">
-            <Avatar className="w-10 h-10 border">
-              <AvatarImage src={fromImage ?? ""} alt={detail.fromName} />
-              <AvatarFallback className="text-sm">{detail.fromName?.[0]?.toUpperCase() ?? "U"}</AvatarFallback>
-            </Avatar>
-            <p className="text-xs text-muted-foreground max-w-[72px] truncate text-center">{detail.fromName}</p>
-          </div>
+          {/* from: ユーザーならタップでプロフィールへ、コミュニティなら非インタラクティブ */}
+          {detail.fromUserId ? (
+            <button
+              type="button"
+              onClick={() => router.push(`/users/${detail.fromUserId}`)}
+              className="flex flex-col items-center gap-1"
+            >
+              <Avatar className="w-10 h-10 border">
+                <AvatarImage src={fromImage ?? ""} alt={detail.fromName} />
+                <AvatarFallback className="text-sm">{detail.fromName?.[0]?.toUpperCase() ?? "U"}</AvatarFallback>
+              </Avatar>
+              <p className="text-xs text-muted-foreground max-w-[72px] truncate text-center">{detail.fromName}</p>
+            </button>
+          ) : (
+            <div className="flex flex-col items-center gap-1">
+              <Avatar className="w-10 h-10 border">
+                <AvatarImage src={fromImage ?? ""} alt={detail.fromName} />
+                <AvatarFallback className="text-sm">{detail.fromName?.[0]?.toUpperCase() ?? "U"}</AvatarFallback>
+              </Avatar>
+              <p className="text-xs text-muted-foreground max-w-[72px] truncate text-center">{detail.fromName}</p>
+            </div>
+          )}
+
           <ArrowRight className="w-4 h-4 text-muted-foreground mb-4" />
-          <div className="flex flex-col items-center gap-1">
-            <Avatar className="w-10 h-10 border">
-              <AvatarImage src={toImage ?? ""} alt={detail.toName} />
-              <AvatarFallback className="text-sm">{detail.toName?.[0]?.toUpperCase() ?? "U"}</AvatarFallback>
-            </Avatar>
-            <p className="text-xs text-muted-foreground max-w-[72px] truncate text-center">{detail.toName}</p>
-          </div>
+
+          {/* to: ユーザーならタップでプロフィールへ、コミュニティなら非インタラクティブ */}
+          {detail.toUserId ? (
+            <button
+              type="button"
+              onClick={() => router.push(`/users/${detail.toUserId}`)}
+              className="flex flex-col items-center gap-1"
+            >
+              <Avatar className="w-10 h-10 border">
+                <AvatarImage src={toImage ?? ""} alt={detail.toName} />
+                <AvatarFallback className="text-sm">{detail.toName?.[0]?.toUpperCase() ?? "U"}</AvatarFallback>
+              </Avatar>
+              <p className="text-xs text-muted-foreground max-w-[72px] truncate text-center">{detail.toName}</p>
+            </button>
+          ) : (
+            <div className="flex flex-col items-center gap-1">
+              <Avatar className="w-10 h-10 border">
+                <AvatarImage src={toImage ?? ""} alt={detail.toName} />
+                <AvatarFallback className="text-sm">{detail.toName?.[0]?.toUpperCase() ?? "U"}</AvatarFallback>
+              </Avatar>
+              <p className="text-xs text-muted-foreground max-w-[72px] truncate text-center">{detail.toName}</p>
+            </div>
+          )}
         </div>
 
         <div className="flex items-baseline gap-2">
