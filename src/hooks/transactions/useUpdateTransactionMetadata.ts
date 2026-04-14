@@ -45,25 +45,22 @@ export function useUpdateTransactionMetadata() {
       caption: "",
     }));
 
-    const permission =
-      !permissionOverride || permissionOverride.type === "self"
-        ? { userId: currentUserId }
-        : undefined;
-    const communityPermission =
-      permissionOverride?.type === "community"
-        ? { communityId: permissionOverride.communityId }
-        : undefined;
+    const input = {
+      ...(payload.comment !== undefined && { comment: payload.comment }),
+      ...(imagesInput !== undefined && { images: imagesInput }),
+    };
 
     try {
       const { data } = await updateMetadataMutation({
         variables: {
           id: transactionId,
-          input: {
-            ...(payload.comment !== undefined && { comment: payload.comment }),
-            ...(imagesInput !== undefined && { images: imagesInput }),
-          },
-          permission,
-          communityPermission,
+          input,
+          ...(!permissionOverride || permissionOverride.type === "self"
+            ? { permission: { userId: currentUserId } }
+            : {}),
+          ...(permissionOverride?.type === "community"
+            ? { communityPermission: { communityId: permissionOverride.communityId } }
+            : {}),
         },
       });
 
