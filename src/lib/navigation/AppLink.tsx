@@ -10,7 +10,7 @@
 import Link, { LinkProps } from "next/link";
 import { forwardRef, ReactNode, useMemo } from "react";
 
-import { getCommunityIdClient } from "@/lib/community";
+import { useCommunityConfigOptional } from "@/contexts/CommunityConfigContext";
 import { resolvePath } from "./path-resolver";
 
 type AppLinkProps = Omit<LinkProps, "href"> & {
@@ -55,14 +55,19 @@ export const AppLink = forwardRef<HTMLAnchorElement, AppLinkProps>(
     },
     ref
   ) {
+    // Context から取得した communityId は SSR と hydration の両方で一貫している。
+    // getCommunityIdClient() は typeof window !== "undefined" チェックを持つため、
+    // SSR では null を返すが hydration 時には cookie から値を読むため不一致が生じる。
+    const communityConfig = useCommunityConfigOptional();
+
     const resolvedHref = useMemo(() => {
       if (skipPathResolution) {
         return href;
       }
 
-      const communityId = explicitCommunityId ?? getCommunityIdClient();
+      const communityId = explicitCommunityId ?? communityConfig?.communityId ?? null;
       return resolvePath(href, communityId);
-    }, [href, skipPathResolution, explicitCommunityId]);
+    }, [href, skipPathResolution, explicitCommunityId, communityConfig?.communityId]);
 
     return (
       <Link ref={ref} href={resolvedHref} {...props}>
