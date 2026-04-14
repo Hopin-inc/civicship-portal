@@ -7,6 +7,10 @@ import {
   GqlTransactionUpdateMetadataMutation,
   useTransactionUpdateMetadataMutation,
 } from "@/types/graphql";
+
+type UpdatePermission =
+  | { type: "self" }
+  | { type: "community"; communityId: string };
 import { logger } from "@/lib/logging";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 
@@ -24,6 +28,7 @@ export function useUpdateTransactionMetadata() {
   const updateTransactionMetadata = async (
     transactionId: string,
     payload: { comment?: string | null; images?: File[] },
+    permissionOverride?: UpdatePermission,
   ): Promise<Result<GqlTransactionUpdateMetadataMutation>> => {
     const { firebaseUser, lineTokens } = useAuthStore.getState().state;
     if (!firebaseUser && !lineTokens.idToken) {
@@ -40,6 +45,15 @@ export function useUpdateTransactionMetadata() {
       caption: "",
     }));
 
+    const permission =
+      !permissionOverride || permissionOverride.type === "self"
+        ? { userId: currentUserId }
+        : undefined;
+    const communityPermission =
+      permissionOverride?.type === "community"
+        ? { communityId: permissionOverride.communityId }
+        : undefined;
+
     try {
       const { data } = await updateMetadataMutation({
         variables: {
@@ -48,7 +62,8 @@ export function useUpdateTransactionMetadata() {
             ...(payload.comment !== undefined && { comment: payload.comment }),
             ...(imagesInput !== undefined && { images: imagesInput }),
           },
-          permission: { userId: currentUserId },
+          permission,
+          communityPermission,
         },
       });
 

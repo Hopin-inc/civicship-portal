@@ -18,6 +18,8 @@ interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
+  /** Owner がコミュニティウォレット発のトランザクションを編集する場合に渡す */
+  communityId?: string;
 }
 
 async function urlToFile(url: string, onError: (msg: string) => void): Promise<File> {
@@ -43,6 +45,7 @@ export function TransactionMetadataEditSheet({
   open,
   onOpenChange,
   onSuccess,
+  communityId,
 }: Props) {
   const t = useTranslations();
   const { updateTransactionMetadata } = useUpdateTransactionMetadata();
@@ -124,10 +127,15 @@ export function TransactionMetadataEditSheet({
         return;
       }
 
-      const res = await updateTransactionMetadata(transactionId, {
-        comment: nextComment,
-        images,
-      });
+      const permission = communityId
+        ? { type: "community" as const, communityId }
+        : { type: "self" as const };
+
+      const res = await updateTransactionMetadata(
+        transactionId,
+        { comment: nextComment, images },
+        permission,
+      );
 
       if (res.success) {
         toast.success(t("transactions.detail.editSheet.saveSuccess"));

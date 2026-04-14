@@ -49,9 +49,10 @@ export const TRANSACTION_UPDATE_METADATA = gql`
   mutation TransactionUpdateMetadata(
     $id: ID!
     $input: TransactionUpdateMetadataInput!
-    $permission: CheckIsSelfPermissionInput!
+    $permission: CheckIsSelfPermissionInput
+    $communityPermission: CheckCommunityPermissionInput
   ) {
-    transactionUpdateMetadata(id: $id, input: $input, permission: $permission) {
+    transactionUpdateMetadata(id: $id, input: $input, permission: $permission, communityPermission: $communityPermission) {
       ... on TransactionUpdateMetadataSuccess {
         transaction {
           id
