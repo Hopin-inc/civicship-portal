@@ -188,6 +188,7 @@ function TransferInputStep({
             <div className="flex gap-2 mt-3 flex-wrap">
               {imagePreviews.map((url, i) => (
                 <div key={i} className="relative w-20 h-20 shrink-0">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={url}
                     alt=""

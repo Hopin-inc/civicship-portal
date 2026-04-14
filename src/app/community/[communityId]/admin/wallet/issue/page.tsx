@@ -52,13 +52,17 @@ export default function IssuePointPage() {
       setInputStr((prev) => prev.slice(0, -1));
       return;
     }
+    // Validate against current render value first (for toast), then update
+    // functionally from prev to avoid stale closure on rapid taps
     const parsed = parseInt((inputStr || "") + key, 10);
-    const next = String(parsed);
     if (parsed > INT_LIMIT) {
       toast.error(t("adminWallet.issue.validation.max"));
       return;
     }
-    setInputStr(next);
+    setInputStr((prev) => {
+      const next = parseInt((prev || "") + key, 10);
+      return next > INT_LIMIT ? prev : String(next);
+    });
   };
 
   const handleIssuePoint = async () => {

@@ -13484,6 +13484,7 @@ export type GqlTransactionUpdateMetadataMutation = {
     transaction: {
       __typename?: "Transaction";
       id: string;
+      comment?: string | null;
       images?: string[] | null;
     };
   } | null;
@@ -13499,6 +13500,7 @@ export const TransactionUpdateMetadataDocument = gql`
       ... on TransactionUpdateMetadataSuccess {
         transaction {
           id
+          comment
           images
         }
       }
