@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -16,6 +16,12 @@ interface Props {
 export function ImageLightbox({ images, index, onClose, onPrev, onNext }: Props) {
   const t = useTranslations();
   const total = images.length;
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  // オープン時に閉じるボタンへフォーカスを移す
+  useEffect(() => {
+    closeButtonRef.current?.focus();
+  }, []);
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -29,11 +35,14 @@ export function ImageLightbox({ images, index, onClose, onPrev, onNext }: Props)
 
   return createPortal(
     <div
+      role="dialog"
+      aria-modal="true"
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
       onClick={onClose}
     >
       {/* 閉じるボタン */}
       <button
+        ref={closeButtonRef}
         type="button"
         aria-label={t("transactions.detail.lightbox.close")}
         className="absolute right-4 top-4 text-white/80 hover:text-white"
