@@ -208,7 +208,7 @@ export default function IssuePointPage() {
 
         {/* 送信ボタン（下部固定） */}
         <div className="shrink-0 px-4 py-3 bg-background">
-          <Button onClick={handleIssuePoint} disabled={isLoading || !isAuthReady} className="w-full">
+          <Button onClick={handleIssuePoint} disabled={isLoading || !isAuthReady || !isAmountValid} className="w-full">
             {t("adminWallet.issue.submit")}
           </Button>
         </div>
