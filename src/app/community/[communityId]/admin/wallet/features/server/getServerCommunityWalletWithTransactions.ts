@@ -4,6 +4,7 @@ import { getServerCommunityTransactions } from "@/hooks/transactions/server-comm
 import { getCommunityIdFromHeader } from "@/lib/community/get-community-id-server";
 import { GqlTransactionsConnection } from "@/types/graphql";
 import { toPointNumber } from "@/utils/bigint";
+import { logger } from "@/lib/logging";
 
 export interface CommunityWalletWithTransactionsResult {
   wallet: { id: string; currentPoint: number } | null;
@@ -60,7 +61,7 @@ export async function getServerCommunityWalletWithTransactions(
       transactions,
     };
   } catch (error) {
-    console.error("Failed to fetch community wallet with transactions:", error);
+    logger.error("Failed to fetch community wallet with transactions:", { error });
     return { wallet: null, transactions: fallbackConnection };
   }
 }

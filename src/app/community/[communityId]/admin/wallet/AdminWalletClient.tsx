@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useTransition, useMemo } from "react";
+import React, { useTransition, useMemo, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthProvider";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
@@ -29,6 +29,9 @@ export function AdminWalletClient({ initialWallet, initialTransactions }: Props)
 
   const router = useAppRouter();
   const [isPending, startTransition] = useTransition();
+  // refresh 完了後にリストを強制再マウントするためのキー
+  const [listKey, setListKey] = useState(0);
+  const prevIsPendingRef = useRef(false);
 
   const headerConfig = useMemo(
     () => ({
@@ -41,19 +44,20 @@ export function AdminWalletClient({ initialWallet, initialTransactions }: Props)
   );
   useHeaderConfig(headerConfig);
 
+  // isPending が true → false に変わった時（router.refresh() 完了）にトーストとリスト再マウントを実行。
+  // startTransition はエラーを伝播しないため try/catch では捕捉できない。
+  useEffect(() => {
+    if (prevIsPendingRef.current && !isPending) {
+      toast.success(t("adminWallet.toast.refreshSuccess"));
+      setListKey((k) => k + 1);
+    }
+    prevIsPendingRef.current = isPending;
+  }, [isPending, t]);
+
   const handleRefetch = () => {
     startTransition(() => {
       router.refresh();
     });
-  };
-
-  const handleOnRefetch = async () => {
-    try {
-      handleRefetch();
-      toast.success(t("adminWallet.toast.refreshSuccess"));
-    } catch {
-      toast.error(t("adminWallet.toast.refreshError"));
-    }
   };
 
   return (
@@ -61,7 +65,7 @@ export function AdminWalletClient({ initialWallet, initialTransactions }: Props)
       <WalletCard
         currentPoint={initialWallet.currentPoint}
         isLoading={isPending}
-        onRefetch={handleOnRefetch}
+        onRefetch={handleRefetch}
       />
 
       <div className="flex justify-center items-center gap-x-3">
@@ -103,8 +107,8 @@ export function AdminWalletClient({ initialWallet, initialTransactions }: Props)
           </p>
         ) : (
           <InfiniteTransactionList
+            key={listKey}
             initialTransactions={initialTransactions}
-            walletId={initialWallet.id}
             perspectiveWalletId={initialWallet.id}
             showSignedAmount={true}
             showDid={true}
