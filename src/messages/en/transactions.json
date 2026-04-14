@@ -83,6 +83,7 @@
   "transactions.detail.editSheet.photoLimit": "You can add up to {max} photos",
   "transactions.detail.editSheet.saveSuccess": "Updated",
   "transactions.detail.editSheet.saveError": "Failed to update",
+  "transactions.detail.lightbox.title": "Photo viewer",
   "transactions.detail.lightbox.close": "Close",
   "transactions.detail.lightbox.prev": "Previous photo",
   "transactions.detail.lightbox.next": "Next photo",

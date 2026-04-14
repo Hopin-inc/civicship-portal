@@ -37,6 +37,7 @@ export function ImageLightbox({ images, index, onClose, onPrev, onNext }: Props)
     <div
       role="dialog"
       aria-modal="true"
+      aria-label={t("transactions.detail.lightbox.title")}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
       onClick={onClose}
     >
