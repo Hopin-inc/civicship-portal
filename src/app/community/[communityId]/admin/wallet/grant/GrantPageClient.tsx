@@ -92,7 +92,7 @@ export default function GrantPageClient({ initialConnection }: GrantPageClientPr
         });
 
         toast.success(t("adminWallet.grant.success", { amount: amount.toLocaleString() }));
-        router.push("/admin/wallet?refresh=true");
+        router.push("/admin/wallet");
       } else {
         const errorMessage = errorMessages[res.code] ?? t("adminWallet.grant.errorGeneric");
         toast.error(errorMessage);
