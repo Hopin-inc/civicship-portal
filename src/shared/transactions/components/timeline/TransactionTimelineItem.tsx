@@ -2,6 +2,7 @@
 
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { AppLink } from "@/lib/navigation";
 
 interface TransactionTimelineItemProps {
   avatar: ReactNode;
@@ -22,7 +23,7 @@ interface TransactionTimelineItemProps {
  * - ActionLabel: アクション情報（矢印/符号 + 名前 + ポイント）
  * - MessageCard: メッセージ（オプション）
  *
- * リンクが指定された場合、Header + ActionLabel のみを `<a>` でラップする。
+ * リンクが指定された場合、Header + ActionLabel のみを `<AppLink>` でラップする。
  * MessageCard は `<button>` 等のインタラクティブ要素を含む可能性があるため、
  * HTML 仕様上の「リンク内にインタラクティブ要素」を避けるために `<a>` の外に配置する。
  */
@@ -42,14 +43,14 @@ export const TransactionTimelineItem = ({
   );
 
   if (href) {
-    // Render <a> around only the non-interactive content (header + actionLabel).
+    // Render <AppLink> around only the non-interactive content (header + actionLabel).
     // messageCard may contain <button> elements (e.g. image grid), so it must
     // sit outside the <a> to avoid invalid nested interactive elements.
     return (
       <div className="relative flex gap-3 pb-10 timeline-item">
         <div className={avatarClasses}>{avatar}</div>
         <div className="flex-1 min-w-0">
-          <a
+          <AppLink
             href={href}
             className={cn(
               "block cursor-pointer rounded-lg transition-colors",
@@ -58,7 +59,7 @@ export const TransactionTimelineItem = ({
           >
             {header}
             <div className="mt-1">{actionLabel}</div>
-          </a>
+          </AppLink>
           {messageCard && <div className="mt-2">{messageCard}</div>}
         </div>
       </div>

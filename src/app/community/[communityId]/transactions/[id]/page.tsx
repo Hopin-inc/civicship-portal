@@ -14,7 +14,7 @@ import { TransactionMetadataEditSheet } from "./components/TransactionMetadataEd
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ArrowRight, Pencil } from "lucide-react";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
-import { useAppRouter } from "@/lib/navigation";
+import { AppLink } from "@/lib/navigation";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { GqlMembership, GqlRole, GqlTransactionReason, GqlWalletType } from "@/types/graphql";
@@ -34,7 +34,6 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
   const currentUserRole = currentUser?.memberships?.find(
     (m: GqlMembership) => m.community?.id === communityId,
   )?.role;
-  const router = useAppRouter();
   const [editOpen, setEditOpen] = useState(false);
 
   const headerConfig = useMemo(
@@ -79,9 +78,8 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
           {!isIssued && (
             <>
               {detail.fromUserId ? (
-                <button
-                  type="button"
-                  onClick={() => router.push(`/users/${detail.fromUserId}`)}
+                <AppLink
+                  href={`/users/${detail.fromUserId}`}
                   className="flex flex-col items-center gap-1"
                 >
                   <Avatar className="w-10 h-10 border">
@@ -89,7 +87,7 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
                     <AvatarFallback className="text-sm">{detail.fromName?.[0]?.toUpperCase() ?? "U"}</AvatarFallback>
                   </Avatar>
                   <p className="text-xs text-muted-foreground max-w-[72px] truncate text-center">{detail.fromName}</p>
-                </button>
+                </AppLink>
               ) : (
                 <div className="flex flex-col items-center gap-1">
                   <Avatar className="w-10 h-10 border">
@@ -105,9 +103,8 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
 
           {/* to: ユーザーならタップでプロフィールへ、コミュニティなら非インタラクティブ */}
           {detail.toUserId ? (
-            <button
-              type="button"
-              onClick={() => router.push(`/users/${detail.toUserId}`)}
+            <AppLink
+              href={`/users/${detail.toUserId}`}
               className="flex flex-col items-center gap-1"
             >
               <Avatar className="w-10 h-10 border">
@@ -115,7 +112,7 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
                 <AvatarFallback className="text-sm">{detail.toName?.[0]?.toUpperCase() ?? "U"}</AvatarFallback>
               </Avatar>
               <p className="text-xs text-muted-foreground max-w-[72px] truncate text-center">{detail.toName}</p>
-            </button>
+            </AppLink>
           ) : (
             <div className="flex flex-col items-center gap-1">
               <Avatar className="w-10 h-10 border">
