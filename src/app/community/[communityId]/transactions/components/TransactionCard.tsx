@@ -16,6 +16,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { TransactionTimelineItem } from "@/shared/transactions/components/timeline/TransactionTimelineItem";
 import { TransactionHeader } from "@/shared/transactions/components/timeline/TransactionHeader";
 import { TransactionActionLabel } from "@/shared/transactions/components/timeline/TransactionActionLabel";
+import { ChainDepthBadge } from "@/shared/transactions/components/timeline/ChainDepthBadge";
 import { TransactionMessageCard } from "@/shared/transactions/components/timeline/TransactionMessageCard";
 import { TransactionImageGrid } from "@/app/community/[communityId]/transactions/components/TransactionImageGrid";
 
@@ -101,7 +102,14 @@ export const TransactionCard = ({
           formattedDateTime={formatDateTime(info.transferredAt)}
         />
       }
-      actionLabel={<TransactionActionLabel data={actionLabelData} />}
+      actionLabel={
+        <div className="flex items-center gap-1.5 min-w-0">
+          <TransactionActionLabel data={actionLabelData} />
+          {typeof transaction.chainDepth === "number" && (
+            <ChainDepthBadge depth={transaction.chainDepth} />
+          )}
+        </div>
+      }
       messageCard={messageCard}
       href={transactionHref}
       isFirst={isFirst}

@@ -9,6 +9,7 @@ import { useTranslations } from "next-intl";
 import { useLocaleDateTimeFormat } from "@/utils/i18n";
 import { useTransactionDetailData } from "./lib/useTransactionDetailData";
 import { VerificationSection } from "../components/VerificationSection";
+import { TransactionChainTrail } from "../components/TransactionChainTrail";
 import { TransactionImageGrid } from "../components/TransactionImageGrid";
 import { TransactionMetadataEditSheet } from "./components/TransactionMetadataEditSheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -162,6 +163,9 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
           </button>
         )}
       </div>
+
+      {/* ── ポイントの経路（chain） ── */}
+      {transaction.chain && <TransactionChainTrail chain={transaction.chain} />}
 
       {/* ── 検証セクション ── */}
       <VerificationSection transactionId={id} />

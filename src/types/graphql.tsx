@@ -6633,6 +6633,7 @@ export type GqlTransactionFieldsFragment = {
   images?: Array<string> | null;
   fromPointChange?: number | null;
   toPointChange?: number | null;
+  chainDepth?: number | null;
   createdAt?: Date | null;
 };
 
@@ -6826,7 +6827,31 @@ export type GqlGetTransactionDetailQuery = {
     images?: Array<string> | null;
     fromPointChange?: number | null;
     toPointChange?: number | null;
+    chainDepth?: number | null;
     createdAt?: Date | null;
+    chain?: {
+      __typename?: "TransactionChain";
+      depth: number;
+      steps: Array<{
+        __typename?: "TransactionChainStep";
+        id: string;
+        points: number;
+        reason: GqlTransactionReason;
+        createdAt: Date;
+        fromUser?: {
+          __typename?: "TransactionChainUser";
+          id: string;
+          name: string;
+          image?: string | null;
+        } | null;
+        toUser?: {
+          __typename?: "TransactionChainUser";
+          id: string;
+          name: string;
+          image?: string | null;
+        } | null;
+      }>;
+    } | null;
     fromWallet?: {
       __typename?: "Wallet";
       id: string;
@@ -7086,6 +7111,7 @@ export const TransactionFieldsFragmentDoc = gql`
     images
     fromPointChange
     toPointChange
+    chainDepth
     createdAt
   }
 `;
@@ -13871,6 +13897,25 @@ export const GetTransactionDetailDocument = gql`
   query GetTransactionDetail($id: ID!) {
     transaction(id: $id) {
       ...TransactionFields
+      chain {
+        depth
+        steps {
+          id
+          points
+          reason
+          createdAt
+          fromUser {
+            id
+            name
+            image
+          }
+          toUser {
+            id
+            name
+            image
+          }
+        }
+      }
       fromWallet {
         id
         type

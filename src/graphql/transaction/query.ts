@@ -74,6 +74,25 @@ export const GET_TRANSACTION_DETAIL = gql`
   query GetTransactionDetail($id: ID!) {
     transaction(id: $id) {
       ...TransactionFields
+      chain {
+        depth
+        steps {
+          id
+          points
+          reason
+          createdAt
+          fromUser {
+            id
+            name
+            image
+          }
+          toUser {
+            id
+            name
+            image
+          }
+        }
+      }
       fromWallet {
         id
         type
