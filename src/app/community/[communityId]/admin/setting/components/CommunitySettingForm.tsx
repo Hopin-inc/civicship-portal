@@ -256,7 +256,12 @@ export function CommunitySettingForm({ editor, onSubmit }: CommunitySettingFormP
           <DialogHeader>
             <DialogTitle className="text-sm font-medium">ウォレットカードでの表示イメージ</DialogTitle>
           </DialogHeader>
-          <WalletCard currentPoint={0} isLoading={false} showRefreshButton={false} />
+          <WalletCard
+            currentPoint={0}
+            isLoading={false}
+            showRefreshButton={false}
+            logoOverride={logoPreviewUrl}
+          />
         </DialogContent>
       </Dialog>
 

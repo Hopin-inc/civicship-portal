@@ -12,6 +12,8 @@ interface WalletCardProps {
   isLoading: boolean;
   onRefetch?: () => void | Promise<void>;
   showRefreshButton?: boolean;
+  // プレビュー用途などで logoPath を外部から差し替える
+  logoOverride?: string | null;
 }
 
 const WalletCard: React.FC<WalletCardProps> = ({
@@ -19,10 +21,13 @@ const WalletCard: React.FC<WalletCardProps> = ({
   isLoading,
   onRefetch,
   showRefreshButton = true,
+  logoOverride,
 }) => {
   const t = useTranslations();
   const communityConfig = useCommunityConfig();
-  
+  // undefined（未指定）のときのみ context にフォールバック。null はプレビューで「未設定」を明示するため尊重する
+  const logoSrc = logoOverride !== undefined ? logoOverride : communityConfig?.logoPath;
+
   return (
     <div className="bg-background rounded-[32px] px-12 py-8 shadow-[0_2px_20px_rgba(0,0,0,0.08)] mt-8 mb-8">
       <div className="flex flex-col items-center mb-12">
@@ -40,13 +45,15 @@ const WalletCard: React.FC<WalletCardProps> = ({
       </div>
 
       <div className="flex justify-between items-center">
-        {communityConfig?.logoPath && (
+        {logoSrc && (
           <Image
-            src={communityConfig.logoPath}
+            src={logoSrc}
             alt="Logo"
             width={80}
             height={24}
             className="opacity-60"
+            // blob: URL（プレビュー）は next/image の最適化を通せないため unoptimized にする
+            unoptimized={logoSrc.startsWith("blob:")}
           />
         )}
         {onRefetch && showRefreshButton && (
