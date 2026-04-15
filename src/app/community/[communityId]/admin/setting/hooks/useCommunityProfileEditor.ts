@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, FormEvent, ChangeEvent } from "react";
 import { useMutation } from "@apollo/client";
 import { toast } from "react-toastify";
 import { useTranslations } from "next-intl";
+import { useAppRouter } from "@/lib/navigation";
 import { UPDATE_PORTAL_CONFIG } from "@/graphql/account/community/mutation";
 import {
   useGetCommunityPortalConfigQuery,
@@ -30,6 +31,7 @@ interface FormErrors {
 
 export function useCommunityProfileEditor(communityId: string | undefined) {
   const t = useTranslations();
+  const router = useAppRouter();
 
   const { data, loading: queryLoading } = useGetCommunityPortalConfigQuery({
     variables: { communityId: communityId ?? "" },
@@ -174,6 +176,7 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
         }
       }
       toast.success(t("adminSetting.form.success"));
+      router.push("/admin");
     } catch {
       toast.error(t("adminSetting.form.error.submit"));
     }
