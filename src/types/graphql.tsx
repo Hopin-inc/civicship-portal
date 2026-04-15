@@ -4165,6 +4165,7 @@ export type GqlGetUserWalletQuery = {
         images?: Array<string> | null;
         fromPointChange?: number | null;
         toPointChange?: number | null;
+        chainDepth?: number | null;
         createdAt?: Date | null;
         fromWallet?: {
           __typename?: "Wallet";
@@ -4255,6 +4256,7 @@ export type GqlGetWalletsWithTransactionQuery = {
           images?: Array<string> | null;
           fromPointChange?: number | null;
           toPointChange?: number | null;
+          chainDepth?: number | null;
           createdAt?: Date | null;
           fromWallet?: {
             __typename?: "Wallet";
@@ -6654,6 +6656,7 @@ export type GqlPointIssueMutation = {
       images?: Array<string> | null;
       fromPointChange?: number | null;
       toPointChange?: number | null;
+      chainDepth?: number | null;
       createdAt?: Date | null;
     };
   } | null;
@@ -6676,6 +6679,7 @@ export type GqlPointGrantMutation = {
       images?: Array<string> | null;
       fromPointChange?: number | null;
       toPointChange?: number | null;
+      chainDepth?: number | null;
       createdAt?: Date | null;
     };
   } | null;
@@ -6698,6 +6702,7 @@ export type GqlPointDonateMutation = {
       images?: Array<string> | null;
       fromPointChange?: number | null;
       toPointChange?: number | null;
+      chainDepth?: number | null;
       createdAt?: Date | null;
     };
   } | null;
@@ -6754,6 +6759,7 @@ export type GqlGetTransactionsQuery = {
         images?: Array<string> | null;
         fromPointChange?: number | null;
         toPointChange?: number | null;
+        chainDepth?: number | null;
         createdAt?: Date | null;
         fromWallet?: {
           __typename?: "Wallet";
