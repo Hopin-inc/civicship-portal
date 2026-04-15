@@ -57,20 +57,6 @@ export const GET_FAILED_INCENTIVE_GRANTS = gql`
   }
 `;
 
-export const GET_COMMUNITY_PROFILE = gql`
-  query GetCommunityProfile($id: ID!) {
-    community(id: $id) {
-      id
-      name
-      bio
-      website
-      pointName
-      image
-      establishedAt
-    }
-  }
-`;
-
 export const GET_COMMUNITY_PORTAL_CONFIG = gql`
   query GetCommunityPortalConfig($communityId: String!) {
     communityPortalConfig(communityId: $communityId) {

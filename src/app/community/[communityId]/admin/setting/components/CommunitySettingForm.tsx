@@ -23,9 +23,10 @@ interface CommunitySettingFormProps {
 }
 
 function RequiredBadge() {
+  const t = useTranslations();
   return (
     <span className="text-primary text-xs font-bold bg-primary-foreground px-1 py-0.5 rounded">
-      必須
+      {t("adminSetting.form.required")}
     </span>
   );
 }
@@ -51,6 +52,7 @@ function ImagePickerField({
   previewClassName = "h-16 aspect-[2/1]",
   onPreviewClick,
 }: ImagePickerFieldProps) {
+  const t = useTranslations();
   const [imgError, setImgError] = useState(false);
 
   // previewUrl が変わったらエラー状態をリセット（新画像のプレビューを正しく表示するため）
@@ -78,7 +80,9 @@ function ImagePickerField({
             ) : (
               <div className="flex items-center justify-center w-full h-full">
                 <p className="text-xs text-muted-foreground">
-                  {previewUrl && imgError ? "設定済み" : "未設定"}
+                  {previewUrl && imgError
+                    ? t("adminSetting.form.imageSet")
+                    : t("adminSetting.form.imageNotSet")}
                 </p>
               </div>
             )}
@@ -86,12 +90,18 @@ function ImagePickerField({
         </ItemContent>
         <ItemActions className="self-center">
           {onPreviewClick && (
-            <Button type="button" variant="icon-only" size="icon" onClick={onPreviewClick} aria-label="プレビュー">
+            <Button
+              type="button"
+              variant="icon-only"
+              size="icon"
+              onClick={onPreviewClick}
+              aria-label={t("adminSetting.form.preview")}
+            >
               <Eye className="h-4 w-4" />
             </Button>
           )}
           <Button type="button" variant="tertiary" size="sm" onClick={onPickerClick}>
-            変更
+            {t("adminSetting.form.change")}
           </Button>
         </ItemActions>
       </Item>
@@ -230,14 +240,16 @@ export function CommunitySettingForm({ editor, onSubmit }: CommunitySettingFormP
       >
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle className="text-sm font-medium">ヘッダーでの表示イメージ</DialogTitle>
+            <DialogTitle className="text-sm font-medium">
+              {t("adminSetting.preview.header")}
+            </DialogTitle>
           </DialogHeader>
           {/* Header と同じ CSS クラスで構成したモック */}
           <div className="bg-background border-b border-border w-full flex items-center px-6 h-16 rounded-lg border">
             {squareLogoPreviewUrl ? (
               <img
                 src={squareLogoPreviewUrl}
-                alt="ロゴ"
+                alt={t("adminSetting.preview.logoAlt")}
                 className="h-[28px] w-auto object-contain"
               />
             ) : (
@@ -254,7 +266,9 @@ export function CommunitySettingForm({ editor, onSubmit }: CommunitySettingFormP
       >
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle className="text-sm font-medium">ウォレットカードでの表示イメージ</DialogTitle>
+            <DialogTitle className="text-sm font-medium">
+              {t("adminSetting.preview.wallet")}
+            </DialogTitle>
           </DialogHeader>
           <WalletCard
             currentPoint={0}
@@ -272,26 +286,29 @@ export function CommunitySettingForm({ editor, onSubmit }: CommunitySettingFormP
       >
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle className="text-sm font-medium">SNSシェア時の表示イメージ</DialogTitle>
+            <DialogTitle className="text-sm font-medium">
+              {t("adminSetting.preview.sns")}
+            </DialogTitle>
           </DialogHeader>
           <div className="border rounded-lg overflow-hidden">
             {ogImagePreviewUrl ? (
               <img
                 src={ogImagePreviewUrl}
                 className="w-full aspect-[1200/630] object-cover"
-                alt="og image preview"
+                alt={t("adminSetting.preview.ogImageAlt")}
               />
             ) : (
               <div className="w-full aspect-[1200/630] bg-muted flex items-center justify-center text-xs text-muted-foreground">
-                画像未設定
+                {t("adminSetting.preview.imageNotSet")}
               </div>
             )}
             <div className="p-3 border-t bg-background">
               <p className="text-sm font-bold truncate">
-                {editor.formState.title || "タイトル"}
+                {editor.formState.title || t("adminSetting.preview.titlePlaceholder")}
               </p>
               <p className="text-xs text-muted-foreground truncate">
-                {editor.formState.shortDescription || "短い説明"}
+                {editor.formState.shortDescription ||
+                  t("adminSetting.preview.shortDescriptionPlaceholder")}
               </p>
             </div>
           </div>
