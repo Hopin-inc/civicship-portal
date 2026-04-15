@@ -81,8 +81,8 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
         setOgImageImage({ type: "existing", url: c.ogImagePath });
       }
       if (c.faviconPrefix) {
-        // faviconPrefix はディレクトリ prefix。favicon.ico をプレビューとして使用
-        setFaviconImage({ type: "existing", url: `${c.faviconPrefix}/favicon.ico` });
+        // faviconPrefix はディレクトリ prefix。.ico は img タグで表示できないことがあるため PNG でプレビュー
+        setFaviconImage({ type: "existing", url: `${c.faviconPrefix}/apple-touch-icon.png` });
       }
     }
   }, [data]);
@@ -186,7 +186,7 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
         }
         if (updated.faviconPrefix) {
           if (faviconImage?.type === "new") URL.revokeObjectURL(faviconImage.previewUrl);
-          setFaviconImage({ type: "existing", url: `${updated.faviconPrefix}/favicon.ico` });
+          setFaviconImage({ type: "existing", url: `${updated.faviconPrefix}/apple-touch-icon.png` });
         }
       }
       toast.success(t("adminSetting.form.success"));
