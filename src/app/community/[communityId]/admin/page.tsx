@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAppRouter } from "@/lib/navigation";
+import { useAppRouter, AppLink } from "@/lib/navigation";
 import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import {
@@ -19,7 +19,6 @@ import {
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { useAdminRole } from "@/app/community/[communityId]/admin/context/AdminRoleContext";
 import { GqlRole, useGetCommunityPortalConfigQuery } from "@/types/graphql";
-import { AppLink } from "@/lib/navigation";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 

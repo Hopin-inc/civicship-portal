@@ -137,7 +137,6 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
     if (!communityId || !validate()) return;
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const input: any = {
         title: formState.title.trim(),
         description: formState.description.trim(),
