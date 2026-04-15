@@ -3499,11 +3499,11 @@
             "deprecationReason": null
           },
           {
-            "name": "ogImagePath",
+            "name": "ogImage",
             "description": null,
             "type": {
-              "kind": "SCALAR",
-              "name": "String",
+              "kind": "INPUT_OBJECT",
+              "name": "ImageInput",
               "ofType": null
             },
             "defaultValue": null,
