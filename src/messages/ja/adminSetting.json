@@ -13,7 +13,7 @@
   "adminSetting.form.squareLogoPath": "正方形ロゴ画像",
   "adminSetting.form.squareLogoPathHint": "ヘッダーに表示されるロゴ。推奨: 200×200px（正方形）",
   "adminSetting.form.faviconPrefix": "Favicon",
-  "adminSetting.form.faviconPrefixHint": "ブラウザタブに表示されるアイコン（favicon.ico / apple-touch-icon.png）。推奨: 512×512px",
+  "adminSetting.form.faviconPrefixHint": "ブラウザタブに表示されるアイコン（favicon.ico）。推奨: 32×32px",
   "adminSetting.form.submit": "保存",
   "adminSetting.form.saving": "保存中...",
   "adminSetting.form.success": "コミュニティ設定を更新しました",
