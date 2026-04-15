@@ -485,6 +485,20 @@ li {
   }
 }
 
+/* top-center コンテナの中央寄せ（モバイルファースト・最小 override）。
+   react-toastify は max-width: 480px のメディアクエリで
+   top: 0 / left: 0 / translateX(0) に強制上書きしてしまうので、
+   ベースルールで再度中央寄せに戻す。
+   width / padding は上書きしないため、デスクトップ（320px コンテナ）の
+   見た目には影響しない。モバイル側は width: 100vw のままだが
+   max-width: 425px で上限をかける。 */
+.Toastify__toast-container--top-center {
+  top: 1em;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 425px;
+}
+
 .Toastify__toast--success {
   border-left-color: hsl(var(--success));
 }
