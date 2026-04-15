@@ -172,10 +172,22 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
       });
       const updated = result.data?.updatePortalConfig;
       if (updated) {
-        if (updated.logoPath) setLogoImage({ type: "existing", url: updated.logoPath });
-        if (updated.squareLogoPath) setSquareLogoImage({ type: "existing", url: updated.squareLogoPath });
-        if (updated.ogImagePath) setOgImageImage({ type: "existing", url: updated.ogImagePath });
-        if (updated.faviconPrefix) setFaviconImage({ type: "existing", url: `${updated.faviconPrefix}/favicon.ico` });
+        if (updated.logoPath) {
+          if (logoImage?.type === "new") URL.revokeObjectURL(logoImage.previewUrl);
+          setLogoImage({ type: "existing", url: updated.logoPath });
+        }
+        if (updated.squareLogoPath) {
+          if (squareLogoImage?.type === "new") URL.revokeObjectURL(squareLogoImage.previewUrl);
+          setSquareLogoImage({ type: "existing", url: updated.squareLogoPath });
+        }
+        if (updated.ogImagePath) {
+          if (ogImageImage?.type === "new") URL.revokeObjectURL(ogImageImage.previewUrl);
+          setOgImageImage({ type: "existing", url: updated.ogImagePath });
+        }
+        if (updated.faviconPrefix) {
+          if (faviconImage?.type === "new") URL.revokeObjectURL(faviconImage.previewUrl);
+          setFaviconImage({ type: "existing", url: `${updated.faviconPrefix}/favicon.ico` });
+        }
       }
       toast.success(t("adminSetting.form.success"));
     } catch {
