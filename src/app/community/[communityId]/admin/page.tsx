@@ -142,7 +142,7 @@ export default function AdminPage() {
           ) : (
             <div className="w-12 h-12 rounded-lg bg-muted shrink-0" />
           )}
-          <span className="text-body-lg font-bold flex-1">{portalConfig?.title}</span>
+          <span className="text-body-md font-semibold flex-1">{portalConfig?.title}</span>
           <AppLink href="/admin/setting">
             <Button variant="tertiary" size="sm">
               設定
