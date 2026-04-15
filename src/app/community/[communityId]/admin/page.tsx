@@ -131,33 +131,29 @@ export default function AdminPage() {
   return (
     <div className="max-w-xl mx-auto mt-8 space-y-6 px-4">
       {/* コミュニティプロフィール */}
-      <div className="flex flex-col gap-3">
-        <div className="flex items-center w-full">
-          <div className="flex-grow">
-            {portalConfig?.squareLogoPath ? (
-              <img
-                src={portalConfig.squareLogoPath}
-                alt={portalConfig.title}
-                className="w-16 h-16 rounded object-contain"
-              />
-            ) : (
-              <div className="w-16 h-16 rounded bg-muted" />
-            )}
-          </div>
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-3">
+          {portalConfig?.squareLogoPath ? (
+            <img
+              src={portalConfig.squareLogoPath}
+              alt={portalConfig.title}
+              className="w-12 h-12 rounded-lg object-contain shrink-0"
+            />
+          ) : (
+            <div className="w-12 h-12 rounded-lg bg-muted shrink-0" />
+          )}
+          <span className="text-body-lg font-bold flex-1">{portalConfig?.title}</span>
           <AppLink href="/admin/setting">
-            <Button variant="tertiary" size="md">
+            <Button variant="tertiary" size="sm">
               設定
             </Button>
           </AppLink>
         </div>
-        <div>
-          <h1 className="text-body-lg font-bold">{portalConfig?.title}</h1>
-          {portalConfig?.shortDescription && (
-            <p className="text-body-sm text-muted-foreground mt-0.5">
-              {portalConfig.shortDescription}
-            </p>
-          )}
-        </div>
+        {portalConfig?.shortDescription && (
+          <p className="text-body-sm text-muted-foreground">
+            {portalConfig.shortDescription}
+          </p>
+        )}
       </div>
 
       {/* 管理者セクション */}
