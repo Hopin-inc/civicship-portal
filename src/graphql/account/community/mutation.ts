@@ -51,6 +51,7 @@ export const UPDATE_PORTAL_CONFIG = gql`
       shortDescription
       logoPath
       squareLogoPath
+      ogImagePath
       faviconPrefix
     }
   }

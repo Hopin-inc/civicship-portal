@@ -42,11 +42,13 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
   });
   const [logoImage, setLogoImage] = useState<ImageField>(null);
   const [squareLogoImage, setSquareLogoImage] = useState<ImageField>(null);
+  const [ogImageImage, setOgImageImage] = useState<ImageField>(null);
   const [faviconImage, setFaviconImage] = useState<ImageField>(null);
   const [errors, setErrors] = useState<FormErrors>({});
 
   const logoInputRef = useRef<HTMLInputElement>(null);
   const squareLogoInputRef = useRef<HTMLInputElement>(null);
+  const ogImageInputRef = useRef<HTMLInputElement>(null);
   const faviconInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -62,6 +64,9 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
       }
       if (c.squareLogoPath) {
         setSquareLogoImage({ type: "existing", url: c.squareLogoPath });
+      }
+      if (c.ogImagePath) {
+        setOgImageImage({ type: "existing", url: c.ogImagePath });
       }
       if (c.faviconPrefix) {
         // faviconPrefix はディレクトリ prefix。favicon.ico をプレビューとして使用
@@ -83,7 +88,7 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
   }
 
   function handleImageSelect(
-    field: "logo" | "squareLogo" | "favicon",
+    field: "logo" | "squareLogo" | "ogImage" | "favicon",
     e: ChangeEvent<HTMLInputElement>,
   ) {
     const file = e.target.files?.[0];
@@ -94,6 +99,8 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
       setLogoImage(imageField);
     } else if (field === "squareLogo") {
       setSquareLogoImage(imageField);
+    } else if (field === "ogImage") {
+      setOgImageImage(imageField);
     } else {
       setFaviconImage(imageField);
     }
@@ -120,7 +127,6 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
     if (!communityId || !validate()) return;
 
     try {
-      // バックエンドが logo/squareLogo: ImageInput に対応後、型は codegen で更新される
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const input: any = {
         title: formState.title.trim(),
@@ -134,11 +140,21 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
       if (squareLogoImage?.type === "new") {
         input.squareLogo = { file: squareLogoImage.file };
       }
+      if (ogImageImage?.type === "new") {
+        input.ogImage = { file: ogImageImage.file };
+      }
       if (faviconImage?.type === "new") {
         input.favicon = { file: faviconImage.file };
       }
 
-      await updatePortalConfig({ variables: { communityId, input } });
+      const result = await updatePortalConfig({ variables: { communityId, input } });
+      const updated = result.data?.updatePortalConfig;
+      if (updated) {
+        if (updated.logoPath) setLogoImage({ type: "existing", url: updated.logoPath });
+        if (updated.squareLogoPath) setSquareLogoImage({ type: "existing", url: updated.squareLogoPath });
+        if (updated.ogImagePath) setOgImageImage({ type: "existing", url: updated.ogImagePath });
+        if (updated.faviconPrefix) setFaviconImage({ type: "existing", url: `${updated.faviconPrefix}/favicon.ico` });
+      }
       toast.success(t("adminSetting.form.success"));
     } catch {
       toast.error(t("adminSetting.form.error.submit"));
@@ -151,9 +167,11 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
     updateField,
     logoImage,
     squareLogoImage,
+    ogImageImage,
     faviconImage,
     logoInputRef,
     squareLogoInputRef,
+    ogImageInputRef,
     faviconInputRef,
     handleImageSelect,
     getPreviewUrl,
