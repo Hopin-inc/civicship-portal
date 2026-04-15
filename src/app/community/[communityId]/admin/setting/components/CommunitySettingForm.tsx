@@ -48,7 +48,7 @@ function ImagePickerField({
   onPickerClick,
   inputRef,
   onFileChange,
-  previewClassName = "h-16 w-auto",
+  previewClassName = "h-16 aspect-[2/1]",
   onPreviewClick,
 }: ImagePickerFieldProps) {
   const [imgError, setImgError] = useState(false);
@@ -66,16 +66,21 @@ function ImagePickerField({
       {hint && <p className="text-xs text-muted-foreground px-1">{hint}</p>}
       <Item size="sm" variant="outline">
         <ItemContent>
-          {previewUrl && !imgError ? (
-            <img
-              src={previewUrl}
-              alt={label}
-              className={cn("rounded object-contain bg-muted self-start", previewClassName)}
-              onError={() => setImgError(true)}
-            />
-          ) : (
-            <p className="text-xs text-muted-foreground">未設定</p>
-          )}
+          {/* 推奨サイズのアスペクト比でグレー枠を表示し、画像が正しい比率かを視覚的に確認できる */}
+          <div className={cn("bg-muted rounded overflow-hidden", previewClassName)}>
+            {previewUrl && !imgError ? (
+              <img
+                src={previewUrl}
+                alt={label}
+                className="w-full h-full object-contain"
+                onError={() => setImgError(true)}
+              />
+            ) : (
+              <div className="flex items-center justify-center w-full h-full">
+                <p className="text-xs text-muted-foreground">未設定</p>
+              </div>
+            )}
+          </div>
         </ItemContent>
         <ItemActions className="self-center">
           {onPreviewClick && (
@@ -175,7 +180,7 @@ export function CommunitySettingForm({ editor, onSubmit }: CommunitySettingFormP
           onPickerClick={() => editor.ogImageInputRef.current?.click()}
           inputRef={editor.ogImageInputRef}
           onFileChange={(e) => editor.handleImageSelect("ogImage", e)}
-          previewClassName="h-20 w-auto"
+          previewClassName="h-20 aspect-[1200/630]"
           onPreviewClick={() => setPreviewDialog("ogImage")}
         />
 
@@ -187,7 +192,7 @@ export function CommunitySettingForm({ editor, onSubmit }: CommunitySettingFormP
           onPickerClick={() => editor.logoInputRef.current?.click()}
           inputRef={editor.logoInputRef}
           onFileChange={(e) => editor.handleImageSelect("logo", e)}
-          previewClassName="h-16 w-auto"
+          previewClassName="h-16 aspect-[240/100]"
           onPreviewClick={() => setPreviewDialog("logo")}
         />
 
@@ -199,7 +204,7 @@ export function CommunitySettingForm({ editor, onSubmit }: CommunitySettingFormP
           onPickerClick={() => editor.squareLogoInputRef.current?.click()}
           inputRef={editor.squareLogoInputRef}
           onFileChange={(e) => editor.handleImageSelect("squareLogo", e)}
-          previewClassName="h-12 w-12"
+          previewClassName="h-12 aspect-square"
           onPreviewClick={() => setPreviewDialog("squareLogo")}
         />
 
@@ -211,7 +216,7 @@ export function CommunitySettingForm({ editor, onSubmit }: CommunitySettingFormP
           onPickerClick={() => editor.faviconInputRef.current?.click()}
           inputRef={editor.faviconInputRef}
           onFileChange={(e) => editor.handleImageSelect("favicon", e)}
-          previewClassName="h-8 w-8"
+          previewClassName="h-8 aspect-square"
         />
 
         {/* 送信ボタン */}
