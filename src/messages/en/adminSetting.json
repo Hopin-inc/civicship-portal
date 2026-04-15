@@ -13,7 +13,7 @@
   "adminSetting.form.squareLogoPath": "Square Logo Image",
   "adminSetting.form.squareLogoPathHint": "Logo shown in the header. Recommended: 200×200px (square)",
   "adminSetting.form.faviconPrefix": "Favicon",
-  "adminSetting.form.faviconPrefixHint": "Icon shown in browser tabs (favicon.ico / apple-touch-icon.png). Recommended: 512×512px",
+  "adminSetting.form.faviconPrefixHint": "Icon shown in browser tabs (favicon.ico). Recommended: 32×32px",
   "adminSetting.form.submit": "Save",
   "adminSetting.form.saving": "Saving...",
   "adminSetting.form.success": "Community settings updated",

@@ -51,6 +51,18 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
   const ogImageInputRef = useRef<HTMLInputElement>(null);
   const faviconInputRef = useRef<HTMLInputElement>(null);
 
+  // 最新の画像 state を ref で追跡してアンマウント時に blob URL を解放する
+  const imagesRef = useRef({ logoImage, squareLogoImage, ogImageImage, faviconImage });
+  imagesRef.current = { logoImage, squareLogoImage, ogImageImage, faviconImage };
+
+  useEffect(() => {
+    return () => {
+      Object.values(imagesRef.current).forEach((img) => {
+        if (img?.type === "new") URL.revokeObjectURL(img.previewUrl);
+      });
+    };
+  }, []);
+
   useEffect(() => {
     if (data?.communityPortalConfig) {
       const c = data.communityPortalConfig as GqlCommunityPortalConfig;
@@ -95,13 +107,20 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
     if (!file) return;
     const previewUrl = URL.createObjectURL(file);
     const imageField: ImageField = { type: "new", file, previewUrl };
+
+    // 同じフィールドに既存の blob URL があれば解放する
+    const current = imagesRef.current;
     if (field === "logo") {
+      if (current.logoImage?.type === "new") URL.revokeObjectURL(current.logoImage.previewUrl);
       setLogoImage(imageField);
     } else if (field === "squareLogo") {
+      if (current.squareLogoImage?.type === "new") URL.revokeObjectURL(current.squareLogoImage.previewUrl);
       setSquareLogoImage(imageField);
     } else if (field === "ogImage") {
+      if (current.ogImageImage?.type === "new") URL.revokeObjectURL(current.ogImageImage.previewUrl);
       setOgImageImage(imageField);
     } else {
+      if (current.faviconImage?.type === "new") URL.revokeObjectURL(current.faviconImage.previewUrl);
       setFaviconImage(imageField);
     }
     // input をリセットして同じファイルを再選択できるようにする
@@ -147,7 +166,10 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
         input.favicon = { file: faviconImage.file };
       }
 
-      const result = await updatePortalConfig({ variables: { communityId, input } });
+      const result = await updatePortalConfig({
+        variables: { communityId, input },
+        refetchQueries: ["GetCommunityPortalConfig"],
+      });
       const updated = result.data?.updatePortalConfig;
       if (updated) {
         if (updated.logoPath) setLogoImage({ type: "existing", url: updated.logoPath });
