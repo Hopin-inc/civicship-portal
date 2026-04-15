@@ -3475,11 +3475,11 @@
             "deprecationReason": null
           },
           {
-            "name": "faviconPrefix",
+            "name": "favicon",
             "description": null,
             "type": {
-              "kind": "SCALAR",
-              "name": "String",
+              "kind": "INPUT_OBJECT",
+              "name": "ImageInput",
               "ofType": null
             },
             "defaultValue": null,
@@ -3487,11 +3487,11 @@
             "deprecationReason": null
           },
           {
-            "name": "logoPath",
+            "name": "logo",
             "description": null,
             "type": {
-              "kind": "SCALAR",
-              "name": "String",
+              "kind": "INPUT_OBJECT",
+              "name": "ImageInput",
               "ofType": null
             },
             "defaultValue": null,
@@ -3499,11 +3499,11 @@
             "deprecationReason": null
           },
           {
-            "name": "ogImagePath",
+            "name": "ogImage",
             "description": null,
             "type": {
-              "kind": "SCALAR",
-              "name": "String",
+              "kind": "INPUT_OBJECT",
+              "name": "ImageInput",
               "ofType": null
             },
             "defaultValue": null,
@@ -3559,11 +3559,11 @@
             "deprecationReason": null
           },
           {
-            "name": "squareLogoPath",
+            "name": "squareLogo",
             "description": null,
             "type": {
-              "kind": "SCALAR",
-              "name": "String",
+              "kind": "INPUT_OBJECT",
+              "name": "ImageInput",
               "ofType": null
             },
             "defaultValue": null,
