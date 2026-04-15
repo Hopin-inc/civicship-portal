@@ -8,6 +8,7 @@ import { UPDATE_PORTAL_CONFIG } from "@/graphql/account/community/mutation";
 import {
   useGetCommunityPortalConfigQuery,
   GqlCommunityPortalConfig,
+  GqlCommunityPortalConfigInput,
   GqlMutationUpdatePortalConfigArgs,
 } from "@/types/graphql";
 
@@ -137,7 +138,7 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
     if (!communityId || !validate()) return;
 
     try {
-      const input: any = {
+      const input: GqlCommunityPortalConfigInput = {
         title: formState.title.trim(),
         description: formState.description.trim(),
         shortDescription: formState.shortDescription.trim() || null,
