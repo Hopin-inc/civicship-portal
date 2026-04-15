@@ -67,7 +67,7 @@ function ImagePickerField({
       <Item size="sm" variant="outline">
         <ItemContent>
           {/* 推奨サイズのアスペクト比でグレー枠を表示し、画像が正しい比率かを視覚的に確認できる */}
-          <div className={cn("bg-muted rounded overflow-hidden", previewClassName)}>
+          <div className={cn("bg-muted rounded overflow-hidden self-start", previewClassName)}>
             {previewUrl && !imgError ? (
               <img
                 src={previewUrl}
