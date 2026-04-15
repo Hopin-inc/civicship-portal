@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { useAdminRole } from "@/app/community/[communityId]/admin/context/AdminRoleContext";
-import { GqlRole } from "@/types/graphql";
+import { GqlRole, useGetCommunityPortalConfigQuery } from "@/types/graphql";
 import { AppLink } from "@/lib/navigation";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
@@ -89,6 +89,12 @@ export default function AdminPage() {
   const t = useTranslations();
   const communityConfig = useCommunityConfig();
 
+  const { data: portalConfigData } = useGetCommunityPortalConfigQuery({
+    variables: { communityId: communityConfig?.communityId ?? "" },
+    skip: !communityConfig?.communityId,
+  });
+  const portalConfig = portalConfigData?.communityPortalConfig;
+
   const headerConfig = useMemo(
     () => ({
       title: "管理画面",
@@ -128,27 +134,27 @@ export default function AdminPage() {
       <div className="flex flex-col gap-3">
         <div className="flex items-center w-full">
           <div className="flex-grow">
-            {communityConfig?.squareLogoPath ? (
+            {portalConfig?.squareLogoPath ? (
               <img
-                src={communityConfig.squareLogoPath}
-                alt={communityConfig.title}
-                className="w-24 h-24 rounded object-contain"
+                src={portalConfig.squareLogoPath}
+                alt={portalConfig.title}
+                className="w-16 h-16 rounded object-contain"
               />
             ) : (
-              <div className="w-24 h-24 rounded bg-muted" />
+              <div className="w-16 h-16 rounded bg-muted" />
             )}
           </div>
           <AppLink href="/admin/setting">
             <Button variant="tertiary" size="md">
-              {t("adminSetting.page.title")}
+              設定
             </Button>
           </AppLink>
         </div>
         <div>
-          <h1 className="text-title-md">{communityConfig?.title}</h1>
-          {communityConfig?.shortDescription && (
-            <p className="text-body-md text-muted-foreground mt-1">
-              {communityConfig.shortDescription}
+          <h1 className="text-body-lg font-bold">{portalConfig?.title}</h1>
+          {portalConfig?.shortDescription && (
+            <p className="text-body-sm text-muted-foreground mt-0.5">
+              {portalConfig.shortDescription}
             </p>
           )}
         </div>
