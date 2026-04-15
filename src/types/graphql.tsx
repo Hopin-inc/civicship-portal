@@ -385,14 +385,14 @@ export type GqlCommunityPortalConfigInput = {
   documents?: InputMaybe<Array<GqlCommunityDocumentInput>>;
   domain?: InputMaybe<Scalars["String"]["input"]>;
   enableFeatures?: InputMaybe<Array<Scalars["String"]["input"]>>;
-  faviconPrefix?: InputMaybe<Scalars["String"]["input"]>;
-  logoPath?: InputMaybe<Scalars["String"]["input"]>;
-  ogImagePath?: InputMaybe<Scalars["String"]["input"]>;
+  favicon?: InputMaybe<GqlImageInput>;
+  logo?: InputMaybe<GqlImageInput>;
+  ogImage?: InputMaybe<GqlImageInput>;
   regionKey?: InputMaybe<Scalars["String"]["input"]>;
   regionName?: InputMaybe<Scalars["String"]["input"]>;
   rootPath?: InputMaybe<Scalars["String"]["input"]>;
   shortDescription?: InputMaybe<Scalars["String"]["input"]>;
-  squareLogoPath?: InputMaybe<Scalars["String"]["input"]>;
+  squareLogo?: InputMaybe<GqlImageInput>;
   title?: InputMaybe<Scalars["String"]["input"]>;
   tokenName?: InputMaybe<Scalars["String"]["input"]>;
 };
@@ -3218,6 +3218,26 @@ export type GqlIncentiveGrantRetryMutation = {
   } | null;
 };
 
+export type GqlUpdatePortalConfigMutationVariables = Exact<{
+  input: GqlCommunityPortalConfigInput;
+  communityId: Scalars["ID"]["input"];
+}>;
+
+export type GqlUpdatePortalConfigMutation = {
+  __typename?: "Mutation";
+  updatePortalConfig: {
+    __typename?: "CommunityPortalConfig";
+    communityId: string;
+    title: string;
+    description: string;
+    shortDescription?: string | null;
+    logoPath: string;
+    squareLogoPath: string;
+    ogImagePath: string;
+    faviconPrefix: string;
+  };
+};
+
 export type GqlGetCommunitiesQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GqlGetCommunitiesQuery = {
@@ -3276,6 +3296,24 @@ export type GqlGetFailedIncentiveGrantsQuery = {
       } | null;
     } | null> | null;
   };
+};
+
+export type GqlGetCommunityProfileQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type GqlGetCommunityProfileQuery = {
+  __typename?: "Query";
+  community?: {
+    __typename?: "Community";
+    id: string;
+    name?: string | null;
+    bio?: string | null;
+    website?: string | null;
+    pointName?: string | null;
+    image?: string | null;
+    establishedAt?: Date | null;
+  } | null;
 };
 
 export type GqlGetCommunityPortalConfigQueryVariables = Exact<{
@@ -7346,6 +7384,61 @@ export type IncentiveGrantRetryMutationOptions = Apollo.BaseMutationOptions<
   GqlIncentiveGrantRetryMutation,
   GqlIncentiveGrantRetryMutationVariables
 >;
+export const UpdatePortalConfigDocument = gql`
+  mutation UpdatePortalConfig($input: CommunityPortalConfigInput!, $communityId: ID!) {
+    updatePortalConfig(input: $input, permission: { communityId: $communityId }) {
+      communityId
+      title
+      description
+      shortDescription
+      logoPath
+      squareLogoPath
+      ogImagePath
+      faviconPrefix
+    }
+  }
+`;
+export type GqlUpdatePortalConfigMutationFn = Apollo.MutationFunction<
+  GqlUpdatePortalConfigMutation,
+  GqlUpdatePortalConfigMutationVariables
+>;
+
+/**
+ * __useUpdatePortalConfigMutation__
+ *
+ * To run a mutation, you first call `useUpdatePortalConfigMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdatePortalConfigMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updatePortalConfigMutation, { data, loading, error }] = useUpdatePortalConfigMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *      communityId: // value for 'communityId'
+ *   },
+ * });
+ */
+export function useUpdatePortalConfigMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlUpdatePortalConfigMutation,
+    GqlUpdatePortalConfigMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlUpdatePortalConfigMutation, GqlUpdatePortalConfigMutationVariables>(
+    UpdatePortalConfigDocument,
+    options,
+  );
+}
+export type UpdatePortalConfigMutationHookResult = ReturnType<typeof useUpdatePortalConfigMutation>;
+export type UpdatePortalConfigMutationResult = Apollo.MutationResult<GqlUpdatePortalConfigMutation>;
+export type UpdatePortalConfigMutationOptions = Apollo.BaseMutationOptions<
+  GqlUpdatePortalConfigMutation,
+  GqlUpdatePortalConfigMutationVariables
+>;
 export const GetCommunitiesDocument = gql`
   query GetCommunities {
     communities {
@@ -7649,6 +7742,87 @@ export type GetFailedIncentiveGrantsSuspenseQueryHookResult = ReturnType<
 export type GetFailedIncentiveGrantsQueryResult = Apollo.QueryResult<
   GqlGetFailedIncentiveGrantsQuery,
   GqlGetFailedIncentiveGrantsQueryVariables
+>;
+export const GetCommunityProfileDocument = gql`
+  query GetCommunityProfile($id: ID!) {
+    community(id: $id) {
+      id
+      name
+      bio
+      website
+      pointName
+      image
+      establishedAt
+    }
+  }
+`;
+
+/**
+ * __useGetCommunityProfileQuery__
+ *
+ * To run a query within a React component, call `useGetCommunityProfileQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCommunityProfileQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCommunityProfileQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetCommunityProfileQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GqlGetCommunityProfileQuery,
+    GqlGetCommunityProfileQueryVariables
+  > &
+    ({ variables: GqlGetCommunityProfileQueryVariables; skip?: boolean } | { skip: boolean }),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetCommunityProfileQuery, GqlGetCommunityProfileQueryVariables>(
+    GetCommunityProfileDocument,
+    options,
+  );
+}
+export function useGetCommunityProfileLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetCommunityProfileQuery,
+    GqlGetCommunityProfileQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetCommunityProfileQuery, GqlGetCommunityProfileQueryVariables>(
+    GetCommunityProfileDocument,
+    options,
+  );
+}
+export function useGetCommunityProfileSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetCommunityProfileQuery,
+        GqlGetCommunityProfileQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetCommunityProfileQuery, GqlGetCommunityProfileQueryVariables>(
+    GetCommunityProfileDocument,
+    options,
+  );
+}
+export type GetCommunityProfileQueryHookResult = ReturnType<typeof useGetCommunityProfileQuery>;
+export type GetCommunityProfileLazyQueryHookResult = ReturnType<
+  typeof useGetCommunityProfileLazyQuery
+>;
+export type GetCommunityProfileSuspenseQueryHookResult = ReturnType<
+  typeof useGetCommunityProfileSuspenseQuery
+>;
+export type GetCommunityProfileQueryResult = Apollo.QueryResult<
+  GqlGetCommunityProfileQuery,
+  GqlGetCommunityProfileQueryVariables
 >;
 export const GetCommunityPortalConfigDocument = gql`
   query GetCommunityPortalConfig($communityId: String!) {

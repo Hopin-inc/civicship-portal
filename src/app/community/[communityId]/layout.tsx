@@ -42,20 +42,8 @@ export async function generateMetadata({
     title: config.title,
     description: config.description,
     icons: {
-      icon: [
-        {
-          url: config.faviconPrefix
-            ? `${config.faviconPrefix}/favicon.ico`
-            : DEFAULT_ASSET_PATHS.FAVICON,
-        },
-      ],
-      apple: [
-        {
-          url: config.faviconPrefix
-            ? `${config.faviconPrefix}/apple-touch-icon.png`
-            : DEFAULT_ASSET_PATHS.APPLE_TOUCH_ICON,
-        },
-      ],
+      icon: [{ url: DEFAULT_ASSET_PATHS.FAVICON }],
+      apple: [{ url: DEFAULT_ASSET_PATHS.APPLE_TOUCH_ICON }],
     },
     openGraph: {
       title: config.title,

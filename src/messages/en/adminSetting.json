@@ -1,0 +1,22 @@
+{
+  "adminSetting.page.title": "Community Settings",
+  "adminSetting.form.title": "Title",
+  "adminSetting.form.titleHint": "Used as the browser tab title and OGP title",
+  "adminSetting.form.shortDescription": "Short Description",
+  "adminSetting.form.shortDescriptionHint": "Used as the SNS share description (og:description)",
+  "adminSetting.form.description": "Description",
+  "adminSetting.form.descriptionHint": "Shown as the page body description",
+  "adminSetting.form.ogImage": "OGP Image",
+  "adminSetting.form.ogImageHint": "Thumbnail shown when sharing on SNS (og:image). Recommended: 1200×630px",
+  "adminSetting.form.logoPath": "Logo Image",
+  "adminSetting.form.logoPathHint": "Horizontal logo shown on wallets and certificates. Recommended: 240×100px",
+  "adminSetting.form.squareLogoPath": "Square Logo Image",
+  "adminSetting.form.squareLogoPathHint": "Logo shown in the header. Recommended: 200×200px (square)",
+  "adminSetting.form.faviconPrefix": "Favicon",
+  "adminSetting.form.faviconPrefixHint": "Icon shown in browser tabs (favicon.ico). Recommended: 32×32px",
+  "adminSetting.form.submit": "Save",
+  "adminSetting.form.saving": "Saving...",
+  "adminSetting.form.success": "Community settings updated",
+  "adminSetting.form.error.titleRequired": "Title is required",
+  "adminSetting.form.error.submit": "Failed to update. Please try again"
+}

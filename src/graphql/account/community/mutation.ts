@@ -41,3 +41,18 @@ export const INCENTIVE_GRANT_RETRY = gql`
     }
   }
 `;
+
+export const UPDATE_PORTAL_CONFIG = gql`
+  mutation UpdatePortalConfig($input: CommunityPortalConfigInput!, $communityId: ID!) {
+    updatePortalConfig(input: $input, permission: { communityId: $communityId }) {
+      communityId
+      title
+      description
+      shortDescription
+      logoPath
+      squareLogoPath
+      ogImagePath
+      faviconPrefix
+    }
+  }
+`;

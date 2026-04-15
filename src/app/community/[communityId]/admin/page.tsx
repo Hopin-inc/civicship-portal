@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { useAdminRole } from "@/app/community/[communityId]/admin/context/AdminRoleContext";
-import { GqlRole } from "@/types/graphql";
+import { GqlRole, useGetCommunityPortalConfigQuery } from "@/types/graphql";
 import { AppLink } from "@/lib/navigation";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
@@ -89,6 +89,12 @@ export default function AdminPage() {
   const t = useTranslations();
   const communityConfig = useCommunityConfig();
 
+  const { data: portalConfigData } = useGetCommunityPortalConfigQuery({
+    variables: { communityId: communityConfig?.communityId ?? "" },
+    skip: !communityConfig?.communityId,
+  });
+  const portalConfig = portalConfigData?.communityPortalConfig;
+
   const headerConfig = useMemo(
     () => ({
       title: "管理画面",
@@ -124,6 +130,32 @@ export default function AdminPage() {
 
   return (
     <div className="max-w-xl mx-auto mt-8 space-y-6 px-4">
+      {/* コミュニティプロフィール */}
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-1.5">
+          {portalConfig?.squareLogoPath ? (
+            <img
+              src={portalConfig.squareLogoPath}
+              alt={portalConfig.title}
+              className="w-12 h-12 rounded-xl border border-border object-contain shrink-0"
+            />
+          ) : (
+            <div className="w-12 h-12 rounded-xl border border-border bg-muted shrink-0" />
+          )}
+          <span className="text-body-md font-semibold flex-1">{portalConfig?.title}</span>
+          <AppLink href="/admin/setting">
+            <Button variant="tertiary" size="sm">
+              設定
+            </Button>
+          </AppLink>
+        </div>
+        {portalConfig?.shortDescription && (
+          <p className="text-body-sm text-muted-foreground">
+            {portalConfig.shortDescription}
+          </p>
+        )}
+      </div>
+
       {/* 管理者セクション */}
       <section>
         <h2 className="text-sm text-muted-foreground font-semibold mb-2">管理者</h2>
