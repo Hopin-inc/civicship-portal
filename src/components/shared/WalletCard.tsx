@@ -25,7 +25,8 @@ const WalletCard: React.FC<WalletCardProps> = ({
 }) => {
   const t = useTranslations();
   const communityConfig = useCommunityConfig();
-  const logoSrc = logoOverride ?? communityConfig?.logoPath;
+  // undefined（未指定）のときのみ context にフォールバック。null はプレビューで「未設定」を明示するため尊重する
+  const logoSrc = logoOverride !== undefined ? logoOverride : communityConfig?.logoPath;
 
   return (
     <div className="bg-background rounded-[32px] px-12 py-8 shadow-[0_2px_20px_rgba(0,0,0,0.08)] mt-8 mb-8">
