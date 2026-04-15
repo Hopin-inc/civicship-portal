@@ -1,7 +1,8 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -50,6 +51,13 @@ function ImagePickerField({
   previewClassName = "h-16 w-auto",
   onPreviewClick,
 }: ImagePickerFieldProps) {
+  const [imgError, setImgError] = useState(false);
+
+  // previewUrl が変わったらエラー状態をリセット（新画像のプレビューを正しく表示するため）
+  useEffect(() => {
+    setImgError(false);
+  }, [previewUrl]);
+
   return (
     <div className="space-y-1">
       <div className="flex items-center gap-2 px-1">
@@ -58,14 +66,12 @@ function ImagePickerField({
       {hint && <p className="text-xs text-muted-foreground px-1">{hint}</p>}
       <Item size="sm" variant="outline">
         <ItemContent>
-          {previewUrl ? (
+          {previewUrl && !imgError ? (
             <img
               src={previewUrl}
               alt={label}
-              className={`rounded object-contain bg-muted ${previewClassName}`}
-              onError={(e) => {
-                (e.currentTarget as HTMLImageElement).style.display = "none";
-              }}
+              className={cn("rounded object-contain bg-muted", previewClassName)}
+              onError={() => setImgError(true)}
             />
           ) : (
             <p className="text-xs text-muted-foreground">未設定</p>
@@ -169,7 +175,7 @@ export function CommunitySettingForm({ editor, onSubmit }: CommunitySettingFormP
           onPickerClick={() => editor.ogImageInputRef.current?.click()}
           inputRef={editor.ogImageInputRef}
           onFileChange={(e) => editor.handleImageSelect("ogImage", e)}
-          previewClassName="w-full max-w-xs aspect-[1200/630] object-cover"
+          previewClassName="h-20 w-auto"
           onPreviewClick={() => setPreviewDialog("ogImage")}
         />
 
