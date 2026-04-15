@@ -1,5 +1,6 @@
 {
   "adminSetting.page.title": "コミュニティ設定",
+  "adminSetting.page.settings": "設定",
   "adminSetting.form.title": "タイトル",
   "adminSetting.form.titleHint": "ブラウザタブ・OGPのタイトルとして使用されます",
   "adminSetting.form.shortDescription": "短い説明",
@@ -12,11 +13,22 @@
   "adminSetting.form.logoPathHint": "ウォレット・証明書に表示される横長ロゴ。推奨: 240×100px",
   "adminSetting.form.squareLogoPath": "正方形ロゴ画像",
   "adminSetting.form.squareLogoPathHint": "ヘッダーに表示されるロゴ。推奨: 200×200px（正方形）",
-  "adminSetting.form.faviconPrefix": "Favicon",
-  "adminSetting.form.faviconPrefixHint": "ブラウザタブに表示されるアイコン（favicon.ico）。推奨: 32×32px",
+  "adminSetting.form.required": "必須",
+  "adminSetting.form.imageSet": "設定済み",
+  "adminSetting.form.imageNotSet": "未設定",
+  "adminSetting.form.change": "変更",
+  "adminSetting.form.preview": "プレビュー",
   "adminSetting.form.submit": "保存",
   "adminSetting.form.saving": "保存中...",
   "adminSetting.form.success": "コミュニティ設定を更新しました",
   "adminSetting.form.error.titleRequired": "タイトルは必須です",
-  "adminSetting.form.error.submit": "更新に失敗しました。もう一度お試しください"
+  "adminSetting.form.error.submit": "更新に失敗しました。もう一度お試しください",
+  "adminSetting.preview.header": "ヘッダーでの表示イメージ",
+  "adminSetting.preview.wallet": "ウォレットカードでの表示イメージ",
+  "adminSetting.preview.sns": "SNSシェア時の表示イメージ",
+  "adminSetting.preview.imageNotSet": "画像未設定",
+  "adminSetting.preview.titlePlaceholder": "タイトル",
+  "adminSetting.preview.shortDescriptionPlaceholder": "短い説明",
+  "adminSetting.preview.logoAlt": "ロゴ",
+  "adminSetting.preview.ogImageAlt": "OGP画像プレビュー"
 }

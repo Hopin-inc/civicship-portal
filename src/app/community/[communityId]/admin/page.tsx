@@ -144,7 +144,7 @@ export default function AdminPage() {
           <span className="text-body-md font-semibold flex-1">{portalConfig?.title}</span>
           <AppLink href="/admin/setting">
             <Button variant="tertiary" size="sm">
-              設定
+              {t("adminSetting.page.settings")}
             </Button>
           </AppLink>
         </div>

@@ -10,7 +10,7 @@ import {
   useGetCommunityPortalConfigQuery,
   GqlCommunityPortalConfig,
   GqlCommunityPortalConfigInput,
-  GqlMutationUpdatePortalConfigArgs,
+  GqlUpdatePortalConfigMutationVariables,
 } from "@/types/graphql";
 
 // 単一画像フィールドの状態
@@ -86,7 +86,7 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
 
   const [updatePortalConfig, { loading: saving }] = useMutation<
     { updatePortalConfig: GqlCommunityPortalConfig },
-    GqlMutationUpdatePortalConfigArgs
+    GqlUpdatePortalConfigMutationVariables
   >(UPDATE_PORTAL_CONFIG);
 
   function updateField<K extends keyof FormState>(key: K, value: FormState[K]) {
