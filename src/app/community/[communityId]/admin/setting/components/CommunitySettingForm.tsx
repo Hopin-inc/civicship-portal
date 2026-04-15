@@ -12,6 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Eye } from "lucide-react";
 import WalletCard from "@/components/shared/WalletCard";
 import { useCommunityProfileEditor } from "../hooks/useCommunityProfileEditor";
 
@@ -72,12 +73,12 @@ function ImagePickerField({
         </ItemContent>
         <ItemActions className="self-center">
           {onPreviewClick && (
-            <Button type="button" variant="text" size="sm" onClick={onPreviewClick}>
-              プレビュー
+            <Button type="button" variant="icon-only" size="icon" onClick={onPreviewClick} aria-label="プレビュー">
+              <Eye className="h-4 w-4" />
             </Button>
           )}
-          <Button type="button" variant="text" size="sm" onClick={onPickerClick}>
-            画像を変更
+          <Button type="button" variant="tertiary" size="sm" onClick={onPickerClick}>
+            変更
           </Button>
         </ItemActions>
       </Item>
