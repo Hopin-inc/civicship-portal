@@ -12,7 +12,6 @@ import {
   Image,
   MapPin,
   MegaphoneIcon,
-  Settings,
   Ticket,
   Users,
   Wallet,
@@ -27,11 +26,6 @@ import { useTranslations } from "next-intl";
 type FeaturesType = string;
 
 const adminSettings = [
-  {
-    title: "コミュニティ設定",
-    href: "/admin/setting",
-    icon: Settings,
-  },
   {
     title: "メンバー管理",
     href: "/admin/members",
@@ -130,6 +124,36 @@ export default function AdminPage() {
 
   return (
     <div className="max-w-xl mx-auto mt-8 space-y-6 px-4">
+      {/* コミュニティプロフィール */}
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center w-full">
+          <div className="flex-grow">
+            {communityConfig?.squareLogoPath ? (
+              <img
+                src={communityConfig.squareLogoPath}
+                alt={communityConfig.title}
+                className="w-24 h-24 rounded object-contain"
+              />
+            ) : (
+              <div className="w-24 h-24 rounded bg-muted" />
+            )}
+          </div>
+          <AppLink href="/admin/setting">
+            <Button variant="tertiary" size="md">
+              {t("adminSetting.page.title")}
+            </Button>
+          </AppLink>
+        </div>
+        <div>
+          <h1 className="text-title-md">{communityConfig?.title}</h1>
+          {communityConfig?.shortDescription && (
+            <p className="text-body-md text-muted-foreground mt-1">
+              {communityConfig.shortDescription}
+            </p>
+          )}
+        </div>
+      </div>
+
       {/* 管理者セクション */}
       <section>
         <h2 className="text-sm text-muted-foreground font-semibold mb-2">管理者</h2>
