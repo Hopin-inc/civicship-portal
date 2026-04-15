@@ -3233,6 +3233,7 @@ export type GqlUpdatePortalConfigMutation = {
     shortDescription?: string | null;
     logoPath: string;
     squareLogoPath: string;
+    ogImagePath: string;
     faviconPrefix: string;
   };
 };
@@ -7392,6 +7393,7 @@ export const UpdatePortalConfigDocument = gql`
       shortDescription
       logoPath
       squareLogoPath
+      ogImagePath
       faviconPrefix
     }
   }
