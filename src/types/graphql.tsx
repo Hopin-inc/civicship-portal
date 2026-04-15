@@ -2664,6 +2664,14 @@ export type GqlTicketsConnection = {
 
 export type GqlTransaction = {
   __typename?: "Transaction";
+  /**
+   * ポイントの旅のステップを返します（最大10段階）。
+   * 再帰CTEによる単一クエリで取得しますが、循環・異常データ対策のため深さ上限を10としています。
+   * transactions などのリスト取得で chain を要求すると、各 Transaction ごとにこのクエリが実行されるため高コストになりえます。
+   * transaction(id) での単体取得時のみ使用し、深さだけ必要な場合は chainDepth を使用してください。
+   */
+  chain?: Maybe<GqlTransactionChain>;
+  chainDepth?: Maybe<Scalars["Int"]["output"]>;
   comment?: Maybe<Scalars["String"]["output"]>;
   createdAt?: Maybe<Scalars["Datetime"]["output"]>;
   createdByUser?: Maybe<GqlUser>;
@@ -2678,6 +2686,29 @@ export type GqlTransaction = {
   toPointChange?: Maybe<Scalars["Int"]["output"]>;
   toWallet?: Maybe<GqlWallet>;
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+};
+
+export type GqlTransactionChain = {
+  __typename?: "TransactionChain";
+  depth: Scalars["Int"]["output"];
+  steps: Array<GqlTransactionChainStep>;
+};
+
+export type GqlTransactionChainStep = {
+  __typename?: "TransactionChainStep";
+  createdAt: Scalars["Datetime"]["output"];
+  fromUser?: Maybe<GqlTransactionChainUser>;
+  id: Scalars["ID"]["output"];
+  points: Scalars["Int"]["output"];
+  reason: GqlTransactionReason;
+  toUser?: Maybe<GqlTransactionChainUser>;
+};
+
+export type GqlTransactionChainUser = {
+  __typename?: "TransactionChainUser";
+  id: Scalars["ID"]["output"];
+  image?: Maybe<Scalars["String"]["output"]>;
+  name: Scalars["String"]["output"];
 };
 
 export type GqlTransactionDonateSelfPointInput = {
@@ -3296,24 +3327,6 @@ export type GqlGetFailedIncentiveGrantsQuery = {
       } | null;
     } | null> | null;
   };
-};
-
-export type GqlGetCommunityProfileQueryVariables = Exact<{
-  id: Scalars["ID"]["input"];
-}>;
-
-export type GqlGetCommunityProfileQuery = {
-  __typename?: "Query";
-  community?: {
-    __typename?: "Community";
-    id: string;
-    name?: string | null;
-    bio?: string | null;
-    website?: string | null;
-    pointName?: string | null;
-    image?: string | null;
-    establishedAt?: Date | null;
-  } | null;
 };
 
 export type GqlGetCommunityPortalConfigQueryVariables = Exact<{
@@ -7742,87 +7755,6 @@ export type GetFailedIncentiveGrantsSuspenseQueryHookResult = ReturnType<
 export type GetFailedIncentiveGrantsQueryResult = Apollo.QueryResult<
   GqlGetFailedIncentiveGrantsQuery,
   GqlGetFailedIncentiveGrantsQueryVariables
->;
-export const GetCommunityProfileDocument = gql`
-  query GetCommunityProfile($id: ID!) {
-    community(id: $id) {
-      id
-      name
-      bio
-      website
-      pointName
-      image
-      establishedAt
-    }
-  }
-`;
-
-/**
- * __useGetCommunityProfileQuery__
- *
- * To run a query within a React component, call `useGetCommunityProfileQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetCommunityProfileQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetCommunityProfileQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function useGetCommunityProfileQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    GqlGetCommunityProfileQuery,
-    GqlGetCommunityProfileQueryVariables
-  > &
-    ({ variables: GqlGetCommunityProfileQueryVariables; skip?: boolean } | { skip: boolean }),
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GqlGetCommunityProfileQuery, GqlGetCommunityProfileQueryVariables>(
-    GetCommunityProfileDocument,
-    options,
-  );
-}
-export function useGetCommunityProfileLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    GqlGetCommunityProfileQuery,
-    GqlGetCommunityProfileQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GqlGetCommunityProfileQuery, GqlGetCommunityProfileQueryVariables>(
-    GetCommunityProfileDocument,
-    options,
-  );
-}
-export function useGetCommunityProfileSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        GqlGetCommunityProfileQuery,
-        GqlGetCommunityProfileQueryVariables
-      >,
-) {
-  const options =
-    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<GqlGetCommunityProfileQuery, GqlGetCommunityProfileQueryVariables>(
-    GetCommunityProfileDocument,
-    options,
-  );
-}
-export type GetCommunityProfileQueryHookResult = ReturnType<typeof useGetCommunityProfileQuery>;
-export type GetCommunityProfileLazyQueryHookResult = ReturnType<
-  typeof useGetCommunityProfileLazyQuery
->;
-export type GetCommunityProfileSuspenseQueryHookResult = ReturnType<
-  typeof useGetCommunityProfileSuspenseQuery
->;
-export type GetCommunityProfileQueryResult = Apollo.QueryResult<
-  GqlGetCommunityProfileQuery,
-  GqlGetCommunityProfileQueryVariables
 >;
 export const GetCommunityPortalConfigDocument = gql`
   query GetCommunityPortalConfig($communityId: String!) {
