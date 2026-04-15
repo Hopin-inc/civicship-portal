@@ -132,15 +132,15 @@ export default function AdminPage() {
     <div className="max-w-xl mx-auto mt-8 space-y-6 px-4">
       {/* コミュニティプロフィール */}
       <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1.5">
           {portalConfig?.squareLogoPath ? (
             <img
               src={portalConfig.squareLogoPath}
               alt={portalConfig.title}
-              className="w-12 h-12 rounded-lg object-contain shrink-0"
+              className="w-12 h-12 rounded-xl border border-border object-contain shrink-0"
             />
           ) : (
-            <div className="w-12 h-12 rounded-lg bg-muted shrink-0" />
+            <div className="w-12 h-12 rounded-xl border border-border bg-muted shrink-0" />
           )}
           <span className="text-body-md font-semibold flex-1">{portalConfig?.title}</span>
           <AppLink href="/admin/setting">
