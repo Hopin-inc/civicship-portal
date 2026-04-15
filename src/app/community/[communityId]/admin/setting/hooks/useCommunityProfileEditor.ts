@@ -82,7 +82,7 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
       }
       if (c.faviconPrefix) {
         // faviconPrefix はディレクトリ prefix。.ico は img タグで表示できないことがあるため PNG でプレビュー
-        setFaviconImage({ type: "existing", url: `${c.faviconPrefix}/apple-touch-icon.png` });
+        setFaviconImage({ type: "existing", url: `${c.faviconPrefix}/favicon.ico` });
       }
     }
   }, [data]);
@@ -186,7 +186,7 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
         }
         if (updated.faviconPrefix) {
           if (faviconImage?.type === "new") URL.revokeObjectURL(faviconImage.previewUrl);
-          setFaviconImage({ type: "existing", url: `${updated.faviconPrefix}/apple-touch-icon.png` });
+          setFaviconImage({ type: "existing", url: `${updated.faviconPrefix}/favicon.ico` });
         }
       }
       toast.success(t("adminSetting.form.success"));
