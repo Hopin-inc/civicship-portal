@@ -77,7 +77,9 @@ function ImagePickerField({
               />
             ) : (
               <div className="flex items-center justify-center w-full h-full">
-                <p className="text-xs text-muted-foreground">未設定</p>
+                <p className="text-xs text-muted-foreground">
+                  {previewUrl && imgError ? "設定済み" : "未設定"}
+                </p>
               </div>
             )}
           </div>
