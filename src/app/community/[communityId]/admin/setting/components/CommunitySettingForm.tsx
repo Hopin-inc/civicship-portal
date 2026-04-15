@@ -12,6 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import WalletCard from "@/components/shared/WalletCard";
 import { useCommunityProfileEditor } from "../hooks/useCommunityProfileEditor";
 
 interface CommunitySettingFormProps {
@@ -110,7 +111,7 @@ export function CommunitySettingForm({ editor, onSubmit }: CommunitySettingFormP
             <span className="text-sm text-muted-foreground">{t("adminSetting.form.title")}</span>
             <RequiredBadge />
           </div>
-          <p className="text-xs text-muted-foreground px-1">{t("adminSetting.form.title.hint")}</p>
+          <p className="text-xs text-muted-foreground px-1">{t("adminSetting.form.titleHint")}</p>
           <Input
             value={editor.formState.title}
             onChange={(e) => editor.updateField("title", e.target.value)}
@@ -132,7 +133,7 @@ export function CommunitySettingForm({ editor, onSubmit }: CommunitySettingFormP
             </span>
           </div>
           <p className="text-xs text-muted-foreground px-1">
-            {t("adminSetting.form.shortDescription.hint")}
+            {t("adminSetting.form.shortDescriptionHint")}
           </p>
           <Input
             value={editor.formState.shortDescription}
@@ -149,7 +150,7 @@ export function CommunitySettingForm({ editor, onSubmit }: CommunitySettingFormP
             </span>
           </div>
           <p className="text-xs text-muted-foreground px-1">
-            {t("adminSetting.form.description.hint")}
+            {t("adminSetting.form.descriptionHint")}
           </p>
           <Textarea
             value={editor.formState.description}
@@ -162,7 +163,7 @@ export function CommunitySettingForm({ editor, onSubmit }: CommunitySettingFormP
         {/* OGP画像 */}
         <ImagePickerField
           label={t("adminSetting.form.ogImage")}
-          hint={t("adminSetting.form.ogImage.hint")}
+          hint={t("adminSetting.form.ogImageHint")}
           previewUrl={ogImagePreviewUrl}
           onPickerClick={() => editor.ogImageInputRef.current?.click()}
           inputRef={editor.ogImageInputRef}
@@ -174,7 +175,7 @@ export function CommunitySettingForm({ editor, onSubmit }: CommunitySettingFormP
         {/* ロゴ画像 */}
         <ImagePickerField
           label={t("adminSetting.form.logoPath")}
-          hint={t("adminSetting.form.logoPath.hint")}
+          hint={t("adminSetting.form.logoPathHint")}
           previewUrl={logoPreviewUrl}
           onPickerClick={() => editor.logoInputRef.current?.click()}
           inputRef={editor.logoInputRef}
@@ -186,7 +187,7 @@ export function CommunitySettingForm({ editor, onSubmit }: CommunitySettingFormP
         {/* 正方形ロゴ画像 */}
         <ImagePickerField
           label={t("adminSetting.form.squareLogoPath")}
-          hint={t("adminSetting.form.squareLogoPath.hint")}
+          hint={t("adminSetting.form.squareLogoPathHint")}
           previewUrl={squareLogoPreviewUrl}
           onPickerClick={() => editor.squareLogoInputRef.current?.click()}
           inputRef={editor.squareLogoInputRef}
@@ -198,7 +199,7 @@ export function CommunitySettingForm({ editor, onSubmit }: CommunitySettingFormP
         {/* Favicon */}
         <ImagePickerField
           label={t("adminSetting.form.faviconPrefix")}
-          hint={t("adminSetting.form.faviconPrefix.hint")}
+          hint={t("adminSetting.form.faviconPrefixHint")}
           previewUrl={editor.getPreviewUrl(editor.faviconImage)}
           onPickerClick={() => editor.faviconInputRef.current?.click()}
           inputRef={editor.faviconInputRef}
@@ -219,7 +220,7 @@ export function CommunitySettingForm({ editor, onSubmit }: CommunitySettingFormP
         </div>
       </form>
 
-      {/* プレビューダイアログ: 正方形ロゴ（ヘッダーモック） */}
+      {/* プレビューダイアログ: 正方形ロゴ（ヘッダービジュアルモック） */}
       <Dialog
         open={previewDialog === "squareLogo"}
         onOpenChange={(o) => !o && setPreviewDialog(null)}
@@ -228,22 +229,22 @@ export function CommunitySettingForm({ editor, onSubmit }: CommunitySettingFormP
           <DialogHeader>
             <DialogTitle>ヘッダーでの表示イメージ</DialogTitle>
           </DialogHeader>
-          <div className="flex items-center gap-3 bg-background border rounded-lg px-4 h-12">
+          {/* Header と同じ CSS クラスで構成したモック */}
+          <div className="bg-background border-b border-border w-full flex items-center px-6 h-16 rounded-lg border">
             {squareLogoPreviewUrl ? (
               <img
                 src={squareLogoPreviewUrl}
+                alt="ロゴ"
                 className="h-[28px] w-auto object-contain"
-                alt="square logo preview"
               />
             ) : (
               <div className="h-[28px] w-16 bg-muted rounded" />
             )}
-            <span className="text-xs text-muted-foreground ml-auto">ヘッダー</span>
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* プレビューダイアログ: ロゴ（ウォレットカードモック） */}
+      {/* プレビューダイアログ: ロゴ（実際のWalletCard） */}
       <Dialog
         open={previewDialog === "logo"}
         onOpenChange={(o) => !o && setPreviewDialog(null)}
@@ -252,22 +253,7 @@ export function CommunitySettingForm({ editor, onSubmit }: CommunitySettingFormP
           <DialogHeader>
             <DialogTitle>ウォレットカードでの表示イメージ</DialogTitle>
           </DialogHeader>
-          <div className="bg-background rounded-2xl px-6 py-4 shadow-sm border">
-            <div className="text-xs text-muted-foreground mb-1">残高</div>
-            <div className="text-xl font-bold mb-4">1,234 pt</div>
-            <div>
-              {logoPreviewUrl ? (
-                <img
-                  src={logoPreviewUrl}
-                  style={{ width: 80, height: 24 }}
-                  className="opacity-60 object-contain"
-                  alt="logo preview"
-                />
-              ) : (
-                <div className="w-[80px] h-[24px] bg-muted rounded opacity-60" />
-              )}
-            </div>
-          </div>
+          <WalletCard currentPoint={0} isLoading={false} showRefreshButton={false} />
         </DialogContent>
       </Dialog>
 
