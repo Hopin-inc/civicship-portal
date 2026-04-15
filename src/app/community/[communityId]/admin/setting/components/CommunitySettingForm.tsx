@@ -70,7 +70,7 @@ function ImagePickerField({
             <img
               src={previewUrl}
               alt={label}
-              className={cn("rounded object-contain bg-muted", previewClassName)}
+              className={cn("rounded object-contain bg-muted self-start", previewClassName)}
               onError={() => setImgError(true)}
             />
           ) : (
@@ -234,7 +234,7 @@ export function CommunitySettingForm({ editor, onSubmit }: CommunitySettingFormP
       >
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>ヘッダーでの表示イメージ</DialogTitle>
+            <DialogTitle className="text-sm font-medium">ヘッダーでの表示イメージ</DialogTitle>
           </DialogHeader>
           {/* Header と同じ CSS クラスで構成したモック */}
           <div className="bg-background border-b border-border w-full flex items-center px-6 h-16 rounded-lg border">
@@ -258,7 +258,7 @@ export function CommunitySettingForm({ editor, onSubmit }: CommunitySettingFormP
       >
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>ウォレットカードでの表示イメージ</DialogTitle>
+            <DialogTitle className="text-sm font-medium">ウォレットカードでの表示イメージ</DialogTitle>
           </DialogHeader>
           <WalletCard currentPoint={0} isLoading={false} showRefreshButton={false} />
         </DialogContent>
@@ -271,7 +271,7 @@ export function CommunitySettingForm({ editor, onSubmit }: CommunitySettingFormP
       >
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>SNSシェア時の表示イメージ</DialogTitle>
+            <DialogTitle className="text-sm font-medium">SNSシェア時の表示イメージ</DialogTitle>
           </DialogHeader>
           <div className="border rounded-lg overflow-hidden">
             {ogImagePreviewUrl ? (
