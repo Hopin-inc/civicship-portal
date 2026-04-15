@@ -43,17 +43,15 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
   const [logoImage, setLogoImage] = useState<ImageField>(null);
   const [squareLogoImage, setSquareLogoImage] = useState<ImageField>(null);
   const [ogImageImage, setOgImageImage] = useState<ImageField>(null);
-  const [faviconImage, setFaviconImage] = useState<ImageField>(null);
   const [errors, setErrors] = useState<FormErrors>({});
 
   const logoInputRef = useRef<HTMLInputElement>(null);
   const squareLogoInputRef = useRef<HTMLInputElement>(null);
   const ogImageInputRef = useRef<HTMLInputElement>(null);
-  const faviconInputRef = useRef<HTMLInputElement>(null);
 
   // 最新の画像 state を ref で追跡してアンマウント時に blob URL を解放する
-  const imagesRef = useRef({ logoImage, squareLogoImage, ogImageImage, faviconImage });
-  imagesRef.current = { logoImage, squareLogoImage, ogImageImage, faviconImage };
+  const imagesRef = useRef({ logoImage, squareLogoImage, ogImageImage });
+  imagesRef.current = { logoImage, squareLogoImage, ogImageImage };
 
   useEffect(() => {
     return () => {
@@ -80,10 +78,6 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
       if (c.ogImagePath) {
         setOgImageImage({ type: "existing", url: c.ogImagePath });
       }
-      if (c.faviconPrefix) {
-        // faviconPrefix はディレクトリ prefix。.ico は img タグで表示できないことがあるため PNG でプレビュー
-        setFaviconImage({ type: "existing", url: `${c.faviconPrefix}/favicon.ico` });
-      }
     }
   }, [data]);
 
@@ -100,7 +94,7 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
   }
 
   function handleImageSelect(
-    field: "logo" | "squareLogo" | "ogImage" | "favicon",
+    field: "logo" | "squareLogo" | "ogImage",
     e: ChangeEvent<HTMLInputElement>,
   ) {
     const file = e.target.files?.[0];
@@ -116,12 +110,9 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
     } else if (field === "squareLogo") {
       if (current.squareLogoImage?.type === "new") URL.revokeObjectURL(current.squareLogoImage.previewUrl);
       setSquareLogoImage(imageField);
-    } else if (field === "ogImage") {
+    } else {
       if (current.ogImageImage?.type === "new") URL.revokeObjectURL(current.ogImageImage.previewUrl);
       setOgImageImage(imageField);
-    } else {
-      if (current.faviconImage?.type === "new") URL.revokeObjectURL(current.faviconImage.previewUrl);
-      setFaviconImage(imageField);
     }
     // input をリセットして同じファイルを再選択できるようにする
     e.target.value = "";
@@ -162,9 +153,6 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
       if (ogImageImage?.type === "new") {
         input.ogImage = { file: ogImageImage.file };
       }
-      if (faviconImage?.type === "new") {
-        input.favicon = { file: faviconImage.file };
-      }
 
       const result = await updatePortalConfig({
         variables: { communityId, input },
@@ -184,10 +172,6 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
           if (ogImageImage?.type === "new") URL.revokeObjectURL(ogImageImage.previewUrl);
           setOgImageImage({ type: "existing", url: updated.ogImagePath });
         }
-        if (updated.faviconPrefix) {
-          if (faviconImage?.type === "new") URL.revokeObjectURL(faviconImage.previewUrl);
-          setFaviconImage({ type: "existing", url: `${updated.faviconPrefix}/favicon.ico` });
-        }
       }
       toast.success(t("adminSetting.form.success"));
     } catch {
@@ -202,11 +186,9 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
     logoImage,
     squareLogoImage,
     ogImageImage,
-    faviconImage,
     logoInputRef,
     squareLogoInputRef,
     ogImageInputRef,
-    faviconInputRef,
     handleImageSelect,
     getPreviewUrl,
     onSubmit,

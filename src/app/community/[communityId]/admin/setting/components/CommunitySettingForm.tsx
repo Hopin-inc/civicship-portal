@@ -210,17 +210,6 @@ export function CommunitySettingForm({ editor, onSubmit }: CommunitySettingFormP
           onPreviewClick={() => setPreviewDialog("squareLogo")}
         />
 
-        {/* Favicon */}
-        <ImagePickerField
-          label={t("adminSetting.form.faviconPrefix")}
-          hint={t("adminSetting.form.faviconPrefixHint")}
-          previewUrl={editor.getPreviewUrl(editor.faviconImage)}
-          onPickerClick={() => editor.faviconInputRef.current?.click()}
-          inputRef={editor.faviconInputRef}
-          onFileChange={(e) => editor.handleImageSelect("favicon", e)}
-          previewClassName="h-8 aspect-square"
-        />
-
         {/* 送信ボタン */}
         <div className="w-full max-w-[345px] mx-auto pt-4">
           <Button
