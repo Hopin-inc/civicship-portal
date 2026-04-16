@@ -79,7 +79,7 @@ export const Typical: Story = {
   },
 };
 
-/** 長い chain: 間 8 人が「もっと見る (8人)」で畳まれる。 */
+/** 長い chain: 間が「もっと見る」で畳まれる。表示人数は depth - 2（= 7人）。 */
 export const LongChain: Story = {
   args: {
     chain: buildMockChain(10, [
@@ -150,7 +150,7 @@ export const TruncatedChain: Story = {
     docs: {
       description: {
         story:
-          "chainDepth (= 19) > chain.depth (= 10) のとき、保持上限の外側にいた人数を「最初の N 人」として示す",
+          "chainDepth (= 19) > chain.depth (= 10) のとき、保持上限の外側にいた人数を「最初の 9 人」として示す。バッジは 19、もっと見るは 17 (= 19 - 2)。",
       },
     },
   },
