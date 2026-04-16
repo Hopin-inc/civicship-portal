@@ -23,7 +23,7 @@ export function VoteTopicFormEditor({
   const t = useTranslations();
   const form = useVoteTopicEditor();
   const { save, saving } = useVoteTopicSave({ communityId });
-  const { tokens, loading: tokensLoading } = useNftTokens();
+  const { tokens, loading: tokensLoading } = useNftTokens({ communityId });
   const sheets = useFormSheets();
 
   const headerConfig = useMemo(

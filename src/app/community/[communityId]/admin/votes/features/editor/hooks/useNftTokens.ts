@@ -8,16 +8,18 @@ export interface NftTokenOption {
   symbol: string | null;
 }
 
+interface UseNftTokensParams {
+  communityId: string;
+}
+
 /**
  * NFT Token list for gate/power-policy dropdowns.
- *
- * Note: `NftTokenFilterInput` does not have a communityId filter in the current
- * schema, so this returns all NftTokens. If per-community filtering becomes
- * necessary, the backend filter needs to be extended first.
+ * Filtered by `communityId` so only NftTokens directly attached to the
+ * current community appear (NftTokens with `community_id = NULL` are excluded).
  */
-export function useNftTokens() {
+export function useNftTokens({ communityId }: UseNftTokensParams) {
   const { data, loading, error } = useGetNftTokensQuery({
-    variables: { first: 100 },
+    variables: { first: 100, filter: { communityId } },
   });
 
   const tokens: NftTokenOption[] = useMemo(() => {

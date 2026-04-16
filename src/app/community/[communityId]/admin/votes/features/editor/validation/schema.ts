@@ -70,5 +70,22 @@ export const createVoteTopicSchema = (t: Translator) => {
         path: ["endsAt"],
         message: t("adminVotes.form.errors.endsAfterStart"),
       },
+    )
+    .refine(
+      (values) => {
+        // Both NFT-based: gate.nftTokenId must equal powerPolicy.nftTokenId
+        // (BE enforces this with VALIDATION_ERROR; we validate client-side for UX).
+        if (
+          values.gate.type === GqlVoteGateType.Nft &&
+          values.powerPolicy.type === GqlVotePowerPolicyType.NftCount
+        ) {
+          return values.gate.nftTokenId === values.powerPolicy.nftTokenId;
+        }
+        return true;
+      },
+      {
+        path: ["powerPolicy", "nftTokenId"],
+        message: t("adminVotes.form.errors.nftTokenMismatch"),
+      },
     );
 };
