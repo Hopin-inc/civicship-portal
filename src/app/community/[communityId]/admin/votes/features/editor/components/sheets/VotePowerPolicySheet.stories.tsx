@@ -15,6 +15,13 @@ const meta: Meta<typeof VotePowerPolicySheet> = {
     nftTokens: mockNftTokens,
     nftTokensLoading: false,
   },
+  decorators: [
+    (Story) => (
+      <div>
+        <Story />
+      </div>
+    ),
+  ],
 };
 
 export default meta;
