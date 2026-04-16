@@ -14354,33 +14354,17 @@ export const GetTransactionDetailDocument = gql`
           createdAt
           from {
             __typename
-            ... on TransactionChainUser {
-              id
-              name
-              image
-              bio
-            }
-            ... on TransactionChainCommunity {
-              id
-              name
-              image
-              bio
-            }
+            id
+            name
+            image
+            bio
           }
           to {
             __typename
-            ... on TransactionChainUser {
-              id
-              name
-              image
-              bio
-            }
-            ... on TransactionChainCommunity {
-              id
-              name
-              image
-              bio
-            }
+            id
+            name
+            image
+            bio
           }
         }
       }
