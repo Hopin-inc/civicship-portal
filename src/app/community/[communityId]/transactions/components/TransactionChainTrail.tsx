@@ -61,7 +61,7 @@ export const TransactionChainTrail = ({ chain, chainDepth }: TransactionChainTra
 
         {shouldCollapseMiddle ? (
           <ChainExpandRow
-            count={Math.max(fullDepth - 2, 0)}
+            count={middleNodes.length}
             onClick={() => setExpanded(true)}
           />
         ) : (
@@ -190,7 +190,7 @@ const ChainTruncationRow = ({ count }: { count: number }) => {
     <div className="relative flex gap-3 pb-10 timeline-item">
       <div className="relative shrink-0 timeline-avatar timeline-avatar-first w-10 h-10" />
       <div className="flex-1 min-w-0 self-center">
-        <p className="text-sm text-muted-foreground">
+        <p className="text-xs text-muted-foreground text-left">
           {t("transactions.chain.earlierParticipants", { count })}
         </p>
       </div>
