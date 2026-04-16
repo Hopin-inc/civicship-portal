@@ -75,7 +75,8 @@ export async function generateMetadata({
 
 const CommunityLayout = async ({ children, params }: CommunityLayoutProps) => {
   const { communityId } = await params;
-  const { user, lineAuthenticated, phoneAuthenticated } = await getUserServer();
+  const { user, lineAuthenticated, phoneAuthenticated, lineIdToken, lineTokenExpiresAt } =
+    await getUserServer();
 
   // Fetch community config from database
   let communityConfig: CommunityPortalConfig | null = null;
@@ -112,6 +113,8 @@ const CommunityLayout = async ({ children, params }: CommunityLayoutProps) => {
           ssrCurrentUser={user}
           ssrLineAuthenticated={lineAuthenticated}
           ssrPhoneAuthenticated={phoneAuthenticated}
+          ssrLineIdToken={lineIdToken}
+          ssrLineTokenExpiresAt={lineTokenExpiresAt}
         >
           <LiffDeepLinkHandler />
           <HeaderProvider>

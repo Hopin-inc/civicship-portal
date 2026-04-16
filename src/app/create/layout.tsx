@@ -12,7 +12,10 @@ export default async function CreateLayout({ children }: { children: ReactNode }
   const headersList = await headers();
   const communityId = headersList.get("x-community-id") ?? null;
 
-  const [communityConfig, { user, lineAuthenticated, phoneAuthenticated }] = await Promise.all([
+  const [
+    communityConfig,
+    { user, lineAuthenticated, phoneAuthenticated, lineIdToken, lineTokenExpiresAt },
+  ] = await Promise.all([
     communityId ? getCommunityConfig(communityId) : Promise.resolve(null),
     getUserServer(),
   ]);
@@ -24,6 +27,8 @@ export default async function CreateLayout({ children }: { children: ReactNode }
           ssrCurrentUser={user}
           ssrLineAuthenticated={lineAuthenticated}
           ssrPhoneAuthenticated={phoneAuthenticated}
+          ssrLineIdToken={lineIdToken}
+          ssrLineTokenExpiresAt={lineTokenExpiresAt}
         >
           {children}
           <Toaster />

@@ -12,6 +12,15 @@ export async function POST() {
     expires: new Date(0),
     path: "/",
   });
+  // Clear LINE idToken cookies set by /api/auth/exchange
+  response.cookies.set("auth_line_id_token", "", {
+    expires: new Date(0),
+    path: "/",
+  });
+  response.cookies.set("auth_line_token_expires_at", "", {
+    expires: new Date(0),
+    path: "/",
+  });
 
   return response;
 }

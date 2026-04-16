@@ -21,6 +21,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
   ssrCurrentUser,
   ssrLineAuthenticated,
   ssrPhoneAuthenticated,
+  ssrLineIdToken,
+  ssrLineTokenExpiresAt,
 }) => {
   const communityConfig = useCommunityConfig();
   const { liffService, phoneAuthService, authStateManager } = useAuthDependencies(communityConfig);
@@ -40,11 +42,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
       ssrCurrentUserId: ssrCurrentUser?.id,
       ssrLineAuthenticated,
       ssrPhoneAuthenticated,
+      hasSsrLineIdToken: !!ssrLineIdToken,
       environment: typeof window !== "undefined" ? liffService.getState() : "SSR",
     });
 
     // ✅ SSR初期状態適用
-    applySsrAuthState(ssrCurrentUser, ssrLineAuthenticated, ssrPhoneAuthenticated);
+    applySsrAuthState(
+      ssrCurrentUser,
+      ssrLineAuthenticated,
+      ssrPhoneAuthenticated,
+      ssrLineIdToken,
+      ssrLineTokenExpiresAt,
+    );
 
     // 🚀 通常の初期化
     void initAuth({
@@ -55,7 +64,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
       ssrLineAuthenticated,
       ssrPhoneAuthenticated,
     });
-  }, [authStateManager, liffService, ssrCurrentUser, ssrLineAuthenticated, ssrPhoneAuthenticated]);
+  }, [
+    authStateManager,
+    liffService,
+    ssrCurrentUser,
+    ssrLineAuthenticated,
+    ssrPhoneAuthenticated,
+    ssrLineIdToken,
+    ssrLineTokenExpiresAt,
+  ]);
 
   // 認証が完了するまでクエリの自動発火を抑制する。
   // loading/authenticating 中に発火すると Bearer トークンなしの匿名リクエストになり、

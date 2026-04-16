@@ -13,17 +13,35 @@ export async function getUserServer(): Promise<{
   user: GqlUser | null;
   lineAuthenticated: boolean;
   phoneAuthenticated: boolean;
+  lineIdToken: string | null;
+  lineTokenExpiresAt: string | null;
 }> {
   const cookieStore = await cookies();
   const hasSession = await hasServerSession();
 
   const phoneAuthenticated = cookieStore.get("phone_authenticated")?.value === "true";
 
+  // exchange で発行した LINE 由来の idToken をクライアントへ受け渡すために読み出す。
+  // クライアント側のストアへ初期値として流し込むことで、Firebase 再初期化を待たずに
+  // 認証が必要な UI（例: ウォレット送金ボタン）を即座に活性化できる。
+  const lineIdTokenCookie = cookieStore.get("auth_line_id_token")?.value ?? null;
+  const lineTokenExpiresAtCookie =
+    cookieStore.get("auth_line_token_expires_at")?.value ?? null;
+  const hasValidIdTokenCookie = Boolean(
+    lineIdTokenCookie &&
+      lineTokenExpiresAtCookie &&
+      Number(lineTokenExpiresAtCookie) > Date.now(),
+  );
+  const lineIdToken = hasValidIdTokenCookie ? lineIdTokenCookie : null;
+  const lineTokenExpiresAt = hasValidIdTokenCookie ? lineTokenExpiresAtCookie : null;
+
   if (!hasSession) {
     return {
       user: null,
       lineAuthenticated: false,
       phoneAuthenticated: false,
+      lineIdToken: null,
+      lineTokenExpiresAt: null,
     };
   }
 
@@ -40,6 +58,8 @@ export async function getUserServer(): Promise<{
       user,
       lineAuthenticated: true, // SSR時点でsessionがあればtrue扱い
       phoneAuthenticated: hasPhoneIdentity,
+      lineIdToken,
+      lineTokenExpiresAt,
     };
   } catch (error) {
     logger.warn("⚠️ Failed to fetch currentUser:", {
@@ -50,6 +70,8 @@ export async function getUserServer(): Promise<{
       user: null,
       lineAuthenticated: true,
       phoneAuthenticated,
+      lineIdToken,
+      lineTokenExpiresAt,
     };
   }
 }

@@ -134,6 +134,28 @@ export async function POST(request: NextRequest) {
       expiresAt,
     });
 
+    // Persist the LINE-exchanged idToken in HttpOnly cookies so that SSR can
+    // hydrate `lineTokens.idToken` into the auth store on the very first
+    // render after a reload. This eliminates the race window where mutations
+    // (e.g. wallet send) are disabled while client-side Firebase initialization
+    // is still in flight.
+    const idTokenMaxAge = Math.max(0, Math.floor(Number(expiresIn) || 0));
+    const isSecureCookie = process.env.NODE_ENV === "production";
+    response.cookies.set("auth_line_id_token", idToken, {
+      httpOnly: true,
+      secure: isSecureCookie,
+      sameSite: "lax",
+      path: "/",
+      maxAge: idTokenMaxAge,
+    });
+    response.cookies.set("auth_line_token_expires_at", expiresAt, {
+      httpOnly: true,
+      secure: isSecureCookie,
+      sameSite: "lax",
+      path: "/",
+      maxAge: idTokenMaxAge,
+    });
+
     // Forward session cookie from backend to client
     if (sessionRes.ok) {
       const setCookies = sessionRes.headers.getSetCookie();

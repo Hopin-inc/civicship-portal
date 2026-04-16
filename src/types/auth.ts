@@ -85,4 +85,6 @@ export interface AuthProviderProps {
   ssrCurrentUser?: GqlUser | undefined | null;
   ssrLineAuthenticated?: boolean;
   ssrPhoneAuthenticated?: boolean;
+  ssrLineIdToken?: string | null;
+  ssrLineTokenExpiresAt?: string | null;
 }
