@@ -1,9 +1,12 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AppLink } from "@/lib/navigation";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { GqlGetTransactionDetailQuery } from "@/types/graphql";
 
 type Chain = NonNullable<NonNullable<GqlGetTransactionDetailQuery["transaction"]>["chain"]>;
@@ -12,31 +15,50 @@ type ChainUser = NonNullable<Step["fromUser"] | Step["toUser"]>;
 
 interface TransactionChainTrailProps {
   chain: Chain;
+  /** 表示から除外するユーザー ID（詳細ページの from/to と重複させないため） */
+  excludeUserIds?: (string | null | undefined)[];
 }
 
+const DEFAULT_VISIBLE = 3;
+
 /**
- * トランザクション詳細画面で「このポイントが誰から誰へ渡ってきたか」を縦タイムラインで表示する。
+ * トランザクション詳細画面で「このポイントがどこから来たか」を縦タイムラインで表示する。
  *
- * steps は古い→新しい順に並んでいる想定で、
- * 先頭 step の fromUser から各 step の toUser を繋いで 1 列の連鎖として表示する。
- * 縦線は transactions 側の `.timeline-avatar` と同じスタイルを流用。
- * depth < 2 のときは何も表示しない。
+ * - chain.steps の fromUser/toUser を連結して 1 列のユーザー列を作る
+ * - 詳細ページ上部に出ている「送信者・受信者」は重複するので除外
+ * - 新しい順（直近の経由者 → 発行者）で並べる
+ * - デフォルト 3 件、残りは「もっと見る」で展開
+ * - depth < 2 / 残ノード 0 件のときは何も表示しない
  */
-export const TransactionChainTrail = ({ chain }: TransactionChainTrailProps) => {
+export const TransactionChainTrail = ({
+  chain,
+  excludeUserIds = [],
+}: TransactionChainTrailProps) => {
   const t = useTranslations();
+  const [expanded, setExpanded] = useState(false);
 
-  if (!chain || chain.depth < 2 || chain.steps.length === 0) {
-    return null;
-  }
+  const nodes = useMemo<ChainUser[]>(() => {
+    if (!chain || chain.depth < 2 || chain.steps.length === 0) return [];
 
-  const nodes: ChainUser[] = [];
-  const firstFrom = chain.steps[0]?.fromUser;
-  if (firstFrom) nodes.push(firstFrom);
-  for (const step of chain.steps) {
-    if (step.toUser) nodes.push(step.toUser);
-  }
+    // 古い順: [s1.fromUser, s1.toUser, s2.toUser, ..., sN.toUser]
+    const chronological: ChainUser[] = [];
+    const firstFrom = chain.steps[0]?.fromUser;
+    if (firstFrom) chronological.push(firstFrom);
+    for (const step of chain.steps) {
+      if (step.toUser) chronological.push(step.toUser);
+    }
 
-  if (nodes.length < 2) return null;
+    const excludeSet = new Set(excludeUserIds.filter((v): v is string => !!v));
+    const filtered = chronological.filter((u) => !excludeSet.has(u.id));
+
+    // 新しい順（直近 → 発行者）
+    return filtered.reverse();
+  }, [chain, excludeUserIds]);
+
+  if (nodes.length === 0) return null;
+
+  const visibleNodes = expanded ? nodes : nodes.slice(0, DEFAULT_VISIBLE);
+  const hiddenCount = Math.max(nodes.length - DEFAULT_VISIBLE, 0);
 
   return (
     <div className="mt-8">
@@ -49,10 +71,10 @@ export const TransactionChainTrail = ({ chain }: TransactionChainTrailProps) => 
         </span>
       </div>
 
-      <div>
-        {nodes.map((node, idx) => {
+      <Card className="p-4">
+        {visibleNodes.map((node, idx) => {
           const isFirst = idx === 0;
-          const isLast = idx === nodes.length - 1;
+          const isLast = idx === visibleNodes.length - 1;
           return (
             <div
               key={`${node.id}-${idx}`}
@@ -83,7 +105,22 @@ export const TransactionChainTrail = ({ chain }: TransactionChainTrailProps) => 
             </div>
           );
         })}
-      </div>
+
+        {!expanded && hiddenCount > 0 && (
+          <div className="flex justify-center pt-2">
+            <Button
+              variant="tertiary"
+              size="sm"
+              className="bg-white px-6"
+              onClick={() => setExpanded(true)}
+            >
+              <span className="text-label-sm font-bold">
+                {t("transactions.chain.showMore", { count: hiddenCount })}
+              </span>
+            </Button>
+          </div>
+        )}
+      </Card>
     </div>
   );
 };

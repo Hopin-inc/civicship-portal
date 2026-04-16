@@ -240,6 +240,7 @@ export type TranslationKey =
   | "transactions.action.return.to"
   | "transactions.chain.badgeLabel"
   | "transactions.chain.journey"
+  | "transactions.chain.showMore"
   | "transactions.chain.stepsSummary"
   | "transactions.date.unknown"
   | "transactions.detail.actions.addMessage"
