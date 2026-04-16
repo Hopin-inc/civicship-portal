@@ -512,6 +512,7 @@ export const GqlErrorCode = {
   UnsupportedGrantType: "UNSUPPORTED_GRANT_TYPE",
   UnsupportedTransactionReason: "UNSUPPORTED_TRANSACTION_REASON",
   ValidationError: "VALIDATION_ERROR",
+  VoteTopicNotEditable: "VOTE_TOPIC_NOT_EDITABLE",
 } as const;
 
 export type GqlErrorCode = (typeof GqlErrorCode)[keyof typeof GqlErrorCode];
@@ -962,14 +963,24 @@ export type GqlMutation = {
   voteCast: GqlVoteCastPayload;
   /**
    * 管理者: 投票テーマ・ゲート・ポリシー・選択肢を 1 トランザクションで一括作成。
-   * Gate と PowerPolicy のクロス検証（NFT トークンの一致等）は行わない。
+   * Gate.type=NFT かつ PowerPolicy.type=NFT_COUNT の場合、両者の nftTokenId は
+   * 一致していなければならない（バックエンドで検証、違反時は `VALIDATION_ERROR`）。
+   * 詳細は VoteGate 型の説明を参照。
    */
   voteTopicCreate: GqlVoteTopicCreatePayload;
   /**
-   * 管理者: 投票テーマ削除。
-   * gate / powerPolicy / options / ballots は onDelete: Cascade で自動削除される。
+   * 管理者: 投票テーマ削除。UPCOMING フェーズ（投票開始前）のみ許可。
+   * OPEN / CLOSED フェーズでは `VOTE_TOPIC_NOT_EDITABLE` エラーが返る。
+   * gate / powerPolicy / options は onDelete: Cascade で自動削除される（UPCOMING 限定なので ballots は存在しない）。
    */
   voteTopicDelete: GqlVoteTopicDeletePayload;
+  /**
+   * 管理者: 投票テーマを更新する。UPCOMING フェーズ（投票開始前）のみ許可。
+   * OPEN / CLOSED フェーズでは `VOTE_TOPIC_NOT_EDITABLE` エラーが返る。
+   * options は全量置換される（UPCOMING なので投票0件が保証されており安全）。
+   * gate / powerPolicy も同時に再設定可能。
+   */
+  voteTopicUpdate: GqlVoteTopicUpdatePayload;
 };
 
 export type GqlMutationArticleCreateArgs = {
@@ -1272,6 +1283,12 @@ export type GqlMutationVoteTopicDeleteArgs = {
   permission: GqlCheckCommunityPermissionInput;
 };
 
+export type GqlMutationVoteTopicUpdateArgs = {
+  id: Scalars["ID"]["input"];
+  input: GqlVoteTopicUpdateInput;
+  permission: GqlCheckCommunityPermissionInput;
+};
+
 /** ログインユーザーの投票資格と現状。再投票可能性の判定にも利用する。 */
 export type GqlMyVoteEligibility = {
   __typename?: "MyVoteEligibility";
@@ -1372,6 +1389,11 @@ export type GqlNftInstancesConnection = {
 export type GqlNftToken = {
   __typename?: "NftToken";
   address: Scalars["String"]["output"];
+  /**
+   * トークンを所有するコミュニティ。複数コミュニティで共用する場合や運用都合で未設定の場合は null。
+   * portal 側の「このコミュニティに属する NftToken」一覧取得で参照される。
+   */
+  community?: Maybe<GqlCommunity>;
   createdAt: Scalars["Datetime"]["output"];
   id: Scalars["ID"]["output"];
   json?: Maybe<Scalars["JSON"]["output"]>;
@@ -1379,6 +1401,38 @@ export type GqlNftToken = {
   symbol?: Maybe<Scalars["String"]["output"]>;
   type: Scalars["String"]["output"];
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+};
+
+export type GqlNftTokenEdge = GqlEdge & {
+  __typename?: "NftTokenEdge";
+  cursor: Scalars["String"]["output"];
+  node: GqlNftToken;
+};
+
+export type GqlNftTokenFilterInput = {
+  address?: InputMaybe<Array<Scalars["String"]["input"]>>;
+  and?: InputMaybe<Array<GqlNftTokenFilterInput>>;
+  /**
+   * 指定したコミュニティに直接紐付く NftToken に絞る（NftToken.community_id を直接参照）。
+   * NftToken.communityId が NULL のトークンは除外される。
+   */
+  communityId?: InputMaybe<Scalars["ID"]["input"]>;
+  not?: InputMaybe<GqlNftTokenFilterInput>;
+  or?: InputMaybe<Array<GqlNftTokenFilterInput>>;
+  type?: InputMaybe<Array<Scalars["String"]["input"]>>;
+};
+
+export type GqlNftTokenSortInput = {
+  address?: InputMaybe<GqlSortDirection>;
+  createdAt?: InputMaybe<GqlSortDirection>;
+  name?: InputMaybe<GqlSortDirection>;
+};
+
+export type GqlNftTokensConnection = {
+  __typename?: "NftTokensConnection";
+  edges: Array<GqlNftTokenEdge>;
+  pageInfo: GqlPageInfo;
+  totalCount: Scalars["Int"]["output"];
 };
 
 export type GqlNftWallet = {
@@ -1981,6 +2035,8 @@ export type GqlQuery = {
   myWallet?: Maybe<GqlWallet>;
   nftInstance?: Maybe<GqlNftInstance>;
   nftInstances: GqlNftInstancesConnection;
+  nftToken?: Maybe<GqlNftToken>;
+  nftTokens: GqlNftTokensConnection;
   opportunities: GqlOpportunitiesConnection;
   opportunity?: Maybe<GqlOpportunity>;
   opportunitySlot?: Maybe<GqlOpportunitySlot>;
@@ -2125,6 +2181,17 @@ export type GqlQueryNftInstancesArgs = {
   filter?: InputMaybe<GqlNftInstanceFilterInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   sort?: InputMaybe<GqlNftInstanceSortInput>;
+};
+
+export type GqlQueryNftTokenArgs = {
+  id: Scalars["ID"]["input"];
+};
+
+export type GqlQueryNftTokensArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  filter?: InputMaybe<GqlNftTokenFilterInput>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  sort?: InputMaybe<GqlNftTokenSortInput>;
 };
 
 export type GqlQueryOpportunitiesArgs = {
@@ -2769,23 +2836,71 @@ export type GqlTransaction = {
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
 };
 
+/**
+ * ポイントの旅（chain）の全体像。
+ * depth はチェーンの長さ（ステップ数）、steps は古い順（起点→現在）に並ぶ。
+ */
 export type GqlTransactionChain = {
   __typename?: "TransactionChain";
   depth: Scalars["Int"]["output"];
   steps: Array<GqlTransactionChainStep>;
 };
 
+/**
+ * 参加者がコミュニティ（COMMUNITY wallet の所有者）である場合の表現。
+ * id は Community.id。GRANT / ONBOARDING のような、community wallet から
+ * 発行される transaction の起点ステップで登場する。
+ */
+export type GqlTransactionChainCommunity = GqlTransactionChainParticipant & {
+  __typename?: "TransactionChainCommunity";
+  bio?: Maybe<Scalars["String"]["output"]>;
+  id: Scalars["ID"]["output"];
+  image?: Maybe<Scalars["String"]["output"]>;
+  name: Scalars["String"]["output"];
+};
+
+/**
+ * chain の 1 ステップに登場する参加者（User または Community）。
+ * 共通フィールドを束ねた interface。実体の判別は __typename で行う。
+ */
+export type GqlTransactionChainParticipant = {
+  bio?: Maybe<Scalars["String"]["output"]>;
+  id: Scalars["ID"]["output"];
+  image?: Maybe<Scalars["String"]["output"]>;
+  name: Scalars["String"]["output"];
+};
+
+/**
+ * chain の1ステップ。ある transaction（ポイントの移動 1回分）に対応する。
+ * from が送信元、to が送信先。どちらも User または Community を表す
+ * TransactionChainParticipant interface で、__typename で判別できる。
+ */
 export type GqlTransactionChainStep = {
   __typename?: "TransactionChainStep";
   createdAt: Scalars["Datetime"]["output"];
-  fromUser?: Maybe<GqlTransactionChainUser>;
+  /**
+   * 送信元の参加者。
+   * - GRANT / ONBOARDING の起点ステップでは TransactionChainCommunity（community wallet 発）
+   * - それ以外のステップは TransactionChainUser
+   * - ウォレットが削除済み（退会済みユーザー等）の場合は null
+   */
+  from?: Maybe<GqlTransactionChainParticipant>;
   id: Scalars["ID"]["output"];
   points: Scalars["Int"]["output"];
   reason: GqlTransactionReason;
-  toUser?: Maybe<GqlTransactionChainUser>;
+  /**
+   * 送信先の参加者。
+   * 現状の業務ロジックでは常に TransactionChainUser（MEMBER wallet 宛）。
+   * ウォレットが削除済みの場合は null。
+   */
+  to?: Maybe<GqlTransactionChainParticipant>;
 };
 
-export type GqlTransactionChainUser = {
+/**
+ * 参加者がユーザー（MEMBER wallet の所有者）である場合の表現。
+ * id は User.id。
+ */
+export type GqlTransactionChainUser = GqlTransactionChainParticipant & {
   __typename?: "TransactionChainUser";
   bio?: Maybe<Scalars["String"]["output"]>;
   id: Scalars["ID"]["output"];
@@ -3196,6 +3311,7 @@ export type GqlVoteBallot = {
    * （現時点の power は MyVoteEligibility.currentPower を参照）。
    */
   power: Scalars["Int"]["output"];
+  /** 再投票（upsert）時に現在時刻で更新される。初回投票時は null。 */
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
 };
 
@@ -3204,17 +3320,26 @@ export type GqlVoteCastInput = {
   topicId: Scalars["ID"]["input"];
 };
 
-export type GqlVoteCastPayload = {
-  __typename?: "VoteCastPayload";
+export type GqlVoteCastPayload = GqlVoteCastSuccess;
+
+export type GqlVoteCastSuccess = {
+  __typename?: "VoteCastSuccess";
   ballot: GqlVoteBallot;
 };
 
 /**
  * 誰が投票できるか（資格ゲート）。
- * VotePowerPolicy（何票持つか）とは**独立に設定される**。
- * スキーマレベルでのクロス検証は行わないため、Gate=NFT(tokenA) + PowerPolicy=NFT_COUNT(tokenB)
- * のような食い違いも作成可能。この場合 A のみ保有するユーザーは eligible=true / currentPower=0 になる。
- * 組み合わせの妥当性は呼び出し側（管理 UI 等）で担保すること。
+ * VotePowerPolicy（何票持つか）とは**独立に設定される**が、両方が NFT 系
+ * （Gate.type=NFT かつ PowerPolicy.type=NFT_COUNT）の場合に限り、参照する
+ * **nftTokenId は一致していなければならない**（バックエンドで検証、違反時は
+ * `VALIDATION_ERROR`）。異なる token を指定した場合、A 保有者のうち B 非保有者が
+ * eligible=true / currentPower=0 になる「投票しても効かない」状態が生じる設定ミスを防ぐため。
+ *
+ * 許容される組み合わせ:
+ * - Gate=NFT(A) + Policy=NFT_COUNT(A)  典型的
+ * - Gate=MEMBERSHIP + Policy=NFT_COUNT(A)  メンバー内で NFT ホルダーのみ重み付け（非ホルダーは power=0）
+ * - Gate=NFT(A) + Policy=FLAT  A 保有者は一律 1 票
+ * - Gate=MEMBERSHIP + Policy=FLAT  全員 1 票
  */
 export type GqlVoteGate = {
   __typename?: "VoteGate";
@@ -3250,6 +3375,10 @@ export type GqlVoteOption = {
   __typename?: "VoteOption";
   id: Scalars["ID"]["output"];
   label: Scalars["String"]["output"];
+  /**
+   * 作成時（VoteOptionInput）に指定した値がそのまま保持される。
+   * VoteTopic.options は本フィールドの昇順で返るため、UI 側で追加のソートは不要。
+   */
   orderIndex: Scalars["Int"]["output"];
   /** 票の重み合計（= Σ power）。endsAt 到達前は一般ユーザーに null（管理者は常に実値を参照可）。 */
   totalPower?: Maybe<Scalars["Int"]["output"]>;
@@ -3304,7 +3433,12 @@ export type GqlVoteTopic = {
   myBallot?: Maybe<GqlVoteBallot>;
   /** ログインユーザーの投票資格情報（未ログインは null）。 */
   myEligibility?: Maybe<GqlMyVoteEligibility>;
+  /** 投票選択肢。orderIndex 昇順で返る（UI 側でのソートは不要）。 */
   options: Array<GqlVoteOption>;
+  /**
+   * 現在フェーズ。**レスポンス時点でサーバ時刻から計算される値**であり DB カラムではない。
+   * 詳細は VoteTopicPhase の説明を参照。
+   */
   phase: GqlVoteTopicPhase;
   powerPolicy: GqlVotePowerPolicy;
   startsAt: Scalars["Datetime"]["output"];
@@ -3323,14 +3457,18 @@ export type GqlVoteTopicCreateInput = {
   title: Scalars["String"]["input"];
 };
 
-export type GqlVoteTopicCreatePayload = {
-  __typename?: "VoteTopicCreatePayload";
+export type GqlVoteTopicCreatePayload = GqlVoteTopicCreateSuccess;
+
+export type GqlVoteTopicCreateSuccess = {
+  __typename?: "VoteTopicCreateSuccess";
   voteTopic: GqlVoteTopic;
 };
 
-export type GqlVoteTopicDeletePayload = {
-  __typename?: "VoteTopicDeletePayload";
-  id: Scalars["ID"]["output"];
+export type GqlVoteTopicDeletePayload = GqlVoteTopicDeleteSuccess;
+
+export type GqlVoteTopicDeleteSuccess = {
+  __typename?: "VoteTopicDeleteSuccess";
+  voteTopicId: Scalars["ID"]["output"];
 };
 
 export type GqlVoteTopicEdge = {
@@ -3352,6 +3490,28 @@ export const GqlVoteTopicPhase = {
 } as const;
 
 export type GqlVoteTopicPhase = (typeof GqlVoteTopicPhase)[keyof typeof GqlVoteTopicPhase];
+/**
+ * voteTopicUpdate 用の入力。**既存の全フィールドを置き換える**（部分更新は未サポート）。
+ * options は delete → create で全量置換される。gate / powerPolicy も同様に再生成されるため、
+ * 既存の id 値は保持されない点に注意。UPCOMING フェーズ限定で呼ばれるため、投票は存在しない前提。
+ */
+export type GqlVoteTopicUpdateInput = {
+  description?: InputMaybe<Scalars["String"]["input"]>;
+  endsAt: Scalars["Datetime"]["input"];
+  gate: GqlVoteGateInput;
+  options: Array<GqlVoteOptionInput>;
+  powerPolicy: GqlVotePowerPolicyInput;
+  startsAt: Scalars["Datetime"]["input"];
+  title: Scalars["String"]["input"];
+};
+
+export type GqlVoteTopicUpdatePayload = GqlVoteTopicUpdateSuccess;
+
+export type GqlVoteTopicUpdateSuccess = {
+  __typename?: "VoteTopicUpdateSuccess";
+  voteTopic: GqlVoteTopic;
+};
+
 export type GqlVoteTopicsConnection = {
   __typename?: "VoteTopicsConnection";
   edges: Array<GqlVoteTopicEdge>;
@@ -7106,20 +7266,38 @@ export type GqlGetTransactionDetailQuery = {
         points: number;
         reason: GqlTransactionReason;
         createdAt: Date;
-        fromUser?: {
-          __typename?: "TransactionChainUser";
-          id: string;
-          name: string;
-          image?: string | null;
-          bio?: string | null;
-        } | null;
-        toUser?: {
-          __typename?: "TransactionChainUser";
-          id: string;
-          name: string;
-          image?: string | null;
-          bio?: string | null;
-        } | null;
+        from?:
+          | {
+              __typename: "TransactionChainCommunity";
+              id: string;
+              name: string;
+              image?: string | null;
+              bio?: string | null;
+            }
+          | {
+              __typename: "TransactionChainUser";
+              id: string;
+              name: string;
+              image?: string | null;
+              bio?: string | null;
+            }
+          | null;
+        to?:
+          | {
+              __typename: "TransactionChainCommunity";
+              id: string;
+              name: string;
+              image?: string | null;
+              bio?: string | null;
+            }
+          | {
+              __typename: "TransactionChainUser";
+              id: string;
+              name: string;
+              image?: string | null;
+              bio?: string | null;
+            }
+          | null;
       }>;
     } | null;
     fromWallet?: {
@@ -14174,17 +14352,35 @@ export const GetTransactionDetailDocument = gql`
           points
           reason
           createdAt
-          fromUser {
-            id
-            name
-            image
-            bio
+          from {
+            __typename
+            ... on TransactionChainUser {
+              id
+              name
+              image
+              bio
+            }
+            ... on TransactionChainCommunity {
+              id
+              name
+              image
+              bio
+            }
           }
-          toUser {
-            id
-            name
-            image
-            bio
+          to {
+            __typename
+            ... on TransactionChainUser {
+              id
+              name
+              image
+              bio
+            }
+            ... on TransactionChainCommunity {
+              id
+              name
+              image
+              bio
+            }
           }
         }
       }
