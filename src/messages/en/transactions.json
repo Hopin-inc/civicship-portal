@@ -76,7 +76,7 @@
   "transactions.chain.badgeLabel": "Point journey: {count} steps",
   "transactions.chain.journey": "Point's journey",
   "transactions.chain.stepsSummary": "{count} steps",
-  "transactions.chain.showMore": "Show more ({count})",
+  "transactions.chain.showMore": "Show {count} more",
   "transactions.detail.actions.edit": "Edit",
   "transactions.detail.actions.addMessage": "Add message",
   "transactions.detail.editSheet.title": "Edit Message",

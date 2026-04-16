@@ -72,7 +72,7 @@
   "transactions.chain.badgeLabel": "ポイントの経路 {count} ステップ",
   "transactions.chain.journey": "このポイントの道のり",
   "transactions.chain.stepsSummary": "{count} ステップ",
-  "transactions.chain.showMore": "もっと見る ({count})",
+  "transactions.chain.showMore": "もっと見る ({count}人)",
   "transactions.detail.actions.edit": "編集",
   "transactions.detail.actions.addMessage": "メッセージを追加",
   "transactions.detail.editSheet.title": "メッセージを編集",
