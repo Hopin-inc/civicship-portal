@@ -69,7 +69,7 @@
   "transactions.detail.verification.result": "この交換内容は、後から変更されていません",
   "transactions.detail.verification.resultDescription": "ブロックチェーン上の記録と照合し、内容が書き換えられていないことを確認しています。",
   "transactions.detail.verification.openExplorer": "ブロックチェーンで確認",
-  "transactions.chain.badgeLabel": "ポイントの経路に {count} 人が関わっています",
+  "transactions.chain.badgeLabel": "ポイントの経路 {count} ステップ",
   "transactions.chain.earlierParticipants": "最初の {count} 人",
   "transactions.chain.journey": "このポイントの道のり",
   "transactions.chain.showMore": "もっと見る ({count}人)",

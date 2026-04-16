@@ -73,7 +73,7 @@
   "transactions.detail.verification.result": "This exchange content has not been modified",
   "transactions.detail.verification.resultDescription": "The content has been verified by cross-checking it with records stored on the blockchain.",
   "transactions.detail.verification.openExplorer": "View on blockchain",
-  "transactions.chain.badgeLabel": "Point journey: {count} people involved",
+  "transactions.chain.badgeLabel": "Point journey: {count} steps",
   "transactions.chain.earlierParticipants": "First {count} people",
   "transactions.chain.journey": "Point's journey",
   "transactions.chain.showMore": "Show {count} more",

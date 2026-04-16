@@ -61,7 +61,7 @@ export const TransactionChainTrail = ({ chain, chainDepth }: TransactionChainTra
 
         {shouldCollapseMiddle ? (
           <ChainExpandRow
-            count={middleNodes.length}
+            count={Math.max(fullDepth - 2, 0)}
             onClick={() => setExpanded(true)}
           />
         ) : (
