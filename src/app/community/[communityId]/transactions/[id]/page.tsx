@@ -164,14 +164,8 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
         )}
       </div>
 
-      {/* ── ポイントの経路（chain） ── */}
-      <TransactionChainTrail
-        chain={transaction.chain}
-        excludeUserIds={[
-          transaction.fromWallet?.user?.id,
-          transaction.toWallet?.user?.id,
-        ]}
-      />
+      {/* ── ポイントの道のり（chain） ── */}
+      <TransactionChainTrail chain={transaction.chain} />
 
       {/* ── 検証セクション ── */}
       <VerificationSection transactionId={id} />

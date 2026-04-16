@@ -15,91 +15,69 @@ type ChainUser = NonNullable<Step["fromUser"] | Step["toUser"]>;
 
 interface TransactionChainTrailProps {
   chain?: Chain | null;
-  /** 表示から除外するユーザー ID（詳細ページの from/to と重複させないため） */
-  excludeUserIds?: (string | null | undefined)[];
 }
 
-const DEFAULT_VISIBLE = 3;
-
 /**
- * トランザクション詳細画面で「このポイントがどこから来たか」を縦タイムラインで表示する。
+ * トランザクション詳細画面で「このポイントの道のり」を縦タイムラインで表示する。
  *
- * - chain.steps の fromUser/toUser を連結して 1 列のユーザー列を作る
- * - 詳細ページ上部に出ている「送信者・受信者」は重複するので除外
- * - 新しい順（直近の経由者 → 発行者）で並べる
- * - デフォルト 3 件、残りは「もっと見る」で展開
- * - chain が null / depth < 2 / 残ノード 0 件のときは何も表示しない
+ * 表示ルール:
+ * - 2 人以下（直接送金）: 非表示（詳細ヘッダーで完結するため冗長）
+ * - 3 人（発行者・経由 1 人・最終着地点）: 3 人そのまま縦に並べる
+ * - 4 人以上: 先頭と末尾を表示し、間の経由者は「もっと見る (N人)」で展開
  */
-export const TransactionChainTrail = ({
-  chain,
-  excludeUserIds = [],
-}: TransactionChainTrailProps) => {
-  const t = useTranslations();
+export const TransactionChainTrail = ({ chain }: TransactionChainTrailProps) => {
   const [expanded, setExpanded] = useState(false);
+  const t = useTranslations();
 
-  // chain は最大 10 ステップに制限されているため memoize せず素直に計算。
-  const nodes = buildTrailNodes(chain, excludeUserIds);
+  const nodes = buildTrailNodes(chain);
+  if (nodes.length < 3) return null;
 
-  if (!chain || nodes.length === 0) return null;
-
-  const visibleNodes = expanded ? nodes : nodes.slice(0, DEFAULT_VISIBLE);
-  const hiddenCount = Math.max(nodes.length - DEFAULT_VISIBLE, 0);
+  const firstNode = nodes[0];
+  const lastNode = nodes[nodes.length - 1];
+  const middleNodes = nodes.slice(1, -1);
+  const shouldCollapseMiddle = middleNodes.length >= 2 && !expanded;
 
   return (
     <div className="mt-8">
-      <div className="mb-3 flex items-baseline justify-between">
+      <div className="mb-3">
         <span className="text-label-sm text-muted-foreground">
           {t("transactions.chain.journey")}
-        </span>
-        <span className="text-label-xs text-muted-foreground">
-          {t("transactions.chain.stepsSummary", { count: chain.depth })}
         </span>
       </div>
 
       <Card className="p-4">
-        {visibleNodes.map((node, idx) => (
-          <ChainNodeItem
-            key={`${node.id}-${idx}`}
-            node={node}
-            isFirst={idx === 0}
-            isLast={idx === visibleNodes.length - 1}
-          />
-        ))}
+        <ChainNodeItem node={firstNode} isFirst isLast={false} />
 
-        {!expanded && hiddenCount > 0 && (
-          <div className="flex justify-center pt-2">
-            <Button
-              variant="tertiary"
-              size="sm"
-              className="bg-white px-6"
-              onClick={() => setExpanded(true)}
-            >
-              <span className="text-label-sm font-bold">
-                {t("transactions.chain.showMore", { count: hiddenCount })}
-              </span>
-            </Button>
-          </div>
+        {shouldCollapseMiddle ? (
+          <ChainExpandRow
+            count={middleNodes.length}
+            onClick={() => setExpanded(true)}
+          />
+        ) : (
+          middleNodes.map((node, idx) => (
+            <ChainNodeItem
+              key={`${node.id}-mid-${idx}`}
+              node={node}
+              isFirst={false}
+              isLast={false}
+            />
+          ))
         )}
+
+        <ChainNodeItem node={lastNode} isFirst={false} isLast />
       </Card>
     </div>
   );
 };
 
-/** chain.steps からユーザーの縦列を組み立てる（除外 + 新しい順）。 */
-const buildTrailNodes = (
-  chain: Chain | null | undefined,
-  excludeUserIds: (string | null | undefined)[],
-): ChainUser[] => {
+/** chain.steps からユーザーの時系列列を作る（古い → 新しい）。 */
+const buildTrailNodes = (chain: Chain | null | undefined): ChainUser[] => {
   if (!chain || chain.depth < 2 || chain.steps.length === 0) return [];
 
-  // 古い順: [s1.fromUser, s1.toUser, s2.toUser, ..., sN.toUser]
-  const chronological: ChainUser[] = [
+  return [
     chain.steps[0]?.fromUser,
     ...chain.steps.map((step) => step.toUser),
   ].filter((u): u is ChainUser => !!u);
-
-  const excludeSet = new Set(excludeUserIds.filter((v): v is string => !!v));
-  return chronological.filter((u) => !excludeSet.has(u.id)).reverse();
 };
 
 interface ChainNodeItemProps {
@@ -110,7 +88,14 @@ interface ChainNodeItemProps {
 
 /** 縦タイムライン 1 行ぶん（アバター + 名前 + bio）。rail は `.timeline-avatar` に任せる。 */
 const ChainNodeItem = ({ node, isFirst, isLast }: ChainNodeItemProps) => (
-  <div className={cn("relative flex gap-3 timeline-item", !isLast && "pb-10")}>
+  <AppLink
+    href={`/users/${node.id}`}
+    className={cn(
+      "relative flex gap-3 timeline-item",
+      !isLast && "pb-10",
+      "rounded-md -mx-1 px-1 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50",
+    )}
+  >
     <div
       className={cn(
         "relative shrink-0 timeline-avatar",
@@ -123,13 +108,41 @@ const ChainNodeItem = ({ node, isFirst, isLast }: ChainNodeItemProps) => (
         <AvatarFallback>{node.name?.[0]?.toUpperCase() ?? "U"}</AvatarFallback>
       </Avatar>
     </div>
-    <AppLink href={`/users/${node.id}`} className="flex-1 min-w-0 pt-0.5">
+    <div className={cn("flex-1 min-w-0", node.bio ? "pt-0.5" : "self-center")}>
       <p className="text-sm font-semibold truncate">{node.name}</p>
       {node.bio && (
         <p className="mt-0.5 text-body-xs text-muted-foreground line-clamp-2 leading-snug">
           {node.bio}
         </p>
       )}
-    </AppLink>
-  </div>
+    </div>
+  </AppLink>
 );
+
+interface ChainExpandRowProps {
+  count: number;
+  onClick: () => void;
+}
+
+/** 畳まれた中間ノード用のプレースホルダ行。rail だけ継続させてボタンを置く。 */
+const ChainExpandRow = ({ count, onClick }: ChainExpandRowProps) => {
+  const t = useTranslations();
+  return (
+    <div className="relative flex gap-3 pb-10 timeline-item">
+      {/* アバター位置は空。rail（.timeline-avatar の疑似要素）だけ通す */}
+      <div className="relative shrink-0 timeline-avatar w-10 h-10" />
+      <div className="flex-1 min-w-0 pt-0.5">
+        <Button
+          variant="tertiary"
+          size="sm"
+          className="bg-white px-6"
+          onClick={onClick}
+        >
+          <span className="text-label-sm font-bold">
+            {t("transactions.chain.showMore", { count })}
+          </span>
+        </Button>
+      </div>
+    </div>
+  );
+};
