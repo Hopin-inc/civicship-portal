@@ -4,12 +4,12 @@ import { GqlGetTransactionDetailQuery, GqlTransactionReason } from "@/types/grap
 
 type Chain = NonNullable<NonNullable<GqlGetTransactionDetailQuery["transaction"]>["chain"]>;
 type Step = Chain["steps"][number];
-type ChainUser = NonNullable<Step["fromUser"] | Step["toUser"]>;
+type ChainParticipant = NonNullable<Step["from"] | Step["to"]>;
 
 const makeUser = (
   n: number,
   opts: { name?: string; bio?: string | null; image?: string | null } = {},
-): ChainUser => ({
+): ChainParticipant => ({
   __typename: "TransactionChainUser",
   id: `user-${n}`,
   name: opts.name ?? `ユーザー${n}`,
@@ -17,14 +17,18 @@ const makeUser = (
   bio: opts.bio === undefined ? `コミュニティで活動しているユーザー${n}の自己紹介。` : opts.bio,
 });
 
-const makeStep = (n: number, from: ChainUser | null, to: ChainUser | null): Step => ({
+const makeStep = (
+  n: number,
+  from: ChainParticipant | null,
+  to: ChainParticipant | null,
+): Step => ({
   __typename: "TransactionChainStep",
   id: `step-${n}`,
   points: 100,
   reason: GqlTransactionReason.Donation,
   createdAt: new Date(`2026-04-${String(n + 1).padStart(2, "0")}T09:00:00Z`),
-  fromUser: from,
-  toUser: to,
+  from,
+  to,
 });
 
 /**

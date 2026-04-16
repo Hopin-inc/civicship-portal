@@ -11,7 +11,7 @@ import { GqlGetTransactionDetailQuery } from "@/types/graphql";
 
 type Chain = NonNullable<NonNullable<GqlGetTransactionDetailQuery["transaction"]>["chain"]>;
 type Step = Chain["steps"][number];
-type ChainUser = NonNullable<Step["fromUser"] | Step["toUser"]>;
+type ChainParticipant = NonNullable<Step["from"] | Step["to"]>;
 
 interface TransactionChainTrailProps {
   chain?: Chain | null;
@@ -71,20 +71,20 @@ export const TransactionChainTrail = ({ chain }: TransactionChainTrailProps) => 
 };
 
 /**
- * chain.steps からユーザーの時系列列を作る（古い → 新しい）。
- * null のユーザー（退会済み等）は位置を保つため null のまま残し、描画側でプレースホルダ表示する。
+ * chain.steps から参加者（User / Community）の時系列列を作る（古い → 新しい）。
+ * null の参加者（wallet 削除済み等）は位置を保つため null のまま残し、描画側でプレースホルダ表示する。
  */
-const buildTrailNodes = (chain: Chain | null | undefined): (ChainUser | null)[] => {
+const buildTrailNodes = (chain: Chain | null | undefined): (ChainParticipant | null)[] => {
   if (!chain || chain.depth < 2 || chain.steps.length === 0) return [];
 
   return [
-    chain.steps[0]?.fromUser ?? null,
-    ...chain.steps.map((step) => step.toUser ?? null),
+    chain.steps[0]?.from ?? null,
+    ...chain.steps.map((step) => step.to ?? null),
   ];
 };
 
 interface ChainNodeItemProps {
-  node: ChainUser | null;
+  node: ChainParticipant | null;
   isFirst: boolean;
   isLast: boolean;
 }
@@ -122,15 +122,8 @@ const ChainNodeItem = ({ node, isFirst, isLast }: ChainNodeItemProps) => {
     );
   }
 
-  return (
-    <AppLink
-      href={`/users/${node.id}`}
-      className={cn(
-        "relative flex gap-3 timeline-item",
-        !isLast && "pb-10",
-        "rounded-md -mx-1 px-1 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50",
-      )}
-    >
+  const inner = (
+    <>
       <div className={railClasses}>
         <Avatar className="h-10 w-10 shrink-0 border">
           <AvatarImage src={node.image ?? ""} alt={node.name} />
@@ -145,6 +138,33 @@ const ChainNodeItem = ({ node, isFirst, isLast }: ChainNodeItemProps) => {
           </p>
         )}
       </div>
+    </>
+  );
+
+  if (node.__typename === "TransactionChainCommunity") {
+    return (
+      <div
+        className={cn(
+          "relative flex gap-3 timeline-item",
+          !isLast && "pb-10",
+          "-mx-1 px-1",
+        )}
+      >
+        {inner}
+      </div>
+    );
+  }
+
+  return (
+    <AppLink
+      href={`/users/${node.id}`}
+      className={cn(
+        "relative flex gap-3 timeline-item",
+        !isLast && "pb-10",
+        "rounded-md -mx-1 px-1 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50",
+      )}
+    >
+      {inner}
     </AppLink>
   );
 };
