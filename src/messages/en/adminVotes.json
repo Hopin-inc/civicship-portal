@@ -45,6 +45,7 @@
   "adminVotes.form.errors.minTwoOptions": "Please provide at least 2 options",
   "adminVotes.form.errors.optionLabelRequired": "Please enter an option label",
   "adminVotes.form.errors.nftTokenRequired": "Please select an NFT",
+  "adminVotes.form.errors.nftTokenMismatch": "The NFT used for vote weight must match the NFT used for eligibility",
   "adminVotes.toast.createSuccess": "Vote created successfully",
   "adminVotes.toast.createError": "Failed to create vote"
 }

@@ -45,6 +45,7 @@
   "adminVotes.form.errors.minTwoOptions": "選択肢を 2 件以上入力してください",
   "adminVotes.form.errors.optionLabelRequired": "選択肢のラベルを入力してください",
   "adminVotes.form.errors.nftTokenRequired": "NFT を選択してください",
+  "adminVotes.form.errors.nftTokenMismatch": "票の重みに使う NFT は、投票資格に使う NFT と同じものにしてください",
   "adminVotes.toast.createSuccess": "投票を作成しました",
   "adminVotes.toast.createError": "投票の作成に失敗しました"
 }
