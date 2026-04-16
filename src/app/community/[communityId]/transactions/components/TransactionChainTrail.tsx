@@ -6,12 +6,14 @@ import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AppLink } from "@/lib/navigation";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { ChainDepthBadge } from "@/shared/transactions/components/timeline/ChainDepthBadge";
 import { GqlGetTransactionDetailQuery } from "@/types/graphql";
 
 type Chain = NonNullable<NonNullable<GqlGetTransactionDetailQuery["transaction"]>["chain"]>;
 type Step = Chain["steps"][number];
 type ChainParticipant = NonNullable<Step["from"] | Step["to"]>;
+
+const CHAIN_MAX_DEPTH = 10;
 
 interface TransactionChainTrailProps {
   chain?: Chain | null;
@@ -24,6 +26,7 @@ interface TransactionChainTrailProps {
  * - 2 人以下（直接送金）: 非表示（詳細ヘッダーで完結するため冗長）
  * - 3 人（発行者・経由 1 人・最終着地点）: 3 人そのまま縦に並べる
  * - 4 人以上: 先頭と末尾を表示し、間の経由者は「もっと見る (N人)」で展開
+ * - depth が上限値（10）に達している場合: 先頭ノードの上に「⋮」を表示し、さらに続きがある可能性を示唆
  */
 export const TransactionChainTrail = ({ chain }: TransactionChainTrailProps) => {
   const [expanded, setExpanded] = useState(false);
@@ -36,17 +39,20 @@ export const TransactionChainTrail = ({ chain }: TransactionChainTrailProps) => 
   const lastNode = nodes[nodes.length - 1];
   const middleNodes = nodes.slice(1, -1);
   const shouldCollapseMiddle = middleNodes.length >= 2 && !expanded;
+  const isTruncated = (chain?.depth ?? 0) >= CHAIN_MAX_DEPTH;
 
   return (
     <div className="mt-8">
-      <div className="mb-3">
+      <div className="mb-3 flex items-center gap-2">
         <span className="text-label-sm text-muted-foreground">
           {t("transactions.chain.journey")}
         </span>
+        <ChainDepthBadge depth={chain?.depth} />
       </div>
 
-      <Card className="p-4">
-        <ChainNodeItem node={firstNode} isFirst isLast={false} />
+      <div>
+        {isTruncated && <ChainTruncationRow />}
+        <ChainNodeItem node={firstNode} isFirst={!isTruncated} isLast={false} />
 
         {shouldCollapseMiddle ? (
           <ChainExpandRow
@@ -65,7 +71,7 @@ export const TransactionChainTrail = ({ chain }: TransactionChainTrailProps) => 
         )}
 
         <ChainNodeItem node={lastNode} isFirst={false} isLast />
-      </Card>
+      </div>
     </div>
   );
 };
@@ -166,6 +172,23 @@ const ChainNodeItem = ({ node, isFirst, isLast }: ChainNodeItemProps) => {
     >
       {inner}
     </AppLink>
+  );
+};
+
+/**
+ * depth が上限値に達したときに先頭ノードの上に出す「⋮」プレースホルダ。
+ * 連鎖の続きがある可能性をやわらかく示唆する（欠損ではない）。
+ */
+const ChainTruncationRow = () => {
+  return (
+    <div className="relative flex gap-3 pb-10 timeline-item">
+      <div className="relative shrink-0 timeline-avatar timeline-avatar-first w-10 h-10 flex items-center justify-center">
+        <span className="text-muted-foreground text-xl leading-none" aria-hidden>
+          ⋮
+        </span>
+      </div>
+      <div className="flex-1 min-w-0" />
+    </div>
   );
 };
 
