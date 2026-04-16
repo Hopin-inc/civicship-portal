@@ -71,8 +71,8 @@ export const TransactionChainTrail = ({ chain }: TransactionChainTrailProps) => 
 };
 
 /**
- * chain.steps からユーザーの時系列列を作る（古い → 新しい）。
- * null のユーザー（退会済み等）は位置を保つため null のまま残し、描画側でプレースホルダ表示する。
+ * chain.steps から参加者（User / Community）の時系列列を作る（古い → 新しい）。
+ * null の参加者（wallet 削除済み等）は位置を保つため null のまま残し、描画側でプレースホルダ表示する。
  */
 const buildTrailNodes = (chain: Chain | null | undefined): (ChainParticipant | null)[] => {
   if (!chain || chain.depth < 2 || chain.steps.length === 0) return [];
