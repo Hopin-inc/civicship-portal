@@ -105,9 +105,7 @@ export const TransactionCard = ({
       actionLabel={
         <div className="flex items-center gap-1.5 min-w-0">
           <TransactionActionLabel data={actionLabelData} />
-          {typeof transaction.chainDepth === "number" && (
-            <ChainDepthBadge depth={transaction.chainDepth} />
-          )}
+          <ChainDepthBadge depth={transaction.chainDepth} />
         </div>
       }
       messageCard={messageCard}
