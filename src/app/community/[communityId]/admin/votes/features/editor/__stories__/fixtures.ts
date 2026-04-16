@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { GqlVoteGateType, GqlVotePowerPolicyType } from "@/types/graphql";
+import { GqlRole, GqlVoteGateType, GqlVotePowerPolicyType } from "@/types/graphql";
 import { NftTokenOption } from "../hooks/useNftTokens";
 import { VoteTopicFormValues } from "../types/form";
 
@@ -42,7 +42,7 @@ export function makeDefaultFormValues(
     options: [{ label: "" }, { label: "" }],
     gate: {
       type: GqlVoteGateType.Membership,
-      requiredRole: null,
+      requiredRole: GqlRole.Member,
       nftTokenId: null,
     },
     powerPolicy: {

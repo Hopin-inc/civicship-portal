@@ -3,7 +3,7 @@ import { useForm, UseFormReturn } from "react-hook-form";
 import { useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
 import dayjs from "dayjs";
-import { GqlVoteGateType, GqlVotePowerPolicyType } from "@/types/graphql";
+import { GqlRole, GqlVoteGateType, GqlVotePowerPolicyType } from "@/types/graphql";
 import { createVoteTopicSchema } from "../validation/schema";
 import { VoteTopicFormValues } from "../types/form";
 
@@ -21,7 +21,7 @@ export function useVoteTopicEditor(): UseFormReturn<VoteTopicFormValues> {
       options: [{ label: "" }, { label: "" }],
       gate: {
         type: GqlVoteGateType.Membership,
-        requiredRole: null,
+        requiredRole: GqlRole.Member,
         nftTokenId: null,
       },
       powerPolicy: {

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { fn } from "storybook/test";
-import { GqlVotePowerPolicyType } from "@/types/graphql";
+import { GqlVoteGateType, GqlVotePowerPolicyType } from "@/types/graphql";
 import { VotePowerPolicySheet } from "./VotePowerPolicySheet";
 import { withVoteForm } from "../../__stories__/withForm";
 import { mockNftTokens } from "../../__stories__/fixtures";
@@ -72,6 +72,28 @@ export const NftCountEmpty: Story = {
         powerPolicy: {
           type: GqlVotePowerPolicyType.NftCount,
           nftTokenId: "",
+        },
+      },
+    }),
+  ],
+};
+
+/**
+ * gate が NFT 型のとき、powerPolicy の NFT 選択は disabled になり、
+ * gate で選んだトークン名が表示される（自動同期モード）
+ */
+export const NftCountSyncedFromGate: Story = {
+  decorators: [
+    withVoteForm({
+      defaultValues: {
+        gate: {
+          type: GqlVoteGateType.Nft,
+          requiredRole: null,
+          nftTokenId: mockNftTokens[0].id,
+        },
+        powerPolicy: {
+          type: GqlVotePowerPolicyType.NftCount,
+          nftTokenId: mockNftTokens[0].id,
         },
       },
     }),

@@ -20,14 +20,14 @@ const meta: Meta<typeof VoteGateSheet> = {
 export default meta;
 type Story = StoryObj<typeof VoteGateSheet>;
 
-/** 初期状態: MEMBERSHIP / 指定なし */
+/** 初期状態: MEMBERSHIP / MEMBER 以上 */
 export const MembershipOpen: Story = {
   decorators: [
     withVoteForm({
       defaultValues: {
         gate: {
           type: GqlVoteGateType.Membership,
-          requiredRole: null,
+          requiredRole: GqlRole.Member,
           nftTokenId: null,
         },
       },

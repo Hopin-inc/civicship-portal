@@ -5,7 +5,7 @@ export type VoteOptionInput = { label: string };
 export type VoteGateInput =
   | {
       type: typeof GqlVoteGateType.Membership;
-      requiredRole: GqlRole | null;
+      requiredRole: GqlRole;
       nftTokenId: null;
     }
   | {

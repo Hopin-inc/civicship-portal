@@ -40,11 +40,9 @@ export function GateSection({ onOpenSheet, nftTokens }: GateSectionProps) {
 
   const summary = (() => {
     if (gate.type === GqlVoteGateType.Membership) {
-      return gate.requiredRole
-        ? t("adminVotes.form.gate.summary.membershipWithRole", {
-            role: roleLabel(gate.requiredRole, t),
-          })
-        : t("adminVotes.form.gate.summary.membership");
+      return t("adminVotes.form.gate.summary.membershipWithRole", {
+        role: roleLabel(gate.requiredRole, t),
+      });
     }
     const token = nftTokens.find((nt) => nt.id === gate.nftTokenId);
     if (token) {

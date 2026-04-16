@@ -25,14 +25,29 @@ const meta: Meta<typeof GateSection> = {
 export default meta;
 type Story = StoryObj<typeof GateSection>;
 
-/** MEMBERSHIP: ロール指定なし（MEMBER 以上） */
-export const Membership: Story = {
+/** MEMBERSHIP: MEMBER 以上（デフォルト） */
+export const MembershipMember: Story = {
   decorators: [
     withVoteForm({
       defaultValues: {
         gate: {
           type: GqlVoteGateType.Membership,
-          requiredRole: null,
+          requiredRole: GqlRole.Member,
+          nftTokenId: null,
+        },
+      },
+    }),
+  ],
+};
+
+/** MEMBERSHIP: MANAGER 以上 */
+export const MembershipManager: Story = {
+  decorators: [
+    withVoteForm({
+      defaultValues: {
+        gate: {
+          type: GqlVoteGateType.Membership,
+          requiredRole: GqlRole.Manager,
           nftTokenId: null,
         },
       },
@@ -41,7 +56,7 @@ export const Membership: Story = {
 };
 
 /** MEMBERSHIP: OWNER 以上 */
-export const MembershipWithOwnerRole: Story = {
+export const MembershipOwner: Story = {
   decorators: [
     withVoteForm({
       defaultValues: {

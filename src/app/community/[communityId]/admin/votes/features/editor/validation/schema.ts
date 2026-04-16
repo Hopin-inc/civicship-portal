@@ -5,7 +5,7 @@ import { GqlRole, GqlVoteGateType, GqlVotePowerPolicyType } from "@/types/graphq
 type Translator = (key: string) => string;
 
 export const createVoteTopicSchema = (t: Translator) => {
-  const roleEnum = z.nativeEnum(GqlRole).nullable();
+  const roleEnum = z.nativeEnum(GqlRole);
   const nftTokenIdRequired = z
     .string({ required_error: t("adminVotes.form.errors.nftTokenRequired") })
     .trim()

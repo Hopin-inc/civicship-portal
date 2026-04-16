@@ -40,7 +40,7 @@ export function useVoteTopicSave({ communityId }: UseVoteTopicSaveParams) {
                 }
               : {
                   type: GqlVoteGateType.Membership,
-                  requiredRole: values.gate.requiredRole ?? undefined,
+                  requiredRole: values.gate.requiredRole,
                 },
           powerPolicy:
             values.powerPolicy.type === GqlVotePowerPolicyType.NftCount
