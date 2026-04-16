@@ -122,20 +122,8 @@ const ChainNodeItem = ({ node, isFirst, isLast }: ChainNodeItemProps) => {
     );
   }
 
-  const href =
-    node.__typename === "TransactionChainCommunity"
-      ? `/community/${node.id}`
-      : `/users/${node.id}`;
-
-  return (
-    <AppLink
-      href={href}
-      className={cn(
-        "relative flex gap-3 timeline-item",
-        !isLast && "pb-10",
-        "rounded-md -mx-1 px-1 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50",
-      )}
-    >
+  const inner = (
+    <>
       <div className={railClasses}>
         <Avatar className="h-10 w-10 shrink-0 border">
           <AvatarImage src={node.image ?? ""} alt={node.name} />
@@ -150,6 +138,33 @@ const ChainNodeItem = ({ node, isFirst, isLast }: ChainNodeItemProps) => {
           </p>
         )}
       </div>
+    </>
+  );
+
+  if (node.__typename === "TransactionChainCommunity") {
+    return (
+      <div
+        className={cn(
+          "relative flex gap-3 timeline-item",
+          !isLast && "pb-10",
+          "-mx-1 px-1",
+        )}
+      >
+        {inner}
+      </div>
+    );
+  }
+
+  return (
+    <AppLink
+      href={`/users/${node.id}`}
+      className={cn(
+        "relative flex gap-3 timeline-item",
+        !isLast && "pb-10",
+        "rounded-md -mx-1 px-1 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50",
+      )}
+    >
+      {inner}
     </AppLink>
   );
 };
