@@ -2836,23 +2836,71 @@ export type GqlTransaction = {
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
 };
 
+/**
+ * ポイントの旅（chain）の全体像。
+ * depth はチェーンの長さ（ステップ数）、steps は古い順（起点→現在）に並ぶ。
+ */
 export type GqlTransactionChain = {
   __typename?: "TransactionChain";
   depth: Scalars["Int"]["output"];
   steps: Array<GqlTransactionChainStep>;
 };
 
+/**
+ * 参加者がコミュニティ（COMMUNITY wallet の所有者）である場合の表現。
+ * id は Community.id。GRANT / ONBOARDING のような、community wallet から
+ * 発行される transaction の起点ステップで登場する。
+ */
+export type GqlTransactionChainCommunity = GqlTransactionChainParticipant & {
+  __typename?: "TransactionChainCommunity";
+  bio?: Maybe<Scalars["String"]["output"]>;
+  id: Scalars["ID"]["output"];
+  image?: Maybe<Scalars["String"]["output"]>;
+  name: Scalars["String"]["output"];
+};
+
+/**
+ * chain の 1 ステップに登場する参加者（User または Community）。
+ * 共通フィールドを束ねた interface。実体の判別は __typename で行う。
+ */
+export type GqlTransactionChainParticipant = {
+  bio?: Maybe<Scalars["String"]["output"]>;
+  id: Scalars["ID"]["output"];
+  image?: Maybe<Scalars["String"]["output"]>;
+  name: Scalars["String"]["output"];
+};
+
+/**
+ * chain の1ステップ。ある transaction（ポイントの移動 1回分）に対応する。
+ * from が送信元、to が送信先。どちらも User または Community を表す
+ * TransactionChainParticipant interface で、__typename で判別できる。
+ */
 export type GqlTransactionChainStep = {
   __typename?: "TransactionChainStep";
   createdAt: Scalars["Datetime"]["output"];
-  fromUser?: Maybe<GqlTransactionChainUser>;
+  /**
+   * 送信元の参加者。
+   * - GRANT / ONBOARDING の起点ステップでは TransactionChainCommunity（community wallet 発）
+   * - それ以外のステップは TransactionChainUser
+   * - ウォレットが削除済み（退会済みユーザー等）の場合は null
+   */
+  from?: Maybe<GqlTransactionChainParticipant>;
   id: Scalars["ID"]["output"];
   points: Scalars["Int"]["output"];
   reason: GqlTransactionReason;
-  toUser?: Maybe<GqlTransactionChainUser>;
+  /**
+   * 送信先の参加者。
+   * 現状の業務ロジックでは常に TransactionChainUser（MEMBER wallet 宛）。
+   * ウォレットが削除済みの場合は null。
+   */
+  to?: Maybe<GqlTransactionChainParticipant>;
 };
 
-export type GqlTransactionChainUser = {
+/**
+ * 参加者がユーザー（MEMBER wallet の所有者）である場合の表現。
+ * id は User.id。
+ */
+export type GqlTransactionChainUser = GqlTransactionChainParticipant & {
   __typename?: "TransactionChainUser";
   bio?: Maybe<Scalars["String"]["output"]>;
   id: Scalars["ID"]["output"];
@@ -4051,34 +4099,6 @@ export type GqlGetMembershipListQuery = {
   };
 };
 
-export type GqlGetNftTokensQueryVariables = Exact<{
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  cursor?: InputMaybe<Scalars["String"]["input"]>;
-  filter?: InputMaybe<GqlNftTokenFilterInput>;
-  sort?: InputMaybe<GqlNftTokenSortInput>;
-}>;
-
-export type GqlGetNftTokensQuery = {
-  __typename?: "Query";
-  nftTokens: {
-    __typename?: "NftTokensConnection";
-    totalCount: number;
-    edges: Array<{
-      __typename?: "NftTokenEdge";
-      cursor: string;
-      node: {
-        __typename?: "NftToken";
-        id: string;
-        address: string;
-        name?: string | null;
-        symbol?: string | null;
-        type: string;
-      };
-    }>;
-    pageInfo: { __typename?: "PageInfo"; hasNextPage: boolean; endCursor?: string | null };
-  };
-};
-
 export type GqlGetNftInstancesQueryVariables = Exact<{
   first?: InputMaybe<Scalars["Int"]["input"]>;
   cursor?: InputMaybe<Scalars["String"]["input"]>;
@@ -4567,6 +4587,7 @@ export type GqlGetUserWalletQuery = {
         images?: Array<string> | null;
         fromPointChange?: number | null;
         toPointChange?: number | null;
+        chainDepth?: number | null;
         createdAt?: Date | null;
         fromWallet?: {
           __typename?: "Wallet";
@@ -4657,6 +4678,7 @@ export type GqlGetWalletsWithTransactionQuery = {
           images?: Array<string> | null;
           fromPointChange?: number | null;
           toPointChange?: number | null;
+          chainDepth?: number | null;
           createdAt?: Date | null;
           fromWallet?: {
             __typename?: "Wallet";
@@ -7035,6 +7057,7 @@ export type GqlTransactionFieldsFragment = {
   images?: Array<string> | null;
   fromPointChange?: number | null;
   toPointChange?: number | null;
+  chainDepth?: number | null;
   createdAt?: Date | null;
 };
 
@@ -7055,6 +7078,7 @@ export type GqlPointIssueMutation = {
       images?: Array<string> | null;
       fromPointChange?: number | null;
       toPointChange?: number | null;
+      chainDepth?: number | null;
       createdAt?: Date | null;
     };
   } | null;
@@ -7077,6 +7101,7 @@ export type GqlPointGrantMutation = {
       images?: Array<string> | null;
       fromPointChange?: number | null;
       toPointChange?: number | null;
+      chainDepth?: number | null;
       createdAt?: Date | null;
     };
   } | null;
@@ -7099,6 +7124,7 @@ export type GqlPointDonateMutation = {
       images?: Array<string> | null;
       fromPointChange?: number | null;
       toPointChange?: number | null;
+      chainDepth?: number | null;
       createdAt?: Date | null;
     };
   } | null;
@@ -7155,6 +7181,7 @@ export type GqlGetTransactionsQuery = {
         images?: Array<string> | null;
         fromPointChange?: number | null;
         toPointChange?: number | null;
+        chainDepth?: number | null;
         createdAt?: Date | null;
         fromWallet?: {
           __typename?: "Wallet";
@@ -7228,7 +7255,51 @@ export type GqlGetTransactionDetailQuery = {
     images?: Array<string> | null;
     fromPointChange?: number | null;
     toPointChange?: number | null;
+    chainDepth?: number | null;
     createdAt?: Date | null;
+    chain?: {
+      __typename?: "TransactionChain";
+      depth: number;
+      steps: Array<{
+        __typename?: "TransactionChainStep";
+        id: string;
+        points: number;
+        reason: GqlTransactionReason;
+        createdAt: Date;
+        from?:
+          | {
+              __typename: "TransactionChainCommunity";
+              id: string;
+              name: string;
+              image?: string | null;
+              bio?: string | null;
+            }
+          | {
+              __typename: "TransactionChainUser";
+              id: string;
+              name: string;
+              image?: string | null;
+              bio?: string | null;
+            }
+          | null;
+        to?:
+          | {
+              __typename: "TransactionChainCommunity";
+              id: string;
+              name: string;
+              image?: string | null;
+              bio?: string | null;
+            }
+          | {
+              __typename: "TransactionChainUser";
+              id: string;
+              name: string;
+              image?: string | null;
+              bio?: string | null;
+            }
+          | null;
+      }>;
+    } | null;
     fromWallet?: {
       __typename?: "Wallet";
       id: string;
@@ -7270,69 +7341,6 @@ export type GqlVerifyTransactionsQuery = {
     rootHash: string;
     label: number;
   }> | null;
-};
-
-export type GqlVoteTopicFieldsFragment = {
-  __typename?: "VoteTopic";
-  id: string;
-  title: string;
-  description?: string | null;
-  startsAt: Date;
-  endsAt: Date;
-  phase: GqlVoteTopicPhase;
-  createdAt: Date;
-  updatedAt?: Date | null;
-  options: Array<{ __typename?: "VoteOption"; id: string; label: string; orderIndex: number }>;
-  gate: {
-    __typename?: "VoteGate";
-    id: string;
-    type: GqlVoteGateType;
-    requiredRole?: GqlRole | null;
-    nftToken?: { __typename?: "NftToken"; id: string; name?: string | null } | null;
-  };
-  powerPolicy: {
-    __typename?: "VotePowerPolicy";
-    id: string;
-    type: GqlVotePowerPolicyType;
-    nftToken?: { __typename?: "NftToken"; id: string; name?: string | null } | null;
-  };
-};
-
-export type GqlCreateVoteTopicMutationVariables = Exact<{
-  input: GqlVoteTopicCreateInput;
-  permission: GqlCheckCommunityPermissionInput;
-}>;
-
-export type GqlCreateVoteTopicMutation = {
-  __typename?: "Mutation";
-  voteTopicCreate: {
-    __typename?: "VoteTopicCreateSuccess";
-    voteTopic: {
-      __typename?: "VoteTopic";
-      id: string;
-      title: string;
-      description?: string | null;
-      startsAt: Date;
-      endsAt: Date;
-      phase: GqlVoteTopicPhase;
-      createdAt: Date;
-      updatedAt?: Date | null;
-      options: Array<{ __typename?: "VoteOption"; id: string; label: string; orderIndex: number }>;
-      gate: {
-        __typename?: "VoteGate";
-        id: string;
-        type: GqlVoteGateType;
-        requiredRole?: GqlRole | null;
-        nftToken?: { __typename?: "NftToken"; id: string; name?: string | null } | null;
-      };
-      powerPolicy: {
-        __typename?: "VotePowerPolicy";
-        id: string;
-        type: GqlVotePowerPolicyType;
-        nftToken?: { __typename?: "NftToken"; id: string; name?: string | null } | null;
-      };
-    };
-  };
 };
 
 export const CommunityFieldsFragmentDoc = gql`
@@ -7551,41 +7559,8 @@ export const TransactionFieldsFragmentDoc = gql`
     images
     fromPointChange
     toPointChange
+    chainDepth
     createdAt
-  }
-`;
-export const VoteTopicFieldsFragmentDoc = gql`
-  fragment VoteTopicFields on VoteTopic {
-    id
-    title
-    description
-    startsAt
-    endsAt
-    phase
-    createdAt
-    updatedAt
-    options {
-      id
-      label
-      orderIndex
-    }
-    gate {
-      id
-      type
-      requiredRole
-      nftToken {
-        id
-        name
-      }
-    }
-    powerPolicy {
-      id
-      type
-      nftToken {
-        id
-        name
-      }
-    }
   }
 `;
 export const GetStatesDocument = gql`
@@ -9125,89 +9100,6 @@ export type GetMembershipListSuspenseQueryHookResult = ReturnType<
 export type GetMembershipListQueryResult = Apollo.QueryResult<
   GqlGetMembershipListQuery,
   GqlGetMembershipListQueryVariables
->;
-export const GetNftTokensDocument = gql`
-  query GetNftTokens(
-    $first: Int
-    $cursor: String
-    $filter: NftTokenFilterInput
-    $sort: NftTokenSortInput
-  ) {
-    nftTokens(first: $first, cursor: $cursor, filter: $filter, sort: $sort) {
-      edges {
-        cursor
-        node {
-          id
-          address
-          name
-          symbol
-          type
-        }
-      }
-      pageInfo {
-        hasNextPage
-        endCursor
-      }
-      totalCount
-    }
-  }
-`;
-
-/**
- * __useGetNftTokensQuery__
- *
- * To run a query within a React component, call `useGetNftTokensQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetNftTokensQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetNftTokensQuery({
- *   variables: {
- *      first: // value for 'first'
- *      cursor: // value for 'cursor'
- *      filter: // value for 'filter'
- *      sort: // value for 'sort'
- *   },
- * });
- */
-export function useGetNftTokensQuery(
-  baseOptions?: Apollo.QueryHookOptions<GqlGetNftTokensQuery, GqlGetNftTokensQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GqlGetNftTokensQuery, GqlGetNftTokensQueryVariables>(
-    GetNftTokensDocument,
-    options,
-  );
-}
-export function useGetNftTokensLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<GqlGetNftTokensQuery, GqlGetNftTokensQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GqlGetNftTokensQuery, GqlGetNftTokensQueryVariables>(
-    GetNftTokensDocument,
-    options,
-  );
-}
-export function useGetNftTokensSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<GqlGetNftTokensQuery, GqlGetNftTokensQueryVariables>,
-) {
-  const options =
-    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<GqlGetNftTokensQuery, GqlGetNftTokensQueryVariables>(
-    GetNftTokensDocument,
-    options,
-  );
-}
-export type GetNftTokensQueryHookResult = ReturnType<typeof useGetNftTokensQuery>;
-export type GetNftTokensLazyQueryHookResult = ReturnType<typeof useGetNftTokensLazyQuery>;
-export type GetNftTokensSuspenseQueryHookResult = ReturnType<typeof useGetNftTokensSuspenseQuery>;
-export type GetNftTokensQueryResult = Apollo.QueryResult<
-  GqlGetNftTokensQuery,
-  GqlGetNftTokensQueryVariables
 >;
 export const GetNftInstancesDocument = gql`
   query GetNftInstances($first: Int, $cursor: String, $filter: NftInstanceFilterInput) {
@@ -14453,6 +14345,29 @@ export const GetTransactionDetailDocument = gql`
   query GetTransactionDetail($id: ID!) {
     transaction(id: $id) {
       ...TransactionFields
+      chain {
+        depth
+        steps {
+          id
+          points
+          reason
+          createdAt
+          from {
+            __typename
+            id
+            name
+            image
+            bio
+          }
+          to {
+            __typename
+            id
+            name
+            image
+            bio
+          }
+        }
+      }
       fromWallet {
         id
         type
@@ -14631,60 +14546,4 @@ export type VerifyTransactionsSuspenseQueryHookResult = ReturnType<
 export type VerifyTransactionsQueryResult = Apollo.QueryResult<
   GqlVerifyTransactionsQuery,
   GqlVerifyTransactionsQueryVariables
->;
-export const CreateVoteTopicDocument = gql`
-  mutation CreateVoteTopic(
-    $input: VoteTopicCreateInput!
-    $permission: CheckCommunityPermissionInput!
-  ) {
-    voteTopicCreate(input: $input, permission: $permission) {
-      ... on VoteTopicCreateSuccess {
-        voteTopic {
-          ...VoteTopicFields
-        }
-      }
-    }
-  }
-  ${VoteTopicFieldsFragmentDoc}
-`;
-export type GqlCreateVoteTopicMutationFn = Apollo.MutationFunction<
-  GqlCreateVoteTopicMutation,
-  GqlCreateVoteTopicMutationVariables
->;
-
-/**
- * __useCreateVoteTopicMutation__
- *
- * To run a mutation, you first call `useCreateVoteTopicMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateVoteTopicMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [createVoteTopicMutation, { data, loading, error }] = useCreateVoteTopicMutation({
- *   variables: {
- *      input: // value for 'input'
- *      permission: // value for 'permission'
- *   },
- * });
- */
-export function useCreateVoteTopicMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    GqlCreateVoteTopicMutation,
-    GqlCreateVoteTopicMutationVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<GqlCreateVoteTopicMutation, GqlCreateVoteTopicMutationVariables>(
-    CreateVoteTopicDocument,
-    options,
-  );
-}
-export type CreateVoteTopicMutationHookResult = ReturnType<typeof useCreateVoteTopicMutation>;
-export type CreateVoteTopicMutationResult = Apollo.MutationResult<GqlCreateVoteTopicMutation>;
-export type CreateVoteTopicMutationOptions = Apollo.BaseMutationOptions<
-  GqlCreateVoteTopicMutation,
-  GqlCreateVoteTopicMutationVariables
 >;

@@ -23227,7 +23227,7 @@
       {
         "kind": "OBJECT",
         "name": "TransactionChain",
-        "description": null,
+        "description": "ポイントの旅（chain）の全体像。\ndepth はチェーンの長さ（ステップ数）、steps は古い順（起点→現在）に並ぶ。",
         "isOneOf": null,
         "fields": [
           {
@@ -23278,33 +23278,17 @@
       },
       {
         "kind": "OBJECT",
-        "name": "TransactionChainStep",
-        "description": null,
+        "name": "TransactionChainCommunity",
+        "description": "参加者がコミュニティ（COMMUNITY wallet の所有者）である場合の表現。\nid は Community.id。GRANT / ONBOARDING のような、community wallet から\n発行される transaction の起点ステップで登場する。",
         "isOneOf": null,
         "fields": [
           {
-            "name": "createdAt",
+            "name": "bio",
             "description": null,
             "args": [],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Datetime",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "fromUser",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "OBJECT",
-              "name": "TransactionChainUser",
+              "kind": "SCALAR",
+              "name": "String",
               "ofType": null
             },
             "isDeprecated": false,
@@ -23327,7 +23311,19 @@
             "deprecationReason": null
           },
           {
-            "name": "points",
+            "name": "image",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "name",
             "description": null,
             "args": [],
             "type": {
@@ -23335,51 +23331,29 @@
               "name": null,
               "ofType": {
                 "kind": "SCALAR",
-                "name": "Int",
+                "name": "String",
                 "ofType": null
               }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "reason",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "ENUM",
-                "name": "TransactionReason",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "toUser",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "OBJECT",
-              "name": "TransactionChainUser",
-              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
           }
         ],
         "inputFields": null,
-        "interfaces": [],
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "TransactionChainParticipant",
+            "ofType": null
+          }
+        ],
         "enumValues": null,
         "possibleTypes": null
       },
       {
-        "kind": "OBJECT",
-        "name": "TransactionChainUser",
-        "description": null,
+        "kind": "INTERFACE",
+        "name": "TransactionChainParticipant",
+        "description": "chain の 1 ステップに登場する参加者（User または Community）。\n共通フィールドを束ねた interface。実体の判別は __typename で行う。",
         "isOneOf": null,
         "fields": [
           {
@@ -23441,6 +23415,191 @@
         ],
         "inputFields": null,
         "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": [
+          {
+            "kind": "OBJECT",
+            "name": "TransactionChainCommunity",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "TransactionChainUser",
+            "ofType": null
+          }
+        ]
+      },
+      {
+        "kind": "OBJECT",
+        "name": "TransactionChainStep",
+        "description": "chain の1ステップ。ある transaction（ポイントの移動 1回分）に対応する。\nfrom が送信元、to が送信先。どちらも User または Community を表す\nTransactionChainParticipant interface で、__typename で判別できる。",
+        "isOneOf": null,
+        "fields": [
+          {
+            "name": "createdAt",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Datetime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "from",
+            "description": "送信元の参加者。\n- GRANT / ONBOARDING の起点ステップでは TransactionChainCommunity（community wallet 発）\n- それ以外のステップは TransactionChainUser\n- ウォレットが削除済み（退会済みユーザー等）の場合は null",
+            "args": [],
+            "type": {
+              "kind": "INTERFACE",
+              "name": "TransactionChainParticipant",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "id",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "points",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "reason",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "TransactionReason",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "to",
+            "description": "送信先の参加者。\n現状の業務ロジックでは常に TransactionChainUser（MEMBER wallet 宛）。\nウォレットが削除済みの場合は null。",
+            "args": [],
+            "type": {
+              "kind": "INTERFACE",
+              "name": "TransactionChainParticipant",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "TransactionChainUser",
+        "description": "参加者がユーザー（MEMBER wallet の所有者）である場合の表現。\nid は User.id。",
+        "isOneOf": null,
+        "fields": [
+          {
+            "name": "bio",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "id",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "image",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "name",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "TransactionChainParticipant",
+            "ofType": null
+          }
+        ],
         "enumValues": null,
         "possibleTypes": null
       },

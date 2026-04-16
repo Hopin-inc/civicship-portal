@@ -291,7 +291,7 @@ export type TranslationKey =
   | "transactions.chain.badgeLabel"
   | "transactions.chain.journey"
   | "transactions.chain.showMore"
-  | "transactions.chain.stepsSummary"
+  | "transactions.chain.unknownUser"
   | "transactions.date.unknown"
   | "transactions.detail.actions.addMessage"
   | "transactions.detail.actions.edit"

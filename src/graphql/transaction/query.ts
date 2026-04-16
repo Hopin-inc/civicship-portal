@@ -81,13 +81,15 @@ export const GET_TRANSACTION_DETAIL = gql`
           points
           reason
           createdAt
-          fromUser {
+          from {
+            __typename
             id
             name
             image
             bio
           }
-          toUser {
+          to {
+            __typename
             id
             name
             image
