@@ -27,6 +27,7 @@ export const GET_TRANSACTIONS_SERVER_QUERY = `
           images
           fromPointChange
           toPointChange
+          chainDepth
           createdAt
           fromWallet {
             id
