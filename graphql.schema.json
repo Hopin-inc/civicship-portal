@@ -10202,7 +10202,7 @@
           },
           {
             "name": "voteCast",
-            "description": null,
+            "description": "ユーザー: 投票実行。\n同一 topicId への再投票は **upsert で上書き** される（投票履歴は残らない）。\n投票の取消（withdraw）は現時点で未サポート。\neligibility と power は呼び出しごとに再チェックされ、NFT_COUNT の場合は呼び出し時点の保有数が新しい power として記録される。",
             "args": [
               {
                 "name": "input",
@@ -10235,7 +10235,7 @@
           },
           {
             "name": "voteTopicCreate",
-            "description": null,
+            "description": "管理者: 投票テーマ・ゲート・ポリシー・選択肢を 1 トランザクションで一括作成。\nGate と PowerPolicy のクロス検証（NFT トークンの一致等）は行わない。",
             "args": [
               {
                 "name": "input",
@@ -10284,7 +10284,7 @@
           },
           {
             "name": "voteTopicDelete",
-            "description": null,
+            "description": "管理者: 投票テーマ削除。\ngate / powerPolicy / options / ballots は onDelete: Cascade で自動削除される。",
             "args": [
               {
                 "name": "id",
@@ -10340,12 +10340,12 @@
       {
         "kind": "OBJECT",
         "name": "MyVoteEligibility",
-        "description": null,
+        "description": "ログインユーザーの投票資格と現状。再投票可能性の判定にも利用する。",
         "isOneOf": null,
         "fields": [
           {
             "name": "currentPower",
-            "description": null,
+            "description": "**リクエスト時点**で計算される power。\nVoteBallot.power（投票時スナップショット）とは別物で、NFT_COUNT ポリシー下では乖離しうる。",
             "args": [],
             "type": {
               "kind": "SCALAR",
@@ -10357,7 +10357,7 @@
           },
           {
             "name": "eligible",
-            "description": null,
+            "description": "投票可能か。**投票済みでも再投票可能なら true** を返す\n（期間内 & ゲート通過なら常に true。投票済みフラグは myBallot の有無で判定）。",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -10373,7 +10373,7 @@
           },
           {
             "name": "myBallot",
-            "description": null,
+            "description": "ログインユーザーの投票（VoteTopic.myBallot と同じ値）。",
             "args": [],
             "type": {
               "kind": "OBJECT",
@@ -10385,7 +10385,7 @@
           },
           {
             "name": "reason",
-            "description": null,
+            "description": "eligible=false 時の理由コード。次のいずれか:\nGATE_NOT_CONFIGURED / GATE_NFT_TOKEN_NOT_CONFIGURED / REQUIRED_NFT_NOT_FOUND /\nNOT_A_MEMBER / INSUFFICIENT_ROLE / UNKNOWN_GATE_TYPE",
             "args": [],
             "type": {
               "kind": "SCALAR",
@@ -17283,7 +17283,7 @@
           },
           {
             "name": "myVoteEligibility",
-            "description": null,
+            "description": "ログインユーザーの投票資格確認。\n投票画面（単一トピックにフォーカス）で利用する想定。\n一覧画面では各ノードの VoteTopic.myEligibility を使う方が効率的。",
             "args": [
               {
                 "name": "topicId",
@@ -19048,7 +19048,7 @@
           },
           {
             "name": "voteTopic",
-            "description": null,
+            "description": "投票テーマ詳細（myBallot / myEligibility はフィールドリゾルバー経由で解決）。",
             "args": [
               {
                 "name": "id",
@@ -19077,7 +19077,7 @@
           },
           {
             "name": "voteTopics",
-            "description": null,
+            "description": "コミュニティの投票テーマ一覧（カーソルページネーション）。\n各ノードの myBallot / myEligibility は DataLoader 経由で解決され、N+1 は発生しない。",
             "args": [
               {
                 "name": "communityId",
@@ -26545,7 +26545,7 @@
       {
         "kind": "OBJECT",
         "name": "VoteBallot",
-        "description": null,
+        "description": "個々の投票レコード。同一 (userId, topicId) に対し常に 1 レコード。\n再投票は upsert で上書きされるため**投票履歴は保持されない**。\n投票の取消（withdraw）は現時点で未サポート。",
         "isOneOf": null,
         "fields": [
           {
@@ -26598,7 +26598,7 @@
           },
           {
             "name": "power",
-            "description": null,
+            "description": "投票時点の power **スナップショット**。\nNFT_COUNT ポリシーの場合、投票後に NFT 保有数が変化しても本フィールドは変わらない\n（現時点の power は MyVoteEligibility.currentPower を参照）。",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -26705,7 +26705,7 @@
       {
         "kind": "OBJECT",
         "name": "VoteGate",
-        "description": null,
+        "description": "誰が投票できるか（資格ゲート）。\nVotePowerPolicy（何票持つか）とは**独立に設定される**。\nスキーマレベルでのクロス検証は行わないため、Gate=NFT(tokenA) + PowerPolicy=NFT_COUNT(tokenB)\nのような食い違いも作成可能。この場合 A のみ保有するユーザーは eligible=true / currentPower=0 になる。\n組み合わせの妥当性は呼び出し側（管理 UI 等）で担保すること。",
         "isOneOf": null,
         "fields": [
           {
@@ -26726,7 +26726,7 @@
           },
           {
             "name": "nftToken",
-            "description": null,
+            "description": "type=NFT のときの参照 NftToken",
             "args": [],
             "type": {
               "kind": "OBJECT",
@@ -26738,7 +26738,7 @@
           },
           {
             "name": "requiredRole",
-            "description": null,
+            "description": "type=MEMBERSHIP のときに要求する最低ロール（未指定時は MEMBER 以上）",
             "args": [],
             "type": {
               "kind": "ENUM",
@@ -26779,7 +26779,7 @@
         "inputFields": [
           {
             "name": "nftTokenId",
-            "description": null,
+            "description": "type=NFT のとき必須。MEMBERSHIP のときは無視される。",
             "type": {
               "kind": "SCALAR",
               "name": "ID",
@@ -26791,7 +26791,7 @@
           },
           {
             "name": "requiredRole",
-            "description": null,
+            "description": "type=MEMBERSHIP のときに任意指定（未指定時は MEMBER 以上で可）。NFT のときは無視される。",
             "type": {
               "kind": "ENUM",
               "name": "Role",
@@ -26849,7 +26849,7 @@
       {
         "kind": "OBJECT",
         "name": "VoteOption",
-        "description": null,
+        "description": "投票選択肢。\nvoteCount / totalPower は投票・再投票時にトランザクション内で直接更新される**非正規化カラム**で、\n集計コストを O(1) に抑える。PowerPolicy=FLAT のとき voteCount == totalPower、\nNFT_COUNT では乖離する。一般的には勝敗判定に totalPower、参加者数表示に voteCount を使う。",
         "isOneOf": null,
         "fields": [
           {
@@ -26902,7 +26902,7 @@
           },
           {
             "name": "totalPower",
-            "description": null,
+            "description": "票の重み合計（= Σ power）。endsAt 到達前は一般ユーザーに null（管理者は常に実値を参照可）。",
             "args": [],
             "type": {
               "kind": "SCALAR",
@@ -26914,7 +26914,7 @@
           },
           {
             "name": "voteCount",
-            "description": null,
+            "description": "投票した**人数**。endsAt 到達前は一般ユーザーに null（管理者は常に実値を参照可）。",
             "args": [],
             "type": {
               "kind": "SCALAR",
@@ -26955,7 +26955,7 @@
           },
           {
             "name": "orderIndex",
-            "description": null,
+            "description": "0 以上の整数。オプション間で重複不可。",
             "type": {
               "kind": "NON_NULL",
               "name": null,
@@ -26977,7 +26977,7 @@
       {
         "kind": "OBJECT",
         "name": "VotePowerPolicy",
-        "description": null,
+        "description": "投票の重み（1 人が何票持つか）を決めるポリシー。\nVoteGate（投票可能か）とは独立に設定される。",
         "isOneOf": null,
         "fields": [
           {
@@ -26998,7 +26998,7 @@
           },
           {
             "name": "nftToken",
-            "description": null,
+            "description": "type=NFT_COUNT のときに参照する NftToken（保有数を power とする）",
             "args": [],
             "type": {
               "kind": "OBJECT",
@@ -27039,7 +27039,7 @@
         "inputFields": [
           {
             "name": "nftTokenId",
-            "description": null,
+            "description": "type=NFT_COUNT のとき必須。FLAT のときは無視される。",
             "type": {
               "kind": "SCALAR",
               "name": "ID",
@@ -27194,7 +27194,7 @@
           },
           {
             "name": "myBallot",
-            "description": null,
+            "description": "ログインユーザーの投票（未ログイン・未投票は null）。\nMyVoteEligibility.myBallot と同じ値を返すため、一覧画面ではこちらを利用することを推奨\n（投票画面のように資格情報も必要な場合は myEligibility.myBallot を使う）。",
             "args": [],
             "type": {
               "kind": "OBJECT",
@@ -27206,7 +27206,7 @@
           },
           {
             "name": "myEligibility",
-            "description": null,
+            "description": "ログインユーザーの投票資格情報（未ログインは null）。",
             "args": [],
             "type": {
               "kind": "OBJECT",
@@ -27569,7 +27569,7 @@
       {
         "kind": "ENUM",
         "name": "VoteTopicPhase",
-        "description": null,
+        "description": "投票テーマの現在フェーズ。\nstartsAt / endsAt と現在時刻から**レスポンス時点で**計算される値で、DB カラムではない。\n長時間開いたままの画面（カウントダウン等）ではクライアント側で古くなるため、\n精密な期間判定には startsAt / endsAt を直接比較すること。一覧表示などでは phase を利用して構わない。",
         "isOneOf": null,
         "fields": null,
         "inputFields": null,
