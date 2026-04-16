@@ -8,6 +8,7 @@ export const TRANSACTION_FRAGMENT = gql`
     images
     fromPointChange
     toPointChange
+    chainDepth
 
     createdAt
   }
