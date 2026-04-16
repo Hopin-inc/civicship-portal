@@ -1,5 +1,6 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useGetNftTokensQuery } from "@/types/graphql";
+import { logger } from "@/lib/logging";
 
 export interface NftTokenOption {
   id: string;
@@ -21,6 +22,15 @@ export function useNftTokens({ communityId }: UseNftTokensParams) {
   const { data, loading, error } = useGetNftTokensQuery({
     variables: { first: 100, filter: { communityId } },
   });
+
+  useEffect(() => {
+    if (!error) return;
+    logger.warn("Failed to load NFT tokens", {
+      error: error instanceof Error ? error.message : String(error),
+      communityId,
+      component: "useNftTokens",
+    });
+  }, [error, communityId]);
 
   const tokens: NftTokenOption[] = useMemo(() => {
     return (

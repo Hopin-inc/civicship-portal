@@ -20,6 +20,7 @@ export function OptionsSection() {
   });
 
   const canRemove = fields.length > 2;
+  const canAdd = fields.length < 20;
   const rootError = errors.options?.root?.message ?? errors.options?.message;
 
   return (
@@ -72,6 +73,7 @@ export function OptionsSection() {
         variant="tertiary"
         size="sm"
         className="w-full"
+        disabled={!canAdd}
         onClick={() => append({ label: "" })}
       >
         {t("adminVotes.form.options.addButton")}

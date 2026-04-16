@@ -42,6 +42,8 @@
   "adminVotes.form.errors.endsAtRequired": "終了日時を入力してください",
   "adminVotes.form.errors.endsAfterStart": "終了日時は開始日時より後に設定してください",
   "adminVotes.form.errors.minTwoOptions": "選択肢を 2 件以上入力してください",
+  "adminVotes.form.errors.maxOptions": "選択肢は 20 件までです",
+  "adminVotes.form.errors.descriptionMaxLength": "説明は 2000 文字以内で入力してください",
   "adminVotes.form.errors.optionLabelRequired": "選択肢のラベルを入力してください",
   "adminVotes.form.errors.nftTokenRequired": "NFT を選択してください",
   "adminVotes.form.errors.nftTokenMismatch": "票の重みに使う NFT は、投票資格に使う NFT と同じものにしてください",

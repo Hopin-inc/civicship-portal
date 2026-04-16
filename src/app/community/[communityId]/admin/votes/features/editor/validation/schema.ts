@@ -41,7 +41,7 @@ export const createVoteTopicSchema = (t: Translator) => {
         .string({ required_error: t("adminVotes.form.errors.titleRequired") })
         .trim()
         .min(1, t("adminVotes.form.errors.titleRequired")),
-      description: z.string(),
+      description: z.string().max(2000, t("adminVotes.form.errors.descriptionMaxLength")),
       startsAt: z
         .string({ required_error: t("adminVotes.form.errors.startsAtRequired") })
         .min(1, t("adminVotes.form.errors.startsAtRequired")),
@@ -57,7 +57,8 @@ export const createVoteTopicSchema = (t: Translator) => {
               .min(1, t("adminVotes.form.errors.optionLabelRequired")),
           }),
         )
-        .min(2, t("adminVotes.form.errors.minTwoOptions")),
+        .min(2, t("adminVotes.form.errors.minTwoOptions"))
+        .max(20, t("adminVotes.form.errors.maxOptions")),
       gate: gateSchema,
       powerPolicy: powerPolicySchema,
     })

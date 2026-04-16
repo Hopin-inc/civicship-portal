@@ -42,6 +42,8 @@
   "adminVotes.form.errors.endsAtRequired": "Please enter an end date and time",
   "adminVotes.form.errors.endsAfterStart": "End time must be after start time",
   "adminVotes.form.errors.minTwoOptions": "Please provide at least 2 options",
+  "adminVotes.form.errors.maxOptions": "A vote can have at most 20 options",
+  "adminVotes.form.errors.descriptionMaxLength": "Description must be 2000 characters or fewer",
   "adminVotes.form.errors.optionLabelRequired": "Please enter an option label",
   "adminVotes.form.errors.nftTokenRequired": "Please select an NFT",
   "adminVotes.form.errors.nftTokenMismatch": "The NFT used for vote weight must match the NFT used for eligibility",
