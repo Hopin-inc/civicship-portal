@@ -102,7 +102,10 @@ const ChainNodeItem = ({ node, isFirst, isLast }: ChainNodeItemProps) => (
         <AvatarFallback>{node.name?.[0]?.toUpperCase() ?? "U"}</AvatarFallback>
       </Avatar>
     </div>
-    <AppLink href={`/users/${node.id}`} className="flex-1 min-w-0 pt-0.5">
+    <AppLink
+      href={`/users/${node.id}`}
+      className={cn("flex-1 min-w-0", node.bio ? "pt-0.5" : "self-center")}
+    >
       <p className="text-sm font-semibold truncate">{node.name}</p>
       {node.bio && (
         <p className="mt-0.5 text-body-xs text-muted-foreground line-clamp-2 leading-snug">
