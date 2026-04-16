@@ -81,17 +81,35 @@ export const GET_TRANSACTION_DETAIL = gql`
           points
           reason
           createdAt
-          fromUser {
-            id
-            name
-            image
-            bio
+          from {
+            __typename
+            ... on TransactionChainUser {
+              id
+              name
+              image
+              bio
+            }
+            ... on TransactionChainCommunity {
+              id
+              name
+              image
+              bio
+            }
           }
-          toUser {
-            id
-            name
-            image
-            bio
+          to {
+            __typename
+            ... on TransactionChainUser {
+              id
+              name
+              image
+              bio
+            }
+            ... on TransactionChainCommunity {
+              id
+              name
+              image
+              bio
+            }
           }
         }
       }
