@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -37,10 +37,8 @@ export const TransactionChainTrail = ({
   const t = useTranslations();
   const [expanded, setExpanded] = useState(false);
 
-  const nodes = useMemo(
-    () => buildTrailNodes(chain, excludeUserIds),
-    [chain, excludeUserIds],
-  );
+  // chain は最大 10 ステップに制限されているため memoize せず素直に計算。
+  const nodes = buildTrailNodes(chain, excludeUserIds);
 
   if (!chain || nodes.length === 0) return null;
 
