@@ -150,7 +150,7 @@ export function GateSection({ nftTokens, nftTokensLoading }: GateSectionProps) {
                   </p>
                 ) : (
                   <Select
-                    value={gate.nftTokenId}
+                    value={gate.nftTokenId || undefined}
                     onValueChange={(v) => setNft(v)}
                     disabled={nftTokensLoading || nftTokens.length === 0}
                   >
