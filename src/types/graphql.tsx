@@ -953,6 +953,9 @@ export type GqlMutation = {
   utilityDelete?: Maybe<GqlUtilityDeletePayload>;
   utilitySetPublishStatus?: Maybe<GqlUtilitySetPublishStatusPayload>;
   utilityUpdateInfo?: Maybe<GqlUtilityUpdateInfoPayload>;
+  voteCast: GqlVoteCastPayload;
+  voteTopicCreate: GqlVoteTopicCreatePayload;
+  voteTopicDelete: GqlVoteTopicDeletePayload;
 };
 
 export type GqlMutationArticleCreateArgs = {
@@ -1239,6 +1242,28 @@ export type GqlMutationUtilityUpdateInfoArgs = {
   id: Scalars["ID"]["input"];
   input: GqlUtilityUpdateInfoInput;
   permission: GqlCheckCommunityPermissionInput;
+};
+
+export type GqlMutationVoteCastArgs = {
+  input: GqlVoteCastInput;
+};
+
+export type GqlMutationVoteTopicCreateArgs = {
+  input: GqlVoteTopicCreateInput;
+  permission: GqlCheckCommunityPermissionInput;
+};
+
+export type GqlMutationVoteTopicDeleteArgs = {
+  id: Scalars["ID"]["input"];
+  permission: GqlCheckCommunityPermissionInput;
+};
+
+export type GqlMyVoteEligibility = {
+  __typename?: "MyVoteEligibility";
+  currentPower?: Maybe<Scalars["Int"]["output"]>;
+  eligible: Scalars["Boolean"]["output"];
+  myBallot?: Maybe<GqlVoteBallot>;
+  reason?: Maybe<Scalars["String"]["output"]>;
 };
 
 export type GqlNestedPlaceConnectOrCreateInput = {
@@ -1918,6 +1943,7 @@ export type GqlQuery = {
   incentiveGrants: GqlIncentiveGrantsConnection;
   membership?: Maybe<GqlMembership>;
   memberships: GqlMembershipsConnection;
+  myVoteEligibility: GqlMyVoteEligibility;
   myWallet?: Maybe<GqlWallet>;
   nftInstance?: Maybe<GqlNftInstance>;
   nftInstances: GqlNftInstancesConnection;
@@ -1962,6 +1988,8 @@ export type GqlQuery = {
    * - Returns data integrity verification results
    */
   verifyTransactions?: Maybe<Array<GqlTransactionVerificationResult>>;
+  voteTopic?: Maybe<GqlVoteTopic>;
+  voteTopics: GqlVoteTopicsConnection;
   wallet?: Maybe<GqlWallet>;
   wallets: GqlWalletsConnection;
 };
@@ -2043,6 +2071,10 @@ export type GqlQueryMembershipsArgs = {
   filter?: InputMaybe<GqlMembershipFilterInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   sort?: InputMaybe<GqlMembershipSortInput>;
+};
+
+export type GqlQueryMyVoteEligibilityArgs = {
+  topicId: Scalars["ID"]["input"];
 };
 
 export type GqlQueryNftInstanceArgs = {
@@ -2241,6 +2273,16 @@ export type GqlQueryVcIssuanceRequestsArgs = {
 
 export type GqlQueryVerifyTransactionsArgs = {
   txIds: Array<Scalars["ID"]["input"]>;
+};
+
+export type GqlQueryVoteTopicArgs = {
+  id: Scalars["ID"]["input"];
+};
+
+export type GqlQueryVoteTopicsArgs = {
+  communityId: Scalars["ID"]["input"];
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type GqlQueryWalletArgs = {
@@ -2706,6 +2748,7 @@ export type GqlTransactionChainStep = {
 
 export type GqlTransactionChainUser = {
   __typename?: "TransactionChainUser";
+  bio?: Maybe<Scalars["String"]["output"]>;
   id: Scalars["ID"]["output"];
   image?: Maybe<Scalars["String"]["output"]>;
   name: Scalars["String"]["output"];
@@ -3098,6 +3141,138 @@ export const GqlVerificationStatus = {
 
 export type GqlVerificationStatus =
   (typeof GqlVerificationStatus)[keyof typeof GqlVerificationStatus];
+export type GqlVoteBallot = {
+  __typename?: "VoteBallot";
+  createdAt: Scalars["Datetime"]["output"];
+  id: Scalars["ID"]["output"];
+  option: GqlVoteOption;
+  power: Scalars["Int"]["output"];
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+};
+
+export type GqlVoteCastInput = {
+  optionId: Scalars["ID"]["input"];
+  topicId: Scalars["ID"]["input"];
+};
+
+export type GqlVoteCastPayload = {
+  __typename?: "VoteCastPayload";
+  ballot: GqlVoteBallot;
+};
+
+export type GqlVoteGate = {
+  __typename?: "VoteGate";
+  id: Scalars["ID"]["output"];
+  nftToken?: Maybe<GqlNftToken>;
+  requiredRole?: Maybe<GqlRole>;
+  type: GqlVoteGateType;
+};
+
+export type GqlVoteGateInput = {
+  nftTokenId?: InputMaybe<Scalars["ID"]["input"]>;
+  requiredRole?: InputMaybe<GqlRole>;
+  type: GqlVoteGateType;
+};
+
+export const GqlVoteGateType = {
+  Membership: "MEMBERSHIP",
+  Nft: "NFT",
+} as const;
+
+export type GqlVoteGateType = (typeof GqlVoteGateType)[keyof typeof GqlVoteGateType];
+export type GqlVoteOption = {
+  __typename?: "VoteOption";
+  id: Scalars["ID"]["output"];
+  label: Scalars["String"]["output"];
+  orderIndex: Scalars["Int"]["output"];
+  totalPower?: Maybe<Scalars["Int"]["output"]>;
+  voteCount?: Maybe<Scalars["Int"]["output"]>;
+};
+
+export type GqlVoteOptionInput = {
+  label: Scalars["String"]["input"];
+  orderIndex: Scalars["Int"]["input"];
+};
+
+export type GqlVotePowerPolicy = {
+  __typename?: "VotePowerPolicy";
+  id: Scalars["ID"]["output"];
+  nftToken?: Maybe<GqlNftToken>;
+  type: GqlVotePowerPolicyType;
+};
+
+export type GqlVotePowerPolicyInput = {
+  nftTokenId?: InputMaybe<Scalars["ID"]["input"]>;
+  type: GqlVotePowerPolicyType;
+};
+
+export const GqlVotePowerPolicyType = {
+  Flat: "FLAT",
+  NftCount: "NFT_COUNT",
+} as const;
+
+export type GqlVotePowerPolicyType =
+  (typeof GqlVotePowerPolicyType)[keyof typeof GqlVotePowerPolicyType];
+export type GqlVoteTopic = {
+  __typename?: "VoteTopic";
+  community: GqlCommunity;
+  createdAt: Scalars["Datetime"]["output"];
+  description?: Maybe<Scalars["String"]["output"]>;
+  endsAt: Scalars["Datetime"]["output"];
+  gate: GqlVoteGate;
+  id: Scalars["ID"]["output"];
+  myBallot?: Maybe<GqlVoteBallot>;
+  myEligibility?: Maybe<GqlMyVoteEligibility>;
+  options: Array<GqlVoteOption>;
+  phase: GqlVoteTopicPhase;
+  powerPolicy: GqlVotePowerPolicy;
+  startsAt: Scalars["Datetime"]["output"];
+  title: Scalars["String"]["output"];
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+};
+
+export type GqlVoteTopicCreateInput = {
+  communityId: Scalars["ID"]["input"];
+  description?: InputMaybe<Scalars["String"]["input"]>;
+  endsAt: Scalars["Datetime"]["input"];
+  gate: GqlVoteGateInput;
+  options: Array<GqlVoteOptionInput>;
+  powerPolicy: GqlVotePowerPolicyInput;
+  startsAt: Scalars["Datetime"]["input"];
+  title: Scalars["String"]["input"];
+};
+
+export type GqlVoteTopicCreatePayload = {
+  __typename?: "VoteTopicCreatePayload";
+  voteTopic: GqlVoteTopic;
+};
+
+export type GqlVoteTopicDeletePayload = {
+  __typename?: "VoteTopicDeletePayload";
+  id: Scalars["ID"]["output"];
+};
+
+export type GqlVoteTopicEdge = {
+  __typename?: "VoteTopicEdge";
+  cursor: Scalars["String"]["output"];
+  node: GqlVoteTopic;
+};
+
+export const GqlVoteTopicPhase = {
+  Closed: "CLOSED",
+  Open: "OPEN",
+  Upcoming: "UPCOMING",
+} as const;
+
+export type GqlVoteTopicPhase = (typeof GqlVoteTopicPhase)[keyof typeof GqlVoteTopicPhase];
+export type GqlVoteTopicsConnection = {
+  __typename?: "VoteTopicsConnection";
+  edges: Array<GqlVoteTopicEdge>;
+  nodes: Array<GqlVoteTopic>;
+  pageInfo: GqlPageInfo;
+  totalCount: Scalars["Int"]["output"];
+};
+
 export type GqlWallet = {
   __typename?: "Wallet";
   accumulatedPointView?: Maybe<GqlAccumulatedPointView>;
