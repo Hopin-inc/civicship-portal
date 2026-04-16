@@ -89,7 +89,14 @@ interface ChainNodeItemProps {
 
 /** 縦タイムライン 1 行ぶん（アバター + 名前 + bio）。rail は `.timeline-avatar` に任せる。 */
 const ChainNodeItem = ({ node, isFirst, isLast }: ChainNodeItemProps) => (
-  <div className={cn("relative flex gap-3 timeline-item", !isLast && "pb-10")}>
+  <AppLink
+    href={`/users/${node.id}`}
+    className={cn(
+      "relative flex gap-3 timeline-item",
+      !isLast && "pb-10",
+      "rounded-md -mx-1 px-1 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50",
+    )}
+  >
     <div
       className={cn(
         "relative shrink-0 timeline-avatar",
@@ -102,18 +109,15 @@ const ChainNodeItem = ({ node, isFirst, isLast }: ChainNodeItemProps) => (
         <AvatarFallback>{node.name?.[0]?.toUpperCase() ?? "U"}</AvatarFallback>
       </Avatar>
     </div>
-    <AppLink
-      href={`/users/${node.id}`}
-      className={cn("flex-1 min-w-0", node.bio ? "pt-0.5" : "self-center")}
-    >
+    <div className={cn("flex-1 min-w-0", node.bio ? "pt-0.5" : "self-center")}>
       <p className="text-sm font-semibold truncate">{node.name}</p>
       {node.bio && (
         <p className="mt-0.5 text-body-xs text-muted-foreground line-clamp-2 leading-snug">
           {node.bio}
         </p>
       )}
-    </AppLink>
-  </div>
+    </div>
+  </AppLink>
 );
 
 interface ChainExpandRowProps {
