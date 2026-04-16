@@ -12,10 +12,9 @@ const meta: Meta<typeof VoteTopicForm> = {
   parameters: { layout: "fullscreen" },
   args: {
     onSubmit: fn((e) => e.preventDefault()),
-    onOpenGateSheet: fn(),
-    onOpenPowerPolicySheet: fn(),
     saving: false,
     nftTokens: mockNftTokens,
+    nftTokensLoading: false,
   },
   decorators: [
     (Story) => (

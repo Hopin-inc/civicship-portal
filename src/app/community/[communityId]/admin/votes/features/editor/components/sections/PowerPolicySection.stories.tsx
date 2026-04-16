@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { fn } from "storybook/test";
-import { GqlVotePowerPolicyType } from "@/types/graphql";
+import { GqlVoteGateType, GqlVotePowerPolicyType } from "@/types/graphql";
 import { PowerPolicySection } from "./PowerPolicySection";
 import { withVoteForm } from "../../__stories__/withForm";
 import { mockNftTokens } from "../../__stories__/fixtures";
@@ -10,8 +9,8 @@ const meta: Meta<typeof PowerPolicySection> = {
   component: PowerPolicySection,
   parameters: { layout: "padded" },
   args: {
-    onOpenSheet: fn(),
     nftTokens: mockNftTokens,
+    nftTokensLoading: false,
   },
   decorators: [
     (Story) => (
@@ -36,7 +35,7 @@ export const Flat: Story = {
   ],
 };
 
-/** NFT_COUNT: 選択済み */
+/** NFT_COUNT: トークン選択済み（gate は MEMBERSHIP なので Select 操作可能） */
 export const NftCountSelected: Story = {
   decorators: [
     withVoteForm({
@@ -44,20 +43,6 @@ export const NftCountSelected: Story = {
         powerPolicy: {
           type: GqlVotePowerPolicyType.NftCount,
           nftTokenId: mockNftTokens[0].id,
-        },
-      },
-    }),
-  ],
-};
-
-/** NFT_COUNT: 未選択 */
-export const NftCountUnselected: Story = {
-  decorators: [
-    withVoteForm({
-      defaultValues: {
-        powerPolicy: {
-          type: GqlVotePowerPolicyType.NftCount,
-          nftTokenId: "",
         },
       },
     }),
@@ -75,32 +60,45 @@ export const NftCountUnselectedWithError: Story = {
         },
       },
       errors: [
-        {
-          path: "powerPolicy.nftTokenId",
-          message: "NFT を選択してください",
-        },
+        { path: "powerPolicy.nftTokenId", message: "NFT を選択してください" },
       ],
     }),
   ],
 };
 
-/** gate(NFT) と powerPolicy(NFT_COUNT) のトークン不一致エラー */
-export const NftTokenMismatchError: Story = {
+/** NFT_COUNT: 空リスト */
+export const NftCountEmpty: Story = {
+  args: { nftTokens: [] },
   decorators: [
     withVoteForm({
       defaultValues: {
         powerPolicy: {
           type: GqlVotePowerPolicyType.NftCount,
-          nftTokenId: mockNftTokens[1].id,
+          nftTokenId: "",
         },
       },
-      errors: [
-        {
-          path: "powerPolicy.nftTokenId",
-          message:
-            "票の重みに使う NFT は、投票資格に使う NFT と同じものにしてください",
+    }),
+  ],
+};
+
+/**
+ * gate が NFT 型のとき、NFT 選択は disabled 表示になり、
+ * gate.nftTokenId で選ばれたトークンが表示される（自動同期モード）
+ */
+export const NftCountSyncedFromGate: Story = {
+  decorators: [
+    withVoteForm({
+      defaultValues: {
+        gate: {
+          type: GqlVoteGateType.Nft,
+          requiredRole: null,
+          nftTokenId: mockNftTokens[0].id,
         },
-      ],
+        powerPolicy: {
+          type: GqlVotePowerPolicyType.NftCount,
+          nftTokenId: mockNftTokens[0].id,
+        },
+      },
     }),
   ],
 };

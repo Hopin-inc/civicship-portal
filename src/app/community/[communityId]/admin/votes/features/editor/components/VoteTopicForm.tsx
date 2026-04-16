@@ -14,16 +14,14 @@ interface VoteTopicFormProps {
   onSubmit: (e: FormEvent) => void;
   saving: boolean;
   nftTokens: NftTokenOption[];
-  onOpenGateSheet: () => void;
-  onOpenPowerPolicySheet: () => void;
+  nftTokensLoading: boolean;
 }
 
 export function VoteTopicForm({
   onSubmit,
   saving,
   nftTokens,
-  onOpenGateSheet,
-  onOpenPowerPolicySheet,
+  nftTokensLoading,
 }: VoteTopicFormProps) {
   const t = useTranslations();
 
@@ -32,10 +30,10 @@ export function VoteTopicForm({
       <BasicInfoSection />
       <PeriodSection />
       <OptionsSection />
-      <GateSection onOpenSheet={onOpenGateSheet} nftTokens={nftTokens} />
+      <GateSection nftTokens={nftTokens} nftTokensLoading={nftTokensLoading} />
       <PowerPolicySection
-        onOpenSheet={onOpenPowerPolicySheet}
         nftTokens={nftTokens}
+        nftTokensLoading={nftTokensLoading}
       />
 
       <div className="w-full max-w-[345px] mx-auto">

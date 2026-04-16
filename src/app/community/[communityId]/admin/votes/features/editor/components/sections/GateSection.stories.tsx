@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { fn } from "storybook/test";
 import { GqlRole, GqlVoteGateType } from "@/types/graphql";
 import { GateSection } from "./GateSection";
 import { withVoteForm } from "../../__stories__/withForm";
@@ -10,8 +9,8 @@ const meta: Meta<typeof GateSection> = {
   component: GateSection,
   parameters: { layout: "padded" },
   args: {
-    onOpenSheet: fn(),
     nftTokens: mockNftTokens,
+    nftTokensLoading: false,
   },
   decorators: [
     (Story) => (
@@ -55,21 +54,6 @@ export const MembershipManager: Story = {
   ],
 };
 
-/** MEMBERSHIP: OWNER 以上 */
-export const MembershipOwner: Story = {
-  decorators: [
-    withVoteForm({
-      defaultValues: {
-        gate: {
-          type: GqlVoteGateType.Membership,
-          requiredRole: GqlRole.Owner,
-          nftTokenId: null,
-        },
-      },
-    }),
-  ],
-};
-
 /** NFT: 選択済み */
 export const NftSelected: Story = {
   decorators: [
@@ -85,8 +69,25 @@ export const NftSelected: Story = {
   ],
 };
 
-/** NFT: 未選択（summary のみ） */
-export const NftUnselected: Story = {
+/** NFT: 未選択 + バリデーションエラー */
+export const NftUnselectedWithError: Story = {
+  decorators: [
+    withVoteForm({
+      defaultValues: {
+        gate: {
+          type: GqlVoteGateType.Nft,
+          requiredRole: null,
+          nftTokenId: "",
+        },
+      },
+      errors: [{ path: "gate.nftTokenId", message: "NFT を選択してください" }],
+    }),
+  ],
+};
+
+/** NFT: ロード中（Select disabled） */
+export const NftLoading: Story = {
+  args: { nftTokens: [], nftTokensLoading: true },
   decorators: [
     withVoteForm({
       defaultValues: {
@@ -100,8 +101,9 @@ export const NftUnselected: Story = {
   ],
 };
 
-/** NFT: 未選択 + バリデーションエラー（送信後の状態） */
-export const NftUnselectedWithError: Story = {
+/** NFT: 空リスト（community に NFT が無いケース） */
+export const NftEmpty: Story = {
+  args: { nftTokens: [] },
   decorators: [
     withVoteForm({
       defaultValues: {
@@ -111,12 +113,6 @@ export const NftUnselectedWithError: Story = {
           nftTokenId: "",
         },
       },
-      errors: [
-        {
-          path: "gate.nftTokenId",
-          message: "NFT を選択してください",
-        },
-      ],
     }),
   ],
 };

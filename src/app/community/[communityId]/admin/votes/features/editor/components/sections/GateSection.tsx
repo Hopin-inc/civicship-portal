@@ -2,56 +2,67 @@
 
 import { useFormContext } from "react-hook-form";
 import { useTranslations } from "next-intl";
-import { ChevronRight } from "lucide-react";
 import {
   Item,
   ItemActions,
   ItemContent,
-  ItemDescription,
+  ItemGroup,
+  ItemSeparator,
   ItemTitle,
 } from "@/components/ui/item";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { GqlRole, GqlVoteGateType } from "@/types/graphql";
 import { VoteTopicFormValues } from "../../types/form";
 import { NftTokenOption } from "../../hooks/useNftTokens";
 
 interface GateSectionProps {
-  onOpenSheet: () => void;
   nftTokens: NftTokenOption[];
+  nftTokensLoading: boolean;
 }
 
-const roleLabel = (role: GqlRole, t: (k: string) => string) => {
-  switch (role) {
-    case GqlRole.Owner:
-      return t("adminVotes.form.gate.requiredRole.OWNER");
-    case GqlRole.Manager:
-      return t("adminVotes.form.gate.requiredRole.MANAGER");
-    case GqlRole.Member:
-    default:
-      return t("adminVotes.form.gate.requiredRole.MEMBER");
-  }
-};
-
-export function GateSection({ onOpenSheet, nftTokens }: GateSectionProps) {
+export function GateSection({ nftTokens, nftTokensLoading }: GateSectionProps) {
   const t = useTranslations();
-  const { watch, formState } = useFormContext<VoteTopicFormValues>();
+  const { setValue, watch, formState } = useFormContext<VoteTopicFormValues>();
   const gate = watch("gate");
-  const nftTokenIdError = formState.errors.gate &&
+
+  const nftTokenIdError =
+    formState.errors.gate &&
     (formState.errors.gate as { nftTokenId?: { message?: string } }).nftTokenId?.message;
 
-  const summary = (() => {
-    if (gate.type === GqlVoteGateType.Membership) {
-      return t("adminVotes.form.gate.summary.membershipWithRole", {
-        role: roleLabel(gate.requiredRole, t),
-      });
+  const setMembership = (requiredRole: GqlRole) =>
+    setValue(
+      "gate",
+      { type: GqlVoteGateType.Membership, requiredRole, nftTokenId: null },
+      { shouldDirty: true, shouldValidate: true },
+    );
+
+  const setNft = (nftTokenId: string) =>
+    setValue(
+      "gate",
+      { type: GqlVoteGateType.Nft, requiredRole: null, nftTokenId },
+      { shouldDirty: true, shouldValidate: true },
+    );
+
+  const handleTypeChange = (next: GqlVoteGateType) => {
+    if (next === gate.type) return;
+    if (next === GqlVoteGateType.Membership) {
+      setMembership(GqlRole.Member);
+    } else {
+      setNft("");
     }
-    const token = nftTokens.find((nt) => nt.id === gate.nftTokenId);
-    if (token) {
-      return t("adminVotes.form.gate.summary.nft", {
-        tokenName: token.name ?? token.address,
-      });
-    }
-    return t("adminVotes.form.gate.summary.nftUnselected");
-  })();
+  };
+
+  const typeDescription =
+    gate.type === GqlVoteGateType.Nft
+      ? t("adminVotes.form.gate.type.description.NFT")
+      : t("adminVotes.form.gate.type.description.MEMBERSHIP");
 
   return (
     <section className="space-y-2">
@@ -63,30 +74,104 @@ export function GateSection({ onOpenSheet, nftTokens }: GateSectionProps) {
           必須
         </span>
       </div>
-      <Item
-        size="sm"
-        variant="outline"
-        role="button"
-        tabIndex={0}
-        onClick={onOpenSheet}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            onOpenSheet();
-          }
-        }}
-        className="cursor-pointer"
-      >
-        <ItemContent>
-          <ItemTitle>{t("adminVotes.form.gate.label")}</ItemTitle>
-          <ItemDescription>{summary}</ItemDescription>
-        </ItemContent>
-        <ItemActions>
-          <ChevronRight className="h-4 w-4 text-muted-foreground" />
-        </ItemActions>
-      </Item>
-      {nftTokenIdError && (
-        <p className="text-xs text-destructive px-1">{nftTokenIdError}</p>
-      )}
+
+      <ItemGroup className="border rounded-lg">
+        <Item size="sm">
+          <ItemContent className="space-y-2">
+            <ToggleGroup
+              type="single"
+              value={gate.type}
+              onValueChange={(v) => {
+                if (v === GqlVoteGateType.Nft || v === GqlVoteGateType.Membership) {
+                  handleTypeChange(v);
+                }
+              }}
+              variant="outline"
+              className="grid grid-cols-2 w-full gap-2"
+            >
+              <ToggleGroupItem value={GqlVoteGateType.Membership}>
+                {t("adminVotes.form.gate.type.MEMBERSHIP")}
+              </ToggleGroupItem>
+              <ToggleGroupItem value={GqlVoteGateType.Nft}>
+                {t("adminVotes.form.gate.type.NFT")}
+              </ToggleGroupItem>
+            </ToggleGroup>
+            <p className="text-xs text-muted-foreground">{typeDescription}</p>
+          </ItemContent>
+        </Item>
+
+        {gate.type === GqlVoteGateType.Membership && (
+          <>
+            <ItemSeparator />
+            <Item size="sm">
+              <ItemContent>
+                <ItemTitle>{t("adminVotes.form.gate.requiredRole.label")}</ItemTitle>
+              </ItemContent>
+              <ItemActions>
+                <Select
+                  value={gate.requiredRole}
+                  onValueChange={(v) => setMembership(v as GqlRole)}
+                >
+                  <SelectTrigger className="w-40">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={GqlRole.Member}>
+                      {t("adminVotes.form.gate.requiredRole.MEMBER")}
+                    </SelectItem>
+                    <SelectItem value={GqlRole.Manager}>
+                      {t("adminVotes.form.gate.requiredRole.MANAGER")}
+                    </SelectItem>
+                    <SelectItem value={GqlRole.Owner}>
+                      {t("adminVotes.form.gate.requiredRole.OWNER")}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </ItemActions>
+            </Item>
+          </>
+        )}
+
+        {gate.type === GqlVoteGateType.Nft && (
+          <>
+            <ItemSeparator />
+            <Item size="sm">
+              <ItemContent className="space-y-2">
+                <ItemTitle>{t("adminVotes.form.gate.nftToken.label")}</ItemTitle>
+                {!nftTokensLoading && nftTokens.length === 0 ? (
+                  <p className="text-xs text-muted-foreground">
+                    {t("adminVotes.form.gate.nftToken.empty")}
+                  </p>
+                ) : (
+                  <Select
+                    value={gate.nftTokenId}
+                    onValueChange={(v) => setNft(v)}
+                    disabled={nftTokensLoading || nftTokens.length === 0}
+                  >
+                    <SelectTrigger
+                      className={nftTokenIdError ? "border-destructive" : undefined}
+                    >
+                      <SelectValue
+                        placeholder={t("adminVotes.form.gate.nftToken.placeholder")}
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {nftTokens.map((token) => (
+                        <SelectItem key={token.id} value={token.id}>
+                          {token.name ?? token.address}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+                {nftTokenIdError && (
+                  <p className="text-xs text-destructive">{nftTokenIdError}</p>
+                )}
+              </ItemContent>
+            </Item>
+          </>
+        )}
+      </ItemGroup>
     </section>
   );
 }
