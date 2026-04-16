@@ -136,6 +136,24 @@ export const LongBio: Story = {
   },
 };
 
+/** depth が上限値（10）に達した chain: 先頭ノードの上に「⋮」プレースホルダが出る。 */
+export const TruncatedChain: Story = {
+  args: {
+    chain: buildMockChain(11, [
+      { name: "古い発行者" },
+      ...Array(9).fill({}),
+      { name: "あなた" },
+    ]),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "depth >= 10 のとき、先頭ノードの上に「⋮」を出して、さらに続きがある可能性を示唆する",
+      },
+    },
+  },
+};
+
 /** chain が null: 何も描画されない。 */
 export const NullChain: Story = {
   args: { chain: null },
