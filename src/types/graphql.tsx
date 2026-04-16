@@ -512,6 +512,7 @@ export const GqlErrorCode = {
   UnsupportedGrantType: "UNSUPPORTED_GRANT_TYPE",
   UnsupportedTransactionReason: "UNSUPPORTED_TRANSACTION_REASON",
   ValidationError: "VALIDATION_ERROR",
+  VoteTopicNotEditable: "VOTE_TOPIC_NOT_EDITABLE",
 } as const;
 
 export type GqlErrorCode = (typeof GqlErrorCode)[keyof typeof GqlErrorCode];
@@ -962,14 +963,24 @@ export type GqlMutation = {
   voteCast: GqlVoteCastPayload;
   /**
    * 管理者: 投票テーマ・ゲート・ポリシー・選択肢を 1 トランザクションで一括作成。
-   * Gate と PowerPolicy のクロス検証（NFT トークンの一致等）は行わない。
+   * Gate.type=NFT かつ PowerPolicy.type=NFT_COUNT の場合、両者の nftTokenId は
+   * 一致していなければならない（バックエンドで検証、違反時は `VALIDATION_ERROR`）。
+   * 詳細は VoteGate 型の説明を参照。
    */
   voteTopicCreate: GqlVoteTopicCreatePayload;
   /**
-   * 管理者: 投票テーマ削除。
-   * gate / powerPolicy / options / ballots は onDelete: Cascade で自動削除される。
+   * 管理者: 投票テーマ削除。UPCOMING フェーズ（投票開始前）のみ許可。
+   * OPEN / CLOSED フェーズでは `VOTE_TOPIC_NOT_EDITABLE` エラーが返る。
+   * gate / powerPolicy / options は onDelete: Cascade で自動削除される（UPCOMING 限定なので ballots は存在しない）。
    */
   voteTopicDelete: GqlVoteTopicDeletePayload;
+  /**
+   * 管理者: 投票テーマを更新する。UPCOMING フェーズ（投票開始前）のみ許可。
+   * OPEN / CLOSED フェーズでは `VOTE_TOPIC_NOT_EDITABLE` エラーが返る。
+   * options は全量置換される（UPCOMING なので投票0件が保証されており安全）。
+   * gate / powerPolicy も同時に再設定可能。
+   */
+  voteTopicUpdate: GqlVoteTopicUpdatePayload;
 };
 
 export type GqlMutationArticleCreateArgs = {
@@ -1272,6 +1283,12 @@ export type GqlMutationVoteTopicDeleteArgs = {
   permission: GqlCheckCommunityPermissionInput;
 };
 
+export type GqlMutationVoteTopicUpdateArgs = {
+  id: Scalars["ID"]["input"];
+  input: GqlVoteTopicUpdateInput;
+  permission: GqlCheckCommunityPermissionInput;
+};
+
 /** ログインユーザーの投票資格と現状。再投票可能性の判定にも利用する。 */
 export type GqlMyVoteEligibility = {
   __typename?: "MyVoteEligibility";
@@ -1372,6 +1389,11 @@ export type GqlNftInstancesConnection = {
 export type GqlNftToken = {
   __typename?: "NftToken";
   address: Scalars["String"]["output"];
+  /**
+   * トークンを所有するコミュニティ。複数コミュニティで共用する場合や運用都合で未設定の場合は null。
+   * portal 側の「このコミュニティに属する NftToken」一覧取得で参照される。
+   */
+  community?: Maybe<GqlCommunity>;
   createdAt: Scalars["Datetime"]["output"];
   id: Scalars["ID"]["output"];
   json?: Maybe<Scalars["JSON"]["output"]>;
@@ -1390,6 +1412,11 @@ export type GqlNftTokenEdge = GqlEdge & {
 export type GqlNftTokenFilterInput = {
   address?: InputMaybe<Array<Scalars["String"]["input"]>>;
   and?: InputMaybe<Array<GqlNftTokenFilterInput>>;
+  /**
+   * 指定したコミュニティに直接紐付く NftToken に絞る（NftToken.community_id を直接参照）。
+   * NftToken.communityId が NULL のトークンは除外される。
+   */
+  communityId?: InputMaybe<Scalars["ID"]["input"]>;
   not?: InputMaybe<GqlNftTokenFilterInput>;
   or?: InputMaybe<Array<GqlNftTokenFilterInput>>;
   type?: InputMaybe<Array<Scalars["String"]["input"]>>;
@@ -3236,6 +3263,7 @@ export type GqlVoteBallot = {
    * （現時点の power は MyVoteEligibility.currentPower を参照）。
    */
   power: Scalars["Int"]["output"];
+  /** 再投票（upsert）時に現在時刻で更新される。初回投票時は null。 */
   updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
 };
 
@@ -3253,10 +3281,17 @@ export type GqlVoteCastSuccess = {
 
 /**
  * 誰が投票できるか（資格ゲート）。
- * VotePowerPolicy（何票持つか）とは**独立に設定される**。
- * スキーマレベルでのクロス検証は行わないため、Gate=NFT(tokenA) + PowerPolicy=NFT_COUNT(tokenB)
- * のような食い違いも作成可能。この場合 A のみ保有するユーザーは eligible=true / currentPower=0 になる。
- * 組み合わせの妥当性は呼び出し側（管理 UI 等）で担保すること。
+ * VotePowerPolicy（何票持つか）とは**独立に設定される**が、両方が NFT 系
+ * （Gate.type=NFT かつ PowerPolicy.type=NFT_COUNT）の場合に限り、参照する
+ * **nftTokenId は一致していなければならない**（バックエンドで検証、違反時は
+ * `VALIDATION_ERROR`）。異なる token を指定した場合、A 保有者のうち B 非保有者が
+ * eligible=true / currentPower=0 になる「投票しても効かない」状態が生じる設定ミスを防ぐため。
+ *
+ * 許容される組み合わせ:
+ * - Gate=NFT(A) + Policy=NFT_COUNT(A)  典型的
+ * - Gate=MEMBERSHIP + Policy=NFT_COUNT(A)  メンバー内で NFT ホルダーのみ重み付け（非ホルダーは power=0）
+ * - Gate=NFT(A) + Policy=FLAT  A 保有者は一律 1 票
+ * - Gate=MEMBERSHIP + Policy=FLAT  全員 1 票
  */
 export type GqlVoteGate = {
   __typename?: "VoteGate";
@@ -3292,6 +3327,10 @@ export type GqlVoteOption = {
   __typename?: "VoteOption";
   id: Scalars["ID"]["output"];
   label: Scalars["String"]["output"];
+  /**
+   * 作成時（VoteOptionInput）に指定した値がそのまま保持される。
+   * VoteTopic.options は本フィールドの昇順で返るため、UI 側で追加のソートは不要。
+   */
   orderIndex: Scalars["Int"]["output"];
   /** 票の重み合計（= Σ power）。endsAt 到達前は一般ユーザーに null（管理者は常に実値を参照可）。 */
   totalPower?: Maybe<Scalars["Int"]["output"]>;
@@ -3346,7 +3385,12 @@ export type GqlVoteTopic = {
   myBallot?: Maybe<GqlVoteBallot>;
   /** ログインユーザーの投票資格情報（未ログインは null）。 */
   myEligibility?: Maybe<GqlMyVoteEligibility>;
+  /** 投票選択肢。orderIndex 昇順で返る（UI 側でのソートは不要）。 */
   options: Array<GqlVoteOption>;
+  /**
+   * 現在フェーズ。**レスポンス時点でサーバ時刻から計算される値**であり DB カラムではない。
+   * 詳細は VoteTopicPhase の説明を参照。
+   */
   phase: GqlVoteTopicPhase;
   powerPolicy: GqlVotePowerPolicy;
   startsAt: Scalars["Datetime"]["output"];
@@ -3398,6 +3442,28 @@ export const GqlVoteTopicPhase = {
 } as const;
 
 export type GqlVoteTopicPhase = (typeof GqlVoteTopicPhase)[keyof typeof GqlVoteTopicPhase];
+/**
+ * voteTopicUpdate 用の入力。**既存の全フィールドを置き換える**（部分更新は未サポート）。
+ * options は delete → create で全量置換される。gate / powerPolicy も同様に再生成されるため、
+ * 既存の id 値は保持されない点に注意。UPCOMING フェーズ限定で呼ばれるため、投票は存在しない前提。
+ */
+export type GqlVoteTopicUpdateInput = {
+  description?: InputMaybe<Scalars["String"]["input"]>;
+  endsAt: Scalars["Datetime"]["input"];
+  gate: GqlVoteGateInput;
+  options: Array<GqlVoteOptionInput>;
+  powerPolicy: GqlVotePowerPolicyInput;
+  startsAt: Scalars["Datetime"]["input"];
+  title: Scalars["String"]["input"];
+};
+
+export type GqlVoteTopicUpdatePayload = GqlVoteTopicUpdateSuccess;
+
+export type GqlVoteTopicUpdateSuccess = {
+  __typename?: "VoteTopicUpdateSuccess";
+  voteTopic: GqlVoteTopic;
+};
+
 export type GqlVoteTopicsConnection = {
   __typename?: "VoteTopicsConnection";
   edges: Array<GqlVoteTopicEdge>;

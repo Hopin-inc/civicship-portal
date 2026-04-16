@@ -4563,6 +4563,12 @@
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "VOTE_TOPIC_NOT_EDITABLE",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "possibleTypes": null
@@ -10240,7 +10246,7 @@
           },
           {
             "name": "voteTopicCreate",
-            "description": "管理者: 投票テーマ・ゲート・ポリシー・選択肢を 1 トランザクションで一括作成。\nGate と PowerPolicy のクロス検証（NFT トークンの一致等）は行わない。",
+            "description": "管理者: 投票テーマ・ゲート・ポリシー・選択肢を 1 トランザクションで一括作成。\nGate.type=NFT かつ PowerPolicy.type=NFT_COUNT の場合、両者の nftTokenId は\n一致していなければならない（バックエンドで検証、違反時は `VALIDATION_ERROR`）。\n詳細は VoteGate 型の説明を参照。",
             "args": [
               {
                 "name": "input",
@@ -10289,7 +10295,7 @@
           },
           {
             "name": "voteTopicDelete",
-            "description": "管理者: 投票テーマ削除。\ngate / powerPolicy / options / ballots は onDelete: Cascade で自動削除される。",
+            "description": "管理者: 投票テーマ削除。UPCOMING フェーズ（投票開始前）のみ許可。\nOPEN / CLOSED フェーズでは `VOTE_TOPIC_NOT_EDITABLE` エラーが返る。\ngate / powerPolicy / options は onDelete: Cascade で自動削除される（UPCOMING 限定なので ballots は存在しない）。",
             "args": [
               {
                 "name": "id",
@@ -10330,6 +10336,71 @@
               "ofType": {
                 "kind": "UNION",
                 "name": "VoteTopicDeletePayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "voteTopicUpdate",
+            "description": "管理者: 投票テーマを更新する。UPCOMING フェーズ（投票開始前）のみ許可。\nOPEN / CLOSED フェーズでは `VOTE_TOPIC_NOT_EDITABLE` エラーが返る。\noptions は全量置換される（UPCOMING なので投票0件が保証されており安全）。\ngate / powerPolicy も同時に再設定可能。",
+            "args": [
+              {
+                "name": "id",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "ID",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "input",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "VoteTopicUpdateInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "CheckCommunityPermissionInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "UNION",
+                "name": "VoteTopicUpdatePayload",
                 "ofType": null
               }
             },
@@ -11207,6 +11278,18 @@
             "deprecationReason": null
           },
           {
+            "name": "community",
+            "description": "トークンを所有するコミュニティ。複数コミュニティで共用する場合や運用都合で未設定の場合は null。\nportal 側の「このコミュニティに属する NftToken」一覧取得で参照される。",
+            "args": [],
+            "type": {
+              "kind": "OBJECT",
+              "name": "Community",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "createdAt",
             "description": null,
             "args": [],
@@ -11400,6 +11483,18 @@
                   "ofType": null
                 }
               }
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "communityId",
+            "description": "指定したコミュニティに直接紐付く NftToken に絞る（NftToken.community_id を直接参照）。\nNftToken.communityId が NULL のトークンは除外される。",
+            "type": {
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
             },
             "defaultValue": null,
             "isDeprecated": false,
@@ -26983,7 +27078,7 @@
           },
           {
             "name": "updatedAt",
-            "description": null,
+            "description": "再投票（upsert）時に現在時刻で更新される。初回投票時は null。",
             "args": [],
             "type": {
               "kind": "SCALAR",
@@ -27091,7 +27186,7 @@
       {
         "kind": "OBJECT",
         "name": "VoteGate",
-        "description": "誰が投票できるか（資格ゲート）。\nVotePowerPolicy（何票持つか）とは**独立に設定される**。\nスキーマレベルでのクロス検証は行わないため、Gate=NFT(tokenA) + PowerPolicy=NFT_COUNT(tokenB)\nのような食い違いも作成可能。この場合 A のみ保有するユーザーは eligible=true / currentPower=0 になる。\n組み合わせの妥当性は呼び出し側（管理 UI 等）で担保すること。",
+        "description": "誰が投票できるか（資格ゲート）。\nVotePowerPolicy（何票持つか）とは**独立に設定される**が、両方が NFT 系\n（Gate.type=NFT かつ PowerPolicy.type=NFT_COUNT）の場合に限り、参照する\n**nftTokenId は一致していなければならない**（バックエンドで検証、違反時は\n`VALIDATION_ERROR`）。異なる token を指定した場合、A 保有者のうち B 非保有者が\neligible=true / currentPower=0 になる「投票しても効かない」状態が生じる設定ミスを防ぐため。\n\n許容される組み合わせ:\n- Gate=NFT(A) + Policy=NFT_COUNT(A)  典型的\n- Gate=MEMBERSHIP + Policy=NFT_COUNT(A)  メンバー内で NFT ホルダーのみ重み付け（非ホルダーは power=0）\n- Gate=NFT(A) + Policy=FLAT  A 保有者は一律 1 票\n- Gate=MEMBERSHIP + Policy=FLAT  全員 1 票",
         "isOneOf": null,
         "fields": [
           {
@@ -27272,7 +27367,7 @@
           },
           {
             "name": "orderIndex",
-            "description": null,
+            "description": "作成時（VoteOptionInput）に指定した値がそのまま保持される。\nVoteTopic.options は本フィールドの昇順で返るため、UI 側で追加のソートは不要。",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -27604,7 +27699,7 @@
           },
           {
             "name": "options",
-            "description": null,
+            "description": "投票選択肢。orderIndex 昇順で返る（UI 側でのソートは不要）。",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -27628,7 +27723,7 @@
           },
           {
             "name": "phase",
-            "description": null,
+            "description": "現在フェーズ。**レスポンス時点でサーバ時刻から計算される値**であり DB カラムではない。\n詳細は VoteTopicPhase の説明を参照。",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -28014,6 +28109,179 @@
             "deprecationReason": null
           }
         ],
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "VoteTopicUpdateInput",
+        "description": "voteTopicUpdate 用の入力。**既存の全フィールドを置き換える**（部分更新は未サポート）。\noptions は delete → create で全量置換される。gate / powerPolicy も同様に再生成されるため、\n既存の id 値は保持されない点に注意。UPCOMING フェーズ限定で呼ばれるため、投票は存在しない前提。",
+        "isOneOf": false,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "description",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "endsAt",
+            "description": null,
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Datetime",
+                "ofType": null
+              }
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "gate",
+            "description": null,
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "INPUT_OBJECT",
+                "name": "VoteGateInput",
+                "ofType": null
+              }
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "options",
+            "description": null,
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "VoteOptionInput",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "powerPolicy",
+            "description": null,
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "INPUT_OBJECT",
+                "name": "VotePowerPolicyInput",
+                "ofType": null
+              }
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "startsAt",
+            "description": null,
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Datetime",
+                "ofType": null
+              }
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "title",
+            "description": null,
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "UNION",
+        "name": "VoteTopicUpdatePayload",
+        "description": null,
+        "isOneOf": null,
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": [
+          {
+            "kind": "OBJECT",
+            "name": "VoteTopicUpdateSuccess",
+            "ofType": null
+          }
+        ]
+      },
+      {
+        "kind": "OBJECT",
+        "name": "VoteTopicUpdateSuccess",
+        "description": null,
+        "isOneOf": null,
+        "fields": [
+          {
+            "name": "voteTopic",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "VoteTopic",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
         "possibleTypes": null
       },
       {
