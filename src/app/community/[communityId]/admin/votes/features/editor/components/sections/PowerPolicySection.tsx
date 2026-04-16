@@ -11,45 +11,37 @@ import {
   ItemTitle,
 } from "@/components/ui/item";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { GqlVoteGateType, GqlVotePowerPolicyType } from "@/types/graphql";
 import { VoteTopicFormValues } from "../../types/form";
 import { NftTokenOption } from "../../hooks/useNftTokens";
 
 interface PowerPolicySectionProps {
   nftTokens: NftTokenOption[];
-  nftTokensLoading: boolean;
 }
 
-export function PowerPolicySection({
-  nftTokens,
-  nftTokensLoading,
-}: PowerPolicySectionProps) {
+export function PowerPolicySection({ nftTokens }: PowerPolicySectionProps) {
   const t = useTranslations();
-  const { setValue, watch, formState } = useFormContext<VoteTopicFormValues>();
+  const { setValue, watch } = useFormContext<VoteTopicFormValues>();
   const gate = watch("gate");
   const powerPolicy = watch("powerPolicy");
 
-  const nftTokenIdError =
-    formState.errors.powerPolicy &&
-    (formState.errors.powerPolicy as { nftTokenId?: { message?: string } }).nftTokenId
-      ?.message;
+  const gateIsNft = gate.type === GqlVoteGateType.Nft;
 
-  /** gate が NFT 型 + powerPolicy が NFT_COUNT 型なら、powerPolicy.nftTokenId を gate のものに同期する */
-  const syncedFromGate =
-    powerPolicy.type === GqlVotePowerPolicyType.NftCount &&
-    gate.type === GqlVoteGateType.Nft;
-
+  /**
+   * gate 依存の整合:
+   * - gate=MEMBERSHIP のとき powerPolicy を NFT_COUNT のままにしない（FLAT に戻す）
+   * - gate=NFT のとき powerPolicy.nftTokenId を gate.nftTokenId に追従
+   */
   useEffect(() => {
-    if (!syncedFromGate) return;
-    if (gate.type !== GqlVoteGateType.Nft) return;
     if (powerPolicy.type !== GqlVotePowerPolicyType.NftCount) return;
+    if (gate.type !== GqlVoteGateType.Nft) {
+      setValue(
+        "powerPolicy",
+        { type: GqlVotePowerPolicyType.Flat, nftTokenId: null },
+        { shouldDirty: true, shouldValidate: true },
+      );
+      return;
+    }
     if (!gate.nftTokenId) return;
     if (gate.nftTokenId === powerPolicy.nftTokenId) return;
     setValue(
@@ -57,7 +49,7 @@ export function PowerPolicySection({
       { type: GqlVotePowerPolicyType.NftCount, nftTokenId: gate.nftTokenId },
       { shouldDirty: true, shouldValidate: true },
     );
-  }, [syncedFromGate, gate, powerPolicy, setValue]);
+  }, [gate, powerPolicy, setValue]);
 
   const gateNftToken = useMemo(
     () =>
@@ -74,22 +66,21 @@ export function PowerPolicySection({
       { shouldDirty: true, shouldValidate: true },
     );
 
-  const setNftCount = (nftTokenId: string) =>
+  const setNftCount = () => {
+    if (gate.type !== GqlVoteGateType.Nft) return;
     setValue(
       "powerPolicy",
-      { type: GqlVotePowerPolicyType.NftCount, nftTokenId },
+      { type: GqlVotePowerPolicyType.NftCount, nftTokenId: gate.nftTokenId ?? "" },
       { shouldDirty: true, shouldValidate: true },
     );
+  };
 
   const handleTypeChange = (next: GqlVotePowerPolicyType) => {
     if (next === powerPolicy.type) return;
     if (next === GqlVotePowerPolicyType.Flat) {
       setFlat();
     } else {
-      // gate が NFT ならそこから同期、そうでなければ空文字
-      const initialTokenId =
-        gate.type === GqlVoteGateType.Nft ? (gate.nftTokenId ?? "") : "";
-      setNftCount(initialTokenId);
+      setNftCount();
     }
   };
 
@@ -97,11 +88,6 @@ export function PowerPolicySection({
     powerPolicy.type === GqlVotePowerPolicyType.NftCount
       ? t("adminVotes.form.powerPolicy.type.description.NFT_COUNT")
       : t("adminVotes.form.powerPolicy.type.description.FLAT");
-
-  const currentNftTokenId =
-    powerPolicy.type === GqlVotePowerPolicyType.NftCount
-      ? powerPolicy.nftTokenId
-      : "";
 
   return (
     <section className="space-y-2">
@@ -131,18 +117,29 @@ export function PowerPolicySection({
               variant="outline"
               className="grid grid-cols-2 w-full gap-2"
             >
-              <ToggleGroupItem value={GqlVotePowerPolicyType.Flat}>
+              <ToggleGroupItem
+                value={GqlVotePowerPolicyType.Flat}
+                className="h-auto min-h-10 whitespace-pre-line text-center leading-tight"
+              >
                 {t("adminVotes.form.powerPolicy.type.FLAT")}
               </ToggleGroupItem>
-              <ToggleGroupItem value={GqlVotePowerPolicyType.NftCount}>
+              <ToggleGroupItem
+                value={GqlVotePowerPolicyType.NftCount}
+                disabled={!gateIsNft}
+                className="h-auto min-h-10 whitespace-pre-line text-center leading-tight"
+              >
                 {t("adminVotes.form.powerPolicy.type.NFT_COUNT")}
               </ToggleGroupItem>
             </ToggleGroup>
-            <p className="text-xs text-muted-foreground">{typeDescription}</p>
+            <p className="text-xs text-muted-foreground">
+              {gateIsNft
+                ? typeDescription
+                : t("adminVotes.form.powerPolicy.type.requiresNftGate")}
+            </p>
           </ItemContent>
         </Item>
 
-        {powerPolicy.type === GqlVotePowerPolicyType.NftCount && (
+        {powerPolicy.type === GqlVotePowerPolicyType.NftCount && gateIsNft && (
           <>
             <ItemSeparator />
             <Item size="sm">
@@ -150,49 +147,14 @@ export function PowerPolicySection({
                 <ItemTitle>
                   {t("adminVotes.form.powerPolicy.nftToken.label")}
                 </ItemTitle>
-
-                {syncedFromGate ? (
-                  <>
-                    <div className="rounded-md border bg-muted/40 px-3 py-2 text-sm">
-                      {gateNftToken
-                        ? (gateNftToken.name ?? gateNftToken.address)
-                        : t("adminVotes.form.gate.summary.nftUnselected")}
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      {t("adminVotes.form.powerPolicy.nftToken.syncedFromGate")}
-                    </p>
-                  </>
-                ) : !nftTokensLoading && nftTokens.length === 0 ? (
-                  <p className="text-xs text-muted-foreground">
-                    {t("adminVotes.form.powerPolicy.nftToken.empty")}
-                  </p>
-                ) : (
-                  <Select
-                    value={currentNftTokenId}
-                    onValueChange={(v) => setNftCount(v)}
-                    disabled={nftTokensLoading || nftTokens.length === 0}
-                  >
-                    <SelectTrigger
-                      className={nftTokenIdError ? "border-destructive" : undefined}
-                    >
-                      <SelectValue
-                        placeholder={t(
-                          "adminVotes.form.powerPolicy.nftToken.placeholder",
-                        )}
-                      />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {nftTokens.map((token) => (
-                        <SelectItem key={token.id} value={token.id}>
-                          {token.name ?? token.address}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-                {nftTokenIdError && !syncedFromGate && (
-                  <p className="text-xs text-destructive">{nftTokenIdError}</p>
-                )}
+                <div className="rounded-md border bg-muted/40 px-3 py-2 text-sm truncate">
+                  {gateNftToken
+                    ? (gateNftToken.name ?? gateNftToken.address)
+                    : t("adminVotes.form.gate.summary.nftUnselected")}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {t("adminVotes.form.powerPolicy.nftToken.syncedFromGate")}
+                </p>
               </ItemContent>
             </Item>
           </>

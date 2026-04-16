@@ -23,6 +23,12 @@ export const mockNftTokens: NftTokenOption[] = [
     symbol: "CPS",
   },
   {
+    id: "nft-long-name",
+    name: "地域エコシステム貢献者向け特別記念NFTトークン 2026 春",
+    address: "0x4444444444444444444444444444444444444444",
+    symbol: "REGIONAL-ECO-CONTRIBUTOR",
+  },
+  {
     id: "nft-no-name",
     name: null,
     address: "0x3333333333333333333333333333333333333333",

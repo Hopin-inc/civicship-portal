@@ -8,10 +8,7 @@ const meta: Meta<typeof PowerPolicySection> = {
   title: "AdminVotes/Sections/PowerPolicySection",
   component: PowerPolicySection,
   parameters: { layout: "padded" },
-  args: {
-    nftTokens: mockNftTokens,
-    nftTokensLoading: false,
-  },
+  args: { nftTokens: mockNftTokens },
   decorators: [
     (Story) => (
       <div className="max-w-md mx-auto px-6 py-4">
@@ -24,7 +21,7 @@ const meta: Meta<typeof PowerPolicySection> = {
 export default meta;
 type Story = StoryObj<typeof PowerPolicySection>;
 
-/** FLAT: 1人1票 */
+/** FLAT: 1人1票（gate=MEMBERSHIP でも選べる） */
 export const Flat: Story = {
   decorators: [
     withVoteForm({
@@ -35,57 +32,13 @@ export const Flat: Story = {
   ],
 };
 
-/** NFT_COUNT: トークン選択済み（gate は MEMBERSHIP なので Select 操作可能） */
-export const NftCountSelected: Story = {
-  decorators: [
-    withVoteForm({
-      defaultValues: {
-        powerPolicy: {
-          type: GqlVotePowerPolicyType.NftCount,
-          nftTokenId: mockNftTokens[0].id,
-        },
-      },
-    }),
-  ],
+/** gate=MEMBERSHIP のとき NFT_COUNT は disabled、ヒント文言に差し替わる */
+export const NftCountDisabled: Story = {
+  decorators: [withVoteForm()],
 };
 
-/** NFT_COUNT: 未選択 + バリデーションエラー */
-export const NftCountUnselectedWithError: Story = {
-  decorators: [
-    withVoteForm({
-      defaultValues: {
-        powerPolicy: {
-          type: GqlVotePowerPolicyType.NftCount,
-          nftTokenId: "",
-        },
-      },
-      errors: [
-        { path: "powerPolicy.nftTokenId", message: "NFT を選択してください" },
-      ],
-    }),
-  ],
-};
-
-/** NFT_COUNT: 空リスト */
-export const NftCountEmpty: Story = {
-  args: { nftTokens: [] },
-  decorators: [
-    withVoteForm({
-      defaultValues: {
-        powerPolicy: {
-          type: GqlVotePowerPolicyType.NftCount,
-          nftTokenId: "",
-        },
-      },
-    }),
-  ],
-};
-
-/**
- * gate が NFT 型のとき、NFT 選択は disabled 表示になり、
- * gate.nftTokenId で選ばれたトークンが表示される（自動同期モード）
- */
-export const NftCountSyncedFromGate: Story = {
+/** gate=NFT + NFT_COUNT: gate で選択した NFT が表示される（自動同期） */
+export const NftCount: Story = {
   decorators: [
     withVoteForm({
       defaultValues: {
@@ -97,6 +50,25 @@ export const NftCountSyncedFromGate: Story = {
         powerPolicy: {
           type: GqlVotePowerPolicyType.NftCount,
           nftTokenId: mockNftTokens[0].id,
+        },
+      },
+    }),
+  ],
+};
+
+/** 長い NFT 名は truncate で省略される */
+export const NftCountLongName: Story = {
+  decorators: [
+    withVoteForm({
+      defaultValues: {
+        gate: {
+          type: GqlVoteGateType.Nft,
+          requiredRole: null,
+          nftTokenId: "nft-long-name",
+        },
+        powerPolicy: {
+          type: GqlVotePowerPolicyType.NftCount,
+          nftTokenId: "nft-long-name",
         },
       },
     }),

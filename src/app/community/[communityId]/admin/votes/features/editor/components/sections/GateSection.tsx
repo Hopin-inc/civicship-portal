@@ -89,10 +89,16 @@ export function GateSection({ nftTokens, nftTokensLoading }: GateSectionProps) {
               variant="outline"
               className="grid grid-cols-2 w-full gap-2"
             >
-              <ToggleGroupItem value={GqlVoteGateType.Membership}>
+              <ToggleGroupItem
+                value={GqlVoteGateType.Membership}
+                className="h-auto min-h-10 whitespace-pre-line text-center leading-tight"
+              >
                 {t("adminVotes.form.gate.type.MEMBERSHIP")}
               </ToggleGroupItem>
-              <ToggleGroupItem value={GqlVoteGateType.Nft}>
+              <ToggleGroupItem
+                value={GqlVoteGateType.Nft}
+                className="h-auto min-h-10 whitespace-pre-line text-center leading-tight"
+              >
                 {t("adminVotes.form.gate.type.NFT")}
               </ToggleGroupItem>
             </ToggleGroup>
@@ -158,7 +164,9 @@ export function GateSection({ nftTokens, nftTokensLoading }: GateSectionProps) {
                     <SelectContent>
                       {nftTokens.map((token) => (
                         <SelectItem key={token.id} value={token.id}>
-                          {token.name ?? token.address}
+                          <span className="block max-w-[260px] truncate">
+                            {token.name ?? token.address}
+                          </span>
                         </SelectItem>
                       ))}
                     </SelectContent>

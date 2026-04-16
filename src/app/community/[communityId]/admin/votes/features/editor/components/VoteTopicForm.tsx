@@ -31,10 +31,7 @@ export function VoteTopicForm({
       <PeriodSection />
       <OptionsSection />
       <GateSection nftTokens={nftTokens} nftTokensLoading={nftTokensLoading} />
-      <PowerPolicySection
-        nftTokens={nftTokens}
-        nftTokensLoading={nftTokensLoading}
-      />
+      <PowerPolicySection nftTokens={nftTokens} />
 
       <div className="w-full max-w-[345px] mx-auto">
         <Button

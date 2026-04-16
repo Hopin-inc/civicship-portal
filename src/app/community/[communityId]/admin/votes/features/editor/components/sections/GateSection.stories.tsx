@@ -116,3 +116,18 @@ export const NftEmpty: Story = {
     }),
   ],
 };
+
+/** NFT: 長い名前のトークンが選択済み（truncate 表示） */
+export const NftLongName: Story = {
+  decorators: [
+    withVoteForm({
+      defaultValues: {
+        gate: {
+          type: GqlVoteGateType.Nft,
+          requiredRole: null,
+          nftTokenId: "nft-long-name",
+        },
+      },
+    }),
+  ],
+};
