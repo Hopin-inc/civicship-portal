@@ -136,7 +136,7 @@ export const LongBio: Story = {
   },
 };
 
-/** depth が上限値（10）に達した chain: 先頭ノードの上に「⋮」プレースホルダが出る。 */
+/** chainDepth > chain.depth の切り詰めケース: 先頭ノードの上に「最初の N 人」プレースホルダが出る。 */
 export const TruncatedChain: Story = {
   args: {
     chain: buildMockChain(11, [
@@ -144,11 +144,13 @@ export const TruncatedChain: Story = {
       ...Array(9).fill({}),
       { name: "あなた" },
     ]),
+    chainDepth: 19,
   },
   parameters: {
     docs: {
       description: {
-        story: "depth >= 10 のとき、先頭ノードの上に「⋮」を出して、さらに続きがある可能性を示唆する",
+        story:
+          "chainDepth (= 19) > chain.depth (= 10) のとき、保持上限の外側にいた人数を「最初の N 人」として示す",
       },
     },
   },
