@@ -1,5 +1,27 @@
 import { gql } from '@apollo/client';
 
+export const GET_NFT_TOKENS = gql`
+  query GetNftTokens($first: Int, $cursor: String, $filter: NftTokenFilterInput, $sort: NftTokenSortInput) {
+    nftTokens(first: $first, cursor: $cursor, filter: $filter, sort: $sort) {
+      edges {
+        cursor
+        node {
+          id
+          address
+          name
+          symbol
+          type
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      totalCount
+    }
+  }
+`;
+
 export const GET_NFT_INSTANCES = gql`
   query GetNftInstances($first: Int, $cursor: String, $filter: NftInstanceFilterInput) {
     nftInstances(first: $first, cursor: $cursor, filter: $filter) {
