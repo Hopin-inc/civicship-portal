@@ -95,12 +95,10 @@ const buildTrailNodes = (
   if (!chain || chain.depth < 2 || chain.steps.length === 0) return [];
 
   // 古い順: [s1.fromUser, s1.toUser, s2.toUser, ..., sN.toUser]
-  const chronological: ChainUser[] = [];
-  const firstFrom = chain.steps[0]?.fromUser;
-  if (firstFrom) chronological.push(firstFrom);
-  for (const step of chain.steps) {
-    if (step.toUser) chronological.push(step.toUser);
-  }
+  const chronological: ChainUser[] = [
+    chain.steps[0]?.fromUser,
+    ...chain.steps.map((step) => step.toUser),
+  ].filter((u): u is ChainUser => !!u);
 
   const excludeSet = new Set(excludeUserIds.filter((v): v is string => !!v));
   return chronological.filter((u) => !excludeSet.has(u.id)).reverse();
