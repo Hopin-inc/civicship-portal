@@ -85,11 +85,13 @@ export const GET_TRANSACTION_DETAIL = gql`
             id
             name
             image
+            bio
           }
           toUser {
             id
             name
             image
+            bio
           }
         }
       }

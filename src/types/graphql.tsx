@@ -2706,6 +2706,7 @@ export type GqlTransactionChainStep = {
 
 export type GqlTransactionChainUser = {
   __typename?: "TransactionChainUser";
+  bio?: Maybe<Scalars["String"]["output"]>;
   id: Scalars["ID"]["output"];
   image?: Maybe<Scalars["String"]["output"]>;
   name: Scalars["String"]["output"];
@@ -6849,12 +6850,14 @@ export type GqlGetTransactionDetailQuery = {
           id: string;
           name: string;
           image?: string | null;
+          bio?: string | null;
         } | null;
         toUser?: {
           __typename?: "TransactionChainUser";
           id: string;
           name: string;
           image?: string | null;
+          bio?: string | null;
         } | null;
       }>;
     } | null;
@@ -13914,11 +13917,13 @@ export const GetTransactionDetailDocument = gql`
             id
             name
             image
+            bio
           }
           toUser {
             id
             name
             image
+            bio
           }
         }
       }
