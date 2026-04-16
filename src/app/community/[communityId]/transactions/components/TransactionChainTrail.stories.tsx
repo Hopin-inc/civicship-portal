@@ -86,14 +86,21 @@ export const LongChain: Story = {
   },
 };
 
-/** 間が 1 人だけ（depth=2, 3 ノード）: 「もっと見る (1人)」で展開。 */
-export const SingleIntermediate: Story = {
+/** 間が 1 人だけ（depth=2, 3 ノード）: 3 人まるごと縦に表示、展開ボタンなし。 */
+export const ThreePeopleInline: Story = {
   args: {
     chain: buildMockChain(3, [
       { name: "発行者" },
       { name: "直前の持ち主" },
       { name: "あなた" },
     ]),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "3 人のときはもっと見るボタンを出さず、間のユーザーも並べて表示する",
+      },
+    },
   },
 };
 

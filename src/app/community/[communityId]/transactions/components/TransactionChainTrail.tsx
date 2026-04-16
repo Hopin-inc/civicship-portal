@@ -20,22 +20,22 @@ interface TransactionChainTrailProps {
 /**
  * トランザクション詳細画面で「このポイントの道のり」を縦タイムラインで表示する。
  *
- * ブックエンド構成:
- * - 発行者（先頭）と最終着地点（末尾）を常に表示
- * - 間の経由者はデフォルトで畳み、「もっと見る (N人)」で展開
- * - chain が null / depth < 2 / ノード不足のときは何も表示しない
+ * 表示ルール:
+ * - 2 人以下（直接送金）: 非表示（詳細ヘッダーで完結するため冗長）
+ * - 3 人（発行者・経由 1 人・最終着地点）: 3 人そのまま縦に並べる
+ * - 4 人以上: 先頭と末尾を表示し、間の経由者は「もっと見る (N人)」で展開
  */
 export const TransactionChainTrail = ({ chain }: TransactionChainTrailProps) => {
   const [expanded, setExpanded] = useState(false);
   const t = useTranslations();
 
   const nodes = buildTrailNodes(chain);
-  if (nodes.length < 2) return null;
+  if (nodes.length < 3) return null;
 
   const firstNode = nodes[0];
   const lastNode = nodes[nodes.length - 1];
   const middleNodes = nodes.slice(1, -1);
-  const hasMiddle = middleNodes.length > 0;
+  const shouldCollapseMiddle = middleNodes.length >= 2 && !expanded;
 
   return (
     <div className="mt-8">
@@ -48,22 +48,21 @@ export const TransactionChainTrail = ({ chain }: TransactionChainTrailProps) => 
       <Card className="p-4">
         <ChainNodeItem node={firstNode} isFirst isLast={false} />
 
-        {hasMiddle &&
-          (expanded
-            ? middleNodes.map((node, idx) => (
-                <ChainNodeItem
-                  key={`${node.id}-mid-${idx}`}
-                  node={node}
-                  isFirst={false}
-                  isLast={false}
-                />
-              ))
-            : (
-              <ChainExpandRow
-                count={middleNodes.length}
-                onClick={() => setExpanded(true)}
-              />
-            ))}
+        {shouldCollapseMiddle ? (
+          <ChainExpandRow
+            count={middleNodes.length}
+            onClick={() => setExpanded(true)}
+          />
+        ) : (
+          middleNodes.map((node, idx) => (
+            <ChainNodeItem
+              key={`${node.id}-mid-${idx}`}
+              node={node}
+              isFirst={false}
+              isLast={false}
+            />
+          ))
+        )}
 
         <ChainNodeItem node={lastNode} isFirst={false} isLast />
       </Card>
