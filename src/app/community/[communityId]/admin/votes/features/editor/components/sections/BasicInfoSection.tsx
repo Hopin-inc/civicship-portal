@@ -45,8 +45,13 @@ export function BasicInfoSection() {
         <Textarea
           {...register("description")}
           placeholder={t("adminVotes.form.description.placeholder")}
-          className="min-h-[80px] placeholder:text-sm"
+          className={`min-h-[80px] placeholder:text-sm ${
+            errors.description ? "border-destructive focus-visible:ring-destructive" : ""
+          }`}
         />
+        {errors.description && (
+          <p className="text-xs text-destructive px-1">{errors.description.message}</p>
+        )}
       </div>
     </section>
   );
