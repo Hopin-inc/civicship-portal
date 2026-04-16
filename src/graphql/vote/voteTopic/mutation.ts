@@ -16,3 +16,13 @@ export const CREATE_VOTE_TOPIC = gql`
   }
   ${VOTE_TOPIC_FRAGMENT}
 `;
+
+export const DELETE_VOTE_TOPIC = gql`
+  mutation DeleteVoteTopic($id: ID!, $permission: CheckCommunityPermissionInput!) {
+    voteTopicDelete(id: $id, permission: $permission) {
+      ... on VoteTopicDeleteSuccess {
+        voteTopicId
+      }
+    }
+  }
+`;
