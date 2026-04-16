@@ -56,7 +56,7 @@ export const TransactionChainTrail = ({ chain }: TransactionChainTrailProps) => 
         ) : (
           middleNodes.map((node, idx) => (
             <ChainNodeItem
-              key={`${node.id}-mid-${idx}`}
+              key={`${node?.id ?? "unknown"}-mid-${idx}`}
               node={node}
               isFirst={false}
               isLast={false}
@@ -70,54 +70,84 @@ export const TransactionChainTrail = ({ chain }: TransactionChainTrailProps) => 
   );
 };
 
-/** chain.steps からユーザーの時系列列を作る（古い → 新しい）。 */
-const buildTrailNodes = (chain: Chain | null | undefined): ChainUser[] => {
+/**
+ * chain.steps からユーザーの時系列列を作る（古い → 新しい）。
+ * null のユーザー（退会済み等）は位置を保つため null のまま残し、描画側でプレースホルダ表示する。
+ */
+const buildTrailNodes = (chain: Chain | null | undefined): (ChainUser | null)[] => {
   if (!chain || chain.depth < 2 || chain.steps.length === 0) return [];
 
   return [
-    chain.steps[0]?.fromUser,
-    ...chain.steps.map((step) => step.toUser),
-  ].filter((u): u is ChainUser => !!u);
+    chain.steps[0]?.fromUser ?? null,
+    ...chain.steps.map((step) => step.toUser ?? null),
+  ];
 };
 
 interface ChainNodeItemProps {
-  node: ChainUser;
+  node: ChainUser | null;
   isFirst: boolean;
   isLast: boolean;
 }
 
 /** 縦タイムライン 1 行ぶん（アバター + 名前 + bio）。rail は `.timeline-avatar` に任せる。 */
-const ChainNodeItem = ({ node, isFirst, isLast }: ChainNodeItemProps) => (
-  <AppLink
-    href={`/users/${node.id}`}
-    className={cn(
-      "relative flex gap-3 timeline-item",
-      !isLast && "pb-10",
-      "rounded-md -mx-1 px-1 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50",
-    )}
-  >
-    <div
+const ChainNodeItem = ({ node, isFirst, isLast }: ChainNodeItemProps) => {
+  const t = useTranslations();
+
+  const railClasses = cn(
+    "relative shrink-0 timeline-avatar",
+    isFirst && "timeline-avatar-first",
+    isLast && "timeline-avatar-last",
+  );
+
+  if (!node) {
+    return (
+      <div
+        className={cn(
+          "relative flex gap-3 timeline-item",
+          !isLast && "pb-10",
+          "-mx-1 px-1",
+        )}
+      >
+        <div className={railClasses}>
+          <Avatar className="h-10 w-10 shrink-0 border">
+            <AvatarFallback>?</AvatarFallback>
+          </Avatar>
+        </div>
+        <div className="flex-1 min-w-0 self-center">
+          <p className="text-sm font-semibold text-muted-foreground truncate">
+            {t("transactions.chain.unknownUser")}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <AppLink
+      href={`/users/${node.id}`}
       className={cn(
-        "relative shrink-0 timeline-avatar",
-        isFirst && "timeline-avatar-first",
-        isLast && "timeline-avatar-last",
+        "relative flex gap-3 timeline-item",
+        !isLast && "pb-10",
+        "rounded-md -mx-1 px-1 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50",
       )}
     >
-      <Avatar className="h-10 w-10 shrink-0 border">
-        <AvatarImage src={node.image ?? ""} alt={node.name} />
-        <AvatarFallback>{node.name?.[0]?.toUpperCase() ?? "U"}</AvatarFallback>
-      </Avatar>
-    </div>
-    <div className={cn("flex-1 min-w-0", node.bio ? "pt-0.5" : "self-center")}>
-      <p className="text-sm font-semibold truncate">{node.name}</p>
-      {node.bio && (
-        <p className="mt-0.5 text-body-xs text-muted-foreground line-clamp-2 leading-snug">
-          {node.bio}
-        </p>
-      )}
-    </div>
-  </AppLink>
-);
+      <div className={railClasses}>
+        <Avatar className="h-10 w-10 shrink-0 border">
+          <AvatarImage src={node.image ?? ""} alt={node.name} />
+          <AvatarFallback>{node.name?.[0]?.toUpperCase() ?? "U"}</AvatarFallback>
+        </Avatar>
+      </div>
+      <div className={cn("flex-1 min-w-0", node.bio ? "pt-0.5" : "self-center")}>
+        <p className="text-sm font-semibold truncate">{node.name}</p>
+        {node.bio && (
+          <p className="mt-0.5 text-body-xs text-muted-foreground line-clamp-2 leading-snug">
+            {node.bio}
+          </p>
+        )}
+      </div>
+    </AppLink>
+  );
+};
 
 interface ChainExpandRowProps {
   count: number;
@@ -135,7 +165,7 @@ const ChainExpandRow = ({ count, onClick }: ChainExpandRowProps) => {
         <Button
           variant="tertiary"
           size="sm"
-          className="bg-white px-6"
+          className="bg-background px-6"
           onClick={onClick}
         >
           <span className="text-label-sm font-bold">
