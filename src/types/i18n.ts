@@ -239,6 +239,7 @@ export type TranslationKey =
   | "transactions.action.return.from"
   | "transactions.action.return.to"
   | "transactions.chain.badgeLabel"
+  | "transactions.chain.earlierParticipants"
   | "transactions.chain.journey"
   | "transactions.chain.showMore"
   | "transactions.chain.unknownUser"

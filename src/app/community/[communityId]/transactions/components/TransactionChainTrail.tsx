@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AppLink } from "@/lib/navigation";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { ChainDepthBadge } from "@/shared/transactions/components/timeline/ChainDepthBadge";
 import { GqlGetTransactionDetailQuery } from "@/types/graphql";
 
 type Chain = NonNullable<NonNullable<GqlGetTransactionDetailQuery["transaction"]>["chain"]>;
@@ -15,6 +15,9 @@ type ChainParticipant = NonNullable<Step["from"] | Step["to"]>;
 
 interface TransactionChainTrailProps {
   chain?: Chain | null;
+  /** Transaction.chainDepth（上限なし）。chain.depth は保持上限（10）までしか取れないため、
+   * その前に切り詰められた人数を出すために使う。 */
+  chainDepth?: number | null;
 }
 
 /**
@@ -24,8 +27,10 @@ interface TransactionChainTrailProps {
  * - 2 人以下（直接送金）: 非表示（詳細ヘッダーで完結するため冗長）
  * - 3 人（発行者・経由 1 人・最終着地点）: 3 人そのまま縦に並べる
  * - 4 人以上: 先頭と末尾を表示し、間の経由者は「もっと見る (N人)」で展開
+ * - chainDepth > chain.depth の場合: 先頭ノードの上に「最初の N 人」プレースホルダを表示し、
+ *   保持上限（chain は最大 10 ステップ）より前の連鎖が存在することを示す
  */
-export const TransactionChainTrail = ({ chain }: TransactionChainTrailProps) => {
+export const TransactionChainTrail = ({ chain, chainDepth }: TransactionChainTrailProps) => {
   const [expanded, setExpanded] = useState(false);
   const t = useTranslations();
 
@@ -36,17 +41,23 @@ export const TransactionChainTrail = ({ chain }: TransactionChainTrailProps) => 
   const lastNode = nodes[nodes.length - 1];
   const middleNodes = nodes.slice(1, -1);
   const shouldCollapseMiddle = middleNodes.length >= 2 && !expanded;
+  const retainedDepth = chain?.depth ?? 0;
+  const fullDepth = Math.max(chainDepth ?? retainedDepth, retainedDepth);
+  const truncatedCount = fullDepth - retainedDepth;
+  const isTruncated = truncatedCount > 0;
 
   return (
     <div className="mt-8">
-      <div className="mb-3">
+      <div className="mb-3 flex items-center gap-2">
         <span className="text-label-sm text-muted-foreground">
           {t("transactions.chain.journey")}
         </span>
+        <ChainDepthBadge depth={fullDepth} />
       </div>
 
-      <Card className="p-4">
-        <ChainNodeItem node={firstNode} isFirst isLast={false} />
+      <div>
+        {isTruncated && <ChainTruncationRow count={truncatedCount} />}
+        <ChainNodeItem node={firstNode} isFirst={!isTruncated} isLast={false} />
 
         {shouldCollapseMiddle ? (
           <ChainExpandRow
@@ -65,7 +76,7 @@ export const TransactionChainTrail = ({ chain }: TransactionChainTrailProps) => 
         )}
 
         <ChainNodeItem node={lastNode} isFirst={false} isLast />
-      </Card>
+      </div>
     </div>
   );
 };
@@ -166,6 +177,23 @@ const ChainNodeItem = ({ node, isFirst, isLast }: ChainNodeItemProps) => {
     >
       {inner}
     </AppLink>
+  );
+};
+
+/**
+ * chain.steps の保持上限を超えて連鎖が続いている場合に、先頭ノードの上に出すプレースホルダ。
+ * 「最初の N 人」という形で、この前にもさらに連鎖があったことを文字で示す（欠損ではない）。
+ */
+const ChainTruncationRow = ({ count }: { count: number }) => {
+  const t = useTranslations();
+  return (
+    <div>
+      <p className="text-xs text-muted-foreground mb-2">
+        {t("transactions.chain.earlierParticipants", { count })}
+      </p>
+      {/* 下のアバターの top rail と繋がるように、左から 20px の位置に縦線を流す */}
+      <div className="ml-5 h-4 w-px bg-border opacity-40" aria-hidden />
+    </div>
   );
 };
 
