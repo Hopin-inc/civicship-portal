@@ -36,6 +36,7 @@
   "adminVotes.form.options.removeLabel": "削除",
   "adminVotes.form.options.placeholder": "選択肢のラベル",
   "adminVotes.form.gate.label": "投票できる人",
+  "adminVotes.form.votingRules.label": "投票ルール",
   "adminVotes.form.gate.summary.nftUnselected": "NFT 保有者（未選択）",
   "adminVotes.form.gate.type.label": "資格タイプ",
   "adminVotes.form.gate.type.MEMBERSHIP": "コミュニティメンバー",

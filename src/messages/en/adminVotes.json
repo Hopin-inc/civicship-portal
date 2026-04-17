@@ -36,6 +36,7 @@
   "adminVotes.form.options.removeLabel": "Remove",
   "adminVotes.form.options.placeholder": "Option label",
   "adminVotes.form.gate.label": "Who can vote",
+  "adminVotes.form.votingRules.label": "Voting rules",
   "adminVotes.form.gate.summary.nftUnselected": "NFT holders (not selected)",
   "adminVotes.form.gate.type.label": "Eligibility type",
   "adminVotes.form.gate.type.MEMBERSHIP": "Community members",

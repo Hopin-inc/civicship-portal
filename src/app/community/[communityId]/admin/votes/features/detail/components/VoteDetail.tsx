@@ -3,8 +3,7 @@
 import { useTranslations } from "next-intl";
 import { VoteDetailHeader } from "./VoteDetailHeader";
 import { VoteDetailOptionsSection } from "./VoteDetailOptionsSection";
-import { VoteDetailGateSection } from "./VoteDetailGateSection";
-import { VoteDetailPowerPolicySection } from "./VoteDetailPowerPolicySection";
+import { VoteDetailRulesSection } from "./VoteDetailRulesSection";
 import type { VoteDetailView } from "../types/VoteDetailView";
 
 interface VoteDetailProps {
@@ -34,8 +33,7 @@ export function VoteDetail({ view }: VoteDetailProps) {
       )}
 
       <VoteDetailOptionsSection options={view.options} />
-      <VoteDetailGateSection gate={view.gate} />
-      <VoteDetailPowerPolicySection powerPolicy={view.powerPolicy} />
+      <VoteDetailRulesSection gate={view.gate} powerPolicy={view.powerPolicy} />
     </div>
   );
 }
