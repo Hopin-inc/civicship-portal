@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { AppLink } from "@/lib/navigation";
 import { useTranslations } from "next-intl";
 import { Item, ItemContent, ItemFooter, ItemTitle } from "@/components/ui/item";
 import { cn } from "@/lib/utils";
@@ -59,7 +59,7 @@ export function VoteListItem({ item, communityId, refetch }: VoteListItemProps) 
 
   return (
     <Item className="items-start">
-      <Link
+      <AppLink
         href={`/admin/votes/${item.id}`}
         className="flex flex-1 flex-col min-w-0 gap-2"
       >
@@ -89,7 +89,7 @@ export function VoteListItem({ item, communityId, refetch }: VoteListItemProps) 
             </span>
           </div>
         </ItemFooter>
-      </Link>
+      </AppLink>
 
       <VoteActionsMenu
         phase={item.phase}

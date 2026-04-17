@@ -1,9 +1,9 @@
 "use client";
 
 import { useRef } from "react";
-import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Plus } from "lucide-react";
+import { AppLink } from "@/lib/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Empty,
@@ -51,10 +51,10 @@ export function VoteList({ communityId }: VoteListProps) {
         </EmptyHeader>
         <EmptyContent>
           <Button asChild variant="primary">
-            <Link href="/admin/votes/new">
+            <AppLink href="/admin/votes/new">
               <Plus className="h-4 w-4" />
               {t("adminVotes.list.createButton")}
-            </Link>
+            </AppLink>
           </Button>
         </EmptyContent>
       </Empty>
