@@ -9,7 +9,8 @@
     "start": "next start -p 8000",
     "lint": "next lint --dir src",
     "lint:fix": "yarn lint --fix",
-    "lint:graphql": "eslint 'src/**/*.{ts,tsx}' --no-eslintrc --config .eslintrc.json",
+    "lint:graphql": "eslint 'src/**/*.{ts,tsx,graphql}' --no-eslintrc --config .eslintrc.js",
+    "lint:graphql:report": "tsx scripts/graphql-limits-report.ts",
     "format": "prettier --write --ignore-path .gitignore './**/*.{js,jsx,ts,tsx,json}'",
     "gql:generate": "export NODE_TLS_REJECT_UNAUTHORIZED=0 && graphql-codegen --config codegen.yaml",
     "i18n:validate": "tsx scripts/validate-i18n-json.ts",
@@ -21,7 +22,8 @@
     "test:coverage": "vitest --project unit --coverage",
     "test:ui": "vitest --project unit --ui",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "chromatic": "chromatic --exit-zero-on-changes"
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",
@@ -106,6 +108,11 @@
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^4.0.1",
+    "@escape.tech/graphql-armor-cost-limit": "^2.4.3",
+    "@escape.tech/graphql-armor-max-aliases": "^2.6.2",
+    "@escape.tech/graphql-armor-max-depth": "^2.4.2",
+    "@escape.tech/graphql-armor-max-directives": "^2.3.1",
+    "@escape.tech/graphql-armor-max-tokens": "^2.5.1",
     "@graphql-codegen/cli": "5.0.2",
     "@graphql-codegen/client-preset": "4.3.3",
     "@graphql-codegen/introspection": "4.0.3",
@@ -133,6 +140,7 @@
     "@types/retry": "^0.12.5",
     "@vitest/browser": "^3.2.4",
     "@vitest/coverage-v8": "^3.2.4",
+    "chromatic": "16.3.0",
     "eslint": "^8.57.1",
     "eslint-config-next": "14.2.5",
     "eslint-config-prettier": "^9.1.0",
