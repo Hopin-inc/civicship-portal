@@ -21,7 +21,9 @@ const config: StorybookConfig = {
   viteFinal: async (viteConfig) => {
     viteConfig.define = {
       ...viteConfig.define,
-      "process.env": JSON.stringify({ ENV: "STORYBOOK" }),
+      // src/lib/environment.ts の isStorybook 判定をビルド時に true にする。
+      // NODE_ENV など他の process.env.* は Vite のデフォルト置換に任せる。
+      "process.env.ENV": JSON.stringify("STORYBOOK"),
     };
     return viteConfig;
   },
