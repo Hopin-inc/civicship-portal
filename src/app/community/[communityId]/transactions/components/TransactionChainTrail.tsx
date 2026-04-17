@@ -187,13 +187,10 @@ const ChainNodeItem = ({ node, isFirst, isLast }: ChainNodeItemProps) => {
 const ChainTruncationRow = ({ count }: { count: number }) => {
   const t = useTranslations();
   return (
-    <div className="relative flex gap-3 pb-10 timeline-item">
-      <div className="relative shrink-0 timeline-avatar timeline-avatar-first w-10 h-10" />
-      <div className="flex-1 min-w-0 self-center">
-        <p className="text-xs text-muted-foreground text-left">
-          {t("transactions.chain.earlierParticipants", { count })}
-        </p>
-      </div>
+    <div className="pb-4">
+      <p className="text-xs text-muted-foreground">
+        {t("transactions.chain.earlierParticipants", { count })}
+      </p>
     </div>
   );
 };
