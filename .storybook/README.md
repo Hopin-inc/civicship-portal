@@ -38,7 +38,10 @@ pnpm chromatic        # Chromatic へ publish (要 CHROMATIC_PROJECT_TOKEN)
 
 1. `withI18n` — next-intl の翻訳供給 (`useTranslations()` が動く)
 2. `withCommunityConfig` — `CommunityConfigProvider` にモック config を供給 (`AppLink` 等のパス解決に必要)
-3. `withHeader` — 実物の `HeaderProvider` でラップ (`useHeader()` が動く)
+3. `withHeader` — `HeaderContext.Provider` に固定値を供給して `useHeader()` を動かす。
+   実物の `HeaderProvider` コンポーネントは内部で `usePathname()` を参照しており、
+   Chromatic の Playwright テスト環境では null が返って `normalizePathname` が
+   落ちるため、副作用のない Context.Provider 直使用に留める
 4. `withAuth` — **現状は no-op**。`src/contexts/AuthProvider.tsx` 内部の
    `AuthContext` が export されていないため、独自に作った context を Provider
    しても実体の `useAuth()` からは参照されない。`useAuth()` を呼ばない
@@ -99,6 +102,16 @@ const meta: Meta<typeof MyComponent> = {
 2. `decorators/index.ts` で再 export
 3. グローバル適用したいなら `globalDecorators` に追加
 4. opt-in なら各 story の `decorators` に直接入れる
+
+### 実装の指針
+
+- **副作用を持つ Provider コンポーネントを直接マウントしない**
+  `usePathname()` / `useRouter()` / `useEffect` で外部リソースを叩く等の副作用がある
+  Provider は Chromatic の Playwright テスト環境で想定外のエラーを出しやすい。
+  可能な限り `Context.Provider` に固定値を渡す形にする。
+- **本物の Context を使う**
+  `createContext()` で独自の context を decorator 内に作っても、コンポーネント側が
+  参照する実体の context とは別物なので効果がない (withAuth 参照)。
 
 ## useAuth() を使うコンポーネントの story
 
