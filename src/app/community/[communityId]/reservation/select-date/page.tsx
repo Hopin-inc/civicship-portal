@@ -5,7 +5,7 @@ import GuestSelectionForm from "@/app/community/[communityId]/reservation/select
 import SelectionSheet from "@/app/community/[communityId]/reservation/select-date/components/SelectionSheet";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { HeaderConfig } from "@/contexts/HeaderContext";
+import { HeaderConfig } from "@/components/providers/HeaderProvider";
 import { useReservationDateLoader } from "@/app/community/[communityId]/reservation/select-date/hooks/useOpportunitySlotQuery";
 import { useReservationDateHandler } from "@/app/community/[communityId]/reservation/select-date/hooks/useReservationDateHandler";
 import { filterSlotGroupsBySelectedDate } from "@/app/community/[communityId]/reservation/data/presenter/opportunitySlot";

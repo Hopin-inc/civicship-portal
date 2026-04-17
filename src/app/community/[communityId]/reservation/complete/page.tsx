@@ -4,7 +4,7 @@ import CompletionHeader from "@/app/community/[communityId]/reservation/complete
 import React, { useEffect, useMemo, useRef } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useSearchParams } from "next/navigation";
-import { HeaderConfig } from "@/contexts/HeaderContext";
+import { HeaderConfig } from "@/components/providers/HeaderProvider";
 import { useCompletePageViewModel } from "@/app/community/[communityId]/reservation/complete/hooks/useCompletePageViewModel";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";
