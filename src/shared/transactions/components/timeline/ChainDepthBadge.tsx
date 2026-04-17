@@ -22,9 +22,9 @@ export const ChainDepthBadge = ({ depth }: ChainDepthBadgeProps) => {
     <span
       title={label}
       aria-label={label}
-      className="shrink-0 inline-flex items-center gap-0.5 rounded-full border border-muted-foreground/30 px-1.5 py-px text-[10px] leading-none text-muted-foreground"
+      className="shrink-0 inline-flex items-center gap-0.5 rounded-full border border-muted-foreground/30 px-2 py-0.5 text-xs leading-none text-muted-foreground"
     >
-      <Link2 className="w-2.5 h-2.5" strokeWidth={2} />
+      <Link2 className="w-3 h-3" strokeWidth={2} />
       <span className="tabular-nums">{depth}</span>
     </span>
   );
