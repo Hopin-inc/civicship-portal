@@ -79,7 +79,7 @@ module.exports = {
       'Document:exit'(doc) {
         for (const def of doc.definitions) {
           if (def.kind !== 'OperationDefinition') continue;
-          const cost = costOfSelections(def.selectionSet.selections, 1, new Set());
+          const cost = costOfSelections(def.selectionSet.selections, 0, new Set());
           if (cost > maxCost) {
             context.report({
               node: def,

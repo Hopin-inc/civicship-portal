@@ -5,6 +5,7 @@ import {
   Source,
   buildClientSchema,
   parse,
+  print,
   validate,
   type DefinitionNode,
   type DocumentNode,
@@ -20,9 +21,10 @@ import { maxDirectivesRule } from "@escape.tech/graphql-armor-max-directives";
 import { MaxTokensParserWLexer } from "@escape.tech/graphql-armor-max-tokens";
 import { BACKEND_LIMITS, CLIENT_LIMITS } from "../src/config/graphql-limits";
 
-const ROOT = path.resolve(__dirname, "..", "src");
-const GENERATED_FILE = path.resolve(__dirname, "..", "src", "types", "graphql.tsx");
-const SCHEMA_FILE = path.resolve(__dirname, "..", "graphql.schema.json");
+const PROJECT_ROOT = process.cwd();
+const ROOT = path.resolve(PROJECT_ROOT, "src");
+const GENERATED_FILE = path.resolve(PROJECT_ROOT, "src", "types", "graphql.tsx");
+const SCHEMA_FILE = path.resolve(PROJECT_ROOT, "graphql.schema.json");
 
 type Metric = "depth" | "aliases" | "directives" | "tokens" | "cost";
 
@@ -42,7 +44,8 @@ function walkDir(dir: string, out: string[] = []): string[] {
 
 function extractGqlTemplates(source: string): string[] {
   const out: string[] = [];
-  const re = /gql`([\s\S]*?)`/g;
+  // Matches both tagged-template form `gql`...`` and call form `gql(`...`)`.
+  const re = /\bgql\s*\(?\s*`([\s\S]*?)`\s*\)?/g;
   let m: RegExpExecArray | null;
   while ((m = re.exec(source)) !== null) {
     out.push(m[1].replace(/\$\{[^}]*\}/g, ""));
@@ -126,7 +129,6 @@ function measureWithArmor(schema: GraphQLSchema, doc: DocumentNode): Captured {
 
 function measureTokens(doc: DocumentNode): number {
   // Armor's max-tokens plugin hooks the Parser; replicate by tokenizing printed output.
-  const { print } = require("graphql") as typeof import("graphql");
   const source = new Source(print(doc));
   const parser = new MaxTokensParserWLexer(source, {
     n: Number.MAX_SAFE_INTEGER,
@@ -256,9 +258,9 @@ const NUM_W = 6;
 const BAR_W = 20;
 
 console.log(
-  `  ${"metric".padEnd(LABEL_W)} ${"max".padStart(NUM_W)} / ${"limit".padStart(NUM_W)}  ${"usage".padStart(7)}  status  ${"chart".padEnd(BAR_W)}   top operation`,
+  `  ${"metric".padEnd(LABEL_W)} ${"max".padStart(NUM_W)} / ${"limit".padStart(NUM_W)} / ${"backend".padStart(NUM_W)}  ${"usage".padStart(7)}  status  ${"chart".padEnd(BAR_W)}   top operation`,
 );
-console.log(color(`  ${"-".repeat(LABEL_W + NUM_W * 2 + BAR_W + 50)}`, DIM));
+console.log(color(`  ${"-".repeat(LABEL_W + NUM_W * 3 + BAR_W + 55)}`, DIM));
 
 function maxOf(metric: Metric): { value: number; operation: string } {
   let best: { value: number; operation: string } = { value: 0, operation: "" };
@@ -280,7 +282,7 @@ for (const row of rows) {
   const opName = top.operation || "—";
   console.log(
     `  ${row.label.padEnd(LABEL_W)}` +
-      ` ${color(String(value).padStart(NUM_W), c)} / ${String(row.limit).padStart(NUM_W)}  ` +
+      ` ${color(String(value).padStart(NUM_W), c)} / ${String(row.limit).padStart(NUM_W)} / ${color(String(row.backend).padStart(NUM_W), DIM)}  ` +
       `${color(usage.padStart(7), c)}  ${statusLabel(value, row.limit).padEnd(14)} ` +
       `${color(bar(value, row.limit, BAR_W), c)}   ${opName}`,
   );
