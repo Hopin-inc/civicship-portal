@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import {
   parse,
+  print,
   Source,
   Lexer,
   TokenKind,
@@ -119,36 +120,77 @@ function computeDepth(
   return max;
 }
 
+function collectSpreadFragments(
+  node: unknown,
+  acc: Set<string> = new Set(),
+): Set<string> {
+  if (!node || typeof node !== "object") return acc;
+  const obj = node as Record<string, unknown>;
+  if (obj.kind === "FragmentSpread") {
+    const name = ((obj.name as { value: string }) || { value: "" }).value;
+    if (name && !acc.has(name)) {
+      acc.add(name);
+      const frag = fragments.get(name);
+      if (frag) collectSpreadFragments(frag, acc);
+    }
+  }
+  for (const k of Object.keys(obj)) {
+    const v = obj[k];
+    if (Array.isArray(v)) v.forEach((x) => collectSpreadFragments(x, acc));
+    else if (v && typeof v === "object" && (v as Record<string, unknown>).kind) {
+      collectSpreadFragments(v, acc);
+    }
+  }
+  return acc;
+}
+
 function countAliases(op: OperationDefinitionNode): number {
   let count = 0;
-  const walk = (sels: readonly SelectionNode[]) => {
+  const walk = (sels: readonly SelectionNode[], visited: Set<string>) => {
     for (const s of sels) {
       if (s.kind === "Field") {
         if (s.alias) count++;
-        if (s.selectionSet) walk(s.selectionSet.selections);
+        if (s.selectionSet) walk(s.selectionSet.selections, visited);
       } else if (s.kind === "InlineFragment" && s.selectionSet) {
-        walk(s.selectionSet.selections);
+        walk(s.selectionSet.selections, visited);
+      } else if (s.kind === "FragmentSpread") {
+        const name = s.name.value;
+        if (visited.has(name)) continue;
+        const frag = fragments.get(name);
+        if (!frag) continue;
+        const next = new Set(visited);
+        next.add(name);
+        walk(frag.selectionSet.selections, next);
       }
     }
   };
-  walk(op.selectionSet.selections);
+  walk(op.selectionSet.selections, new Set());
+  return count;
+}
+
+function countDirectivesIn(node: unknown): number {
+  let count = 0;
+  if (!node || typeof node !== "object") return 0;
+  const obj = node as Record<string, unknown>;
+  const directives = obj.directives as unknown[] | undefined;
+  if (Array.isArray(directives)) count += directives.length;
+  for (const k of Object.keys(obj)) {
+    if (k === "directives") continue;
+    const v = obj[k];
+    if (Array.isArray(v)) v.forEach((x) => (count += countDirectivesIn(x)));
+    else if (v && typeof v === "object" && (v as Record<string, unknown>).kind) {
+      count += countDirectivesIn(v);
+    }
+  }
   return count;
 }
 
 function countDirectives(op: OperationDefinitionNode): number {
-  let count = 0;
-  const visit = (n: unknown): void => {
-    if (!n || typeof n !== "object") return;
-    const obj = n as Record<string, unknown>;
-    const directives = obj.directives as unknown[] | undefined;
-    if (Array.isArray(directives)) count += directives.length;
-    for (const k of Object.keys(obj)) {
-      const v = obj[k];
-      if (Array.isArray(v)) v.forEach(visit);
-      else if (v && typeof v === "object" && (v as Record<string, unknown>).kind) visit(v);
-    }
-  };
-  visit(op);
+  let count = countDirectivesIn(op);
+  for (const name of collectSpreadFragments(op)) {
+    const frag = fragments.get(name);
+    if (frag) count += countDirectivesIn(frag);
+  }
   return count;
 }
 
@@ -165,6 +207,15 @@ function countTokens(text: string): number {
     /* ignore */
   }
   return c;
+}
+
+function countOperationTokens(op: OperationDefinitionNode): number {
+  const parts: string[] = [print(op)];
+  for (const name of collectSpreadFragments(op)) {
+    const frag = fragments.get(name);
+    if (frag) parts.push(print(frag));
+  }
+  return countTokens(parts.join("\n"));
 }
 
 function rel(p: string): string {
@@ -235,12 +286,8 @@ interface OperationRow {
 
 const opRows: OperationRow[] = [];
 
-// Phase 2: measure each operation
-for (const { file, text, doc } of docs) {
-  const tokens = countTokens(text);
-  if (tokens > 0) {
-    hits.tokens.push({ metric: "tokens", value: tokens, operation: "(document)", file });
-  }
+// Phase 2: measure each operation (fragments expanded to match wire request)
+for (const { file, doc } of docs) {
   for (const d of doc.definitions) {
     if (d.kind !== "OperationDefinition") continue;
     const name = d.name?.value ?? "(anonymous)";
@@ -248,10 +295,12 @@ for (const { file, text, doc } of docs) {
     const cost = Math.round(computeCost(d.selectionSet.selections, 1, new Set()));
     const aliases = countAliases(d);
     const directives = countDirectives(d);
+    const tokens = countOperationTokens(d);
     hits.depth.push({ metric: "depth", value: depth, operation: name, file });
     hits.cost.push({ metric: "cost", value: cost, operation: name, file });
     hits.aliases.push({ metric: "aliases", value: aliases, operation: name, file });
     hits.directives.push({ metric: "directives", value: directives, operation: name, file });
+    hits.tokens.push({ metric: "tokens", value: tokens, operation: name, file });
     opRows.push({ name, file, depth, aliases, directives, tokens, cost });
   }
 }
