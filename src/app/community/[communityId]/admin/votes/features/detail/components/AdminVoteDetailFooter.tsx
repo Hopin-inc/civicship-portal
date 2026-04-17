@@ -22,28 +22,36 @@ export function AdminVoteDetailFooter({
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background">
       <div className="max-w-md mx-auto px-4 py-3 flex justify-end gap-3">
-        <Button
-          variant="tertiary"
-          size="sm"
-          disabled={!isEditable}
-          onClick={onDelete}
+        <span
+          className="inline-block"
           title={!isEditable ? t("adminVotes.detail.deleteDisabledHint") : undefined}
-          className="gap-1"
         >
-          <Trash2 className="h-4 w-4" />
-          {t("adminVotes.detail.deleteButton")}
-        </Button>
-        <Button
-          variant="primary"
-          size="sm"
-          disabled={!isEditable}
-          onClick={onEdit}
+          <Button
+            variant="tertiary"
+            size="sm"
+            disabled={!isEditable}
+            onClick={onDelete}
+            className="gap-1"
+          >
+            <Trash2 className="h-4 w-4" />
+            {t("adminVotes.detail.deleteButton")}
+          </Button>
+        </span>
+        <span
+          className="inline-block"
           title={!isEditable ? t("adminVotes.detail.editDisabledHint") : undefined}
-          className="gap-1"
         >
-          <Pencil className="h-4 w-4" />
-          {t("adminVotes.detail.editButton")}
-        </Button>
+          <Button
+            variant="primary"
+            size="sm"
+            disabled={!isEditable}
+            onClick={onEdit}
+            className="gap-1"
+          >
+            <Pencil className="h-4 w-4" />
+            {t("adminVotes.detail.editButton")}
+          </Button>
+        </span>
       </div>
     </div>
   );
