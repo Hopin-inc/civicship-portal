@@ -1,0 +1,7 @@
+<script>
+  // Vite ビルドのバンドルが読み込まれる前に process.env を用意する。
+  // src/lib/logging/client/index.ts 等のモジュール初期化時に
+  // process.env.NEXT_PUBLIC_LOG_LEVEL を参照しており、
+  // ブラウザでは process が未定義のため ReferenceError になる。
+  window.process = window.process || { env: {} };
+</script>
