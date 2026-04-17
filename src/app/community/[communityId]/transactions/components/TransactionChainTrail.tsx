@@ -187,10 +187,12 @@ const ChainNodeItem = ({ node, isFirst, isLast }: ChainNodeItemProps) => {
 const ChainTruncationRow = ({ count }: { count: number }) => {
   const t = useTranslations();
   return (
-    <div className="pb-4">
-      <p className="text-xs text-muted-foreground">
+    <div>
+      <p className="text-xs text-muted-foreground mb-2">
         {t("transactions.chain.earlierParticipants", { count })}
       </p>
+      {/* 下のアバターの top rail と繋がるように、左から 20px の位置に縦線を流す */}
+      <div className="ml-5 h-4 w-px bg-border opacity-40" aria-hidden />
     </div>
   );
 };
