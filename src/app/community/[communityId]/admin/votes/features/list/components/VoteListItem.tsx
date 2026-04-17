@@ -47,9 +47,7 @@ function powerPolicySummaryText(
   if (summary.type === "flat") {
     return t("adminVotes.form.powerPolicy.type.FLAT");
   }
-  return summary.tokenName
-    ? `NFT: ${summary.tokenName}`
-    : t("adminVotes.form.powerPolicy.type.NFT_COUNT");
+  return t("adminVotes.form.powerPolicy.type.NFT_COUNT");
 }
 
 export function VoteListItem({ item, onEdit, onDelete }: VoteListItemProps) {

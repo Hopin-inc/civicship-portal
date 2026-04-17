@@ -34,18 +34,6 @@ export function VoteDetailPowerPolicySection({
             </ItemTitle>
           </ItemContent>
         </Item>
-        {powerPolicy.type === "nftCount" && (
-          <>
-            <ItemSeparator />
-            <Item size="sm">
-              <ItemContent>
-                <span className="text-sm text-muted-foreground">
-                  NFT: {powerPolicy.tokenName ?? "—"}
-                </span>
-              </ItemContent>
-            </Item>
-          </>
-        )}
       </ItemGroup>
     </section>
   );
