@@ -102,11 +102,13 @@ const meta: Meta<typeof MyComponent> = {
 
 ## useAuth() を使うコンポーネントの story
 
-現状 `src/contexts/AuthProvider.tsx` が `AuthContext` を export していないため、`useAuth()` を直接叩くコンポーネントは完全にはモックできない。対応方法:
+現状 `src/contexts/AuthProvider.tsx` が `AuthContext` を export していないため、`useAuth()` を直接叩くコンポーネントは story を書けない (必ず throw する)。`withAuth` は将来対応の placeholder であり、この問題は解消しない。
 
-- **軽量パス**: `withAuth` に委ねる（`useContext(MockContext)` だけ動く）
-- **本格パス**: `AuthProvider.tsx` から `AuthContext` を export して、decorator で `AuthContext.Provider` を使う
-- **ホイスト**: コンポーネント側で props 経由で値を受け取るリファクタ
+解決するには以下のいずれかの対応が必要:
+
+- **AuthContext を export**: `AuthProvider.tsx` から `AuthContext` を export し、decorator 内で `AuthContext.Provider` を使う
+- **Vite alias mock**: `@/contexts/AuthProvider` をテスト用 mock 実装に alias する
+- **props リフト**: コンポーネント側で props 経由で auth 情報を受け取る設計に変更する
 
 新規 UI 部品を書く際は、可能なら props 経由でユーザー情報を受け取る設計にすると story が書きやすい。
 
