@@ -61,6 +61,7 @@
   "adminVotes.form.powerPolicy.nftToken.syncedFromGate": "Uses the same NFT as the eligibility gate",
   "adminVotes.form.powerPolicy.type.requiresNftGate": "Available when the eligibility type is set to NFT holders",
   "adminVotes.form.submitButton": "Create",
+  "adminVotes.form.createConfirm": "Create this vote? Once the start time passes, it can no longer be edited or deleted.",
   "adminVotes.form.submitting": "Creating...",
   "adminVotes.form.errors.titleRequired": "Please enter a title",
   "adminVotes.form.errors.startsAtRequired": "Please enter a start date and time",
