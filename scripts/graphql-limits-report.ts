@@ -34,10 +34,13 @@ const hits: Record<Metric, Hit[]> = {
 const fragments = new Map<string, FragmentDefinitionNode>();
 const docs: { file: string; text: string; doc: DocumentNode }[] = [];
 
+const GENERATED_FILE = path.resolve(__dirname, "..", "src", "types", "graphql.tsx");
+
 function walkDir(dir: string, out: string[] = []): string[] {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     if (entry.name === "node_modules" || entry.name === ".next") continue;
     const p = path.join(dir, entry.name);
+    if (p === GENERATED_FILE) continue;
     if (entry.isDirectory()) walkDir(p, out);
     else if (/\.(ts|tsx|graphql)$/.test(entry.name)) out.push(p);
   }
@@ -213,6 +216,18 @@ for (const f of files) {
   }
 }
 
+interface OperationRow {
+  name: string;
+  file: string;
+  depth: number;
+  aliases: number;
+  directives: number;
+  tokens: number;
+  cost: number;
+}
+
+const opRows: OperationRow[] = [];
+
 // Phase 2: measure each operation
 for (const { file, text, doc } of docs) {
   const tokens = countTokens(text);
@@ -223,13 +238,14 @@ for (const { file, text, doc } of docs) {
     if (d.kind !== "OperationDefinition") continue;
     const name = d.name?.value ?? "(anonymous)";
     const depth = computeDepth(d.selectionSet.selections, 1, new Set());
-    const cost = computeCost(d.selectionSet.selections, 1, new Set());
+    const cost = Math.round(computeCost(d.selectionSet.selections, 1, new Set()));
     const aliases = countAliases(d);
     const directives = countDirectives(d);
     hits.depth.push({ metric: "depth", value: depth, operation: name, file });
-    hits.cost.push({ metric: "cost", value: Math.round(cost), operation: name, file });
+    hits.cost.push({ metric: "cost", value: cost, operation: name, file });
     hits.aliases.push({ metric: "aliases", value: aliases, operation: name, file });
     hits.directives.push({ metric: "directives", value: directives, operation: name, file });
+    opRows.push({ name, file, depth, aliases, directives, tokens, cost });
   }
 }
 
@@ -282,13 +298,43 @@ for (const row of rows) {
 }
 
 console.log("");
-console.log(color("top 3 per metric:", "1"));
-for (const row of rows) {
-  console.log(color(`  ${row.label}`, DIM));
-  for (const hit of topN(row.metric, 3)) {
-    if (hit.value === 0) continue;
-    console.log(`    ${String(hit.value).padStart(NUM_W)}  ${hit.operation}  ${color(rel(hit.file), DIM)}`);
-  }
+console.log(color("per operation (sorted by worst-metric usage):", "1"));
+
+const CELL = 10;
+const NAME_W = Math.max(12, ...opRows.map((r) => r.name.length));
+
+function cell(value: number, limit: number): string {
+  const p = limit > 0 ? value / limit : 0;
+  const text = `${value}/${limit}`;
+  const padded = text.padStart(CELL);
+  if (value > limit) return color(padded, RED);
+  if (value === limit) return color(padded, YELLOW);
+  if (p >= 0.8) return color(padded, YELLOW);
+  return padded;
+}
+
+function worstPct(op: OperationRow): number {
+  return Math.max(
+    op.depth / CLIENT_LIMITS.maxDepth,
+    CLIENT_LIMITS.maxAliases ? op.aliases / CLIENT_LIMITS.maxAliases : 0,
+    CLIENT_LIMITS.maxDirectives ? op.directives / CLIENT_LIMITS.maxDirectives : 0,
+    op.tokens / CLIENT_LIMITS.maxTokens,
+    op.cost / CLIENT_LIMITS.maxCost,
+  );
+}
+
+opRows.sort((a, b) => worstPct(b) - worstPct(a) || b.cost - a.cost || a.name.localeCompare(b.name));
+
+console.log(
+  color(
+    `  ${"operation".padEnd(NAME_W)}  ${"depth".padStart(CELL)}  ${"aliases".padStart(CELL)}  ${"directives".padStart(CELL)}  ${"tokens".padStart(CELL)}  ${"cost".padStart(CELL)}  file`,
+    DIM,
+  ),
+);
+for (const op of opRows) {
+  console.log(
+    `  ${op.name.padEnd(NAME_W)}  ${cell(op.depth, CLIENT_LIMITS.maxDepth)}  ${cell(op.aliases, CLIENT_LIMITS.maxAliases)}  ${cell(op.directives, CLIENT_LIMITS.maxDirectives)}  ${cell(op.tokens, CLIENT_LIMITS.maxTokens)}  ${cell(op.cost, CLIENT_LIMITS.maxCost)}  ${color(rel(op.file), DIM)}`,
+  );
 }
 console.log("");
 console.log(color("status legend: OK (< 80%) · NEAR (>= 80%) · AT (== limit) · OVER (> limit)", DIM));
