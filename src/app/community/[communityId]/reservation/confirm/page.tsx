@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { useAppRouter } from "@/lib/navigation";
 import { toast } from "react-toastify";
 import { useAuth } from "@/contexts/AuthProvider";
-import { HeaderConfig } from "@/contexts/HeaderContext";
+import type { HeaderConfig } from "@/components/providers/HeaderProvider";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";

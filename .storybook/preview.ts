@@ -1,81 +1,6 @@
 import type { Preview } from "@storybook/nextjs-vite";
-import React from "react";
 import "../src/app/globals.css";
-import { NextIntlClientProvider } from "next-intl";
-import { nestMessages } from "../src/lib/i18n/nestMessages";
-
-import transactions from "../src/messages/ja/transactions.json";
-import common from "../src/messages/ja/common.json";
-import users from "../src/messages/ja/users.json";
-import navigation from "../src/messages/ja/navigation.json";
-import adminVotes from "../src/messages/ja/adminVotes.json";
-
-const messages = nestMessages({
-  ...common,
-  ...navigation,
-  ...transactions,
-  ...users,
-  ...adminVotes,
-});
-
-const mockAuthValue = {
-  user: { id: "mock-user-id", name: "Mock User" },
-  firebaseUser: null,
-  uid: "mock-uid",
-  isAuthenticated: true,
-  isPhoneVerified: true,
-  isUserRegistered: true,
-  authenticationState: "user_registered" as const,
-  isAuthenticating: false,
-  environment: "development" as const,
-  loginWithLiff: async () => false,
-  logout: async () => {},
-  phoneAuth: {
-    startPhoneVerification: async () => null,
-    verifyPhoneCode: async () => false,
-    clearRecaptcha: () => {},
-    isVerifying: false,
-    phoneUid: null,
-  },
-  createUser: async () => null,
-  updateAuthState: async () => {},
-  loading: false,
-};
-
-const MockAuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const AuthContext = React.createContext(mockAuthValue);
-  return React.createElement(AuthContext.Provider, { value: mockAuthValue }, children);
-};
-
-const MockHeaderProvider = ({ children }: { children: React.ReactNode }) => {
-  const mockHeaderContext = {
-    config: {
-      hideHeader: false,
-      showBackButton: false,
-      showLogo: true,
-      showSearchForm: false,
-    },
-    setConfig: () => {},
-  };
-
-  return React.createElement(
-    React.createContext(mockHeaderContext).Provider,
-    { value: mockHeaderContext },
-    children
-  );
-};
-
-const MockProviders = ({ children }: { children: React.ReactNode }) => {
-  return React.createElement(
-    NextIntlClientProvider,
-    { locale: "ja", messages, timeZone: "Asia/Tokyo" },
-    React.createElement(
-      MockAuthProvider,
-      null,
-      React.createElement(MockHeaderProvider, null, children)
-    )
-  );
-};
+import { globalDecorators } from "./decorators";
 
 const preview: Preview = {
   parameters: {
@@ -128,9 +53,7 @@ const preview: Preview = {
   initialGlobals: {
     viewport: { value: "mobile", isRotated: false },
   },
-  decorators: [
-    (Story) => React.createElement(MockProviders, null, React.createElement(Story)),
-  ],
+  decorators: globalDecorators,
 };
 
 export default preview;
