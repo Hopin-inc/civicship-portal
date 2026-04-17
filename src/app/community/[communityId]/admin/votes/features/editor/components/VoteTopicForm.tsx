@@ -6,8 +6,7 @@ import { Button } from "@/components/ui/button";
 import { BasicInfoSection } from "./sections/BasicInfoSection";
 import { PeriodSection } from "./sections/PeriodSection";
 import { OptionsSection } from "./sections/OptionsSection";
-import { GateSection } from "./sections/GateSection";
-import { PowerPolicySection } from "./sections/PowerPolicySection";
+import { VotingRulesSection } from "./sections/VotingRulesSection";
 import { NftTokenOption } from "../hooks/useNftTokens";
 
 interface VoteTopicFormProps {
@@ -30,8 +29,10 @@ export function VoteTopicForm({
       <BasicInfoSection />
       <PeriodSection />
       <OptionsSection />
-      <GateSection nftTokens={nftTokens} nftTokensLoading={nftTokensLoading} />
-      <PowerPolicySection nftTokens={nftTokens} />
+      <VotingRulesSection
+        nftTokens={nftTokens}
+        nftTokensLoading={nftTokensLoading}
+      />
 
       <div className="w-full max-w-[345px] mx-auto">
         <Button

@@ -1,7 +1,7 @@
 "use client";
 
-import { AppLink } from "@/lib/navigation";
 import { useTranslations } from "next-intl";
+import { AppLink } from "@/lib/navigation";
 import { Item, ItemContent, ItemFooter, ItemTitle } from "@/components/ui/item";
 import { cn } from "@/lib/utils";
 import { GqlRole } from "@/types/graphql";
@@ -9,12 +9,11 @@ import { VotePhaseBadge } from "@/shared/vote/components/VotePhaseBadge";
 import { formatVotePeriod } from "@/shared/vote/utils/formatVotePeriod";
 import type { VoteListItem as VoteListItemModel } from "../types/VoteListItem";
 import { VoteActionsMenu } from "./VoteActionsMenu";
-import { useVoteTopicActions } from "../hooks/useVoteTopicActions";
 
 interface VoteListItemProps {
   item: VoteListItemModel;
-  communityId: string;
-  refetch?: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
 }
 
 type Translator = ReturnType<typeof useTranslations>;
@@ -48,14 +47,11 @@ function powerPolicySummaryText(
   if (summary.type === "flat") {
     return t("adminVotes.form.powerPolicy.type.FLAT");
   }
-  return summary.tokenName
-    ? `NFT: ${summary.tokenName}`
-    : t("adminVotes.form.powerPolicy.type.NFT_COUNT");
+  return t("adminVotes.form.powerPolicy.type.NFT_COUNT");
 }
 
-export function VoteListItem({ item, communityId, refetch }: VoteListItemProps) {
+export function VoteListItem({ item, onEdit, onDelete }: VoteListItemProps) {
   const t = useTranslations();
-  const { handleEdit, handleDelete } = useVoteTopicActions({ communityId, refetch });
 
   return (
     <Item className="items-start">
@@ -64,12 +60,10 @@ export function VoteListItem({ item, communityId, refetch }: VoteListItemProps) 
         className="flex flex-1 flex-col min-w-0 gap-2"
       >
         <ItemContent className="space-y-2">
-          <div className="flex items-start gap-2">
-            <ItemTitle className={cn("font-bold text-base leading-snug", "line-clamp-2 flex-1")}>
-              {item.title}
-            </ItemTitle>
-            <VotePhaseBadge phase={item.phase} />
-          </div>
+          <VotePhaseBadge phase={item.phase} className="w-fit" />
+          <ItemTitle className={cn("font-bold text-base leading-snug", "line-clamp-2")}>
+            {item.title}
+          </ItemTitle>
 
           <div className="text-xs text-muted-foreground">
             {formatVotePeriod(item.startsAt, item.endsAt)}
@@ -77,13 +71,15 @@ export function VoteListItem({ item, communityId, refetch }: VoteListItemProps) 
         </ItemContent>
 
         <ItemFooter className="mt-1">
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-            <span className="truncate max-w-[160px]">
+          <div className="flex flex-wrap items-center gap-y-1 text-xs text-muted-foreground min-w-0">
+            <span className="truncate max-w-[200px]">
               {gateSummaryText(item.gateSummary, t)}
             </span>
-            <span className="truncate max-w-[160px]">
+            <span className="mx-1.5 text-muted-foreground/40">・</span>
+            <span className="truncate max-w-[200px]">
               {powerPolicySummaryText(item.powerPolicySummary, t)}
             </span>
+            <span className="mx-1.5 text-muted-foreground/40">・</span>
             <span>
               {t("adminVotes.list.optionCount", { count: item.optionCount })}
             </span>
@@ -93,8 +89,8 @@ export function VoteListItem({ item, communityId, refetch }: VoteListItemProps) 
 
       <VoteActionsMenu
         phase={item.phase}
-        onEdit={() => handleEdit(item.id)}
-        onDelete={() => handleDelete(item.id)}
+        onEdit={onEdit}
+        onDelete={onDelete}
       />
     </Item>
   );

@@ -1,0 +1,7 @@
+<script>
+  // Vite の define で置換されない動的な process.env アクセスに備えた runtime polyfill。
+  // 例えば一部ライブラリが process.env や process 自体の存在を typeof 等でチェックする場合、
+  // ブラウザでは process が未定義のため ReferenceError になるのを防ぐ。
+  window.process = window.process || {};
+  window.process.env = window.process.env || {};
+</script>

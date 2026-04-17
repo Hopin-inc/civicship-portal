@@ -35,6 +35,7 @@ export function VoteTopicFormEditor({
   useHeaderConfig(headerConfig);
 
   const handleSubmit = form.handleSubmit(async (values) => {
+    if (!window.confirm(t("adminVotes.form.createConfirm"))) return;
     const id = await save(values);
     if (id) onSuccess?.(id);
   });

@@ -79,7 +79,7 @@ export const Typical: Story = {
   },
 };
 
-/** 長い chain: 間 8 人が「もっと見る (8人)」で畳まれる。 */
+/** 長い chain: 間が「もっと見る」で畳まれる。表示人数は depth - 2（= 7人）。 */
 export const LongChain: Story = {
   args: {
     chain: buildMockChain(10, [
@@ -133,6 +133,26 @@ export const LongBio: Story = {
       { bio: null },
       { name: "あなた" },
     ]),
+  },
+};
+
+/** chainDepth > chain.depth の切り詰めケース: 先頭ノードの上に「最初の N 人」プレースホルダが出る。 */
+export const TruncatedChain: Story = {
+  args: {
+    chain: buildMockChain(11, [
+      { name: "古い発行者" },
+      ...Array(9).fill({}),
+      { name: "あなた" },
+    ]),
+    chainDepth: 19,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "chainDepth (= 19) > chain.depth (= 10) のとき、保持上限の外側にいた人数を「最初の 9 人」として示す。バッジは 19、もっと見るは 17 (= 19 - 2)。",
+      },
+    },
   },
 };
 

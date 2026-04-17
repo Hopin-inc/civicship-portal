@@ -165,7 +165,7 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
       </div>
 
       {/* ── ポイントの道のり（chain） ── */}
-      <TransactionChainTrail chain={transaction.chain} />
+      <TransactionChainTrail chain={transaction.chain} chainDepth={transaction.chainDepth} />
 
       {/* ── 検証セクション ── */}
       <VerificationSection transactionId={id} />

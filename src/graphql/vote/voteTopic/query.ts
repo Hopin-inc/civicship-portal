@@ -1,4 +1,5 @@
 import { gql } from "@apollo/client";
+import { VOTE_TOPIC_FRAGMENT } from "./fragment";
 
 /**
  * 投票一覧（admin）向けの軽量 fragment。
@@ -53,4 +54,13 @@ export const GET_VOTE_TOPICS = gql`
     }
   }
   ${VOTE_TOPIC_LIST_ITEM_FRAGMENT}
+`;
+
+export const GET_VOTE_TOPIC = gql`
+  query GetVoteTopic($id: ID!) {
+    voteTopic(id: $id) {
+      ...VoteTopicFields
+    }
+  }
+  ${VOTE_TOPIC_FRAGMENT}
 `;
