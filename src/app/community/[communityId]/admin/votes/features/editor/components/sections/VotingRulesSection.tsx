@@ -129,7 +129,7 @@ export function VotingRulesSection({
           {t("adminVotes.form.votingRules.label")}
         </span>
         <span className="text-primary text-xs font-bold bg-primary-foreground px-1 py-0.5 rounded">
-          必須
+          {t("adminVotes.form.required")}
         </span>
       </div>
 

@@ -7,10 +7,7 @@ const meta: Meta<typeof VoteActionsMenu> = {
   title: "AdminVotes/List/VoteActionsMenu",
   component: VoteActionsMenu,
   parameters: { layout: "centered" },
-  args: {
-    onEdit: fn(),
-    onDelete: fn(),
-  },
+  args: { onDelete: fn() },
   decorators: [
     (Story) => (
       <div className="p-8">
@@ -23,17 +20,17 @@ const meta: Meta<typeof VoteActionsMenu> = {
 export default meta;
 type Story = StoryObj<typeof VoteActionsMenu>;
 
-/** UPCOMING: 編集・削除ともに有効 */
-export const UpcomingEnabled: Story = {
+/** UPCOMING: 削除メニュー表示 */
+export const Upcoming: Story = {
   args: { phase: GqlVoteTopicPhase.Upcoming },
 };
 
-/** OPEN: 編集・削除とも disabled（BE で弾かれるため） */
-export const OpenDisabled: Story = {
+/** OPEN: メニュー非表示（null） */
+export const Open: Story = {
   args: { phase: GqlVoteTopicPhase.Open },
 };
 
-/** CLOSED: 同上 */
-export const ClosedDisabled: Story = {
+/** CLOSED: メニュー非表示（null） */
+export const Closed: Story = {
   args: { phase: GqlVoteTopicPhase.Closed },
 };

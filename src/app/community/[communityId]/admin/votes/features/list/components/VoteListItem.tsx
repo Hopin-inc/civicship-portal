@@ -12,7 +12,6 @@ import { VoteActionsMenu } from "./VoteActionsMenu";
 
 interface VoteListItemProps {
   item: VoteListItemModel;
-  onEdit: () => void;
   onDelete: () => void;
 }
 
@@ -35,7 +34,7 @@ function gateSummaryText(
   t: Translator,
 ): string {
   if (summary.type === "nft") {
-    return summary.tokenName ?? "NFT";
+    return summary.tokenName ?? t("adminVotes.form.gate.nftToken.fallbackName");
   }
   return roleLabel(summary.requiredRole, t);
 }
@@ -50,7 +49,7 @@ function powerPolicySummaryText(
   return t("adminVotes.form.powerPolicy.type.NFT_COUNT");
 }
 
-export function VoteListItem({ item, onEdit, onDelete }: VoteListItemProps) {
+export function VoteListItem({ item, onDelete }: VoteListItemProps) {
   const t = useTranslations();
 
   return (
@@ -87,11 +86,7 @@ export function VoteListItem({ item, onEdit, onDelete }: VoteListItemProps) {
         </ItemFooter>
       </AppLink>
 
-      <VoteActionsMenu
-        phase={item.phase}
-        onEdit={onEdit}
-        onDelete={onDelete}
-      />
+      <VoteActionsMenu phase={item.phase} onDelete={onDelete} />
     </Item>
   );
 }

@@ -7,10 +7,7 @@ const meta: Meta<typeof AdminVoteDetailFooter> = {
   title: "AdminVotes/Detail/AdminVoteDetailFooter",
   component: AdminVoteDetailFooter,
   parameters: { layout: "fullscreen" },
-  args: {
-    onEdit: fn(),
-    onDelete: fn(),
-  },
+  args: { onDelete: fn() },
   decorators: [
     (Story) => (
       <div className="min-h-[200px] bg-background">
@@ -23,14 +20,17 @@ const meta: Meta<typeof AdminVoteDetailFooter> = {
 export default meta;
 type Story = StoryObj<typeof AdminVoteDetailFooter>;
 
+/** UPCOMING: 削除ボタン表示 */
 export const Upcoming: Story = {
   args: { phase: GqlVoteTopicPhase.Upcoming },
 };
 
+/** OPEN: フッター非表示（null） */
 export const Open: Story = {
   args: { phase: GqlVoteTopicPhase.Open },
 };
 
+/** CLOSED: フッター非表示（null） */
 export const Closed: Story = {
   args: { phase: GqlVoteTopicPhase.Closed },
 };
