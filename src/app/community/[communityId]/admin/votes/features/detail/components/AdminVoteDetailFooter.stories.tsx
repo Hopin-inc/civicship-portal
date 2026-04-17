@@ -20,17 +20,7 @@ const meta: Meta<typeof AdminVoteDetailFooter> = {
 export default meta;
 type Story = StoryObj<typeof AdminVoteDetailFooter>;
 
-/** UPCOMING: 削除ボタン表示 */
+/** UPCOMING: 削除ボタン表示（OPEN/CLOSED は null を返すため story なし） */
 export const Upcoming: Story = {
   args: { phase: GqlVoteTopicPhase.Upcoming },
-};
-
-/** OPEN: フッター非表示（null） */
-export const Open: Story = {
-  args: { phase: GqlVoteTopicPhase.Open },
-};
-
-/** CLOSED: フッター非表示（null） */
-export const Closed: Story = {
-  args: { phase: GqlVoteTopicPhase.Closed },
 };

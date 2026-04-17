@@ -20,17 +20,7 @@ const meta: Meta<typeof VoteActionsMenu> = {
 export default meta;
 type Story = StoryObj<typeof VoteActionsMenu>;
 
-/** UPCOMING: 削除メニュー表示 */
+/** UPCOMING: 削除メニュー表示（OPEN/CLOSED は null を返すため story なし） */
 export const Upcoming: Story = {
   args: { phase: GqlVoteTopicPhase.Upcoming },
-};
-
-/** OPEN: メニュー非表示（null） */
-export const Open: Story = {
-  args: { phase: GqlVoteTopicPhase.Open },
-};
-
-/** CLOSED: メニュー非表示（null） */
-export const Closed: Story = {
-  args: { phase: GqlVoteTopicPhase.Closed },
 };
