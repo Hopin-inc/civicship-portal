@@ -78,8 +78,22 @@ module.exports = {
     const siblings = services.siblingOperations;
 
     if (!schema) {
-      // Schema is required. graphql.config.yml must declare it.
-      return {};
+      // Without a schema the armor ValidationRules cannot run. Surface this
+      // as a lint error rather than silently passing, so a misconfigured
+      // graphql.config.yml / missing graphql.schema.json can't disable the
+      // security check unnoticed.
+      let reported = false;
+      return {
+        "Document:exit"(node) {
+          if (reported) return;
+          reported = true;
+          context.report({
+            node,
+            message:
+              "Apollo Armor check skipped: GraphQL schema not available. Ensure graphql.config.yml points to an existing graphql.schema.json.",
+          });
+        },
+      };
     }
 
     return {

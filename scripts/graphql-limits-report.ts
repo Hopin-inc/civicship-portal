@@ -56,7 +56,9 @@ function extractGqlTemplates(source: string): string[] {
   while ((m = raw.exec(source)) !== null) {
     const before = source.slice(Math.max(0, m.index - 30), m.index);
     if (/\b(gql|graphql)\s*\(?\s*$/.test(before)) continue;
-    if (/\b(query|mutation|subscription|fragment)\s+\w+\s*[({]/.test(m[1])) {
+    // Also catch anonymous operations (`query { ... }` with no name) by
+    // allowing the name token to be absent.
+    if (/\b(query|mutation|subscription|fragment)\b[^({]*[({]/.test(m[1])) {
       out.push(m[1].replace(/\$\{[^}]*\}/g, ""));
     }
   }
