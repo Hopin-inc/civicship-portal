@@ -30,8 +30,8 @@ export function VoteDetailOptionsSection({
           <div key={option.id}>
             {idx !== 0 && <ItemSeparator />}
             <Item size="sm">
-              <ItemContent>
-                <ItemTitle>{option.label}</ItemTitle>
+              <ItemContent className="min-w-0 flex-1">
+                <ItemTitle className="break-words">{option.label}</ItemTitle>
               </ItemContent>
               {option.voteCount != null && (
                 <ItemActions>

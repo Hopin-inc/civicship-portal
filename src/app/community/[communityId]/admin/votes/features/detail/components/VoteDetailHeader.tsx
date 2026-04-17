@@ -19,7 +19,7 @@ export function VoteDetailHeader({
 }: VoteDetailHeaderProps) {
   return (
     <div className="space-y-2">
-      <VotePhaseBadge phase={phase} />
+      <VotePhaseBadge phase={phase} className="w-fit" />
       <h1 className="text-xl font-bold leading-tight">{title}</h1>
       <p className="text-sm text-muted-foreground">
         {formatVotePeriod(startsAt, endsAt)}

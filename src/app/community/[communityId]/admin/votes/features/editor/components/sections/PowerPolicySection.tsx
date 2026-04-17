@@ -143,7 +143,7 @@ export function PowerPolicySection({ nftTokens }: PowerPolicySectionProps) {
           <>
             <ItemSeparator />
             <Item size="sm">
-              <ItemContent className="space-y-2">
+              <ItemContent className="space-y-2 min-w-0">
                 <ItemTitle>
                   {t("adminVotes.form.powerPolicy.nftToken.label")}
                 </ItemTitle>

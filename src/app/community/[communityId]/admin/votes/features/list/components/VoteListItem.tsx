@@ -60,7 +60,7 @@ export function VoteListItem({ item, onEdit, onDelete }: VoteListItemProps) {
         className="flex flex-1 flex-col min-w-0 gap-2"
       >
         <ItemContent className="space-y-2">
-          <VotePhaseBadge phase={item.phase} />
+          <VotePhaseBadge phase={item.phase} className="w-fit" />
           <ItemTitle className={cn("font-bold text-base leading-snug", "line-clamp-2")}>
             {item.title}
           </ItemTitle>
@@ -71,13 +71,15 @@ export function VoteListItem({ item, onEdit, onDelete }: VoteListItemProps) {
         </ItemContent>
 
         <ItemFooter className="mt-1">
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground min-w-0">
+          <div className="flex flex-wrap items-center gap-y-1 text-xs text-muted-foreground min-w-0">
             <span className="truncate max-w-[200px]">
               {gateSummaryText(item.gateSummary, t)}
             </span>
+            <span className="mx-1.5 text-muted-foreground/40">・</span>
             <span className="truncate max-w-[200px]">
               {powerPolicySummaryText(item.powerPolicySummary, t)}
             </span>
+            <span className="mx-1.5 text-muted-foreground/40">・</span>
             <span>
               {t("adminVotes.list.optionCount", { count: item.optionCount })}
             </span>

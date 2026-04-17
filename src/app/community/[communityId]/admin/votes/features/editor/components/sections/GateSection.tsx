@@ -142,7 +142,7 @@ export function GateSection({ nftTokens, nftTokensLoading }: GateSectionProps) {
           <>
             <ItemSeparator />
             <Item size="sm">
-              <ItemContent className="space-y-2">
+              <ItemContent className="space-y-2 min-w-0">
                 <ItemTitle>{t("adminVotes.form.gate.nftToken.label")}</ItemTitle>
                 {!nftTokensLoading && nftTokens.length === 0 ? (
                   <p className="text-xs text-muted-foreground">
