@@ -10,6 +10,7 @@
     "lint": "next lint --dir src",
     "lint:fix": "yarn lint --fix",
     "lint:graphql": "eslint 'src/**/*.{ts,tsx}' --no-eslintrc --config .eslintrc.js",
+    "lint:graphql:report": "tsx scripts/graphql-limits-report.ts",
     "format": "prettier --write --ignore-path .gitignore './**/*.{js,jsx,ts,tsx,json}'",
     "gql:generate": "export NODE_TLS_REJECT_UNAUTHORIZED=0 && graphql-codegen --config codegen.yaml",
     "i18n:validate": "tsx scripts/validate-i18n-json.ts",
