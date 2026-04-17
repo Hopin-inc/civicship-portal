@@ -44,10 +44,13 @@ export function VotingRulesSection({
   const gateIsNft = gate.type === GqlVoteGateType.Nft;
   const hasNftTokens = !nftTokensLoading && nftTokens.length > 0;
 
-  const nftTokenIdError =
-    formState.errors.gate &&
-    (formState.errors.gate as { nftTokenId?: { message?: string } }).nftTokenId
-      ?.message;
+  const nftTokenIdError = gateIsNft
+    ? (
+        formState.errors.gate as
+          | { nftTokenId?: { message?: string } }
+          | undefined
+      )?.nftTokenId?.message
+    : undefined;
 
   useEffect(() => {
     if (powerPolicy.type !== GqlVotePowerPolicyType.NftCount) return;

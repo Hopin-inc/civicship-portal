@@ -1,5 +1,7 @@
 import { useCallback } from "react";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 import { toast } from "react-toastify";
 import { useTranslations } from "next-intl";
 import {
@@ -10,6 +12,11 @@ import {
 } from "@/types/graphql";
 import { logger } from "@/lib/logging";
 import { VoteTopicFormValues } from "../types/form";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+const APP_TIMEZONE = "Asia/Tokyo";
 
 interface UseVoteTopicSaveParams {
   communityId: string;
@@ -26,8 +33,8 @@ export function useVoteTopicSave({ communityId }: UseVoteTopicSaveParams) {
           communityId,
           title: values.title.trim(),
           description: values.description.trim() || undefined,
-          startsAt: dayjs(values.startsAt).toDate(),
-          endsAt: dayjs(values.endsAt).toDate(),
+          startsAt: dayjs.tz(values.startsAt, APP_TIMEZONE).toDate(),
+          endsAt: dayjs.tz(values.endsAt, APP_TIMEZONE).toDate(),
           options: values.options.map((option, index) => ({
             label: option.label.trim(),
             orderIndex: index,

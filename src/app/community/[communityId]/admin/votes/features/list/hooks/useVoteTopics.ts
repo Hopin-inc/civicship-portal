@@ -54,7 +54,9 @@ export function useVoteTopics({ communityId }: UseVoteTopicsParams) {
                   [
                     ...prev.voteTopics.edges,
                     ...fetchMoreResult.voteTopics.edges,
-                  ].map((edge) => [edge.node?.id, edge]),
+                  ]
+                    .filter((edge) => edge.node)
+                    .map((edge) => [edge.node.id, edge]),
                 ).values(),
               ],
               pageInfo: fetchMoreResult.voteTopics.pageInfo,
