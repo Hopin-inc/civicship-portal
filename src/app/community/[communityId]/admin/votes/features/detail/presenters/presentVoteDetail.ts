@@ -1,8 +1,8 @@
 import {
+  GqlGetVoteTopicQuery,
   GqlRole,
   GqlVoteGateType,
   GqlVotePowerPolicyType,
-  GqlVoteTopic,
 } from "@/types/graphql";
 import {
   VoteDetailView,
@@ -10,7 +10,9 @@ import {
   VoteDetailPowerPolicy,
 } from "../types/VoteDetailView";
 
-function toGate(gate: GqlVoteTopic["gate"]): VoteDetailGate {
+type VoteTopicData = NonNullable<GqlGetVoteTopicQuery["voteTopic"]>;
+
+function toGate(gate: VoteTopicData["gate"]): VoteDetailGate {
   if (gate.type === GqlVoteGateType.Nft) {
     return { type: "nft", tokenName: gate.nftToken?.name ?? null };
   }
@@ -21,7 +23,7 @@ function toGate(gate: GqlVoteTopic["gate"]): VoteDetailGate {
 }
 
 function toPowerPolicy(
-  pp: GqlVoteTopic["powerPolicy"],
+  pp: VoteTopicData["powerPolicy"],
 ): VoteDetailPowerPolicy {
   if (pp.type === GqlVotePowerPolicyType.NftCount) {
     return { type: "nftCount", tokenName: pp.nftToken?.name ?? null };
@@ -29,7 +31,7 @@ function toPowerPolicy(
   return { type: "flat" };
 }
 
-export function presentVoteDetail(topic: GqlVoteTopic): VoteDetailView {
+export function presentVoteDetail(topic: VoteTopicData): VoteDetailView {
   return {
     id: topic.id,
     title: topic.title,

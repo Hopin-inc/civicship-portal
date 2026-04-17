@@ -7381,7 +7381,14 @@ export type GqlVoteTopicFieldsFragment = {
   phase: GqlVoteTopicPhase;
   createdAt: Date;
   updatedAt?: Date | null;
-  options: Array<{ __typename?: "VoteOption"; id: string; label: string; orderIndex: number }>;
+  options: Array<{
+    __typename?: "VoteOption";
+    id: string;
+    label: string;
+    orderIndex: number;
+    voteCount?: number | null;
+    totalPower?: number | null;
+  }>;
   gate: {
     __typename?: "VoteGate";
     id: string;
@@ -7416,7 +7423,14 @@ export type GqlCreateVoteTopicMutation = {
       phase: GqlVoteTopicPhase;
       createdAt: Date;
       updatedAt?: Date | null;
-      options: Array<{ __typename?: "VoteOption"; id: string; label: string; orderIndex: number }>;
+      options: Array<{
+        __typename?: "VoteOption";
+        id: string;
+        label: string;
+        orderIndex: number;
+        voteCount?: number | null;
+        totalPower?: number | null;
+      }>;
       gate: {
         __typename?: "VoteGate";
         id: string;
@@ -7530,7 +7544,14 @@ export type GqlGetVoteTopicQuery = {
     phase: GqlVoteTopicPhase;
     createdAt: Date;
     updatedAt?: Date | null;
-    options: Array<{ __typename?: "VoteOption"; id: string; label: string; orderIndex: number }>;
+    options: Array<{
+      __typename?: "VoteOption";
+      id: string;
+      label: string;
+      orderIndex: number;
+      voteCount?: number | null;
+      totalPower?: number | null;
+    }>;
     gate: {
       __typename?: "VoteGate";
       id: string;
@@ -7781,6 +7802,8 @@ export const VoteTopicFieldsFragmentDoc = gql`
       id
       label
       orderIndex
+      voteCount
+      totalPower
     }
     gate {
       id

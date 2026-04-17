@@ -14,6 +14,8 @@ export const VOTE_TOPIC_FRAGMENT = gql`
       id
       label
       orderIndex
+      voteCount
+      totalPower
     }
     gate {
       id
