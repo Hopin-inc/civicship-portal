@@ -50,10 +50,6 @@ export function VotingRulesSection({
       ?.message;
 
   useEffect(() => {
-    if (gateIsNft && !hasNftTokens && !nftTokensLoading) {
-      setMembership(GqlRole.Member);
-      return;
-    }
     if (powerPolicy.type !== GqlVotePowerPolicyType.NftCount) return;
     if (gate.type !== GqlVoteGateType.Nft) {
       setValue(
