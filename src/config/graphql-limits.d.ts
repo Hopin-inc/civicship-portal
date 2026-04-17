@@ -11,4 +11,3 @@ export interface GraphQLLimits {
 
 export const BACKEND_LIMITS: GraphQLLimits;
 export const CLIENT_LIMITS: GraphQLLimits;
-export const FRONTEND_BUFFER: number;
