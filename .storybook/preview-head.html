@@ -3,5 +3,8 @@
   // src/lib/logging/client/index.ts 等のモジュール初期化時に
   // process.env.NEXT_PUBLIC_LOG_LEVEL を参照しており、
   // ブラウザでは process が未定義のため ReferenceError になる。
-  window.process = window.process || { env: {} };
+  // ENV=STORYBOOK を明示することで src/lib/environment.ts の isStorybook 判定を通し、
+  // clientLogger が /api/client-log に送信しないようにする。
+  window.process = window.process || {};
+  window.process.env = { ...(window.process.env || {}), ENV: "STORYBOOK" };
 </script>

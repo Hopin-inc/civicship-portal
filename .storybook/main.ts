@@ -21,7 +21,7 @@ const config: StorybookConfig = {
   viteFinal: async (viteConfig) => {
     viteConfig.define = {
       ...viteConfig.define,
-      "process.env": JSON.stringify({}),
+      "process.env": JSON.stringify({ ENV: "STORYBOOK" }),
     };
     return viteConfig;
   },
