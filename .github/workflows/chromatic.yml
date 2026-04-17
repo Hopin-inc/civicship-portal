@@ -22,6 +22,13 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           fetch-depth: 0
+          # pull_request イベントではデフォルトで ephemeral な merge commit
+          # (refs/pull/N/merge) を checkout するため、Chromatic の TurboSnap
+          # が git 履歴を辿れず invalidChangedFiles で bail する。
+          # ブランチ名 (head.ref) で checkout してローカル ref を作ることで、
+          # Chromatic CLI が正しく履歴を解析できるようにする。
+          # 公式 troubleshooting ガイド: https://www.chromatic.com/docs/turbosnap/troubleshooting/
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
 
       - name: Install pnpm
         run: npm install -g pnpm
