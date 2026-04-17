@@ -51,7 +51,7 @@ export function VoteDetailRulesSection({
             <ItemTitle>
               {gate.type === "membership"
                 ? t("adminVotes.form.gate.type.MEMBERSHIP")
-                : t("adminVotes.form.gate.type.NFT.inline")}
+                : t("adminVotes.form.gate.type.NFT_INLINE")}
             </ItemTitle>
           </ItemContent>
         </Item>

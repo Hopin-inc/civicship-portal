@@ -44,7 +44,7 @@
   "adminVotes.form.gate.type.label": "資格タイプ",
   "adminVotes.form.gate.type.MEMBERSHIP": "コミュニティメンバー",
   "adminVotes.form.gate.type.NFT": "特定 NFT\n保有者",
-  "adminVotes.form.gate.type.NFT.inline": "特定 NFT 保有者",
+  "adminVotes.form.gate.type.NFT_INLINE": "特定 NFT 保有者",
   "adminVotes.form.gate.type.description.MEMBERSHIP": "コミュニティに参加しているメンバーが投票できます",
   "adminVotes.form.gate.type.description.NFT": "指定した NFT を保有している人が投票できます",
   "adminVotes.form.gate.requiredRole.label": "最低権限",

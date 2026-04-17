@@ -44,7 +44,7 @@
   "adminVotes.form.gate.type.label": "Eligibility type",
   "adminVotes.form.gate.type.MEMBERSHIP": "Community members",
   "adminVotes.form.gate.type.NFT": "Holders of\na specific NFT",
-  "adminVotes.form.gate.type.NFT.inline": "Specific NFT holders",
+  "adminVotes.form.gate.type.NFT_INLINE": "Specific NFT holders",
   "adminVotes.form.gate.type.description.MEMBERSHIP": "Members of the community can vote",
   "adminVotes.form.gate.type.description.NFT": "Only holders of the selected NFT can vote",
   "adminVotes.form.gate.requiredRole.label": "Minimum permission",
