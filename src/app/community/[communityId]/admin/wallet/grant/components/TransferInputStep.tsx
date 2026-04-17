@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { GqlUser } from "@/types/graphql";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { HeaderConfig } from "@/contexts/HeaderContext";
+import type { HeaderConfig } from "@/components/providers/HeaderProvider";
 import { toast } from "react-toastify";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/textarea";
