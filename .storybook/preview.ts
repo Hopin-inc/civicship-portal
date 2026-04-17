@@ -79,6 +79,13 @@ const MockProviders = ({ children }: { children: React.ReactNode }) => {
 
 const preview: Preview = {
   parameters: {
+    nextjs: {
+      appDirectory: true,
+      navigation: {
+        pathname: "/admin/votes",
+      },
+    },
+
     controls: {
       matchers: {
         color: /(background|color)$/i,
