@@ -44,6 +44,12 @@ export const MembershipManager: Story = {
   ],
 };
 
+/** NFT 未登録: 「特定 NFT 保有者」トグルが disabled */
+export const NftDisabled: Story = {
+  args: { nftTokens: [] },
+  decorators: [withVoteForm()],
+};
+
 /** NFT + FLAT: NFT 選択 + 票の重みトグルが出現 */
 export const NftFlat: Story = {
   decorators: [
@@ -73,38 +79,6 @@ export const NftNftCount: Story = {
         powerPolicy: {
           type: GqlVotePowerPolicyType.NftCount,
           nftTokenId: mockNftTokens[0].id,
-        },
-      },
-    }),
-  ],
-};
-
-/** NFT 未選択 + バリデーションエラー */
-export const NftUnselectedWithError: Story = {
-  decorators: [
-    withVoteForm({
-      defaultValues: {
-        gate: {
-          type: GqlVoteGateType.Nft,
-          requiredRole: null,
-          nftTokenId: "",
-        },
-      },
-      errors: [{ path: "gate.nftTokenId", message: "NFT を選択してください" }],
-    }),
-  ],
-};
-
-/** NFT 空リスト */
-export const NftEmpty: Story = {
-  args: { nftTokens: [] },
-  decorators: [
-    withVoteForm({
-      defaultValues: {
-        gate: {
-          type: GqlVoteGateType.Nft,
-          requiredRole: null,
-          nftTokenId: "",
         },
       },
     }),
