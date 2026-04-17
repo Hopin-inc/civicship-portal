@@ -5,7 +5,7 @@
   "adminVotes.list.emptyTitle": "No votes yet",
   "adminVotes.list.emptyDescription": "Create a new vote to gather opinions from your community.",
   "adminVotes.list.loadError": "Failed to load votes",
-  "adminVotes.list.optionCount": "{count} options",
+  "adminVotes.list.optionCount": "Options {count}",
   "adminVotes.list.actions.edit": "Edit",
   "adminVotes.list.actions.delete": "Delete",
   "adminVotes.list.deleteConfirm": "Delete this vote? This action cannot be undone.",

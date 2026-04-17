@@ -62,12 +62,10 @@ export function VoteListItem({ item, onEdit, onDelete }: VoteListItemProps) {
         className="flex flex-1 flex-col min-w-0 gap-2"
       >
         <ItemContent className="space-y-2">
-          <div className="flex items-start gap-2">
-            <ItemTitle className={cn("font-bold text-base leading-snug", "line-clamp-2 flex-1")}>
-              {item.title}
-            </ItemTitle>
-            <VotePhaseBadge phase={item.phase} />
-          </div>
+          <VotePhaseBadge phase={item.phase} />
+          <ItemTitle className={cn("font-bold text-base leading-snug", "line-clamp-2")}>
+            {item.title}
+          </ItemTitle>
 
           <div className="text-xs text-muted-foreground">
             {formatVotePeriod(item.startsAt, item.endsAt)}
@@ -76,10 +74,10 @@ export function VoteListItem({ item, onEdit, onDelete }: VoteListItemProps) {
 
         <ItemFooter className="mt-1">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-            <span className="truncate max-w-[160px]">
+            <span className="truncate">
               {gateSummaryText(item.gateSummary, t)}
             </span>
-            <span className="truncate max-w-[160px]">
+            <span className="truncate">
               {powerPolicySummaryText(item.powerPolicySummary, t)}
             </span>
             <span>

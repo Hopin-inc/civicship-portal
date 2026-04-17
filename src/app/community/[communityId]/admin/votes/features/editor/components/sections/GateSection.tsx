@@ -155,7 +155,7 @@ export function GateSection({ nftTokens, nftTokensLoading }: GateSectionProps) {
                     disabled={nftTokensLoading || nftTokens.length === 0}
                   >
                     <SelectTrigger
-                      className={nftTokenIdError ? "border-destructive" : undefined}
+                      className={`overflow-hidden ${nftTokenIdError ? "border-destructive" : ""}`}
                     >
                       <SelectValue
                         placeholder={t("adminVotes.form.gate.nftToken.placeholder")}

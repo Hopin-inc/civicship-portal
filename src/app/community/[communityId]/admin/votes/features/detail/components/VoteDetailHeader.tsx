@@ -19,10 +19,8 @@ export function VoteDetailHeader({
 }: VoteDetailHeaderProps) {
   return (
     <div className="space-y-2">
-      <div className="flex items-start gap-3">
-        <h1 className="flex-1 text-xl font-bold leading-tight">{title}</h1>
-        <VotePhaseBadge phase={phase} />
-      </div>
+      <VotePhaseBadge phase={phase} />
+      <h1 className="text-xl font-bold leading-tight">{title}</h1>
       <p className="text-sm text-muted-foreground">
         {formatVotePeriod(startsAt, endsAt)}
       </p>
