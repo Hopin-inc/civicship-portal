@@ -74,7 +74,7 @@
   "transactions.detail.verification.resultDescription": "The content has been verified by cross-checking it with records stored on the blockchain.",
   "transactions.detail.verification.openExplorer": "View on blockchain",
   "transactions.chain.badgeLabel": "Point journey: {count} people involved",
-  "transactions.chain.earlierParticipants": "{count, plural, one {# person passed it along before this} other {# people passed it along before this}}",
+  "transactions.chain.earlierParticipants": "{count, plural, one {Passed through # hand so far} other {Passed through # hands so far}}",
   "transactions.chain.journey": "Point's journey",
   "transactions.chain.showMore": "Show {count} more",
   "transactions.chain.unknownUser": "Unknown user",
