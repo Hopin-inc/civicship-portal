@@ -38,8 +38,14 @@ pnpm chromatic        # Chromatic へ publish (要 CHROMATIC_PROJECT_TOKEN)
 
 1. `withI18n` — next-intl の翻訳供給 (`useTranslations()` が動く)
 2. `withCommunityConfig` — `CommunityConfigProvider` にモック config を供給 (`AppLink` 等のパス解決に必要)
-3. `withHeader` — `HeaderContext` にモック値を供給 (`useHeader()` が動く)
-4. `withAuth` — 軽量モック。useAuth() を直接呼ぶコンポーネントは現状未対応（後述）
+3. `withHeader` — **2 系統の HeaderContext** を両方供給する。リポジトリ内に
+   `src/contexts/HeaderContext` と `src/components/providers/HeaderProvider` の
+   2 つの `HeaderContext` が存在するため、`useHeader` がどちらの import path
+   から参照されても動くように両方をラップする
+4. `withAuth` — **現状は no-op**。`src/contexts/AuthProvider.tsx` 内部の
+   `AuthContext` が export されていないため、独自に作った context を Provider
+   しても実体の `useAuth()` からは参照されない。`useAuth()` を呼ばない
+   コンポーネント向けの placeholder として置いている（後述）
 
 ### オプトイン (story ごとに指定)
 
@@ -120,10 +126,14 @@ const meta: Meta<typeof MyComponent> = {
 `.storybook/preview-head.html` が読まれていない可能性。`main.ts` の `staticDirs` 等の順序を変えていないか確認。
 
 ### `useAuth must be used within an AuthProvider`
-`withAuth` は `useAuth()` 完全対応ではない。上記「useAuth() を使うコンポーネント」を参照。
+`AuthProvider.tsx` 内の `AuthContext` の default 値が `undefined` のため、
+Provider が無い環境で `useAuth()` を呼ぶと確実に throw する。
+現状の `withAuth` はこのエラーを回避できない。対応策は「useAuth() を使うコンポーネントの story」参照。
 
-### `useHeader must be used within a HeaderProvider`
-グローバル `withHeader` が外れていないか確認。`preview.ts` の `globalDecorators` を見直す。
+### 型エラー: `HeaderConfig` 等の import path が混在
+`src/contexts/HeaderContext` と `src/components/providers/HeaderProvider`
+の双方に同名の型があり、構造的に互換でない場合がある。基本は実体の
+state 管理を行う後者 (`@/components/providers/HeaderProvider`) を参照する。
 
 ### ChromaticでAPI呼び出しのエラー
 Storybook では実 API は叩かない設計。GraphQL が必要なら `withApollo` で mocks を渡す。
