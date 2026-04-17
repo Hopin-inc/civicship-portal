@@ -1,41 +1,33 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
-  parse,
-  print,
+  Kind,
   Source,
-  Lexer,
-  TokenKind,
+  buildClientSchema,
+  parse,
+  validate,
+  type DefinitionNode,
   type DocumentNode,
   type FragmentDefinitionNode,
+  type GraphQLSchema,
+  type IntrospectionQuery,
   type OperationDefinitionNode,
-  type SelectionNode,
 } from "graphql";
+import { costLimitRule } from "@escape.tech/graphql-armor-cost-limit";
+import { maxDepthRule } from "@escape.tech/graphql-armor-max-depth";
+import { maxAliasesRule } from "@escape.tech/graphql-armor-max-aliases";
+import { maxDirectivesRule } from "@escape.tech/graphql-armor-max-directives";
+import { MaxTokensParserWLexer } from "@escape.tech/graphql-armor-max-tokens";
 import { BACKEND_LIMITS, CLIENT_LIMITS } from "../src/config/graphql-limits";
 
 const ROOT = path.resolve(__dirname, "..", "src");
+const GENERATED_FILE = path.resolve(__dirname, "..", "src", "types", "graphql.tsx");
+const SCHEMA_FILE = path.resolve(__dirname, "..", "graphql.schema.json");
 
 type Metric = "depth" | "aliases" | "directives" | "tokens" | "cost";
 
-interface Hit {
-  metric: Metric;
-  value: number;
-  operation: string;
-  file: string;
-}
-
-const hits: Record<Metric, Hit[]> = {
-  depth: [],
-  aliases: [],
-  directives: [],
-  tokens: [],
-  cost: [],
-};
-
 const fragments = new Map<string, FragmentDefinitionNode>();
-const docs: { file: string; text: string; doc: DocumentNode }[] = [];
-
-const GENERATED_FILE = path.resolve(__dirname, "..", "src", "types", "graphql.tsx");
+const docs: { file: string; doc: DocumentNode }[] = [];
 
 function walkDir(dir: string, out: string[] = []): string[] {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -53,77 +45,18 @@ function extractGqlTemplates(source: string): string[] {
   const re = /gql`([\s\S]*?)`/g;
   let m: RegExpExecArray | null;
   while ((m = re.exec(source)) !== null) {
-    // Strip ${...} template interpolations (used to inline fragment constants
-    // like `${USER_FRAGMENT}`). Fragment definitions are parsed separately
-    // from their own gql templates, so the spread reference in the operation
-    // body is sufficient for structural analysis.
-    const stripped = m[1].replace(/\$\{[^}]*\}/g, "");
-    out.push(stripped);
+    out.push(m[1].replace(/\$\{[^}]*\}/g, ""));
   }
   return out;
 }
 
-function hasSelections(node: { selectionSet?: { selections: readonly SelectionNode[] } }): boolean {
-  return !!node.selectionSet && node.selectionSet.selections.length > 0;
+function loadSchema(): GraphQLSchema {
+  const raw = JSON.parse(fs.readFileSync(SCHEMA_FILE, "utf8"));
+  const introspection: IntrospectionQuery = raw.__schema ? raw : raw.data;
+  return buildClientSchema(introspection);
 }
 
-function computeCost(
-  selections: readonly SelectionNode[],
-  depth: number,
-  visited: Set<string>,
-): number {
-  const { costObjectCost: obj, costScalarCost: sc, costDepthCostFactor: f } = CLIENT_LIMITS;
-  let cost = 0;
-  for (const sel of selections) {
-    if (sel.kind === "Field") {
-      const isObject = hasSelections(sel);
-      cost += (isObject ? obj : sc) * Math.pow(f, depth);
-      if (isObject) {
-        cost += computeCost(sel.selectionSet!.selections, depth + 1, visited);
-      }
-    } else if (sel.kind === "InlineFragment" && hasSelections(sel)) {
-      cost += computeCost(sel.selectionSet!.selections, depth, visited);
-    } else if (sel.kind === "FragmentSpread") {
-      const name = sel.name.value;
-      if (visited.has(name)) continue;
-      const frag = fragments.get(name);
-      if (!frag) continue;
-      const next = new Set(visited);
-      next.add(name);
-      cost += computeCost(frag.selectionSet.selections, depth, next);
-    }
-  }
-  return cost;
-}
-
-function computeDepth(
-  selections: readonly SelectionNode[],
-  depth: number,
-  visited: Set<string>,
-): number {
-  let max = depth;
-  for (const sel of selections) {
-    if (sel.kind === "Field" && hasSelections(sel)) {
-      max = Math.max(max, computeDepth(sel.selectionSet!.selections, depth + 1, visited));
-    } else if (sel.kind === "InlineFragment" && hasSelections(sel)) {
-      max = Math.max(max, computeDepth(sel.selectionSet!.selections, depth, visited));
-    } else if (sel.kind === "FragmentSpread") {
-      const name = sel.name.value;
-      if (visited.has(name)) continue;
-      const frag = fragments.get(name);
-      if (!frag) continue;
-      const next = new Set(visited);
-      next.add(name);
-      max = Math.max(max, computeDepth(frag.selectionSet.selections, depth, next));
-    }
-  }
-  return max;
-}
-
-function collectSpreadFragments(
-  node: unknown,
-  acc: Set<string> = new Set(),
-): Set<string> {
+function collectSpreadFragments(node: unknown, acc: Set<string> = new Set()): Set<string> {
   if (!node || typeof node !== "object") return acc;
   const obj = node as Record<string, unknown>;
   if (obj.kind === "FragmentSpread") {
@@ -144,78 +77,63 @@ function collectSpreadFragments(
   return acc;
 }
 
-function countAliases(op: OperationDefinitionNode): number {
-  let count = 0;
-  const walk = (sels: readonly SelectionNode[], visited: Set<string>) => {
-    for (const s of sels) {
-      if (s.kind === "Field") {
-        if (s.alias) count++;
-        if (s.selectionSet) walk(s.selectionSet.selections, visited);
-      } else if (s.kind === "InlineFragment" && s.selectionSet) {
-        walk(s.selectionSet.selections, visited);
-      } else if (s.kind === "FragmentSpread") {
-        const name = s.name.value;
-        if (visited.has(name)) continue;
-        const frag = fragments.get(name);
-        if (!frag) continue;
-        const next = new Set(visited);
-        next.add(name);
-        walk(frag.selectionSet.selections, next);
-      }
-    }
-  };
-  walk(op.selectionSet.selections, new Set());
-  return count;
-}
-
-function countDirectivesIn(node: unknown): number {
-  let count = 0;
-  if (!node || typeof node !== "object") return 0;
-  const obj = node as Record<string, unknown>;
-  const directives = obj.directives as unknown[] | undefined;
-  if (Array.isArray(directives)) count += directives.length;
-  for (const k of Object.keys(obj)) {
-    if (k === "directives") continue;
-    const v = obj[k];
-    if (Array.isArray(v)) v.forEach((x) => (count += countDirectivesIn(x)));
-    else if (v && typeof v === "object" && (v as Record<string, unknown>).kind) {
-      count += countDirectivesIn(v);
-    }
-  }
-  return count;
-}
-
-function countDirectives(op: OperationDefinitionNode): number {
-  let count = countDirectivesIn(op);
+function buildSelfContainedDocument(op: OperationDefinitionNode): DocumentNode {
+  const definitions: DefinitionNode[] = [op];
   for (const name of collectSpreadFragments(op)) {
     const frag = fragments.get(name);
-    if (frag) count += countDirectivesIn(frag);
+    if (frag) definitions.push(frag);
   }
-  return count;
+  return { kind: Kind.DOCUMENT, definitions };
 }
 
-function countTokens(text: string): number {
-  let c = 0;
-  try {
-    const lexer = new Lexer(new Source(text));
-    let t = lexer.advance();
-    while (t.kind !== TokenKind.EOF) {
-      c++;
-      t = lexer.advance();
-    }
-  } catch {
-    /* ignore */
-  }
-  return c;
+interface Captured {
+  depth: number;
+  aliases: number;
+  directives: number;
+  cost: number;
 }
 
-function countOperationTokens(op: OperationDefinitionNode): number {
-  const parts: string[] = [print(op)];
-  for (const name of collectSpreadFragments(op)) {
-    const frag = fragments.get(name);
-    if (frag) parts.push(print(frag));
-  }
-  return countTokens(parts.join("\n"));
+function measureWithArmor(schema: GraphQLSchema, doc: DocumentNode): Captured {
+  const captured: Captured = { depth: 0, aliases: 0, directives: 0, cost: 0 };
+  const rules = [
+    costLimitRule({
+      maxCost: Number.MAX_SAFE_INTEGER,
+      objectCost: BACKEND_LIMITS.costObjectCost,
+      scalarCost: BACKEND_LIMITS.costScalarCost,
+      depthCostFactor: BACKEND_LIMITS.costDepthCostFactor,
+      propagateOnRejection: false,
+      onAccept: [(_ctx, { n }) => (captured.cost = n)],
+    }),
+    maxDepthRule({
+      n: Number.MAX_SAFE_INTEGER,
+      propagateOnRejection: false,
+      onAccept: [(_ctx, { n }) => (captured.depth = n)],
+    }),
+    maxAliasesRule({
+      n: Number.MAX_SAFE_INTEGER,
+      propagateOnRejection: false,
+      onAccept: [(_ctx, { n }) => (captured.aliases = n)],
+    }),
+    maxDirectivesRule({
+      n: Number.MAX_SAFE_INTEGER,
+      propagateOnRejection: false,
+      onAccept: [(_ctx, { n }) => (captured.directives = n)],
+    }),
+  ];
+  validate(schema, doc, rules);
+  return captured;
+}
+
+function measureTokens(doc: DocumentNode): number {
+  // Armor's max-tokens plugin hooks the Parser; replicate by tokenizing printed output.
+  const { print } = require("graphql") as typeof import("graphql");
+  const source = new Source(print(doc));
+  const parser = new MaxTokensParserWLexer(source, {
+    n: Number.MAX_SAFE_INTEGER,
+    propagateOnRejection: false,
+  });
+  parser.parseDocument();
+  return parser.tokenCount;
 }
 
 function rel(p: string): string {
@@ -255,7 +173,10 @@ function statusLabel(value: number, limit: number): string {
   return color("OK", GREEN);
 }
 
-// Phase 1: collect fragments
+// --- main ------------------------------------------------------------------
+
+const schema = loadSchema();
+
 const files = walkDir(ROOT);
 for (const f of files) {
   const src = fs.readFileSync(f, "utf8");
@@ -270,7 +191,7 @@ for (const f of files) {
     for (const d of doc.definitions) {
       if (d.kind === "FragmentDefinition") fragments.set(d.name.value, d);
     }
-    docs.push({ file: f, text, doc });
+    docs.push({ file: f, doc });
   }
 }
 
@@ -286,30 +207,32 @@ interface OperationRow {
 
 const opRows: OperationRow[] = [];
 
-// Phase 2: measure each operation (fragments expanded to match wire request)
 for (const { file, doc } of docs) {
   for (const d of doc.definitions) {
     if (d.kind !== "OperationDefinition") continue;
     const name = d.name?.value ?? "(anonymous)";
-    const depth = computeDepth(d.selectionSet.selections, 1, new Set());
-    const cost = Math.round(computeCost(d.selectionSet.selections, 1, new Set()));
-    const aliases = countAliases(d);
-    const directives = countDirectives(d);
-    const tokens = countOperationTokens(d);
-    hits.depth.push({ metric: "depth", value: depth, operation: name, file });
-    hits.cost.push({ metric: "cost", value: cost, operation: name, file });
-    hits.aliases.push({ metric: "aliases", value: aliases, operation: name, file });
-    hits.directives.push({ metric: "directives", value: directives, operation: name, file });
-    hits.tokens.push({ metric: "tokens", value: tokens, operation: name, file });
-    opRows.push({ name, file, depth, aliases, directives, tokens, cost });
+    const selfContained = buildSelfContainedDocument(d);
+    try {
+      const { depth, aliases, directives, cost } = measureWithArmor(schema, selfContained);
+      const tokens = measureTokens(selfContained);
+      opRows.push({
+        name,
+        file,
+        depth,
+        aliases,
+        directives,
+        tokens,
+        cost: Math.round(cost),
+      });
+    } catch (err) {
+      console.error(`failed to measure ${name} in ${rel(file)}:`, (err as Error).message);
+    }
   }
 }
 
-function topN(metric: Metric, n = 3): Hit[] {
-  return [...hits[metric]].sort((a, b) => b.value - a.value).slice(0, n);
-}
+type RowMeta = { label: string; metric: Metric; limit: number; backend: number };
 
-const rows: { label: string; metric: Metric; limit: number; backend: number }[] = [
+const rows: RowMeta[] = [
   { label: "depth", metric: "depth", limit: CLIENT_LIMITS.maxDepth, backend: BACKEND_LIMITS.maxDepth },
   { label: "aliases", metric: "aliases", limit: CLIENT_LIMITS.maxAliases, backend: BACKEND_LIMITS.maxAliases },
   { label: "directives", metric: "directives", limit: CLIENT_LIMITS.maxDirectives, backend: BACKEND_LIMITS.maxDirectives },
@@ -321,10 +244,11 @@ console.log("");
 console.log(color("GraphQL operation limits report", "1"));
 console.log(
   color(
-    `  scanned ${docs.length} documents, ${hits.depth.length} operations, ${fragments.size} fragments`,
+    `  scanned ${docs.length} documents, ${opRows.length} operations, ${fragments.size} fragments`,
     DIM,
   ),
 );
+console.log(color(`  measurement engine: @escape.tech/graphql-armor-* (parity with backend)`, DIM));
 console.log("");
 
 const LABEL_W = 11;
@@ -336,15 +260,24 @@ console.log(
 );
 console.log(color(`  ${"-".repeat(LABEL_W + NUM_W * 2 + BAR_W + 50)}`, DIM));
 
+function maxOf(metric: Metric): { value: number; operation: string } {
+  let best: { value: number; operation: string } = { value: 0, operation: "" };
+  for (const op of opRows) {
+    const v = op[metric];
+    if (v > best.value) best = { value: v, operation: op.name };
+  }
+  return best;
+}
+
 let anyOver = false;
 for (const row of rows) {
-  const top = topN(row.metric, 1)[0];
-  const value = top?.value ?? 0;
+  const top = maxOf(row.metric);
+  const value = top.value;
   const p = pct(value, row.limit);
   if (value > row.limit) anyOver = true;
   const c = statusColor(p);
   const usage = `${p.toFixed(1)}%`;
-  const opName = top && value > 0 ? top.operation : "—";
+  const opName = top.operation || "—";
   console.log(
     `  ${row.label.padEnd(LABEL_W)}` +
       ` ${color(String(value).padStart(NUM_W), c)} / ${String(row.limit).padStart(NUM_W)}  ` +
