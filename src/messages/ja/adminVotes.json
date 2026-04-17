@@ -77,6 +77,7 @@
   "adminVotes.form.errors.maxOptions": "選択肢は 20 件までです",
   "adminVotes.form.errors.descriptionMaxLength": "説明は 2000 文字以内で入力してください",
   "adminVotes.form.errors.optionLabelRequired": "選択肢のラベルを入力してください",
+  "adminVotes.form.errors.duplicateOptionLabel": "同じ名前の選択肢は設定できません",
   "adminVotes.form.errors.nftTokenRequired": "NFT を選択してください",
   "adminVotes.form.errors.nftTokenMismatch": "票の重みに使う NFT は、投票資格に使う NFT と同じものにしてください",
   "adminVotes.toast.createSuccess": "投票を作成しました",

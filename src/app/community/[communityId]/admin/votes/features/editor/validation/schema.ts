@@ -58,7 +58,14 @@ export const createVoteTopicSchema = (t: Translator) => {
           }),
         )
         .min(2, t("adminVotes.form.errors.minTwoOptions"))
-        .max(20, t("adminVotes.form.errors.maxOptions")),
+        .max(20, t("adminVotes.form.errors.maxOptions"))
+        .refine(
+          (options) => {
+            const labels = options.map((o) => o.label.trim()).filter(Boolean);
+            return new Set(labels).size === labels.length;
+          },
+          { message: t("adminVotes.form.errors.duplicateOptionLabel") },
+        ),
       gate: gateSchema,
       powerPolicy: powerPolicySchema,
     })

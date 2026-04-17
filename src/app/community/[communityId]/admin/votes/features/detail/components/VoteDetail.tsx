@@ -1,10 +1,12 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { GqlVoteTopicPhase } from "@/types/graphql";
 import { VoteDetailHeader } from "./VoteDetailHeader";
 import { VoteDetailOptionsSection } from "./VoteDetailOptionsSection";
 import { VoteDetailRulesSection } from "./VoteDetailRulesSection";
 import type { VoteDetailView } from "../types/VoteDetailView";
+import { cn } from "@/lib/utils";
 
 interface VoteDetailProps {
   view: VoteDetailView;
@@ -14,7 +16,10 @@ export function VoteDetail({ view }: VoteDetailProps) {
   const t = useTranslations();
 
   return (
-    <div className="px-4 max-w-md mx-auto py-6 space-y-6 pb-28">
+    <div className={cn(
+      "px-4 max-w-md mx-auto py-6 space-y-6",
+      view.phase === GqlVoteTopicPhase.Upcoming && "pb-28",
+    )}>
       <VoteDetailHeader
         title={view.title}
         phase={view.phase}

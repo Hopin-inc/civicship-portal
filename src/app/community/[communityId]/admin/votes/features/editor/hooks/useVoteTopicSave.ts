@@ -11,12 +11,11 @@ import {
   useCreateVoteTopicMutation,
 } from "@/types/graphql";
 import { logger } from "@/lib/logging";
+import { APP_TIMEZONE } from "@/lib/constants";
 import { VoteTopicFormValues } from "../types/form";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
-
-const APP_TIMEZONE = "Asia/Tokyo";
 
 interface UseVoteTopicSaveParams {
   communityId: string;
