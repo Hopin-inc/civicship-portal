@@ -20,8 +20,7 @@ interface VoteActionsMenuProps {
 
 /**
  * 投票一覧行のアクションメニュー。
- * UPCOMING でないフェーズでは編集・削除どちらも BE で弾かれるため、
- * UPCOMING のときだけメニュー項目を表示する。
+ * UPCOMING でないフェーズでは編集・削除は disabled で表示される。
  */
 export function VoteActionsMenu({ phase, onEdit, onDelete }: VoteActionsMenuProps) {
   const t = useTranslations();
@@ -32,7 +31,7 @@ export function VoteActionsMenu({ phase, onEdit, onDelete }: VoteActionsMenuProp
       <DropdownMenuTrigger asChild>
         <ItemActions
           className="items-start pt-1 cursor-pointer"
-          aria-label={t("adminVotes.list.actions.edit")}
+          aria-label="アクションメニューを開く"
           onClick={(e) => e.stopPropagation()}
         >
           <Ellipsis className="size-5 text-foreground" />

@@ -1,5 +1,6 @@
 "use client";
 
+import type { ComponentProps } from "react";
 import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { GqlVoteTopicPhase } from "@/types/graphql";
@@ -12,7 +13,7 @@ interface VotePhaseBadgeProps {
 
 const VARIANT_BY_PHASE: Record<
   GqlVoteTopicPhase,
-  React.ComponentProps<typeof Badge>["variant"]
+  ComponentProps<typeof Badge>["variant"]
 > = {
   UPCOMING: "secondary",
   OPEN: "success",
