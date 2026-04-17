@@ -73,11 +73,11 @@ export function VoteListItem({ item, onEdit, onDelete }: VoteListItemProps) {
         </ItemContent>
 
         <ItemFooter className="mt-1">
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-            <span className="truncate">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground min-w-0">
+            <span className="truncate max-w-[200px]">
               {gateSummaryText(item.gateSummary, t)}
             </span>
-            <span className="truncate">
+            <span className="truncate max-w-[200px]">
               {powerPolicySummaryText(item.powerPolicySummary, t)}
             </span>
             <span>
