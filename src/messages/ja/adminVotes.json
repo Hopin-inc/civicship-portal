@@ -15,6 +15,7 @@
   "adminVotes.toast.deleteSuccess": "投票を削除しました",
   "adminVotes.toast.deleteError": "投票の削除に失敗しました",
   "adminVotes.toast.notEditableError": "開始前の投票のみ編集・削除できます",
+  "adminVotes.detail.title": "投票詳細",
   "adminVotes.detail.sections.options": "選択肢",
   "adminVotes.detail.sections.gate": "投票資格",
   "adminVotes.detail.sections.powerPolicy": "票の重み",

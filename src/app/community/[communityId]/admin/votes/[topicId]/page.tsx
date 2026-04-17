@@ -23,7 +23,7 @@ export default function VoteDetailPage() {
 
   const headerConfig = useMemo(
     () => ({
-      title: t("adminVotes.list.title"),
+      title: t("adminVotes.detail.title"),
       showLogo: false,
       showBackButton: true,
       backTo: "/admin/votes",

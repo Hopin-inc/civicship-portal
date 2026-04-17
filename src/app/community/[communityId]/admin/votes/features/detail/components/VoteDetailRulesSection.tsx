@@ -51,7 +51,7 @@ export function VoteDetailRulesSection({
             <ItemTitle>
               {gate.type === "membership"
                 ? t("adminVotes.form.gate.type.MEMBERSHIP")
-                : t("adminVotes.form.gate.type.NFT")}
+                : String(t("adminVotes.form.gate.type.NFT")).replace(/\n/g, "")}
             </ItemTitle>
           </ItemContent>
         </Item>
@@ -76,7 +76,7 @@ export function VoteDetailRulesSection({
             <Item size="sm">
               <ItemContent>
                 <span className="text-sm text-muted-foreground">
-                  NFT: {gate.tokenName ?? "—"}
+                  {t("adminVotes.form.gate.nftToken.label")}: {gate.tokenName ?? "—"}
                 </span>
               </ItemContent>
             </Item>

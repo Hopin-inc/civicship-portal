@@ -15,6 +15,7 @@
   "adminVotes.toast.deleteSuccess": "Vote deleted",
   "adminVotes.toast.deleteError": "Failed to delete vote",
   "adminVotes.toast.notEditableError": "Only upcoming votes can be edited or deleted",
+  "adminVotes.detail.title": "Vote details",
   "adminVotes.detail.sections.options": "Options",
   "adminVotes.detail.sections.gate": "Eligibility",
   "adminVotes.detail.sections.powerPolicy": "Vote weight",
