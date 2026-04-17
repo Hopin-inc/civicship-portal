@@ -45,10 +45,20 @@ function walkDir(dir: string, out: string[] = []): string[] {
 function extractGqlTemplates(source: string): string[] {
   const out: string[] = [];
   // Matches both tagged-template form `gql`...`` and call form `gql(`...`)`.
-  const re = /\bgql\s*\(?\s*`([\s\S]*?)`\s*\)?/g;
+  const tagged = /\bgql\s*\(?\s*`([\s\S]*?)`\s*\)?/g;
   let m: RegExpExecArray | null;
-  while ((m = re.exec(source)) !== null) {
+  while ((m = tagged.exec(source)) !== null) {
     out.push(m[1].replace(/\$\{[^}]*\}/g, ""));
+  }
+  // Untagged raw template literals that contain a GraphQL operation or fragment
+  // definition (used for server-side queries executed via fetch()).
+  const raw = /`([\s\S]*?)`/g;
+  while ((m = raw.exec(source)) !== null) {
+    const before = source.slice(Math.max(0, m.index - 30), m.index);
+    if (/\b(gql|graphql)\s*\(?\s*$/.test(before)) continue;
+    if (/\b(query|mutation|subscription|fragment)\s+\w+\s*[({]/.test(m[1])) {
+      out.push(m[1].replace(/\$\{[^}]*\}/g, ""));
+    }
   }
   return out;
 }
