@@ -51,7 +51,14 @@ function extractGqlTemplates(source: string): string[] {
   const out: string[] = [];
   const re = /gql`([\s\S]*?)`/g;
   let m: RegExpExecArray | null;
-  while ((m = re.exec(source)) !== null) out.push(m[1]);
+  while ((m = re.exec(source)) !== null) {
+    // Strip ${...} template interpolations (used to inline fragment constants
+    // like `${USER_FRAGMENT}`). Fragment definitions are parsed separately
+    // from their own gql templates, so the spread reference in the operation
+    // body is sufficient for structural analysis.
+    const stripped = m[1].replace(/\$\{[^}]*\}/g, "");
+    out.push(stripped);
+  }
   return out;
 }
 
