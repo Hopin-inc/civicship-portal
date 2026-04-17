@@ -1,7 +1,7 @@
 "use client";
 
-import { AppLink } from "@/lib/navigation";
 import { useTranslations } from "next-intl";
+import { AppLink } from "@/lib/navigation";
 import { Item, ItemContent, ItemFooter, ItemTitle } from "@/components/ui/item";
 import { cn } from "@/lib/utils";
 import { GqlRole } from "@/types/graphql";
@@ -9,12 +9,11 @@ import { VotePhaseBadge } from "@/shared/vote/components/VotePhaseBadge";
 import { formatVotePeriod } from "@/shared/vote/utils/formatVotePeriod";
 import type { VoteListItem as VoteListItemModel } from "../types/VoteListItem";
 import { VoteActionsMenu } from "./VoteActionsMenu";
-import { useVoteTopicActions } from "../hooks/useVoteTopicActions";
 
 interface VoteListItemProps {
   item: VoteListItemModel;
-  communityId: string;
-  refetch?: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
 }
 
 type Translator = ReturnType<typeof useTranslations>;
@@ -53,9 +52,8 @@ function powerPolicySummaryText(
     : t("adminVotes.form.powerPolicy.type.NFT_COUNT");
 }
 
-export function VoteListItem({ item, communityId, refetch }: VoteListItemProps) {
+export function VoteListItem({ item, onEdit, onDelete }: VoteListItemProps) {
   const t = useTranslations();
-  const { handleEdit, handleDelete } = useVoteTopicActions({ communityId, refetch });
 
   return (
     <Item className="items-start">
@@ -93,8 +91,8 @@ export function VoteListItem({ item, communityId, refetch }: VoteListItemProps) 
 
       <VoteActionsMenu
         phase={item.phase}
-        onEdit={() => handleEdit(item.id)}
-        onDelete={() => handleDelete(item.id)}
+        onEdit={onEdit}
+        onDelete={onDelete}
       />
     </Item>
   );

@@ -14,8 +14,8 @@ const meta: Meta<typeof VoteListItem> = {
   component: VoteListItem,
   parameters: { layout: "padded" },
   args: {
-    communityId: "mock-community",
-    refetch: fn(),
+    onEdit: fn(),
+    onDelete: fn(),
   },
   decorators: [
     (Story) => (
