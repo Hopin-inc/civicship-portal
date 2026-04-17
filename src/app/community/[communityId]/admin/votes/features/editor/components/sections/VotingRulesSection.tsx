@@ -42,6 +42,7 @@ export function VotingRulesSection({
   const powerPolicy = watch("powerPolicy");
 
   const gateIsNft = gate.type === GqlVoteGateType.Nft;
+  const hasNftTokens = !nftTokensLoading && nftTokens.length > 0;
 
   const nftTokenIdError =
     formState.errors.gate &&
@@ -49,6 +50,10 @@ export function VotingRulesSection({
       ?.message;
 
   useEffect(() => {
+    if (gateIsNft && !hasNftTokens && !nftTokensLoading) {
+      setMembership(GqlRole.Member);
+      return;
+    }
     if (powerPolicy.type !== GqlVotePowerPolicyType.NftCount) return;
     if (gate.type !== GqlVoteGateType.Nft) {
       setValue(
@@ -158,6 +163,7 @@ export function VotingRulesSection({
               </ToggleGroupItem>
               <ToggleGroupItem
                 value={GqlVoteGateType.Nft}
+                disabled={!hasNftTokens}
                 className="h-auto min-h-10 whitespace-pre-line text-center leading-tight"
               >
                 {t("adminVotes.form.gate.type.NFT")}
