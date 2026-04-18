@@ -54,6 +54,7 @@ export function VoteTopicFormEditor({
   return (
     <FormProvider {...form}>
       <VoteTopicForm
+        mode={mode}
         onSubmit={handleSubmit}
         saving={saving}
         nftTokens={tokens}

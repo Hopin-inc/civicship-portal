@@ -10,6 +10,7 @@ import { VotingRulesSection } from "./sections/VotingRulesSection";
 import { NftTokenOption } from "../hooks/useNftTokens";
 
 interface VoteTopicFormProps {
+  mode: "create" | "update";
   onSubmit: (e: FormEvent) => void;
   saving: boolean;
   nftTokens: NftTokenOption[];
@@ -17,12 +18,17 @@ interface VoteTopicFormProps {
 }
 
 export function VoteTopicForm({
+  mode,
   onSubmit,
   saving,
   nftTokens,
   nftTokensLoading,
 }: VoteTopicFormProps) {
   const t = useTranslations();
+
+  const buttonLabel = saving
+    ? t(mode === "create" ? "adminVotes.form.submitting" : "adminVotes.form.updating")
+    : t(mode === "create" ? "adminVotes.form.submitButton" : "adminVotes.form.updateButton");
 
   return (
     <form onSubmit={onSubmit} className="space-y-8 py-6">
@@ -41,7 +47,7 @@ export function VoteTopicForm({
           className="w-full h-[56px]"
           disabled={saving}
         >
-          {saving ? t("adminVotes.form.submitting") : t("adminVotes.form.submitButton")}
+          {buttonLabel}
         </Button>
       </div>
     </form>

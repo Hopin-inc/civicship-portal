@@ -11,6 +11,7 @@ const meta: Meta<typeof VoteTopicForm> = {
   component: VoteTopicForm,
   parameters: { layout: "fullscreen" },
   args: {
+    mode: "create",
     onSubmit: fn((e) => e.preventDefault()),
     saving: false,
     nftTokens: mockNftTokens,
@@ -115,6 +116,7 @@ export const WithValidationErrors: Story = {
 
 /** 編集モード: 全フィールドに初期値がロードされた状態 */
 export const UpdateMode: Story = {
+  args: { mode: "update" },
   decorators: [
     withVoteForm({
       defaultValues: {
@@ -141,6 +143,7 @@ export const UpdateMode: Story = {
 
 /** 編集モード (NFT): NFT gate + NFT_COUNT の初期値 */
 export const UpdateModeNft: Story = {
+  args: { mode: "update" },
   decorators: [
     withVoteForm({
       defaultValues: {
