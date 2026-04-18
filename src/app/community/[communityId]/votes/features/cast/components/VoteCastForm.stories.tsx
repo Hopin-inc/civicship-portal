@@ -1,4 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import React from "react";
+import { MockedProvider } from "@apollo/client/testing";
 import { VoteCastForm } from "./VoteCastForm";
 
 const mockOptions = [
@@ -19,9 +21,11 @@ const meta: Meta<typeof VoteCastForm> = {
   },
   decorators: [
     (Story) => (
-      <div className="max-w-md mx-auto p-4">
-        <Story />
-      </div>
+      <MockedProvider mocks={[]} addTypename={false}>
+        <div className="max-w-md mx-auto p-4">
+          <Story />
+        </div>
+      </MockedProvider>
     ),
   ],
 };

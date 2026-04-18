@@ -1,4 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import React from "react";
+import { MockedProvider } from "@apollo/client/testing";
 import { VoteCastPage } from "./VoteCastPage";
 import {
   mockUpcomingView,
@@ -15,9 +17,11 @@ const meta: Meta<typeof VoteCastPage> = {
   parameters: { layout: "fullscreen" },
   decorators: [
     (Story) => (
-      <div className="min-h-screen bg-background">
-        <Story />
-      </div>
+      <MockedProvider mocks={[]} addTypename={false}>
+        <div className="min-h-screen bg-background">
+          <Story />
+        </div>
+      </MockedProvider>
     ),
   ],
 };
