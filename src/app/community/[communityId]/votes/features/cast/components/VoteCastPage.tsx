@@ -10,6 +10,7 @@ import { VoteCastForm } from "./VoteCastForm";
 import { VoteUpcomingNotice } from "./VoteUpcomingNotice";
 import { VoteClosedNotice } from "./VoteClosedNotice";
 import { VoteEligibilityNotice } from "./VoteEligibilityNotice";
+import { VoteGateInfoBanner } from "./VoteGateInfoBanner";
 
 function formatRemaining(ms: number): string {
   const totalSeconds = Math.floor(ms / 1000);
@@ -83,12 +84,15 @@ export function VoteCastPage({ view }: VoteCastPageProps) {
       )}
 
       {view.displayMode === "cast" && (
-        <VoteCastForm
-          topicId={view.topicId}
-          options={view.options}
-          currentPower={view.currentPower}
-          myBallotOptionId={view.myBallotOptionId}
-        />
+        <>
+          <VoteGateInfoBanner gate={view.gate} />
+          <VoteCastForm
+            topicId={view.topicId}
+            options={view.options}
+            currentPower={view.currentPower}
+            myBallotOptionId={view.myBallotOptionId}
+          />
+        </>
       )}
 
       {view.displayMode === "closed" && (
