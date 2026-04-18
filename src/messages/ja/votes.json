@@ -15,6 +15,7 @@
   "votes.eligibility.reason.GATE_NOT_CONFIGURED": "投票資格が設定されていません",
   "votes.eligibility.reason.GATE_NFT_TOKEN_NOT_CONFIGURED": "投票資格の NFT が設定されていません",
   "votes.eligibility.reason.UNKNOWN_GATE_TYPE": "不明な投票資格タイプです",
+  "votes.page.loadError": "投票を読み込めませんでした",
   "votes.toast.castSuccess": "投票しました",
   "votes.toast.castError": "投票に失敗しました"
 }

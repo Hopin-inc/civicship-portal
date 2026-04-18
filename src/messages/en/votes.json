@@ -15,6 +15,7 @@
   "votes.eligibility.reason.GATE_NOT_CONFIGURED": "Voting eligibility is not configured",
   "votes.eligibility.reason.GATE_NFT_TOKEN_NOT_CONFIGURED": "The NFT for voting eligibility is not configured",
   "votes.eligibility.reason.UNKNOWN_GATE_TYPE": "Unknown eligibility type",
+  "votes.page.loadError": "Failed to load vote",
   "votes.toast.castSuccess": "Vote submitted",
   "votes.toast.castError": "Failed to submit vote"
 }

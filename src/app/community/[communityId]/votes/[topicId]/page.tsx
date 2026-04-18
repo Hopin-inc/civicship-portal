@@ -35,7 +35,7 @@ export default function UserVotePage() {
   useHeaderConfig(headerConfig);
 
   if (loading && !data) return <LoadingIndicator fullScreen={false} />;
-  if (error) return <ErrorState title={t("votes.toast.castError")} />;
+  if (error) return <ErrorState title={t("votes.page.loadError")} />;
   if (!data?.voteTopic) return notFound();
   if (!view) return null;
 
