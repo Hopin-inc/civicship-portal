@@ -45,7 +45,7 @@ export function VoteCastForm({
         onValueChange={setSelectedOptionId}
       />
 
-      {currentPower != null && currentPower > 0 && (
+      {currentPower != null && (
         <p className="text-sm text-muted-foreground text-center">
           {t("votes.cast.power", { power: currentPower })}
         </p>
@@ -54,7 +54,7 @@ export function VoteCastForm({
       <Button
         variant="primary"
         className="w-full h-[56px]"
-        disabled={!selectedOptionId || casting}
+        disabled={!selectedOptionId || casting || (currentPower != null && currentPower <= 0)}
         onClick={handleSubmit}
       >
         {casting
