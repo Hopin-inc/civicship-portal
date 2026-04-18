@@ -2,6 +2,12 @@ import { GqlVoteTopicPhase } from "@/types/graphql";
 
 export type DisplayMode = "upcoming" | "ineligible" | "cast" | "closed";
 
+export interface VoteGateInfo {
+  type: "membership" | "nft";
+  requiredRoleLabel: string | null;
+  nftTokenName: string | null;
+}
+
 export interface VoteCastViewModel {
   topicId: string;
   title: string;
@@ -16,4 +22,5 @@ export interface VoteCastViewModel {
   myBallotPower: number | null;
   myBallotLabel: string | null;
   reason: string | null;
+  gate: VoteGateInfo;
 }

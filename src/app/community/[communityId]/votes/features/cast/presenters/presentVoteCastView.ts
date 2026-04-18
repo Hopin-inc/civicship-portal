@@ -1,5 +1,5 @@
-import { GqlGetVoteTopicForUserQuery, GqlVoteTopicPhase } from "@/types/graphql";
-import { DisplayMode, VoteCastViewModel } from "../types/VoteCastViewModel";
+import { GqlGetVoteTopicForUserQuery, GqlVoteGateType, GqlVoteTopicPhase } from "@/types/graphql";
+import { DisplayMode, VoteCastViewModel, VoteGateInfo } from "../types/VoteCastViewModel";
 
 type VoteTopicData = NonNullable<GqlGetVoteTopicForUserQuery["voteTopic"]>;
 
@@ -8,6 +8,21 @@ function computeDisplayMode(topic: VoteTopicData): DisplayMode {
   if (topic.phase === GqlVoteTopicPhase.Closed) return "closed";
   if (!topic.myEligibility?.eligible) return "ineligible";
   return "cast";
+}
+
+function toGateInfo(gate: VoteTopicData["gate"]): VoteGateInfo {
+  if (gate.type === GqlVoteGateType.Nft) {
+    return {
+      type: "nft",
+      requiredRoleLabel: null,
+      nftTokenName: gate.nftToken?.name ?? null,
+    };
+  }
+  return {
+    type: "membership",
+    requiredRoleLabel: gate.requiredRole ?? null,
+    nftTokenName: null,
+  };
 }
 
 export function presentVoteCastView(topic: VoteTopicData): VoteCastViewModel {
@@ -30,5 +45,6 @@ export function presentVoteCastView(topic: VoteTopicData): VoteCastViewModel {
     myBallotPower: ballot?.power ?? null,
     myBallotLabel: ballot?.option.label ?? null,
     reason: eligibility?.reason ?? null,
+    gate: toGateInfo(topic.gate),
   };
 }

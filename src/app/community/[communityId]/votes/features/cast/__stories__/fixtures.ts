@@ -22,6 +22,7 @@ export const mockUpcomingView: VoteCastViewModel = {
   myBallotPower: null,
   myBallotLabel: null,
   reason: null,
+  gate: { type: "membership" as const, requiredRoleLabel: null, nftTokenName: null },
 };
 
 export const mockOpenIneligibleView: VoteCastViewModel = {
@@ -30,7 +31,8 @@ export const mockOpenIneligibleView: VoteCastViewModel = {
   phase: GqlVoteTopicPhase.Open,
   displayMode: "ineligible",
   startsAt: base.subtract(1, "day").toDate(),
-  reason: "NOT_A_MEMBER",
+  reason: "REQUIRED_NFT_NOT_FOUND",
+  gate: { type: "nft", requiredRoleLabel: null, nftTokenName: "コミュニティパス" },
 };
 
 export const mockOpenEligibleNewView: VoteCastViewModel = {
