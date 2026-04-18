@@ -7458,6 +7458,51 @@ export type GqlDeleteVoteTopicMutation = {
   voteTopicDelete: { __typename?: "VoteTopicDeleteSuccess"; voteTopicId: string };
 };
 
+export type GqlUpdateVoteTopicMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+  input: GqlVoteTopicUpdateInput;
+  permission: GqlCheckCommunityPermissionInput;
+}>;
+
+export type GqlUpdateVoteTopicMutation = {
+  __typename?: "Mutation";
+  voteTopicUpdate: {
+    __typename?: "VoteTopicUpdateSuccess";
+    voteTopic: {
+      __typename?: "VoteTopic";
+      id: string;
+      title: string;
+      description?: string | null;
+      startsAt: Date;
+      endsAt: Date;
+      phase: GqlVoteTopicPhase;
+      createdAt: Date;
+      updatedAt?: Date | null;
+      options: Array<{
+        __typename?: "VoteOption";
+        id: string;
+        label: string;
+        orderIndex: number;
+        voteCount?: number | null;
+        totalPower?: number | null;
+      }>;
+      gate: {
+        __typename?: "VoteGate";
+        id: string;
+        type: GqlVoteGateType;
+        requiredRole?: GqlRole | null;
+        nftToken?: { __typename?: "NftToken"; id: string; name?: string | null } | null;
+      };
+      powerPolicy: {
+        __typename?: "VotePowerPolicy";
+        id: string;
+        type: GqlVotePowerPolicyType;
+        nftToken?: { __typename?: "NftToken"; id: string; name?: string | null } | null;
+      };
+    };
+  };
+};
+
 export type GqlVoteTopicListItemFieldsFragment = {
   __typename?: "VoteTopic";
   id: string;
@@ -15025,6 +15070,64 @@ export type DeleteVoteTopicMutationResult = Apollo.MutationResult<GqlDeleteVoteT
 export type DeleteVoteTopicMutationOptions = Apollo.BaseMutationOptions<
   GqlDeleteVoteTopicMutation,
   GqlDeleteVoteTopicMutationVariables
+>;
+export const UpdateVoteTopicDocument = gql`
+  mutation UpdateVoteTopic(
+    $id: ID!
+    $input: VoteTopicUpdateInput!
+    $permission: CheckCommunityPermissionInput!
+  ) {
+    voteTopicUpdate(id: $id, input: $input, permission: $permission) {
+      ... on VoteTopicUpdateSuccess {
+        voteTopic {
+          ...VoteTopicFields
+        }
+      }
+    }
+  }
+  ${VoteTopicFieldsFragmentDoc}
+`;
+export type GqlUpdateVoteTopicMutationFn = Apollo.MutationFunction<
+  GqlUpdateVoteTopicMutation,
+  GqlUpdateVoteTopicMutationVariables
+>;
+
+/**
+ * __useUpdateVoteTopicMutation__
+ *
+ * To run a mutation, you first call `useUpdateVoteTopicMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateVoteTopicMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateVoteTopicMutation, { data, loading, error }] = useUpdateVoteTopicMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      input: // value for 'input'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function useUpdateVoteTopicMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlUpdateVoteTopicMutation,
+    GqlUpdateVoteTopicMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlUpdateVoteTopicMutation, GqlUpdateVoteTopicMutationVariables>(
+    UpdateVoteTopicDocument,
+    options,
+  );
+}
+export type UpdateVoteTopicMutationHookResult = ReturnType<typeof useUpdateVoteTopicMutation>;
+export type UpdateVoteTopicMutationResult = Apollo.MutationResult<GqlUpdateVoteTopicMutation>;
+export type UpdateVoteTopicMutationOptions = Apollo.BaseMutationOptions<
+  GqlUpdateVoteTopicMutation,
+  GqlUpdateVoteTopicMutationVariables
 >;
 export const GetVoteTopicsDocument = gql`
   query GetVoteTopics($communityId: ID!, $cursor: String, $first: Int) {

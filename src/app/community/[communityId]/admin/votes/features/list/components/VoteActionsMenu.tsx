@@ -6,6 +6,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ItemActions } from "@/components/ui/item";
@@ -13,10 +14,11 @@ import { GqlVoteTopicPhase } from "@/types/graphql";
 
 interface VoteActionsMenuProps {
   phase: GqlVoteTopicPhase;
+  onEdit: () => void;
   onDelete: () => void;
 }
 
-export function VoteActionsMenu({ phase, onDelete }: VoteActionsMenuProps) {
+export function VoteActionsMenu({ phase, onEdit, onDelete }: VoteActionsMenuProps) {
   const t = useTranslations();
   const isEditable = phase === GqlVoteTopicPhase.Upcoming;
 
@@ -35,6 +37,17 @@ export function VoteActionsMenu({ phase, onDelete }: VoteActionsMenuProps) {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="w-40">
+        <DropdownMenuItem
+          onSelect={(event) => {
+            event.preventDefault();
+            onEdit();
+          }}
+        >
+          {t("adminVotes.list.actions.edit")}
+        </DropdownMenuItem>
+
+        <DropdownMenuSeparator />
+
         <DropdownMenuItem
           className="text-destructive"
           onSelect={(event) => {

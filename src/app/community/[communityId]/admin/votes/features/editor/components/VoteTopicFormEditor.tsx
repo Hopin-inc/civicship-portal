@@ -8,34 +8,45 @@ import { useVoteTopicEditor } from "../hooks/useVoteTopicEditor";
 import { useVoteTopicSave } from "../hooks/useVoteTopicSave";
 import { useNftTokens } from "../hooks/useNftTokens";
 import { VoteTopicForm } from "./VoteTopicForm";
+import { VoteTopicFormValues } from "../types/form";
 
 interface VoteTopicFormEditorProps {
+  mode: "create" | "update";
   communityId: string;
+  topicId?: string;
+  initialValues?: VoteTopicFormValues;
   onSuccess?: (id: string) => void;
 }
 
 export function VoteTopicFormEditor({
+  mode,
   communityId,
+  topicId,
+  initialValues,
   onSuccess,
 }: VoteTopicFormEditorProps) {
   const t = useTranslations();
-  const form = useVoteTopicEditor();
-  const { save, saving } = useVoteTopicSave({ communityId });
+  const form = useVoteTopicEditor(initialValues);
+  const { save, saving } = useVoteTopicSave({ mode, communityId, topicId });
   const { tokens, loading: tokensLoading } = useNftTokens({ communityId });
 
   const headerConfig = useMemo(
     () => ({
-      title: t("adminVotes.page.title"),
+      title: t(
+        mode === "create" ? "adminVotes.page.title" : "adminVotes.edit.title",
+      ),
       showLogo: false,
       showBackButton: true,
       hideFooter: true,
     }),
-    [t],
+    [t, mode],
   );
   useHeaderConfig(headerConfig);
 
   const handleSubmit = form.handleSubmit(async (values) => {
-    if (!window.confirm(t("adminVotes.form.createConfirm"))) return;
+    if (mode === "create") {
+      if (!window.confirm(t("adminVotes.form.createConfirm"))) return;
+    }
     const id = await save(values);
     if (id) onSuccess?.(id);
   });

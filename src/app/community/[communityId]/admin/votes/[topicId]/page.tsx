@@ -37,7 +37,7 @@ export default function VoteDetailPage() {
     fetchPolicy: "network-only",
   });
 
-  const { handleDelete } = useVoteTopicActions({
+  const { handleEdit, handleDelete } = useVoteTopicActions({
     communityId: communityId ?? "",
     refetch: () => router.push("/admin/votes"),
   });
@@ -65,6 +65,7 @@ export default function VoteDetailPage() {
       <VoteDetail view={view} />
       <AdminVoteDetailFooter
         phase={view.phase}
+        onEdit={() => handleEdit(view.id)}
         onDelete={() => handleDelete(view.id)}
       />
     </>

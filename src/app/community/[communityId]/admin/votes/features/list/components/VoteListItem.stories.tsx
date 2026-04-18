@@ -13,7 +13,7 @@ const meta: Meta<typeof VoteListItem> = {
   title: "AdminVotes/List/VoteListItem",
   component: VoteListItem,
   parameters: { layout: "padded" },
-  args: { onDelete: fn() },
+  args: { onEdit: fn(), onDelete: fn() },
   decorators: [
     (Story) => (
       <div className="max-w-2xl mx-auto p-4">

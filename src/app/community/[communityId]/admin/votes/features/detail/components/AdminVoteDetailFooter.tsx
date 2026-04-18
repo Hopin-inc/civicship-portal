@@ -1,17 +1,19 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GqlVoteTopicPhase } from "@/types/graphql";
 
 interface AdminVoteDetailFooterProps {
   phase: GqlVoteTopicPhase;
+  onEdit: () => void;
   onDelete: () => void;
 }
 
 export function AdminVoteDetailFooter({
   phase,
+  onEdit,
   onDelete,
 }: AdminVoteDetailFooterProps) {
   const t = useTranslations();
@@ -30,6 +32,15 @@ export function AdminVoteDetailFooter({
         >
           <Trash2 className="h-4 w-4" />
           {t("adminVotes.detail.deleteButton")}
+        </Button>
+        <Button
+          variant="primary"
+          size="sm"
+          onClick={onEdit}
+          className="gap-1"
+        >
+          <Pencil className="h-4 w-4" />
+          {t("adminVotes.detail.editButton")}
         </Button>
       </div>
     </div>

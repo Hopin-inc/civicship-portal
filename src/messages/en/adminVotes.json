@@ -17,6 +17,7 @@
   "adminVotes.list.actions.openMenu": "Open actions menu",
   "adminVotes.toast.notEditableError": "Only upcoming votes can be edited or deleted",
   "adminVotes.detail.title": "Vote details",
+  "adminVotes.edit.title": "Edit vote",
   "adminVotes.detail.sections.options": "Options",
   "adminVotes.detail.sections.gate": "Eligibility",
   "adminVotes.detail.sections.powerPolicy": "Vote weight",
@@ -81,5 +82,7 @@
   "adminVotes.form.errors.nftTokenRequired": "Please select an NFT",
   "adminVotes.form.errors.nftTokenMismatch": "The NFT used for vote weight must match the NFT used for eligibility",
   "adminVotes.toast.createSuccess": "Vote created successfully",
-  "adminVotes.toast.createError": "Failed to create vote"
+  "adminVotes.toast.createError": "Failed to create vote",
+  "adminVotes.toast.updateSuccess": "Vote updated",
+  "adminVotes.toast.updateError": "Failed to update vote"
 }
