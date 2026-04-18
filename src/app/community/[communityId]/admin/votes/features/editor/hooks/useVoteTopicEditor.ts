@@ -3,12 +3,18 @@ import { useForm, UseFormReturn } from "react-hook-form";
 import { useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 import { GqlRole, GqlVoteGateType, GqlVotePowerPolicyType } from "@/types/graphql";
+import { APP_TIMEZONE } from "@/lib/constants";
 import { createVoteTopicSchema } from "../validation/schema";
 import { VoteTopicFormValues } from "../types/form";
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
 function createDefaultValues(): VoteTopicFormValues {
-  const tomorrow = dayjs().add(1, "day");
+  const tomorrow = dayjs().tz(APP_TIMEZONE).add(1, "day");
   return {
     title: "",
     description: "",

@@ -1,11 +1,17 @@
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 import {
   GqlGetVoteTopicQuery,
   GqlRole,
   GqlVoteGateType,
   GqlVotePowerPolicyType,
 } from "@/types/graphql";
+import { APP_TIMEZONE } from "@/lib/constants";
 import { VoteTopicFormValues } from "../types/form";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 type VoteTopicData = NonNullable<GqlGetVoteTopicQuery["voteTopic"]>;
 
@@ -15,8 +21,8 @@ export function presentVoteTopicForEdit(
   return {
     title: topic.title,
     description: topic.description ?? "",
-    startsAt: dayjs(topic.startsAt).format("YYYY-MM-DDTHH:mm"),
-    endsAt: dayjs(topic.endsAt).format("YYYY-MM-DDTHH:mm"),
+    startsAt: dayjs(topic.startsAt).tz(APP_TIMEZONE).format("YYYY-MM-DDTHH:mm"),
+    endsAt: dayjs(topic.endsAt).tz(APP_TIMEZONE).format("YYYY-MM-DDTHH:mm"),
     options: [...topic.options]
       .sort((a, b) => a.orderIndex - b.orderIndex)
       .map((o) => ({ label: o.label })),
