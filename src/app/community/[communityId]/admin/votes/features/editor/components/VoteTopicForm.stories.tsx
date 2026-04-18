@@ -11,6 +11,7 @@ const meta: Meta<typeof VoteTopicForm> = {
   component: VoteTopicForm,
   parameters: { layout: "fullscreen" },
   args: {
+    mode: "create",
     onSubmit: fn((e) => e.preventDefault()),
     saving: false,
     nftTokens: mockNftTokens,
@@ -109,6 +110,56 @@ export const WithValidationErrors: Story = {
         { path: "options.1.label", message: "選択肢のラベルを入力してください" },
         { path: "gate.nftTokenId", message: "NFT を選択してください" },
       ],
+    }),
+  ],
+};
+
+/** 編集モード: 全フィールドに初期値がロードされた状態 */
+export const UpdateMode: Story = {
+  args: { mode: "update" },
+  decorators: [
+    withVoteForm({
+      defaultValues: {
+        title: "既存の投票テーマ",
+        description: "この投票は編集中です。",
+        options: [
+          { label: "地域の夏祭り" },
+          { label: "ハイキングイベント" },
+          { label: "フリーマーケット" },
+        ],
+        gate: {
+          type: GqlVoteGateType.Membership,
+          requiredRole: GqlRole.Member,
+          nftTokenId: null,
+        },
+        powerPolicy: {
+          type: GqlVotePowerPolicyType.Flat,
+          nftTokenId: null,
+        },
+      },
+    }),
+  ],
+};
+
+/** 編集モード (NFT): NFT gate + NFT_COUNT の初期値 */
+export const UpdateModeNft: Story = {
+  args: { mode: "update" },
+  decorators: [
+    withVoteForm({
+      defaultValues: {
+        title: "NFT 保有者限定の投票",
+        description: "コミュニティパス保有者のみ参加可能。",
+        options: [{ label: "賛成" }, { label: "反対" }],
+        gate: {
+          type: GqlVoteGateType.Nft,
+          requiredRole: null,
+          nftTokenId: mockNftTokens[0].id,
+        },
+        powerPolicy: {
+          type: GqlVotePowerPolicyType.NftCount,
+          nftTokenId: mockNftTokens[0].id,
+        },
+      },
     }),
   ],
 };

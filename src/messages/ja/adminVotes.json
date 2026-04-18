@@ -17,6 +17,7 @@
   "adminVotes.list.actions.openMenu": "アクションメニューを開く",
   "adminVotes.toast.notEditableError": "開始前の投票のみ編集・削除できます",
   "adminVotes.detail.title": "投票詳細",
+  "adminVotes.edit.title": "投票編集",
   "adminVotes.detail.sections.options": "選択肢",
   "adminVotes.detail.sections.gate": "投票資格",
   "adminVotes.detail.sections.powerPolicy": "票の重み",
@@ -67,8 +68,10 @@
   "adminVotes.form.powerPolicy.nftToken.syncedFromGate": "投票資格と同じ NFT を使用します",
   "adminVotes.form.powerPolicy.type.requiresNftGate": "「特定 NFT の保有者」を資格タイプに選ぶと有効になります",
   "adminVotes.form.submitButton": "作成する",
+  "adminVotes.form.updateButton": "保存する",
   "adminVotes.form.createConfirm": "投票を作成します。開始日時を過ぎると編集・削除ができなくなります。よろしいですか？",
   "adminVotes.form.submitting": "作成中...",
+  "adminVotes.form.updating": "保存中...",
   "adminVotes.form.errors.titleRequired": "タイトルを入力してください",
   "adminVotes.form.errors.startsAtRequired": "開始日時を入力してください",
   "adminVotes.form.errors.endsAtRequired": "終了日時を入力してください",
@@ -81,5 +84,7 @@
   "adminVotes.form.errors.nftTokenRequired": "NFT を選択してください",
   "adminVotes.form.errors.nftTokenMismatch": "票の重みに使う NFT は、投票資格に使う NFT と同じものにしてください",
   "adminVotes.toast.createSuccess": "投票を作成しました",
-  "adminVotes.toast.createError": "投票の作成に失敗しました"
+  "adminVotes.toast.createError": "投票の作成に失敗しました",
+  "adminVotes.toast.updateSuccess": "投票を更新しました",
+  "adminVotes.toast.updateError": "投票の更新に失敗しました"
 }
