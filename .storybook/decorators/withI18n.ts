@@ -7,12 +7,14 @@ import common from "../../src/messages/ja/common.json";
 import navigation from "../../src/messages/ja/navigation.json";
 import transactions from "../../src/messages/ja/transactions.json";
 import users from "../../src/messages/ja/users.json";
+import adminVotes from "../../src/messages/ja/adminVotes.json";
 
 const messages = nestMessages({
   ...common,
   ...navigation,
   ...transactions,
   ...users,
+  ...adminVotes,
 });
 
 /**

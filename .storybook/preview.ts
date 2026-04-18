@@ -4,6 +4,13 @@ import { globalDecorators } from "./decorators";
 
 const preview: Preview = {
   parameters: {
+    nextjs: {
+      appDirectory: true,
+      navigation: {
+        pathname: "/admin/votes",
+      },
+    },
+
     controls: {
       matchers: {
         color: /(background|color)$/i,
