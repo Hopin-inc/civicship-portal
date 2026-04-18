@@ -1,0 +1,20 @@
+{
+  "votes.page.title": "Vote",
+  "votes.cast.submitButton": "Vote",
+  "votes.cast.changeButton": "Change vote",
+  "votes.cast.submitting": "Voting...",
+  "votes.cast.power": "{power} votes",
+  "votes.upcoming.message": "Voting has not started yet",
+  "votes.upcoming.startsAt": "Starts: {date}",
+  "votes.closed.message": "Voting has ended",
+  "votes.closed.myBallot": "You voted for \"{label}\" ({power} votes)",
+  "votes.eligibility.title": "You cannot vote",
+  "votes.eligibility.reason.NOT_A_MEMBER": "You are not a member of this community",
+  "votes.eligibility.reason.INSUFFICIENT_ROLE": "You don't have the required role to vote",
+  "votes.eligibility.reason.REQUIRED_NFT_NOT_FOUND": "You don't hold the required NFT",
+  "votes.eligibility.reason.GATE_NOT_CONFIGURED": "Voting eligibility is not configured",
+  "votes.eligibility.reason.GATE_NFT_TOKEN_NOT_CONFIGURED": "The NFT for voting eligibility is not configured",
+  "votes.eligibility.reason.UNKNOWN_GATE_TYPE": "Unknown eligibility type",
+  "votes.toast.castSuccess": "Vote submitted",
+  "votes.toast.castError": "Failed to submit vote"
+}
