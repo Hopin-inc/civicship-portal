@@ -39,7 +39,12 @@ export function presentVoteCastView(topic: VoteTopicData): VoteCastViewModel {
     displayMode: computeDisplayMode(topic),
     options: [...topic.options]
       .sort((a, b) => a.orderIndex - b.orderIndex)
-      .map((o) => ({ id: o.id, label: o.label })),
+      .map((o) => ({
+        id: o.id,
+        label: o.label,
+        voteCount: o.voteCount ?? null,
+        totalPower: o.totalPower ?? null,
+      })),
     currentPower: eligibility?.currentPower ?? null,
     myBallotOptionId: ballot?.option.id ?? null,
     myBallotPower: ballot?.power ?? null,

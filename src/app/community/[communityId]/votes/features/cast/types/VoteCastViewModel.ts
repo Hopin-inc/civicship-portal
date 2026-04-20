@@ -16,7 +16,7 @@ export interface VoteCastViewModel {
   endsAt: Date;
   phase: GqlVoteTopicPhase;
   displayMode: DisplayMode;
-  options: { id: string; label: string }[];
+  options: { id: string; label: string; voteCount: number | null; totalPower: number | null }[];
   currentPower: number | null;
   myBallotOptionId: string | null;
   myBallotPower: number | null;

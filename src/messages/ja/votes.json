@@ -21,5 +21,7 @@
   "votes.eligibility.reason.UNKNOWN_GATE_TYPE": "不明な投票資格タイプです",
   "votes.page.loadError": "投票を読み込めませんでした",
   "votes.toast.castSuccess": "投票しました",
-  "votes.toast.castError": "投票に失敗しました"
+  "votes.toast.castError": "投票に失敗しました",
+  "votes.results.totalVoters": "投票者 {count} 人",
+  "votes.results.totalPower": "総票数 {power}"
 }
