@@ -7404,6 +7404,52 @@ export type GqlVoteTopicFieldsFragment = {
   };
 };
 
+export type GqlVoteTopicUserFieldsFragment = {
+  __typename?: "VoteTopic";
+  id: string;
+  title: string;
+  description?: string | null;
+  startsAt: Date;
+  endsAt: Date;
+  phase: GqlVoteTopicPhase;
+  createdAt: Date;
+  updatedAt?: Date | null;
+  myBallot?: {
+    __typename?: "VoteBallot";
+    id: string;
+    power: number;
+    createdAt: Date;
+    option: { __typename?: "VoteOption"; id: string; label: string };
+  } | null;
+  myEligibility?: {
+    __typename?: "MyVoteEligibility";
+    eligible: boolean;
+    currentPower?: number | null;
+    reason?: string | null;
+  } | null;
+  options: Array<{
+    __typename?: "VoteOption";
+    id: string;
+    label: string;
+    orderIndex: number;
+    voteCount?: number | null;
+    totalPower?: number | null;
+  }>;
+  gate: {
+    __typename?: "VoteGate";
+    id: string;
+    type: GqlVoteGateType;
+    requiredRole?: GqlRole | null;
+    nftToken?: { __typename?: "NftToken"; id: string; name?: string | null } | null;
+  };
+  powerPolicy: {
+    __typename?: "VotePowerPolicy";
+    id: string;
+    type: GqlVotePowerPolicyType;
+    nftToken?: { __typename?: "NftToken"; id: string; name?: string | null } | null;
+  };
+};
+
 export type GqlCreateVoteTopicMutationVariables = Exact<{
   input: GqlVoteTopicCreateInput;
   permission: GqlCheckCommunityPermissionInput;
@@ -7456,6 +7502,24 @@ export type GqlDeleteVoteTopicMutationVariables = Exact<{
 export type GqlDeleteVoteTopicMutation = {
   __typename?: "Mutation";
   voteTopicDelete: { __typename?: "VoteTopicDeleteSuccess"; voteTopicId: string };
+};
+
+export type GqlVoteCastMutationVariables = Exact<{
+  input: GqlVoteCastInput;
+}>;
+
+export type GqlVoteCastMutation = {
+  __typename?: "Mutation";
+  voteCast: {
+    __typename?: "VoteCastSuccess";
+    ballot: {
+      __typename?: "VoteBallot";
+      id: string;
+      power: number;
+      createdAt: Date;
+      option: { __typename?: "VoteOption"; id: string; label: string };
+    };
+  };
 };
 
 export type GqlUpdateVoteTopicMutationVariables = Exact<{
@@ -7589,6 +7653,59 @@ export type GqlGetVoteTopicQuery = {
     phase: GqlVoteTopicPhase;
     createdAt: Date;
     updatedAt?: Date | null;
+    options: Array<{
+      __typename?: "VoteOption";
+      id: string;
+      label: string;
+      orderIndex: number;
+      voteCount?: number | null;
+      totalPower?: number | null;
+    }>;
+    gate: {
+      __typename?: "VoteGate";
+      id: string;
+      type: GqlVoteGateType;
+      requiredRole?: GqlRole | null;
+      nftToken?: { __typename?: "NftToken"; id: string; name?: string | null } | null;
+    };
+    powerPolicy: {
+      __typename?: "VotePowerPolicy";
+      id: string;
+      type: GqlVotePowerPolicyType;
+      nftToken?: { __typename?: "NftToken"; id: string; name?: string | null } | null;
+    };
+  } | null;
+};
+
+export type GqlGetVoteTopicForUserQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type GqlGetVoteTopicForUserQuery = {
+  __typename?: "Query";
+  voteTopic?: {
+    __typename?: "VoteTopic";
+    id: string;
+    title: string;
+    description?: string | null;
+    startsAt: Date;
+    endsAt: Date;
+    phase: GqlVoteTopicPhase;
+    createdAt: Date;
+    updatedAt?: Date | null;
+    myBallot?: {
+      __typename?: "VoteBallot";
+      id: string;
+      power: number;
+      createdAt: Date;
+      option: { __typename?: "VoteOption"; id: string; label: string };
+    } | null;
+    myEligibility?: {
+      __typename?: "MyVoteEligibility";
+      eligible: boolean;
+      currentPower?: number | null;
+      reason?: string | null;
+    } | null;
     options: Array<{
       __typename?: "VoteOption";
       id: string;
@@ -7868,6 +7985,26 @@ export const VoteTopicFieldsFragmentDoc = gql`
       }
     }
   }
+`;
+export const VoteTopicUserFieldsFragmentDoc = gql`
+  fragment VoteTopicUserFields on VoteTopic {
+    ...VoteTopicFields
+    myBallot {
+      id
+      option {
+        id
+        label
+      }
+      power
+      createdAt
+    }
+    myEligibility {
+      eligible
+      currentPower
+      reason
+    }
+  }
+  ${VoteTopicFieldsFragmentDoc}
 `;
 export const VoteTopicListItemFieldsFragmentDoc = gql`
   fragment VoteTopicListItemFields on VoteTopic {
@@ -15071,6 +15208,60 @@ export type DeleteVoteTopicMutationOptions = Apollo.BaseMutationOptions<
   GqlDeleteVoteTopicMutation,
   GqlDeleteVoteTopicMutationVariables
 >;
+export const VoteCastDocument = gql`
+  mutation VoteCast($input: VoteCastInput!) {
+    voteCast(input: $input) {
+      ... on VoteCastSuccess {
+        ballot {
+          id
+          option {
+            id
+            label
+          }
+          power
+          createdAt
+        }
+      }
+    }
+  }
+`;
+export type GqlVoteCastMutationFn = Apollo.MutationFunction<
+  GqlVoteCastMutation,
+  GqlVoteCastMutationVariables
+>;
+
+/**
+ * __useVoteCastMutation__
+ *
+ * To run a mutation, you first call `useVoteCastMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useVoteCastMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [voteCastMutation, { data, loading, error }] = useVoteCastMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useVoteCastMutation(
+  baseOptions?: Apollo.MutationHookOptions<GqlVoteCastMutation, GqlVoteCastMutationVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<GqlVoteCastMutation, GqlVoteCastMutationVariables>(
+    VoteCastDocument,
+    options,
+  );
+}
+export type VoteCastMutationHookResult = ReturnType<typeof useVoteCastMutation>;
+export type VoteCastMutationResult = Apollo.MutationResult<GqlVoteCastMutation>;
+export type VoteCastMutationOptions = Apollo.BaseMutationOptions<
+  GqlVoteCastMutation,
+  GqlVoteCastMutationVariables
+>;
 export const UpdateVoteTopicDocument = gql`
   mutation UpdateVoteTopic(
     $id: ID!
@@ -15268,4 +15459,80 @@ export type GetVoteTopicSuspenseQueryHookResult = ReturnType<typeof useGetVoteTo
 export type GetVoteTopicQueryResult = Apollo.QueryResult<
   GqlGetVoteTopicQuery,
   GqlGetVoteTopicQueryVariables
+>;
+export const GetVoteTopicForUserDocument = gql`
+  query GetVoteTopicForUser($id: ID!) {
+    voteTopic(id: $id) {
+      ...VoteTopicUserFields
+    }
+  }
+  ${VoteTopicUserFieldsFragmentDoc}
+`;
+
+/**
+ * __useGetVoteTopicForUserQuery__
+ *
+ * To run a query within a React component, call `useGetVoteTopicForUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetVoteTopicForUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetVoteTopicForUserQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetVoteTopicForUserQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GqlGetVoteTopicForUserQuery,
+    GqlGetVoteTopicForUserQueryVariables
+  > &
+    ({ variables: GqlGetVoteTopicForUserQueryVariables; skip?: boolean } | { skip: boolean }),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetVoteTopicForUserQuery, GqlGetVoteTopicForUserQueryVariables>(
+    GetVoteTopicForUserDocument,
+    options,
+  );
+}
+export function useGetVoteTopicForUserLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetVoteTopicForUserQuery,
+    GqlGetVoteTopicForUserQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetVoteTopicForUserQuery, GqlGetVoteTopicForUserQueryVariables>(
+    GetVoteTopicForUserDocument,
+    options,
+  );
+}
+export function useGetVoteTopicForUserSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetVoteTopicForUserQuery,
+        GqlGetVoteTopicForUserQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetVoteTopicForUserQuery, GqlGetVoteTopicForUserQueryVariables>(
+    GetVoteTopicForUserDocument,
+    options,
+  );
+}
+export type GetVoteTopicForUserQueryHookResult = ReturnType<typeof useGetVoteTopicForUserQuery>;
+export type GetVoteTopicForUserLazyQueryHookResult = ReturnType<
+  typeof useGetVoteTopicForUserLazyQuery
+>;
+export type GetVoteTopicForUserSuspenseQueryHookResult = ReturnType<
+  typeof useGetVoteTopicForUserSuspenseQuery
+>;
+export type GetVoteTopicForUserQueryResult = Apollo.QueryResult<
+  GqlGetVoteTopicForUserQuery,
+  GqlGetVoteTopicForUserQueryVariables
 >;

@@ -8,6 +8,7 @@ import navigation from "../../src/messages/ja/navigation.json";
 import transactions from "../../src/messages/ja/transactions.json";
 import users from "../../src/messages/ja/users.json";
 import adminVotes from "../../src/messages/ja/adminVotes.json";
+import votes from "../../src/messages/ja/votes.json";
 
 const messages = nestMessages({
   ...common,
@@ -15,6 +16,7 @@ const messages = nestMessages({
   ...transactions,
   ...users,
   ...adminVotes,
+  ...votes,
 });
 
 /**
