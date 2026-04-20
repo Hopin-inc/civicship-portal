@@ -1,4 +1,5 @@
 export interface TallyOption {
+  id: string;
   label: string;
   count: number;
   power: number;
@@ -7,7 +8,7 @@ export interface TallyOption {
 }
 
 export function computeVoteTally(
-  options: { label: string; voteCount: number | null; totalPower: number | null }[],
+  options: { id: string; label: string; voteCount: number | null; totalPower: number | null }[],
   usePower: boolean,
 ): { items: TallyOption[]; totalVoters: number; totalPower: number } {
   const totalVoters = options.reduce((sum, o) => sum + (o.voteCount ?? 0), 0);
@@ -19,6 +20,7 @@ export function computeVoteTally(
     const power = o.totalPower ?? 0;
     const value = usePower ? power : count;
     return {
+      id: o.id,
       label: o.label,
       count,
       power,

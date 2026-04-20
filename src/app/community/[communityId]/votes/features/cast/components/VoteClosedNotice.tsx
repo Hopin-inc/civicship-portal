@@ -8,7 +8,7 @@ import { VoteTallyList } from "@/shared/vote/components/VoteTallyList";
 interface VoteClosedNoticeProps {
   myBallotLabel: string | null;
   myBallotPower: number | null;
-  options: { label: string; voteCount: number | null; totalPower: number | null }[];
+  options: { id: string; label: string; voteCount: number | null; totalPower: number | null }[];
 }
 
 export function VoteClosedNotice({

@@ -56,7 +56,7 @@ export const mockOpenAlreadyVotedView: VoteCastViewModel = {
   myBallotLabel: "地域の夏祭り",
 };
 
-const closedOptions = [
+const closedOptions: VoteCastViewModel["options"] = [
   { id: "opt-1", label: "地域の夏祭り", voteCount: 12, totalPower: 12 },
   { id: "opt-2", label: "ハイキングイベント", voteCount: 8, totalPower: 8 },
   { id: "opt-3", label: "フリーマーケット", voteCount: 5, totalPower: 5 },

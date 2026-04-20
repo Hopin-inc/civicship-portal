@@ -4,14 +4,15 @@ import { useTranslations } from "next-intl";
 import { VoteTallyBar } from "./VoteTallyBar";
 import { computeVoteTally } from "../utils/computeVoteTally";
 
-interface TallyOption {
+interface TallyInputOption {
+  id: string;
   label: string;
   voteCount: number | null;
   totalPower: number | null;
 }
 
 interface VoteTallyListProps {
-  options: TallyOption[];
+  options: TallyInputOption[];
   usePower: boolean;
 }
 
@@ -24,7 +25,7 @@ export function VoteTallyList({ options, usePower }: VoteTallyListProps) {
       <div className="space-y-3">
         {items.map((item) => (
           <VoteTallyBar
-            key={item.label}
+            key={item.id}
             label={item.label}
             percent={item.percent}
             count={usePower ? item.power : item.count}

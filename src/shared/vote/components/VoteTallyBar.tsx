@@ -30,7 +30,7 @@ export function VoteTallyBar({
           {percent}% ({count})
         </span>
       </div>
-      <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+      <div className="h-2 w-full rounded-full bg-muted overflow-hidden" role="progressbar" aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100}>
         <div
           className={cn(
             "h-full rounded-full transition-all",
