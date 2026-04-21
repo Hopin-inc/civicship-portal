@@ -118,14 +118,33 @@ export async function POST(request: NextRequest) {
     }
     const apiBase = apiEndpoint.replace(/\/graphql\/?$/, "");
 
-    const sessionRes = await fetch(`${apiBase}/sessionLogin`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(communityId ? { "X-Community-Id": communityId } : {}),
-      },
-      body: JSON.stringify({ idToken }),
-    });
+    // Retry helper for session login (handles transient 429 / 5xx from backend)
+    const createSession = async (): Promise<Response> => {
+      const doFetch = () =>
+        fetch(`${apiBase}/sessionLogin`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(communityId ? { "X-Community-Id": communityId } : {}),
+          },
+          body: JSON.stringify({ idToken }),
+        });
+
+      const first = await doFetch();
+      if (first.status === 429 || first.status >= 500) {
+        logger.info("[auth/exchange] Session login returned retryable status, retrying after delay", {
+          status: first.status,
+          component: "auth/exchange",
+        });
+        // Drain the response body to release the connection back to the pool
+        await first.text().catch(() => {});
+        await new Promise((r) => setTimeout(r, 2000));
+        return doFetch();
+      }
+      return first;
+    };
+
+    const sessionRes = await createSession();
 
     // Build response with tokens
     const response = NextResponse.json({
@@ -143,13 +162,19 @@ export async function POST(request: NextRequest) {
     } else {
       // Session cookie is required for subsequent GraphQL requests in session mode.
       // If session creation fails, return error to prevent silent auth failure.
+      const isRateLimited = sessionRes.status === 429;
       logger.error("[auth/exchange] Session creation failed", {
         sessionStatus: sessionRes.status,
+        isRateLimited,
         component: "auth/exchange",
       });
       return NextResponse.json(
-        { error: "Session creation failed" },
-        { status: 502 },
+        {
+          error: isRateLimited
+            ? "Too many login attempts. Please try again later."
+            : "Session creation failed",
+        },
+        { status: sessionRes.status === 429 ? 429 : 502 },
       );
     }
 

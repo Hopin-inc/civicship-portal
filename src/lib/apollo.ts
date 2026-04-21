@@ -131,10 +131,16 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
   }
 
   if (networkError) {
-    if ("statusCode" in networkError && networkError.statusCode === 401) {
+    const statusCode = "statusCode" in networkError ? networkError.statusCode : undefined;
+    const responseBody =
+      "result" in networkError && networkError.result
+        ? JSON.stringify(networkError.result).substring(0, 200)
+        : undefined;
+
+    if (statusCode === 401) {
       logger.warn("Network authentication error", {
         error: networkError.message || String(networkError),
-        statusCode: networkError.statusCode,
+        statusCode,
         component: "ApolloErrorLink",
         operation: operation.operationName,
       });
@@ -148,6 +154,7 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
       if (isTemporaryNetworkIssue) {
         logger.warn("Network connectivity issue", {
           error: errorMessage,
+          statusCode,
           component: "ApolloErrorLink",
           operation: operation.operationName,
           errorCategory: "network_temporary",
@@ -156,6 +163,8 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
       } else {
         logger.warn("Network system error", {
           error: errorMessage,
+          statusCode,
+          responseBody,
           component: "ApolloErrorLink",
           operation: operation.operationName,
           errorCategory: "system_error",
