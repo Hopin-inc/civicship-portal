@@ -23,6 +23,8 @@
   "users.settings.updateSectionTitle": "お知らせ",
   "users.settings.updatePageTitle": "リリース情報",
   "users.settings.dangerSectionTitle": "ご注意して操作して下さい",
+  "users.settings.systemAdminSectionTitle": "システム",
+  "users.settings.systemAdminLabel": "システム設定",
   "users.account.coCreationId": "共創ID",
   "users.account.didPreparation": "did発行準備中",
   "users.account.copied": "コピーしました",
