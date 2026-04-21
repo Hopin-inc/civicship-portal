@@ -4,6 +4,7 @@ import {
   DangerSection,
   PromiseSection,
   SettingSection,
+  SystemAdminSection,
 } from "@/app/community/[communityId]/users/features/settings";
 import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
@@ -40,6 +41,7 @@ export default function SettingPage() {
       <DangerSection />
       <h2 className="text-sm mb-2 font-bold mt-6">{t("users.settings.updateSectionTitle")}</h2>
       <UpdateSection />
+      <SystemAdminSection />
     </div>
   );
 }
