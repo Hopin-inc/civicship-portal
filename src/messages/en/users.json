@@ -23,6 +23,8 @@
   "users.settings.updateSectionTitle": "Updates",
   "users.settings.updatePageTitle": "Release Notes",
   "users.settings.dangerSectionTitle": "Please proceed with caution",
+  "users.settings.systemAdminSectionTitle": "System",
+  "users.settings.systemAdminLabel": "System Settings",
   "users.account.coCreationId": "Co-creation ID",
   "users.account.didPreparation": "In progress",
   "users.account.copied": "Copied",
