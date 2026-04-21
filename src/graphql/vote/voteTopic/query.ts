@@ -56,6 +56,42 @@ export const GET_VOTE_TOPICS = gql`
   ${VOTE_TOPIC_LIST_ITEM_FRAGMENT}
 `;
 
+export const VOTE_TOPIC_USER_LIST_ITEM_FRAGMENT = gql`
+  fragment VoteTopicUserListItemFields on VoteTopic {
+    ...VoteTopicListItemFields
+    myBallot {
+      id
+      option {
+        id
+        label
+      }
+    }
+    myEligibility {
+      eligible
+    }
+  }
+  ${VOTE_TOPIC_LIST_ITEM_FRAGMENT}
+`;
+
+export const GET_VOTE_TOPICS_FOR_USER = gql`
+  query GetVoteTopicsForUser($communityId: ID!, $cursor: String, $first: Int) {
+    voteTopics(communityId: $communityId, cursor: $cursor, first: $first) {
+      edges {
+        cursor
+        node {
+          ...VoteTopicUserListItemFields
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      totalCount
+    }
+  }
+  ${VOTE_TOPIC_USER_LIST_ITEM_FRAGMENT}
+`;
+
 export const GET_VOTE_TOPIC = gql`
   query GetVoteTopic($id: ID!) {
     voteTopic(id: $id) {
