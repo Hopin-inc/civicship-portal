@@ -13,9 +13,9 @@ export const mockUpcomingView: VoteCastViewModel = {
   phase: GqlVoteTopicPhase.Upcoming,
   displayMode: "upcoming",
   options: [
-    { id: "opt-1", label: "地域の夏祭り" },
-    { id: "opt-2", label: "ハイキングイベント" },
-    { id: "opt-3", label: "フリーマーケット" },
+    { id: "opt-1", label: "地域の夏祭り", voteCount: null, totalPower: null },
+    { id: "opt-2", label: "ハイキングイベント", voteCount: null, totalPower: null },
+    { id: "opt-3", label: "フリーマーケット", voteCount: null, totalPower: null },
   ],
   currentPower: null,
   myBallotOptionId: null,
@@ -56,6 +56,12 @@ export const mockOpenAlreadyVotedView: VoteCastViewModel = {
   myBallotLabel: "地域の夏祭り",
 };
 
+const closedOptions: VoteCastViewModel["options"] = [
+  { id: "opt-1", label: "地域の夏祭り", voteCount: 12, totalPower: 12 },
+  { id: "opt-2", label: "ハイキングイベント", voteCount: 8, totalPower: 8 },
+  { id: "opt-3", label: "フリーマーケット", voteCount: 5, totalPower: 5 },
+];
+
 export const mockClosedNotVotedView: VoteCastViewModel = {
   ...mockUpcomingView,
   topicId: "topic-closed-notvoted",
@@ -63,6 +69,7 @@ export const mockClosedNotVotedView: VoteCastViewModel = {
   displayMode: "closed",
   startsAt: base.subtract(10, "day").toDate(),
   endsAt: base.subtract(3, "day").toDate(),
+  options: closedOptions,
 };
 
 export const mockClosedVotedView: VoteCastViewModel = {
@@ -72,6 +79,7 @@ export const mockClosedVotedView: VoteCastViewModel = {
   displayMode: "closed",
   startsAt: base.subtract(10, "day").toDate(),
   endsAt: base.subtract(3, "day").toDate(),
+  options: closedOptions,
   myBallotOptionId: "opt-2",
   myBallotPower: 1,
   myBallotLabel: "ハイキングイベント",

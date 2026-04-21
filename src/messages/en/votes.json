@@ -21,5 +21,7 @@
   "votes.eligibility.reason.UNKNOWN_GATE_TYPE": "Unknown eligibility type",
   "votes.page.loadError": "Failed to load vote",
   "votes.toast.castSuccess": "Vote submitted",
-  "votes.toast.castError": "Failed to submit vote"
+  "votes.toast.castError": "Failed to submit vote",
+  "votes.results.totalVoters": "{count, plural, one {{count} voter} other {{count} voters}}",
+  "votes.results.totalPower": "{power} total votes"
 }

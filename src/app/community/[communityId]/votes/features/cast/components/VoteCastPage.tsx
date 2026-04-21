@@ -99,6 +99,7 @@ export function VoteCastPage({ view }: VoteCastPageProps) {
         <VoteClosedNotice
           myBallotLabel={view.myBallotLabel}
           myBallotPower={view.myBallotPower}
+          options={view.options}
         />
       )}
     </div>
