@@ -23,7 +23,7 @@ export default function SysAdminPage() {
   return (
     <div className="p-4 max-w-2xl mx-auto">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-body-sm text-muted-foreground">コミュニティ一覧</h2>
+        <h2 className="text-body-sm text-muted-foreground pl-4">コミュニティ一覧</h2>
         <Button
           onClick={() => router.push("/sysAdmin/create")}
           variant="primary"

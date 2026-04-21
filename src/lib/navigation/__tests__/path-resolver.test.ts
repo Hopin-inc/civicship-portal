@@ -90,6 +90,16 @@ describe("path-resolver", () => {
         );
         expect(resolvePath("favicon.ico", "community-a")).toBe("favicon.ico");
       });
+
+      it("should not modify /sysAdmin paths (community-scope外)", () => {
+        expect(resolvePath("/sysAdmin", "community-a")).toBe("/sysAdmin");
+        expect(resolvePath("/sysAdmin/create", "community-a")).toBe(
+          "/sysAdmin/create"
+        );
+        expect(resolvePath("/sysAdmin/create?foo=bar", "community-a")).toBe(
+          "/sysAdmin/create?foo=bar"
+        );
+      });
     });
 
     describe("community-dependent paths (now included)", () => {
