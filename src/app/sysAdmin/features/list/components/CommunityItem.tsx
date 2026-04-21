@@ -1,6 +1,7 @@
 "use client";
 
 import { Item, ItemContent, ItemFooter, ItemTitle } from "@/components/ui/item";
+import { AppLink } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
 import type { CommunityListItem } from "../hooks/useCommunities";
 
@@ -11,7 +12,7 @@ interface CommunityItemProps {
 export function CommunityItem({ community }: CommunityItemProps) {
   return (
     <Item asChild>
-      <a href={`/community/${community.id}`} className="flex flex-1 gap-3">
+      <AppLink href={`/community/${community.id}`} className="flex flex-1 gap-3">
         <div className="flex flex-1 flex-col min-w-0">
           <ItemContent>
             <ItemTitle className={cn("font-bold text-base leading-snug", "line-clamp-2")}>
@@ -22,7 +23,7 @@ export function CommunityItem({ community }: CommunityItemProps) {
             <div className="text-xs text-muted-foreground truncate">{community.id}</div>
           </ItemFooter>
         </div>
-      </a>
+      </AppLink>
     </Item>
   );
 }

@@ -22,7 +22,7 @@ export const SysAdminGuard: React.FC<SysAdminGuardProps> = ({ children }) => {
     }
 
     if (!isAuthenticated || !currentUser) {
-      const next = window.location.pathname + window.location.search;
+      const next = encodeURIComponent(window.location.pathname + window.location.search);
       logger.debug("No user found. Redirecting to login", {
         component: "SysAdminGuard",
         redirectTo: `/login?next=${next}`,
