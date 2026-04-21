@@ -6,8 +6,9 @@ import { getCommunityConfig } from "@/lib/communities/config";
 import { getUserServer } from "@/lib/auth/init/getUserServer";
 import { CommunityConfigProvider } from "@/contexts/CommunityConfigContext";
 import { AuthProvider } from "@/contexts/AuthProvider";
+import { SysAdminGuard } from "@/components/auth/SysAdminGuard";
 
-export default async function CreateLayout({ children }: { children: ReactNode }) {
+export default async function SysAdminLayout({ children }: { children: ReactNode }) {
   // ミドルウェアが x-community-id cookie から X-Community-Id ヘッダーをセット済み
   const headersList = await headers();
   const communityId = headersList.get("x-community-id") ?? null;
@@ -25,7 +26,7 @@ export default async function CreateLayout({ children }: { children: ReactNode }
           ssrLineAuthenticated={lineAuthenticated}
           ssrPhoneAuthenticated={phoneAuthenticated}
         >
-          {children}
+          <SysAdminGuard>{children}</SysAdminGuard>
           <Toaster />
         </AuthProvider>
       </ApolloProvider>
