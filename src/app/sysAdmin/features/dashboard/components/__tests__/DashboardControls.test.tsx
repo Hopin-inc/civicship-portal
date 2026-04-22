@@ -16,8 +16,8 @@ describe("DashboardControls", () => {
       />,
     );
     expect(screen.getByLabelText("基準日")).toBeInTheDocument();
-    expect(screen.getByText("Tier1 しきい値 (習慣層)")).toBeInTheDocument();
-    expect(screen.getByText("Tier2 しきい値 (準習慣層)")).toBeInTheDocument();
+    expect(screen.getByText("習慣化の閾値")).toBeInTheDocument();
+    expect(screen.getByText("定期参加の閾値")).toBeInTheDocument();
   });
 
   it("fires onAsOfChange with ISO string when date input changes", () => {

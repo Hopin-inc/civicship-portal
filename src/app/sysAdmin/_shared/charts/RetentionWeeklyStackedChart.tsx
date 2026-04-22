@@ -28,7 +28,7 @@ type Props = {
   height?: number;
 };
 
-export function RetentionWeeklyStackedChart({ data, height = 280 }: Props) {
+export function RetentionWeeklyStackedChart({ data, height = 240 }: Props) {
   if (data.length === 0) {
     return (
       <div
@@ -49,17 +49,17 @@ export function RetentionWeeklyStackedChart({ data, height = 280 }: Props) {
   return (
     <div style={{ width: "100%", height }}>
       <ResponsiveContainer width="100%" height="100%">
-        <ComposedChart data={chartData} margin={{ top: 8, right: 16, bottom: 4, left: 0 }}>
+        <ComposedChart data={chartData} margin={{ top: 8, right: 8, bottom: 4, left: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
           <XAxis dataKey="weekLabel" tick={{ fontSize: 10 }} interval="preserveStartEnd" />
-          <YAxis yAxisId="count" tick={{ fontSize: 11 }} width={40} />
+          <YAxis yAxisId="count" tick={{ fontSize: 10 }} width={32} />
           <YAxis
             yAxisId="rate"
             orientation="right"
             domain={[0, 1]}
             tickFormatter={(v) => toPct(v as number)}
-            tick={{ fontSize: 11 }}
-            width={44}
+            tick={{ fontSize: 10 }}
+            width={36}
           />
           <Tooltip
             formatter={(value, name) => {
