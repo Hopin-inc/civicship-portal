@@ -11,7 +11,7 @@ const meta: Meta<typeof CommunityDashboardDetail> = {
   decorators: [
     withApollo,
     (Story) => (
-      <div className="w-[1280px]">
+      <div className="w-full max-w-[1280px]">
         <Story />
       </div>
     ),

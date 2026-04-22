@@ -7,7 +7,7 @@ const meta: Meta<typeof ChartCard> = {
   component: ChartCard,
   decorators: [
     (Story) => (
-      <div className="w-[640px]">
+      <div className="w-full max-w-[640px]">
         <Story />
       </div>
     ),

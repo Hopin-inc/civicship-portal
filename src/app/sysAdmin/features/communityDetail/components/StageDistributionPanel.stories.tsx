@@ -10,7 +10,7 @@ const meta: Meta<typeof StageDistributionPanel> = {
   component: StageDistributionPanel,
   decorators: [
     (Story) => (
-      <div className="w-[960px] p-4">
+      <div className="w-full max-w-[960px] p-4">
         <Story />
       </div>
     ),

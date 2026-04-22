@@ -7,7 +7,7 @@ const meta: Meta<typeof KpiCard> = {
   component: KpiCard,
   decorators: [
     (Story) => (
-      <div className="w-[280px]">
+      <div className="w-full max-w-[280px]">
         <Story />
       </div>
     ),
