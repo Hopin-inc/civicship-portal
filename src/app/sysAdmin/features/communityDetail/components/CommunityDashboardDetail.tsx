@@ -78,6 +78,8 @@ export function CommunityDashboardDetail({ communityId }: Props) {
         memberList={data.memberList}
         filter={detail.state.filter}
         sort={detail.state.sort}
+        tier1={dashboard.state.tier1}
+        tier2={dashboard.state.tier2}
         onFilterChange={detail.setFilter}
         onResetFilter={detail.resetFilter}
         onSortFieldChange={detail.setSortField}

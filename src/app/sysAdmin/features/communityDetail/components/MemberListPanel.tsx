@@ -15,6 +15,7 @@ import { MetricInfoButton } from "@/app/sysAdmin/_shared/components/MetricInfoBu
 import { SendRateDot } from "@/app/sysAdmin/_shared/components/SendRateDot";
 import { Empty } from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
+import { toCompactJa, toIntJa } from "@/app/sysAdmin/_shared/format/number";
 import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";
 import type { MemberFilter, MemberSort } from "../hooks/useDetailControls";
 import { useMemberListPagination } from "../hooks/useMemberListPagination";
@@ -24,6 +25,8 @@ type Props = {
   memberList: GqlSysAdminMemberList | null;
   filter: MemberFilter;
   sort: MemberSort;
+  tier1: number;
+  tier2: number;
   onFilterChange: (next: MemberFilter) => void;
   onResetFilter: () => void;
   onSortFieldChange: (field: GqlSysAdminUserSortField) => void;
@@ -38,10 +41,42 @@ const ROW_HEIGHT = 60;
 const LIST_HEIGHT = 540;
 const PREFETCH_THRESHOLD = 10;
 
+type RowProps = {
+  users: GqlSysAdminMemberRow[];
+  sortField: GqlSysAdminUserSortField;
+  tier1: number;
+  tier2: number;
+};
+
+/**
+ * Sort key ごとに meta 行の表示を切り替え。ユーザーが何で並び替えたかの
+ * 根拠を必ず行内に見せる (totalPointsOut 順なのに pt が見えない問題の解消)。
+ */
+function formatMetaForSort(
+  row: GqlSysAdminMemberRow,
+  sortField: GqlSysAdminUserSortField,
+): string {
+  const t = sysAdminDashboardJa.detail.member;
+  const tenure = `${t.tenurePrefix}${row.monthsIn}${t.tenureSuffix}`;
+  switch (sortField) {
+    case "TOTAL_POINTS_OUT":
+      return `${tenure} · 累計 ${toCompactJa(row.totalPointsOut)}pt`;
+    case "DONATION_OUT_MONTHS":
+      return `${tenure} · 送付 ${toIntJa(row.donationOutMonths)}ヶ月`;
+    case "MONTHS_IN":
+    case "SEND_RATE":
+    default:
+      return tenure;
+  }
+}
+
 function MemberRow({
   index,
   users,
-}: RowComponentProps<{ users: GqlSysAdminMemberRow[] }>) {
+  sortField,
+  tier1,
+  tier2,
+}: RowComponentProps<RowProps>) {
   const row = users[index];
   if (!row) {
     return (
@@ -50,7 +85,7 @@ function MemberRow({
       </div>
     );
   }
-  const tenure = `${sysAdminDashboardJa.detail.member.tenurePrefix}${row.monthsIn}${sysAdminDashboardJa.detail.member.tenureSuffix}`;
+  const meta = formatMetaForSort(row, sortField);
   const sendRatePct = `${Math.round(row.userSendRate * 100)}%`;
   return (
     <div
@@ -59,11 +94,11 @@ function MemberRow({
     >
       <div className="flex min-w-0 flex-col">
         <span className="truncate text-sm font-medium">{row.name ?? "-"}</span>
-        <span className="text-xs text-muted-foreground">{tenure}</span>
+        <span className="truncate text-xs text-muted-foreground">{meta}</span>
       </div>
       <div className="flex items-center gap-1 tabular-nums">
         <span className="text-sm font-medium">{sendRatePct}</span>
-        <SendRateDot rate={row.userSendRate} />
+        <SendRateDot rate={row.userSendRate} tier1={tier1} tier2={tier2} />
       </div>
     </div>
   );
@@ -73,6 +108,8 @@ export function MemberListPanel({
   memberList,
   filter: _filter,
   sort,
+  tier1,
+  tier2,
   onFilterChange: _onFilterChange,
   onResetFilter: _onResetFilter,
   onSortFieldChange,
@@ -140,7 +177,7 @@ export function MemberListPanel({
             rowCount={users.length}
             rowHeight={ROW_HEIGHT}
             rowComponent={MemberRow}
-            rowProps={{ users }}
+            rowProps={{ users, sortField: sort.field, tier1, tier2 }}
             onRowsRendered={handleRowsRendered}
             style={{ height: LIST_HEIGHT }}
           />

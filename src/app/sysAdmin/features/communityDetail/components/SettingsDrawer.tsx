@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -42,6 +42,8 @@ type Props = {
   hasNonDefaults: boolean;
 };
 
+const FILTER_DEBOUNCE_MS = 300;
+
 function parseIntOrNull(raw: string): number | null {
   if (raw === "") return null;
   const n = Number.parseInt(raw, 10);
@@ -61,14 +63,29 @@ export function SettingsDrawer({
   hasNonDefaults,
 }: Props) {
   const [open, setOpen] = useState(false);
-  const [localFilter, setLocalFilter] = useState<MemberFilter>(filter);
 
-  // Apply パターン: drawer を開くたびに最新 prop で local を初期化することで、
-  // 適用せずに閉じた場合の変更を破棄する。
-  const handleOpenChange = (next: boolean) => {
-    if (next) setLocalFilter(filter);
-    setOpen(next);
-  };
+  // Filter は slider 連続操作が多いので 300ms debounce で immediate commit。
+  // tier / cohortMonths と挙動を揃えるため Apply ボタンは撤廃。
+  const [localFilter, setLocalFilter] = useState<MemberFilter>(filter);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const onFilterChangeRef = useRef(onFilterChange);
+  onFilterChangeRef.current = onFilterChange;
+
+  // prop → local に同期 (外部から filter が変わった場合)
+  useEffect(() => {
+    setLocalFilter(filter);
+  }, [filter]);
+
+  // local → prop に debounced commit
+  useEffect(() => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      onFilterChangeRef.current(localFilter);
+    }, FILTER_DEBOUNCE_MS);
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [localFilter]);
 
   const t = sysAdminDashboardJa.controls;
   const f = sysAdminDashboardJa.detail.member.filters;
@@ -76,16 +93,10 @@ export function SettingsDrawer({
 
   const filterMin = localFilter.minSendRate ?? 0;
   const filterMax = localFilter.maxSendRate ?? 1;
-
-  const cohortValue = useMemo(() => String(cohortMonths), [cohortMonths]);
-
-  const handleApply = () => {
-    onFilterChange(localFilter);
-    setOpen(false);
-  };
+  const cohortValue = String(cohortMonths);
 
   return (
-    <Drawer open={open} onOpenChange={handleOpenChange}>
+    <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
         <Button variant="ghost" size="sm" className="gap-1">
           <Settings className="h-4 w-4" />
@@ -258,11 +269,8 @@ export function SettingsDrawer({
         </div>
 
         <DrawerFooter>
-          <Button type="button" variant="primary" onClick={handleApply}>
-            適用
-          </Button>
           <DrawerClose asChild>
-            <Button type="button" variant="ghost">
+            <Button type="button" variant="primary">
               {t.drawerClose}
             </Button>
           </DrawerClose>

@@ -3,9 +3,21 @@ import { cn } from "@/lib/utils";
 
 export type SendRateTier = "habitual" | "regular" | "occasional" | "latent";
 
-export function classifySendRate(rate: number): SendRateTier {
-  if (rate >= 0.7) return "habitual";
-  if (rate >= 0.4) return "regular";
+export const DEFAULT_SEND_RATE_TIER1 = 0.7;
+export const DEFAULT_SEND_RATE_TIER2 = 0.4;
+
+/**
+ * SendRate を 4 ステージに分類。`tier1` / `tier2` は SettingsDrawer で
+ * ユーザーが変えられるため、呼び出し側で都度渡せるようにしている。
+ * 省略時は backend default と揃えた 0.7 / 0.4 を使う。
+ */
+export function classifySendRate(
+  rate: number,
+  tier1: number = DEFAULT_SEND_RATE_TIER1,
+  tier2: number = DEFAULT_SEND_RATE_TIER2,
+): SendRateTier {
+  if (rate >= tier1) return "habitual";
+  if (rate >= tier2) return "regular";
   if (rate > 0) return "occasional";
   return "latent";
 }
@@ -20,10 +32,12 @@ const COLOR: Record<SendRateTier, string> = {
 
 type Props = {
   rate: number;
+  tier1?: number;
+  tier2?: number;
   className?: string;
 };
 
-export function SendRateDot({ rate, className }: Props) {
-  const tier = classifySendRate(rate);
+export function SendRateDot({ rate, tier1, tier2, className }: Props) {
+  const tier = classifySendRate(rate, tier1, tier2);
   return <span className={cn(COLOR[tier], className)} aria-hidden>●</span>;
 }
