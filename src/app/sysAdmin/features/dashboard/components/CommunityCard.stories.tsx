@@ -39,6 +39,17 @@ export const ChurnSpike: Story = {
   },
 };
 
+export const ActiveDrop: Story = {
+  args: {
+    row: makeCommunityOverview({
+      communityName: "コミュニティB",
+      communityActivityRate: 0.28,
+      growthRateActivity: -0.14,
+      alerts: makeAlerts({ activeDrop: true }),
+    }),
+  },
+};
+
 export const NoNewMembers: Story = {
   args: {
     row: makeCommunityOverview({

@@ -32,3 +32,19 @@ export const AllTiers: Story = {
     </div>
   ),
 };
+
+// SettingsDrawer で tier を絞ったときの挙動:
+// rate=0.8 は default (tier1=0.7) では habitual だが、tier1=0.85 では regular
+export const CustomThresholdsStrict: Story = {
+  render: () => (
+    <div className="flex flex-col gap-1 text-2xl">
+      <div>
+        <SendRateDot rate={0.8} /> <span className="text-sm">rate=0.8 (default tier1=0.7 → habitual)</span>
+      </div>
+      <div>
+        <SendRateDot rate={0.8} tier1={0.85} tier2={0.5} />{" "}
+        <span className="text-sm">rate=0.8 (tier1=0.85 → regular)</span>
+      </div>
+    </div>
+  ),
+};
