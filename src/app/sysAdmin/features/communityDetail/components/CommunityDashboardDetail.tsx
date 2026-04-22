@@ -23,7 +23,7 @@ type Props = {
 export function CommunityDashboardDetail({ communityId }: Props) {
   const dashboard = useDashboardControls();
   const detail = useDetailControls();
-  const { loading, error, detail: data, input, fetchMore, evictAndRefetch } = useCommunityDetail({
+  const { loading, error, detail: data, input, fetchMore } = useCommunityDetail({
     communityId,
     dashboardControls: dashboard.state,
     detailControls: detail.state,
@@ -75,7 +75,6 @@ export function CommunityDashboardDetail({ communityId }: Props) {
         onFilterChange={detail.setFilter}
         onResetFilter={detail.resetFilter}
         onToggleSort={detail.toggleSort}
-        onEvictAndRefetch={() => void evictAndRefetch()}
         baseInput={input}
         fetchMore={fetchMore}
         loading={loading}

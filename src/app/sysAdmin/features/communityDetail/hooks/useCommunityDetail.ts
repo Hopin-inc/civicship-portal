@@ -2,7 +2,6 @@
 
 import { useMemo } from "react";
 import type { ApolloError, ApolloQueryResult } from "@apollo/client";
-import { useApolloClient } from "@apollo/client";
 import {
   type GqlGetSysAdminCommunityDetailQuery,
   type GqlSysAdminCommunityDetailInput,
@@ -28,7 +27,6 @@ export type CommunityDetailResult = {
     variables: { input: GqlSysAdminCommunityDetailInput };
   }) => Promise<ApolloQueryResult<GqlGetSysAdminCommunityDetailQuery>>;
   refetch: () => Promise<ApolloQueryResult<GqlGetSysAdminCommunityDetailQuery>>;
-  evictAndRefetch: () => Promise<ApolloQueryResult<GqlGetSysAdminCommunityDetailQuery>>;
 };
 
 export function useCommunityDetail({
@@ -37,8 +35,6 @@ export function useCommunityDetail({
   detailControls,
   limit = 50,
 }: Args): CommunityDetailResult {
-  const client = useApolloClient();
-
   const input = useMemo<GqlSysAdminCommunityDetailInput>(
     () => ({
       communityId,
@@ -69,14 +65,6 @@ export function useCommunityDetail({
     notifyOnNetworkStatusChange: true,
   });
 
-  const evictAndRefetch = () => {
-    // filter 変更時: keyArgs に含めていないため Apollo は同一キャッシュエントリを返し続ける。
-    // 明示的に evict + refetch することで filter 変更を反映させる。
-    client.cache.evict({ fieldName: "sysAdminCommunityDetail" });
-    client.cache.gc();
-    return refetch();
-  };
-
   return {
     loading,
     error,
@@ -84,6 +72,5 @@ export function useCommunityDetail({
     input,
     fetchMore,
     refetch,
-    evictAndRefetch,
   };
 }

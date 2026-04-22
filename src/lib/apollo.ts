@@ -195,12 +195,23 @@ const defaultOptions: ApolloClientOptions<NormalizedCacheObject> = {
       Query: {
         fields: {
           sysAdminCommunityDetail: {
-            // cursor / limit / userFilter はキャッシュキーから外し、同一キー内で merge する。
-            // userSort は選択肢有限 (4 field × 2 order) のため別キーで保持。
-            // userFilter は UI 側で cache.evict + refetch する (slider 連続操作で累積回避)。
+            // cursor / limit はキャッシュキーから外し、同一キー内で merge する。
+            // それ以外 (communityId / asOf / segmentThresholds / windowMonths /
+            // userSort / userFilter) はすべて keyArgs に含め、組み合わせごとに
+            // 独立したキャッシュエントリを保持する。
+            // userFilter の slider 連続操作は UI 側で debounce 済みのため、
+            // 実用上キャッシュが過剰に累積することはない。L1 ↔ L2 往復や
+            // フィルタ変更の戻り操作がキャッシュヒットで即描画される。
             keyArgs: [
               "input",
-              ["communityId", "asOf", "segmentThresholds", "windowMonths", "userSort"],
+              [
+                "communityId",
+                "asOf",
+                "segmentThresholds",
+                "windowMonths",
+                "userSort",
+                "userFilter",
+              ],
             ],
             merge(existing, incoming, { args }) {
               type WithMembers = typeof incoming & {

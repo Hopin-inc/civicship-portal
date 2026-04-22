@@ -27,7 +27,6 @@ type Props = {
   onFilterChange: (next: MemberFilter) => void;
   onResetFilter: () => void;
   onToggleSort: (field: GqlSysAdminUserSortField) => void;
-  onEvictAndRefetch: () => void;
   baseInput: GqlSysAdminCommunityDetailInput;
   fetchMore: (opts: {
     variables: { input: GqlSysAdminCommunityDetailInput };
@@ -72,7 +71,6 @@ export function MemberListPanel({
   onFilterChange,
   onResetFilter,
   onToggleSort,
-  onEvictAndRefetch,
   baseInput,
   fetchMore,
   loading,
@@ -98,18 +96,9 @@ export function MemberListPanel({
     [users.length, loadMore],
   );
 
-  const handleFilterChange = useCallback(
-    (next: MemberFilter) => {
-      onFilterChange(next);
-      onEvictAndRefetch();
-    },
-    [onFilterChange, onEvictAndRefetch],
-  );
-
-  const handleResetFilter = useCallback(() => {
-    onResetFilter();
-    onEvictAndRefetch();
-  }, [onResetFilter, onEvictAndRefetch]);
+  // userFilter は keyArgs に含めているため、onFilterChange で state が変わる
+  // → useCommunityDetail の input が変わる → Apollo が別エントリを引く (cache-and-network)
+  // という自然なフローでデータが更新される。手動の evict/refetch は不要。
 
   useEffect(() => {
     // 初期 or sort 切替後、1 画面分に満たず hasNextPage=true なら自動的にもう 1 ページ取る
@@ -131,8 +120,8 @@ export function MemberListPanel({
       <div className="flex flex-col gap-3">
         <MemberFilters
           value={filter}
-          onChange={handleFilterChange}
-          onReset={handleResetFilter}
+          onChange={onFilterChange}
+          onReset={onResetFilter}
           disabled={loading}
         />
         <div className="rounded-md border">
