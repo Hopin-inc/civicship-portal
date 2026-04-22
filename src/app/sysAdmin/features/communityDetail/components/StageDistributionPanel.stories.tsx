@@ -3,7 +3,7 @@ import { StageDistributionPanel } from "./StageDistributionPanel";
 import {
   makeStageBucket,
   makeStageDistribution,
-} from "../../../_shared/__mocks__/sysAdminDashboard";
+} from "../../../_shared/fixtures/sysAdminDashboard";
 
 const meta: Meta<typeof StageDistributionPanel> = {
   title: "SysAdmin/Detail/StageDistributionPanel",

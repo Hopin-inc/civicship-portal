@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { ApolloQueryResult } from "@apollo/client";
 
 type Args<Q, Input extends { cursor?: string | null }> = {
@@ -16,19 +16,29 @@ export function useMemberListPagination<
 >({ hasNextPage, nextCursor, fetchMore, baseVariables }: Args<Q, Input>) {
   const [loadingMore, setLoadingMore] = useState(false);
 
+  // 呼び出し時点の最新値を ref 経由で参照することで loadMore の identity を安定化させる。
+  // これにより MemberListPanel 側の useCallback / useEffect が各依存の参照変化で
+  // 不要に再生成されるのを防ぎ、react-window の onRowsRendered に渡すハンドラが
+  // 安定する。
+  const latestRef = useRef({ hasNextPage, nextCursor, fetchMore, baseVariables, loadingMore });
+  useEffect(() => {
+    latestRef.current = { hasNextPage, nextCursor, fetchMore, baseVariables, loadingMore };
+  });
+
   const loadMore = useCallback(async () => {
-    if (!hasNextPage || !nextCursor || loadingMore) return;
+    const snap = latestRef.current;
+    if (!snap.hasNextPage || !snap.nextCursor || snap.loadingMore) return;
     setLoadingMore(true);
     try {
-      await fetchMore({
+      await snap.fetchMore({
         variables: {
-          input: { ...baseVariables, cursor: nextCursor },
+          input: { ...snap.baseVariables, cursor: snap.nextCursor },
         },
       });
     } finally {
       setLoadingMore(false);
     }
-  }, [hasNextPage, nextCursor, loadingMore, fetchMore, baseVariables]);
+  }, []);
 
   return { loadMore, loadingMore, hasNextPage: !!hasNextPage };
 }

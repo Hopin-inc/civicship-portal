@@ -3,7 +3,7 @@ import { CommunityOverviewTable } from "./CommunityOverviewTable";
 import {
   makeAlerts,
   makeCommunityOverview,
-} from "../../../_shared/__mocks__/sysAdminDashboard";
+} from "../../../_shared/fixtures/sysAdminDashboard";
 
 const meta: Meta<typeof CommunityOverviewTable> = {
   title: "SysAdmin/Dashboard/CommunityOverviewTable",

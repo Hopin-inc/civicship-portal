@@ -35,7 +35,7 @@ export function DashboardOverview() {
           onAsOfChange={setAsOf}
           onThresholdsChange={setThresholds}
           onReset={reset}
-          disabled={loading}
+          disabled={loading && !platform}
         />
       }>
         <PlatformSummaryCards platform={platform} />

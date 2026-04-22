@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { CohortRetentionTable } from "./CohortRetentionTable";
-import { makeCohortRetentionPoint } from "../../../_shared/__mocks__/sysAdminDashboard";
+import { makeCohortRetentionPoint } from "../../../_shared/fixtures/sysAdminDashboard";
 
 const meta: Meta<typeof CohortRetentionTable> = {
   title: "SysAdmin/Detail/CohortRetentionTable",

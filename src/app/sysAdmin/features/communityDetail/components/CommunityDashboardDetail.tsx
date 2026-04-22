@@ -57,7 +57,7 @@ export function CommunityDashboardDetail({ communityId }: Props) {
             onAsOfChange={dashboard.setAsOf}
             onThresholdsChange={dashboard.setThresholds}
             onReset={dashboard.reset}
-            disabled={loading}
+            disabled={loading && !data}
           />
         }
       >

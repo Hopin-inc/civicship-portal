@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { RetentionTrendPanel } from "./RetentionTrendPanel";
-import { makeRetentionTrendPoint } from "../../../_shared/__mocks__/sysAdminDashboard";
+import { makeRetentionTrendPoint } from "../../../_shared/fixtures/sysAdminDashboard";
 
 const meta: Meta<typeof RetentionTrendPanel> = {
   title: "SysAdmin/Detail/RetentionTrendPanel",

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { SummaryKpiGrid } from "./SummaryKpiGrid";
-import { makeSummaryCard } from "../../../_shared/__mocks__/sysAdminDashboard";
+import { makeSummaryCard } from "../../../_shared/fixtures/sysAdminDashboard";
 
 const meta: Meta<typeof SummaryKpiGrid> = {
   title: "SysAdmin/Detail/SummaryKpiGrid",

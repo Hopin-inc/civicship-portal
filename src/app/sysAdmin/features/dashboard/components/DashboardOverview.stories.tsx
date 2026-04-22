@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { GetSysAdminDashboardDocument } from "@/types/graphql";
 import { withApollo } from "../../../../../../.storybook/decorators";
 import { DashboardOverview } from "./DashboardOverview";
-import { makeDashboardPayload } from "../../../_shared/__mocks__/sysAdminDashboard";
+import { makeDashboardPayload } from "../../../_shared/fixtures/sysAdminDashboard";
 
 const meta: Meta<typeof DashboardOverview> = {
   title: "SysAdmin/Dashboard/DashboardOverview",

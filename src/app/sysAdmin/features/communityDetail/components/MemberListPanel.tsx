@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import type { ApolloQueryResult } from "@apollo/client";
 import { List, type RowComponentProps } from "react-window";
 import type {
@@ -100,16 +100,18 @@ export function MemberListPanel({
   // → useCommunityDetail の input が変わる → Apollo が別エントリを引く (cache-and-network)
   // という自然なフローでデータが更新される。手動の evict/refetch は不要。
 
+  // 初期 or sort 切替後、1 画面分に満たず hasNextPage=true なら自動的にもう 1 ページ取る。
+  // バックエンドが hasNextPage=true を返し続けるのに users が増えないケースで
+  // 無限リクエストに陥らないよう、直前に auto-load した時点の length を ref で記憶し、
+  // 増えていない場合はそれ以上 auto-load しない。
+  const lastAutoLoadLengthRef = useRef<number | null>(null);
   useEffect(() => {
-    // 初期 or sort 切替後、1 画面分に満たず hasNextPage=true なら自動的にもう 1 ページ取る
-    if (
-      hasNextPage &&
-      !loadingMore &&
-      users.length > 0 &&
-      users.length * ROW_HEIGHT < LIST_HEIGHT
-    ) {
-      void loadMore();
-    }
+    if (!hasNextPage || loadingMore) return;
+    if (users.length === 0) return;
+    if (users.length * ROW_HEIGHT >= LIST_HEIGHT) return;
+    if (lastAutoLoadLengthRef.current === users.length) return;
+    lastAutoLoadLengthRef.current = users.length;
+    void loadMore();
   }, [hasNextPage, loadingMore, users.length, loadMore]);
 
   return (
@@ -122,7 +124,7 @@ export function MemberListPanel({
           value={filter}
           onChange={onFilterChange}
           onReset={onResetFilter}
-          disabled={loading}
+          disabled={loading && !memberList}
         />
         <div className="rounded-md border">
           <MemberSortHeader sort={sort} onToggle={onToggleSort} />

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { MonthlyActivityPanel } from "./MonthlyActivityPanel";
-import { makeMonthlyActivityPoint } from "../../../_shared/__mocks__/sysAdminDashboard";
+import { makeMonthlyActivityPoint } from "../../../_shared/fixtures/sysAdminDashboard";
 
 const meta: Meta<typeof MonthlyActivityPanel> = {
   title: "SysAdmin/Detail/MonthlyActivityPanel",
