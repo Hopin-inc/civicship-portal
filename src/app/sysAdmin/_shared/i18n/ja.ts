@@ -11,10 +11,15 @@ export const sysAdminDashboardJa = {
   },
   controls: {
     asOfLabel: "基準日",
-    tier1Label: "Tier1 しきい値 (習慣層)",
-    tier2Label: "Tier2 しきい値 (準習慣層)",
+    tier1Label: "習慣化の閾値",
+    tier2Label: "定期参加の閾値",
     windowMonthsLabel: "集計期間 (月)",
     reset: "リセット",
+    settingsButton: "設定",
+    drawerTitle: "設定",
+    drawerClose: "閉じる",
+    filterSection: "メンバー絞り込み",
+    activeBadge: "(変更あり)",
   },
   overview: {
     columns: {
@@ -30,13 +35,21 @@ export const sysAdminDashboardJa = {
     },
   },
   alerts: {
-    activeDrop: "活動率低下",
-    churnSpike: "離脱増加",
-    noNewMembers: "新規加入なし",
+    activeDrop: "稼働低下",
+    churnSpike: "離脱加速",
+    noNewMembers: "新規停止",
     allClear: "アラートなし",
   },
   detail: {
     title: "コミュニティ詳細",
+    header: {
+      memberSuffix: "人",
+      donationSuffix: "pt",
+      chainPrefix: "最大chain",
+      chainSuffix: "段",
+      growth: "前月比",
+      threeMonthAvg: "3ヶ月平均",
+    },
     summary: {
       activityRate: "活動率",
       activityRate3m: "活動率 (3ヶ月平均)",
@@ -47,10 +60,12 @@ export const sysAdminDashboardJa = {
     },
     stages: {
       title: "ステージ分布",
-      habitual: "習慣",
-      regular: "準習慣",
-      occasional: "ときどき",
-      latent: "未参加",
+      habitual: "習慣化",
+      regular: "定期",
+      occasional: "散発",
+      latent: "潜在",
+      avgSendRate: "送付率 avg",
+      avgMonthsIn: "在籍 avg",
     },
     monthly: {
       title: "月次アクティビティ推移",
@@ -65,18 +80,21 @@ export const sysAdminDashboardJa = {
       returned: "復帰",
     },
     cohort: {
-      title: "加入コホート別継続率",
-      columns: {
-        cohortMonth: "加入月",
-        cohortSize: "人数",
-        m1: "M+1",
-        m3: "M+3",
-        m6: "M+6",
-      },
+      title: "コホートretention",
+      axisX: { m0: "M+0", m1: "M+1", m3: "M+3", m6: "M+6" },
       empty: "データなし",
+      period: {
+        label: "コホート表示期間",
+        m3: "直近3ヶ月",
+        m6: "直近6ヶ月",
+        m12: "直近12ヶ月",
+        all: "全期間",
+      },
     },
     member: {
       title: "メンバー一覧",
+      tenurePrefix: "在籍",
+      tenureSuffix: "ヶ月",
       columns: {
         name: "氏名",
         sendRate: "送付率",
@@ -93,6 +111,20 @@ export const sysAdminDashboardJa = {
       },
       sort: {
         placeholder: "並び順",
+        sendRate: "送付率順",
+        monthsIn: "在籍月数順",
+        donationOutMonths: "送付月数順",
+        totalPointsOut: "累計ポイント順",
+      },
+    },
+    overview: {
+      latestRetentionM1: "M+1定着率",
+      sort: {
+        placeholder: "並び順",
+        activityRate: "稼働率順",
+        growth: "前月比順",
+        tier1Count: "習慣化人数順",
+        latestRetentionM1: "M+1定着率順",
       },
     },
   },
