@@ -1,3 +1,4 @@
+import { Inbox } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";
 
@@ -11,11 +12,12 @@ export function EmptyChart({ message, className }: Props) {
     <div
       role="status"
       className={cn(
-        "flex min-h-[260px] items-center justify-center text-sm text-muted-foreground",
+        "flex min-h-[220px] flex-col items-center justify-center gap-2 py-8 text-sm text-muted-foreground",
         className,
       )}
     >
-      {message ?? sysAdminDashboardJa.state.chartEmpty}
+      <Inbox className="h-6 w-6" aria-hidden />
+      <span>{message ?? sysAdminDashboardJa.state.chartEmpty}</span>
     </div>
   );
 }

@@ -14,6 +14,7 @@ import {
 import { toPct } from "@/app/sysAdmin/_shared/format/number";
 import { formatJstMonthShort } from "@/app/sysAdmin/_shared/format/date";
 import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";
+import { EmptyChart } from "@/app/sysAdmin/_shared/components/EmptyChart";
 
 export type MonthlyActivityDatum = {
   month: string;
@@ -29,15 +30,7 @@ type Props = {
 
 export function MonthlyActivityComposedChart({ data, height = 240 }: Props) {
   if (data.length === 0) {
-    return (
-      <div
-        role="status"
-        className="flex items-center justify-center text-sm text-muted-foreground"
-        style={{ height }}
-      >
-        {sysAdminDashboardJa.state.chartEmpty}
-      </div>
-    );
+    return <EmptyChart message={sysAdminDashboardJa.state.chartEmpty} />;
   }
 
   const chartData = data.map((d) => ({

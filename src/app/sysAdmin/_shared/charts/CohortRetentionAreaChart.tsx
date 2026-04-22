@@ -12,6 +12,7 @@ import {
   YAxis,
 } from "recharts";
 import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";
+import { EmptyChart } from "@/app/sysAdmin/_shared/components/EmptyChart";
 import { pickCohortColor } from "./cohortColors";
 import type { CohortChartData } from "./buildCohortChartData";
 
@@ -22,15 +23,7 @@ type Props = {
 
 export function CohortRetentionAreaChart({ data, height = 240 }: Props) {
   if (data.cohortLabels.length === 0) {
-    return (
-      <div
-        role="status"
-        className="flex items-center justify-center text-sm text-muted-foreground"
-        style={{ height }}
-      >
-        {sysAdminDashboardJa.state.chartEmpty}
-      </div>
-    );
+    return <EmptyChart message={sysAdminDashboardJa.state.chartEmpty} />;
   }
 
   return (
@@ -63,7 +56,7 @@ export function CohortRetentionAreaChart({ data, height = 240 }: Props) {
                 name={label}
                 stroke={color}
                 fill={color}
-                fillOpacity={0.15}
+                fillOpacity={0.22}
                 strokeWidth={2}
                 connectNulls={false}
                 isAnimationActive={false}

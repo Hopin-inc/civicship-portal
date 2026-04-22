@@ -11,9 +11,9 @@ import {
   type GqlSysAdminMemberRow,
 } from "@/types/graphql";
 import { ChartCard } from "@/app/sysAdmin/_shared/components/ChartCard";
+import { EmptyChart } from "@/app/sysAdmin/_shared/components/EmptyChart";
 import { MetricInfoButton } from "@/app/sysAdmin/_shared/components/MetricInfoButton";
 import { SendRateDot } from "@/app/sysAdmin/_shared/components/SendRateDot";
-import { Empty } from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toCompactJa, toIntJa } from "@/app/sysAdmin/_shared/format/number";
 import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";
@@ -169,9 +169,7 @@ export function MemberListPanel({
     >
       <div className="rounded-md border">
         {users.length === 0 && !loading ? (
-          <div className="p-6">
-            <Empty>{sysAdminDashboardJa.state.empty}</Empty>
-          </div>
+          <EmptyChart message={sysAdminDashboardJa.state.empty} />
         ) : (
           <List
             rowCount={users.length}

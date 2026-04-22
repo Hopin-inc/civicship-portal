@@ -3,7 +3,7 @@
 import { useCallback } from "react";
 import { useAppRouter } from "@/lib/navigation";
 import { DashboardSection } from "@/app/sysAdmin/_shared/components/DashboardSection";
-import { Empty } from "@/components/ui/empty";
+import { EmptyChart } from "@/app/sysAdmin/_shared/components/EmptyChart";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";
@@ -45,7 +45,7 @@ export function DashboardOverview() {
         {isInitialLoading && <LoadingIndicator />}
         {!isInitialLoading && error && <ErrorState title={sysAdminDashboardJa.state.error} />}
         {!isInitialLoading && !error && communities.length === 0 && (
-          <Empty>{sysAdminDashboardJa.state.empty}</Empty>
+          <EmptyChart message={sysAdminDashboardJa.state.empty} />
         )}
         {!isInitialLoading && !error && communities.length > 0 && (
           <CommunityCardGrid rows={communities} onRowClick={handleRowClick} />
