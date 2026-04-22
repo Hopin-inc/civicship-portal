@@ -22,16 +22,13 @@ export const sysAdminDashboardJa = {
     activeBadge: "(変更あり)",
   },
   overview: {
-    columns: {
-      name: "コミュニティ",
-      activityRate: "活動率",
-      growth: "前月比",
-      latestRetentionM1: "直近 M+1 継続率",
-      totalMembers: "総メンバー",
-      tier1: "Tier1",
-      tier2: "Tier2",
-      passive: "未参加",
-      alerts: "アラート",
+    latestRetentionM1: "M+1定着率",
+    sort: {
+      placeholder: "並び順",
+      activityRate: "稼働率順",
+      growth: "前月比順",
+      tier1Count: "習慣化人数順",
+      latestRetentionM1: "M+1定着率順",
     },
   },
   alerts: {
@@ -90,6 +87,15 @@ export const sysAdminDashboardJa = {
         m12: "直近12ヶ月",
         all: "全期間",
       },
+      // legacy columns — cohort table gets removed in next commit; keep keys
+      // so the file compiles in the meantime
+      columns: {
+        cohortMonth: "加入月",
+        cohortSize: "人数",
+        m1: "M+1",
+        m3: "M+3",
+        m6: "M+6",
+      },
     },
     member: {
       title: "メンバー一覧",
@@ -115,16 +121,6 @@ export const sysAdminDashboardJa = {
         monthsIn: "在籍月数順",
         donationOutMonths: "送付月数順",
         totalPointsOut: "累計ポイント順",
-      },
-    },
-    overview: {
-      latestRetentionM1: "M+1定着率",
-      sort: {
-        placeholder: "並び順",
-        activityRate: "稼働率順",
-        growth: "前月比順",
-        tier1Count: "習慣化人数順",
-        latestRetentionM1: "M+1定着率順",
       },
     },
   },

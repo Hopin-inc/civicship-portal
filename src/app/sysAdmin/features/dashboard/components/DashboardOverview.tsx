@@ -9,7 +9,7 @@ import { ErrorState } from "@/components/shared/ErrorState";
 import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";
 import { useDashboardControls } from "../hooks/useDashboardControls";
 import { useDashboardOverview } from "../hooks/useDashboardOverview";
-import { CommunityOverviewTable } from "./CommunityOverviewTable";
+import { CommunityCardGrid } from "./CommunityCardGrid";
 import { DashboardControls } from "./DashboardControls";
 import { PlatformSummaryCards } from "./PlatformSummaryCards";
 
@@ -48,7 +48,7 @@ export function DashboardOverview() {
           <Empty>{sysAdminDashboardJa.state.empty}</Empty>
         )}
         {!isInitialLoading && !error && communities.length > 0 && (
-          <CommunityOverviewTable rows={communities} onRowClick={handleRowClick} />
+          <CommunityCardGrid rows={communities} onRowClick={handleRowClick} />
         )}
       </DashboardSection>
     </div>
