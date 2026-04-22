@@ -5006,6 +5006,311 @@ export type GqlGetNftInstanceWithDidQuery = {
   } | null;
 };
 
+export type GqlSysAdminAlertFieldsFragment = {
+  __typename?: "SysAdminCommunityAlerts";
+  activeDrop: boolean;
+  churnSpike: boolean;
+  noNewMembers: boolean;
+};
+
+export type GqlSysAdminSegmentCountsFieldsFragment = {
+  __typename?: "SysAdminSegmentCounts";
+  total: number;
+  activeCount: number;
+  passiveCount: number;
+  tier1Count: number;
+  tier2Count: number;
+};
+
+export type GqlSysAdminPlatformSummaryFieldsFragment = {
+  __typename?: "SysAdminPlatformSummary";
+  communitiesCount: number;
+  latestMonthDonationPoints: number;
+  totalMembers: number;
+};
+
+export type GqlSysAdminCommunityOverviewRowFieldsFragment = {
+  __typename?: "SysAdminCommunityOverview";
+  communityId: string;
+  communityName: string;
+  communityActivityRate: number;
+  growthRateActivity?: number | null;
+  latestCohortRetentionM1?: number | null;
+  totalMembers: number;
+  passiveCount: number;
+  tier1Count: number;
+  tier2Count: number;
+  segmentCounts: {
+    __typename?: "SysAdminSegmentCounts";
+    total: number;
+    activeCount: number;
+    passiveCount: number;
+    tier1Count: number;
+    tier2Count: number;
+  };
+  alerts: {
+    __typename?: "SysAdminCommunityAlerts";
+    activeDrop: boolean;
+    churnSpike: boolean;
+    noNewMembers: boolean;
+  };
+};
+
+export type GqlSysAdminCommunityDetailSummaryFieldsFragment = {
+  __typename?: "SysAdminCommunitySummaryCard";
+  communityId: string;
+  communityName: string;
+  communityActivityRate: number;
+  communityActivityRate3mAvg?: number | null;
+  growthRateActivity?: number | null;
+  totalMembers: number;
+  tier2Count: number;
+  tier2Pct: number;
+  totalDonationPointsAllTime: number;
+  maxChainDepthAllTime?: number | null;
+  dataFrom?: Date | null;
+  dataTo?: Date | null;
+};
+
+export type GqlSysAdminStageBucketFieldsFragment = {
+  __typename?: "SysAdminStageBucket";
+  count: number;
+  pct: number;
+  avgSendRate: number;
+  avgMonthsIn: number;
+  pointsContributionPct: number;
+};
+
+export type GqlSysAdminStageDistributionFieldsFragment = {
+  __typename?: "SysAdminStageDistribution";
+  habitual: {
+    __typename?: "SysAdminStageBucket";
+    count: number;
+    pct: number;
+    avgSendRate: number;
+    avgMonthsIn: number;
+    pointsContributionPct: number;
+  };
+  regular: {
+    __typename?: "SysAdminStageBucket";
+    count: number;
+    pct: number;
+    avgSendRate: number;
+    avgMonthsIn: number;
+    pointsContributionPct: number;
+  };
+  occasional: {
+    __typename?: "SysAdminStageBucket";
+    count: number;
+    pct: number;
+    avgSendRate: number;
+    avgMonthsIn: number;
+    pointsContributionPct: number;
+  };
+  latent: {
+    __typename?: "SysAdminStageBucket";
+    count: number;
+    pct: number;
+    avgSendRate: number;
+    avgMonthsIn: number;
+    pointsContributionPct: number;
+  };
+};
+
+export type GqlSysAdminMonthlyActivityPointFieldsFragment = {
+  __typename?: "SysAdminMonthlyActivityPoint";
+  month: Date;
+  communityActivityRate: number;
+  senderCount: number;
+  newMembers: number;
+  donationPointsSum: number;
+  chainPct?: number | null;
+};
+
+export type GqlSysAdminRetentionTrendPointFieldsFragment = {
+  __typename?: "SysAdminRetentionTrendPoint";
+  week: Date;
+  communityActivityRate?: number | null;
+  retainedSenders: number;
+  churnedSenders: number;
+  returnedSenders: number;
+  newMembers: number;
+};
+
+export type GqlSysAdminCohortRetentionPointFieldsFragment = {
+  __typename?: "SysAdminCohortRetentionPoint";
+  cohortMonth: Date;
+  cohortSize: number;
+  retentionM1?: number | null;
+  retentionM3?: number | null;
+  retentionM6?: number | null;
+};
+
+export type GqlSysAdminMemberRowFieldsFragment = {
+  __typename?: "SysAdminMemberRow";
+  userId: string;
+  name?: string | null;
+  userSendRate: number;
+  totalPointsOut: number;
+  donationOutMonths: number;
+  monthsIn: number;
+};
+
+export type GqlGetSysAdminDashboardQueryVariables = Exact<{
+  input?: InputMaybe<GqlSysAdminDashboardInput>;
+}>;
+
+export type GqlGetSysAdminDashboardQuery = {
+  __typename?: "Query";
+  sysAdminDashboard: {
+    __typename?: "SysAdminDashboardPayload";
+    asOf: Date;
+    platform: {
+      __typename?: "SysAdminPlatformSummary";
+      communitiesCount: number;
+      latestMonthDonationPoints: number;
+      totalMembers: number;
+    };
+    communities: Array<{
+      __typename?: "SysAdminCommunityOverview";
+      communityId: string;
+      communityName: string;
+      communityActivityRate: number;
+      growthRateActivity?: number | null;
+      latestCohortRetentionM1?: number | null;
+      totalMembers: number;
+      passiveCount: number;
+      tier1Count: number;
+      tier2Count: number;
+      segmentCounts: {
+        __typename?: "SysAdminSegmentCounts";
+        total: number;
+        activeCount: number;
+        passiveCount: number;
+        tier1Count: number;
+        tier2Count: number;
+      };
+      alerts: {
+        __typename?: "SysAdminCommunityAlerts";
+        activeDrop: boolean;
+        churnSpike: boolean;
+        noNewMembers: boolean;
+      };
+    }>;
+  };
+};
+
+export type GqlGetSysAdminCommunityDetailQueryVariables = Exact<{
+  input: GqlSysAdminCommunityDetailInput;
+}>;
+
+export type GqlGetSysAdminCommunityDetailQuery = {
+  __typename?: "Query";
+  sysAdminCommunityDetail: {
+    __typename?: "SysAdminCommunityDetailPayload";
+    asOf: Date;
+    communityId: string;
+    communityName: string;
+    windowMonths: number;
+    alerts: {
+      __typename?: "SysAdminCommunityAlerts";
+      activeDrop: boolean;
+      churnSpike: boolean;
+      noNewMembers: boolean;
+    };
+    summary: {
+      __typename?: "SysAdminCommunitySummaryCard";
+      communityId: string;
+      communityName: string;
+      communityActivityRate: number;
+      communityActivityRate3mAvg?: number | null;
+      growthRateActivity?: number | null;
+      totalMembers: number;
+      tier2Count: number;
+      tier2Pct: number;
+      totalDonationPointsAllTime: number;
+      maxChainDepthAllTime?: number | null;
+      dataFrom?: Date | null;
+      dataTo?: Date | null;
+    };
+    stages: {
+      __typename?: "SysAdminStageDistribution";
+      habitual: {
+        __typename?: "SysAdminStageBucket";
+        count: number;
+        pct: number;
+        avgSendRate: number;
+        avgMonthsIn: number;
+        pointsContributionPct: number;
+      };
+      regular: {
+        __typename?: "SysAdminStageBucket";
+        count: number;
+        pct: number;
+        avgSendRate: number;
+        avgMonthsIn: number;
+        pointsContributionPct: number;
+      };
+      occasional: {
+        __typename?: "SysAdminStageBucket";
+        count: number;
+        pct: number;
+        avgSendRate: number;
+        avgMonthsIn: number;
+        pointsContributionPct: number;
+      };
+      latent: {
+        __typename?: "SysAdminStageBucket";
+        count: number;
+        pct: number;
+        avgSendRate: number;
+        avgMonthsIn: number;
+        pointsContributionPct: number;
+      };
+    };
+    monthlyActivityTrend: Array<{
+      __typename?: "SysAdminMonthlyActivityPoint";
+      month: Date;
+      communityActivityRate: number;
+      senderCount: number;
+      newMembers: number;
+      donationPointsSum: number;
+      chainPct?: number | null;
+    }>;
+    retentionTrend: Array<{
+      __typename?: "SysAdminRetentionTrendPoint";
+      week: Date;
+      communityActivityRate?: number | null;
+      retainedSenders: number;
+      churnedSenders: number;
+      returnedSenders: number;
+      newMembers: number;
+    }>;
+    cohortRetention: Array<{
+      __typename?: "SysAdminCohortRetentionPoint";
+      cohortMonth: Date;
+      cohortSize: number;
+      retentionM1?: number | null;
+      retentionM3?: number | null;
+      retentionM6?: number | null;
+    }>;
+    memberList: {
+      __typename?: "SysAdminMemberList";
+      hasNextPage: boolean;
+      nextCursor?: string | null;
+      users: Array<{
+        __typename?: "SysAdminMemberRow";
+        userId: string;
+        name?: string | null;
+        userSendRate: number;
+        totalPointsOut: number;
+        donationOutMonths: number;
+        monthsIn: number;
+      }>;
+    };
+  };
+};
+
 export type GqlGetCurrentUserProfileQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GqlGetCurrentUserProfileQuery = {
@@ -8365,6 +8670,131 @@ export const MembershipFieldsFragmentDoc = gql`
     reason
   }
 `;
+export const SysAdminPlatformSummaryFieldsFragmentDoc = gql`
+  fragment SysAdminPlatformSummaryFields on SysAdminPlatformSummary {
+    communitiesCount
+    latestMonthDonationPoints
+    totalMembers
+  }
+`;
+export const SysAdminSegmentCountsFieldsFragmentDoc = gql`
+  fragment SysAdminSegmentCountsFields on SysAdminSegmentCounts {
+    total
+    activeCount
+    passiveCount
+    tier1Count
+    tier2Count
+  }
+`;
+export const SysAdminAlertFieldsFragmentDoc = gql`
+  fragment SysAdminAlertFields on SysAdminCommunityAlerts {
+    activeDrop
+    churnSpike
+    noNewMembers
+  }
+`;
+export const SysAdminCommunityOverviewRowFieldsFragmentDoc = gql`
+  fragment SysAdminCommunityOverviewRowFields on SysAdminCommunityOverview {
+    communityId
+    communityName
+    communityActivityRate
+    growthRateActivity
+    latestCohortRetentionM1
+    totalMembers
+    passiveCount
+    tier1Count
+    tier2Count
+    segmentCounts {
+      ...SysAdminSegmentCountsFields
+    }
+    alerts {
+      ...SysAdminAlertFields
+    }
+  }
+  ${SysAdminSegmentCountsFieldsFragmentDoc}
+  ${SysAdminAlertFieldsFragmentDoc}
+`;
+export const SysAdminCommunityDetailSummaryFieldsFragmentDoc = gql`
+  fragment SysAdminCommunityDetailSummaryFields on SysAdminCommunitySummaryCard {
+    communityId
+    communityName
+    communityActivityRate
+    communityActivityRate3mAvg
+    growthRateActivity
+    totalMembers
+    tier2Count
+    tier2Pct
+    totalDonationPointsAllTime
+    maxChainDepthAllTime
+    dataFrom
+    dataTo
+  }
+`;
+export const SysAdminStageBucketFieldsFragmentDoc = gql`
+  fragment SysAdminStageBucketFields on SysAdminStageBucket {
+    count
+    pct
+    avgSendRate
+    avgMonthsIn
+    pointsContributionPct
+  }
+`;
+export const SysAdminStageDistributionFieldsFragmentDoc = gql`
+  fragment SysAdminStageDistributionFields on SysAdminStageDistribution {
+    habitual {
+      ...SysAdminStageBucketFields
+    }
+    regular {
+      ...SysAdminStageBucketFields
+    }
+    occasional {
+      ...SysAdminStageBucketFields
+    }
+    latent {
+      ...SysAdminStageBucketFields
+    }
+  }
+  ${SysAdminStageBucketFieldsFragmentDoc}
+`;
+export const SysAdminMonthlyActivityPointFieldsFragmentDoc = gql`
+  fragment SysAdminMonthlyActivityPointFields on SysAdminMonthlyActivityPoint {
+    month
+    communityActivityRate
+    senderCount
+    newMembers
+    donationPointsSum
+    chainPct
+  }
+`;
+export const SysAdminRetentionTrendPointFieldsFragmentDoc = gql`
+  fragment SysAdminRetentionTrendPointFields on SysAdminRetentionTrendPoint {
+    week
+    communityActivityRate
+    retainedSenders
+    churnedSenders
+    returnedSenders
+    newMembers
+  }
+`;
+export const SysAdminCohortRetentionPointFieldsFragmentDoc = gql`
+  fragment SysAdminCohortRetentionPointFields on SysAdminCohortRetentionPoint {
+    cohortMonth
+    cohortSize
+    retentionM1
+    retentionM3
+    retentionM6
+  }
+`;
+export const SysAdminMemberRowFieldsFragmentDoc = gql`
+  fragment SysAdminMemberRowFields on SysAdminMemberRow {
+    userId
+    name
+    userSendRate
+    totalPointsOut
+    donationOutMonths
+    monthsIn
+  }
+`;
 export const PlaceFieldsFragmentDoc = gql`
   fragment PlaceFields on Place {
     id
@@ -10466,6 +10896,203 @@ export type GetNftInstanceWithDidSuspenseQueryHookResult = ReturnType<
 export type GetNftInstanceWithDidQueryResult = Apollo.QueryResult<
   GqlGetNftInstanceWithDidQuery,
   GqlGetNftInstanceWithDidQueryVariables
+>;
+export const GetSysAdminDashboardDocument = gql`
+  query GetSysAdminDashboard($input: SysAdminDashboardInput) {
+    sysAdminDashboard(input: $input) {
+      asOf
+      platform {
+        ...SysAdminPlatformSummaryFields
+      }
+      communities {
+        ...SysAdminCommunityOverviewRowFields
+      }
+    }
+  }
+  ${SysAdminPlatformSummaryFieldsFragmentDoc}
+  ${SysAdminCommunityOverviewRowFieldsFragmentDoc}
+`;
+
+/**
+ * __useGetSysAdminDashboardQuery__
+ *
+ * To run a query within a React component, call `useGetSysAdminDashboardQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetSysAdminDashboardQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetSysAdminDashboardQuery({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useGetSysAdminDashboardQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GqlGetSysAdminDashboardQuery,
+    GqlGetSysAdminDashboardQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetSysAdminDashboardQuery, GqlGetSysAdminDashboardQueryVariables>(
+    GetSysAdminDashboardDocument,
+    options,
+  );
+}
+export function useGetSysAdminDashboardLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetSysAdminDashboardQuery,
+    GqlGetSysAdminDashboardQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetSysAdminDashboardQuery, GqlGetSysAdminDashboardQueryVariables>(
+    GetSysAdminDashboardDocument,
+    options,
+  );
+}
+export function useGetSysAdminDashboardSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetSysAdminDashboardQuery,
+        GqlGetSysAdminDashboardQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GqlGetSysAdminDashboardQuery,
+    GqlGetSysAdminDashboardQueryVariables
+  >(GetSysAdminDashboardDocument, options);
+}
+export type GetSysAdminDashboardQueryHookResult = ReturnType<typeof useGetSysAdminDashboardQuery>;
+export type GetSysAdminDashboardLazyQueryHookResult = ReturnType<
+  typeof useGetSysAdminDashboardLazyQuery
+>;
+export type GetSysAdminDashboardSuspenseQueryHookResult = ReturnType<
+  typeof useGetSysAdminDashboardSuspenseQuery
+>;
+export type GetSysAdminDashboardQueryResult = Apollo.QueryResult<
+  GqlGetSysAdminDashboardQuery,
+  GqlGetSysAdminDashboardQueryVariables
+>;
+export const GetSysAdminCommunityDetailDocument = gql`
+  query GetSysAdminCommunityDetail($input: SysAdminCommunityDetailInput!) {
+    sysAdminCommunityDetail(input: $input) {
+      asOf
+      communityId
+      communityName
+      windowMonths
+      alerts {
+        ...SysAdminAlertFields
+      }
+      summary {
+        ...SysAdminCommunityDetailSummaryFields
+      }
+      stages {
+        ...SysAdminStageDistributionFields
+      }
+      monthlyActivityTrend {
+        ...SysAdminMonthlyActivityPointFields
+      }
+      retentionTrend {
+        ...SysAdminRetentionTrendPointFields
+      }
+      cohortRetention {
+        ...SysAdminCohortRetentionPointFields
+      }
+      memberList {
+        hasNextPage
+        nextCursor
+        users {
+          ...SysAdminMemberRowFields
+        }
+      }
+    }
+  }
+  ${SysAdminAlertFieldsFragmentDoc}
+  ${SysAdminCommunityDetailSummaryFieldsFragmentDoc}
+  ${SysAdminStageDistributionFieldsFragmentDoc}
+  ${SysAdminMonthlyActivityPointFieldsFragmentDoc}
+  ${SysAdminRetentionTrendPointFieldsFragmentDoc}
+  ${SysAdminCohortRetentionPointFieldsFragmentDoc}
+  ${SysAdminMemberRowFieldsFragmentDoc}
+`;
+
+/**
+ * __useGetSysAdminCommunityDetailQuery__
+ *
+ * To run a query within a React component, call `useGetSysAdminCommunityDetailQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetSysAdminCommunityDetailQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetSysAdminCommunityDetailQuery({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useGetSysAdminCommunityDetailQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GqlGetSysAdminCommunityDetailQuery,
+    GqlGetSysAdminCommunityDetailQueryVariables
+  > &
+    (
+      | { variables: GqlGetSysAdminCommunityDetailQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GqlGetSysAdminCommunityDetailQuery,
+    GqlGetSysAdminCommunityDetailQueryVariables
+  >(GetSysAdminCommunityDetailDocument, options);
+}
+export function useGetSysAdminCommunityDetailLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetSysAdminCommunityDetailQuery,
+    GqlGetSysAdminCommunityDetailQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GqlGetSysAdminCommunityDetailQuery,
+    GqlGetSysAdminCommunityDetailQueryVariables
+  >(GetSysAdminCommunityDetailDocument, options);
+}
+export function useGetSysAdminCommunityDetailSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetSysAdminCommunityDetailQuery,
+        GqlGetSysAdminCommunityDetailQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GqlGetSysAdminCommunityDetailQuery,
+    GqlGetSysAdminCommunityDetailQueryVariables
+  >(GetSysAdminCommunityDetailDocument, options);
+}
+export type GetSysAdminCommunityDetailQueryHookResult = ReturnType<
+  typeof useGetSysAdminCommunityDetailQuery
+>;
+export type GetSysAdminCommunityDetailLazyQueryHookResult = ReturnType<
+  typeof useGetSysAdminCommunityDetailLazyQuery
+>;
+export type GetSysAdminCommunityDetailSuspenseQueryHookResult = ReturnType<
+  typeof useGetSysAdminCommunityDetailSuspenseQuery
+>;
+export type GetSysAdminCommunityDetailQueryResult = Apollo.QueryResult<
+  GqlGetSysAdminCommunityDetailQuery,
+  GqlGetSysAdminCommunityDetailQueryVariables
 >;
 export const GetCurrentUserProfileDocument = gql`
   query GetCurrentUserProfile {
