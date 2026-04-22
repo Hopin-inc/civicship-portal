@@ -1,7 +1,11 @@
 "use client";
 
-import type { ApolloError } from "@apollo/client";
+import { useMemo } from "react";
+import type { ApolloError, ApolloQueryResult } from "@apollo/client";
+import { useApolloClient } from "@apollo/client";
 import {
+  type GqlGetSysAdminCommunityDetailQuery,
+  type GqlSysAdminCommunityDetailInput,
   type GqlSysAdminCommunityDetailPayload,
   useGetSysAdminCommunityDetailQuery,
 } from "@/types/graphql";
@@ -19,6 +23,12 @@ export type CommunityDetailResult = {
   loading: boolean;
   error: ApolloError | undefined;
   detail: GqlSysAdminCommunityDetailPayload | null;
+  input: GqlSysAdminCommunityDetailInput;
+  fetchMore: (opts: {
+    variables: { input: GqlSysAdminCommunityDetailInput };
+  }) => Promise<ApolloQueryResult<GqlGetSysAdminCommunityDetailQuery>>;
+  refetch: () => Promise<ApolloQueryResult<GqlGetSysAdminCommunityDetailQuery>>;
+  evictAndRefetch: () => Promise<ApolloQueryResult<GqlGetSysAdminCommunityDetailQuery>>;
 };
 
 export function useCommunityDetail({
@@ -27,36 +37,53 @@ export function useCommunityDetail({
   detailControls,
   limit = 50,
 }: Args): CommunityDetailResult {
-  const { data, loading, error } = useGetSysAdminCommunityDetailQuery({
-    variables: {
-      input: {
-        communityId,
-        asOf: dashboardControls.asOf ? new Date(dashboardControls.asOf) : undefined,
-        segmentThresholds: {
-          tier1: dashboardControls.tier1,
-          tier2: dashboardControls.tier2,
-        },
-        windowMonths: detailControls.windowMonths,
-        userFilter: {
-          minSendRate: detailControls.filter.minSendRate ?? undefined,
-          maxSendRate: detailControls.filter.maxSendRate ?? undefined,
-          minDonationOutMonths: detailControls.filter.minDonationOutMonths ?? undefined,
-          minMonthsIn: detailControls.filter.minMonthsIn ?? undefined,
-        },
-        userSort: {
-          field: detailControls.sort.field,
-          order: detailControls.sort.order,
-        },
-        limit,
+  const client = useApolloClient();
+
+  const input = useMemo<GqlSysAdminCommunityDetailInput>(
+    () => ({
+      communityId,
+      asOf: dashboardControls.asOf ? new Date(dashboardControls.asOf) : undefined,
+      segmentThresholds: {
+        tier1: dashboardControls.tier1,
+        tier2: dashboardControls.tier2,
       },
-    },
+      windowMonths: detailControls.windowMonths,
+      userFilter: {
+        minSendRate: detailControls.filter.minSendRate ?? undefined,
+        maxSendRate: detailControls.filter.maxSendRate ?? undefined,
+        minDonationOutMonths: detailControls.filter.minDonationOutMonths ?? undefined,
+        minMonthsIn: detailControls.filter.minMonthsIn ?? undefined,
+      },
+      userSort: {
+        field: detailControls.sort.field,
+        order: detailControls.sort.order,
+      },
+      limit,
+    }),
+    [communityId, dashboardControls, detailControls, limit],
+  );
+
+  const { data, loading, error, fetchMore, refetch } = useGetSysAdminCommunityDetailQuery({
+    variables: { input },
     fetchPolicy: "cache-and-network",
     notifyOnNetworkStatusChange: true,
   });
+
+  const evictAndRefetch = () => {
+    // filter 変更時: keyArgs に含めていないため Apollo は同一キャッシュエントリを返し続ける。
+    // 明示的に evict + refetch することで filter 変更を反映させる。
+    client.cache.evict({ fieldName: "sysAdminCommunityDetail" });
+    client.cache.gc();
+    return refetch();
+  };
 
   return {
     loading,
     error,
     detail: data?.sysAdminCommunityDetail ?? null,
+    input,
+    fetchMore,
+    refetch,
+    evictAndRefetch,
   };
 }

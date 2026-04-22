@@ -187,6 +187,43 @@ const defaultOptions: ApolloClientOptions<NormalizedCacheObject> = {
           transactionsConnection: relayStylePagination(),
         },
       },
+      SysAdminCommunityDetailPayload: {
+        // asOf / segmentThresholds / windowMonths の組み合わせで返される「スナップショット」は
+        // 状況で変化するため normalize せず、親 Query のキャッシュエントリ内に閉じる。
+        keyFields: false,
+      },
+      Query: {
+        fields: {
+          sysAdminCommunityDetail: {
+            // cursor / limit / userFilter はキャッシュキーから外し、同一キー内で merge する。
+            // userSort は選択肢有限 (4 field × 2 order) のため別キーで保持。
+            // userFilter は UI 側で cache.evict + refetch する (slider 連続操作で累積回避)。
+            keyArgs: [
+              "input",
+              ["communityId", "asOf", "segmentThresholds", "windowMonths", "userSort"],
+            ],
+            merge(existing, incoming, { args }) {
+              type WithMembers = typeof incoming & {
+                memberList?: { users?: unknown[] } | null;
+              };
+              const inc = incoming as WithMembers;
+              const ex = existing as WithMembers | undefined;
+              const cursor = (args as { input?: { cursor?: string | null } } | null)?.input?.cursor;
+              const isInitial = !cursor;
+              if (isInitial || !ex) return inc;
+              const existingUsers = ex.memberList?.users ?? [];
+              const incomingUsers = inc.memberList?.users ?? [];
+              return {
+                ...inc,
+                memberList: {
+                  ...inc.memberList,
+                  users: [...existingUsers, ...incomingUsers],
+                },
+              };
+            },
+          },
+        },
+      },
     },
   }),
 };

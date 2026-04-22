@@ -14,6 +14,7 @@ import { StageDistributionPanel } from "./StageDistributionPanel";
 import { MonthlyActivityPanel } from "./MonthlyActivityPanel";
 import { RetentionTrendPanel } from "./RetentionTrendPanel";
 import { CohortRetentionTable } from "./CohortRetentionTable";
+import { MemberListPanel } from "./MemberListPanel";
 
 type Props = {
   communityId: string;
@@ -22,7 +23,7 @@ type Props = {
 export function CommunityDashboardDetail({ communityId }: Props) {
   const dashboard = useDashboardControls();
   const detail = useDetailControls();
-  const { loading, error, detail: data } = useCommunityDetail({
+  const { loading, error, detail: data, input, fetchMore, evictAndRefetch } = useCommunityDetail({
     communityId,
     dashboardControls: dashboard.state,
     detailControls: detail.state,
@@ -67,6 +68,18 @@ export function CommunityDashboardDetail({ communityId }: Props) {
       <MonthlyActivityPanel points={data.monthlyActivityTrend} />
       <RetentionTrendPanel points={data.retentionTrend} />
       <CohortRetentionTable points={data.cohortRetention} />
+      <MemberListPanel
+        memberList={data.memberList}
+        filter={detail.state.filter}
+        sort={detail.state.sort}
+        onFilterChange={detail.setFilter}
+        onResetFilter={detail.resetFilter}
+        onToggleSort={detail.toggleSort}
+        onEvictAndRefetch={() => void evictAndRefetch()}
+        baseInput={input}
+        fetchMore={fetchMore}
+        loading={loading}
+      />
     </div>
   );
 }
