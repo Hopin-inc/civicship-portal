@@ -11,7 +11,7 @@ import { CommunityDetailHeader } from "./CommunityDetailHeader";
 import { StageDistributionPanel } from "./StageDistributionPanel";
 import { MonthlyActivityPanel } from "./MonthlyActivityPanel";
 import { RetentionTrendPanel } from "./RetentionTrendPanel";
-import { CohortRetentionTable } from "./CohortRetentionTable";
+import { CohortRetentionPanel } from "./CohortRetentionPanel";
 import { MemberListPanel } from "./MemberListPanel";
 
 type Props = {
@@ -47,7 +47,10 @@ export function CommunityDashboardDetail({ communityId }: Props) {
       <StageDistributionPanel stages={data.stages} />
       <MonthlyActivityPanel points={data.monthlyActivityTrend} />
       <RetentionTrendPanel points={data.retentionTrend} />
-      <CohortRetentionTable points={data.cohortRetention} />
+      <CohortRetentionPanel
+        points={data.cohortRetention}
+        cohortMonths={detail.state.cohortMonths}
+      />
       <MemberListPanel
         memberList={data.memberList}
         filter={detail.state.filter}

@@ -87,15 +87,6 @@ export const sysAdminDashboardJa = {
         m12: "直近12ヶ月",
         all: "全期間",
       },
-      // legacy columns — cohort table gets removed in next commit; keep keys
-      // so the file compiles in the meantime
-      columns: {
-        cohortMonth: "加入月",
-        cohortSize: "人数",
-        m1: "M+1",
-        m3: "M+3",
-        m6: "M+6",
-      },
     },
     member: {
       title: "メンバー一覧",
