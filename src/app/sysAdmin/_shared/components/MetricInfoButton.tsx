@@ -27,11 +27,13 @@ export function MetricInfoButton({ metricKey, className }: Props) {
         onClick={() => setOpen(true)}
         aria-label={`${def.title}の定義を見る`}
         className={cn(
-          "inline-flex h-5 w-5 items-center justify-center rounded text-muted-foreground hover:text-foreground",
+          "inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground",
+          "hover:bg-muted hover:text-foreground",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
           className,
         )}
       >
-        <Info className="h-3.5 w-3.5" />
+        <Info className="h-4 w-4" />
       </button>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-h-[80vh] overflow-y-auto">

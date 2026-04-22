@@ -23,7 +23,7 @@ export function DashboardControls({
   disabled,
 }: Props) {
   return (
-    <div className="flex flex-wrap items-end gap-6">
+    <div className="flex flex-wrap items-center gap-4 md:gap-6">
       <AsOfControl value={state.asOf} onChange={onAsOfChange} disabled={disabled} />
       <SegmentThresholdsControl
         tier1={state.tier1}

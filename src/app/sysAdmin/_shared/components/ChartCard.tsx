@@ -14,7 +14,7 @@ type Props = {
 export function ChartCard({ title, description, actions, children, footer, className }: Props) {
   return (
     <Card className={cn("shadow-none", className)}>
-      <CardHeader className="flex flex-row items-start justify-between gap-2 pb-2">
+      <CardHeader className="flex flex-col gap-2 pb-2 md:flex-row md:items-start md:justify-between">
         <div className="flex flex-col gap-0.5">
           <CardTitle className="text-base font-semibold">{title}</CardTitle>
           {description && (

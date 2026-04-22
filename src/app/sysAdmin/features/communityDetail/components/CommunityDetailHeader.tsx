@@ -18,15 +18,17 @@ type Props = {
 export function CommunityDetailHeader({ summary, alerts }: Props) {
   const t = sysAdminDashboardJa.detail.header;
 
-  const metaParts: string[] = [
+  // 各項目を独立した inline-block に分割して、mobile 幅では自然に改行
+  // させつつ "中黒孤立" のような見苦しい wrap を回避する。
+  const metaItems: string[] = [
     `${toIntJa(summary.totalMembers)}${t.memberSuffix}`,
   ];
   if (summary.dataFrom && summary.dataTo) {
-    metaParts.push(`${formatJstDate(summary.dataFrom)} 〜 ${formatJstDate(summary.dataTo)}`);
+    metaItems.push(`${formatJstDate(summary.dataFrom)} 〜 ${formatJstDate(summary.dataTo)}`);
   }
-  metaParts.push(`累計 ${toCompactJa(summary.totalDonationPointsAllTime)}${t.donationSuffix}`);
+  metaItems.push(`累計 ${toCompactJa(summary.totalDonationPointsAllTime)}${t.donationSuffix}`);
   if (summary.maxChainDepthAllTime != null) {
-    metaParts.push(`${t.chainPrefix} ${summary.maxChainDepthAllTime}${t.chainSuffix}`);
+    metaItems.push(`${t.chainPrefix} ${summary.maxChainDepthAllTime}${t.chainSuffix}`);
   }
 
   return (
@@ -36,7 +38,11 @@ export function CommunityDetailHeader({ summary, alerts }: Props) {
         <PrimaryAlertBadge alerts={alerts} />
       </div>
 
-      <p className="text-sm text-muted-foreground">{metaParts.join(" · ")}</p>
+      <ul className="flex flex-wrap gap-x-3 gap-y-1 text-sm text-muted-foreground">
+        {metaItems.map((item) => (
+          <li key={item}>{item}</li>
+        ))}
+      </ul>
 
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-1">
@@ -45,16 +51,15 @@ export function CommunityDetailHeader({ summary, alerts }: Props) {
           </span>
           <MetricInfoButton metricKey="communityActivityRate" />
         </div>
-        <p className="text-sm text-muted-foreground">
+        <div className="flex flex-wrap gap-x-3 gap-y-1 text-sm text-muted-foreground">
           <span>
             {t.growth}{" "}
             <PercentDelta value={summary.growthRateActivity} className="font-normal" />
           </span>
-          <span className="mx-1">·</span>
           <span>
             {t.threeMonthAvg} {toPct(summary.communityActivityRate3mAvg)}
           </span>
-        </p>
+        </div>
       </div>
     </header>
   );

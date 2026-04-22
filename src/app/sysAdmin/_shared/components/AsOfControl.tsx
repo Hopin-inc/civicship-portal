@@ -35,7 +35,7 @@ export function AsOfControl({ value, onChange, id = "asOf", disabled }: Props) {
   };
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex items-center gap-2">
       <Label htmlFor={id} className="text-xs text-muted-foreground">
         {sysAdminDashboardJa.controls.asOfLabel}
       </Label>
@@ -45,7 +45,7 @@ export function AsOfControl({ value, onChange, id = "asOf", disabled }: Props) {
         value={toDateInputValue(value)}
         onChange={handleChange}
         disabled={disabled}
-        className="h-9 w-40"
+        className="h-9 w-36 sm:w-40"
       />
     </div>
   );

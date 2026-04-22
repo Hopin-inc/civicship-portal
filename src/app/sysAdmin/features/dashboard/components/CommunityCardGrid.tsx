@@ -58,7 +58,7 @@ export function CommunityCardGrid({ rows, onRowClick }: Props) {
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <StageLegend />
         <div className="flex items-center gap-2">
           <Label htmlFor="overview-sort" className="text-xs text-muted-foreground">
@@ -78,7 +78,7 @@ export function CommunityCardGrid({ rows, onRowClick }: Props) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {sorted.map((row) => (
           <CommunityCard key={row.communityId} row={row} onClick={onRowClick} />
         ))}

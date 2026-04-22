@@ -50,32 +50,35 @@ export function StageDistributionPanel({ stages }: Props) {
       <div className="flex flex-col gap-4">
         <StageProgressBar counts={counts} />
 
-        <ul className="flex flex-col gap-1.5 text-sm">
+        <ul className="flex flex-col gap-2 text-sm md:gap-1.5">
           {STAGE_KEYS.map((stage) => {
             const bucket = buckets[stage];
             const isLatent = stage === "latent";
             return (
               <li
                 key={stage}
-                className="grid grid-cols-[auto_1fr_auto] items-baseline gap-2"
+                className="flex flex-col gap-0.5 md:grid md:grid-cols-[auto_1fr_auto] md:items-baseline md:gap-2"
               >
-                <span className="inline-flex items-center gap-1">
-                  <StageDot stage={stage} />
-                  <span className="font-medium">{labels[stage]}</span>
-                </span>
-                <span className="text-xs tabular-nums text-muted-foreground">
+                <div className="flex items-baseline justify-between gap-2 md:contents">
+                  <span className="inline-flex items-center gap-1">
+                    <StageDot stage={stage} />
+                    <span className="font-medium">{labels[stage]}</span>
+                  </span>
+                  <span className="tabular-nums md:order-last">
+                    <span className="font-medium">{toIntJa(bucket.count)}</span>
+                    <span className="ml-1 text-xs text-muted-foreground">
+                      {toPct(bucket.pct)}
+                    </span>
+                  </span>
+                </div>
+                <span className="flex flex-wrap gap-x-2 gap-y-0.5 text-xs tabular-nums text-muted-foreground">
                   {!isLatent && (
-                    <>
+                    <span>
                       {labels.avgSendRate} {toPct(bucket.avgSendRate)}
-                      <span className="mx-1">·</span>
-                    </>
+                    </span>
                   )}
-                  {labels.avgMonthsIn} {bucket.avgMonthsIn.toFixed(1)}ヶ月
-                </span>
-                <span className="tabular-nums">
-                  <span className="font-medium">{toIntJa(bucket.count)}</span>
-                  <span className="ml-1 text-xs text-muted-foreground">
-                    {toPct(bucket.pct)}
+                  <span>
+                    {labels.avgMonthsIn} {bucket.avgMonthsIn.toFixed(1)}ヶ月
                   </span>
                 </span>
               </li>

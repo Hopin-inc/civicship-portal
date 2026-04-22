@@ -2,7 +2,10 @@ import React from "react";
 import type { GqlSysAdminCommunityOverview } from "@/types/graphql";
 import { Card } from "@/components/ui/card";
 import { PercentDelta } from "@/app/sysAdmin/_shared/components/PercentDelta";
-import { PrimaryAlertBadge } from "@/app/sysAdmin/_shared/components/PrimaryAlertBadge";
+import {
+  PrimaryAlertBadge,
+  selectPrimaryAlert,
+} from "@/app/sysAdmin/_shared/components/PrimaryAlertBadge";
 import { StageProgressBar } from "@/app/sysAdmin/_shared/components/StageProgressBar";
 import { toPct } from "@/app/sysAdmin/_shared/format/number";
 import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";
@@ -11,6 +14,14 @@ import { cn } from "@/lib/utils";
 type Props = {
   row: GqlSysAdminCommunityOverview;
   onClick?: (communityId: string) => void;
+};
+
+// アラートの severity を左 border の色で表現する。
+// 並んだ card の中で「気にすべきコミュニティ」を一瞥で判別できるようにする。
+const ALERT_BORDER: Record<NonNullable<ReturnType<typeof selectPrimaryAlert>>, string> = {
+  churnSpike: "border-l-4 border-l-red-400",
+  activeDrop: "border-l-4 border-l-amber-400",
+  noNewMembers: "border-l-4 border-l-sky-400",
 };
 
 export function CommunityCard({ row, onClick }: Props) {
@@ -24,13 +35,16 @@ export function CommunityCard({ row, onClick }: Props) {
     latent: row.segmentCounts.passiveCount,
   };
 
+  const alertVariant = selectPrimaryAlert(row.alerts);
   const handleClick = () => onClick?.(row.communityId);
 
   return (
     <Card
       className={cn(
         "flex flex-col gap-3 p-4 shadow-none",
-        onClick && "cursor-pointer transition-colors hover:bg-muted/30",
+        alertVariant && ALERT_BORDER[alertVariant],
+        onClick &&
+          "cursor-pointer transition-colors hover:bg-muted/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
       )}
       onClick={onClick ? handleClick : undefined}
       role={onClick ? "button" : undefined}
