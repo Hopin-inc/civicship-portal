@@ -7637,6 +7637,82 @@ export type GqlGetVoteTopicsQuery = {
   };
 };
 
+export type GqlVoteTopicUserListItemFieldsFragment = {
+  __typename?: "VoteTopic";
+  id: string;
+  title: string;
+  startsAt: Date;
+  endsAt: Date;
+  phase: GqlVoteTopicPhase;
+  myBallot?: {
+    __typename?: "VoteBallot";
+    id: string;
+    option: { __typename?: "VoteOption"; id: string; label: string };
+  } | null;
+  myEligibility?: { __typename?: "MyVoteEligibility"; eligible: boolean } | null;
+  options: Array<{ __typename?: "VoteOption"; id: string }>;
+  gate: {
+    __typename?: "VoteGate";
+    id: string;
+    type: GqlVoteGateType;
+    requiredRole?: GqlRole | null;
+    nftToken?: { __typename?: "NftToken"; id: string; name?: string | null } | null;
+  };
+  powerPolicy: {
+    __typename?: "VotePowerPolicy";
+    id: string;
+    type: GqlVotePowerPolicyType;
+    nftToken?: { __typename?: "NftToken"; id: string; name?: string | null } | null;
+  };
+};
+
+export type GqlGetVoteTopicsForUserQueryVariables = Exact<{
+  communityId: Scalars["ID"]["input"];
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+}>;
+
+export type GqlGetVoteTopicsForUserQuery = {
+  __typename?: "Query";
+  voteTopics: {
+    __typename?: "VoteTopicsConnection";
+    totalCount: number;
+    edges: Array<{
+      __typename?: "VoteTopicEdge";
+      cursor: string;
+      node: {
+        __typename?: "VoteTopic";
+        id: string;
+        title: string;
+        startsAt: Date;
+        endsAt: Date;
+        phase: GqlVoteTopicPhase;
+        myBallot?: {
+          __typename?: "VoteBallot";
+          id: string;
+          option: { __typename?: "VoteOption"; id: string; label: string };
+        } | null;
+        myEligibility?: { __typename?: "MyVoteEligibility"; eligible: boolean } | null;
+        options: Array<{ __typename?: "VoteOption"; id: string }>;
+        gate: {
+          __typename?: "VoteGate";
+          id: string;
+          type: GqlVoteGateType;
+          requiredRole?: GqlRole | null;
+          nftToken?: { __typename?: "NftToken"; id: string; name?: string | null } | null;
+        };
+        powerPolicy: {
+          __typename?: "VotePowerPolicy";
+          id: string;
+          type: GqlVotePowerPolicyType;
+          nftToken?: { __typename?: "NftToken"; id: string; name?: string | null } | null;
+        };
+      };
+    }>;
+    pageInfo: { __typename?: "PageInfo"; hasNextPage: boolean; endCursor?: string | null };
+  };
+};
+
 export type GqlGetVoteTopicQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
@@ -8034,6 +8110,22 @@ export const VoteTopicListItemFieldsFragmentDoc = gql`
       }
     }
   }
+`;
+export const VoteTopicUserListItemFieldsFragmentDoc = gql`
+  fragment VoteTopicUserListItemFields on VoteTopic {
+    ...VoteTopicListItemFields
+    myBallot {
+      id
+      option {
+        id
+        label
+      }
+    }
+    myEligibility {
+      eligible
+    }
+  }
+  ${VoteTopicListItemFieldsFragmentDoc}
 `;
 export const GetStatesDocument = gql`
   query GetStates($first: Int) {
@@ -15396,6 +15488,94 @@ export type GetVoteTopicsSuspenseQueryHookResult = ReturnType<typeof useGetVoteT
 export type GetVoteTopicsQueryResult = Apollo.QueryResult<
   GqlGetVoteTopicsQuery,
   GqlGetVoteTopicsQueryVariables
+>;
+export const GetVoteTopicsForUserDocument = gql`
+  query GetVoteTopicsForUser($communityId: ID!, $cursor: String, $first: Int) {
+    voteTopics(communityId: $communityId, cursor: $cursor, first: $first) {
+      edges {
+        cursor
+        node {
+          ...VoteTopicUserListItemFields
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      totalCount
+    }
+  }
+  ${VoteTopicUserListItemFieldsFragmentDoc}
+`;
+
+/**
+ * __useGetVoteTopicsForUserQuery__
+ *
+ * To run a query within a React component, call `useGetVoteTopicsForUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetVoteTopicsForUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetVoteTopicsForUserQuery({
+ *   variables: {
+ *      communityId: // value for 'communityId'
+ *      cursor: // value for 'cursor'
+ *      first: // value for 'first'
+ *   },
+ * });
+ */
+export function useGetVoteTopicsForUserQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GqlGetVoteTopicsForUserQuery,
+    GqlGetVoteTopicsForUserQueryVariables
+  > &
+    ({ variables: GqlGetVoteTopicsForUserQueryVariables; skip?: boolean } | { skip: boolean }),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetVoteTopicsForUserQuery, GqlGetVoteTopicsForUserQueryVariables>(
+    GetVoteTopicsForUserDocument,
+    options,
+  );
+}
+export function useGetVoteTopicsForUserLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetVoteTopicsForUserQuery,
+    GqlGetVoteTopicsForUserQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetVoteTopicsForUserQuery, GqlGetVoteTopicsForUserQueryVariables>(
+    GetVoteTopicsForUserDocument,
+    options,
+  );
+}
+export function useGetVoteTopicsForUserSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetVoteTopicsForUserQuery,
+        GqlGetVoteTopicsForUserQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GqlGetVoteTopicsForUserQuery,
+    GqlGetVoteTopicsForUserQueryVariables
+  >(GetVoteTopicsForUserDocument, options);
+}
+export type GetVoteTopicsForUserQueryHookResult = ReturnType<typeof useGetVoteTopicsForUserQuery>;
+export type GetVoteTopicsForUserLazyQueryHookResult = ReturnType<
+  typeof useGetVoteTopicsForUserLazyQuery
+>;
+export type GetVoteTopicsForUserSuspenseQueryHookResult = ReturnType<
+  typeof useGetVoteTopicsForUserSuspenseQuery
+>;
+export type GetVoteTopicsForUserQueryResult = Apollo.QueryResult<
+  GqlGetVoteTopicsForUserQuery,
+  GqlGetVoteTopicsForUserQueryVariables
 >;
 export const GetVoteTopicDocument = gql`
   query GetVoteTopic($id: ID!) {
