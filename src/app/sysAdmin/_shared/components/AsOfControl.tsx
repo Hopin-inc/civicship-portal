@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent } from "react";
+import React, { ChangeEvent } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";

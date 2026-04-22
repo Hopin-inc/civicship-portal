@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";

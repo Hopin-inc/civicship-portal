@@ -1,3 +1,4 @@
+import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";
 import { cn } from "@/lib/utils";
