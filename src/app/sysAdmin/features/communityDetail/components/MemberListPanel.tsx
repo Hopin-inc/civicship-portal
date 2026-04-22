@@ -3,22 +3,22 @@
 import { useCallback, useEffect, useRef } from "react";
 import type { ApolloQueryResult } from "@apollo/client";
 import { List, type RowComponentProps } from "react-window";
-import type {
-  GqlGetSysAdminCommunityDetailQuery,
-  GqlSysAdminCommunityDetailInput,
-  GqlSysAdminMemberList,
-  GqlSysAdminMemberRow,
+import {
   GqlSysAdminUserSortField,
+  type GqlGetSysAdminCommunityDetailQuery,
+  type GqlSysAdminCommunityDetailInput,
+  type GqlSysAdminMemberList,
+  type GqlSysAdminMemberRow,
 } from "@/types/graphql";
 import { ChartCard } from "@/app/sysAdmin/_shared/components/ChartCard";
+import { MetricInfoButton } from "@/app/sysAdmin/_shared/components/MetricInfoButton";
+import { SendRateDot } from "@/app/sysAdmin/_shared/components/SendRateDot";
 import { Empty } from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
-import { toIntJa, toPct } from "@/app/sysAdmin/_shared/format/number";
 import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";
 import type { MemberFilter, MemberSort } from "../hooks/useDetailControls";
 import { useMemberListPagination } from "../hooks/useMemberListPagination";
-import { MemberFilters } from "./MemberFilters";
-import { MemberSortHeader } from "./MemberSortControls";
+import { MemberSortSelect } from "./MemberSortSelect";
 
 type Props = {
   memberList: GqlSysAdminMemberList | null;
@@ -26,7 +26,7 @@ type Props = {
   sort: MemberSort;
   onFilterChange: (next: MemberFilter) => void;
   onResetFilter: () => void;
-  onToggleSort: (field: GqlSysAdminUserSortField) => void;
+  onSortFieldChange: (field: GqlSysAdminUserSortField) => void;
   baseInput: GqlSysAdminCommunityDetailInput;
   fetchMore: (opts: {
     variables: { input: GqlSysAdminCommunityDetailInput };
@@ -34,8 +34,8 @@ type Props = {
   loading: boolean;
 };
 
-const ROW_HEIGHT = 56;
-const LIST_HEIGHT = 560;
+const ROW_HEIGHT = 60;
+const LIST_HEIGHT = 540;
 const PREFETCH_THRESHOLD = 10;
 
 function MemberRow({
@@ -50,27 +50,32 @@ function MemberRow({
       </div>
     );
   }
+  const tenure = `${sysAdminDashboardJa.detail.member.tenurePrefix}${row.monthsIn}${sysAdminDashboardJa.detail.member.tenureSuffix}`;
+  const sendRatePct = `${Math.round(row.userSendRate * 100)}%`;
   return (
     <div
-      className="flex items-center border-b px-3 py-2 text-sm"
+      className="flex items-center justify-between gap-3 border-b px-3 py-2"
       style={{ height: ROW_HEIGHT }}
     >
-      <div className="flex-1 truncate">{row.name ?? "-"}</div>
-      <div className="w-24 text-right tabular-nums">{toPct(row.userSendRate)}</div>
-      <div className="w-28 text-right tabular-nums">{toIntJa(row.totalPointsOut)}</div>
-      <div className="w-24 text-right tabular-nums">{toIntJa(row.donationOutMonths)}</div>
-      <div className="w-24 text-right tabular-nums">{toIntJa(row.monthsIn)}</div>
+      <div className="flex min-w-0 flex-col">
+        <span className="truncate text-sm font-medium">{row.name ?? "-"}</span>
+        <span className="text-xs text-muted-foreground">{tenure}</span>
+      </div>
+      <div className="flex items-center gap-1 tabular-nums">
+        <span className="text-sm font-medium">{sendRatePct}</span>
+        <SendRateDot rate={row.userSendRate} />
+      </div>
     </div>
   );
 }
 
 export function MemberListPanel({
   memberList,
-  filter,
+  filter: _filter,
   sort,
-  onFilterChange,
-  onResetFilter,
-  onToggleSort,
+  onFilterChange: _onFilterChange,
+  onResetFilter: _onResetFilter,
+  onSortFieldChange,
   baseInput,
   fetchMore,
   loading,
@@ -116,38 +121,35 @@ export function MemberListPanel({
 
   return (
     <ChartCard
-      title={sysAdminDashboardJa.detail.member.title}
+      title={
+        <span className="inline-flex items-center gap-2">
+          <span>{sysAdminDashboardJa.detail.member.title}</span>
+          <MetricInfoButton metricKey="userSendRate" />
+        </span>
+      }
       description={`${users.length}${hasNextPage ? "+" : ""} 件`}
+      actions={<MemberSortSelect field={sort.field} onChange={onSortFieldChange} />}
     >
-      <div className="flex flex-col gap-3">
-        <MemberFilters
-          value={filter}
-          onChange={onFilterChange}
-          onReset={onResetFilter}
-          disabled={loading && !memberList}
-        />
-        <div className="rounded-md border">
-          <MemberSortHeader sort={sort} onToggle={onToggleSort} />
-          {users.length === 0 && !loading ? (
-            <div className="p-6">
-              <Empty>{sysAdminDashboardJa.state.empty}</Empty>
-            </div>
-          ) : (
-            <List
-              rowCount={users.length}
-              rowHeight={ROW_HEIGHT}
-              rowComponent={MemberRow}
-              rowProps={{ users }}
-              onRowsRendered={handleRowsRendered}
-              style={{ height: LIST_HEIGHT }}
-            />
-          )}
-          {loadingMore && (
-            <div className="flex items-center justify-center p-2 text-xs text-muted-foreground">
-              {sysAdminDashboardJa.state.loading}
-            </div>
-          )}
-        </div>
+      <div className="rounded-md border">
+        {users.length === 0 && !loading ? (
+          <div className="p-6">
+            <Empty>{sysAdminDashboardJa.state.empty}</Empty>
+          </div>
+        ) : (
+          <List
+            rowCount={users.length}
+            rowHeight={ROW_HEIGHT}
+            rowComponent={MemberRow}
+            rowProps={{ users }}
+            onRowsRendered={handleRowsRendered}
+            style={{ height: LIST_HEIGHT }}
+          />
+        )}
+        {loadingMore && (
+          <div className="flex items-center justify-center p-2 text-xs text-muted-foreground">
+            {sysAdminDashboardJa.state.loading}
+          </div>
+        )}
       </div>
     </ChartCard>
   );

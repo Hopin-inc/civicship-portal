@@ -51,6 +51,7 @@ type Action =
   | { type: "setCohortMonths"; value: number }
   | { type: "setFilter"; value: MemberFilter }
   | { type: "setSort"; value: MemberSort }
+  | { type: "setSortField"; field: GqlSysAdminUserSortField }
   | { type: "toggleSort"; field: GqlSysAdminUserSortField }
   | { type: "resetFilter" }
   | { type: "reset" };
@@ -65,6 +66,11 @@ function reducer(state: DetailControlsState, action: Action): DetailControlsStat
       return { ...state, filter: action.value };
     case "setSort":
       return { ...state, sort: action.value };
+    case "setSortField":
+      return {
+        ...state,
+        sort: { field: action.field, order: GqlSysAdminSortOrder.Desc },
+      };
     case "toggleSort":
       if (state.sort.field === action.field) {
         return {
@@ -110,6 +116,10 @@ export function useDetailControls(initial?: Partial<DetailControlsState>) {
     (value: MemberSort) => dispatch({ type: "setSort", value }),
     [],
   );
+  const setSortField = useCallback(
+    (field: GqlSysAdminUserSortField) => dispatch({ type: "setSortField", field }),
+    [],
+  );
   const toggleSort = useCallback(
     (field: GqlSysAdminUserSortField) => dispatch({ type: "toggleSort", field }),
     [],
@@ -123,6 +133,7 @@ export function useDetailControls(initial?: Partial<DetailControlsState>) {
     setCohortMonths,
     setFilter,
     setSort,
+    setSortField,
     toggleSort,
     resetFilter,
     reset,

@@ -57,7 +57,7 @@ export function CommunityDashboardDetail({ communityId }: Props) {
         sort={detail.state.sort}
         onFilterChange={detail.setFilter}
         onResetFilter={detail.resetFilter}
-        onToggleSort={detail.toggleSort}
+        onSortFieldChange={detail.setSortField}
         baseInput={input}
         fetchMore={fetchMore}
         loading={loading}
