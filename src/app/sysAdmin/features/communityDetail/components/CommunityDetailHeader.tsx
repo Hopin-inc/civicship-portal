@@ -1,12 +1,14 @@
 import React from "react";
-import type { GqlSysAdminCommunitySummaryCard } from "@/types/graphql";
+import type {
+  GqlSysAdminCommunityAlerts,
+  GqlSysAdminCommunitySummaryCard,
+} from "@/types/graphql";
 import { PercentDelta } from "@/app/sysAdmin/_shared/components/PercentDelta";
 import { PrimaryAlertBadge } from "@/app/sysAdmin/_shared/components/PrimaryAlertBadge";
 import { MetricInfoButton } from "@/app/sysAdmin/_shared/components/MetricInfoButton";
 import { formatJstDate } from "@/app/sysAdmin/_shared/format/date";
 import { toCompactJa, toIntJa, toPct } from "@/app/sysAdmin/_shared/format/number";
 import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";
-import type { GqlSysAdminCommunityAlerts } from "@/types/graphql";
 
 type Props = {
   summary: GqlSysAdminCommunitySummaryCard;
