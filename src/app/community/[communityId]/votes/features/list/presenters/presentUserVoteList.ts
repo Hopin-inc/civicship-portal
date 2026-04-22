@@ -25,5 +25,9 @@ export function presentUserVoteList(
       myBallotLabel: node.myBallot?.option.label ?? null,
       isEligible: node.myEligibility?.eligible ?? true,
     }))
-    .sort((a, b) => (PHASE_ORDER[a.phase] ?? 9) - (PHASE_ORDER[b.phase] ?? 9));
+    .sort((a, b) => {
+      const phaseOrderDiff = (PHASE_ORDER[a.phase] ?? 9) - (PHASE_ORDER[b.phase] ?? 9);
+      if (phaseOrderDiff !== 0) return phaseOrderDiff;
+      return new Date(b.startsAt).getTime() - new Date(a.startsAt).getTime();
+    });
 }
