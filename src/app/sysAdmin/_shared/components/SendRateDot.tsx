@@ -10,11 +10,12 @@ export function classifySendRate(rate: number): SendRateTier {
   return "latent";
 }
 
+// StageColors と同じ palette を使う (視覚的に揃える)
 const COLOR: Record<SendRateTier, string> = {
-  habitual: "text-emerald-500",
-  regular: "text-amber-500",
-  occasional: "text-orange-400",
-  latent: "text-slate-300",
+  habitual: "text-emerald-600",
+  regular: "text-sky-500",
+  occasional: "text-violet-500",
+  latent: "text-slate-400",
 };
 
 type Props = {

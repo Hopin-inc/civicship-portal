@@ -12,10 +12,24 @@ export function selectPrimaryAlert(alerts: GqlSysAdminCommunityAlerts): AlertVar
   return null;
 }
 
-const STYLE: Record<AlertVariant, { dot: string; label: string }> = {
-  churnSpike: { dot: "bg-red-500", label: sysAdminDashboardJa.alerts.churnSpike },
-  activeDrop: { dot: "bg-amber-500", label: sysAdminDashboardJa.alerts.activeDrop },
-  noNewMembers: { dot: "bg-sky-500", label: sysAdminDashboardJa.alerts.noNewMembers },
+// critical signal としての視認性を上げるため tinted background に。
+// 50/200/700 の組み合わせで light-mode コントラスト 4.5:1 以上を確保。
+const STYLE: Record<AlertVariant, { container: string; dot: string; label: string }> = {
+  churnSpike: {
+    container: "bg-red-50 text-red-700 border-red-200",
+    dot: "bg-red-500",
+    label: sysAdminDashboardJa.alerts.churnSpike,
+  },
+  activeDrop: {
+    container: "bg-amber-50 text-amber-700 border-amber-200",
+    dot: "bg-amber-500",
+    label: sysAdminDashboardJa.alerts.activeDrop,
+  },
+  noNewMembers: {
+    container: "bg-sky-50 text-sky-700 border-sky-200",
+    dot: "bg-sky-500",
+    label: sysAdminDashboardJa.alerts.noNewMembers,
+  },
 };
 
 type Props = {
@@ -30,7 +44,8 @@ export function PrimaryAlertBadge({ alerts, className }: Props) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full border border-border px-2 py-0.5 text-xs",
+        "inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs font-medium",
+        s.container,
         className,
       )}
     >
