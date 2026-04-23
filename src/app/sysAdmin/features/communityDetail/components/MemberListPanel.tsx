@@ -10,7 +10,7 @@ import {
   type GqlSysAdminMemberList,
   type GqlSysAdminMemberRow,
 } from "@/types/graphql";
-import { ChartCard } from "@/app/sysAdmin/_shared/components/ChartCard";
+import { Panel } from "@/app/sysAdmin/_shared/components/Panel";
 import { EmptyChart } from "@/app/sysAdmin/_shared/components/EmptyChart";
 import { MetricInfoButton } from "@/app/sysAdmin/_shared/components/MetricInfoButton";
 import { SendRateDot } from "@/app/sysAdmin/_shared/components/SendRateDot";
@@ -157,7 +157,7 @@ export function MemberListPanel({
   }, [hasNextPage, loadingMore, users.length, loadMore]);
 
   return (
-    <ChartCard
+    <Panel
       title={
         <span className="inline-flex items-center gap-2">
           <span>{sysAdminDashboardJa.detail.member.title}</span>
@@ -186,6 +186,6 @@ export function MemberListPanel({
           </div>
         )}
       </div>
-    </ChartCard>
+    </Panel>
   );
 }

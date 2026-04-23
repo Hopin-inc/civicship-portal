@@ -47,11 +47,14 @@ export function CommunityDashboardDetail({ communityId }: Props) {
     detail.state.cohortMonths !== DETAIL_CONTROLS_DEFAULTS.cohortMonths ||
     !isFilterDefault(detail.state.filter);
 
+  const s = sysAdminDashboardJa.detail.sections;
+
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
+      {/* Header + controls */}
       <div className="flex flex-col gap-3">
         <CommunityDetailHeader summary={data.summary} alerts={data.alerts} />
-        <div className="flex flex-wrap items-end gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <AsOfControl value={dashboard.state.asOf} onChange={dashboard.setAsOf} />
           <SettingsDrawer
             tier1={dashboard.state.tier1}
@@ -67,26 +70,40 @@ export function CommunityDashboardDetail({ communityId }: Props) {
         </div>
       </div>
 
-      <StageDistributionPanel stages={data.stages} />
-      <MonthlyActivityPanel points={data.monthlyActivityTrend} />
-      <RetentionTrendPanel points={data.retentionTrend} />
-      <CohortRetentionPanel
-        points={data.cohortRetention}
-        cohortMonths={detail.state.cohortMonths}
-      />
-      <MemberListPanel
-        memberList={data.memberList}
-        filter={detail.state.filter}
-        sort={detail.state.sort}
-        tier1={dashboard.state.tier1}
-        tier2={dashboard.state.tier2}
-        onFilterChange={detail.setFilter}
-        onResetFilter={detail.resetFilter}
-        onSortFieldChange={detail.setSortField}
-        baseInput={input}
-        fetchMore={fetchMore}
-        loading={loading}
-      />
+      {/* Section: 今の状態 */}
+      <section className="flex flex-col gap-4 border-t pt-6">
+        <h2 className="text-sm font-medium text-muted-foreground">{s.snapshot}</h2>
+        <StageDistributionPanel stages={data.stages} />
+      </section>
+
+      {/* Section: 推移 */}
+      <section className="flex flex-col gap-6 border-t pt-6">
+        <h2 className="text-sm font-medium text-muted-foreground">{s.trends}</h2>
+        <MonthlyActivityPanel points={data.monthlyActivityTrend} />
+        <RetentionTrendPanel points={data.retentionTrend} />
+        <CohortRetentionPanel
+          points={data.cohortRetention}
+          cohortMonths={detail.state.cohortMonths}
+        />
+      </section>
+
+      {/* Section: メンバー */}
+      <section className="flex flex-col gap-4 border-t pt-6">
+        <h2 className="text-sm font-medium text-muted-foreground">{s.members}</h2>
+        <MemberListPanel
+          memberList={data.memberList}
+          filter={detail.state.filter}
+          sort={detail.state.sort}
+          tier1={dashboard.state.tier1}
+          tier2={dashboard.state.tier2}
+          onFilterChange={detail.setFilter}
+          onResetFilter={detail.resetFilter}
+          onSortFieldChange={detail.setSortField}
+          baseInput={input}
+          fetchMore={fetchMore}
+          loading={loading}
+        />
+      </section>
     </div>
   );
 }

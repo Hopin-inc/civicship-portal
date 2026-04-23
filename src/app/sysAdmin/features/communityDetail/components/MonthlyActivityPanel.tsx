@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import type { GqlSysAdminMonthlyActivityPoint } from "@/types/graphql";
-import { ChartCard } from "@/app/sysAdmin/_shared/components/ChartCard";
+import { Panel } from "@/app/sysAdmin/_shared/components/Panel";
 import {
   MonthlyActivityComposedChart,
   type MonthlyActivityDatum,
@@ -24,8 +24,8 @@ export function MonthlyActivityPanel({ points }: Props) {
   );
 
   return (
-    <ChartCard title={sysAdminDashboardJa.detail.monthly.title}>
+    <Panel title={sysAdminDashboardJa.detail.monthly.title}>
       <MonthlyActivityComposedChart data={data} />
-    </ChartCard>
+    </Panel>
   );
 }

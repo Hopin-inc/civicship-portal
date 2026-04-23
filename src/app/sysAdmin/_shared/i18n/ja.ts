@@ -39,6 +39,11 @@ export const sysAdminDashboardJa = {
   },
   detail: {
     title: "コミュニティ詳細",
+    sections: {
+      snapshot: "今の状態",
+      trends: "推移",
+      members: "メンバー",
+    },
     header: {
       memberSuffix: "人",
       donationSuffix: "pt",

@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import type { GqlSysAdminRetentionTrendPoint } from "@/types/graphql";
-import { ChartCard } from "@/app/sysAdmin/_shared/components/ChartCard";
+import { Panel } from "@/app/sysAdmin/_shared/components/Panel";
 import {
   RetentionWeeklyStackedChart,
   type RetentionWeeklyDatum,
@@ -25,8 +25,8 @@ export function RetentionTrendPanel({ points }: Props) {
   );
 
   return (
-    <ChartCard title={sysAdminDashboardJa.detail.retention.title}>
+    <Panel title={sysAdminDashboardJa.detail.retention.title}>
       <RetentionWeeklyStackedChart data={data} />
-    </ChartCard>
+    </Panel>
   );
 }
