@@ -1,8 +1,15 @@
 "use client";
 
 import React from "react";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 
 export type PeriodPreset =
   | "thisMonth"
@@ -25,9 +32,9 @@ type Option = {
 export const PERIOD_OPTIONS: readonly Option[] = [
   { value: "thisMonth", label: "今月", windowMonths: 1, asOfOffset: "today" },
   { value: "lastMonth", label: "先月", windowMonths: 1, asOfOffset: "lastMonthEnd" },
-  { value: "last3Months", label: "3ヶ月", windowMonths: 3, asOfOffset: "today" },
-  { value: "last6Months", label: "半年", windowMonths: 6, asOfOffset: "today" },
-  { value: "last1Year", label: "1年", windowMonths: 12, asOfOffset: "today" },
+  { value: "last3Months", label: "直近3ヶ月", windowMonths: 3, asOfOffset: "today" },
+  { value: "last6Months", label: "直近半年", windowMonths: 6, asOfOffset: "today" },
+  { value: "last1Year", label: "直近1年", windowMonths: 12, asOfOffset: "today" },
   { value: "allTime", label: "全期間", windowMonths: 36, asOfOffset: "today" },
 ] as const;
 
@@ -44,7 +51,7 @@ export function resolvePeriodToInput(preset: PeriodPreset): {
   if (opt.asOfOffset === "today") {
     return { asOf: null, windowMonths: opt.windowMonths };
   }
-  // lastMonthEnd: 先月の末日 23:59:59 JST
+  // lastMonthEnd: 先月末日 23:59:59 JST
   const now = new Date();
   const jst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
   const lastMonthEnd = new Date(
@@ -57,40 +64,47 @@ type Props = {
   value: PeriodPreset;
   onChange: (next: PeriodPreset) => void;
   disabled?: boolean;
+  id?: string;
   className?: string;
+  /** ラベル ("期間") を表示するか。デフォルト true */
+  showLabel?: boolean;
 };
 
 /**
- * 横並びの segmented button group。mobile では flex-wrap で自然に折り返す。
+ * shadcn Select を使った dropdown。MemberSortSelect と同じパターン。
+ * MetricGlossaryButton の隣に配置しても占有面積が小さく収まる。
  */
-export function PeriodPresetSelect({ value, onChange, disabled, className }: Props) {
+export function PeriodPresetSelect({
+  value,
+  onChange,
+  disabled,
+  id = "period-preset",
+  className,
+  showLabel = true,
+}: Props) {
   return (
-    <div
-      role="radiogroup"
-      aria-label="集計期間"
-      className={cn("inline-flex flex-wrap gap-1 rounded-md border p-0.5", className)}
-    >
-      {PERIOD_OPTIONS.map((opt) => {
-        const selected = opt.value === value;
-        return (
-          <Button
-            key={opt.value}
-            type="button"
-            role="radio"
-            aria-checked={selected}
-            variant={selected ? "secondary" : "ghost"}
-            size="sm"
-            className={cn(
-              "h-7 rounded-sm px-2.5 text-xs font-medium",
-              selected && "shadow-none",
-            )}
-            onClick={() => onChange(opt.value)}
-            disabled={disabled}
-          >
-            {opt.label}
-          </Button>
-        );
-      })}
+    <div className={cn("flex items-center gap-2", className)}>
+      {showLabel && (
+        <Label htmlFor={id} className="text-xs text-muted-foreground">
+          期間
+        </Label>
+      )}
+      <Select
+        value={value}
+        onValueChange={(v) => onChange(v as PeriodPreset)}
+        disabled={disabled}
+      >
+        <SelectTrigger id={id} className="h-9 w-32">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {PERIOD_OPTIONS.map((opt) => (
+            <SelectItem key={opt.value} value={opt.value}>
+              {opt.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   );
 }
