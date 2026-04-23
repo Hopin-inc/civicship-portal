@@ -3,6 +3,7 @@
 import React, { ChangeEvent } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { MetricInfoButton } from "@/app/sysAdmin/_shared/components/MetricInfoButton";
 import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";
 
 type Props = {
@@ -35,10 +36,11 @@ export function AsOfControl({ value, onChange, id = "asOf", disabled }: Props) {
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1">
       <Label htmlFor={id} className="text-xs text-muted-foreground">
         {sysAdminDashboardJa.controls.asOfLabel}
       </Label>
+      <MetricInfoButton metricKey="asOf" className="h-6 w-6" />
       <Input
         id={id}
         type="date"

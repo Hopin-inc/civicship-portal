@@ -49,6 +49,12 @@ export const METRIC_DEFINITIONS: Record<string, MetricDefinition> = {
       "habitual: send_rate >= tier1 / regular: tier2 <= send_rate < tier1 / occasional: 0 < send_rate < tier2 / latent: send_rate == 0",
     note: "デフォルト tier1=0.7, tier2=0.4。閾値は設定 Drawer から変更可能。",
   },
+  asOf: {
+    title: "集計日",
+    formula: "指定日時点の状態を計算対象にする",
+    note:
+      "画面上の稼働率・ステージ分布・コホート retention 等、すべての指標は この日時点のスナップショット。未指定時は今日 (実行時) を使う。",
+  },
 };
 
 export type MetricKey =
@@ -58,4 +64,5 @@ export type MetricKey =
   | "retainedSenders"
   | "churnedSenders"
   | "monthsIn"
-  | "stages";
+  | "stages"
+  | "asOf";

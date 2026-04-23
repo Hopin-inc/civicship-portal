@@ -15,7 +15,7 @@ describe("DashboardControls", () => {
         onReset={vi.fn()}
       />,
     );
-    expect(screen.getByLabelText("基準日")).toBeInTheDocument();
+    expect(screen.getByLabelText("集計日")).toBeInTheDocument();
     expect(screen.getByText("習慣化の閾値")).toBeInTheDocument();
     expect(screen.getByText("定期参加の閾値")).toBeInTheDocument();
   });
@@ -30,7 +30,7 @@ describe("DashboardControls", () => {
         onReset={vi.fn()}
       />,
     );
-    fireEvent.change(screen.getByLabelText("基準日"), {
+    fireEvent.change(screen.getByLabelText("集計日"), {
       target: { value: "2026-04-22" },
     });
     expect(onAsOfChange).toHaveBeenCalledWith(expect.stringMatching(/^2026-04-22T/));

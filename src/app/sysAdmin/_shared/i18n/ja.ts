@@ -10,7 +10,8 @@ export const sysAdminDashboardJa = {
     totalMembers: "総メンバー数",
   },
   controls: {
-    asOfLabel: "基準日",
+    asOfLabel: "集計日",
+    asOfHint: "すべての数値をこの日時点でスナップショット (未指定で今日)",
     tier1Label: "習慣化の閾値",
     tier2Label: "定期参加の閾値",
     windowMonthsLabel: "集計期間 (月)",

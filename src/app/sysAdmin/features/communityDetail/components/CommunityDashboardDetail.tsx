@@ -1,5 +1,7 @@
 "use client";
 
+import { useMemo } from "react";
+import useHeaderConfig from "@/hooks/useHeaderConfig";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { AsOfControl } from "@/app/sysAdmin/_shared/components/AsOfControl";
@@ -37,6 +39,18 @@ export function CommunityDashboardDetail({ communityId }: Props) {
     dashboardControls: dashboard.state,
     detailControls: detail.state,
   });
+
+  // Page header の title を community 名に差し替える (data 到達後)。
+  // 未到達時は「コミュニティ詳細」を暫定表示。
+  const headerConfig = useMemo(
+    () => ({
+      title: data?.communityName ?? sysAdminDashboardJa.detail.title,
+      showLogo: false,
+      showBackButton: true,
+    }),
+    [data?.communityName],
+  );
+  useHeaderConfig(headerConfig);
 
   if (loading && !data) return <LoadingIndicator />;
   if (error) return <ErrorState title={sysAdminDashboardJa.state.error} />;
