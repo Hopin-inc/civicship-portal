@@ -14,13 +14,6 @@ import {
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";
 import { toPct } from "@/app/sysAdmin/_shared/format/number";
@@ -29,10 +22,8 @@ import type { MemberFilter } from "../hooks/useDetailControls";
 type Props = {
   tier1: number;
   tier2: number;
-  cohortMonths: number;
   filter: MemberFilter;
   onThresholdsChange: (next: { tier1: number; tier2: number }) => void;
-  onCohortMonthsChange: (value: number) => void;
   onFilterChange: (next: MemberFilter) => void;
   onResetFilter: () => void;
   /**
@@ -54,10 +45,8 @@ function parseIntOrNull(raw: string): number | null {
 export function SettingsDrawer({
   tier1,
   tier2,
-  cohortMonths,
   filter,
   onThresholdsChange,
-  onCohortMonthsChange,
   onFilterChange,
   onResetFilter,
   hasNonDefaults,
@@ -65,7 +54,7 @@ export function SettingsDrawer({
   const [open, setOpen] = useState(false);
 
   // Filter は slider 連続操作が多いので 300ms debounce で immediate commit。
-  // tier / cohortMonths と挙動を揃えるため Apply ボタンは撤廃。
+  // tier と挙動を揃えるため Apply ボタンは撤廃。
   const [localFilter, setLocalFilter] = useState<MemberFilter>(filter);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onFilterChangeRef = useRef(onFilterChange);
@@ -89,11 +78,9 @@ export function SettingsDrawer({
 
   const t = sysAdminDashboardJa.controls;
   const f = sysAdminDashboardJa.detail.member.filters;
-  const c = sysAdminDashboardJa.detail.cohort.period;
 
   const filterMin = localFilter.minSendRate ?? 0;
   const filterMax = localFilter.maxSendRate ?? 1;
-  const cohortValue = String(cohortMonths);
 
   return (
     <Drawer open={open} onOpenChange={setOpen}>
@@ -149,23 +136,6 @@ export function SettingsDrawer({
                 }}
               />
             </div>
-          </section>
-
-          <section className="flex flex-col gap-2">
-            <Label htmlFor="drawer-cohort-months" className="text-sm font-medium">
-              {c.label}
-            </Label>
-            <Select value={cohortValue} onValueChange={(v) => onCohortMonthsChange(Number(v))}>
-              <SelectTrigger id="drawer-cohort-months">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="3">{c.m3}</SelectItem>
-                <SelectItem value="6">{c.m6}</SelectItem>
-                <SelectItem value="12">{c.m12}</SelectItem>
-                <SelectItem value="0">{c.all}</SelectItem>
-              </SelectContent>
-            </Select>
           </section>
 
           <section className="flex flex-col gap-3">

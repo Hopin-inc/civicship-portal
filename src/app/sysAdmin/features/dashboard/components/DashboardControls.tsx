@@ -2,14 +2,15 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { AsOfControl } from "@/app/sysAdmin/_shared/components/AsOfControl";
+import { PeriodPresetSelect } from "@/app/sysAdmin/_shared/components/PeriodPresetSelect";
 import { SegmentThresholdsControl } from "@/app/sysAdmin/_shared/components/SegmentThresholdsControl";
 import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";
 import type { DashboardControlsState } from "../hooks/useDashboardControls";
+import type { PeriodPreset } from "@/app/sysAdmin/_shared/components/PeriodPresetSelect";
 
 type Props = {
   state: DashboardControlsState;
-  onAsOfChange: (value: string | null) => void;
+  onPeriodChange: (value: PeriodPreset) => void;
   onThresholdsChange: (next: { tier1: number; tier2: number }) => void;
   onReset: () => void;
   disabled?: boolean;
@@ -17,14 +18,18 @@ type Props = {
 
 export function DashboardControls({
   state,
-  onAsOfChange,
+  onPeriodChange,
   onThresholdsChange,
   onReset,
   disabled,
 }: Props) {
   return (
-    <div className="flex flex-wrap items-center gap-4 md:gap-6">
-      <AsOfControl value={state.asOf} onChange={onAsOfChange} disabled={disabled} />
+    <div className="flex flex-wrap items-center gap-3 md:gap-4">
+      <PeriodPresetSelect
+        value={state.period}
+        onChange={onPeriodChange}
+        disabled={disabled}
+      />
       <SegmentThresholdsControl
         tier1={state.tier1}
         tier2={state.tier2}

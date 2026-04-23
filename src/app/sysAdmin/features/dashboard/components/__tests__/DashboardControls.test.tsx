@@ -2,38 +2,41 @@ import React from "react";
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { DashboardControls } from "../DashboardControls";
+import type { DashboardControlsState } from "../../hooks/useDashboardControls";
 
 describe("DashboardControls", () => {
-  const defaults = { asOf: null, tier1: 0.7, tier2: 0.4 };
+  const defaults: DashboardControlsState = {
+    period: "last3Months",
+    tier1: 0.7,
+    tier2: 0.4,
+  };
 
-  it("renders asOf input and threshold sliders", () => {
+  it("renders period preset and threshold sliders", () => {
     render(
       <DashboardControls
         state={defaults}
-        onAsOfChange={vi.fn()}
+        onPeriodChange={vi.fn()}
         onThresholdsChange={vi.fn()}
         onReset={vi.fn()}
       />,
     );
-    expect(screen.getByLabelText("集計日")).toBeInTheDocument();
+    expect(screen.getByRole("radiogroup", { name: "集計期間" })).toBeInTheDocument();
     expect(screen.getByText("習慣化の閾値")).toBeInTheDocument();
     expect(screen.getByText("定期参加の閾値")).toBeInTheDocument();
   });
 
-  it("fires onAsOfChange with ISO string when date input changes", () => {
-    const onAsOfChange = vi.fn();
+  it("fires onPeriodChange when a preset is clicked", () => {
+    const onPeriodChange = vi.fn();
     render(
       <DashboardControls
         state={defaults}
-        onAsOfChange={onAsOfChange}
+        onPeriodChange={onPeriodChange}
         onThresholdsChange={vi.fn()}
         onReset={vi.fn()}
       />,
     );
-    fireEvent.change(screen.getByLabelText("集計日"), {
-      target: { value: "2026-04-22" },
-    });
-    expect(onAsOfChange).toHaveBeenCalledWith(expect.stringMatching(/^2026-04-22T/));
+    fireEvent.click(screen.getByRole("radio", { name: "半年" }));
+    expect(onPeriodChange).toHaveBeenCalledWith("last6Months");
   });
 
   it("calls onReset when reset is clicked", () => {
@@ -41,7 +44,7 @@ describe("DashboardControls", () => {
     render(
       <DashboardControls
         state={defaults}
-        onAsOfChange={vi.fn()}
+        onPeriodChange={vi.fn()}
         onThresholdsChange={vi.fn()}
         onReset={onReset}
       />,

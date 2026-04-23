@@ -16,7 +16,7 @@ import { PlatformSummaryCards } from "./PlatformSummaryCards";
 
 export function DashboardOverview() {
   const router = useAppRouter();
-  const { state, setAsOf, setThresholds, reset } = useDashboardControls();
+  const { state, setPeriod, setThresholds, reset } = useDashboardControls();
   const { loading, error, platform, communities } = useDashboardOverview(state);
 
   const handleRowClick = useCallback(
@@ -34,7 +34,7 @@ export function DashboardOverview() {
         <div className="flex flex-wrap items-center gap-2">
           <DashboardControls
             state={state}
-            onAsOfChange={setAsOf}
+            onPeriodChange={setPeriod}
             onThresholdsChange={setThresholds}
             onReset={reset}
             disabled={loading && !platform}

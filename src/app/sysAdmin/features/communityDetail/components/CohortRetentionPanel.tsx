@@ -7,15 +7,15 @@ import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";
 
 type Props = {
   points: GqlSysAdminCohortRetentionPoint[];
-  /** Number of most-recent cohorts to display. 0 = show all available. */
-  cohortMonths: number;
 };
 
-export function CohortRetentionPanel({ points, cohortMonths }: Props) {
-  const chartData = useMemo(
-    () => buildCohortChartData(points, cohortMonths),
-    [points, cohortMonths],
-  );
+/**
+ * API が返す全コホートを描画する。表示する期間は Header の PeriodPreset が
+ * API 側 windowMonths を絞ることで制御されるため、このコンポーネントは
+ * slicing を行わない。
+ */
+export function CohortRetentionPanel({ points }: Props) {
+  const chartData = useMemo(() => buildCohortChartData(points, 0), [points]);
 
   return (
     <Panel title={sysAdminDashboardJa.detail.cohort.title}>

@@ -8,6 +8,7 @@ import {
   useGetSysAdminDashboardQuery,
 } from "@/types/graphql";
 import type { DashboardControlsState } from "./useDashboardControls";
+import { resolvePeriodToInput } from "@/app/sysAdmin/_shared/components/PeriodPresetSelect";
 
 export type DashboardOverviewResult = {
   loading: boolean;
@@ -20,10 +21,15 @@ export type DashboardOverviewResult = {
 export function useDashboardOverview(
   controls: DashboardControlsState,
 ): DashboardOverviewResult {
+  const { asOf: asOfIso } = useMemo(
+    () => resolvePeriodToInput(controls.period),
+    [controls.period],
+  );
+
   const { data, loading, error } = useGetSysAdminDashboardQuery({
     variables: {
       input: {
-        asOf: controls.asOf ? new Date(controls.asOf) : undefined,
+        asOf: asOfIso ? new Date(asOfIso) : undefined,
         segmentThresholds: {
           tier1: controls.tier1,
           tier2: controls.tier2,

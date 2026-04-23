@@ -15,14 +15,11 @@ export type MemberSort = {
   order: GqlSysAdminSortOrder;
 };
 
+/**
+ * L2 detail 固有のセッション state。window/cohort 期間は Header の
+ * PeriodPreset に統合されたためここには持たない。
+ */
 export type DetailControlsState = {
-  windowMonths: number;
-  /**
-   * Number of most-recent cohorts to display in the cohort retention chart.
-   * 0 = show all returned by API (capped by `windowMonths` server-side).
-   * UI-side slice only — does NOT affect API request.
-   */
-  cohortMonths: number;
   filter: MemberFilter;
   sort: MemberSort;
 };
@@ -40,15 +37,11 @@ const DEFAULT_SORT: MemberSort = {
 };
 
 const DEFAULTS: DetailControlsState = {
-  windowMonths: 10,
-  cohortMonths: 12,
   filter: DEFAULT_FILTER,
   sort: DEFAULT_SORT,
 };
 
 type Action =
-  | { type: "setWindowMonths"; value: number }
-  | { type: "setCohortMonths"; value: number }
   | { type: "setFilter"; value: MemberFilter }
   | { type: "setSort"; value: MemberSort }
   | { type: "setSortField"; field: GqlSysAdminUserSortField }
@@ -58,10 +51,6 @@ type Action =
 
 function reducer(state: DetailControlsState, action: Action): DetailControlsState {
   switch (action.type) {
-    case "setWindowMonths":
-      return { ...state, windowMonths: action.value };
-    case "setCohortMonths":
-      return { ...state, cohortMonths: action.value };
     case "setFilter":
       return { ...state, filter: action.value };
     case "setSort":
@@ -100,14 +89,6 @@ function reducer(state: DetailControlsState, action: Action): DetailControlsStat
 export function useDetailControls(initial?: Partial<DetailControlsState>) {
   const [state, dispatch] = useReducer(reducer, { ...DEFAULTS, ...initial });
 
-  const setWindowMonths = useCallback(
-    (value: number) => dispatch({ type: "setWindowMonths", value }),
-    [],
-  );
-  const setCohortMonths = useCallback(
-    (value: number) => dispatch({ type: "setCohortMonths", value }),
-    [],
-  );
   const setFilter = useCallback(
     (value: MemberFilter) => dispatch({ type: "setFilter", value }),
     [],
@@ -129,8 +110,6 @@ export function useDetailControls(initial?: Partial<DetailControlsState>) {
 
   return {
     state,
-    setWindowMonths,
-    setCohortMonths,
     setFilter,
     setSort,
     setSortField,

@@ -56,7 +56,5 @@ const points = [
   }),
 ];
 
-export const ShowAll: Story = { args: { points, cohortMonths: 0 } };
-export const Last3Months: Story = { args: { points, cohortMonths: 3 } };
-export const Last6Months: Story = { args: { points, cohortMonths: 6 } };
-export const Empty: Story = { args: { points: [], cohortMonths: 12 } };
+export const Default: Story = { args: { points } };
+export const Empty: Story = { args: { points: [] } };

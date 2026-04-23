@@ -10,7 +10,6 @@ import {
 describe("useDetailControls", () => {
   it("initializes with defaults", () => {
     const { result } = renderHook(() => useDetailControls());
-    expect(result.current.state.windowMonths).toBe(10);
     expect(result.current.state.filter).toEqual(DEFAULT_MEMBER_FILTER);
     expect(result.current.state.sort).toEqual(DEFAULT_MEMBER_SORT);
   });
@@ -64,9 +63,4 @@ describe("useDetailControls", () => {
     expect(result.current.state.filter).toEqual(DEFAULT_MEMBER_FILTER);
   });
 
-  it("setWindowMonths updates the window", () => {
-    const { result } = renderHook(() => useDetailControls());
-    act(() => result.current.setWindowMonths(6));
-    expect(result.current.state.windowMonths).toBe(6);
-  });
 });

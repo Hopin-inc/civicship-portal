@@ -24,36 +24,28 @@ type Story = StoryObj<typeof SettingsDrawer>;
 function Stateful({
   initialTier1 = 0.7,
   initialTier2 = 0.4,
-  initialCohortMonths = 12,
   initialFilter = DEFAULT_MEMBER_FILTER,
 }: {
   initialTier1?: number;
   initialTier2?: number;
-  initialCohortMonths?: number;
   initialFilter?: MemberFilter;
 }) {
   const [tier1, setTier1] = useState(initialTier1);
   const [tier2, setTier2] = useState(initialTier2);
-  const [cohortMonths, setCohortMonths] = useState(initialCohortMonths);
   const [filter, setFilter] = useState<MemberFilter>(initialFilter);
 
   const hasNonDefaults =
-    tier1 !== 0.7 ||
-    tier2 !== 0.4 ||
-    cohortMonths !== 12 ||
-    filter !== DEFAULT_MEMBER_FILTER;
+    tier1 !== 0.7 || tier2 !== 0.4 || filter !== DEFAULT_MEMBER_FILTER;
 
   return (
     <SettingsDrawer
       tier1={tier1}
       tier2={tier2}
-      cohortMonths={cohortMonths}
       filter={filter}
       onThresholdsChange={(v) => {
         setTier1(v.tier1);
         setTier2(v.tier2);
       }}
-      onCohortMonthsChange={setCohortMonths}
       onFilterChange={setFilter}
       onResetFilter={() => setFilter(DEFAULT_MEMBER_FILTER)}
       hasNonDefaults={hasNonDefaults}

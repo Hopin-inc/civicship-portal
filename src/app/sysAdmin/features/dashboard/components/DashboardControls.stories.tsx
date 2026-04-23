@@ -16,23 +16,29 @@ function Stateful({ initial }: { initial: DashboardControlsState }) {
   return (
     <DashboardControls
       state={state}
-      onAsOfChange={(asOf) => setState((p) => ({ ...p, asOf }))}
+      onPeriodChange={(period) => setState((p) => ({ ...p, period }))}
       onThresholdsChange={(v) => setState((p) => ({ ...p, ...v }))}
-      onReset={() => setState({ asOf: null, tier1: 0.7, tier2: 0.4 })}
+      onReset={() => setState({ period: "last3Months", tier1: 0.7, tier2: 0.4 })}
     />
   );
 }
 
 export const Default: Story = {
   render: () => (
-    <Stateful initial={{ asOf: null, tier1: 0.7, tier2: 0.4 }} />
+    <Stateful initial={{ period: "last3Months", tier1: 0.7, tier2: 0.4 }} />
+  ),
+};
+
+export const LastMonthSelected: Story = {
+  render: () => (
+    <Stateful initial={{ period: "lastMonth", tier1: 0.7, tier2: 0.4 }} />
   ),
 };
 
 export const CustomThresholds: Story = {
   render: () => (
     <Stateful
-      initial={{ asOf: "2026-04-22T00:00:00Z", tier1: 0.85, tier2: 0.5 }}
+      initial={{ period: "last1Year", tier1: 0.85, tier2: 0.5 }}
     />
   ),
 };

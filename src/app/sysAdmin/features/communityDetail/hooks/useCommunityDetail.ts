@@ -9,6 +9,7 @@ import {
   useGetSysAdminCommunityDetailQuery,
 } from "@/types/graphql";
 import type { DashboardControlsState } from "@/app/sysAdmin/features/dashboard/hooks/useDashboardControls";
+import { resolvePeriodToInput } from "@/app/sysAdmin/_shared/components/PeriodPresetSelect";
 import type { DetailControlsState } from "./useDetailControls";
 
 type Args = {
@@ -35,15 +36,16 @@ export function useCommunityDetail({
   detailControls,
   limit = 50,
 }: Args): CommunityDetailResult {
-  const input = useMemo<GqlSysAdminCommunityDetailInput>(
-    () => ({
+  const input = useMemo<GqlSysAdminCommunityDetailInput>(() => {
+    const { asOf, windowMonths } = resolvePeriodToInput(dashboardControls.period);
+    return {
       communityId,
-      asOf: dashboardControls.asOf ? new Date(dashboardControls.asOf) : undefined,
+      asOf: asOf ? new Date(asOf) : undefined,
       segmentThresholds: {
         tier1: dashboardControls.tier1,
         tier2: dashboardControls.tier2,
       },
-      windowMonths: detailControls.windowMonths,
+      windowMonths,
       userFilter: {
         minSendRate: detailControls.filter.minSendRate ?? undefined,
         maxSendRate: detailControls.filter.maxSendRate ?? undefined,
@@ -55,9 +57,8 @@ export function useCommunityDetail({
         order: detailControls.sort.order,
       },
       limit,
-    }),
-    [communityId, dashboardControls, detailControls, limit],
-  );
+    };
+  }, [communityId, dashboardControls, detailControls, limit]);
 
   const { data, loading, error, fetchMore, refetch } = useGetSysAdminCommunityDetailQuery({
     variables: { input },
