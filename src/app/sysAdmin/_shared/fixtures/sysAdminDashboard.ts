@@ -16,8 +16,6 @@ import type {
   GqlSysAdminStageDistribution,
 } from "@/types/graphql";
 
-type Partial<T> = { [K in keyof T]?: T[K] };
-
 export const makeAlerts = (
   overrides: Partial<GqlSysAdminCommunityAlerts> = {},
 ): GqlSysAdminCommunityAlerts => ({

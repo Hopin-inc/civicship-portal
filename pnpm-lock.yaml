@@ -355,9 +355,6 @@ importers:
       '@types/react-linkify':
         specifier: ^1.0.4
         version: 1.0.4
-      '@types/react-window':
-        specifier: ^2.0.0
-        version: 2.0.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@types/retry':
         specifier: ^0.12.5
         version: 0.12.5
@@ -4383,10 +4380,6 @@ packages:
 
   '@types/react-linkify@1.0.4':
     resolution: {integrity: sha512-NOMw4X3kjvjY0lT5kXQdxZCXpPNi2hOuuqG+Kz+5EOQpi9rDUJJDitdE1j2JRNmrTnNIjrLnYG0HKyuOWN/uKA==}
-
-  '@types/react-window@2.0.0':
-    resolution: {integrity: sha512-E8hMDtImEpMk1SjswSvqoSmYvk7GEtyVaTa/GJV++FdDNuMVVEzpAClyJ0nqeKYBrMkGiyH6M1+rPLM0Nu1exQ==}
-    deprecated: This is a stub types definition. react-window provides its own type definitions, so you do not need this installed.
 
   '@types/react@18.3.23':
     resolution: {integrity: sha512-/LDXMQh55EzZQ0uVAZmKKhfENivEvWz6E+EYzh+/MCjMhNsotd+ZHhBGIjFDTi6+fz0OhQQQLbTgdQIxxCsC0w==}
@@ -13795,13 +13788,6 @@ snapshots:
   '@types/react-linkify@1.0.4':
     dependencies:
       '@types/react': 18.3.23
-
-  '@types/react-window@2.0.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
-    dependencies:
-      react-window: 2.2.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-    transitivePeerDependencies:
-      - react
-      - react-dom
 
   '@types/react@18.3.23':
     dependencies:

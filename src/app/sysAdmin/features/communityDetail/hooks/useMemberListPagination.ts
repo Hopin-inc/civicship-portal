@@ -20,14 +20,22 @@ export function useMemberListPagination<
   // これにより MemberListPanel 側の useCallback / useEffect が各依存の参照変化で
   // 不要に再生成されるのを防ぎ、react-window の onRowsRendered に渡すハンドラが
   // 安定する。
-  const latestRef = useRef({ hasNextPage, nextCursor, fetchMore, baseVariables, loadingMore });
+  const latestRef = useRef({ hasNextPage, nextCursor, fetchMore, baseVariables });
   useEffect(() => {
-    latestRef.current = { hasNextPage, nextCursor, fetchMore, baseVariables, loadingMore };
+    latestRef.current = { hasNextPage, nextCursor, fetchMore, baseVariables };
   });
 
+  // setLoadingMore は非同期更新のため、高頻度スクロール等で loadMore が
+  // 並列に呼ばれると `loadingMore` の read-before-write で同じ cursor の
+  // fetchMore が重複発火する可能性がある。Apollo merge は不変に append するので
+  // 重複 user が混入する。同期的な ref フラグで先に弾いておく。
+  const inflightRef = useRef(false);
+
   const loadMore = useCallback(async () => {
+    if (inflightRef.current) return;
     const snap = latestRef.current;
-    if (!snap.hasNextPage || !snap.nextCursor || snap.loadingMore) return;
+    if (!snap.hasNextPage || !snap.nextCursor) return;
+    inflightRef.current = true;
     setLoadingMore(true);
     try {
       await snap.fetchMore({
@@ -36,6 +44,7 @@ export function useMemberListPagination<
         },
       });
     } finally {
+      inflightRef.current = false;
       setLoadingMore(false);
     }
   }, []);

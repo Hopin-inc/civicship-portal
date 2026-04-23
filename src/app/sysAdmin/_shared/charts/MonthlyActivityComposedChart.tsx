@@ -58,9 +58,10 @@ export function MonthlyActivityComposedChart({ data, height = 240 }: Props) {
             width={36}
           />
           <Tooltip
-            formatter={(value, name) => {
+            formatter={(value, _name, item) => {
               const n = typeof value === "number" ? value : Number(value ?? 0);
-              if (name === sysAdminDashboardJa.detail.monthly.activityRate) return toPct(n);
+              // i18n 文言を比較すると文言変更で壊れるため、安定した dataKey で判定
+              if (item?.dataKey === "communityActivityRate") return toPct(n);
               return n.toLocaleString("ja-JP");
             }}
           />

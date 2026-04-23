@@ -12,7 +12,6 @@ import {
 } from "@/types/graphql";
 import { EmptyChart } from "@/app/sysAdmin/_shared/components/EmptyChart";
 import { SendRateDot } from "@/app/sysAdmin/_shared/components/SendRateDot";
-import { Skeleton } from "@/components/ui/skeleton";
 import { toCompactJa, toIntJa } from "@/app/sysAdmin/_shared/format/number";
 import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";
 import type { MemberSort } from "../hooks/useDetailControls";
@@ -70,14 +69,8 @@ function MemberRow({
   tier1,
   tier2,
 }: RowComponentProps<RowProps>) {
-  const row = users[index];
-  if (!row) {
-    return (
-      <div className="flex items-center border-b px-3 py-2" style={{ height: ROW_HEIGHT }}>
-        <Skeleton className="h-4 w-full" />
-      </div>
-    );
-  }
+  // rowCount === users.length で運用しているので users[index] は必ず定義済み。
+  const row = users[index]!;
   const meta = formatMetaForSort(row, sortField);
   const sendRatePct = `${Math.round(row.userSendRate * 100)}%`;
   return (
