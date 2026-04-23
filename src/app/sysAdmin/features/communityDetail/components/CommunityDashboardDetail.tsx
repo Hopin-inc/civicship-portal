@@ -6,31 +6,22 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { MetricGlossaryButton } from "@/app/sysAdmin/_shared/components/MetricGlossary";
 import { PeriodPresetSelect } from "@/app/sysAdmin/_shared/components/PeriodPresetSelect";
-import { useDashboardControls, DASHBOARD_CONTROLS_DEFAULTS } from "@/app/sysAdmin/features/dashboard/hooks/useDashboardControls";
+import { useDashboardControls } from "@/app/sysAdmin/features/dashboard/hooks/useDashboardControls";
 import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";
-import { DEFAULT_MEMBER_FILTER, useDetailControls } from "../hooks/useDetailControls";
+import { useDetailControls } from "../hooks/useDetailControls";
 import { useCommunityDetail } from "../hooks/useCommunityDetail";
 import { CommunityDetailHeader } from "./CommunityDetailHeader";
 import { StageDistributionPanel } from "./StageDistributionPanel";
 import { MonthlyActivityPanel } from "./MonthlyActivityPanel";
 import { RetentionTrendPanel } from "./RetentionTrendPanel";
 import { CohortRetentionPanel } from "./CohortRetentionPanel";
+import { MemberFilterPopover } from "./MemberFilterPopover";
 import { MemberListPanel } from "./MemberListPanel";
 import { MemberSortSelect } from "./MemberSortSelect";
-import { SettingsDrawer } from "./SettingsDrawer";
 
 type Props = {
   communityId: string;
 };
-
-function isFilterDefault(filter: typeof DEFAULT_MEMBER_FILTER): boolean {
-  return (
-    filter.minSendRate === DEFAULT_MEMBER_FILTER.minSendRate &&
-    filter.maxSendRate === DEFAULT_MEMBER_FILTER.maxSendRate &&
-    filter.minDonationOutMonths === DEFAULT_MEMBER_FILTER.minDonationOutMonths &&
-    filter.minMonthsIn === DEFAULT_MEMBER_FILTER.minMonthsIn
-  );
-}
 
 export function CommunityDashboardDetail({ communityId }: Props) {
   const dashboard = useDashboardControls();
@@ -55,11 +46,6 @@ export function CommunityDashboardDetail({ communityId }: Props) {
   if (error) return <ErrorState title={sysAdminDashboardJa.state.error} />;
   if (!data) return null;
 
-  const hasNonDefaults =
-    dashboard.state.tier1 !== DASHBOARD_CONTROLS_DEFAULTS.tier1 ||
-    dashboard.state.tier2 !== DASHBOARD_CONTROLS_DEFAULTS.tier2 ||
-    !isFilterDefault(detail.state.filter);
-
   const s = sysAdminDashboardJa.detail.sections;
   const totalMembers = data.memberList.users.length;
   const memberCountLabel = `${totalMembers}${data.memberList.hasNextPage ? "+" : ""} 件`;
@@ -76,21 +62,17 @@ export function CommunityDashboardDetail({ communityId }: Props) {
               onChange={dashboard.setPeriod}
             />
             <MetricGlossaryButton />
-            <SettingsDrawer
-              tier1={dashboard.state.tier1}
-              tier2={dashboard.state.tier2}
-              filter={detail.state.filter}
-              onThresholdsChange={dashboard.setThresholds}
-              onFilterChange={detail.setFilter}
-              onResetFilter={detail.resetFilter}
-              hasNonDefaults={hasNonDefaults}
-            />
           </>
         }
       />
 
       <div className="border-t pt-6">
-        <StageDistributionPanel stages={data.stages} />
+        <StageDistributionPanel
+          stages={data.stages}
+          tier1={dashboard.state.tier1}
+          tier2={dashboard.state.tier2}
+          onThresholdsChange={dashboard.setThresholds}
+        />
       </div>
 
       <section className="flex flex-col gap-6 border-t pt-6">
@@ -106,7 +88,14 @@ export function CommunityDashboardDetail({ communityId }: Props) {
             <h2 className="text-base font-semibold">{s.members}</h2>
             <span className="text-xs text-muted-foreground">{memberCountLabel}</span>
           </div>
-          <MemberSortSelect field={detail.state.sort.field} onChange={detail.setSortField} />
+          <div className="flex items-center gap-2">
+            <MemberFilterPopover
+              value={detail.state.filter}
+              onChange={detail.setFilter}
+              onReset={detail.resetFilter}
+            />
+            <MemberSortSelect field={detail.state.sort.field} onChange={detail.setSortField} />
+          </div>
         </div>
         <MemberListPanel
           memberList={data.memberList}

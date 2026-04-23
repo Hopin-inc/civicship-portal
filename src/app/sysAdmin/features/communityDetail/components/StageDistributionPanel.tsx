@@ -4,9 +4,13 @@ import { StageDot, STAGE_KEYS, type StageKey } from "@/app/sysAdmin/_shared/comp
 import { StageProgressBar } from "@/app/sysAdmin/_shared/components/StageProgressBar";
 import { toIntJa, toPct } from "@/app/sysAdmin/_shared/format/number";
 import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";
+import { TierThresholdsPopover } from "./TierThresholdsPopover";
 
 type Props = {
   stages: GqlSysAdminStageDistribution | null;
+  tier1: number;
+  tier2: number;
+  onThresholdsChange: (next: { tier1: number; tier2: number }) => void;
 };
 
 /**
@@ -15,15 +19,25 @@ type Props = {
  * dashboard 概況の密度を損なうため廃止。詳細は必要なら MemberListPanel
  * で個別確認できる。
  */
-export function StageDistributionPanel({ stages }: Props) {
+export function StageDistributionPanel({
+  stages,
+  tier1,
+  tier2,
+  onThresholdsChange,
+}: Props) {
   const labels = sysAdminDashboardJa.detail.stages;
+
+  const headerContent = (
+    <header className="flex items-center justify-between gap-2">
+      <h3 className="text-base font-semibold">{labels.title}</h3>
+      <TierThresholdsPopover tier1={tier1} tier2={tier2} onChange={onThresholdsChange} />
+    </header>
+  );
 
   if (!stages) {
     return (
       <section className="flex flex-col gap-2">
-        <header className="flex items-center gap-2">
-          <h3 className="text-base font-semibold">{labels.title}</h3>
-        </header>
+        {headerContent}
         <div className="min-h-[80px]" />
       </section>
     );
@@ -38,9 +52,7 @@ export function StageDistributionPanel({ stages }: Props) {
 
   return (
     <section className="flex flex-col gap-3">
-      <header className="flex items-center gap-2">
-        <h3 className="text-base font-semibold">{labels.title}</h3>
-      </header>
+      {headerContent}
 
       <StageProgressBar counts={counts} showLabels={false} />
 
