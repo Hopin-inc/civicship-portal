@@ -22,11 +22,13 @@ export function classifySendRate(
   return "latent";
 }
 
-// StageColors と同じ palette を使う (視覚的に揃える)
+// StageColors と同じ palette を使う (視覚的に揃える)。
+// habitual/regular が「達成層」、occasional/latent が「未達層」として
+// slate で muted 扱い。
 const COLOR: Record<SendRateTier, string> = {
   habitual: "text-emerald-600",
   regular: "text-sky-500",
-  occasional: "text-violet-500",
+  occasional: "text-slate-400",
   latent: "text-slate-400",
 };
 

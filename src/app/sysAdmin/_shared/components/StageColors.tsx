@@ -1,21 +1,21 @@
 import React from "react";
 
-// カテゴリカルな 4 色。amber/orange の近似を避け、各ステージが 375px 幅の
-// 積み棒でも視覚的に区別できるよう distinct hues を採用。WCAG AA (3:1 以上)
-// を white 背景に対して意識 — latent は slate-400 まで暗くして薄過ぎる問題を
-// 回避 (旧 slate-300 は 1.5:1 で fail)。
+// 情報階層: 「達成ステージ (習慣化/定期) には色を割り当てて視線を引き、
+// 受動ステージ (散発/潜在) は muted な slate で背景扱い」。
+// 4 色を distinct hue で分けるより「達成 vs 未達」の二分軸が admin の
+// 読みやすさに直結するため、occasional/latent は slate 系に統一した。
 const STAGE_DOT_COLORS = {
   habitual: "text-emerald-600",
   regular: "text-sky-500",
-  occasional: "text-violet-500",
+  occasional: "text-slate-400",
   latent: "text-slate-400",
 } as const;
 
 export const STAGE_BG_COLORS = {
   habitual: "bg-emerald-600",
   regular: "bg-sky-500",
-  occasional: "bg-violet-500",
-  latent: "bg-slate-300",
+  occasional: "bg-slate-300",
+  latent: "bg-slate-200",
 } as const;
 
 export type StageKey = keyof typeof STAGE_DOT_COLORS;

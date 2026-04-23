@@ -54,7 +54,10 @@ export function StageDistributionPanel({
     <section className="flex flex-col gap-3">
       {headerContent}
 
-      <StageProgressBar counts={counts} showLabels={false} />
+      {/* Bar はパネル全幅に伸ばさず、ほどよい幅で左寄せに留める */}
+      <div className="w-full max-w-md">
+        <StageProgressBar counts={counts} showLabels={false} />
+      </div>
 
       <ul className="flex flex-wrap gap-x-4 gap-y-1.5 text-sm">
         {STAGE_KEYS.map((stage) => (
