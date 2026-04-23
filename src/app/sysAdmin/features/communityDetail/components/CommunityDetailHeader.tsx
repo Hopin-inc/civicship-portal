@@ -5,49 +5,49 @@ import type {
 } from "@/types/graphql";
 import { PercentDelta } from "@/app/sysAdmin/_shared/components/PercentDelta";
 import { PrimaryAlertBadge } from "@/app/sysAdmin/_shared/components/PrimaryAlertBadge";
-import { formatJstMonth } from "@/app/sysAdmin/_shared/format/date";
 import { toCompactJa, toIntJa, toPct } from "@/app/sysAdmin/_shared/format/number";
 import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";
 
 type Props = {
   summary: GqlSysAdminCommunitySummaryCard;
   alerts: GqlSysAdminCommunityAlerts;
-  /**
-   * 右肩に寄せるコントロール群 (AsOf + SettingsDrawer 等)。
-   * 見出しと同じ行に並ぶことでヘッダ内部に収め、別 row として
-   * 浮遊しないようにする。
-   */
   controls?: ReactNode;
 };
 
+type SubMetric = {
+  label: string;
+  value: string;
+};
+
 /**
- * コミュニティ名は page header (useHeaderConfig) 側で扱うためここでは表示しない。
- * 3 行構成:
- * - Row 1: アラートバッジ (左) / コントロール (右)
- * - Row 2: 主指標 (3xl 稼働率) + ⓘ + 前月比 +N.N% + 3ヶ月平均 N.N%
- * - Row 3: primary meta (人数 + 発足月)
- * - Row 4: tertiary meta (累計/chain) — 更に muted で背景情報扱い
+ * Header layout:
+ * - Row 1: alert (左) / controls (右)
+ * - Row 2: 稼働率 text-5xl bold + PercentDelta (label なし inline 右)
+ * - Row 3: sub-metrics grid (label 上 muted / 値 下 bold) で並列整列
+ *
+ * 旧構成で散らばっていた 3ヶ月平均・発足月は削除、累計pt と最大 chain だけを
+ * 人数と並列で表示。サブ指標は全部同じフォーマットに揃えて読みやすさを確保。
  */
 export function CommunityDetailHeader({ summary, alerts, controls }: Props) {
   const t = sysAdminDashboardJa.detail.header;
 
-  const primaryMeta = [
-    `${toIntJa(summary.totalMembers)}${t.memberSuffix}`,
-    summary.dataFrom ? `発足 ${formatJstMonth(summary.dataFrom)}` : null,
-  ].filter(Boolean) as string[];
-
-  const tertiaryMeta: string[] = [
-    `累計 ${toCompactJa(summary.totalDonationPointsAllTime)}${t.donationSuffix}`,
+  const subMetrics: SubMetric[] = [
+    { label: "メンバー", value: `${toIntJa(summary.totalMembers)}${t.memberSuffix}` },
+    {
+      label: "累計",
+      value: `${toCompactJa(summary.totalDonationPointsAllTime)}${t.donationSuffix}`,
+    },
   ];
   if (summary.maxChainDepthAllTime != null) {
-    tertiaryMeta.push(
-      `${t.chainPrefix} ${summary.maxChainDepthAllTime}${t.chainSuffix}`,
-    );
+    subMetrics.push({
+      label: t.chainPrefix,
+      value: `${summary.maxChainDepthAllTime}${t.chainSuffix}`,
+    });
   }
 
   return (
-    <header className="flex flex-col gap-3">
-      {/* Row 1: alert + controls (名前は page header に移したのでここでは出さない) */}
+    <header className="flex flex-col gap-4">
+      {/* Row 1: alert + controls */}
       {(alerts || controls) && (
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-h-[1.5rem]">
@@ -57,36 +57,24 @@ export function CommunityDetailHeader({ summary, alerts, controls }: Props) {
         </div>
       )}
 
-      {/* Row 2: primary metric inline with labels */}
+      {/* Row 2: 主指標 */}
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-        <span className="text-3xl font-semibold tabular-nums">
+        <span className="text-5xl font-bold tabular-nums leading-tight">
           {toPct(summary.communityActivityRate)}
         </span>
-        <span className="text-sm text-muted-foreground">
-          {t.growth}{" "}
-          <PercentDelta value={summary.growthRateActivity} className="font-normal" />
-        </span>
-        <span className="text-sm text-muted-foreground">
-          {t.threeMonthAvg} {toPct(summary.communityActivityRate3mAvg)}
-        </span>
+        <PercentDelta value={summary.growthRateActivity} className="text-lg" />
       </div>
 
-      {/* Row 3: primary meta (人数 + 発足) */}
-      {primaryMeta.length > 0 && (
-        <ul className="flex flex-wrap gap-x-3 gap-y-1 text-sm text-muted-foreground">
-          {primaryMeta.map((item) => (
-            <li key={item}>{item}</li>
+      {/* Row 3: sub-metrics grid */}
+      {subMetrics.length > 0 && (
+        <dl className="flex flex-wrap gap-x-8 gap-y-2">
+          {subMetrics.map((m) => (
+            <div key={m.label} className="flex flex-col gap-0.5">
+              <dt className="text-xs text-muted-foreground">{m.label}</dt>
+              <dd className="text-lg font-semibold tabular-nums">{m.value}</dd>
+            </div>
           ))}
-        </ul>
-      )}
-
-      {/* Row 4: tertiary meta (累計・chain — より muted) */}
-      {tertiaryMeta.length > 0 && (
-        <ul className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground/80">
-          {tertiaryMeta.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
+        </dl>
       )}
     </header>
   );
