@@ -1,6 +1,5 @@
 import React from "react";
 import type { GqlSysAdminStageDistribution } from "@/types/graphql";
-import { MetricInfoButton } from "@/app/sysAdmin/_shared/components/MetricInfoButton";
 import { StageDot, STAGE_KEYS, type StageKey } from "@/app/sysAdmin/_shared/components/StageColors";
 import { StageProgressBar } from "@/app/sysAdmin/_shared/components/StageProgressBar";
 import { toIntJa, toPct } from "@/app/sysAdmin/_shared/format/number";
@@ -24,7 +23,6 @@ export function StageDistributionPanel({ stages }: Props) {
       <section className="flex flex-col gap-2">
         <header className="flex items-center gap-2">
           <h3 className="text-base font-semibold">{labels.title}</h3>
-          <MetricInfoButton metricKey="stages" />
         </header>
         <div className="min-h-[80px]" />
       </section>
@@ -42,7 +40,6 @@ export function StageDistributionPanel({ stages }: Props) {
     <section className="flex flex-col gap-3">
       <header className="flex items-center gap-2">
         <h3 className="text-base font-semibold">{labels.title}</h3>
-        <MetricInfoButton metricKey="stages" />
       </header>
 
       <StageProgressBar counts={counts} showLabels={false} />

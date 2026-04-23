@@ -5,6 +5,7 @@ import useHeaderConfig from "@/hooks/useHeaderConfig";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { AsOfControl } from "@/app/sysAdmin/_shared/components/AsOfControl";
+import { MetricGlossaryButton } from "@/app/sysAdmin/_shared/components/MetricGlossary";
 import { useDashboardControls, DASHBOARD_CONTROLS_DEFAULTS } from "@/app/sysAdmin/features/dashboard/hooks/useDashboardControls";
 import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";
 import { DEFAULT_MEMBER_FILTER, DETAIL_CONTROLS_DEFAULTS, useDetailControls } from "../hooks/useDetailControls";
@@ -75,6 +76,7 @@ export function CommunityDashboardDetail({ communityId }: Props) {
         controls={
           <>
             <AsOfControl value={dashboard.state.asOf} onChange={dashboard.setAsOf} />
+            <MetricGlossaryButton />
             <SettingsDrawer
               tier1={dashboard.state.tier1}
               tier2={dashboard.state.tier2}

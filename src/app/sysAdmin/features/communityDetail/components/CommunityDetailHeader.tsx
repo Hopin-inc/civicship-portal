@@ -5,7 +5,6 @@ import type {
 } from "@/types/graphql";
 import { PercentDelta } from "@/app/sysAdmin/_shared/components/PercentDelta";
 import { PrimaryAlertBadge } from "@/app/sysAdmin/_shared/components/PrimaryAlertBadge";
-import { MetricInfoButton } from "@/app/sysAdmin/_shared/components/MetricInfoButton";
 import { formatJstMonth } from "@/app/sysAdmin/_shared/format/date";
 import { toCompactJa, toIntJa, toPct } from "@/app/sysAdmin/_shared/format/number";
 import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";
@@ -63,7 +62,6 @@ export function CommunityDetailHeader({ summary, alerts, controls }: Props) {
         <span className="text-3xl font-semibold tabular-nums">
           {toPct(summary.communityActivityRate)}
         </span>
-        <MetricInfoButton metricKey="communityActivityRate" />
         <span className="text-sm text-muted-foreground">
           {t.growth}{" "}
           <PercentDelta value={summary.growthRateActivity} className="font-normal" />

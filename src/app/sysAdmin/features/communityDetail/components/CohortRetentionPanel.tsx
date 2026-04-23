@@ -1,7 +1,6 @@
 import React, { useMemo } from "react";
 import type { GqlSysAdminCohortRetentionPoint } from "@/types/graphql";
 import { Panel } from "@/app/sysAdmin/_shared/components/Panel";
-import { MetricInfoButton } from "@/app/sysAdmin/_shared/components/MetricInfoButton";
 import { CohortRetentionAreaChart } from "@/app/sysAdmin/_shared/charts/CohortRetentionAreaChart";
 import { buildCohortChartData } from "@/app/sysAdmin/_shared/charts/buildCohortChartData";
 import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";
@@ -19,14 +18,7 @@ export function CohortRetentionPanel({ points, cohortMonths }: Props) {
   );
 
   return (
-    <Panel
-      title={
-        <span className="inline-flex items-center gap-2">
-          <span>{sysAdminDashboardJa.detail.cohort.title}</span>
-          <MetricInfoButton metricKey="cohortRetention" />
-        </span>
-      }
-    >
+    <Panel title={sysAdminDashboardJa.detail.cohort.title}>
       <CohortRetentionAreaChart data={chartData} />
     </Panel>
   );
