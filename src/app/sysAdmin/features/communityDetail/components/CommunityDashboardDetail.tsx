@@ -13,6 +13,7 @@ import { MonthlyActivityPanel } from "./MonthlyActivityPanel";
 import { RetentionTrendPanel } from "./RetentionTrendPanel";
 import { CohortRetentionPanel } from "./CohortRetentionPanel";
 import { MemberListPanel } from "./MemberListPanel";
+import { MemberSortSelect } from "./MemberSortSelect";
 import { SettingsDrawer } from "./SettingsDrawer";
 
 type Props = {
@@ -48,35 +49,39 @@ export function CommunityDashboardDetail({ communityId }: Props) {
     !isFilterDefault(detail.state.filter);
 
   const s = sysAdminDashboardJa.detail.sections;
+  const totalMembers = data.memberList.users.length;
+  const memberCountLabel = `${totalMembers}${data.memberList.hasNextPage ? "+" : ""} 件`;
 
   return (
     <div className="flex flex-col gap-8">
-      {/* Header + controls */}
-      <div className="flex flex-col gap-3">
-        <CommunityDetailHeader summary={data.summary} alerts={data.alerts} />
-        <div className="flex flex-wrap items-center gap-2">
-          <AsOfControl value={dashboard.state.asOf} onChange={dashboard.setAsOf} />
-          <SettingsDrawer
-            tier1={dashboard.state.tier1}
-            tier2={dashboard.state.tier2}
-            cohortMonths={detail.state.cohortMonths}
-            filter={detail.state.filter}
-            onThresholdsChange={dashboard.setThresholds}
-            onCohortMonthsChange={detail.setCohortMonths}
-            onFilterChange={detail.setFilter}
-            onResetFilter={detail.resetFilter}
-            hasNonDefaults={hasNonDefaults}
-          />
-        </div>
+      {/* Header + controls (コントロールはヘッダ内部に統合) */}
+      <CommunityDetailHeader
+        summary={data.summary}
+        alerts={data.alerts}
+        controls={
+          <>
+            <AsOfControl value={dashboard.state.asOf} onChange={dashboard.setAsOf} />
+            <SettingsDrawer
+              tier1={dashboard.state.tier1}
+              tier2={dashboard.state.tier2}
+              cohortMonths={detail.state.cohortMonths}
+              filter={detail.state.filter}
+              onThresholdsChange={dashboard.setThresholds}
+              onCohortMonthsChange={detail.setCohortMonths}
+              onFilterChange={detail.setFilter}
+              onResetFilter={detail.resetFilter}
+              hasNonDefaults={hasNonDefaults}
+            />
+          </>
+        }
+      />
+
+      {/* ステージ分布 (単一パネル、StageDistributionPanel が自前で h3 を持つ) */}
+      <div className="border-t pt-6">
+        <StageDistributionPanel stages={data.stages} />
       </div>
 
-      {/* Section: 今の状態 */}
-      <section className="flex flex-col gap-4 border-t pt-6">
-        <h2 className="text-sm font-medium text-muted-foreground">{s.snapshot}</h2>
-        <StageDistributionPanel stages={data.stages} />
-      </section>
-
-      {/* Section: 推移 */}
+      {/* 推移 — multi-panel section のみグループ見出しを持つ */}
       <section className="flex flex-col gap-6 border-t pt-6">
         <h2 className="text-sm font-medium text-muted-foreground">{s.trends}</h2>
         <MonthlyActivityPanel points={data.monthlyActivityTrend} />
@@ -87,18 +92,20 @@ export function CommunityDashboardDetail({ communityId }: Props) {
         />
       </section>
 
-      {/* Section: メンバー */}
-      <section className="flex flex-col gap-4 border-t pt-6">
-        <h2 className="text-sm font-medium text-muted-foreground">{s.members}</h2>
+      {/* メンバー — 見出し右肩に sort select、内部 Panel title は不要 */}
+      <section className="flex flex-col gap-3 border-t pt-6">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-baseline gap-2">
+            <h2 className="text-base font-semibold">{s.members}</h2>
+            <span className="text-xs text-muted-foreground">{memberCountLabel}</span>
+          </div>
+          <MemberSortSelect field={detail.state.sort.field} onChange={detail.setSortField} />
+        </div>
         <MemberListPanel
           memberList={data.memberList}
-          filter={detail.state.filter}
           sort={detail.state.sort}
           tier1={dashboard.state.tier1}
           tier2={dashboard.state.tier2}
-          onFilterChange={detail.setFilter}
-          onResetFilter={detail.resetFilter}
-          onSortFieldChange={detail.setSortField}
           baseInput={input}
           fetchMore={fetchMore}
           loading={loading}

@@ -10,26 +10,19 @@ import {
   type GqlSysAdminMemberList,
   type GqlSysAdminMemberRow,
 } from "@/types/graphql";
-import { Panel } from "@/app/sysAdmin/_shared/components/Panel";
 import { EmptyChart } from "@/app/sysAdmin/_shared/components/EmptyChart";
-import { MetricInfoButton } from "@/app/sysAdmin/_shared/components/MetricInfoButton";
 import { SendRateDot } from "@/app/sysAdmin/_shared/components/SendRateDot";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toCompactJa, toIntJa } from "@/app/sysAdmin/_shared/format/number";
 import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";
-import type { MemberFilter, MemberSort } from "../hooks/useDetailControls";
+import type { MemberSort } from "../hooks/useDetailControls";
 import { useMemberListPagination } from "../hooks/useMemberListPagination";
-import { MemberSortSelect } from "./MemberSortSelect";
 
 type Props = {
   memberList: GqlSysAdminMemberList | null;
-  filter: MemberFilter;
   sort: MemberSort;
   tier1: number;
   tier2: number;
-  onFilterChange: (next: MemberFilter) => void;
-  onResetFilter: () => void;
-  onSortFieldChange: (field: GqlSysAdminUserSortField) => void;
   baseInput: GqlSysAdminCommunityDetailInput;
   fetchMore: (opts: {
     variables: { input: GqlSysAdminCommunityDetailInput };
@@ -106,13 +99,9 @@ function MemberRow({
 
 export function MemberListPanel({
   memberList,
-  filter: _filter,
   sort,
   tier1,
   tier2,
-  onFilterChange: _onFilterChange,
-  onResetFilter: _onResetFilter,
-  onSortFieldChange,
   baseInput,
   fetchMore,
   loading,
@@ -157,35 +146,24 @@ export function MemberListPanel({
   }, [hasNextPage, loadingMore, users.length, loadMore]);
 
   return (
-    <Panel
-      title={
-        <span className="inline-flex items-center gap-2">
-          <span>{sysAdminDashboardJa.detail.member.title}</span>
-          <MetricInfoButton metricKey="userSendRate" />
-        </span>
-      }
-      description={`${users.length}${hasNextPage ? "+" : ""} 件`}
-      actions={<MemberSortSelect field={sort.field} onChange={onSortFieldChange} />}
-    >
-      <div className="rounded-md border">
-        {users.length === 0 && !loading ? (
-          <EmptyChart message={sysAdminDashboardJa.state.empty} />
-        ) : (
-          <List
-            rowCount={users.length}
-            rowHeight={ROW_HEIGHT}
-            rowComponent={MemberRow}
-            rowProps={{ users, sortField: sort.field, tier1, tier2 }}
-            onRowsRendered={handleRowsRendered}
-            style={{ height: LIST_HEIGHT }}
-          />
-        )}
-        {loadingMore && (
-          <div className="flex items-center justify-center p-2 text-xs text-muted-foreground">
-            {sysAdminDashboardJa.state.loading}
-          </div>
-        )}
-      </div>
-    </Panel>
+    <div className="rounded-md border">
+      {users.length === 0 && !loading ? (
+        <EmptyChart message={sysAdminDashboardJa.state.empty} />
+      ) : (
+        <List
+          rowCount={users.length}
+          rowHeight={ROW_HEIGHT}
+          rowComponent={MemberRow}
+          rowProps={{ users, sortField: sort.field, tier1, tier2 }}
+          onRowsRendered={handleRowsRendered}
+          style={{ height: LIST_HEIGHT }}
+        />
+      )}
+      {loadingMore && (
+        <div className="flex items-center justify-center p-2 text-xs text-muted-foreground">
+          {sysAdminDashboardJa.state.loading}
+        </div>
+      )}
+    </div>
   );
 }

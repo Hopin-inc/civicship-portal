@@ -8,10 +8,9 @@ import {
   type GqlSysAdminMemberRow,
 } from "@/types/graphql";
 import { MemberListPanel } from "./MemberListPanel";
+import { MemberSortSelect } from "./MemberSortSelect";
 import {
-  DEFAULT_MEMBER_FILTER,
   DEFAULT_MEMBER_SORT,
-  type MemberFilter,
   type MemberSort,
 } from "../hooks/useDetailControls";
 import { makeMemberRow } from "../../../_shared/fixtures/sysAdminDashboard";
@@ -46,7 +45,12 @@ const fetchMoreStub = async () =>
     ReturnType<NonNullable<React.ComponentProps<typeof MemberListPanel>["fetchMore"]>>
   >;
 
-function Stateful({
+/**
+ * MemberListPanel は list 本体のみを描画する。タイトル + sort select は
+ * 親 (CommunityDashboardDetail) 側の section 見出しに配置される構造。
+ * Story ではその構造を模すため、ラッパーで見出し + Sort Select を添える。
+ */
+function SectionWrapper({
   users,
   hasNextPage = false,
   initialSort = DEFAULT_MEMBER_SORT,
@@ -55,7 +59,6 @@ function Stateful({
   hasNextPage?: boolean;
   initialSort?: MemberSort;
 }) {
-  const [filter, setFilter] = useState<MemberFilter>(DEFAULT_MEMBER_FILTER);
   const [sort, setSort] = useState<MemberSort>(initialSort);
 
   const memberList: GqlSysAdminMemberList = {
@@ -65,22 +68,30 @@ function Stateful({
     users,
   };
 
+  const memberCountLabel = `${users.length}${hasNextPage ? "+" : ""} 件`;
+
   return (
-    <MemberListPanel
-      memberList={memberList}
-      filter={filter}
-      sort={sort}
-      tier1={0.7}
-      tier2={0.4}
-      onFilterChange={setFilter}
-      onResetFilter={() => setFilter(DEFAULT_MEMBER_FILTER)}
-      onSortFieldChange={(field) =>
-        setSort({ field, order: GqlSysAdminSortOrder.Desc })
-      }
-      baseInput={baseInput}
-      fetchMore={fetchMoreStub}
-      loading={false}
-    />
+    <section className="flex flex-col gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-baseline gap-2">
+          <h2 className="text-base font-semibold">メンバー</h2>
+          <span className="text-xs text-muted-foreground">{memberCountLabel}</span>
+        </div>
+        <MemberSortSelect
+          field={sort.field}
+          onChange={(field) => setSort({ field, order: GqlSysAdminSortOrder.Desc })}
+        />
+      </div>
+      <MemberListPanel
+        memberList={memberList}
+        sort={sort}
+        tier1={0.7}
+        tier2={0.4}
+        baseInput={baseInput}
+        fetchMore={fetchMoreStub}
+        loading={false}
+      />
+    </section>
   );
 }
 
@@ -94,12 +105,12 @@ const defaultUsers = [
 ];
 
 export const Default: Story = {
-  render: () => <Stateful users={defaultUsers} />,
+  render: () => <SectionWrapper users={defaultUsers} />,
 };
 
 export const SortByTotalPoints: Story = {
   render: () => (
-    <Stateful
+    <SectionWrapper
       users={defaultUsers}
       initialSort={{
         field: GqlSysAdminUserSortField.TotalPointsOut,
@@ -111,7 +122,7 @@ export const SortByTotalPoints: Story = {
 
 export const SortByDonationOutMonths: Story = {
   render: () => (
-    <Stateful
+    <SectionWrapper
       users={defaultUsers}
       initialSort={{
         field: GqlSysAdminUserSortField.DonationOutMonths,
@@ -122,9 +133,9 @@ export const SortByDonationOutMonths: Story = {
 };
 
 export const HasMore: Story = {
-  render: () => <Stateful users={defaultUsers} hasNextPage />,
+  render: () => <SectionWrapper users={defaultUsers} hasNextPage />,
 };
 
 export const Empty: Story = {
-  render: () => <Stateful users={[]} />,
+  render: () => <SectionWrapper users={[]} />,
 };
