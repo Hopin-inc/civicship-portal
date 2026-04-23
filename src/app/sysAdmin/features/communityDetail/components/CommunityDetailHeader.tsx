@@ -11,7 +11,10 @@ import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";
 type Props = {
   summary: GqlSysAdminCommunitySummaryCard;
   alerts: GqlSysAdminCommunityAlerts;
+  /** アラート行の右に配置する補助コントロール (用語 Button など) */
   controls?: ReactNode;
+  /** 稼働率行の右端に配置する期間セレクト */
+  periodControl?: ReactNode;
 };
 
 type SubMetric = {
@@ -20,15 +23,17 @@ type SubMetric = {
 };
 
 /**
- * Header layout:
+ * Header layout (size を抑えた落ち着き優先):
  * - Row 1: alert (左) / controls (右)
- * - Row 2: 稼働率 text-5xl bold + PercentDelta (label なし inline 右)
- * - Row 3: sub-metrics grid (label 上 muted / 値 下 bold) で並列整列
- *
- * 旧構成で散らばっていた 3ヶ月平均・発足月は削除、累計pt と最大 chain だけを
- * 人数と並列で表示。サブ指標は全部同じフォーマットに揃えて読みやすさを確保。
+ * - Row 2: [text-3xl semibold 稼働率] [sm delta]  ·  [periodControl] (右寄せ)
+ * - Row 3: sub-metrics (label xs / 値 base) を label上/値下 pair で整列
  */
-export function CommunityDetailHeader({ summary, alerts, controls }: Props) {
+export function CommunityDetailHeader({
+  summary,
+  alerts,
+  controls,
+  periodControl,
+}: Props) {
   const t = sysAdminDashboardJa.detail.header;
 
   const subMetrics: SubMetric[] = [
@@ -46,8 +51,8 @@ export function CommunityDetailHeader({ summary, alerts, controls }: Props) {
   }
 
   return (
-    <header className="flex flex-col gap-4">
-      {/* Row 1: alert + controls */}
+    <header className="flex flex-col gap-3">
+      {/* Row 1: alert + optional controls (用語 etc.) */}
       {(alerts || controls) && (
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-h-[1.5rem]">
@@ -57,21 +62,26 @@ export function CommunityDetailHeader({ summary, alerts, controls }: Props) {
         </div>
       )}
 
-      {/* Row 2: 主指標 */}
-      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-        <span className="text-5xl font-bold tabular-nums leading-tight">
-          {toPct(summary.communityActivityRate)}
-        </span>
-        <PercentDelta value={summary.growthRateActivity} className="text-lg" />
+      {/* Row 2: 主指標 + 前月比 + periodControl (右) */}
+      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-2">
+        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+          <span className="text-3xl font-semibold tabular-nums leading-tight">
+            {toPct(summary.communityActivityRate)}
+          </span>
+          <PercentDelta value={summary.growthRateActivity} className="text-sm" />
+        </div>
+        {periodControl && (
+          <div className="flex items-center self-center">{periodControl}</div>
+        )}
       </div>
 
       {/* Row 3: sub-metrics grid */}
       {subMetrics.length > 0 && (
-        <dl className="flex flex-wrap gap-x-8 gap-y-2">
+        <dl className="flex flex-wrap gap-x-6 gap-y-2">
           {subMetrics.map((m) => (
             <div key={m.label} className="flex flex-col gap-0.5">
               <dt className="text-xs text-muted-foreground">{m.label}</dt>
-              <dd className="text-lg font-semibold tabular-nums">{m.value}</dd>
+              <dd className="text-base font-semibold tabular-nums">{m.value}</dd>
             </div>
           ))}
         </dl>

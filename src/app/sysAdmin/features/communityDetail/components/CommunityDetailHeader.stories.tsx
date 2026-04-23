@@ -24,19 +24,17 @@ const meta: Meta<typeof CommunityDetailHeader> = {
 export default meta;
 type Story = StoryObj<typeof CommunityDetailHeader>;
 
-// 実環境での controls slot (PeriodPresetSelect + MetricGlossaryButton) を
-// 静的 proxy で模倣。Dialog/Popover の Portal 干渉を避けるため。
-function MockControls() {
-  return (
-    <>
-      <PeriodPresetSelect value="last3Months" onChange={() => {}} />
-      <Button variant="ghost" size="sm" className="gap-1.5">
-        <BookOpen className="h-4 w-4" />
-        用語
-      </Button>
-    </>
-  );
-}
+// 実装相当の中身を静的 proxy で用意 (Radix Portal 干渉を避ける)
+const MockGlossaryButton = () => (
+  <Button variant="ghost" size="sm" className="gap-1.5">
+    <BookOpen className="h-4 w-4" />
+    用語
+  </Button>
+);
+
+const MockPeriodControl = () => (
+  <PeriodPresetSelect value="last3Months" onChange={() => {}} />
+);
 
 export const PositiveDelta: Story = {
   args: {
@@ -66,11 +64,13 @@ export const SparseData: Story = {
   },
 };
 
+// 実運用形: controls = 用語 button / periodControl = period select
 export const WithControls: Story = {
   args: {
     summary: makeSummaryCard({ growthRateActivity: 0.083 }),
     alerts: makeAlerts(),
-    controls: <MockControls />,
+    controls: <MockGlossaryButton />,
+    periodControl: <MockPeriodControl />,
   },
 };
 
@@ -81,6 +81,7 @@ export const WithControlsAndAlert: Story = {
       communityActivityRate: 0.08,
     }),
     alerts: makeAlerts({ churnSpike: true }),
-    controls: <MockControls />,
+    controls: <MockGlossaryButton />,
+    periodControl: <MockPeriodControl />,
   },
 };

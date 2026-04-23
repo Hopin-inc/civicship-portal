@@ -55,14 +55,12 @@ export function CommunityDashboardDetail({ communityId }: Props) {
       <CommunityDetailHeader
         summary={data.summary}
         alerts={data.alerts}
-        controls={
-          <>
-            <PeriodPresetSelect
-              value={dashboard.state.period}
-              onChange={dashboard.setPeriod}
-            />
-            <MetricGlossaryButton />
-          </>
+        controls={<MetricGlossaryButton />}
+        periodControl={
+          <PeriodPresetSelect
+            value={dashboard.state.period}
+            onChange={dashboard.setPeriod}
+          />
         }
       />
 

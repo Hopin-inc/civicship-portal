@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -66,13 +65,11 @@ type Props = {
   disabled?: boolean;
   id?: string;
   className?: string;
-  /** ラベル ("期間") を表示するか。デフォルト true */
-  showLabel?: boolean;
 };
 
 /**
- * shadcn Select を使った dropdown。MemberSortSelect と同じパターン。
- * MetricGlossaryButton の隣に配置しても占有面積が小さく収まる。
+ * shadcn Select を使った期間 dropdown。ラベルは表示しない
+ * (dropdown 自体で何を選ぶか明確なため)。
  */
 export function PeriodPresetSelect({
   value,
@@ -80,31 +77,23 @@ export function PeriodPresetSelect({
   disabled,
   id = "period-preset",
   className,
-  showLabel = true,
 }: Props) {
   return (
-    <div className={cn("flex items-center gap-2", className)}>
-      {showLabel && (
-        <Label htmlFor={id} className="text-xs text-muted-foreground">
-          期間
-        </Label>
-      )}
-      <Select
-        value={value}
-        onValueChange={(v) => onChange(v as PeriodPreset)}
-        disabled={disabled}
-      >
-        <SelectTrigger id={id} className="h-9 w-32">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          {PERIOD_OPTIONS.map((opt) => (
-            <SelectItem key={opt.value} value={opt.value}>
-              {opt.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
+    <Select
+      value={value}
+      onValueChange={(v) => onChange(v as PeriodPreset)}
+      disabled={disabled}
+    >
+      <SelectTrigger id={id} className={cn("h-8 w-28 text-xs", className)} aria-label="集計期間">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        {PERIOD_OPTIONS.map((opt) => (
+          <SelectItem key={opt.value} value={opt.value} className="text-xs">
+            {opt.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }

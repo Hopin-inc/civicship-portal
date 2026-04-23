@@ -20,7 +20,8 @@ describe("DashboardControls", () => {
         onReset={vi.fn()}
       />,
     );
-    expect(screen.getByLabelText("期間")).toBeInTheDocument();
+    // period Select は aria-label で識別 (text label は撤去済み)
+    expect(screen.getByRole("combobox", { name: "集計期間" })).toBeInTheDocument();
     expect(screen.getByText("習慣化の閾値")).toBeInTheDocument();
     expect(screen.getByText("定期参加の閾値")).toBeInTheDocument();
   });
