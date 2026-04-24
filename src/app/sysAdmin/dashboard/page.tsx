@@ -1,24 +1,10 @@
-"use client";
+import { redirect } from "next/navigation";
 
-import { useMemo } from "react";
-import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { DashboardOverview } from "@/app/sysAdmin/features/dashboard/components/DashboardOverview";
-import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";
-
-export default function SysAdminDashboardPage() {
-  const headerConfig = useMemo(
-    () => ({
-      title: sysAdminDashboardJa.title,
-      showLogo: false,
-      showBackButton: true,
-    }),
-    [],
-  );
-  useHeaderConfig(headerConfig);
-
-  return (
-    <div className="mx-auto max-w-7xl p-4">
-      <DashboardOverview />
-    </div>
-  );
+/**
+ * `/sysAdmin/dashboard` は `/sysAdmin` にコミュニティ一覧 (旧 dashboard) を
+ * 統合したため、旧 URL へのアクセスはトップにリダイレクトさせる。
+ * 既存のブックマークや外部リンクの保険として残置。
+ */
+export default function SysAdminDashboardRedirect() {
+  redirect("/sysAdmin");
 }

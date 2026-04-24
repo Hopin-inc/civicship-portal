@@ -1,15 +1,22 @@
 "use client";
 
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
+import { Plus } from "lucide-react";
 import { useAppRouter } from "@/lib/navigation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { Button } from "@/components/ui/button";
-import { BarChart3, Plus } from "lucide-react";
-import { CommunityList } from "./features/list/components/CommunityList";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { ErrorState } from "@/components/shared/ErrorState";
+import { MetricGlossaryButton } from "./_shared/components/MetricGlossary";
+import { CommunityRow } from "./features/dashboard/components/CommunityRow";
+import { useDashboardControls } from "./features/dashboard/hooks/useDashboardControls";
+import { useDashboardOverview } from "./features/dashboard/hooks/useDashboardOverview";
 import { sysAdminDashboardJa } from "./_shared/i18n/ja";
 
 export default function SysAdminPage() {
   const router = useAppRouter();
+  const { state } = useDashboardControls();
+  const { loading, error, communities } = useDashboardOverview(state);
 
   const headerConfig = useMemo(
     () => ({
@@ -21,20 +28,21 @@ export default function SysAdminPage() {
   );
   useHeaderConfig(headerConfig);
 
+  const handleRowClick = useCallback(
+    (communityId: string) => {
+      router.push(`/sysAdmin/dashboard/${communityId}`);
+    },
+    [router],
+  );
+
   return (
     <div className="p-4 max-w-2xl mx-auto">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-body-sm text-muted-foreground pl-4">コミュニティ一覧</h2>
+        <h2 className="text-body-sm text-muted-foreground pl-4">
+          コミュニティ一覧
+        </h2>
         <div className="flex items-center gap-2">
-          <Button
-            onClick={() => router.push("/sysAdmin/dashboard")}
-            variant="secondary"
-            size="sm"
-            className="gap-1"
-          >
-            <BarChart3 className="h-4 w-4" />
-            {sysAdminDashboardJa.nav.toDashboard}
-          </Button>
+          <MetricGlossaryButton />
           <Button
             onClick={() => router.push("/sysAdmin/create")}
             variant="primary"
@@ -47,7 +55,24 @@ export default function SysAdminPage() {
         </div>
       </div>
 
-      <CommunityList />
+      {loading && communities.length === 0 ? (
+        <LoadingIndicator fullScreen={false} />
+      ) : error ? (
+        <ErrorState title={sysAdminDashboardJa.state.error} />
+      ) : communities.length === 0 ? (
+        <div className="py-12 text-center text-sm text-muted-foreground">
+          {sysAdminDashboardJa.state.empty}
+        </div>
+      ) : (
+        <div className="flex flex-col">
+          {communities.map((community, idx) => (
+            <div key={community.communityId}>
+              {idx !== 0 && <hr className="border-muted" />}
+              <CommunityRow row={community} onClick={handleRowClick} />
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
