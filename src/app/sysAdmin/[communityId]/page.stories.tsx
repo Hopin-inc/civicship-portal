@@ -32,13 +32,8 @@ const variables = {
     asOf: undefined,
     segmentThresholds: { tier1: 0.7, tier2: 0.4 },
     windowMonths: 3,
-    userFilter: {
-      minSendRate: 0.7,
-      maxSendRate: undefined,
-      minDonationOutMonths: undefined,
-      minMonthsIn: undefined,
-    },
-    userSort: { field: "SEND_RATE", order: "DESC" },
+    userFilter: {},
+    userSort: { field: "TOTAL_POINTS_OUT", order: "DESC" },
     limit: 50,
   },
 };

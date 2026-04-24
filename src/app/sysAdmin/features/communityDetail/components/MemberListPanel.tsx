@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef } from "react";
 import type { ApolloQueryResult } from "@apollo/client";
 import { List, type RowComponentProps } from "react-window";
 import {
-  GqlSysAdminUserSortField,
   type GqlGetSysAdminCommunityDetailQuery,
   type GqlSysAdminCommunityDetailInput,
   type GqlSysAdminMemberList,
@@ -12,14 +11,12 @@ import {
 } from "@/types/graphql";
 import { EmptyChart } from "@/app/sysAdmin/_shared/components/EmptyChart";
 import { SendRateDot } from "@/app/sysAdmin/_shared/components/SendRateDot";
-import { toCompactJa, toIntJa } from "@/app/sysAdmin/_shared/format/number";
+import { toCompactJa } from "@/app/sysAdmin/_shared/format/number";
 import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";
-import type { MemberSort } from "../hooks/useDetailControls";
 import { useMemberListPagination } from "../hooks/useMemberListPagination";
 
 type Props = {
   memberList: GqlSysAdminMemberList | null;
-  sort: MemberSort;
   tier1: number;
   tier2: number;
   baseInput: GqlSysAdminCommunityDetailInput;
@@ -35,43 +32,16 @@ const PREFETCH_THRESHOLD = 10;
 
 type RowProps = {
   users: GqlSysAdminMemberRow[];
-  sortField: GqlSysAdminUserSortField;
   tier1: number;
   tier2: number;
 };
 
-/**
- * Sort key ごとに meta 行の表示を切り替え。ユーザーが何で並び替えたかの
- * 根拠を必ず行内に見せる (totalPointsOut 順なのに pt が見えない問題の解消)。
- */
-function formatMetaForSort(
-  row: GqlSysAdminMemberRow,
-  sortField: GqlSysAdminUserSortField,
-): string {
-  const t = sysAdminDashboardJa.detail.member;
-  const tenure = `${t.tenurePrefix}${row.monthsIn}${t.tenureSuffix}`;
-  switch (sortField) {
-    case "TOTAL_POINTS_OUT":
-      return `${tenure} · 累計 ${toCompactJa(row.totalPointsOut)}pt`;
-    case "DONATION_OUT_MONTHS":
-      return `${tenure} · 送付 ${toIntJa(row.donationOutMonths)}ヶ月`;
-    case "MONTHS_IN":
-    case "SEND_RATE":
-    default:
-      return tenure;
-  }
-}
-
-function MemberRow({
-  index,
-  users,
-  sortField,
-  tier1,
-  tier2,
-}: RowComponentProps<RowProps>) {
+function MemberRow({ index, users, tier1, tier2 }: RowComponentProps<RowProps>) {
   // rowCount === users.length で運用しているので users[index] は必ず定義済み。
   const row = users[index]!;
-  const meta = formatMetaForSort(row, sortField);
+  const t = sysAdminDashboardJa.detail.member;
+  const tenure = `${t.tenurePrefix}${row.monthsIn}${t.tenureSuffix}`;
+  const meta = `${tenure} · 累計 ${toCompactJa(row.totalPointsOut)}pt`;
   const sendRatePct = `${Math.round(row.userSendRate * 100)}%`;
   return (
     <div
@@ -92,7 +62,6 @@ function MemberRow({
 
 export function MemberListPanel({
   memberList,
-  sort,
   tier1,
   tier2,
   baseInput,
@@ -120,11 +89,7 @@ export function MemberListPanel({
     [users.length, loadMore],
   );
 
-  // userFilter は keyArgs に含めているため、onFilterChange で state が変わる
-  // → useCommunityDetail の input が変わる → Apollo が別エントリを引く (cache-and-network)
-  // という自然なフローでデータが更新される。手動の evict/refetch は不要。
-
-  // 初期 or sort 切替後、1 画面分に満たず hasNextPage=true なら自動的にもう 1 ページ取る。
+  // 初期取得後、1 画面分に満たず hasNextPage=true なら自動的にもう 1 ページ取る。
   // バックエンドが hasNextPage=true を返し続けるのに users が増えないケースで
   // 無限リクエストに陥らないよう、直前に auto-load した時点の length を ref で記憶し、
   // 増えていない場合はそれ以上 auto-load しない。
@@ -147,7 +112,7 @@ export function MemberListPanel({
           rowCount={users.length}
           rowHeight={ROW_HEIGHT}
           rowComponent={MemberRow}
-          rowProps={{ users, sortField: sort.field, tier1, tier2 }}
+          rowProps={{ users, tier1, tier2 }}
           onRowsRendered={handleRowsRendered}
           style={{ height: LIST_HEIGHT }}
         />

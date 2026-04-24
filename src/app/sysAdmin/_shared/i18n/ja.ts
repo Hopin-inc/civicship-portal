@@ -98,27 +98,6 @@ export const sysAdminDashboardJa = {
       title: "メンバー一覧",
       tenurePrefix: "在籍",
       tenureSuffix: "ヶ月",
-      columns: {
-        name: "氏名",
-        sendRate: "送付率",
-        totalPointsOut: "累計送付",
-        donationOutMonths: "送付月数",
-        monthsIn: "在籍月数",
-      },
-      filters: {
-        minSendRate: "最小送付率",
-        maxSendRate: "最大送付率",
-        minDonationOutMonths: "最小送付月数",
-        minMonthsIn: "最小在籍月数",
-        reset: "フィルタをリセット",
-      },
-      sort: {
-        placeholder: "並び順",
-        sendRate: "送付率順",
-        monthsIn: "在籍月数順",
-        donationOutMonths: "送付月数順",
-        totalPointsOut: "累計ポイント順",
-      },
     },
   },
   state: {

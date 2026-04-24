@@ -8,16 +8,13 @@ import { MetricGlossaryButton } from "@/app/sysAdmin/_shared/components/MetricGl
 import { PeriodPresetSelect } from "@/app/sysAdmin/_shared/components/PeriodPresetSelect";
 import { useDashboardControls } from "@/app/sysAdmin/features/dashboard/hooks/useDashboardControls";
 import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";
-import { useDetailControls } from "../hooks/useDetailControls";
 import { useCommunityDetail } from "../hooks/useCommunityDetail";
 import { CommunityDetailHeader } from "./CommunityDetailHeader";
 import { StageDistributionPanel } from "./StageDistributionPanel";
 import { MonthlyActivityPanel } from "./MonthlyActivityPanel";
 import { RetentionTrendPanel } from "./RetentionTrendPanel";
 import { CohortRetentionPanel } from "./CohortRetentionPanel";
-import { MemberFilterPopover } from "./MemberFilterPopover";
 import { MemberListPanel } from "./MemberListPanel";
-import { MemberSortSelect } from "./MemberSortSelect";
 
 type Props = {
   communityId: string;
@@ -25,11 +22,9 @@ type Props = {
 
 export function CommunityDashboardDetail({ communityId }: Props) {
   const dashboard = useDashboardControls();
-  const detail = useDetailControls();
   const { loading, error, detail: data, input, fetchMore } = useCommunityDetail({
     communityId,
     dashboardControls: dashboard.state,
-    detailControls: detail.state,
   });
 
   const headerConfig = useMemo(
@@ -81,23 +76,12 @@ export function CommunityDashboardDetail({ communityId }: Props) {
       </section>
 
       <section className="flex flex-col gap-3 border-t pt-6">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-baseline gap-2">
-            <h2 className="text-base font-semibold">{s.members}</h2>
-            <span className="text-xs text-muted-foreground">{memberCountLabel}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <MemberFilterPopover
-              value={detail.state.filter}
-              onChange={detail.setFilter}
-              onReset={detail.resetFilter}
-            />
-            <MemberSortSelect field={detail.state.sort.field} onChange={detail.setSortField} />
-          </div>
+        <div className="flex items-baseline gap-2">
+          <h2 className="text-base font-semibold">{s.members}</h2>
+          <span className="text-xs text-muted-foreground">{memberCountLabel}</span>
         </div>
         <MemberListPanel
           memberList={data.memberList}
-          sort={detail.state.sort}
           tier1={dashboard.state.tier1}
           tier2={dashboard.state.tier2}
           baseInput={input}
