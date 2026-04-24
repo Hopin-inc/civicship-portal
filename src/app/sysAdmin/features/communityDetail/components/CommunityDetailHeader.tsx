@@ -68,7 +68,16 @@ export function CommunityDetailHeader({
           <span className="text-3xl font-semibold tabular-nums leading-tight">
             {toPct(summary.communityActivityRate)}
           </span>
-          <PercentDelta value={summary.growthRateActivity} className="text-sm" />
+          {summary.growthRateActivity != null && (
+            <span className="text-sm" aria-label="前月比">
+              (
+              <PercentDelta
+                value={summary.growthRateActivity}
+                className="text-sm"
+              />
+              )
+            </span>
+          )}
         </div>
         {periodControl && (
           <div className="flex items-center self-center">{periodControl}</div>

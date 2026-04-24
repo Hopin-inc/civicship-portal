@@ -52,13 +52,19 @@ export function CommunityRow({ row, onClick }: Props) {
 
       <ItemFooter className="mt-0">
         <div className="flex flex-wrap items-baseline gap-x-2 text-xs text-muted-foreground">
-          <span>稼働率 {toPct(row.communityActivityRate)}</span>
-          {row.growthRateActivity != null && (
-            <>
-              <span aria-hidden>·</span>
-              <PercentDelta value={row.growthRateActivity} className="text-xs" />
-            </>
-          )}
+          <span className="inline-flex items-baseline gap-1">
+            <span>稼働率 {toPct(row.communityActivityRate)}</span>
+            {row.growthRateActivity != null && (
+              <span aria-label="前月比">
+                (
+                <PercentDelta
+                  value={row.growthRateActivity}
+                  className="text-xs"
+                />
+                )
+              </span>
+            )}
+          </span>
           <span aria-hidden>·</span>
           <span>{toIntJa(row.totalMembers)}人</span>
         </div>
