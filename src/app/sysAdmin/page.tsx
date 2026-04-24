@@ -30,7 +30,7 @@ export default function SysAdminPage() {
 
   const handleRowClick = useCallback(
     (communityId: string) => {
-      router.push(`/sysAdmin/dashboard/${communityId}`);
+      router.push(`/sysAdmin/${communityId}`);
     },
     [router],
   );
