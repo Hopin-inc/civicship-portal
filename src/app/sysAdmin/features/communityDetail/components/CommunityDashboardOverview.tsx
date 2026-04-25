@@ -7,7 +7,7 @@ import {
   AlertTriangle,
   CalendarCheck,
   ChevronRight,
-  Gauge,
+  Hourglass,
   Link2,
   type LucideIcon,
   Moon,
@@ -84,6 +84,13 @@ export function CommunityDashboardOverview({
     activeMembers.length > 0
       ? activeMembers.reduce((acc, u) => acc + u.userSendRate, 0) /
         activeMembers.length
+      : 0;
+  // 平均在籍月数: tenure 構造 (member 全員の monthsIn 平均)。"このコミュ
+  // ニティが新興か老舗か" の人視点での補強指標。
+  const avgMonthsIn =
+    data.memberList.users.length > 0
+      ? data.memberList.users.reduce((acc, u) => acc + u.monthsIn, 0) /
+        data.memberList.users.length
       : 0;
 
   // 連鎖率 (今月) — monthlyActivityTrend の最新点
@@ -394,21 +401,21 @@ export function CommunityDashboardOverview({
           hero={<Hero value={newRate != null ? toPct(newRate) : "-"} />}
         />
         <MetricCard
-          icon={Gauge}
+          icon={Hourglass}
           colorClass={SCOPE_COLOR.user}
-          title="平均送付率"
+          title="平均在籍月数"
           meta="累計"
           hero={
-            <Hero value={avgSendRate > 0 ? avgSendRate.toFixed(2) : "-"} />
-          }
-          viz={
-            <Ring value={avgSendRate} colorClass={SCOPE_COLOR.user} />
+            <Hero
+              value={avgMonthsIn > 0 ? avgMonthsIn.toFixed(1) : "-"}
+              unit="ヶ月"
+            />
           }
         />
         <MetricCard
           icon={Moon}
           colorClass={SCOPE_COLOR.user}
-          title="dormant 化率"
+          title="休眠化率"
           status="todo"
         />
 
