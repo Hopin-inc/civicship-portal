@@ -5196,6 +5196,7 @@ export type GqlSysAdminCommunityOverviewRowFieldsFragment = {
   communityId: string;
   communityName: string;
   totalMembers: number;
+  hubMemberCount: number;
   segmentCounts: {
     __typename?: "SysAdminSegmentCounts";
     total: number;
@@ -5240,6 +5241,7 @@ export type GqlGetSysAdminDashboardQuery = {
       communityId: string;
       communityName: string;
       totalMembers: number;
+      hubMemberCount: number;
       segmentCounts: {
         __typename?: "SysAdminSegmentCounts";
         total: number;
@@ -8667,6 +8669,7 @@ export const SysAdminCommunityOverviewRowFieldsFragmentDoc = gql`
     communityId
     communityName
     totalMembers
+    hubMemberCount
     segmentCounts {
       ...SysAdminSegmentCountsFields
     }
