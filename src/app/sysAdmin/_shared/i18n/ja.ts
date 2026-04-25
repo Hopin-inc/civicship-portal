@@ -22,21 +22,10 @@ export const sysAdminDashboardJa = {
     filterSection: "メンバー絞り込み",
     activeBadge: "(変更あり)",
   },
-  overview: {
-    latestRetentionM1: "M+1定着率",
-    sort: {
-      placeholder: "並び順",
-      activityRate: "稼働率順",
-      growth: "前月比順",
-      tier1Count: "習慣化人数順",
-      latestRetentionM1: "M+1定着率順",
-    },
-  },
   alerts: {
-    activeDrop: "稼働低下",
+    activeDrop: "MAU% 低下",
     churnSpike: "離脱加速",
     noNewMembers: "新規停止",
-    allClear: "アラートなし",
   },
   detail: {
     title: "コミュニティ詳細",
@@ -50,16 +39,6 @@ export const sysAdminDashboardJa = {
       donationSuffix: "pt",
       chainPrefix: "最大chain",
       chainSuffix: "段",
-      growth: "前月比",
-      threeMonthAvg: "3ヶ月平均",
-    },
-    summary: {
-      activityRate: "活動率",
-      activityRate3m: "活動率 (3ヶ月平均)",
-      growth: "前月比",
-      totalMembers: "総メンバー",
-      tier2Pct: "Tier2 比率",
-      totalDonation: "累計贈与ポイント",
     },
     stages: {
       title: "ステージ分布",
@@ -71,28 +50,19 @@ export const sysAdminDashboardJa = {
       avgMonthsIn: "在籍 avg",
     },
     monthly: {
-      title: "月次アクティビティ推移",
-      senderCount: "送り手数",
+      title: "MAU 推移",
+      senderCount: "MAU",
       newMembers: "新規加入",
-      activityRate: "活動率",
+      activityRate: "MAU%",
     },
     retention: {
-      title: "週次リテンション",
+      title: "WAU",
       retained: "継続",
       churned: "離脱",
       returned: "復帰",
     },
     cohort: {
       title: "コホートretention",
-      axisX: { m0: "M+0", m1: "M+1", m3: "M+3", m6: "M+6" },
-      empty: "データなし",
-      period: {
-        label: "コホート表示期間",
-        m3: "直近3ヶ月",
-        m6: "直近6ヶ月",
-        m12: "直近12ヶ月",
-        all: "全期間",
-      },
     },
     member: {
       title: "メンバー一覧",
