@@ -7,7 +7,7 @@ import {
   PERIOD_OPTIONS,
   resolvePeriodToInput,
   type PeriodPreset,
-} from "@/app/sysAdmin/_shared/components/PeriodPresetSelect";
+} from "@/app/sysAdmin/_shared/period";
 
 export type DashboardControlsState = {
   period: PeriodPreset;

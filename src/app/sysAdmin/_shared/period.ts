@@ -1,14 +1,7 @@
-"use client";
-
-import React from "react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { cn } from "@/lib/utils";
+/**
+ * Period preset の値型 + helper。L1 baseline では UI を持たない (period select は
+ * L2 詳細で導入予定) ため、定数と純関数だけを切り出して L1 hooks から参照する。
+ */
 
 export type PeriodPreset =
   | "thisMonth"
@@ -24,7 +17,7 @@ type Option = {
   value: PeriodPreset;
   label: string;
   windowMonths: number;
-  /** `asOf` を計算する関数 (null = 今日)。API 未指定時は今日を使うので null で OK */
+  /** `asOf` を計算する関数 (`today` = サーバー現在時刻)。 */
   asOfOffset: "today" | "lastMonthEnd";
 };
 
@@ -50,50 +43,10 @@ export function resolvePeriodToInput(preset: PeriodPreset): {
   if (opt.asOfOffset === "today") {
     return { asOf: null, windowMonths: opt.windowMonths };
   }
-  // lastMonthEnd: 先月末日 23:59:59 JST
   const now = new Date();
   const jst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
   const lastMonthEnd = new Date(
     Date.UTC(jst.getUTCFullYear(), jst.getUTCMonth(), 0, 23 - 9, 59, 59),
   );
   return { asOf: lastMonthEnd.toISOString(), windowMonths: opt.windowMonths };
-}
-
-type Props = {
-  value: PeriodPreset;
-  onChange: (next: PeriodPreset) => void;
-  disabled?: boolean;
-  id?: string;
-  className?: string;
-};
-
-/**
- * shadcn Select を使った期間 dropdown。ラベルは表示しない
- * (dropdown 自体で何を選ぶか明確なため)。
- */
-export function PeriodPresetSelect({
-  value,
-  onChange,
-  disabled,
-  id = "period-preset",
-  className,
-}: Props) {
-  return (
-    <Select
-      value={value}
-      onValueChange={(v) => onChange(v as PeriodPreset)}
-      disabled={disabled}
-    >
-      <SelectTrigger id={id} className={cn("h-8 w-28 text-xs", className)} aria-label="集計期間">
-        <SelectValue />
-      </SelectTrigger>
-      <SelectContent>
-        {PERIOD_OPTIONS.map((opt) => (
-          <SelectItem key={opt.value} value={opt.value} className="text-xs">
-            {opt.label}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-  );
 }

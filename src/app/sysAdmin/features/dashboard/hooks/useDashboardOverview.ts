@@ -12,7 +12,7 @@ import type { DashboardControlsState } from "./useDashboardControls";
 import {
   DEFAULT_PERIOD,
   resolvePeriodToInput,
-} from "@/app/sysAdmin/_shared/components/PeriodPresetSelect";
+} from "@/app/sysAdmin/_shared/period";
 
 export type DashboardOverviewResult = {
   loading: boolean;

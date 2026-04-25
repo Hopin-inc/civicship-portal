@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import { Plus } from "lucide-react";
 import { useAppRouter } from "@/lib/navigation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
@@ -34,13 +34,6 @@ export function SysAdminPageClient({ initialData }: Props) {
   );
   useHeaderConfig(headerConfig);
 
-  const handleRowClick = useCallback(
-    (communityId: string) => {
-      router.push(`/sysAdmin/${communityId}`);
-    },
-    [router],
-  );
-
   return (
     <div className="p-4 max-w-2xl mx-auto">
       <div className="flex items-center justify-between mb-4">
@@ -70,11 +63,13 @@ export function SysAdminPageClient({ initialData }: Props) {
           {sysAdminDashboardJa.state.empty}
         </div>
       ) : (
+        // L2 詳細画面は別 PR で導入予定。本 PR では一覧表示のみのため
+        // 行はクリック不可にしている (onClick を渡さない)。
         <div className="flex flex-col">
           {communities.map((community, idx) => (
             <div key={community.communityId}>
               {idx !== 0 && <hr className="border-muted" />}
-              <CommunityRow row={community} onClick={handleRowClick} />
+              <CommunityRow row={community} />
             </div>
           ))}
         </div>
@@ -82,3 +77,4 @@ export function SysAdminPageClient({ initialData }: Props) {
     </div>
   );
 }
+

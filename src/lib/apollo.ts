@@ -187,54 +187,6 @@ const defaultOptions: ApolloClientOptions<NormalizedCacheObject> = {
           transactionsConnection: relayStylePagination(),
         },
       },
-      SysAdminCommunityDetailPayload: {
-        // asOf / segmentThresholds / windowMonths の組み合わせで返される「スナップショット」は
-        // 状況で変化するため normalize せず、親 Query のキャッシュエントリ内に閉じる。
-        keyFields: false,
-      },
-      Query: {
-        fields: {
-          sysAdminCommunityDetail: {
-            // cursor / limit はキャッシュキーから外し、同一キー内で merge する。
-            // それ以外 (communityId / asOf / segmentThresholds / windowMonths /
-            // userSort / userFilter) はすべて keyArgs に含め、組み合わせごとに
-            // 独立したキャッシュエントリを保持する。
-            // userFilter の slider 連続操作は UI 側で debounce 済みのため、
-            // 実用上キャッシュが過剰に累積することはない。L1 ↔ L2 往復や
-            // フィルタ変更の戻り操作がキャッシュヒットで即描画される。
-            keyArgs: [
-              "input",
-              [
-                "communityId",
-                "asOf",
-                "segmentThresholds",
-                "windowMonths",
-                "userSort",
-                "userFilter",
-              ],
-            ],
-            merge(existing, incoming, { args }) {
-              type WithMembers = typeof incoming & {
-                memberList?: { users?: unknown[] } | null;
-              };
-              const inc = incoming as WithMembers;
-              const ex = existing as WithMembers | undefined;
-              const cursor = (args as { input?: { cursor?: string | null } } | null)?.input?.cursor;
-              const isInitial = !cursor;
-              if (isInitial || !ex) return inc;
-              const existingUsers = ex.memberList?.users ?? [];
-              const incomingUsers = inc.memberList?.users ?? [];
-              return {
-                ...inc,
-                memberList: {
-                  ...inc.memberList,
-                  users: [...existingUsers, ...incomingUsers],
-                },
-              };
-            },
-          },
-        },
-      },
     },
   }),
 };
