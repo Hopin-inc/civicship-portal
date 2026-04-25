@@ -331,14 +331,10 @@ type AxisItem = {
 
 function KeyMetrics({ items }: { items: AxisItem[] }) {
   return (
-    <dl className="flex flex-col divide-y divide-border/60">
+    <dl className="flex flex-col gap-5">
       {items.map((item, i) => (
-        <div
-          key={i}
-          className="flex items-baseline justify-between gap-3 py-3 first:pt-0 last:pb-0"
-        >
-          <dt className="text-sm text-muted-foreground">{item.label}</dt>
-          <dd className="inline-flex items-baseline gap-1 text-2xl font-semibold tabular-nums leading-none tracking-tight">
+        <div key={i} className="flex flex-col gap-1">
+          <dd className="inline-flex items-baseline gap-1 text-3xl font-semibold tabular-nums leading-none tracking-tight">
             {item.prefix && (
               <span className="text-xs font-normal text-muted-foreground">
                 {item.prefix}
@@ -346,11 +342,12 @@ function KeyMetrics({ items }: { items: AxisItem[] }) {
             )}
             {item.value}
             {item.unit && (
-              <span className="text-sm font-medium text-muted-foreground">
+              <span className="text-base font-medium text-muted-foreground">
                 {item.unit}
               </span>
             )}
           </dd>
+          <dt className="text-xs text-muted-foreground">{item.label}</dt>
         </div>
       ))}
     </dl>
