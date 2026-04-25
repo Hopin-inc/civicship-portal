@@ -56,7 +56,7 @@ export function CommunityDashboardDetail({ communityId, initialData = null }: Pr
   return (
     <div className="flex flex-col gap-8">
       <CommunityDetailHeader
-        alerts={data.alerts}
+        loading={loading && !!data}
         controls={<MetricGlossaryButton />}
         periodControl={
           <PeriodPresetSelect
@@ -86,7 +86,7 @@ export function CommunityDashboardDetail({ communityId, initialData = null }: Pr
       <section className="flex flex-col gap-6 border-t pt-6">
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-0.5">
-            <span className="text-xs text-muted-foreground">MAU%</span>
+            <span className="text-xs text-muted-foreground">MAU% (今月)</span>
             <div className="flex flex-wrap items-baseline gap-x-2">
               <span className="text-3xl font-semibold tabular-nums leading-tight">
                 {toPct(summary.communityActivityRate)}

@@ -4,7 +4,6 @@ import { BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PeriodPresetSelect } from "@/app/sysAdmin/_shared/components/PeriodPresetSelect";
 import { CommunityDetailHeader } from "./CommunityDetailHeader";
-import { makeAlerts } from "../../../_shared/fixtures/sysAdminDashboard";
 
 const meta: Meta<typeof CommunityDetailHeader> = {
   title: "SysAdmin/Detail/CommunityDetailHeader",
@@ -32,18 +31,17 @@ const MockPeriodControl = () => (
   <PeriodPresetSelect value="last3Months" onChange={() => {}} />
 );
 
-export const NoAlert: Story = {
+export const Default: Story = {
   args: {
-    alerts: makeAlerts(),
     controls: <MockGlossaryButton />,
     periodControl: <MockPeriodControl />,
   },
 };
 
-export const WithAlert: Story = {
+export const Refetching: Story = {
   args: {
-    alerts: makeAlerts({ churnSpike: true }),
     controls: <MockGlossaryButton />,
     periodControl: <MockPeriodControl />,
+    loading: true,
   },
 };

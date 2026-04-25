@@ -13,14 +13,16 @@ export const METRIC_DEFINITIONS: Record<string, MetricDefinition> = {
   },
   communityActivityRate: {
     title: "MAU%",
-    formula: "MAU ÷ asOf 時点の総メンバー数 (rolling 窓は windowDays 日、default 28)",
-    note: "コミュニティ単位の MAU%。個人の送付率 (user_send_rate) とは別指標。本ツールでの Active = DONATION 送付者。",
+    formula:
+      "MAU 送付者 ÷ 総メンバー数。L1 は rolling windowDays 日 (default 28) 窓、L2 は最新完了月の暦月集計。",
+    note: "同じコミュニティでも L1 と L2 で数字が異なる場合がある — 時間軸が違うため。L1 = 介入判断用の即時シグナル、L2 = 確定済み月次の実績。個人の送付率 (user_send_rate) とは別指標で、本ツールでの Active = DONATION 送付者。",
     range: "0〜100%",
   },
   growthRateActivity: {
     title: "MAU% 前月比",
-    formula: "(現窓 MAU% − 前窓 MAU%) ÷ 前窓 MAU% (窓は windowDays 日、default 28)",
-    note: "負値は MAU% が前窓より低下。前窓の MAU% が 0 のときは null。",
+    formula:
+      "(現期 MAU% − 前期 MAU%) ÷ 前期 MAU%。L1 は windowDays 日窓ベース、L2 は完了月ベース (MoM)。",
+    note: "負値は MAU% が前期より低下。前期 MAU% が 0 のときは null。",
   },
   hubUserPct: {
     title: "Hub user%",
