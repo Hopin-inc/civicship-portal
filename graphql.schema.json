@@ -25355,6 +25355,22 @@
             "deprecationReason": null
           },
           {
+            "name": "retainedSenders",
+            "description": "Users who sent at least one DONATION in BOTH the current window\nAND the previous window (set intersection on user_id). Same\nshape as SysAdminWeeklyRetention.retainedSenders but at\nwindowDays scale, enabling client-side leaky-bucket derivation:\n\n  newlyActivatedSenders = senderCount     - retainedSenders\n  churnedSenders        = senderCountPrev - retainedSenders",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "senderCount",
             "description": "Unique users with at least one outgoing DONATION transaction\nduring the current window (donation_out_count > 0 in\nmv_user_transaction_daily).",
             "args": [],
