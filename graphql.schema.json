@@ -23955,6 +23955,22 @@
             "deprecationReason": null
           },
           {
+            "name": "hubMemberCount",
+            "description": "Number of members classified as a \"hub\" within the parametric\nwindow (`windowDays`):\n\n  hubMemberCount = COUNT(member)\n    WHERE windowUniqueDonationRecipients >= input.hubBreadthThreshold\n\n`windowUniqueDonationRecipients` is the count of DISTINCT users\nthis member sent a DONATION to during\n`[asOf - windowDays JST日, asOf + 1 JST日)` — distinct from the\nL2 `SysAdminMemberRow.uniqueDonationRecipients` field which is\ntenure-wide. The window-scoped variant is computed on demand in\nthis aggregate but not exposed per-member at L1 (members\nthemselves are an L2 concern).\n\nHub classification deliberately uses BREADTH only — a member\nwho reached `hubBreadthThreshold` distinct recipients during\nthe window necessarily transacted at least that many times,\nmaking an explicit frequency floor redundant. This keeps the\nthreshold knobs to one (`hubBreadthThreshold`).\n\nInvariants (the client may assert these):\n  hubMemberCount <= windowActivity.senderCount <= totalMembers\n\nThe first holds because any hub member donated >= 3 times in\nthe window and is therefore a window sender; the second because\nany window sender is a JOINED member at asOf.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "latestCohort",
             "description": "Latest completed monthly cohort and its M+1 activity. See\nSysAdminLatestCohort.",
             "args": [],
@@ -24244,6 +24260,18 @@
             "deprecationReason": null
           },
           {
+            "name": "hubBreadthThreshold",
+            "description": "Minimum number of distinct DONATION recipients within the\nparametric window (`windowDays`) for a member to be classified\nas a hub. Used to populate `SysAdminCommunityOverview.hubMemberCount`.\n\nDefaults to 3, meaning \"sent DONATION to at least 3 different\npeople during the window\". The threshold is on **unique\ncounterparties** (set cardinality), not transaction count, so a\nmember who donated 100 times to the same recipient does not\nqualify on this axis alone.\n\nEffective range 1..1000; values outside are silently clamped on\nthe server.\n\nThis is intentionally an absolute threshold rather than a\ncommunity-relative percentile: a percentile-based hub would\nalways classify ~N% of members as hubs by definition, defeating\ncross-community comparison (\"which communities have the highest\nhub ratio?\"). Community size differences are absorbed\nclient-side by displaying `hubMemberCount / totalMembers` rather\nthan the raw count.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "defaultValue": "3",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "segmentThresholds",
             "description": "Stage classification thresholds (see SysAdminSegmentThresholdsInput).",
             "type": {
@@ -24508,6 +24536,22 @@
               "ofType": {
                 "kind": "SCALAR",
                 "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "uniqueDonationRecipients",
+            "description": "All-time count of distinct OTHER users this member has sent at\nleast one DONATION to in this community. The \"network breadth\"\nhalf of the donor profile (paired with frequency-based\n`userSendRate` and volume-based `totalPointsOut`):\n\n  breadth × frequency × volume → the client's per-member\n  classification space (e.g. true hub vs single-target loyal vs\n  rare-but-far-reaching).\n\nCounts unique counterparty user_id, not transaction count, so a\nmember who sent 100 donations to the same recipient still scores\n1. Excludes burn / system targets (recipient wallets without a\nuser_id).",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
                 "ofType": null
               }
             },
