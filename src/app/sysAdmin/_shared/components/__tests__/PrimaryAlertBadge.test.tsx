@@ -7,7 +7,6 @@ describe("selectPrimaryAlert", () => {
   it("returns null when no alerts active", () => {
     expect(
       selectPrimaryAlert({
-        __typename: "SysAdminCommunityAlerts",
         churnSpike: false,
         activeDrop: false,
         noNewMembers: false,
@@ -18,7 +17,6 @@ describe("selectPrimaryAlert", () => {
   it("prioritizes churnSpike over the others", () => {
     expect(
       selectPrimaryAlert({
-        __typename: "SysAdminCommunityAlerts",
         churnSpike: true,
         activeDrop: true,
         noNewMembers: true,
@@ -29,7 +27,6 @@ describe("selectPrimaryAlert", () => {
   it("falls through to activeDrop when churnSpike is off", () => {
     expect(
       selectPrimaryAlert({
-        __typename: "SysAdminCommunityAlerts",
         churnSpike: false,
         activeDrop: true,
         noNewMembers: true,
@@ -40,7 +37,6 @@ describe("selectPrimaryAlert", () => {
   it("falls through to noNewMembers when others are off", () => {
     expect(
       selectPrimaryAlert({
-        __typename: "SysAdminCommunityAlerts",
         churnSpike: false,
         activeDrop: false,
         noNewMembers: true,
@@ -54,7 +50,6 @@ describe("PrimaryAlertBadge", () => {
     render(
       <PrimaryAlertBadge
         alerts={{
-          __typename: "SysAdminCommunityAlerts",
           churnSpike: true,
           activeDrop: true,
           noNewMembers: false,
@@ -68,7 +63,6 @@ describe("PrimaryAlertBadge", () => {
     const { container } = render(
       <PrimaryAlertBadge
         alerts={{
-          __typename: "SysAdminCommunityAlerts",
           churnSpike: false,
           activeDrop: false,
           noNewMembers: false,

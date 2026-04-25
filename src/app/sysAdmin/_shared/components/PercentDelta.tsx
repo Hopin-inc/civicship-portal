@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { toSignedPct } from "@/app/sysAdmin/_shared/format/number";
+import { toArrowPct } from "@/app/sysAdmin/_shared/format/number";
 import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";
 
 type Props = {
@@ -23,7 +23,7 @@ export function PercentDelta({ value, className }: Props) {
         className,
       )}
     >
-      {toSignedPct(value)}
+      {toArrowPct(value)}
     </span>
   );
 }

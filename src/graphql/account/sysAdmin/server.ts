@@ -20,13 +20,7 @@ export const GET_SYS_ADMIN_DASHBOARD_SERVER_QUERY = `
       communities {
         communityId
         communityName
-        communityActivityRate
-        growthRateActivity
-        latestCohortRetentionM1
         totalMembers
-        passiveCount
-        tier1Count
-        tier2Count
         segmentCounts {
           total
           activeCount
@@ -34,10 +28,20 @@ export const GET_SYS_ADMIN_DASHBOARD_SERVER_QUERY = `
           tier1Count
           tier2Count
         }
-        alerts {
-          activeDrop
-          churnSpike
-          noNewMembers
+        windowActivity {
+          senderCount
+          senderCountPrev
+          newMemberCount
+          newMemberCountPrev
+          retainedSenders
+        }
+        weeklyRetention {
+          retainedSenders
+          churnedSenders
+        }
+        latestCohort {
+          size
+          activeAtM1
         }
       }
     }

@@ -1,20 +1,12 @@
 import type {
   GqlGetSysAdminDashboardQuery,
-  GqlSysAdminCommunityAlerts,
   GqlSysAdminCommunityOverview,
+  GqlSysAdminLatestCohort,
   GqlSysAdminPlatformSummary,
   GqlSysAdminSegmentCounts,
+  GqlSysAdminWeeklyRetention,
+  GqlSysAdminWindowActivity,
 } from "@/types/graphql";
-
-export const makeAlerts = (
-  overrides: Partial<GqlSysAdminCommunityAlerts> = {},
-): GqlSysAdminCommunityAlerts => ({
-  __typename: "SysAdminCommunityAlerts",
-  activeDrop: false,
-  churnSpike: false,
-  noNewMembers: false,
-  ...overrides,
-});
 
 export const makeSegmentCounts = (
   overrides: Partial<GqlSysAdminSegmentCounts> = {},
@@ -28,6 +20,46 @@ export const makeSegmentCounts = (
   ...overrides,
 });
 
+export const makeWindowActivity = (
+  overrides: Partial<GqlSysAdminWindowActivity> = {},
+): GqlSysAdminWindowActivity => {
+  const senderCount = overrides.senderCount ?? 50;
+  const senderCountPrev = overrides.senderCountPrev ?? 46;
+  const newMemberCount = overrides.newMemberCount ?? 8;
+  const newMemberCountPrev = overrides.newMemberCountPrev ?? 6;
+  // retained ≤ min(senderCount, senderCountPrev) by definition.
+  // Clamp the default so story overrides that lower senderCount(/Prev)
+  // don't produce negative newlyActivated / churned counts.
+  const retainedSenders =
+    overrides.retainedSenders ?? Math.min(senderCount, senderCountPrev, 38);
+  return {
+    __typename: "SysAdminWindowActivity",
+    senderCount,
+    senderCountPrev,
+    newMemberCount,
+    newMemberCountPrev,
+    retainedSenders,
+  };
+};
+
+export const makeWeeklyRetention = (
+  overrides: Partial<GqlSysAdminWeeklyRetention> = {},
+): GqlSysAdminWeeklyRetention => ({
+  __typename: "SysAdminWeeklyRetention",
+  retainedSenders: 18,
+  churnedSenders: 4,
+  ...overrides,
+});
+
+export const makeLatestCohort = (
+  overrides: Partial<GqlSysAdminLatestCohort> = {},
+): GqlSysAdminLatestCohort => ({
+  __typename: "SysAdminLatestCohort",
+  size: 12,
+  activeAtM1: 8,
+  ...overrides,
+});
+
 export const makePlatformSummary = (
   overrides: Partial<GqlSysAdminPlatformSummary> = {},
 ): GqlSysAdminPlatformSummary => ({
@@ -38,23 +70,40 @@ export const makePlatformSummary = (
   ...overrides,
 });
 
+// Default proportions used to derive segmentCounts from totalMembers when
+// the caller doesn't pass an explicit segmentCounts override. Keeps Hub /
+// passive rates visually plausible across stories with varied totalMembers.
+const DEFAULT_TIER1_RATIO = 0.33;
+const DEFAULT_TIER2_RATIO = 0.58;
+const DEFAULT_PASSIVE_RATIO = 0.21;
+
+function defaultSegmentCountsFor(total: number): GqlSysAdminSegmentCounts {
+  return {
+    __typename: "SysAdminSegmentCounts",
+    total,
+    activeCount: Math.round(total * (1 - DEFAULT_PASSIVE_RATIO)),
+    passiveCount: Math.round(total * DEFAULT_PASSIVE_RATIO),
+    tier1Count: Math.round(total * DEFAULT_TIER1_RATIO),
+    tier2Count: Math.round(total * DEFAULT_TIER2_RATIO),
+  };
+}
+
 export const makeCommunityOverview = (
   overrides: Partial<GqlSysAdminCommunityOverview> = {},
-): GqlSysAdminCommunityOverview => ({
-  __typename: "SysAdminCommunityOverview",
-  communityId: "community-a",
-  communityName: "コミュニティA",
-  communityActivityRate: 0.42,
-  growthRateActivity: 0.08,
-  latestCohortRetentionM1: 0.63,
-  totalMembers: 120,
-  passiveCount: 25,
-  tier1Count: 40,
-  tier2Count: 70,
-  segmentCounts: makeSegmentCounts(),
-  alerts: makeAlerts(),
-  ...overrides,
-});
+): GqlSysAdminCommunityOverview => {
+  const totalMembers = overrides.totalMembers ?? 120;
+  return {
+    __typename: "SysAdminCommunityOverview",
+    communityId: "community-a",
+    communityName: "コミュニティA",
+    totalMembers,
+    segmentCounts: defaultSegmentCountsFor(totalMembers),
+    windowActivity: makeWindowActivity(),
+    weeklyRetention: makeWeeklyRetention(),
+    latestCohort: makeLatestCohort(),
+    ...overrides,
+  };
+};
 
 export const makeDashboardPayload = (
   overrides: {
@@ -75,17 +124,13 @@ export const makeDashboardPayload = (
         makeCommunityOverview({
           communityId: "community-b",
           communityName: "コミュニティB",
-          communityActivityRate: 0.28,
-          growthRateActivity: -0.14,
-          alerts: makeAlerts({ activeDrop: true }),
+          windowActivity: makeWindowActivity({ senderCount: 28, senderCountPrev: 40 }),
         }),
         makeCommunityOverview({
           communityId: "community-c",
           communityName: "コミュニティC",
-          communityActivityRate: 0.55,
-          growthRateActivity: 0.03,
-          latestCohortRetentionM1: null,
-          alerts: makeAlerts({ noNewMembers: true }),
+          windowActivity: makeWindowActivity({ newMemberCount: 0, newMemberCountPrev: 5 }),
+          latestCohort: makeLatestCohort({ size: 0, activeAtM1: 0 }),
         }),
       ],
   },
