@@ -159,10 +159,8 @@ export function CommunityDashboardOverview({
               label: "平均送付先数",
             },
             {
-              value:
-                paretoTopShare != null
-                  ? `上位 ${toPct(paretoTopShare)}`
-                  : "-",
+              prefix: paretoTopShare != null ? "上位" : undefined,
+              value: paretoTopShare != null ? toPct(paretoTopShare) : "-",
               label: "流通量の偏り",
             },
             {
@@ -323,7 +321,13 @@ function Hero({
   );
 }
 
-type AxisItem = { value: React.ReactNode; unit?: string; label: string };
+type AxisItem = {
+  /** small / muted prefix shown before the value (e.g. "上位"). */
+  prefix?: string;
+  value: React.ReactNode;
+  unit?: string;
+  label: string;
+};
 
 function KeyMetrics({ items }: { items: AxisItem[] }) {
   // 2-col on mobile, full-flex on wider so 3 と 4 metric の両ケースで破綻しない
@@ -332,6 +336,11 @@ function KeyMetrics({ items }: { items: AxisItem[] }) {
       {items.map((item, i) => (
         <div key={i} className="flex flex-col gap-1">
           <span className="inline-flex items-baseline gap-1 text-2xl font-semibold tabular-nums leading-none tracking-tight">
+            {item.prefix && (
+              <span className="text-xs font-normal text-muted-foreground">
+                {item.prefix}
+              </span>
+            )}
             {item.value}
             {item.unit && (
               <span className="text-sm font-medium text-muted-foreground">
