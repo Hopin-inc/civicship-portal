@@ -105,7 +105,7 @@ export function CommunityDashboardOverview({
       : null;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6">
       {/* community-name (page identity, not a card) */}
       {communityName && (
         <header className="flex items-baseline gap-3 pb-1">
@@ -124,30 +124,35 @@ export function CommunityDashboardOverview({
         </header>
       )}
 
-      {/* COMMUNITY band — 角丸カードでトンマナ統一 */}
-      <section className="rounded-xl border p-5 sm:p-6">
-        <dl className="flex flex-wrap gap-x-8 gap-y-2 text-sm tabular-nums">
-          {ageMonths != null && (
-            <div className="flex items-baseline gap-1.5">
-              <dt className="text-xs text-muted-foreground">活動期間</dt>
-              <dd>{ageMonths} ヶ月</dd>
-            </div>
-          )}
-          <div className="flex items-baseline gap-1.5">
-            <dt className="text-xs text-muted-foreground">累計流通</dt>
-            <dd>
-              {toCompactJa(summary.totalDonationPointsAllTime)}
-              <span className="text-xs text-muted-foreground"> pt</span>
-            </dd>
-          </div>
-          {summary.maxChainDepthAllTime != null && (
-            <div className="flex items-baseline gap-1.5">
-              <dt className="text-xs text-muted-foreground">最大連鎖</dt>
-              <dd>{summary.maxChainDepthAllTime} 段</dd>
-            </div>
-          )}
-        </dl>
-      </section>
+      <Scope title="コミュニティ">
+        <KeyMetrics
+          items={[
+            ...(ageMonths != null
+              ? [
+                  {
+                    value: ageMonths,
+                    unit: "ヶ月",
+                    label: "活動期間",
+                  } as AxisItem,
+                ]
+              : []),
+            {
+              value: toCompactJa(summary.totalDonationPointsAllTime),
+              unit: "pt",
+              label: "累計流通",
+            },
+            ...(summary.maxChainDepthAllTime != null
+              ? [
+                  {
+                    value: summary.maxChainDepthAllTime,
+                    unit: "段",
+                    label: "最大連鎖",
+                  } as AxisItem,
+                ]
+              : []),
+          ]}
+        />
+      </Scope>
 
       <Scope title="ネットワーク" detailHref={`/sysAdmin/${data.communityId}/network`}>
         <KeyMetrics
@@ -286,8 +291,8 @@ function Scope({
   children: React.ReactNode;
 }) {
   return (
-    <section className="flex flex-col gap-5 rounded-xl border p-5 sm:p-6">
-      <header className="flex items-baseline justify-between gap-3">
+    <section className="flex flex-col gap-3">
+      <header className="flex items-baseline justify-between gap-3 px-1">
         <h2 className="text-base font-semibold">{title}</h2>
         {detailHref && (
           <Link
@@ -299,7 +304,7 @@ function Scope({
           </Link>
         )}
       </header>
-      <div className="flex flex-col gap-5">{children}</div>
+      <div className="flex flex-col gap-3">{children}</div>
     </section>
   );
 }
@@ -331,10 +336,10 @@ type AxisItem = {
 
 function KeyMetrics({ items }: { items: AxisItem[] }) {
   return (
-    <dl className="flex flex-col gap-5">
+    <div className="flex flex-col gap-3">
       {items.map((item, i) => (
-        <div key={i} className="flex flex-col gap-1">
-          <dd className="inline-flex items-baseline gap-1 text-3xl font-semibold tabular-nums leading-none tracking-tight">
+        <div key={i} className="flex flex-col gap-1 rounded-xl border p-4 sm:p-5">
+          <span className="inline-flex items-baseline gap-1 text-3xl font-semibold tabular-nums leading-none tracking-tight">
             {item.prefix && (
               <span className="text-xs font-normal text-muted-foreground">
                 {item.prefix}
@@ -346,11 +351,11 @@ function KeyMetrics({ items }: { items: AxisItem[] }) {
                 {item.unit}
               </span>
             )}
-          </dd>
-          <dt className="text-xs text-muted-foreground">{item.label}</dt>
+          </span>
+          <span className="text-xs text-muted-foreground">{item.label}</span>
         </div>
       ))}
-    </dl>
+    </div>
   );
 }
 
@@ -418,7 +423,7 @@ function ChartBlock({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-3 rounded-xl border p-4 sm:p-5">
       <span className="text-xs text-muted-foreground">{title}</span>
       {children}
     </div>
