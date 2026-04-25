@@ -2964,55 +2964,42 @@ export type GqlSysAdminCommunityDetailPayload = {
 };
 
 /**
- * One row of the L1 all-community table. See the module docstring for the
- * distinction between `communityActivityRate` (this type) and
- * `userSendRate` (SysAdminMemberRow).
+ * One row of the L1 all-community table. Designed for at-a-glance
+ * intervention judgment: each row carries the raw counts the client
+ * needs to derive rates, growth, alerts, sort keys, and filter
+ * predicates without a second round-trip.
+ *
+ * Calendar-month metrics live on the L2 detail card
+ * (SysAdminCommunitySummaryCard) — L1 is rolling-window only.
  */
 export type GqlSysAdminCommunityOverview = {
   __typename?: "SysAdminCommunityOverview";
-  /** Alert flags (see SysAdminCommunityAlerts). */
-  alerts: GqlSysAdminCommunityAlerts;
-  /**
-   * Community activity rate for the JST calendar month containing asOf:
-   * unique DONATION senders in that month / month-end total_members.
-   * 0.0–1.0. NOT the individual-level userSendRate.
-   */
-  communityActivityRate: Scalars["Float"]["output"];
   /** Community id. */
   communityId: Scalars["ID"]["output"];
   /** Community display name (t_communities.name). */
   communityName: Scalars["String"]["output"];
   /**
-   * Month-over-month % change in communityActivityRate.
-   * Returned as a fraction (e.g. -0.2 == -20%). null when the prior month
-   * has no data to compare against.
+   * Latest completed monthly cohort and its M+1 activity. See
+   * SysAdminLatestCohort.
    */
-  growthRateActivity?: Maybe<Scalars["Float"]["output"]>;
+  latestCohort: GqlSysAdminLatestCohort;
   /**
-   * Retention rate of the most recent completed cohort (members who joined
-   * in asOf's previous JST month) measured in the month after joining.
-   * null when that cohort is empty.
+   * Per-stage member counts (tier1 / tier2 / passive, cumulative
+   * per the type doc) classified against input.segmentThresholds.
    */
-  latestCohortRetentionM1?: Maybe<Scalars["Float"]["output"]>;
-  /**
-   * Direct member count for the "latent" stage (never donated).
-   * Convenience field (== segmentCounts.passiveCount).
-   */
-  passiveCount: Scalars["Int"]["output"];
-  /** Stage counts under the supplied thresholds (cumulative, see type doc). */
   segmentCounts: GqlSysAdminSegmentCounts;
   /**
-   * Direct member count for the "habitual" stage (userSendRate >= tier1).
-   * Convenience field (== segmentCounts.tier1Count).
+   * Total status='JOINED' members as of asOf. Members whose
+   * created_at is after asOf are excluded from the count.
    */
-  tier1Count: Scalars["Int"]["output"];
-  /**
-   * Direct member count for the "regular+habitual" stage
-   * (userSendRate >= tier2). Convenience field (== segmentCounts.tier2Count).
-   */
-  tier2Count: Scalars["Int"]["output"];
-  /** Total status='JOINED' members at asOf. */
   totalMembers: Scalars["Int"]["output"];
+  /**
+   * Latest completed-week retention signals for client-side churn
+   * detection. See SysAdminWeeklyRetention.
+   */
+  weeklyRetention: GqlSysAdminWeeklyRetention;
+  /** Rolling-window DONATION activity. See SysAdminWindowActivity. */
+  windowActivity: GqlSysAdminWindowActivity;
 };
 
 /**
@@ -3066,14 +3053,22 @@ export type GqlSysAdminCommunitySummaryCard = {
 /** Input for the L1 all-community overview (`sysAdminDashboard`). */
 export type GqlSysAdminDashboardInput = {
   /**
-   * The "as of" timestamp. All trailing-window calculations are anchored
-   * here: the "latest month" is the JST calendar month containing asOf,
-   * and "latest week" is the ISO-week containing asOf. Defaults to now
-   * when omitted.
+   * As-of timestamp anchor. All trailing-window calculations are
+   * anchored here:
+   *   - parametric activity window: [asOf - windowDays, asOf + 1 JST日)
+   *   - weekly retention: latest completed ISO week before asOf
+   *   - latest cohort: (asOf JST月 - 2) so its M+1 window is fully past
+   * Defaults to now when omitted.
    */
   asOf?: InputMaybe<Scalars["Datetime"]["input"]>;
-  /** Stage-count thresholds (see SysAdminSegmentThresholdsInput). */
+  /** Stage classification thresholds (see SysAdminSegmentThresholdsInput). */
   segmentThresholds?: InputMaybe<GqlSysAdminSegmentThresholdsInput>;
+  /**
+   * Length of the rolling activity window in JST days. Effective
+   * range 7-90; values outside are silently clamped on the server.
+   * Defaults to 28 (= 4 weeks, absorbs day-of-week variance).
+   */
+  windowDays?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 /** Root payload for sysAdminDashboard (L1). */
@@ -3085,6 +3080,34 @@ export type GqlSysAdminDashboardPayload = {
   communities: Array<GqlSysAdminCommunityOverview>;
   /** Platform-wide aggregate row. */
   platform: GqlSysAdminPlatformSummary;
+};
+
+/**
+ * Most recently completed monthly cohort plus its M+1 activity.
+ * "M+1" follows standard cohort-analysis convention: the calendar
+ * month immediately after the joining month.
+ *
+ * The cohort is selected as (asOf's JST month - 2 months) so its
+ * M+1 window — the JST month immediately preceding asOf's month —
+ * is fully past. This avoids reporting an artificially low retention
+ * during the in-progress month.
+ *
+ * Raw counts are returned; the client divides for the retention rate
+ * and decides how to handle small-N cohorts via `size`.
+ */
+export type GqlSysAdminLatestCohort = {
+  __typename?: "SysAdminLatestCohort";
+  /**
+   * Of those cohort members, how many sent at least one DONATION
+   * during the M+1 month.
+   */
+  activeAtM1: Scalars["Int"]["output"];
+  /**
+   * Cohort size: status='JOINED' members whose created_at falls
+   * within the cohort month. 0 when no one joined that month
+   * (callers should treat M+1 retention as null in that case).
+   */
+  size: Scalars["Int"]["output"];
 };
 
 /** Paginated member list for the L2 detail. */
@@ -3337,6 +3360,53 @@ export const GqlSysAdminUserSortField = {
 
 export type GqlSysAdminUserSortField =
   (typeof GqlSysAdminUserSortField)[keyof typeof GqlSysAdminUserSortField];
+/**
+ * DONATION sender retention against the most recently completed
+ * ISO week (Monday 00:00 JST). Raw signals only; the client composes
+ * churn alerts (e.g. churnedSenders > retainedSenders).
+ */
+export type GqlSysAdminWeeklyRetention = {
+  __typename?: "SysAdminWeeklyRetention";
+  /**
+   * Users who sent DONATION in the week-before-latest but NOT in
+   * the latest completed week. "Lost this week, was engaged last week."
+   */
+  churnedSenders: Scalars["Int"]["output"];
+  /**
+   * Users who sent DONATION in the latest completed week AND in
+   * the week before it. "Engaged this week, was engaged last week."
+   */
+  retainedSenders: Scalars["Int"]["output"];
+};
+
+/**
+ * DONATION activity within the parametric window driven by
+ * `SysAdminDashboardInput.windowDays`. Both the current window and
+ * the immediately preceding window of equal length are returned so
+ * the client can derive growth rates without a second query.
+ *
+ *   current  = [asOf - windowDays JST日, asOf + 1 JST日)
+ *   previous = [asOf - 2 * windowDays, asOf - windowDays)
+ */
+export type GqlSysAdminWindowActivity = {
+  __typename?: "SysAdminWindowActivity";
+  /**
+   * New JOINED memberships (t_memberships.created_at within the
+   * current window, status='JOINED').
+   */
+  newMemberCount: Scalars["Int"]["output"];
+  /** Same metric for the previous window. */
+  newMemberCountPrev: Scalars["Int"]["output"];
+  /**
+   * Unique users with at least one outgoing DONATION transaction
+   * during the current window (donation_out_count > 0 in
+   * mv_user_transaction_daily).
+   */
+  senderCount: Scalars["Int"]["output"];
+  /** Same metric for the previous window of equal length. */
+  senderCountPrev: Scalars["Int"]["output"];
+};
+
 export const GqlSysRole = {
   SysAdmin: "SYS_ADMIN",
   User: "USER",
@@ -5006,13 +5076,6 @@ export type GqlGetNftInstanceWithDidQuery = {
   } | null;
 };
 
-export type GqlSysAdminAlertFieldsFragment = {
-  __typename?: "SysAdminCommunityAlerts";
-  activeDrop: boolean;
-  churnSpike: boolean;
-  noNewMembers: boolean;
-};
-
 export type GqlSysAdminSegmentCountsFieldsFragment = {
   __typename?: "SysAdminSegmentCounts";
   total: number;
@@ -5020,6 +5083,26 @@ export type GqlSysAdminSegmentCountsFieldsFragment = {
   passiveCount: number;
   tier1Count: number;
   tier2Count: number;
+};
+
+export type GqlSysAdminWindowActivityFieldsFragment = {
+  __typename?: "SysAdminWindowActivity";
+  senderCount: number;
+  senderCountPrev: number;
+  newMemberCount: number;
+  newMemberCountPrev: number;
+};
+
+export type GqlSysAdminWeeklyRetentionFieldsFragment = {
+  __typename?: "SysAdminWeeklyRetention";
+  retainedSenders: number;
+  churnedSenders: number;
+};
+
+export type GqlSysAdminLatestCohortFieldsFragment = {
+  __typename?: "SysAdminLatestCohort";
+  size: number;
+  activeAtM1: number;
 };
 
 export type GqlSysAdminPlatformSummaryFieldsFragment = {
@@ -5033,13 +5116,7 @@ export type GqlSysAdminCommunityOverviewRowFieldsFragment = {
   __typename?: "SysAdminCommunityOverview";
   communityId: string;
   communityName: string;
-  communityActivityRate: number;
-  growthRateActivity?: number | null;
-  latestCohortRetentionM1?: number | null;
   totalMembers: number;
-  passiveCount: number;
-  tier1Count: number;
-  tier2Count: number;
   segmentCounts: {
     __typename?: "SysAdminSegmentCounts";
     total: number;
@@ -5048,112 +5125,19 @@ export type GqlSysAdminCommunityOverviewRowFieldsFragment = {
     tier1Count: number;
     tier2Count: number;
   };
-  alerts: {
-    __typename?: "SysAdminCommunityAlerts";
-    activeDrop: boolean;
-    churnSpike: boolean;
-    noNewMembers: boolean;
+  windowActivity: {
+    __typename?: "SysAdminWindowActivity";
+    senderCount: number;
+    senderCountPrev: number;
+    newMemberCount: number;
+    newMemberCountPrev: number;
   };
-};
-
-export type GqlSysAdminCommunityDetailSummaryFieldsFragment = {
-  __typename?: "SysAdminCommunitySummaryCard";
-  communityId: string;
-  communityName: string;
-  communityActivityRate: number;
-  communityActivityRate3mAvg?: number | null;
-  growthRateActivity?: number | null;
-  totalMembers: number;
-  tier2Count: number;
-  tier2Pct: number;
-  totalDonationPointsAllTime: number;
-  maxChainDepthAllTime?: number | null;
-  dataFrom?: Date | null;
-  dataTo?: Date | null;
-};
-
-export type GqlSysAdminStageBucketFieldsFragment = {
-  __typename?: "SysAdminStageBucket";
-  count: number;
-  pct: number;
-  avgSendRate: number;
-  avgMonthsIn: number;
-  pointsContributionPct: number;
-};
-
-export type GqlSysAdminStageDistributionFieldsFragment = {
-  __typename?: "SysAdminStageDistribution";
-  habitual: {
-    __typename?: "SysAdminStageBucket";
-    count: number;
-    pct: number;
-    avgSendRate: number;
-    avgMonthsIn: number;
-    pointsContributionPct: number;
+  weeklyRetention: {
+    __typename?: "SysAdminWeeklyRetention";
+    retainedSenders: number;
+    churnedSenders: number;
   };
-  regular: {
-    __typename?: "SysAdminStageBucket";
-    count: number;
-    pct: number;
-    avgSendRate: number;
-    avgMonthsIn: number;
-    pointsContributionPct: number;
-  };
-  occasional: {
-    __typename?: "SysAdminStageBucket";
-    count: number;
-    pct: number;
-    avgSendRate: number;
-    avgMonthsIn: number;
-    pointsContributionPct: number;
-  };
-  latent: {
-    __typename?: "SysAdminStageBucket";
-    count: number;
-    pct: number;
-    avgSendRate: number;
-    avgMonthsIn: number;
-    pointsContributionPct: number;
-  };
-};
-
-export type GqlSysAdminMonthlyActivityPointFieldsFragment = {
-  __typename?: "SysAdminMonthlyActivityPoint";
-  month: Date;
-  communityActivityRate: number;
-  senderCount: number;
-  newMembers: number;
-  donationPointsSum: number;
-  chainPct?: number | null;
-};
-
-export type GqlSysAdminRetentionTrendPointFieldsFragment = {
-  __typename?: "SysAdminRetentionTrendPoint";
-  week: Date;
-  communityActivityRate?: number | null;
-  retainedSenders: number;
-  churnedSenders: number;
-  returnedSenders: number;
-  newMembers: number;
-};
-
-export type GqlSysAdminCohortRetentionPointFieldsFragment = {
-  __typename?: "SysAdminCohortRetentionPoint";
-  cohortMonth: Date;
-  cohortSize: number;
-  retentionM1?: number | null;
-  retentionM3?: number | null;
-  retentionM6?: number | null;
-};
-
-export type GqlSysAdminMemberRowFieldsFragment = {
-  __typename?: "SysAdminMemberRow";
-  userId: string;
-  name?: string | null;
-  userSendRate: number;
-  totalPointsOut: number;
-  donationOutMonths: number;
-  monthsIn: number;
+  latestCohort: { __typename?: "SysAdminLatestCohort"; size: number; activeAtM1: number };
 };
 
 export type GqlGetSysAdminDashboardQueryVariables = Exact<{
@@ -5175,13 +5159,7 @@ export type GqlGetSysAdminDashboardQuery = {
       __typename?: "SysAdminCommunityOverview";
       communityId: string;
       communityName: string;
-      communityActivityRate: number;
-      growthRateActivity?: number | null;
-      latestCohortRetentionM1?: number | null;
       totalMembers: number;
-      passiveCount: number;
-      tier1Count: number;
-      tier2Count: number;
       segmentCounts: {
         __typename?: "SysAdminSegmentCounts";
         total: number;
@@ -5190,124 +5168,20 @@ export type GqlGetSysAdminDashboardQuery = {
         tier1Count: number;
         tier2Count: number;
       };
-      alerts: {
-        __typename?: "SysAdminCommunityAlerts";
-        activeDrop: boolean;
-        churnSpike: boolean;
-        noNewMembers: boolean;
+      windowActivity: {
+        __typename?: "SysAdminWindowActivity";
+        senderCount: number;
+        senderCountPrev: number;
+        newMemberCount: number;
+        newMemberCountPrev: number;
       };
+      weeklyRetention: {
+        __typename?: "SysAdminWeeklyRetention";
+        retainedSenders: number;
+        churnedSenders: number;
+      };
+      latestCohort: { __typename?: "SysAdminLatestCohort"; size: number; activeAtM1: number };
     }>;
-  };
-};
-
-export type GqlGetSysAdminCommunityDetailQueryVariables = Exact<{
-  input: GqlSysAdminCommunityDetailInput;
-}>;
-
-export type GqlGetSysAdminCommunityDetailQuery = {
-  __typename?: "Query";
-  sysAdminCommunityDetail: {
-    __typename?: "SysAdminCommunityDetailPayload";
-    asOf: Date;
-    communityId: string;
-    communityName: string;
-    windowMonths: number;
-    alerts: {
-      __typename?: "SysAdminCommunityAlerts";
-      activeDrop: boolean;
-      churnSpike: boolean;
-      noNewMembers: boolean;
-    };
-    summary: {
-      __typename?: "SysAdminCommunitySummaryCard";
-      communityId: string;
-      communityName: string;
-      communityActivityRate: number;
-      communityActivityRate3mAvg?: number | null;
-      growthRateActivity?: number | null;
-      totalMembers: number;
-      tier2Count: number;
-      tier2Pct: number;
-      totalDonationPointsAllTime: number;
-      maxChainDepthAllTime?: number | null;
-      dataFrom?: Date | null;
-      dataTo?: Date | null;
-    };
-    stages: {
-      __typename?: "SysAdminStageDistribution";
-      habitual: {
-        __typename?: "SysAdminStageBucket";
-        count: number;
-        pct: number;
-        avgSendRate: number;
-        avgMonthsIn: number;
-        pointsContributionPct: number;
-      };
-      regular: {
-        __typename?: "SysAdminStageBucket";
-        count: number;
-        pct: number;
-        avgSendRate: number;
-        avgMonthsIn: number;
-        pointsContributionPct: number;
-      };
-      occasional: {
-        __typename?: "SysAdminStageBucket";
-        count: number;
-        pct: number;
-        avgSendRate: number;
-        avgMonthsIn: number;
-        pointsContributionPct: number;
-      };
-      latent: {
-        __typename?: "SysAdminStageBucket";
-        count: number;
-        pct: number;
-        avgSendRate: number;
-        avgMonthsIn: number;
-        pointsContributionPct: number;
-      };
-    };
-    monthlyActivityTrend: Array<{
-      __typename?: "SysAdminMonthlyActivityPoint";
-      month: Date;
-      communityActivityRate: number;
-      senderCount: number;
-      newMembers: number;
-      donationPointsSum: number;
-      chainPct?: number | null;
-    }>;
-    retentionTrend: Array<{
-      __typename?: "SysAdminRetentionTrendPoint";
-      week: Date;
-      communityActivityRate?: number | null;
-      retainedSenders: number;
-      churnedSenders: number;
-      returnedSenders: number;
-      newMembers: number;
-    }>;
-    cohortRetention: Array<{
-      __typename?: "SysAdminCohortRetentionPoint";
-      cohortMonth: Date;
-      cohortSize: number;
-      retentionM1?: number | null;
-      retentionM3?: number | null;
-      retentionM6?: number | null;
-    }>;
-    memberList: {
-      __typename?: "SysAdminMemberList";
-      hasNextPage: boolean;
-      nextCursor?: string | null;
-      users: Array<{
-        __typename?: "SysAdminMemberRow";
-        userId: string;
-        name?: string | null;
-        userSendRate: number;
-        totalPointsOut: number;
-        donationOutMonths: number;
-        monthsIn: number;
-      }>;
-    };
   };
 };
 
@@ -8686,114 +8560,48 @@ export const SysAdminSegmentCountsFieldsFragmentDoc = gql`
     tier2Count
   }
 `;
-export const SysAdminAlertFieldsFragmentDoc = gql`
-  fragment SysAdminAlertFields on SysAdminCommunityAlerts {
-    activeDrop
-    churnSpike
-    noNewMembers
+export const SysAdminWindowActivityFieldsFragmentDoc = gql`
+  fragment SysAdminWindowActivityFields on SysAdminWindowActivity {
+    senderCount
+    senderCountPrev
+    newMemberCount
+    newMemberCountPrev
+  }
+`;
+export const SysAdminWeeklyRetentionFieldsFragmentDoc = gql`
+  fragment SysAdminWeeklyRetentionFields on SysAdminWeeklyRetention {
+    retainedSenders
+    churnedSenders
+  }
+`;
+export const SysAdminLatestCohortFieldsFragmentDoc = gql`
+  fragment SysAdminLatestCohortFields on SysAdminLatestCohort {
+    size
+    activeAtM1
   }
 `;
 export const SysAdminCommunityOverviewRowFieldsFragmentDoc = gql`
   fragment SysAdminCommunityOverviewRowFields on SysAdminCommunityOverview {
     communityId
     communityName
-    communityActivityRate
-    growthRateActivity
-    latestCohortRetentionM1
     totalMembers
-    passiveCount
-    tier1Count
-    tier2Count
     segmentCounts {
       ...SysAdminSegmentCountsFields
     }
-    alerts {
-      ...SysAdminAlertFields
+    windowActivity {
+      ...SysAdminWindowActivityFields
+    }
+    weeklyRetention {
+      ...SysAdminWeeklyRetentionFields
+    }
+    latestCohort {
+      ...SysAdminLatestCohortFields
     }
   }
   ${SysAdminSegmentCountsFieldsFragmentDoc}
-  ${SysAdminAlertFieldsFragmentDoc}
-`;
-export const SysAdminCommunityDetailSummaryFieldsFragmentDoc = gql`
-  fragment SysAdminCommunityDetailSummaryFields on SysAdminCommunitySummaryCard {
-    communityId
-    communityName
-    communityActivityRate
-    communityActivityRate3mAvg
-    growthRateActivity
-    totalMembers
-    tier2Count
-    tier2Pct
-    totalDonationPointsAllTime
-    maxChainDepthAllTime
-    dataFrom
-    dataTo
-  }
-`;
-export const SysAdminStageBucketFieldsFragmentDoc = gql`
-  fragment SysAdminStageBucketFields on SysAdminStageBucket {
-    count
-    pct
-    avgSendRate
-    avgMonthsIn
-    pointsContributionPct
-  }
-`;
-export const SysAdminStageDistributionFieldsFragmentDoc = gql`
-  fragment SysAdminStageDistributionFields on SysAdminStageDistribution {
-    habitual {
-      ...SysAdminStageBucketFields
-    }
-    regular {
-      ...SysAdminStageBucketFields
-    }
-    occasional {
-      ...SysAdminStageBucketFields
-    }
-    latent {
-      ...SysAdminStageBucketFields
-    }
-  }
-  ${SysAdminStageBucketFieldsFragmentDoc}
-`;
-export const SysAdminMonthlyActivityPointFieldsFragmentDoc = gql`
-  fragment SysAdminMonthlyActivityPointFields on SysAdminMonthlyActivityPoint {
-    month
-    communityActivityRate
-    senderCount
-    newMembers
-    donationPointsSum
-    chainPct
-  }
-`;
-export const SysAdminRetentionTrendPointFieldsFragmentDoc = gql`
-  fragment SysAdminRetentionTrendPointFields on SysAdminRetentionTrendPoint {
-    week
-    communityActivityRate
-    retainedSenders
-    churnedSenders
-    returnedSenders
-    newMembers
-  }
-`;
-export const SysAdminCohortRetentionPointFieldsFragmentDoc = gql`
-  fragment SysAdminCohortRetentionPointFields on SysAdminCohortRetentionPoint {
-    cohortMonth
-    cohortSize
-    retentionM1
-    retentionM3
-    retentionM6
-  }
-`;
-export const SysAdminMemberRowFieldsFragmentDoc = gql`
-  fragment SysAdminMemberRowFields on SysAdminMemberRow {
-    userId
-    name
-    userSendRate
-    totalPointsOut
-    donationOutMonths
-    monthsIn
-  }
+  ${SysAdminWindowActivityFieldsFragmentDoc}
+  ${SysAdminWeeklyRetentionFieldsFragmentDoc}
+  ${SysAdminLatestCohortFieldsFragmentDoc}
 `;
 export const PlaceFieldsFragmentDoc = gql`
   fragment PlaceFields on Place {
@@ -10978,121 +10786,6 @@ export type GetSysAdminDashboardSuspenseQueryHookResult = ReturnType<
 export type GetSysAdminDashboardQueryResult = Apollo.QueryResult<
   GqlGetSysAdminDashboardQuery,
   GqlGetSysAdminDashboardQueryVariables
->;
-export const GetSysAdminCommunityDetailDocument = gql`
-  query GetSysAdminCommunityDetail($input: SysAdminCommunityDetailInput!) {
-    sysAdminCommunityDetail(input: $input) {
-      asOf
-      communityId
-      communityName
-      windowMonths
-      alerts {
-        ...SysAdminAlertFields
-      }
-      summary {
-        ...SysAdminCommunityDetailSummaryFields
-      }
-      stages {
-        ...SysAdminStageDistributionFields
-      }
-      monthlyActivityTrend {
-        ...SysAdminMonthlyActivityPointFields
-      }
-      retentionTrend {
-        ...SysAdminRetentionTrendPointFields
-      }
-      cohortRetention {
-        ...SysAdminCohortRetentionPointFields
-      }
-      memberList {
-        hasNextPage
-        nextCursor
-        users {
-          ...SysAdminMemberRowFields
-        }
-      }
-    }
-  }
-  ${SysAdminAlertFieldsFragmentDoc}
-  ${SysAdminCommunityDetailSummaryFieldsFragmentDoc}
-  ${SysAdminStageDistributionFieldsFragmentDoc}
-  ${SysAdminMonthlyActivityPointFieldsFragmentDoc}
-  ${SysAdminRetentionTrendPointFieldsFragmentDoc}
-  ${SysAdminCohortRetentionPointFieldsFragmentDoc}
-  ${SysAdminMemberRowFieldsFragmentDoc}
-`;
-
-/**
- * __useGetSysAdminCommunityDetailQuery__
- *
- * To run a query within a React component, call `useGetSysAdminCommunityDetailQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetSysAdminCommunityDetailQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetSysAdminCommunityDetailQuery({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useGetSysAdminCommunityDetailQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    GqlGetSysAdminCommunityDetailQuery,
-    GqlGetSysAdminCommunityDetailQueryVariables
-  > &
-    (
-      | { variables: GqlGetSysAdminCommunityDetailQueryVariables; skip?: boolean }
-      | { skip: boolean }
-    ),
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    GqlGetSysAdminCommunityDetailQuery,
-    GqlGetSysAdminCommunityDetailQueryVariables
-  >(GetSysAdminCommunityDetailDocument, options);
-}
-export function useGetSysAdminCommunityDetailLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    GqlGetSysAdminCommunityDetailQuery,
-    GqlGetSysAdminCommunityDetailQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    GqlGetSysAdminCommunityDetailQuery,
-    GqlGetSysAdminCommunityDetailQueryVariables
-  >(GetSysAdminCommunityDetailDocument, options);
-}
-export function useGetSysAdminCommunityDetailSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        GqlGetSysAdminCommunityDetailQuery,
-        GqlGetSysAdminCommunityDetailQueryVariables
-      >,
-) {
-  const options =
-    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    GqlGetSysAdminCommunityDetailQuery,
-    GqlGetSysAdminCommunityDetailQueryVariables
-  >(GetSysAdminCommunityDetailDocument, options);
-}
-export type GetSysAdminCommunityDetailQueryHookResult = ReturnType<
-  typeof useGetSysAdminCommunityDetailQuery
->;
-export type GetSysAdminCommunityDetailLazyQueryHookResult = ReturnType<
-  typeof useGetSysAdminCommunityDetailLazyQuery
->;
-export type GetSysAdminCommunityDetailSuspenseQueryHookResult = ReturnType<
-  typeof useGetSysAdminCommunityDetailSuspenseQuery
->;
-export type GetSysAdminCommunityDetailQueryResult = Apollo.QueryResult<
-  GqlGetSysAdminCommunityDetailQuery,
-  GqlGetSysAdminCommunityDetailQueryVariables
 >;
 export const GetCurrentUserProfileDocument = gql`
   query GetCurrentUserProfile {

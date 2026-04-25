@@ -23919,41 +23919,9 @@
       {
         "kind": "OBJECT",
         "name": "SysAdminCommunityOverview",
-        "description": "One row of the L1 all-community table. See the module docstring for the\ndistinction between `communityActivityRate` (this type) and\n`userSendRate` (SysAdminMemberRow).",
+        "description": "One row of the L1 all-community table. Designed for at-a-glance\nintervention judgment: each row carries the raw counts the client\nneeds to derive rates, growth, alerts, sort keys, and filter\npredicates without a second round-trip.\n\nCalendar-month metrics live on the L2 detail card\n(SysAdminCommunitySummaryCard) — L1 is rolling-window only.",
         "isOneOf": null,
         "fields": [
-          {
-            "name": "alerts",
-            "description": "Alert flags (see SysAdminCommunityAlerts).",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "SysAdminCommunityAlerts",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "communityActivityRate",
-            "description": "Community activity rate for the JST calendar month containing asOf:\nunique DONATION senders in that month / month-end total_members.\n0.0–1.0. NOT the individual-level userSendRate.",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Float",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
           {
             "name": "communityId",
             "description": "Community id.",
@@ -23987,39 +23955,15 @@
             "deprecationReason": null
           },
           {
-            "name": "growthRateActivity",
-            "description": "Month-over-month % change in communityActivityRate.\nReturned as a fraction (e.g. -0.2 == -20%). null when the prior month\nhas no data to compare against.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "Float",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "latestCohortRetentionM1",
-            "description": "Retention rate of the most recent completed cohort (members who joined\nin asOf's previous JST month) measured in the month after joining.\nnull when that cohort is empty.",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "Float",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "passiveCount",
-            "description": "Direct member count for the \"latent\" stage (never donated).\nConvenience field (== segmentCounts.passiveCount).",
+            "name": "latestCohort",
+            "description": "Latest completed monthly cohort and its M+1 activity. See\nSysAdminLatestCohort.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "SCALAR",
-                "name": "Int",
+                "kind": "OBJECT",
+                "name": "SysAdminLatestCohort",
                 "ofType": null
               }
             },
@@ -24028,7 +23972,7 @@
           },
           {
             "name": "segmentCounts",
-            "description": "Stage counts under the supplied thresholds (cumulative, see type doc).",
+            "description": "Per-stage member counts (tier1 / tier2 / passive, cumulative\nper the type doc) classified against input.segmentThresholds.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -24043,40 +23987,8 @@
             "deprecationReason": null
           },
           {
-            "name": "tier1Count",
-            "description": "Direct member count for the \"habitual\" stage (userSendRate >= tier1).\nConvenience field (== segmentCounts.tier1Count).",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Int",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "tier2Count",
-            "description": "Direct member count for the \"regular+habitual\" stage\n(userSendRate >= tier2). Convenience field (== segmentCounts.tier2Count).",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Int",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "totalMembers",
-            "description": "Total status='JOINED' members at asOf.",
+            "description": "Total status='JOINED' members as of asOf. Members whose\ncreated_at is after asOf are excluded from the count.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -24084,6 +23996,38 @@
               "ofType": {
                 "kind": "SCALAR",
                 "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "weeklyRetention",
+            "description": "Latest completed-week retention signals for client-side churn\ndetection. See SysAdminWeeklyRetention.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "SysAdminWeeklyRetention",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "windowActivity",
+            "description": "Rolling-window DONATION activity. See SysAdminWindowActivity.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "SysAdminWindowActivity",
                 "ofType": null
               }
             },
@@ -24289,7 +24233,7 @@
         "inputFields": [
           {
             "name": "asOf",
-            "description": "The \"as of\" timestamp. All trailing-window calculations are anchored\nhere: the \"latest month\" is the JST calendar month containing asOf,\nand \"latest week\" is the ISO-week containing asOf. Defaults to now\nwhen omitted.",
+            "description": "As-of timestamp anchor. All trailing-window calculations are\nanchored here:\n  - parametric activity window: [asOf - windowDays, asOf + 1 JST日)\n  - weekly retention: latest completed ISO week before asOf\n  - latest cohort: (asOf JST月 - 2) so its M+1 window is fully past\nDefaults to now when omitted.",
             "type": {
               "kind": "SCALAR",
               "name": "Datetime",
@@ -24301,13 +24245,25 @@
           },
           {
             "name": "segmentThresholds",
-            "description": "Stage-count thresholds (see SysAdminSegmentThresholdsInput).",
+            "description": "Stage classification thresholds (see SysAdminSegmentThresholdsInput).",
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "SysAdminSegmentThresholdsInput",
               "ofType": null
             },
             "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "windowDays",
+            "description": "Length of the rolling activity window in JST days. Effective\nrange 7-90; values outside are silently clamped on the server.\nDefaults to 28 (= 4 weeks, absorbs day-of-week variance).",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "defaultValue": "28",
             "isDeprecated": false,
             "deprecationReason": null
           }
@@ -24372,6 +24328,50 @@
               "ofType": {
                 "kind": "OBJECT",
                 "name": "SysAdminPlatformSummary",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "SysAdminLatestCohort",
+        "description": "Most recently completed monthly cohort plus its M+1 activity.\n\"M+1\" follows standard cohort-analysis convention: the calendar\nmonth immediately after the joining month.\n\nThe cohort is selected as (asOf's JST month - 2 months) so its\nM+1 window — the JST month immediately preceding asOf's month —\nis fully past. This avoids reporting an artificially low retention\nduring the in-progress month.\n\nRaw counts are returned; the client divides for the retention rate\nand decides how to handle small-N cohorts via `size`.",
+        "isOneOf": null,
+        "fields": [
+          {
+            "name": "activeAtM1",
+            "description": "Of those cohort members, how many sent at least one DONATION\nduring the M+1 month.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "size",
+            "description": "Cohort size: status='JOINED' members whose created_at falls\nwithin the cohort month. 0 when no one joined that month\n(callers should treat M+1 retention as null in that case).",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
                 "ofType": null
               }
             },
@@ -25270,6 +25270,126 @@
             "deprecationReason": null
           }
         ],
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "SysAdminWeeklyRetention",
+        "description": "DONATION sender retention against the most recently completed\nISO week (Monday 00:00 JST). Raw signals only; the client composes\nchurn alerts (e.g. churnedSenders > retainedSenders).",
+        "isOneOf": null,
+        "fields": [
+          {
+            "name": "churnedSenders",
+            "description": "Users who sent DONATION in the week-before-latest but NOT in\nthe latest completed week. \"Lost this week, was engaged last week.\"",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "retainedSenders",
+            "description": "Users who sent DONATION in the latest completed week AND in\nthe week before it. \"Engaged this week, was engaged last week.\"",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "SysAdminWindowActivity",
+        "description": "DONATION activity within the parametric window driven by\n`SysAdminDashboardInput.windowDays`. Both the current window and\nthe immediately preceding window of equal length are returned so\nthe client can derive growth rates without a second query.\n\n  current  = [asOf - windowDays JST日, asOf + 1 JST日)\n  previous = [asOf - 2 * windowDays, asOf - windowDays)",
+        "isOneOf": null,
+        "fields": [
+          {
+            "name": "newMemberCount",
+            "description": "New JOINED memberships (t_memberships.created_at within the\ncurrent window, status='JOINED').",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "newMemberCountPrev",
+            "description": "Same metric for the previous window.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "senderCount",
+            "description": "Unique users with at least one outgoing DONATION transaction\nduring the current window (donation_out_count > 0 in\nmv_user_transaction_daily).",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "senderCountPrev",
+            "description": "Same metric for the previous window of equal length.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
         "possibleTypes": null
       },
       {
