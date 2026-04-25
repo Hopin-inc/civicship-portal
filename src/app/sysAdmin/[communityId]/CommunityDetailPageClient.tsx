@@ -1,7 +1,14 @@
 "use client";
 
+import { useMemo } from "react";
+import useHeaderConfig from "@/hooks/useHeaderConfig";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { ErrorState } from "@/components/shared/ErrorState";
 import type { GqlGetSysAdminCommunityDetailQuery } from "@/types/graphql";
-import { CommunityDashboardDetail } from "@/app/sysAdmin/features/communityDetail/components/CommunityDashboardDetail";
+import { useDashboardControls } from "@/app/sysAdmin/features/dashboard/hooks/useDashboardControls";
+import { useCommunityDetail } from "@/app/sysAdmin/features/communityDetail/hooks/useCommunityDetail";
+import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";
+import { CommunityDashboardOverview } from "@/app/sysAdmin/features/communityDetail/components/CommunityDashboardOverview";
 
 type Props = {
   communityId: string;
@@ -9,7 +16,40 @@ type Props = {
 };
 
 export function CommunityDetailPageClient({ communityId, initialData }: Props) {
+  const dashboard = useDashboardControls();
+  const { loading, error, detail: data } = useCommunityDetail({
+    communityId,
+    dashboardControls: dashboard.state,
+    initialData,
+  });
+
+  const headerConfig = useMemo(
+    () => ({
+      title: data?.communityName ?? sysAdminDashboardJa.detail.title,
+      showLogo: false,
+      showBackButton: true,
+    }),
+    [data?.communityName],
+  );
+  useHeaderConfig(headerConfig);
+
+  if (loading && !data) return <LoadingIndicator />;
+  if (error) return <ErrorState title={sysAdminDashboardJa.state.error} />;
+  if (!data) return null;
+
+  // L2 detail schema doesn't expose L1's windowActivity, so we approximate
+  // newMemberCount from the latest monthly trend point. hubMemberCount stays
+  // unprovided (renders as 未計測) until backend exposes it on
+  // SysAdminCommunityDetailPayload.
+  const latestMonth =
+    data.monthlyActivityTrend[data.monthlyActivityTrend.length - 1];
+  const newMemberCount = latestMonth?.newMembers;
+
   return (
-    <CommunityDashboardDetail communityId={communityId} initialData={initialData} />
+    <CommunityDashboardOverview
+      data={data}
+      communityName={data.communityName}
+      newMemberCount={newMemberCount}
+    />
   );
 }

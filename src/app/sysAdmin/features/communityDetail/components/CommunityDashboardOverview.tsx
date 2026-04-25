@@ -34,10 +34,14 @@ type DetailPayload = NonNullable<
 
 type Props = {
   data: DetailPayload;
-  /** L2 schema には未掲載のため preview として外部から渡す。 */
+  /** L2 schema には未掲載のため preview として外部から渡す。production
+   * では undefined を渡すと「未計測」表示にフォールバック。 */
   hubMemberCount?: number;
   communityName?: string;
   newMemberCount?: number;
+  /** subpage CTA を出すか (storybook design preview 専用、production では
+   * subpage 未実装なので default false)。 */
+  enableSubpageLinks?: boolean;
 };
 
 const SCOPE_COLOR = {
@@ -55,9 +59,10 @@ const SCOPE_COLOR = {
  */
 export function CommunityDashboardOverview({
   data,
-  hubMemberCount = 0,
+  hubMemberCount,
   communityName,
   newMemberCount,
+  enableSubpageLinks = false,
 }: Props) {
   const summary = data.summary;
   const totalMembers = summary.totalMembers;
@@ -70,7 +75,8 @@ export function CommunityDashboardOverview({
     (u) => u.userSendRate >= 0.7 && u.uniqueDonationRecipients <= 1,
   ).length;
 
-  const hubPct = totalMembers > 0 ? hubMemberCount / totalMembers : 0;
+  const hubProvided = hubMemberCount !== undefined;
+  const hubPct = hubProvided && totalMembers > 0 ? hubMemberCount / totalMembers : 0;
   const isolatedRatio = habitualCount > 0 ? isolatedCount / habitualCount : 0;
   const isolatedAlert = habitualCount > 0 && isolatedRatio >= 0.3;
 
@@ -190,15 +196,22 @@ export function CommunityDashboardOverview({
 
       <Scope
         title="ネットワーク"
-        detailHref={`/sysAdmin/${data.communityId}/network`}
+        detailHref={
+          enableSubpageLinks ? `/sysAdmin/${data.communityId}/network` : undefined
+        }
       >
         <MetricCard
           icon={Network}
           colorClass={SCOPE_COLOR.network}
           title="ハブユーザー比率"
           meta="今月"
-          hero={<Hero value={toPct(hubPct)} />}
-          viz={<Ring value={hubPct} colorClass={SCOPE_COLOR.network} />}
+          status={hubProvided ? "ok" : "todo"}
+          hero={hubProvided ? <Hero value={toPct(hubPct)} /> : undefined}
+          viz={
+            hubProvided ? (
+              <Ring value={hubPct} colorClass={SCOPE_COLOR.network} />
+            ) : undefined
+          }
         />
         <MetricCard
           icon={Send}
@@ -263,7 +276,7 @@ export function CommunityDashboardOverview({
 
       <Scope
         title="アクティビティ"
-        detailHref={`/sysAdmin/${data.communityId}/activity`}
+        detailHref={enableSubpageLinks ? `/sysAdmin/${data.communityId}/activity` : undefined}
       >
         <MetricCard
           icon={Activity}
@@ -385,7 +398,7 @@ export function CommunityDashboardOverview({
 
       <Scope
         title="ユーザー"
-        detailHref={`/sysAdmin/${data.communityId}/users`}
+        detailHref={enableSubpageLinks ? `/sysAdmin/${data.communityId}/users` : undefined}
       >
         <MetricCard
           icon={Star}

@@ -11,12 +11,11 @@ type Props = {
 };
 
 /**
- * L2 detail のパネル基底。カード枠を持たず、title + actions + content だけを
- * 垂直に並べる。親側 (CommunityDashboardDetail) の gap でセクション間の
- * breathing room を確保する。
- *
- * 旧 ChartCard から border+shadow+padding を剥がした版。同じ視覚重量の
- * カードが縦に連なることによるリズムの消失を解消する意図。
+ * Generic panel: card 枠なしで title + actions + content を垂直に並べる。
+ * 親 layout 側の gap で breathing room を確保する。L2 detail の旧構成 で
+ * 使われていた helper だが、現 L2 overview (CommunityDashboardOverview) は
+ * 直接の card で組んでおり Panel は使用していない。subpage の deep-dive
+ * (Phase 2) で再利用候補。
  */
 export function Panel({ title, description, actions, children, footer, className }: Props) {
   return (

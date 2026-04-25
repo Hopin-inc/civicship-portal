@@ -9,7 +9,6 @@ import {
   deriveActivityRate,
   deriveChurnedSenders,
   deriveGrowthRateActivity,
-  deriveHubUserPct,
   deriveNewlyActivatedSenders,
 } from "@/app/sysAdmin/_shared/derive";
 import type { GqlSysAdminCommunityOverview } from "@/types/graphql";
@@ -23,7 +22,6 @@ export function CommunityRow({ row, onClick }: Props) {
   const handleClick = () => onClick?.(row.communityId);
   const activityRate = deriveActivityRate(row);
   const growthRateActivity = deriveGrowthRateActivity(row);
-  const hubUserPct = deriveHubUserPct(row);
   const newMemberCount = row.windowActivity.newMemberCount;
   const newlyActivated = deriveNewlyActivatedSenders(row);
   const churned = deriveChurnedSenders(row);
@@ -60,7 +58,6 @@ export function CommunityRow({ row, onClick }: Props) {
       <ItemFooter className="mt-0">
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5">
           <KpiPill label="MAU" value={toPct(activityRate)} delta={growthRateActivity} />
-          <KpiPill label="Hub" value={toPct(hubUserPct)} />
           <KpiPill label="Δ" value={`新規${toIntJa(newlyActivated)} / 休眠${toIntJa(churned)}`} />
         </div>
       </ItemFooter>

@@ -2,16 +2,16 @@ import React from "react";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { GetSysAdminCommunityDetailDocument } from "@/types/graphql";
 import { withApollo, withPageShell } from "../../../../.storybook/decorators";
-import { CommunityDashboardDetail } from "../features/communityDetail/components/CommunityDashboardDetail";
+import { CommunityDetailPageClient } from "./CommunityDetailPageClient";
 import { makeCommunityDetailPayload } from "../_shared/fixtures/sysAdminDashboard";
 
 // page.tsx は async RSC で SSR fetch するため Storybook から直接 render できない。
-// Client 部分 (`CommunityDashboardDetail`) と route の container (max-w-7xl p-4) を
-// ラップで再現する。initialData は省略して Apollo mock が発火する経路をテスト。
+// Client 部分 (`CommunityDetailPageClient`) と route の container (max-w-7xl p-4)
+// をラップで再現する。initialData=null にして Apollo mock 経路をテスト。
 function CommunityDetailPageShell({ communityId }: { communityId: string }) {
   return (
     <div className="mx-auto max-w-7xl p-4">
-      <CommunityDashboardDetail communityId={communityId} />
+      <CommunityDetailPageClient communityId={communityId} initialData={null} />
     </div>
   );
 }
