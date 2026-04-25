@@ -54,7 +54,7 @@ export function CommunityDashboardDetail({ communityId, initialData = null }: Pr
   const memberCountLabel = `${totalMembers}${data.memberList.hasNextPage ? "+" : ""} 件`;
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-6">
       <CommunityDetailHeader
         loading={loading && !!data}
         controls={<MetricGlossaryButton />}
@@ -66,8 +66,12 @@ export function CommunityDashboardDetail({ communityId, initialData = null }: Pr
         }
       />
 
-      {/* 人: 総数 + ステージ分布 */}
-      <section className="flex flex-col gap-4 border-t pt-6">
+      {/*
+       * 人: 「このコミュニティは誰でできているか」の descriptive context。
+       * 評価指標 (MAU% 等) ではなくヘッダーの延長として扱うため、border / 区切りを
+       * 引かず header と密に並べる。最初の analytical section は次の「活動」。
+       */}
+      <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-0.5">
           <span className="text-xs text-muted-foreground">{t.memberSuffix}</span>
           <span className="text-3xl font-semibold tabular-nums leading-tight">
@@ -80,7 +84,7 @@ export function CommunityDashboardDetail({ communityId, initialData = null }: Pr
           tier2={dashboard.state.tier2}
           onThresholdsChange={dashboard.setThresholds}
         />
-      </section>
+      </div>
 
       {/* 活動: MAU% (大) + 累計pt/最大chain (横並び) + 推移チャート */}
       <section className="flex flex-col gap-6 border-t pt-6">
