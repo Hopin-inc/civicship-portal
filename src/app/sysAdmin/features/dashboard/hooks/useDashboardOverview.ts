@@ -9,6 +9,7 @@ import {
   useGetSysAdminDashboardQuery,
 } from "@/types/graphql";
 import type { DashboardControlsState } from "./useDashboardControls";
+import { DASHBOARD_CONTROLS_DEFAULTS } from "./useDashboardControls";
 import {
   DEFAULT_PERIOD,
   resolvePeriodToInput,
@@ -22,8 +23,8 @@ export type DashboardOverviewResult = {
   asOf: Date | null;
 };
 
-const DEFAULT_TIER1 = 0.7;
-const DEFAULT_TIER2 = 0.4;
+const DEFAULT_TIER1 = DASHBOARD_CONTROLS_DEFAULTS.tier1;
+const DEFAULT_TIER2 = DASHBOARD_CONTROLS_DEFAULTS.tier2;
 
 /**
  * SSR で取得した初期データと、クライアント側のコントロール変化時のみ発火する
