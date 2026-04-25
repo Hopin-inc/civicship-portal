@@ -31,7 +31,7 @@ export const METRIC_DEFINITIONS: Record<string, MetricDefinition> = {
   newMembers: {
     title: "New",
     formula: "直近 28 日 (windowDays default) に JOINED で加入したメンバー数",
-    note: "rolling 窓内の絶対数。コミュニティ size に依らず流入の勢いを見るため % ではなく count で表示。",
+    note: "row では総メンバー数の隣に `(+12)` の形で表示。0 のときは `(+0)` で「新規加入なし」のシグナルを兼ねる。",
   },
   userSendRate: {
     title: "送付率 (個人)",

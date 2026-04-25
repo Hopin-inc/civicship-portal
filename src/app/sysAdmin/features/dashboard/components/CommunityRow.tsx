@@ -53,9 +53,10 @@ export function CommunityRow({ row, onClick }: Props) {
           <ItemTitle className="min-w-0 flex-1 truncate text-base font-semibold">
             {row.communityName}
           </ItemTitle>
-          <span className="shrink-0 text-base font-medium tabular-nums text-muted-foreground">
-            {toIntJa(row.totalMembers)}
-          </span>
+          <div className="flex shrink-0 items-baseline gap-1 tabular-nums text-muted-foreground">
+            <span className="text-base font-medium">{toIntJa(row.totalMembers)}</span>
+            <span className="text-xs">(+{toIntJa(newMemberCount)})</span>
+          </div>
         </div>
       </ItemContent>
 
@@ -63,7 +64,10 @@ export function CommunityRow({ row, onClick }: Props) {
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5">
           <KpiPill label="MAU" value={toPct(activityRate)} delta={growthRateActivity} />
           <KpiPill label="Hub" value={toPct(hubUserPct)} />
-          <KpiPill label="New" value={toIntJa(newMemberCount)} />
+          {/* TODO: [Δ] ↑newlyActivated ↓churned pill awaits backend
+              addition of windowActivity.retainedSenders. Once shipped:
+                newlyActivated = senderCount - retainedSenders
+                churned        = senderCountPrev - retainedSenders */}
         </div>
       </ItemFooter>
     </Item>
