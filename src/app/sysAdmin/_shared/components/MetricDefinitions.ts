@@ -13,9 +13,8 @@ export const METRIC_DEFINITIONS: Record<string, MetricDefinition> = {
   },
   communityActivityRate: {
     title: "MAU%",
-    formula:
-      "直近月にDONATIONを送ったユニークユーザー数 ÷ 月末時点の総メンバー数",
-    note: "コミュニティ単位の月次稼働率。個人の送付率 (user_send_rate) とは別指標。本ツールでの Active = DONATION 送付者。",
+    formula: "MAU ÷ 月末時点の総メンバー数",
+    note: "コミュニティ単位の MAU%。個人の送付率 (user_send_rate) とは別指標。本ツールでの Active = DONATION 送付者。",
     range: "0〜100%",
   },
   growthRateActivity: {
@@ -39,7 +38,7 @@ export const METRIC_DEFINITIONS: Record<string, MetricDefinition> = {
   wau: {
     title: "WAU",
     formula: "今週DONATIONを送ったユニークユーザー数",
-    note: "継続 / 離脱 / 復帰の3カテゴリに分解される。本ツールでの Active = DONATION 送付者。",
+    note: "継続 / 離脱 / 復帰の3カテゴリで分析される。本ツールでの Active = DONATION 送付者。",
   },
   retainedSenders: {
     title: "継続 (WAU 構成)",
