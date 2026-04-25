@@ -6,6 +6,12 @@ import { PercentDelta } from "@/app/sysAdmin/_shared/components/PercentDelta";
 import { PrimaryAlertBadge } from "@/app/sysAdmin/_shared/components/PrimaryAlertBadge";
 import { toIntJa, toPct } from "@/app/sysAdmin/_shared/format/number";
 import { cn } from "@/lib/utils";
+import {
+  deriveActivityRate,
+  deriveAlerts,
+  deriveGrowthRateActivity,
+  hasAnyAlert,
+} from "@/app/sysAdmin/_shared/derive";
 import type { GqlSysAdminCommunityOverview } from "@/types/graphql";
 
 type Props = {
@@ -22,8 +28,10 @@ type Props = {
  */
 export function CommunityRow({ row, onClick }: Props) {
   const handleClick = () => onClick?.(row.communityId);
-  const hasAlert =
-    row.alerts.activeDrop || row.alerts.churnSpike || row.alerts.noNewMembers;
+  const alerts = deriveAlerts(row);
+  const activityRate = deriveActivityRate(row);
+  const growthRateActivity = deriveGrowthRateActivity(row);
+  const hasAlert = hasAnyAlert(alerts);
 
   return (
     <Item
@@ -42,7 +50,7 @@ export function CommunityRow({ row, onClick }: Props) {
         }
       }}
     >
-      {hasAlert && <PrimaryAlertBadge alerts={row.alerts} />}
+      {hasAlert && <PrimaryAlertBadge alerts={alerts} />}
 
       <ItemContent>
         <ItemTitle className="text-base font-semibold">
@@ -53,12 +61,12 @@ export function CommunityRow({ row, onClick }: Props) {
       <ItemFooter className="mt-0">
         <div className="flex flex-wrap items-baseline gap-x-2 text-xs text-muted-foreground">
           <span className="inline-flex items-baseline gap-1">
-            <span>MAU% {toPct(row.communityActivityRate)}</span>
-            {row.growthRateActivity != null && (
+            <span>MAU% {toPct(activityRate)}</span>
+            {growthRateActivity != null && (
               <span aria-label="前月比">
                 (
                 <PercentDelta
-                  value={row.growthRateActivity}
+                  value={growthRateActivity}
                   className="text-xs"
                 />
                 )

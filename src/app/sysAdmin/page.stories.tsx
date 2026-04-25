@@ -3,9 +3,10 @@ import { GetSysAdminDashboardDocument } from "@/types/graphql";
 import { withApollo, withPageShell } from "../../../.storybook/decorators";
 import { SysAdminPageClient } from "./SysAdminPageClient";
 import {
-  makeAlerts,
   makeCommunityOverview,
   makeDashboardPayload,
+  makeWeeklyRetention,
+  makeWindowActivity,
 } from "./_shared/fixtures/sysAdminDashboard";
 
 // page.tsx は async RSC なので Storybook から直接 render できない。
@@ -41,40 +42,56 @@ export const WithItems: Story = {
                 makeCommunityOverview({
                   communityId: "kibotcha",
                   communityName: "kibotcha",
-                  communityActivityRate: 0.423,
-                  growthRateActivity: 0.083,
                   totalMembers: 566,
+                  windowActivity: makeWindowActivity({
+                    senderCount: 240,
+                    senderCountPrev: 222,
+                  }),
                 }),
+                // churnSpike
                 makeCommunityOverview({
                   communityId: "community-b",
                   communityName: "コミュニティB",
-                  communityActivityRate: 0.12,
-                  growthRateActivity: -0.18,
                   totalMembers: 240,
-                  alerts: makeAlerts({ churnSpike: true }),
+                  windowActivity: makeWindowActivity({
+                    senderCount: 30,
+                    senderCountPrev: 36,
+                  }),
+                  weeklyRetention: makeWeeklyRetention({
+                    retainedSenders: 6,
+                    churnedSenders: 14,
+                  }),
                 }),
+                // activeDrop (~-38% growth)
                 makeCommunityOverview({
                   communityId: "community-c",
                   communityName: "コミュニティC",
-                  communityActivityRate: 0.28,
-                  growthRateActivity: -0.14,
                   totalMembers: 180,
-                  alerts: makeAlerts({ activeDrop: true }),
+                  windowActivity: makeWindowActivity({
+                    senderCount: 50,
+                    senderCountPrev: 81,
+                  }),
                 }),
+                // noNewMembers
                 makeCommunityOverview({
                   communityId: "community-d",
                   communityName: "コミュニティD",
-                  communityActivityRate: 0.55,
-                  growthRateActivity: null,
                   totalMembers: 48,
-                  alerts: makeAlerts({ noNewMembers: true }),
+                  windowActivity: makeWindowActivity({
+                    senderCount: 26,
+                    senderCountPrev: 25,
+                    newMemberCount: 0,
+                    newMemberCountPrev: 4,
+                  }),
                 }),
                 makeCommunityOverview({
                   communityId: "community-e",
                   communityName: "未来こども塾",
-                  communityActivityRate: 0.065,
-                  growthRateActivity: -0.03,
                   totalMembers: 566,
+                  windowActivity: makeWindowActivity({
+                    senderCount: 37,
+                    senderCountPrev: 38,
+                  }),
                 }),
               ],
             }),

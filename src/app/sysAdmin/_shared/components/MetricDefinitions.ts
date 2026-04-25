@@ -8,19 +8,19 @@ export type MetricDefinition = {
 export const METRIC_DEFINITIONS: Record<string, MetricDefinition> = {
   mau: {
     title: "MAU",
-    formula: "直近月にDONATIONを送ったユニークユーザー数",
-    note: "本ツールでの Active = DONATION 送付者。MAU% の分子。",
+    formula: "直近 28 日に DONATION を送ったユニークユーザー数 (windowDays default = 28)",
+    note: "本ツールでの Active = DONATION 送付者。MAU% の分子。暦月ではなく rolling 28 日窓。",
   },
   communityActivityRate: {
     title: "MAU%",
-    formula: "MAU ÷ 月末時点の総メンバー数",
+    formula: "MAU ÷ asOf 時点の総メンバー数 (rolling 28 日窓)",
     note: "コミュニティ単位の MAU%。個人の送付率 (user_send_rate) とは別指標。本ツールでの Active = DONATION 送付者。",
     range: "0〜100%",
   },
   growthRateActivity: {
     title: "MAU% 前月比",
-    formula: "(今月の MAU% − 先月の MAU%) ÷ 先月の MAU%",
-    note: "負値は MAU% が前月より低下。先月の MAU% が 0 のときは null。",
+    formula: "(直近 28 日 MAU% − その前 28 日 MAU%) ÷ その前 28 日 MAU%",
+    note: "負値は MAU% が前窓より低下。前 28 日窓の MAU% が 0 のときは null。",
   },
   userSendRate: {
     title: "送付率 (個人)",

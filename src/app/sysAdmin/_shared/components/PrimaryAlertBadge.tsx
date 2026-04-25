@@ -1,11 +1,11 @@
 import React from "react";
-import type { GqlSysAdminCommunityAlerts } from "@/types/graphql";
+import type { DerivedAlerts } from "@/app/sysAdmin/_shared/derive";
 import { cn } from "@/lib/utils";
 import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";
 
 type AlertVariant = "churnSpike" | "activeDrop" | "noNewMembers";
 
-export function selectPrimaryAlert(alerts: GqlSysAdminCommunityAlerts): AlertVariant | null {
+export function selectPrimaryAlert(alerts: DerivedAlerts): AlertVariant | null {
   if (alerts.churnSpike) return "churnSpike";
   if (alerts.activeDrop) return "activeDrop";
   if (alerts.noNewMembers) return "noNewMembers";
@@ -33,7 +33,7 @@ const STYLE: Record<AlertVariant, { container: string; dot: string; label: strin
 };
 
 type Props = {
-  alerts: GqlSysAdminCommunityAlerts;
+  alerts: DerivedAlerts;
   className?: string;
 };
 

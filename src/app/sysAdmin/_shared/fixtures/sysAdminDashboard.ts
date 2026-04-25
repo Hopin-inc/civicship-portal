@@ -1,20 +1,12 @@
 import type {
   GqlGetSysAdminDashboardQuery,
-  GqlSysAdminCommunityAlerts,
   GqlSysAdminCommunityOverview,
+  GqlSysAdminLatestCohort,
   GqlSysAdminPlatformSummary,
   GqlSysAdminSegmentCounts,
+  GqlSysAdminWeeklyRetention,
+  GqlSysAdminWindowActivity,
 } from "@/types/graphql";
-
-export const makeAlerts = (
-  overrides: Partial<GqlSysAdminCommunityAlerts> = {},
-): GqlSysAdminCommunityAlerts => ({
-  __typename: "SysAdminCommunityAlerts",
-  activeDrop: false,
-  churnSpike: false,
-  noNewMembers: false,
-  ...overrides,
-});
 
 export const makeSegmentCounts = (
   overrides: Partial<GqlSysAdminSegmentCounts> = {},
@@ -25,6 +17,35 @@ export const makeSegmentCounts = (
   passiveCount: 25,
   tier1Count: 40,
   tier2Count: 70,
+  ...overrides,
+});
+
+export const makeWindowActivity = (
+  overrides: Partial<GqlSysAdminWindowActivity> = {},
+): GqlSysAdminWindowActivity => ({
+  __typename: "SysAdminWindowActivity",
+  senderCount: 50,
+  senderCountPrev: 46,
+  newMemberCount: 8,
+  newMemberCountPrev: 6,
+  ...overrides,
+});
+
+export const makeWeeklyRetention = (
+  overrides: Partial<GqlSysAdminWeeklyRetention> = {},
+): GqlSysAdminWeeklyRetention => ({
+  __typename: "SysAdminWeeklyRetention",
+  retainedSenders: 18,
+  churnedSenders: 4,
+  ...overrides,
+});
+
+export const makeLatestCohort = (
+  overrides: Partial<GqlSysAdminLatestCohort> = {},
+): GqlSysAdminLatestCohort => ({
+  __typename: "SysAdminLatestCohort",
+  size: 12,
+  activeAtM1: 8,
   ...overrides,
 });
 
@@ -44,15 +65,11 @@ export const makeCommunityOverview = (
   __typename: "SysAdminCommunityOverview",
   communityId: "community-a",
   communityName: "コミュニティA",
-  communityActivityRate: 0.42,
-  growthRateActivity: 0.08,
-  latestCohortRetentionM1: 0.63,
   totalMembers: 120,
-  passiveCount: 25,
-  tier1Count: 40,
-  tier2Count: 70,
   segmentCounts: makeSegmentCounts(),
-  alerts: makeAlerts(),
+  windowActivity: makeWindowActivity(),
+  weeklyRetention: makeWeeklyRetention(),
+  latestCohort: makeLatestCohort(),
   ...overrides,
 });
 
@@ -75,17 +92,13 @@ export const makeDashboardPayload = (
         makeCommunityOverview({
           communityId: "community-b",
           communityName: "コミュニティB",
-          communityActivityRate: 0.28,
-          growthRateActivity: -0.14,
-          alerts: makeAlerts({ activeDrop: true }),
+          windowActivity: makeWindowActivity({ senderCount: 28, senderCountPrev: 40 }),
         }),
         makeCommunityOverview({
           communityId: "community-c",
           communityName: "コミュニティC",
-          communityActivityRate: 0.55,
-          growthRateActivity: 0.03,
-          latestCohortRetentionM1: null,
-          alerts: makeAlerts({ noNewMembers: true }),
+          windowActivity: makeWindowActivity({ newMemberCount: 0, newMemberCountPrev: 5 }),
+          latestCohort: makeLatestCohort({ size: 0, activeAtM1: 0 }),
         }),
       ],
   },

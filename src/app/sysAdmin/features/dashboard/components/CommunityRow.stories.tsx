@@ -2,8 +2,10 @@ import React from "react";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { CommunityRow } from "./CommunityRow";
 import {
-  makeAlerts,
   makeCommunityOverview,
+  makeLatestCohort,
+  makeWeeklyRetention,
+  makeWindowActivity,
 } from "../../../_shared/fixtures/sysAdminDashboard";
 
 const meta: Meta<typeof CommunityRow> = {
@@ -27,46 +29,58 @@ export const Healthy: Story = {
   },
 };
 
+// churnSpike: weeklyRetention.churnedSenders > retainedSenders
 export const ChurnSpike: Story = {
   args: {
     row: makeCommunityOverview({
       communityName: "kibotcha",
-      communityActivityRate: 0.12,
-      growthRateActivity: -0.18,
-      alerts: makeAlerts({ churnSpike: true }),
+      totalMembers: 100,
+      windowActivity: makeWindowActivity({ senderCount: 12, senderCountPrev: 18 }),
+      weeklyRetention: makeWeeklyRetention({ retainedSenders: 4, churnedSenders: 9 }),
     }),
   },
 };
 
+// activeDrop: growthRateActivity <= -0.2 (e.g. senderCount/Prev = 28/45 → -38%)
 export const ActiveDrop: Story = {
   args: {
     row: makeCommunityOverview({
       communityName: "コミュニティB",
-      communityActivityRate: 0.28,
-      growthRateActivity: -0.14,
-      alerts: makeAlerts({ activeDrop: true }),
+      totalMembers: 200,
+      windowActivity: makeWindowActivity({ senderCount: 28, senderCountPrev: 45 }),
     }),
   },
 };
 
+// noNewMembers: windowActivity.newMemberCount === 0
 export const NoNewMembers: Story = {
   args: {
     row: makeCommunityOverview({
       communityName: "コミュニティC",
-      communityActivityRate: 0.55,
-      growthRateActivity: null,
-      alerts: makeAlerts({ noNewMembers: true }),
+      totalMembers: 80,
+      windowActivity: makeWindowActivity({
+        senderCount: 44,
+        senderCountPrev: 42,
+        newMemberCount: 0,
+        newMemberCountPrev: 5,
+      }),
     }),
   },
 };
 
+// growth = null: prev-window had zero senders
 export const NoGrowthData: Story = {
   args: {
     row: makeCommunityOverview({
       communityName: "新規コミュニティ",
-      communityActivityRate: 0.08,
-      growthRateActivity: null,
       totalMembers: 8,
+      windowActivity: makeWindowActivity({
+        senderCount: 1,
+        senderCountPrev: 0,
+        newMemberCount: 8,
+        newMemberCountPrev: 0,
+      }),
+      latestCohort: makeLatestCohort({ size: 0, activeAtM1: 0 }),
     }),
   },
 };
