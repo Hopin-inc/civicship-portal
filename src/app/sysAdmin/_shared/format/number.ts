@@ -19,6 +19,13 @@ export function toSignedPct(value: number | null | undefined, fallback = "-"): s
   return `${sign}${PCT_FORMATTER.format(value)}`;
 }
 
+export function toArrowPct(value: number | null | undefined, fallback = "-"): string {
+  if (value === null || value === undefined || !Number.isFinite(value)) return fallback;
+  if (value === 0) return PCT_FORMATTER.format(0);
+  const arrow = value > 0 ? "↑" : "↓";
+  return `${arrow}${PCT_FORMATTER.format(Math.abs(value))}`;
+}
+
 export function toIntJa(value: number | null | undefined, fallback = "-"): string {
   if (value === null || value === undefined || !Number.isFinite(value)) return fallback;
   return INT_FORMATTER.format(Math.trunc(value));

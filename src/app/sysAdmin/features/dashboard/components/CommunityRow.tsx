@@ -6,6 +6,13 @@ import { PercentDelta } from "@/app/sysAdmin/_shared/components/PercentDelta";
 import { PrimaryAlertBadge } from "@/app/sysAdmin/_shared/components/PrimaryAlertBadge";
 import { toIntJa, toPct } from "@/app/sysAdmin/_shared/format/number";
 import { cn } from "@/lib/utils";
+import {
+  deriveActivityRate,
+  deriveAlerts,
+  deriveGrowthRateActivity,
+  deriveHubUserPct,
+  hasAnyAlert,
+} from "@/app/sysAdmin/_shared/derive";
 import type { GqlSysAdminCommunityOverview } from "@/types/graphql";
 
 type Props = {
@@ -13,17 +20,14 @@ type Props = {
   onClick?: (communityId: string) => void;
 };
 
-/**
- * opportunities の OpportunityItem を参考にした compact な 1 行表示。
- * 構造:
- * - status (アラートがある場合のみ、タイトル上に小さく)
- * - community name (bold base)
- * - footer: MAU%・前月比・人数 (xs muted)
- */
 export function CommunityRow({ row, onClick }: Props) {
   const handleClick = () => onClick?.(row.communityId);
-  const hasAlert =
-    row.alerts.activeDrop || row.alerts.churnSpike || row.alerts.noNewMembers;
+  const alerts = deriveAlerts(row);
+  const activityRate = deriveActivityRate(row);
+  const growthRateActivity = deriveGrowthRateActivity(row);
+  const hubUserPct = deriveHubUserPct(row);
+  const newMemberCount = row.windowActivity.newMemberCount;
+  const hasAlert = hasAnyAlert(alerts);
 
   return (
     <Item
@@ -42,33 +46,52 @@ export function CommunityRow({ row, onClick }: Props) {
         }
       }}
     >
-      {hasAlert && <PrimaryAlertBadge alerts={row.alerts} />}
+      {hasAlert && <PrimaryAlertBadge alerts={alerts} />}
 
       <ItemContent>
-        <ItemTitle className="text-base font-semibold">
-          {row.communityName}
-        </ItemTitle>
+        <div className="flex w-full items-baseline justify-between gap-2">
+          <ItemTitle className="min-w-0 flex-1 truncate text-base font-semibold">
+            {row.communityName}
+          </ItemTitle>
+          <div className="flex shrink-0 items-baseline gap-1 tabular-nums text-muted-foreground">
+            <span className="text-base font-medium">{toIntJa(row.totalMembers)}</span>
+            <span className="text-xs">(+{toIntJa(newMemberCount)})</span>
+          </div>
+        </div>
       </ItemContent>
 
       <ItemFooter className="mt-0">
-        <div className="flex flex-wrap items-baseline gap-x-2 text-xs text-muted-foreground">
-          <span className="inline-flex items-baseline gap-1">
-            <span>MAU% {toPct(row.communityActivityRate)}</span>
-            {row.growthRateActivity != null && (
-              <span aria-label="前月比">
-                (
-                <PercentDelta
-                  value={row.growthRateActivity}
-                  className="text-xs"
-                />
-                )
-              </span>
-            )}
-          </span>
-          <span aria-hidden>·</span>
-          <span>{toIntJa(row.totalMembers)}人</span>
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5">
+          <KpiPill label="MAU" value={toPct(activityRate)} delta={growthRateActivity} />
+          <KpiPill label="Hub" value={toPct(hubUserPct)} />
+          {/* TODO: [Δ] ↑newlyActivated ↓churned pill awaits backend
+              addition of windowActivity.retainedSenders. Once shipped:
+                newlyActivated = senderCount - retainedSenders
+                churned        = senderCountPrev - retainedSenders */}
         </div>
       </ItemFooter>
     </Item>
+  );
+}
+
+type KpiPillProps = {
+  label: string;
+  value: string;
+  delta?: number | null;
+};
+
+function KpiPill({ label, value, delta }: KpiPillProps) {
+  return (
+    <span className="inline-flex items-baseline gap-1">
+      <span className="rounded-md border border-border px-1.5 py-px text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+        {label}
+      </span>
+      <span className="text-sm font-medium tabular-nums">{value}</span>
+      {delta !== undefined && delta !== null && (
+        <span className="text-xs text-muted-foreground">
+          (<PercentDelta value={delta} className="text-xs" />)
+        </span>
+      )}
+    </span>
   );
 }

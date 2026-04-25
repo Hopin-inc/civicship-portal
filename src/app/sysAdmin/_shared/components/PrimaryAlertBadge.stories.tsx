@@ -1,7 +1,13 @@
 import React from "react";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { PrimaryAlertBadge } from "./PrimaryAlertBadge";
-import { makeAlerts } from "../fixtures/sysAdminDashboard";
+import type { DerivedAlerts } from "@/app/sysAdmin/_shared/derive";
+
+const NONE: DerivedAlerts = {
+  churnSpike: false,
+  activeDrop: false,
+  noNewMembers: false,
+};
 
 const meta: Meta<typeof PrimaryAlertBadge> = {
   title: "SysAdmin/Shared/PrimaryAlertBadge",
@@ -19,30 +25,30 @@ export default meta;
 type Story = StoryObj<typeof PrimaryAlertBadge>;
 
 export const ChurnSpike: Story = {
-  args: { alerts: makeAlerts({ churnSpike: true }) },
+  args: { alerts: { ...NONE, churnSpike: true } },
 };
 
 export const ActiveDrop: Story = {
-  args: { alerts: makeAlerts({ activeDrop: true }) },
+  args: { alerts: { ...NONE, activeDrop: true } },
 };
 
 export const NoNewMembers: Story = {
-  args: { alerts: makeAlerts({ noNewMembers: true }) },
+  args: { alerts: { ...NONE, noNewMembers: true } },
 };
 
 // 優先度: churnSpike > activeDrop > noNewMembers
 export const PriorityChurnSpikeWins: Story = {
   args: {
-    alerts: makeAlerts({ churnSpike: true, activeDrop: true, noNewMembers: true }),
+    alerts: { churnSpike: true, activeDrop: true, noNewMembers: true },
   },
 };
 
 export const PriorityActiveDropWins: Story = {
   args: {
-    alerts: makeAlerts({ activeDrop: true, noNewMembers: true }),
+    alerts: { ...NONE, activeDrop: true, noNewMembers: true },
   },
 };
 
 export const NoAlerts: Story = {
-  args: { alerts: makeAlerts() },
+  args: { alerts: NONE },
 };

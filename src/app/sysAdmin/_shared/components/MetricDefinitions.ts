@@ -8,19 +8,30 @@ export type MetricDefinition = {
 export const METRIC_DEFINITIONS: Record<string, MetricDefinition> = {
   mau: {
     title: "MAU",
-    formula: "直近月にDONATIONを送ったユニークユーザー数",
-    note: "本ツールでの Active = DONATION 送付者。MAU% の分子。",
+    formula: "直近 28 日に DONATION を送ったユニークユーザー数 (windowDays default = 28)",
+    note: "本ツールでの Active = DONATION 送付者。MAU% の分子。暦月ではなく rolling 28 日窓。",
   },
   communityActivityRate: {
     title: "MAU%",
-    formula: "MAU ÷ 月末時点の総メンバー数",
+    formula: "MAU ÷ asOf 時点の総メンバー数 (rolling 28 日窓)",
     note: "コミュニティ単位の MAU%。個人の送付率 (user_send_rate) とは別指標。本ツールでの Active = DONATION 送付者。",
     range: "0〜100%",
   },
   growthRateActivity: {
     title: "MAU% 前月比",
-    formula: "(今月の MAU% − 先月の MAU%) ÷ 先月の MAU%",
-    note: "負値は MAU% が前月より低下。先月の MAU% が 0 のときは null。",
+    formula: "(直近 28 日 MAU% − その前 28 日 MAU%) ÷ その前 28 日 MAU%",
+    note: "負値は MAU% が前窓より低下。前 28 日窓の MAU% が 0 のときは null。",
+  },
+  hubUserPct: {
+    title: "Hub user%",
+    formula: "tier1Count ÷ totalMembers (userSendRate ≥ tier1 を満たすメンバー)",
+    note: "ステージ最上位 (習慣化層) の比率。コミュニティの DONATION 連鎖を支える hub 役のユーザー割合。",
+    range: "0〜100%",
+  },
+  newMembers: {
+    title: "New",
+    formula: "直近 28 日 (windowDays default) に JOINED で加入したメンバー数",
+    note: "row では総メンバー数の隣に `(+12)` の形で表示。0 のときは `(+0)` で「新規加入なし」のシグナルを兼ねる。",
   },
   userSendRate: {
     title: "送付率 (個人)",
@@ -91,8 +102,8 @@ export const METRIC_DEFINITIONS: Record<string, MetricDefinition> = {
   stages: {
     title: "ステージ分類",
     formula:
-      "habitual: send_rate ≥ tier1 / regular: tier2 ≤ send_rate < tier1 / occasional: 0 < send_rate < tier2 / latent: send_rate = 0",
-    note: "デフォルト tier1=0.7, tier2=0.4。閾値はステージ分布の「分類設定」から変更可能。",
+      "hub: send_rate ≥ tier1 / regular: tier2 ≤ send_rate < tier1 / occasional: 0 < send_rate < tier2 / latent: send_rate = 0",
+    note: "デフォルト tier1=0.7, tier2=0.4。最上位 (hub) は DONATION ネットワークの連鎖を支える役割を表す。閾値はステージ分布の「分類設定」から変更可能。",
   },
   asOf: {
     title: "集計日",
@@ -106,6 +117,8 @@ export type MetricKey =
   | "mau"
   | "communityActivityRate"
   | "growthRateActivity"
+  | "hubUserPct"
+  | "newMembers"
   | "userSendRate"
   | "cohortRetention"
   | "wau"

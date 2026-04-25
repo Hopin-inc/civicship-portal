@@ -22,8 +22,11 @@ type Section = {
  * 主指標 → ステージ → コホート → 週次 → メンバー → コミュニティ → 設定。
  */
 const SECTIONS: Section[] = [
-  { heading: "主指標", keys: ["mau", "communityActivityRate", "growthRateActivity"] },
-  { heading: "ステージ分類", keys: ["stages", "userSendRate"] },
+  {
+    heading: "主指標",
+    keys: ["mau", "communityActivityRate", "growthRateActivity", "newMembers"],
+  },
+  { heading: "ステージ分類", keys: ["stages", "userSendRate", "hubUserPct"] },
   { heading: "コホート", keys: ["cohortRetention"] },
   {
     heading: "WAU 構成 (週次)",
