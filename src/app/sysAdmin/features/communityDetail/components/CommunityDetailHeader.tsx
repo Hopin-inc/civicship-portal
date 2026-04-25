@@ -13,7 +13,7 @@ type Props = {
   alerts: GqlSysAdminCommunityAlerts;
   /** アラート行の右に配置する補助コントロール (用語 Button など) */
   controls?: ReactNode;
-  /** 稼働率行の右端に配置する期間セレクト */
+  /** MAU% 行の右端に配置する期間セレクト */
   periodControl?: ReactNode;
 };
 
@@ -25,7 +25,7 @@ type SubMetric = {
 /**
  * Header layout (size を抑えた落ち着き優先):
  * - Row 1: alert (左) / controls (右)
- * - Row 2: [text-3xl semibold 稼働率] [sm delta]  ·  [periodControl] (右寄せ)
+ * - Row 2: [text-3xl semibold MAU%] [sm delta]  ·  [periodControl] (右寄せ)
  * - Row 3: sub-metrics (label xs / 値 base) を label上/値下 pair で整列
  */
 export function CommunityDetailHeader({
@@ -62,14 +62,14 @@ export function CommunityDetailHeader({
         </div>
       )}
 
-      {/* Row 2: 主指標 + 前月比 + periodControl (右) */}
+      {/* Row 2: MAU% + 前月比 + periodControl (右) */}
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-2">
         <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
           <span className="text-3xl font-semibold tabular-nums leading-tight">
             {toPct(summary.communityActivityRate)}
           </span>
           {summary.growthRateActivity != null && (
-            <span className="text-sm" aria-label="前月比">
+            <span className="text-sm" aria-label="MAU% 前月比">
               (
               <PercentDelta
                 value={summary.growthRateActivity}

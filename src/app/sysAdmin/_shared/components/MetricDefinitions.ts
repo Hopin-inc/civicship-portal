@@ -6,17 +6,22 @@ export type MetricDefinition = {
 };
 
 export const METRIC_DEFINITIONS: Record<string, MetricDefinition> = {
+  mau: {
+    title: "MAU",
+    formula: "直近月にDONATIONを送ったユニークユーザー数",
+    note: "本ツールでの Active = DONATION 送付者。MAU% の分子。",
+  },
   communityActivityRate: {
-    title: "コミュニティ稼働率",
+    title: "MAU%",
     formula:
       "直近月にDONATIONを送ったユニークユーザー数 ÷ 月末時点の総メンバー数",
-    note: "個人の送付率 (user_send_rate) とは別の指標。その月コミュニティがどれだけ動いたかを表す。",
+    note: "コミュニティ単位の月次稼働率。個人の送付率 (user_send_rate) とは別指標。本ツールでの Active = DONATION 送付者。",
     range: "0〜100%",
   },
   growthRateActivity: {
-    title: "前月比 (稼働率)",
-    formula: "(今月の稼働率 − 先月の稼働率) ÷ 先月の稼働率",
-    note: "負値は稼働率が前月より低下。先月の稼働率が 0 のときは null。",
+    title: "MAU% 前月比",
+    formula: "(今月の MAU% − 先月の MAU%) ÷ 先月の MAU%",
+    note: "負値は MAU% が前月より低下。先月の MAU% が 0 のときは null。",
   },
   userSendRate: {
     title: "送付率 (個人)",
@@ -31,18 +36,23 @@ export const METRIC_DEFINITIONS: Record<string, MetricDefinition> = {
     note: "分母はその月に入会した全メンバー (活動有無問わず)。M+0は全員100%スタート。",
     range: "0〜100%",
   },
+  wau: {
+    title: "WAU",
+    formula: "今週DONATIONを送ったユニークユーザー数",
+    note: "継続 / 離脱 / 復帰の3カテゴリに分解される。本ツールでの Active = DONATION 送付者。",
+  },
   retainedSenders: {
-    title: "継続送付者",
+    title: "継続 (WAU 構成)",
     formula: "今週DONATIONを送った ∧ 先週もDONATIONを送ったユーザー数",
     note: "新規メンバーは先週の活動がないため含まれない。",
   },
   churnedSenders: {
-    title: "離脱予兆",
+    title: "離脱 (WAU 構成)",
     formula: "先週DONATIONを送った ∧ 今週送っていないユーザー数",
     note: "churned > retained が続く場合は介入シグナル。",
   },
   returnedSenders: {
-    title: "復帰送付者",
+    title: "復帰 (WAU 構成)",
     formula:
       "今週DONATIONを送った ∧ 先週は送っていない ∧ 過去12週の間に送ったことがある ユーザー数",
     note: "休眠から復帰したメンバーのシグナル。",
@@ -89,15 +99,17 @@ export const METRIC_DEFINITIONS: Record<string, MetricDefinition> = {
     title: "集計日",
     formula: "指定日時点の状態を計算対象にする",
     note:
-      "画面上の稼働率・ステージ分布・コホート retention 等、すべての指標は この日時点のスナップショット。未指定時は今日 (実行時) を使う。",
+      "画面上の MAU% ・ステージ分布・コホート retention 等、すべての指標は この日時点のスナップショット。未指定時は今日 (実行時) を使う。",
   },
 };
 
 export type MetricKey =
+  | "mau"
   | "communityActivityRate"
   | "growthRateActivity"
   | "userSendRate"
   | "cohortRetention"
+  | "wau"
   | "retainedSenders"
   | "churnedSenders"
   | "returnedSenders"
