@@ -1,41 +1,13 @@
-"use client";
+import { fetchSysAdminDashboardServer } from "./_shared/server/fetchSysAdminDashboard";
+import { SysAdminPageClient } from "./SysAdminPageClient";
 
-import { useMemo } from "react";
-import { useAppRouter } from "@/lib/navigation";
-import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
-import { CommunityList } from "./features/list/components/CommunityList";
-
-export default function SysAdminPage() {
-  const router = useAppRouter();
-
-  const headerConfig = useMemo(
-    () => ({
-      title: "コミュニティ一覧",
-      showLogo: false,
-      showBackButton: false,
-    }),
-    [],
-  );
-  useHeaderConfig(headerConfig);
-
-  return (
-    <div className="p-4 max-w-2xl mx-auto">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-body-sm text-muted-foreground pl-4">コミュニティ一覧</h2>
-        <Button
-          onClick={() => router.push("/sysAdmin/create")}
-          variant="primary"
-          size="sm"
-          className="gap-1"
-        >
-          <Plus className="h-4 w-4" />
-          作成
-        </Button>
-      </div>
-
-      <CommunityList />
-    </div>
-  );
+// SSR で初期データを取得することで、初回ナビゲーション時の auth race
+// (Apollo link が idToken 取得前に発火して 401 になり ErrorState が出る) を解消する。
+// クライアント側のコントロール変更で再フェッチが必要になった時のみ Apollo client query が発火する。
+export default async function SysAdminPage() {
+  const initialData = await fetchSysAdminDashboardServer({
+    asOf: undefined,
+    segmentThresholds: { tier1: 0.7, tier2: 0.4 },
+  });
+  return <SysAdminPageClient initialData={initialData} />;
 }

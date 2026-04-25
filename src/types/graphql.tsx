@@ -33,6 +33,13 @@ export type GqlAccumulatedPointView = {
   walletId?: Maybe<Scalars["String"]["output"]>;
 };
 
+export type GqlApproveReportPayload = GqlApproveReportSuccess;
+
+export type GqlApproveReportSuccess = {
+  __typename?: "ApproveReportSuccess";
+  report: GqlReport;
+};
+
 export type GqlArticle = {
   __typename?: "Article";
   authors?: Maybe<Array<GqlUser>>;
@@ -618,6 +625,21 @@ export type GqlEvaluationsConnection = {
   totalCount: Scalars["Int"]["output"];
 };
 
+export type GqlGenerateReportInput = {
+  communityId: Scalars["ID"]["input"];
+  parentRunId?: InputMaybe<Scalars["ID"]["input"]>;
+  periodFrom: Scalars["Datetime"]["input"];
+  periodTo: Scalars["Datetime"]["input"];
+  variant: GqlReportVariant;
+};
+
+export type GqlGenerateReportPayload = GqlGenerateReportSuccess;
+
+export type GqlGenerateReportSuccess = {
+  __typename?: "GenerateReportSuccess";
+  report: GqlReport;
+};
+
 export type GqlIdentity = {
   __typename?: "Identity";
   createdAt?: Maybe<Scalars["Datetime"]["output"]>;
@@ -897,6 +919,7 @@ export type GqlMembershipsConnection = {
 
 export type GqlMutation = {
   __typename?: "Mutation";
+  approveReport?: Maybe<GqlApproveReportPayload>;
   articleCreate?: Maybe<GqlArticleCreatePayload>;
   articleDelete?: Maybe<GqlArticleDeletePayload>;
   articleUpdateContent?: Maybe<GqlArticleUpdateContentPayload>;
@@ -904,6 +927,7 @@ export type GqlMutation = {
   communityDelete?: Maybe<GqlCommunityDeletePayload>;
   communityUpdateProfile?: Maybe<GqlCommunityUpdateProfilePayload>;
   evaluationBulkCreate?: Maybe<GqlEvaluationBulkCreatePayload>;
+  generateReport?: Maybe<GqlGenerateReportPayload>;
   identityCheckPhoneUser: GqlIdentityCheckPhoneUserPayload;
   incentiveGrantRetry?: Maybe<GqlIncentiveGrantRetryPayload>;
   linkPhoneAuth?: Maybe<GqlLinkPhoneAuthPayload>;
@@ -930,12 +954,15 @@ export type GqlMutation = {
   placeCreate?: Maybe<GqlPlaceCreatePayload>;
   placeDelete?: Maybe<GqlPlaceDeletePayload>;
   placeUpdate?: Maybe<GqlPlaceUpdatePayload>;
+  publishReport?: Maybe<GqlPublishReportPayload>;
+  rejectReport?: Maybe<GqlRejectReportPayload>;
   reservationAccept?: Maybe<GqlReservationSetStatusPayload>;
   reservationCancel?: Maybe<GqlReservationSetStatusPayload>;
   reservationCreate?: Maybe<GqlReservationCreatePayload>;
   reservationJoin?: Maybe<GqlReservationSetStatusPayload>;
   reservationReject?: Maybe<GqlReservationSetStatusPayload>;
   storePhoneAuthToken?: Maybe<GqlStorePhoneAuthTokenPayload>;
+  submitReportFeedback?: Maybe<GqlSubmitReportFeedbackPayload>;
   ticketClaim?: Maybe<GqlTicketClaimPayload>;
   ticketIssue?: Maybe<GqlTicketIssuePayload>;
   ticketPurchase?: Maybe<GqlTicketPurchasePayload>;
@@ -946,6 +973,7 @@ export type GqlMutation = {
   transactionIssueCommunityPoint?: Maybe<GqlTransactionIssueCommunityPointPayload>;
   transactionUpdateMetadata?: Maybe<GqlTransactionUpdateMetadataPayload>;
   updatePortalConfig: GqlCommunityPortalConfig;
+  updateReportTemplate?: Maybe<GqlUpdateReportTemplatePayload>;
   updateSignupBonusConfig: GqlCommunitySignupBonusConfig;
   userDeleteMe?: Maybe<GqlUserDeletePayload>;
   userSignUp?: Maybe<GqlCurrentUserPayload>;
@@ -983,6 +1011,10 @@ export type GqlMutation = {
   voteTopicUpdate: GqlVoteTopicUpdatePayload;
 };
 
+export type GqlMutationApproveReportArgs = {
+  id: Scalars["ID"]["input"];
+};
+
 export type GqlMutationArticleCreateArgs = {
   input: GqlArticleCreateInput;
   permission: GqlCheckCommunityPermissionInput;
@@ -1016,6 +1048,11 @@ export type GqlMutationCommunityUpdateProfileArgs = {
 
 export type GqlMutationEvaluationBulkCreateArgs = {
   input: GqlEvaluationBulkCreateInput;
+  permission: GqlCheckCommunityPermissionInput;
+};
+
+export type GqlMutationGenerateReportArgs = {
+  input: GqlGenerateReportInput;
   permission: GqlCheckCommunityPermissionInput;
 };
 
@@ -1147,6 +1184,15 @@ export type GqlMutationPlaceUpdateArgs = {
   permission: GqlCheckCommunityPermissionInput;
 };
 
+export type GqlMutationPublishReportArgs = {
+  finalContent: Scalars["String"]["input"];
+  id: Scalars["ID"]["input"];
+};
+
+export type GqlMutationRejectReportArgs = {
+  id: Scalars["ID"]["input"];
+};
+
 export type GqlMutationReservationAcceptArgs = {
   id: Scalars["ID"]["input"];
   permission: GqlCheckOpportunityPermissionInput;
@@ -1175,6 +1221,11 @@ export type GqlMutationReservationRejectArgs = {
 export type GqlMutationStorePhoneAuthTokenArgs = {
   input: GqlStorePhoneAuthTokenInput;
   permission: GqlCheckIsSelfPermissionInput;
+};
+
+export type GqlMutationSubmitReportFeedbackArgs = {
+  input: GqlSubmitReportFeedbackInput;
+  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlMutationTicketClaimArgs = {
@@ -1227,6 +1278,12 @@ export type GqlMutationTransactionUpdateMetadataArgs = {
 export type GqlMutationUpdatePortalConfigArgs = {
   input: GqlCommunityPortalConfigInput;
   permission: GqlCheckCommunityPermissionInput;
+};
+
+export type GqlMutationUpdateReportTemplateArgs = {
+  communityId?: InputMaybe<Scalars["ID"]["input"]>;
+  input: GqlUpdateReportTemplateInput;
+  variant: GqlReportVariant;
 };
 
 export type GqlMutationUpdateSignupBonusConfigArgs = {
@@ -2001,6 +2058,13 @@ export type GqlPortfoliosConnection = {
   totalCount: Scalars["Int"]["output"];
 };
 
+export type GqlPublishReportPayload = GqlPublishReportSuccess;
+
+export type GqlPublishReportSuccess = {
+  __typename?: "PublishReportSuccess";
+  report: GqlReport;
+};
+
 export const GqlPublishStatus = {
   CommunityInternal: "COMMUNITY_INTERNAL",
   Private: "PRIVATE",
@@ -2048,12 +2112,31 @@ export type GqlQuery = {
   place?: Maybe<GqlPlace>;
   places: GqlPlacesConnection;
   portfolios?: Maybe<Array<GqlPortfolio>>;
+  report?: Maybe<GqlReport>;
+  reportTemplate?: Maybe<GqlReportTemplate>;
+  reportTemplateStats: GqlReportTemplateStats;
+  reports: GqlReportsConnection;
   reservation?: Maybe<GqlReservation>;
   reservationHistories: GqlReservationHistoriesConnection;
   reservationHistory?: Maybe<GqlReservationHistory>;
   reservations: GqlReservationsConnection;
   signupBonusConfig?: Maybe<GqlCommunitySignupBonusConfig>;
   states: GqlStatesConnection;
+  /**
+   * L2 detail for a single community: summary card, stage distribution,
+   * trailing-window trends, cohort retention, and a paginated member list.
+   * Intended for answering "what are kibotcha's numbers?" in an external
+   * report conversation.
+   */
+  sysAdminCommunityDetail: GqlSysAdminCommunityDetailPayload;
+  /**
+   * L1 overview: platform totals plus one row per community. Intended for
+   * the "is any community stalling?" scan. Community fan-out is served
+   * with N in-process calls (acceptable at today's community count —
+   * switch to a GROUP BY implementation once the platform exceeds ~20
+   * communities).
+   */
+  sysAdminDashboard: GqlSysAdminDashboardPayload;
   ticket?: Maybe<GqlTicket>;
   ticketClaimLink?: Maybe<GqlTicketClaimLink>;
   ticketClaimLinks: GqlTicketClaimLinksConnection;
@@ -2256,6 +2339,29 @@ export type GqlQueryPortfoliosArgs = {
   sort?: InputMaybe<GqlPortfolioSortInput>;
 };
 
+export type GqlQueryReportArgs = {
+  id: Scalars["ID"]["input"];
+};
+
+export type GqlQueryReportTemplateArgs = {
+  communityId?: InputMaybe<Scalars["ID"]["input"]>;
+  variant: GqlReportVariant;
+};
+
+export type GqlQueryReportTemplateStatsArgs = {
+  variant: GqlReportVariant;
+  version?: InputMaybe<Scalars["Int"]["input"]>;
+};
+
+export type GqlQueryReportsArgs = {
+  communityId: Scalars["ID"]["input"];
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  permission: GqlCheckCommunityPermissionInput;
+  status?: InputMaybe<GqlReportStatus>;
+  variant?: InputMaybe<GqlReportVariant>;
+};
+
 export type GqlQueryReservationArgs = {
   id: Scalars["ID"]["input"];
 };
@@ -2286,6 +2392,14 @@ export type GqlQueryStatesArgs = {
   cursor?: InputMaybe<Scalars["String"]["input"]>;
   filter?: InputMaybe<GqlStatesInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
+};
+
+export type GqlQuerySysAdminCommunityDetailArgs = {
+  input: GqlSysAdminCommunityDetailInput;
+};
+
+export type GqlQuerySysAdminDashboardArgs = {
+  input?: InputMaybe<GqlSysAdminDashboardInput>;
 };
 
 export type GqlQueryTicketArgs = {
@@ -2400,6 +2514,155 @@ export type GqlQueryWalletsArgs = {
   filter?: InputMaybe<GqlWalletFilterInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   sort?: InputMaybe<GqlWalletSortInput>;
+};
+
+export type GqlRejectReportPayload = GqlRejectReportSuccess;
+
+export type GqlRejectReportSuccess = {
+  __typename?: "RejectReportSuccess";
+  report: GqlReport;
+};
+
+export type GqlReport = {
+  __typename?: "Report";
+  cacheReadTokens?: Maybe<Scalars["Int"]["output"]>;
+  community: GqlCommunity;
+  createdAt: Scalars["Datetime"]["output"];
+  feedbacks: GqlReportFeedbacksConnection;
+  finalContent?: Maybe<Scalars["String"]["output"]>;
+  generatedByUser?: Maybe<GqlUser>;
+  id: Scalars["ID"]["output"];
+  inputTokens?: Maybe<Scalars["Int"]["output"]>;
+  model?: Maybe<Scalars["String"]["output"]>;
+  myFeedback?: Maybe<GqlReportFeedback>;
+  outputMarkdown?: Maybe<Scalars["String"]["output"]>;
+  outputTokens?: Maybe<Scalars["Int"]["output"]>;
+  parentRun?: Maybe<GqlReport>;
+  periodFrom: Scalars["Datetime"]["output"];
+  periodTo: Scalars["Datetime"]["output"];
+  publishedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  publishedByUser?: Maybe<GqlUser>;
+  regenerateCount: Scalars["Int"]["output"];
+  regenerations: Array<GqlReport>;
+  skipReason?: Maybe<Scalars["String"]["output"]>;
+  status: GqlReportStatus;
+  targetUser?: Maybe<GqlUser>;
+  template?: Maybe<GqlReportTemplate>;
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  variant: GqlReportVariant;
+};
+
+export type GqlReportFeedbacksArgs = {
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+};
+
+export type GqlReportEdge = GqlEdge & {
+  __typename?: "ReportEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<GqlReport>;
+};
+
+export type GqlReportFeedback = {
+  __typename?: "ReportFeedback";
+  comment?: Maybe<Scalars["String"]["output"]>;
+  createdAt: Scalars["Datetime"]["output"];
+  feedbackType?: Maybe<GqlReportFeedbackType>;
+  id: Scalars["ID"]["output"];
+  rating: Scalars["Int"]["output"];
+  reportId: Scalars["ID"]["output"];
+  sectionKey?: Maybe<Scalars["String"]["output"]>;
+  user: GqlUser;
+};
+
+export type GqlReportFeedbackEdge = GqlEdge & {
+  __typename?: "ReportFeedbackEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<GqlReportFeedback>;
+};
+
+export const GqlReportFeedbackType = {
+  Accuracy: "ACCURACY",
+  Other: "OTHER",
+  Quality: "QUALITY",
+  Structure: "STRUCTURE",
+  Tone: "TONE",
+} as const;
+
+export type GqlReportFeedbackType =
+  (typeof GqlReportFeedbackType)[keyof typeof GqlReportFeedbackType];
+export type GqlReportFeedbacksConnection = {
+  __typename?: "ReportFeedbacksConnection";
+  edges?: Maybe<Array<Maybe<GqlReportFeedbackEdge>>>;
+  pageInfo: GqlPageInfo;
+  totalCount: Scalars["Int"]["output"];
+};
+
+export const GqlReportStatus = {
+  Approved: "APPROVED",
+  Draft: "DRAFT",
+  Published: "PUBLISHED",
+  Rejected: "REJECTED",
+  Skipped: "SKIPPED",
+  Superseded: "SUPERSEDED",
+} as const;
+
+export type GqlReportStatus = (typeof GqlReportStatus)[keyof typeof GqlReportStatus];
+export type GqlReportTemplate = {
+  __typename?: "ReportTemplate";
+  community?: Maybe<GqlCommunity>;
+  communityContext?: Maybe<Scalars["String"]["output"]>;
+  createdAt: Scalars["Datetime"]["output"];
+  experimentKey?: Maybe<Scalars["String"]["output"]>;
+  id: Scalars["ID"]["output"];
+  isActive: Scalars["Boolean"]["output"];
+  isEnabled: Scalars["Boolean"]["output"];
+  maxTokens: Scalars["Int"]["output"];
+  model: Scalars["String"]["output"];
+  scope: GqlReportTemplateScope;
+  stopSequences: Array<Scalars["String"]["output"]>;
+  systemPrompt: Scalars["String"]["output"];
+  temperature?: Maybe<Scalars["Float"]["output"]>;
+  trafficWeight: Scalars["Int"]["output"];
+  updatedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  updatedByUser?: Maybe<GqlUser>;
+  userPromptTemplate: Scalars["String"]["output"];
+  variant: GqlReportVariant;
+  version: Scalars["Int"]["output"];
+};
+
+export const GqlReportTemplateScope = {
+  Community: "COMMUNITY",
+  System: "SYSTEM",
+} as const;
+
+export type GqlReportTemplateScope =
+  (typeof GqlReportTemplateScope)[keyof typeof GqlReportTemplateScope];
+export type GqlReportTemplateStats = {
+  __typename?: "ReportTemplateStats";
+  avgJudgeScore?: Maybe<Scalars["Float"]["output"]>;
+  avgRating?: Maybe<Scalars["Float"]["output"]>;
+  correlationWarning: Scalars["Boolean"]["output"];
+  feedbackCount: Scalars["Int"]["output"];
+  judgeHumanCorrelation?: Maybe<Scalars["Float"]["output"]>;
+  variant: GqlReportVariant;
+  version?: Maybe<Scalars["Int"]["output"]>;
+};
+
+export const GqlReportVariant = {
+  GrantApplication: "GRANT_APPLICATION",
+  MediaPr: "MEDIA_PR",
+  MemberNewsletter: "MEMBER_NEWSLETTER",
+  PersonalRecap: "PERSONAL_RECAP",
+  WeeklySummary: "WEEKLY_SUMMARY",
+} as const;
+
+export type GqlReportVariant = (typeof GqlReportVariant)[keyof typeof GqlReportVariant];
+export type GqlReportsConnection = {
+  __typename?: "ReportsConnection";
+  edges?: Maybe<Array<Maybe<GqlReportEdge>>>;
+  pageInfo: GqlPageInfo;
+  totalCount: Scalars["Int"]["output"];
 };
 
 export type GqlReservation = {
@@ -2583,6 +2846,643 @@ export type GqlStorePhoneAuthTokenPayload = {
   __typename?: "StorePhoneAuthTokenPayload";
   expiresAt?: Maybe<Scalars["Datetime"]["output"]>;
   success: Scalars["Boolean"]["output"];
+};
+
+export type GqlSubmitReportFeedbackInput = {
+  comment?: InputMaybe<Scalars["String"]["input"]>;
+  feedbackType?: InputMaybe<GqlReportFeedbackType>;
+  rating: Scalars["Int"]["input"];
+  reportId: Scalars["ID"]["input"];
+  sectionKey?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type GqlSubmitReportFeedbackPayload = GqlSubmitReportFeedbackSuccess;
+
+export type GqlSubmitReportFeedbackSuccess = {
+  __typename?: "SubmitReportFeedbackSuccess";
+  feedback: GqlReportFeedback;
+};
+
+/** One entry-month cohort's retention curve. */
+export type GqlSysAdminCohortRetentionPoint = {
+  __typename?: "SysAdminCohortRetentionPoint";
+  /** Entry month, first day JST (e.g. 2025-10-01T00:00+09:00). */
+  cohortMonth: Scalars["Datetime"]["output"];
+  /** Cohort size at entry (status='JOINED' joiners in the month). */
+  cohortSize: Scalars["Int"]["output"];
+  /**
+   * Fraction of the cohort with a DONATION out in the SECOND month after
+   * entry (m+1). null for an empty cohort or a cohort too recent to have
+   * a completed m+1 window.
+   */
+  retentionM1?: Maybe<Scalars["Float"]["output"]>;
+  /** Fraction active in m+3. */
+  retentionM3?: Maybe<Scalars["Float"]["output"]>;
+  /** Fraction active in m+6. */
+  retentionM6?: Maybe<Scalars["Float"]["output"]>;
+};
+
+/**
+ * API-side alert flags. Boolean only: the server owns the cross-field
+ * judgement, the client just renders the badge.
+ */
+export type GqlSysAdminCommunityAlerts = {
+  __typename?: "SysAdminCommunityAlerts";
+  /** Month-over-month communityActivityRate change <= -20%. */
+  activeDrop: Scalars["Boolean"]["output"];
+  /** Latest-week churned_senders > retained_senders. */
+  churnSpike: Scalars["Boolean"]["output"];
+  /** No t_memberships.created_at rows (status='JOINED') in the last 14 days. */
+  noNewMembers: Scalars["Boolean"]["output"];
+};
+
+export type GqlSysAdminCommunityDetailInput = {
+  /** As-of timestamp (see SysAdminDashboardInput.asOf). */
+  asOf?: InputMaybe<Scalars["Datetime"]["input"]>;
+  /** Target community id. */
+  communityId: Scalars["ID"]["input"];
+  /**
+   * Opaque cursor for pagination. Internally a base64-encoded offset of
+   * the prior page's position. Treat as opaque — pass back the cursor
+   * returned by the previous response unchanged.
+   */
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  /** Member list page size (default 50, max 200). */
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  /** Stage-count thresholds for the stage distribution and tier counts. */
+  segmentThresholds?: InputMaybe<GqlSysAdminSegmentThresholdsInput>;
+  /** Member list filter. Defaults to `minSendRate = 0.7` (habitual only). */
+  userFilter?: InputMaybe<GqlSysAdminUserListFilter>;
+  /** Member list sort. Defaults to SEND_RATE DESC. */
+  userSort?: InputMaybe<GqlSysAdminUserListSort>;
+  /**
+   * How many trailing JST months to include in the trend / cohort arrays.
+   * Default 10.
+   */
+  windowMonths?: InputMaybe<Scalars["Int"]["input"]>;
+};
+
+/** Root payload for sysAdminCommunityDetail (L2). */
+export type GqlSysAdminCommunityDetailPayload = {
+  __typename?: "SysAdminCommunityDetailPayload";
+  /** Alert flags (same structure as L1, evaluated for this community). */
+  alerts: GqlSysAdminCommunityAlerts;
+  /** As-of timestamp echoed back. */
+  asOf: Scalars["Datetime"]["output"];
+  /**
+   * One entry per entry month (length <= windowMonths), newest last.
+   * `retentionM*` fields are null when the cohort is empty or too recent.
+   */
+  cohortRetention: Array<GqlSysAdminCohortRetentionPoint>;
+  /** Community id. */
+  communityId: Scalars["ID"]["output"];
+  /** Community display name. */
+  communityName: Scalars["String"]["output"];
+  /** Paginated member list — see type doc. */
+  memberList: GqlSysAdminMemberList;
+  /**
+   * One entry per month (length <= windowMonths), newest last. Older
+   * months with no MV data are omitted rather than zero-padded.
+   */
+  monthlyActivityTrend: Array<GqlSysAdminMonthlyActivityPoint>;
+  /**
+   * One entry per ISO week, newest last. Length approximates
+   * `windowMonths * ~4.3` weeks; sparse weeks with no activity still emit
+   * a row with zero counters.
+   */
+  retentionTrend: Array<GqlSysAdminRetentionTrendPoint>;
+  /**
+   * Stage distribution, classified server-side with the request's
+   * thresholds. Computed over ALL members (independent of member-list
+   * filter).
+   */
+  stages: GqlSysAdminStageDistribution;
+  /** Summary card — see type doc. */
+  summary: GqlSysAdminCommunitySummaryCard;
+  /** Trailing window length in JST months (echoed back). */
+  windowMonths: Scalars["Int"]["output"];
+};
+
+/**
+ * One row of the L1 all-community table. Designed for at-a-glance
+ * intervention judgment: each row carries the raw counts the client
+ * needs to derive rates, growth, alerts, sort keys, and filter
+ * predicates without a second round-trip.
+ *
+ * Calendar-month metrics live on the L2 detail card
+ * (SysAdminCommunitySummaryCard) — L1 is rolling-window only.
+ */
+export type GqlSysAdminCommunityOverview = {
+  __typename?: "SysAdminCommunityOverview";
+  /** Community id. */
+  communityId: Scalars["ID"]["output"];
+  /** Community display name (t_communities.name). */
+  communityName: Scalars["String"]["output"];
+  /**
+   * Number of members classified as a "hub" within the parametric
+   * window (`windowDays`):
+   *
+   *   hubMemberCount = COUNT(member)
+   *     WHERE windowUniqueDonationRecipients >= input.hubBreadthThreshold
+   *
+   * `windowUniqueDonationRecipients` is the count of DISTINCT users
+   * this member sent a DONATION to during
+   * `[asOf - windowDays JST日, asOf + 1 JST日)` — distinct from the
+   * L2 `SysAdminMemberRow.uniqueDonationRecipients` field which is
+   * tenure-wide. The window-scoped variant is computed on demand in
+   * this aggregate but not exposed per-member at L1 (members
+   * themselves are an L2 concern).
+   *
+   * Hub classification deliberately uses BREADTH only — a member
+   * who reached `hubBreadthThreshold` distinct recipients during
+   * the window necessarily transacted at least that many times,
+   * making an explicit frequency floor redundant. This keeps the
+   * threshold knobs to one (`hubBreadthThreshold`).
+   *
+   * Invariants (the client may assert these):
+   *   hubMemberCount <= windowActivity.senderCount <= totalMembers
+   *
+   * The first holds because any hub member donated >= 3 times in
+   * the window and is therefore a window sender; the second because
+   * any window sender is a JOINED member at asOf.
+   */
+  hubMemberCount: Scalars["Int"]["output"];
+  /**
+   * Latest completed monthly cohort and its M+1 activity. See
+   * SysAdminLatestCohort.
+   */
+  latestCohort: GqlSysAdminLatestCohort;
+  /**
+   * Per-stage member counts (tier1 / tier2 / passive, cumulative
+   * per the type doc) classified against input.segmentThresholds.
+   */
+  segmentCounts: GqlSysAdminSegmentCounts;
+  /**
+   * Total status='JOINED' members as of asOf. Members whose
+   * created_at is after asOf are excluded from the count.
+   */
+  totalMembers: Scalars["Int"]["output"];
+  /**
+   * Latest completed-week retention signals for client-side churn
+   * detection. See SysAdminWeeklyRetention.
+   */
+  weeklyRetention: GqlSysAdminWeeklyRetention;
+  /** Rolling-window DONATION activity. See SysAdminWindowActivity. */
+  windowActivity: GqlSysAdminWindowActivity;
+};
+
+/**
+ * Summary card for a single community. Fronts the L2 detail screen and
+ * answers "is this community improving?" in one row of numbers.
+ */
+export type GqlSysAdminCommunitySummaryCard = {
+  __typename?: "SysAdminCommunitySummaryCard";
+  /**
+   * Latest-month communityActivityRate (PRIMARY indicator — see module
+   * docstring for the distinction vs userSendRate).
+   */
+  communityActivityRate: Scalars["Float"]["output"];
+  /**
+   * 3-month trailing average of communityActivityRate, ending at the JST
+   * calendar month containing asOf (inclusive). null when fewer than 3
+   * months of data exist.
+   */
+  communityActivityRate3mAvg?: Maybe<Scalars["Float"]["output"]>;
+  /** Community id. */
+  communityId: Scalars["ID"]["output"];
+  /** Community display name. */
+  communityName: Scalars["String"]["output"];
+  /** Oldest date with MV data for this community (JST calendar). */
+  dataFrom?: Maybe<Scalars["Datetime"]["output"]>;
+  /** Newest date with MV data for this community (JST calendar). */
+  dataTo?: Maybe<Scalars["Datetime"]["output"]>;
+  /**
+   * Month-over-month % change in communityActivityRate (fraction, e.g.
+   * -0.2 == -20%). null when the prior month has no data.
+   */
+  growthRateActivity?: Maybe<Scalars["Float"]["output"]>;
+  /**
+   * Maximum chain depth observed in any DONATION, all-time. null when
+   * no chained transactions exist.
+   */
+  maxChainDepthAllTime?: Maybe<Scalars["Int"]["output"]>;
+  /** Cumulative members in tier2 or above under the supplied thresholds. */
+  tier2Count: Scalars["Int"]["output"];
+  /** tier2Count / totalMembers (0.0–1.0). */
+  tier2Pct: Scalars["Float"]["output"];
+  /**
+   * Total DONATION points transferred, all-time (no window). Uses
+   * t_transactions directly so the value is independent of MV retention.
+   */
+  totalDonationPointsAllTime: Scalars["Float"]["output"];
+  /** Total status='JOINED' members at asOf. */
+  totalMembers: Scalars["Int"]["output"];
+};
+
+/** Input for the L1 all-community overview (`sysAdminDashboard`). */
+export type GqlSysAdminDashboardInput = {
+  /**
+   * As-of timestamp anchor. All trailing-window calculations are
+   * anchored here:
+   *   - parametric activity window: [asOf - windowDays, asOf + 1 JST日)
+   *   - weekly retention: latest completed ISO week before asOf
+   *   - latest cohort: (asOf JST月 - 2) so its M+1 window is fully past
+   * Defaults to now when omitted.
+   */
+  asOf?: InputMaybe<Scalars["Datetime"]["input"]>;
+  /**
+   * Minimum number of distinct DONATION recipients within the
+   * parametric window (`windowDays`) for a member to be classified
+   * as a hub. Used to populate `SysAdminCommunityOverview.hubMemberCount`.
+   *
+   * Defaults to 3, meaning "sent DONATION to at least 3 different
+   * people during the window". The threshold is on **unique
+   * counterparties** (set cardinality), not transaction count, so a
+   * member who donated 100 times to the same recipient does not
+   * qualify on this axis alone.
+   *
+   * Effective range 1..1000; values outside are silently clamped on
+   * the server.
+   *
+   * This is intentionally an absolute threshold rather than a
+   * community-relative percentile: a percentile-based hub would
+   * always classify ~N% of members as hubs by definition, defeating
+   * cross-community comparison ("which communities have the highest
+   * hub ratio?"). Community size differences are absorbed
+   * client-side by displaying `hubMemberCount / totalMembers` rather
+   * than the raw count.
+   */
+  hubBreadthThreshold?: InputMaybe<Scalars["Int"]["input"]>;
+  /** Stage classification thresholds (see SysAdminSegmentThresholdsInput). */
+  segmentThresholds?: InputMaybe<GqlSysAdminSegmentThresholdsInput>;
+  /**
+   * Length of the rolling activity window in JST days. Effective
+   * range 7-90; values outside are silently clamped on the server.
+   * Defaults to 28 (= 4 weeks, absorbs day-of-week variance).
+   */
+  windowDays?: InputMaybe<Scalars["Int"]["input"]>;
+};
+
+/** Root payload for sysAdminDashboard (L1). */
+export type GqlSysAdminDashboardPayload = {
+  __typename?: "SysAdminDashboardPayload";
+  /** As-of timestamp echoed back (UTC instant). */
+  asOf: Scalars["Datetime"]["output"];
+  /** One row per community, in dashboard sort order. */
+  communities: Array<GqlSysAdminCommunityOverview>;
+  /** Platform-wide aggregate row. */
+  platform: GqlSysAdminPlatformSummary;
+};
+
+/**
+ * Most recently completed monthly cohort plus its M+1 activity.
+ * "M+1" follows standard cohort-analysis convention: the calendar
+ * month immediately after the joining month.
+ *
+ * The cohort is selected as (asOf's JST month - 2 months) so its
+ * M+1 window — the JST month immediately preceding asOf's month —
+ * is fully past. This avoids reporting an artificially low retention
+ * during the in-progress month.
+ *
+ * Raw counts are returned; the client divides for the retention rate
+ * and decides how to handle small-N cohorts via `size`.
+ */
+export type GqlSysAdminLatestCohort = {
+  __typename?: "SysAdminLatestCohort";
+  /**
+   * Of those cohort members, how many sent at least one DONATION
+   * during the M+1 month.
+   */
+  activeAtM1: Scalars["Int"]["output"];
+  /**
+   * Cohort size: status='JOINED' members whose created_at falls
+   * within the cohort month. 0 when no one joined that month
+   * (callers should treat M+1 retention as null in that case).
+   */
+  size: Scalars["Int"]["output"];
+};
+
+/** Paginated member list for the L2 detail. */
+export type GqlSysAdminMemberList = {
+  __typename?: "SysAdminMemberList";
+  /** Whether more pages exist after this one. */
+  hasNextPage: Scalars["Boolean"]["output"];
+  /**
+   * Opaque cursor to pass back in `SysAdminCommunityDetailInput.cursor` to
+   * fetch the next page. null when no further pages exist.
+   */
+  nextCursor?: Maybe<Scalars["String"]["output"]>;
+  /**
+   * Member rows for the current page, matching filter & sort applied
+   * server-side.
+   */
+  users: Array<GqlSysAdminMemberRow>;
+};
+
+/**
+ * One row of the L2 member list. Raw values only — stage classification
+ * (habitual / regular / occasional / latent) is the client's concern so
+ * server-side thresholds can be tuned without a schema change.
+ */
+export type GqlSysAdminMemberRow = {
+  __typename?: "SysAdminMemberRow";
+  /** Distinct months with at least one DONATION out. */
+  donationOutMonths: Scalars["Int"]["output"];
+  /** Tenure in JST calendar months (floor, minimum 1). */
+  monthsIn: Scalars["Int"]["output"];
+  /** User display name (users.name). null when the user has no name set. */
+  name?: Maybe<Scalars["String"]["output"]>;
+  /** All-time DONATION points sent by this user in this community. */
+  totalPointsOut: Scalars["Float"]["output"];
+  /**
+   * All-time count of distinct OTHER users this member has sent at
+   * least one DONATION to in this community. The "network breadth"
+   * half of the donor profile (paired with frequency-based
+   * `userSendRate` and volume-based `totalPointsOut`):
+   *
+   *   breadth × frequency × volume → the client's per-member
+   *   classification space (e.g. true hub vs single-target loyal vs
+   *   rare-but-far-reaching).
+   *
+   * Counts unique counterparty user_id, not transaction count, so a
+   * member who sent 100 donations to the same recipient still scores
+   * 1. Excludes burn / system targets (recipient wallets without a
+   * user_id).
+   */
+  uniqueDonationRecipients: Scalars["Int"]["output"];
+  /** User id. */
+  userId: Scalars["ID"]["output"];
+  /**
+   * Individual monthly-send rate: `donationOutMonths / monthsIn`, 0.0–1.0,
+   * rounded to 3 decimals. INDIVIDUAL LTV variable (not the same as
+   * communityActivityRate elsewhere in this schema).
+   */
+  userSendRate: Scalars["Float"]["output"];
+};
+
+/** One month of community activity trend. */
+export type GqlSysAdminMonthlyActivityPoint = {
+  __typename?: "SysAdminMonthlyActivityPoint";
+  /**
+   * Share of DONATION transactions that were part of a chain (chain_depth
+   * > 0) in the month. 0.0–1.0.
+   */
+  chainPct?: Maybe<Scalars["Float"]["output"]>;
+  /**
+   * senderCount / month-end totalMembers. Read alongside newMembers: a
+   * month with many new joiners can dip the rate even if absolute activity
+   * grew.
+   */
+  communityActivityRate: Scalars["Float"]["output"];
+  /** Sum of DONATION points transferred in the month. */
+  donationPointsSum: Scalars["Float"]["output"];
+  /** First day (JST) of the calendar month, e.g. 2025-10-01T00:00+09:00. */
+  month: Scalars["Datetime"]["output"];
+  /** t_memberships.created_at (status='JOINED') rows falling in the month. */
+  newMembers: Scalars["Int"]["output"];
+  /** Distinct DONATION senders in the month. */
+  senderCount: Scalars["Int"]["output"];
+};
+
+/**
+ * Platform-wide headline, computed by summing across every community in
+ * scope for the caller (which is every community since this query is
+ * SYS_ADMIN-gated).
+ */
+export type GqlSysAdminPlatformSummary = {
+  __typename?: "SysAdminPlatformSummary";
+  /** Number of communities included in the response. */
+  communitiesCount: Scalars["Int"]["output"];
+  /**
+   * Sum of DONATION points transferred during the JST calendar month
+   * containing `asOf`, across every community.
+   */
+  latestMonthDonationPoints: Scalars["Float"]["output"];
+  /** Sum of status='JOINED' members across every community. */
+  totalMembers: Scalars["Int"]["output"];
+};
+
+/** One ISO week of retention signals. */
+export type GqlSysAdminRetentionTrendPoint = {
+  __typename?: "SysAdminRetentionTrendPoint";
+  /** Senders in the prior week who did NOT send this week. */
+  churnedSenders: Scalars["Int"]["output"];
+  /**
+   * Community activity rate for the week: distinct senders / totalMembers
+   * as of week end. null when the community had zero members during the
+   * week.
+   */
+  communityActivityRate?: Maybe<Scalars["Float"]["output"]>;
+  /** New t_memberships.created_at rows (status='JOINED') this week. */
+  newMembers: Scalars["Int"]["output"];
+  /**
+   * Senders in both the prior week and this week (same-user on
+   * donation_out_count > 0).
+   */
+  retainedSenders: Scalars["Int"]["output"];
+  /**
+   * Senders this week who did NOT send last week but DID send some week
+   * in the prior 12-week window.
+   */
+  returnedSenders: Scalars["Int"]["output"];
+  /** Monday 00:00 JST of the ISO week. */
+  week: Scalars["Datetime"]["output"];
+};
+
+/**
+ * Stage-count snapshot for one community, computed by the server using the
+ * client-supplied `SysAdminSegmentThresholdsInput`. Cumulative semantics:
+ * `tier2Count` INCLUDES members counted in `tier1Count`.
+ */
+export type GqlSysAdminSegmentCounts = {
+  __typename?: "SysAdminSegmentCounts";
+  /** Members with userSendRate > 0 (excludes latent). */
+  activeCount: Scalars["Int"]["output"];
+  /** Members with donationOutMonths == 0 (latent / not-yet-participated). */
+  passiveCount: Scalars["Int"]["output"];
+  /** Members with userSendRate >= tier1. */
+  tier1Count: Scalars["Int"]["output"];
+  /** Members with userSendRate >= tier2 (includes tier1). */
+  tier2Count: Scalars["Int"]["output"];
+  /** Total status='JOINED' members at asOf. */
+  total: Scalars["Int"]["output"];
+};
+
+/**
+ * Stage classification thresholds, supplied by the client.
+ * Thresholds define WHERE the boundary between stages sits, but naming
+ * (habitual / regular / occasional / latent) remains fixed on the server.
+ */
+export type GqlSysAdminSegmentThresholdsInput = {
+  /**
+   * Habitual stage threshold. A user with `userSendRate >= tier1` is
+   * counted as "habitual" (i.e. sends donations in at least tier1 share
+   * of their tenure). Default 0.7.
+   */
+  tier1?: InputMaybe<Scalars["Float"]["input"]>;
+  /**
+   * Regular stage threshold. `userSendRate >= tier2` AND `< tier1`
+   * classifies as "regular". Default 0.4.
+   */
+  tier2?: InputMaybe<Scalars["Float"]["input"]>;
+};
+
+/** Sort direction for the member list. */
+export const GqlSysAdminSortOrder = {
+  /**
+   * Ascending — smallest value first (e.g. SEND_RATE ASC puts latent
+   * and occasional members before habitual).
+   */
+  Asc: "ASC",
+  /**
+   * Descending — largest value first (e.g. SEND_RATE DESC puts habitual
+   * members at the top). This is the default.
+   */
+  Desc: "DESC",
+} as const;
+
+export type GqlSysAdminSortOrder = (typeof GqlSysAdminSortOrder)[keyof typeof GqlSysAdminSortOrder];
+/**
+ * Summary for one stage (habitual / regular / occasional / latent).
+ * Stage membership is classified server-side using the thresholds supplied
+ * in the request. `pointsContributionPct` is the share of total DONATION
+ * points-out attributed to members in this stage, in the asOf month.
+ */
+export type GqlSysAdminStageBucket = {
+  __typename?: "SysAdminStageBucket";
+  /** Average monthsIn across members in this stage. */
+  avgMonthsIn: Scalars["Float"]["output"];
+  /** Average userSendRate across members in this stage (0.0–1.0). */
+  avgSendRate: Scalars["Float"]["output"];
+  /** Number of members in this stage. */
+  count: Scalars["Int"]["output"];
+  /** count / totalMembers (0.0–1.0). */
+  pct: Scalars["Float"]["output"];
+  /**
+   * Stage's share of this community's all-time DONATION points-out
+   * (0.0–1.0). Numerator is the sum of `totalPointsOut` across the
+   * stage's members; denominator is the same sum across all members.
+   * 0 for the latent stage by definition.
+   */
+  pointsContributionPct: Scalars["Float"]["output"];
+};
+
+/**
+ * Four-stage distribution of the community's membership.
+ * `pointsContributionPct` on `latent` is always 0 since latent members
+ * haven't donated by definition.
+ */
+export type GqlSysAdminStageDistribution = {
+  __typename?: "SysAdminStageDistribution";
+  /** userSendRate >= tier1. */
+  habitual: GqlSysAdminStageBucket;
+  /** donationOutMonths == 0. */
+  latent: GqlSysAdminStageBucket;
+  /** 0 < userSendRate < tier2. */
+  occasional: GqlSysAdminStageBucket;
+  /** tier2 <= userSendRate < tier1. */
+  regular: GqlSysAdminStageBucket;
+};
+
+/**
+ * Member-list filters for the L2 detail (`sysAdminCommunityDetail`).
+ * All conditions AND together. Unspecified fields do not filter.
+ */
+export type GqlSysAdminUserListFilter = {
+  /** Inclusive upper bound on userSendRate. */
+  maxSendRate?: InputMaybe<Scalars["Float"]["input"]>;
+  /** Inclusive lower bound on donationOutMonths. */
+  minDonationOutMonths?: InputMaybe<Scalars["Int"]["input"]>;
+  /** Inclusive lower bound on monthsIn (JST-calendar months). */
+  minMonthsIn?: InputMaybe<Scalars["Int"]["input"]>;
+  /** Inclusive lower bound on userSendRate. Default 0.7 (habitual only). */
+  minSendRate?: InputMaybe<Scalars["Float"]["input"]>;
+};
+
+/**
+ * Sort configuration for the L2 member list. Both fields are optional;
+ * omitting either falls back to the default (SEND_RATE DESC) so the
+ * "top habitual members first" view renders out of the box.
+ */
+export type GqlSysAdminUserListSort = {
+  /**
+   * Column to sort on. See SysAdminUserSortField for what each value
+   * addresses. Default: SEND_RATE.
+   */
+  field?: InputMaybe<GqlSysAdminUserSortField>;
+  /** Sort direction. Default: DESC. */
+  order?: InputMaybe<GqlSysAdminSortOrder>;
+};
+
+/** Sortable columns on the member list. */
+export const GqlSysAdminUserSortField = {
+  /** donationOutMonths (distinct months with a DONATION out). */
+  DonationOutMonths: "DONATION_OUT_MONTHS",
+  /** monthsIn (tenure in JST calendar months). */
+  MonthsIn: "MONTHS_IN",
+  /** userSendRate (individual monthly-send rate, 0.0–1.0). */
+  SendRate: "SEND_RATE",
+  /** totalPointsOut (lifetime DONATION points sent). */
+  TotalPointsOut: "TOTAL_POINTS_OUT",
+} as const;
+
+export type GqlSysAdminUserSortField =
+  (typeof GqlSysAdminUserSortField)[keyof typeof GqlSysAdminUserSortField];
+/**
+ * DONATION sender retention against the most recently completed
+ * ISO week (Monday 00:00 JST). Raw signals only; the client composes
+ * churn alerts (e.g. churnedSenders > retainedSenders).
+ */
+export type GqlSysAdminWeeklyRetention = {
+  __typename?: "SysAdminWeeklyRetention";
+  /**
+   * Users who sent DONATION in the week-before-latest but NOT in
+   * the latest completed week. "Lost this week, was engaged last week."
+   */
+  churnedSenders: Scalars["Int"]["output"];
+  /**
+   * Users who sent DONATION in the latest completed week AND in
+   * the week before it. "Engaged this week, was engaged last week."
+   */
+  retainedSenders: Scalars["Int"]["output"];
+};
+
+/**
+ * DONATION activity within the parametric window driven by
+ * `SysAdminDashboardInput.windowDays`. Both the current window and
+ * the immediately preceding window of equal length are returned so
+ * the client can derive growth rates without a second query.
+ *
+ *   current  = [asOf - windowDays JST日, asOf + 1 JST日)
+ *   previous = [asOf - 2 * windowDays, asOf - windowDays)
+ */
+export type GqlSysAdminWindowActivity = {
+  __typename?: "SysAdminWindowActivity";
+  /**
+   * New JOINED memberships (t_memberships.created_at within the
+   * current window, status='JOINED').
+   */
+  newMemberCount: Scalars["Int"]["output"];
+  /** Same metric for the previous window. */
+  newMemberCountPrev: Scalars["Int"]["output"];
+  /**
+   * Users who sent at least one DONATION in BOTH the current window
+   * AND the previous window (set intersection on user_id). Same
+   * shape as SysAdminWeeklyRetention.retainedSenders but at
+   * windowDays scale, enabling client-side leaky-bucket derivation:
+   *
+   *   newlyActivatedSenders = senderCount     - retainedSenders
+   *   churnedSenders        = senderCountPrev - retainedSenders
+   */
+  retainedSenders: Scalars["Int"]["output"];
+  /**
+   * Unique users with at least one outgoing DONATION transaction
+   * during the current window (donation_out_count > 0 in
+   * mv_user_transaction_daily).
+   */
+  senderCount: Scalars["Int"]["output"];
+  /** Same metric for the previous window of equal length. */
+  senderCountPrev: Scalars["Int"]["output"];
 };
 
 export const GqlSysRole = {
@@ -3018,6 +3918,27 @@ export type GqlTransactionsConnection = {
   edges?: Maybe<Array<Maybe<GqlTransactionEdge>>>;
   pageInfo: GqlPageInfo;
   totalCount: Scalars["Int"]["output"];
+};
+
+export type GqlUpdateReportTemplateInput = {
+  communityContext?: InputMaybe<Scalars["String"]["input"]>;
+  experimentKey?: InputMaybe<Scalars["String"]["input"]>;
+  isActive?: InputMaybe<Scalars["Boolean"]["input"]>;
+  isEnabled?: InputMaybe<Scalars["Boolean"]["input"]>;
+  maxTokens: Scalars["Int"]["input"];
+  model: Scalars["String"]["input"];
+  stopSequences?: InputMaybe<Array<Scalars["String"]["input"]>>;
+  systemPrompt: Scalars["String"]["input"];
+  temperature?: InputMaybe<Scalars["Float"]["input"]>;
+  trafficWeight?: InputMaybe<Scalars["Int"]["input"]>;
+  userPromptTemplate: Scalars["String"]["input"];
+};
+
+export type GqlUpdateReportTemplatePayload = GqlUpdateReportTemplateSuccess;
+
+export type GqlUpdateReportTemplateSuccess = {
+  __typename?: "UpdateReportTemplateSuccess";
+  reportTemplate: GqlReportTemplate;
 };
 
 export type GqlUpdateSignupBonusConfigInput = {
@@ -4231,6 +5152,120 @@ export type GqlGetNftInstanceWithDidQuery = {
       };
     } | null;
   } | null;
+};
+
+export type GqlSysAdminSegmentCountsFieldsFragment = {
+  __typename?: "SysAdminSegmentCounts";
+  total: number;
+  activeCount: number;
+  passiveCount: number;
+  tier1Count: number;
+  tier2Count: number;
+};
+
+export type GqlSysAdminWindowActivityFieldsFragment = {
+  __typename?: "SysAdminWindowActivity";
+  senderCount: number;
+  senderCountPrev: number;
+  newMemberCount: number;
+  newMemberCountPrev: number;
+  retainedSenders: number;
+};
+
+export type GqlSysAdminWeeklyRetentionFieldsFragment = {
+  __typename?: "SysAdminWeeklyRetention";
+  retainedSenders: number;
+  churnedSenders: number;
+};
+
+export type GqlSysAdminLatestCohortFieldsFragment = {
+  __typename?: "SysAdminLatestCohort";
+  size: number;
+  activeAtM1: number;
+};
+
+export type GqlSysAdminPlatformSummaryFieldsFragment = {
+  __typename?: "SysAdminPlatformSummary";
+  communitiesCount: number;
+  latestMonthDonationPoints: number;
+  totalMembers: number;
+};
+
+export type GqlSysAdminCommunityOverviewRowFieldsFragment = {
+  __typename?: "SysAdminCommunityOverview";
+  communityId: string;
+  communityName: string;
+  totalMembers: number;
+  hubMemberCount: number;
+  segmentCounts: {
+    __typename?: "SysAdminSegmentCounts";
+    total: number;
+    activeCount: number;
+    passiveCount: number;
+    tier1Count: number;
+    tier2Count: number;
+  };
+  windowActivity: {
+    __typename?: "SysAdminWindowActivity";
+    senderCount: number;
+    senderCountPrev: number;
+    newMemberCount: number;
+    newMemberCountPrev: number;
+    retainedSenders: number;
+  };
+  weeklyRetention: {
+    __typename?: "SysAdminWeeklyRetention";
+    retainedSenders: number;
+    churnedSenders: number;
+  };
+  latestCohort: { __typename?: "SysAdminLatestCohort"; size: number; activeAtM1: number };
+};
+
+export type GqlGetSysAdminDashboardQueryVariables = Exact<{
+  input?: InputMaybe<GqlSysAdminDashboardInput>;
+}>;
+
+export type GqlGetSysAdminDashboardQuery = {
+  __typename?: "Query";
+  sysAdminDashboard: {
+    __typename?: "SysAdminDashboardPayload";
+    asOf: Date;
+    platform: {
+      __typename?: "SysAdminPlatformSummary";
+      communitiesCount: number;
+      latestMonthDonationPoints: number;
+      totalMembers: number;
+    };
+    communities: Array<{
+      __typename?: "SysAdminCommunityOverview";
+      communityId: string;
+      communityName: string;
+      totalMembers: number;
+      hubMemberCount: number;
+      segmentCounts: {
+        __typename?: "SysAdminSegmentCounts";
+        total: number;
+        activeCount: number;
+        passiveCount: number;
+        tier1Count: number;
+        tier2Count: number;
+      };
+      windowActivity: {
+        __typename?: "SysAdminWindowActivity";
+        senderCount: number;
+        senderCountPrev: number;
+        newMemberCount: number;
+        newMemberCountPrev: number;
+        retainedSenders: number;
+      };
+      weeklyRetention: {
+        __typename?: "SysAdminWeeklyRetention";
+        retainedSenders: number;
+        churnedSenders: number;
+      };
+      latestCohort: { __typename?: "SysAdminLatestCohort"; size: number; activeAtM1: number };
+    }>;
+  };
 };
 
 export type GqlGetCurrentUserProfileQueryVariables = Exact<{ [key: string]: never }>;
@@ -7592,6 +8627,67 @@ export const MembershipFieldsFragmentDoc = gql`
     reason
   }
 `;
+export const SysAdminPlatformSummaryFieldsFragmentDoc = gql`
+  fragment SysAdminPlatformSummaryFields on SysAdminPlatformSummary {
+    communitiesCount
+    latestMonthDonationPoints
+    totalMembers
+  }
+`;
+export const SysAdminSegmentCountsFieldsFragmentDoc = gql`
+  fragment SysAdminSegmentCountsFields on SysAdminSegmentCounts {
+    total
+    activeCount
+    passiveCount
+    tier1Count
+    tier2Count
+  }
+`;
+export const SysAdminWindowActivityFieldsFragmentDoc = gql`
+  fragment SysAdminWindowActivityFields on SysAdminWindowActivity {
+    senderCount
+    senderCountPrev
+    newMemberCount
+    newMemberCountPrev
+    retainedSenders
+  }
+`;
+export const SysAdminWeeklyRetentionFieldsFragmentDoc = gql`
+  fragment SysAdminWeeklyRetentionFields on SysAdminWeeklyRetention {
+    retainedSenders
+    churnedSenders
+  }
+`;
+export const SysAdminLatestCohortFieldsFragmentDoc = gql`
+  fragment SysAdminLatestCohortFields on SysAdminLatestCohort {
+    size
+    activeAtM1
+  }
+`;
+export const SysAdminCommunityOverviewRowFieldsFragmentDoc = gql`
+  fragment SysAdminCommunityOverviewRowFields on SysAdminCommunityOverview {
+    communityId
+    communityName
+    totalMembers
+    hubMemberCount
+    segmentCounts {
+      ...SysAdminSegmentCountsFields
+    }
+    windowActivity {
+      ...SysAdminWindowActivityFields
+    }
+    weeklyRetention {
+      ...SysAdminWeeklyRetentionFields
+    }
+    latestCohort {
+      ...SysAdminLatestCohortFields
+    }
+  }
+  ${SysAdminSegmentCountsFieldsFragmentDoc}
+  ${SysAdminWindowActivityFieldsFragmentDoc}
+  ${SysAdminWeeklyRetentionFieldsFragmentDoc}
+  ${SysAdminLatestCohortFieldsFragmentDoc}
+`;
 export const PlaceFieldsFragmentDoc = gql`
   fragment PlaceFields on Place {
     id
@@ -9693,6 +10789,88 @@ export type GetNftInstanceWithDidSuspenseQueryHookResult = ReturnType<
 export type GetNftInstanceWithDidQueryResult = Apollo.QueryResult<
   GqlGetNftInstanceWithDidQuery,
   GqlGetNftInstanceWithDidQueryVariables
+>;
+export const GetSysAdminDashboardDocument = gql`
+  query GetSysAdminDashboard($input: SysAdminDashboardInput) {
+    sysAdminDashboard(input: $input) {
+      asOf
+      platform {
+        ...SysAdminPlatformSummaryFields
+      }
+      communities {
+        ...SysAdminCommunityOverviewRowFields
+      }
+    }
+  }
+  ${SysAdminPlatformSummaryFieldsFragmentDoc}
+  ${SysAdminCommunityOverviewRowFieldsFragmentDoc}
+`;
+
+/**
+ * __useGetSysAdminDashboardQuery__
+ *
+ * To run a query within a React component, call `useGetSysAdminDashboardQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetSysAdminDashboardQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetSysAdminDashboardQuery({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useGetSysAdminDashboardQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GqlGetSysAdminDashboardQuery,
+    GqlGetSysAdminDashboardQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetSysAdminDashboardQuery, GqlGetSysAdminDashboardQueryVariables>(
+    GetSysAdminDashboardDocument,
+    options,
+  );
+}
+export function useGetSysAdminDashboardLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetSysAdminDashboardQuery,
+    GqlGetSysAdminDashboardQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetSysAdminDashboardQuery, GqlGetSysAdminDashboardQueryVariables>(
+    GetSysAdminDashboardDocument,
+    options,
+  );
+}
+export function useGetSysAdminDashboardSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetSysAdminDashboardQuery,
+        GqlGetSysAdminDashboardQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GqlGetSysAdminDashboardQuery,
+    GqlGetSysAdminDashboardQueryVariables
+  >(GetSysAdminDashboardDocument, options);
+}
+export type GetSysAdminDashboardQueryHookResult = ReturnType<typeof useGetSysAdminDashboardQuery>;
+export type GetSysAdminDashboardLazyQueryHookResult = ReturnType<
+  typeof useGetSysAdminDashboardLazyQuery
+>;
+export type GetSysAdminDashboardSuspenseQueryHookResult = ReturnType<
+  typeof useGetSysAdminDashboardSuspenseQuery
+>;
+export type GetSysAdminDashboardQueryResult = Apollo.QueryResult<
+  GqlGetSysAdminDashboardQuery,
+  GqlGetSysAdminDashboardQueryVariables
 >;
 export const GetCurrentUserProfileDocument = gql`
   query GetCurrentUserProfile {

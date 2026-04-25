@@ -1,11 +1,12 @@
 import type { Decorator } from "@storybook/nextjs-vite";
 import { withI18n } from "./withI18n";
 import { withHeader } from "./withHeader";
+import { withPageShell } from "./withPageShell";
 import { withCommunityConfig } from "./withCommunityConfig";
 import { withApollo } from "./withApollo";
 import { withAuth } from "./withAuth";
 
-export { withI18n, withHeader, withCommunityConfig, withApollo, withAuth };
+export { withI18n, withHeader, withPageShell, withCommunityConfig, withApollo, withAuth };
 
 /**
  * 全 story に共通で適用するグローバル decorator。
