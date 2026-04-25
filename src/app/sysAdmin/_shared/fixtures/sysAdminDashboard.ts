@@ -59,19 +59,40 @@ export const makePlatformSummary = (
   ...overrides,
 });
 
+// Default proportions used to derive segmentCounts from totalMembers when
+// the caller doesn't pass an explicit segmentCounts override. Keeps Hub /
+// passive rates visually plausible across stories with varied totalMembers.
+const DEFAULT_TIER1_RATIO = 0.33;
+const DEFAULT_TIER2_RATIO = 0.58;
+const DEFAULT_PASSIVE_RATIO = 0.21;
+
+function defaultSegmentCountsFor(total: number): GqlSysAdminSegmentCounts {
+  return {
+    __typename: "SysAdminSegmentCounts",
+    total,
+    activeCount: Math.round(total * (1 - DEFAULT_PASSIVE_RATIO)),
+    passiveCount: Math.round(total * DEFAULT_PASSIVE_RATIO),
+    tier1Count: Math.round(total * DEFAULT_TIER1_RATIO),
+    tier2Count: Math.round(total * DEFAULT_TIER2_RATIO),
+  };
+}
+
 export const makeCommunityOverview = (
   overrides: Partial<GqlSysAdminCommunityOverview> = {},
-): GqlSysAdminCommunityOverview => ({
-  __typename: "SysAdminCommunityOverview",
-  communityId: "community-a",
-  communityName: "コミュニティA",
-  totalMembers: 120,
-  segmentCounts: makeSegmentCounts(),
-  windowActivity: makeWindowActivity(),
-  weeklyRetention: makeWeeklyRetention(),
-  latestCohort: makeLatestCohort(),
-  ...overrides,
-});
+): GqlSysAdminCommunityOverview => {
+  const totalMembers = overrides.totalMembers ?? 120;
+  return {
+    __typename: "SysAdminCommunityOverview",
+    communityId: "community-a",
+    communityName: "コミュニティA",
+    totalMembers,
+    segmentCounts: defaultSegmentCountsFor(totalMembers),
+    windowActivity: makeWindowActivity(),
+    weeklyRetention: makeWeeklyRetention(),
+    latestCohort: makeLatestCohort(),
+    ...overrides,
+  };
+};
 
 export const makeDashboardPayload = (
   overrides: {

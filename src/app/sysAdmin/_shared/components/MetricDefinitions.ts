@@ -22,6 +22,17 @@ export const METRIC_DEFINITIONS: Record<string, MetricDefinition> = {
     formula: "(直近 28 日 MAU% − その前 28 日 MAU%) ÷ その前 28 日 MAU%",
     note: "負値は MAU% が前窓より低下。前 28 日窓の MAU% が 0 のときは null。",
   },
+  hubUserPct: {
+    title: "Hub user%",
+    formula: "tier1Count ÷ totalMembers (userSendRate ≥ tier1 を満たすメンバー)",
+    note: "ステージ最上位 (習慣化層) の比率。コミュニティの DONATION 連鎖を支える hub 役のユーザー割合。",
+    range: "0〜100%",
+  },
+  newMembers: {
+    title: "New",
+    formula: "直近 28 日 (windowDays default) に JOINED で加入したメンバー数",
+    note: "rolling 窓内の絶対数。コミュニティ size に依らず流入の勢いを見るため % ではなく count で表示。",
+  },
   userSendRate: {
     title: "送付率 (個人)",
     formula: "DONATIONを送った月数 ÷ 在籍月数",
@@ -91,8 +102,8 @@ export const METRIC_DEFINITIONS: Record<string, MetricDefinition> = {
   stages: {
     title: "ステージ分類",
     formula:
-      "habitual: send_rate ≥ tier1 / regular: tier2 ≤ send_rate < tier1 / occasional: 0 < send_rate < tier2 / latent: send_rate = 0",
-    note: "デフォルト tier1=0.7, tier2=0.4。閾値はステージ分布の「分類設定」から変更可能。",
+      "hub: send_rate ≥ tier1 / regular: tier2 ≤ send_rate < tier1 / occasional: 0 < send_rate < tier2 / latent: send_rate = 0",
+    note: "デフォルト tier1=0.7, tier2=0.4。最上位 (hub) は DONATION ネットワークの連鎖を支える役割を表す。閾値はステージ分布の「分類設定」から変更可能。",
   },
   asOf: {
     title: "集計日",
@@ -106,6 +117,8 @@ export type MetricKey =
   | "mau"
   | "communityActivityRate"
   | "growthRateActivity"
+  | "hubUserPct"
+  | "newMembers"
   | "userSendRate"
   | "cohortRetention"
   | "wau"

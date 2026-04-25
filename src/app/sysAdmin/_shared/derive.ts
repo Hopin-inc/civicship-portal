@@ -35,6 +35,14 @@ export function deriveLatestCohortRetentionM1(
   return row.latestCohort.activeAtM1 / row.latestCohort.size;
 }
 
+// Hub user share: tier1 segment (userSendRate >= tier1 threshold, default 0.7).
+// "Hub" frames the highest stage as the network-role layer that anchors
+// the donation graph, distinct from generic "habitual" individual behavior.
+export function deriveHubUserPct(row: GqlSysAdminCommunityOverview): number {
+  if (row.totalMembers === 0) return 0;
+  return row.segmentCounts.tier1Count / row.totalMembers;
+}
+
 export type DerivedAlerts = {
   churnSpike: boolean;
   activeDrop: boolean;

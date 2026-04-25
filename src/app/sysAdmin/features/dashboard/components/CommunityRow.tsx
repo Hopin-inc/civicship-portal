@@ -10,6 +10,7 @@ import {
   deriveActivityRate,
   deriveAlerts,
   deriveGrowthRateActivity,
+  deriveHubUserPct,
   hasAnyAlert,
 } from "@/app/sysAdmin/_shared/derive";
 import type { GqlSysAdminCommunityOverview } from "@/types/graphql";
@@ -19,18 +20,13 @@ type Props = {
   onClick?: (communityId: string) => void;
 };
 
-/**
- * opportunities の OpportunityItem を参考にした compact な 1 行表示。
- * 構造:
- * - status (アラートがある場合のみ、タイトル上に小さく)
- * - community name (bold base)
- * - footer: MAU%・前月比・人数 (xs muted)
- */
 export function CommunityRow({ row, onClick }: Props) {
   const handleClick = () => onClick?.(row.communityId);
   const alerts = deriveAlerts(row);
   const activityRate = deriveActivityRate(row);
   const growthRateActivity = deriveGrowthRateActivity(row);
+  const hubUserPct = deriveHubUserPct(row);
+  const newMemberCount = row.windowActivity.newMemberCount;
   const hasAlert = hasAnyAlert(alerts);
 
   return (
@@ -53,30 +49,45 @@ export function CommunityRow({ row, onClick }: Props) {
       {hasAlert && <PrimaryAlertBadge alerts={alerts} />}
 
       <ItemContent>
-        <ItemTitle className="text-base font-semibold">
-          {row.communityName}
-        </ItemTitle>
+        <div className="flex w-full items-baseline justify-between gap-2">
+          <ItemTitle className="min-w-0 flex-1 truncate text-base font-semibold">
+            {row.communityName}
+          </ItemTitle>
+          <span className="shrink-0 text-base font-medium tabular-nums text-muted-foreground">
+            {toIntJa(row.totalMembers)}
+          </span>
+        </div>
       </ItemContent>
 
       <ItemFooter className="mt-0">
-        <div className="flex flex-wrap items-baseline gap-x-2 text-xs text-muted-foreground">
-          <span className="inline-flex items-baseline gap-1">
-            <span>MAU% {toPct(activityRate)}</span>
-            {growthRateActivity != null && (
-              <span aria-label="前月比">
-                (
-                <PercentDelta
-                  value={growthRateActivity}
-                  className="text-xs"
-                />
-                )
-              </span>
-            )}
-          </span>
-          <span aria-hidden>·</span>
-          <span>{toIntJa(row.totalMembers)}人</span>
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5">
+          <KpiPill label="MAU" value={toPct(activityRate)} delta={growthRateActivity} />
+          <KpiPill label="Hub" value={toPct(hubUserPct)} />
+          <KpiPill label="New" value={toIntJa(newMemberCount)} />
         </div>
       </ItemFooter>
     </Item>
+  );
+}
+
+type KpiPillProps = {
+  label: string;
+  value: string;
+  delta?: number | null;
+};
+
+function KpiPill({ label, value, delta }: KpiPillProps) {
+  return (
+    <span className="inline-flex items-baseline gap-1">
+      <span className="rounded-md border border-border px-1.5 py-px text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+        {label}
+      </span>
+      <span className="text-sm font-medium tabular-nums">{value}</span>
+      {delta !== undefined && delta !== null && (
+        <span className="text-xs text-muted-foreground">
+          (<PercentDelta value={delta} className="text-xs" />)
+        </span>
+      )}
+    </span>
   );
 }
