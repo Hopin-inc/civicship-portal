@@ -61,6 +61,25 @@ export function useDashboardControls() {
 
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Sync URL → state on external navigation (browser back / forward, or
+  // any other consumer changing searchParams). The state→URL writer below
+  // uses `window.history.replaceState`, which does NOT cause Next.js's
+  // `useSearchParams` to update — so this effect doesn't re-fire on our
+  // own writes. The equality guard is a belt-and-suspenders against
+  // unrelated re-renders that would otherwise produce a no-op setState.
+  useEffect(() => {
+    const hydrated = hydrateFromParams(
+      new URLSearchParams(searchParams?.toString() ?? ""),
+    );
+    setState((prev) =>
+      prev.period === hydrated.period &&
+      prev.tier1 === hydrated.tier1 &&
+      prev.tier2 === hydrated.tier2
+        ? prev
+        : hydrated,
+    );
+  }, [searchParams]);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (timerRef.current) clearTimeout(timerRef.current);

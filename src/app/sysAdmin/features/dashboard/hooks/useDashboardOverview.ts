@@ -73,7 +73,12 @@ export function useDashboardOverview(
     const source = useSsr ? initialData : data?.sysAdminDashboard ?? null;
 
     return {
-      loading: !useSsr && loading,
+      // Always reflect the actual Apollo loading state. Previously this
+      // was gated by `!useSsr`, which suppressed loading during the gap
+      // between a control change (skipInitialQuery → false) and Apollo
+      // returning data — leaving the user staring at stale SSR data
+      // with no indication that a refresh was in flight.
+      loading,
       error,
       platform: source?.platform ?? null,
       communities: source?.communities ?? [],
