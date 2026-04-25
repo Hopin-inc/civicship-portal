@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
+import type { GqlGetSysAdminCommunityDetailQuery } from "@/types/graphql";
 import { MetricGlossaryButton } from "@/app/sysAdmin/_shared/components/MetricGlossary";
 import { PeriodPresetSelect } from "@/app/sysAdmin/_shared/components/PeriodPresetSelect";
 import { PercentDelta } from "@/app/sysAdmin/_shared/components/PercentDelta";
@@ -20,13 +21,16 @@ import { MemberListPanel } from "./MemberListPanel";
 
 type Props = {
   communityId: string;
+  /** SSR で取得した初期データ。controls がデフォルトのままなら client query を skip する */
+  initialData?: GqlGetSysAdminCommunityDetailQuery["sysAdminCommunityDetail"] | null;
 };
 
-export function CommunityDashboardDetail({ communityId }: Props) {
+export function CommunityDashboardDetail({ communityId, initialData = null }: Props) {
   const dashboard = useDashboardControls();
   const { loading, error, detail: data, input, fetchMore } = useCommunityDetail({
     communityId,
     dashboardControls: dashboard.state,
+    initialData,
   });
 
   const headerConfig = useMemo(

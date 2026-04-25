@@ -1,20 +1,36 @@
-"use client";
-
-import { use } from "react";
-import { CommunityDashboardDetail } from "@/app/sysAdmin/features/communityDetail/components/CommunityDashboardDetail";
+import { fetchSysAdminCommunityDetailServer } from "@/app/sysAdmin/_shared/server/fetchSysAdminCommunityDetail";
+import {
+  GqlSysAdminSortOrder,
+  GqlSysAdminUserSortField,
+} from "@/types/graphql";
+import { CommunityDetailPageClient } from "./CommunityDetailPageClient";
 
 type Props = {
   params: Promise<{ communityId: string }>;
 };
 
-// ヘッダーの title は CommunityDashboardDetail 側でデータ取得後に動的に
+// ヘッダーの title は CommunityDetailPageClient 側でデータ取得後に動的に
 // community 名をセットする (useHeaderConfig をクライアント層で呼ぶため)。
-export default function SysAdminCommunityDetailPage({ params }: Props) {
-  const { communityId } = use(params);
+export default async function SysAdminCommunityDetailPage({ params }: Props) {
+  const { communityId } = await params;
+
+  // SSR 用デフォルト input。useDashboardControls / useCommunityDetail のデフォルトと一致させる。
+  const initialData = await fetchSysAdminCommunityDetailServer({
+    communityId,
+    asOf: undefined,
+    segmentThresholds: { tier1: 0.7, tier2: 0.4 },
+    windowMonths: 3,
+    userFilter: {},
+    userSort: {
+      field: GqlSysAdminUserSortField.TotalPointsOut,
+      order: GqlSysAdminSortOrder.Desc,
+    },
+    limit: 50,
+  });
 
   return (
     <div className="mx-auto max-w-7xl p-4">
-      <CommunityDashboardDetail communityId={communityId} />
+      <CommunityDetailPageClient communityId={communityId} initialData={initialData} />
     </div>
   );
 }

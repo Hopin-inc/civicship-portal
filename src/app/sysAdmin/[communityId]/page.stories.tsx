@@ -5,9 +5,9 @@ import { withApollo, withPageShell } from "../../../../.storybook/decorators";
 import { CommunityDashboardDetail } from "../features/communityDetail/components/CommunityDashboardDetail";
 import { makeCommunityDetailPayload } from "../_shared/fixtures/sysAdminDashboard";
 
-// page.tsx は `use(params)` を使うため Storybook から直接 render しにくい。
-// 実際の route で表示される container (max-w-7xl p-4) + CommunityDashboardDetail
-// の組み合わせをラップして再現する。
+// page.tsx は async RSC で SSR fetch するため Storybook から直接 render できない。
+// Client 部分 (`CommunityDashboardDetail`) と route の container (max-w-7xl p-4) を
+// ラップで再現する。initialData は省略して Apollo mock が発火する経路をテスト。
 function CommunityDetailPageShell({ communityId }: { communityId: string }) {
   return (
     <div className="mx-auto max-w-7xl p-4">

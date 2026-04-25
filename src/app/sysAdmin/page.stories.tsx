@@ -1,22 +1,26 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { GetSysAdminDashboardDocument } from "@/types/graphql";
 import { withApollo, withPageShell } from "../../../.storybook/decorators";
-import SysAdminPage from "./page";
+import { SysAdminPageClient } from "./SysAdminPageClient";
 import {
   makeAlerts,
   makeCommunityOverview,
   makeDashboardPayload,
 } from "./_shared/fixtures/sysAdminDashboard";
 
-const meta: Meta<typeof SysAdminPage> = {
+// page.tsx は async RSC なので Storybook から直接 render できない。
+// Client 部分 (`SysAdminPageClient`) に initialData=null を渡し、
+// Apollo mock をクエリ経由で発火させて従来の画面を再現する。
+const meta: Meta<typeof SysAdminPageClient> = {
   title: "SysAdmin/Pages/CommunityList",
-  component: SysAdminPage,
+  component: SysAdminPageClient,
   parameters: { layout: "fullscreen" },
   decorators: [withPageShell, withApollo],
+  args: { initialData: null },
 };
 
 export default meta;
-type Story = StoryObj<typeof SysAdminPage>;
+type Story = StoryObj<typeof SysAdminPageClient>;
 
 const variables = {
   input: {
