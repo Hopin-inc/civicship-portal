@@ -108,8 +108,8 @@ export const METRIC_DEFINITIONS: Record<string, MetricDefinition> = {
   stages: {
     title: "ステージ分類",
     formula:
-      "hub: send_rate ≥ tier1 / regular: tier2 ≤ send_rate < tier1 / occasional: 0 < send_rate < tier2 / latent: send_rate = 0",
-    note: "デフォルト tier1=0.7, tier2=0.4。最上位 (hub) は DONATION ネットワークの連鎖を支える役割を表す。閾値はステージ分布の「分類設定」から変更可能。",
+      "habitual: send_rate ≥ tier1 / regular: tier2 ≤ send_rate < tier1 / occasional: 0 < send_rate < tier2 / latent: send_rate = 0",
+    note: "ノード軸 (個人の頻度継続性) のステージ分類。デフォルト tier1=0.7, tier2=0.4。閾値はステージ分布の「分類設定」から変更可能。ネットワーク軸の `Hub user%` (関係性の広さ) とは別軸で、両者は独立に評価される。",
   },
   asOf: {
     title: "集計日",
