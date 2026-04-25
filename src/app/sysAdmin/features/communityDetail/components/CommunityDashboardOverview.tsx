@@ -60,6 +60,20 @@ export function CommunityDashboardOverview({
   const isolatedRatio = habitualCount > 0 ? isolatedCount / habitualCount : 0;
   const isolatedAlert = habitualCount > 0 && isolatedRatio >= 0.3;
 
+  // network 量: 平均送付先数 (active な人だけで取る — 潜在を分母に含めると
+  // 数字が薄まる)
+  const activeMembers = data.memberList.users.filter((u) => u.userSendRate > 0);
+  const avgRecipients =
+    activeMembers.length > 0
+      ? activeMembers.reduce((acc, u) => acc + u.uniqueDonationRecipients, 0) /
+        activeMembers.length
+      : 0;
+
+  // network 質: 連鎖率 (今月 = monthlyActivityTrend の最新点)
+  const latestMonth =
+    data.monthlyActivityTrend[data.monthlyActivityTrend.length - 1];
+  const latestChainPct = latestMonth?.chainPct ?? null;
+
   const cohortLatest = data.cohortRetention[data.cohortRetention.length - 1];
   const cohortPrev = data.cohortRetention[data.cohortRetention.length - 2];
   const cohortDelta =
@@ -124,7 +138,23 @@ export function CommunityDashboardOverview({
       )}
 
       <Scope title="ネットワーク" detailHref={`/sysAdmin/${data.communityId}/network`}>
-        <Hero label="ハブユーザー比率" value={toPct(hubPct)} />
+        <DualAxis
+          quantity={[
+            { value: toIntJa(hubMemberCount), unit: "名", label: "ハブユーザー" },
+            {
+              value: avgRecipients > 0 ? avgRecipients.toFixed(1) : "-",
+              unit: "人",
+              label: "平均送付先",
+            },
+          ]}
+          quality={[
+            { value: toPct(hubPct), label: "ハブユーザー比率" },
+            {
+              value: latestChainPct != null ? toPct(latestChainPct) : "-",
+              label: "連鎖率 (今月)",
+            },
+          ]}
+        />
 
         {isolatedAlert && (
           <Issue title="送付先の孤立">
@@ -132,7 +162,14 @@ export function CommunityDashboardOverview({
           </Issue>
         )}
 
-        <Pending items={["ハブ集中度 (Pareto)", "連鎖起点率", "関係幅分布"]} />
+        <Pending
+          items={[
+            "ハブ集中度 (Pareto)",
+            "連鎖起点率",
+            "関係幅分布",
+            "送付件数 (今月)",
+          ]}
+        />
       </Scope>
 
       <Scope title="アクティビティ" detailHref={`/sysAdmin/${data.communityId}/activity`}>
@@ -266,6 +303,46 @@ function Hero({
       <span className="text-4xl font-semibold tabular-nums leading-none tracking-tight">
         {value}
       </span>
+    </div>
+  );
+}
+
+type AxisItem = { value: React.ReactNode; unit?: string; label: string };
+
+function DualAxis({
+  quantity,
+  quality,
+}: {
+  quantity: AxisItem[];
+  quality: AxisItem[];
+}) {
+  return (
+    <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
+      <AxisColumn title="量" items={quantity} />
+      <AxisColumn title="質" items={quality} />
+    </div>
+  );
+}
+
+function AxisColumn({ title, items }: { title: string; items: AxisItem[] }) {
+  return (
+    <div className="flex flex-col gap-4">
+      <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+        {title}
+      </span>
+      {items.map((item, i) => (
+        <div key={i} className="flex flex-col gap-1">
+          <span className="inline-flex items-baseline gap-1 text-3xl font-semibold tabular-nums leading-none tracking-tight">
+            {item.value}
+            {item.unit && (
+              <span className="text-base font-medium text-muted-foreground">
+                {item.unit}
+              </span>
+            )}
+          </span>
+          <span className="text-xs text-muted-foreground">{item.label}</span>
+        </div>
+      ))}
     </div>
   );
 }
