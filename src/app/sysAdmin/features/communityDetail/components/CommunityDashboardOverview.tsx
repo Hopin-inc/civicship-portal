@@ -330,12 +330,15 @@ type AxisItem = {
 };
 
 function KeyMetrics({ items }: { items: AxisItem[] }) {
-  // 2-col on mobile, full-flex on wider so 3 と 4 metric の両ケースで破綻しない
   return (
-    <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-4">
+    <dl className="flex flex-col divide-y divide-border/60">
       {items.map((item, i) => (
-        <div key={i} className="flex flex-col gap-1">
-          <span className="inline-flex items-baseline gap-1 text-2xl font-semibold tabular-nums leading-none tracking-tight">
+        <div
+          key={i}
+          className="flex items-baseline justify-between gap-3 py-3 first:pt-0 last:pb-0"
+        >
+          <dt className="text-sm text-muted-foreground">{item.label}</dt>
+          <dd className="inline-flex items-baseline gap-1 text-2xl font-semibold tabular-nums leading-none tracking-tight">
             {item.prefix && (
               <span className="text-xs font-normal text-muted-foreground">
                 {item.prefix}
@@ -347,11 +350,10 @@ function KeyMetrics({ items }: { items: AxisItem[] }) {
                 {item.unit}
               </span>
             )}
-          </span>
-          <span className="text-xs text-muted-foreground">{item.label}</span>
+          </dd>
         </div>
       ))}
-    </div>
+    </dl>
   );
 }
 
