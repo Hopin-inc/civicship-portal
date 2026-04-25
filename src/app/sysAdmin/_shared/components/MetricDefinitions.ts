@@ -8,36 +8,36 @@ export type MetricDefinition = {
 export const METRIC_DEFINITIONS: Record<string, MetricDefinition> = {
   mau: {
     title: "MAU",
-    formula: "直近 28 日に DONATION を送ったユニークユーザー数 (windowDays default = 28)",
-    note: "本ツールでの Active = DONATION 送付者。MAU% の分子。暦月ではなく rolling 28 日窓。",
+    formula: "直近 windowDays 日 (default 28) に DONATION を送ったユニークユーザー数",
+    note: "本ツールでの Active = DONATION 送付者。MAU% の分子。暦月ではなく rolling 窓。",
   },
   communityActivityRate: {
     title: "MAU%",
-    formula: "MAU ÷ asOf 時点の総メンバー数 (rolling 28 日窓)",
+    formula: "MAU ÷ asOf 時点の総メンバー数 (rolling 窓は windowDays 日、default 28)",
     note: "コミュニティ単位の MAU%。個人の送付率 (user_send_rate) とは別指標。本ツールでの Active = DONATION 送付者。",
     range: "0〜100%",
   },
   growthRateActivity: {
     title: "MAU% 前月比",
-    formula: "(直近 28 日 MAU% − その前 28 日 MAU%) ÷ その前 28 日 MAU%",
-    note: "負値は MAU% が前窓より低下。前 28 日窓の MAU% が 0 のときは null。",
+    formula: "(現窓 MAU% − 前窓 MAU%) ÷ 前窓 MAU% (窓は windowDays 日、default 28)",
+    note: "負値は MAU% が前窓より低下。前窓の MAU% が 0 のときは null。",
   },
   hubUserPct: {
     title: "Hub user%",
-    formula: "hubMemberCount ÷ totalMembers (直近 28d に hubBreadthThreshold=3 以上の distinct 相手に DONATION した user)",
-    note: "ネットワーク軸の指標。「複数方面に送付している = 関係性を広げている」ユーザーの割合。ノード軸の習慣化 (userSendRate ≥ tier1) とは独立で、低頻度でも複数人に送れば hub、高頻度でも 1 人にしか送らなければ hub ではない。",
+    formula: "hubMemberCount ÷ totalMembers (現窓に hubBreadthThreshold (default 3) 以上の distinct 相手に DONATION した user)",
+    note: "ネットワーク軸の指標。「複数方面に送付している = 関係性を広げている」ユーザーの割合。ノード軸の習慣化 (userSendRate ≥ tier1) とは独立で、低頻度でも複数人に送れば hub、高頻度でも 1 人にしか送らなければ hub ではない。閾値・窓幅は SysAdminDashboardInput で可変。",
     range: "0〜100%",
   },
   newMembers: {
     title: "New",
-    formula: "直近 28 日 (windowDays default) に JOINED で加入したメンバー数",
+    formula: "現窓 (windowDays 日、default 28) に JOINED で加入したメンバー数",
     note: "row では総メンバー数の隣に `(+12)` の形で表示。0 のときは `(+0)` で「新規加入なし」のシグナルを兼ねる。",
   },
   activityFlow: {
     title: "Δ (activity flow)",
     formula:
       "↑newlyActivated = senderCount − retainedSenders / ↓churned = senderCountPrev − retainedSenders",
-    note: "leaky-bucket 検出。↑ は前 28d は送付してなく現 28d で送付した sender、↓ は前 28d は送付してたが現 28d で送付してない sender。MAU 数だけ見ても入退室で打ち消されるケースを表面化する。",
+    note: "leaky-bucket 検出。↑ は前窓では送付してなく現窓で送付した sender、↓ は前窓では送付してたが現窓で送付してない sender。窓は windowDays 日 (default 28)。MAU 数だけ見ても入退室で打ち消されるケースを表面化する。",
   },
   userSendRate: {
     title: "送付率 (個人)",
