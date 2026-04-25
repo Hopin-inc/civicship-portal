@@ -69,7 +69,11 @@ export function useDashboardOverview(
     // SSR データを fallback として使う条件:
     // - クライアント query を skip 中 (デフォルト controls のまま)
     // - もしくは Apollo がまだ data を返していない (初回フェッチ中)
-    const useSsr = skipInitialQuery || !data?.sysAdminDashboard;
+    //
+    // `data === undefined` で「まだ応答が来ていない」を厳密に判定する。
+    // `!data?.sysAdminDashboard` だと、Apollo が `null` (= 有効な空応答)
+    // を返したときに stale な initialData を表示し続けてしまう。
+    const useSsr = skipInitialQuery || data === undefined;
     const source = useSsr ? initialData : data?.sysAdminDashboard ?? null;
 
     return {
