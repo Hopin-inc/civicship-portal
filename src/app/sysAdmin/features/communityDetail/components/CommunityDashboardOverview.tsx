@@ -3,7 +3,6 @@
 import React from "react";
 import Link from "next/link";
 import { AlertTriangle, ChevronRight, Clock } from "lucide-react";
-import { cn } from "@/lib/utils";
 import type { GqlGetSysAdminCommunityDetailQuery } from "@/types/graphql";
 import {
   toCompactJa,
@@ -11,14 +10,6 @@ import {
   toPct,
 } from "@/app/sysAdmin/_shared/format/number";
 import { PercentDelta } from "@/app/sysAdmin/_shared/components/PercentDelta";
-import { StageProgressBar } from "@/app/sysAdmin/_shared/components/StageProgressBar";
-import { CohortRetentionAreaChart } from "@/app/sysAdmin/_shared/charts/CohortRetentionAreaChart";
-import { buildCohortChartData } from "@/app/sysAdmin/_shared/charts/buildCohortChartData";
-import {
-  RetentionWeeklyStackedChart,
-  type RetentionWeeklyDatum,
-} from "@/app/sysAdmin/_shared/charts/RetentionWeeklyStackedChart";
-import { formatJstDate } from "@/app/sysAdmin/_shared/format/date";
 
 type DetailPayload = NonNullable<
   GqlGetSysAdminCommunityDetailQuery["sysAdminCommunityDetail"]
@@ -145,10 +136,6 @@ export function CommunityDashboardOverview({
               value: paretoTopShare != null ? toPct(paretoTopShare) : "-",
               label: "流通量の偏り",
             },
-            {
-              value: latestChainPct != null ? toPct(latestChainPct) : "-",
-              label: "連鎖率 (今月)",
-            },
           ]}
         />
 
@@ -160,6 +147,7 @@ export function CommunityDashboardOverview({
 
         <Pending
           items={[
+            "連鎖率",
             "ハブユーザー数",
             "平均流通量",
             "連鎖起点率",
@@ -169,78 +157,71 @@ export function CommunityDashboardOverview({
       </Scope>
 
       <Scope title="アクティビティ" detailHref={`/sysAdmin/${data.communityId}/activity`}>
-        <Hero
-          label="今月の MAU%"
-          value={
-            <span className="inline-flex items-baseline gap-2">
-              <span>{toPct(summary.communityActivityRate)}</span>
-              {summary.growthRateActivity != null && (
-                <PercentDelta
-                  value={summary.growthRateActivity}
-                  className="text-base"
-                />
-              )}
-            </span>
-          }
+        <KeyMetrics
+          items={[
+            {
+              value: (
+                <span className="inline-flex items-baseline gap-2">
+                  <span>{toPct(summary.communityActivityRate)}</span>
+                  {summary.growthRateActivity != null && (
+                    <PercentDelta
+                      value={summary.growthRateActivity}
+                      className="text-sm"
+                    />
+                  )}
+                </span>
+              ),
+              label: "今月の MAU%",
+            },
+            {
+              value:
+                summary.communityActivityRate3mAvg != null
+                  ? toPct(summary.communityActivityRate3mAvg)
+                  : "-",
+              label: "3 ヶ月平均 MAU%",
+            },
+            {
+              value:
+                cohortLatest?.retentionM1 != null
+                  ? toPct(cohortLatest.retentionM1)
+                  : "-",
+              label: "最新コホート M+1",
+            },
+          ]}
         />
 
-        {data.cohortRetention.length > 0 && (
-          <ChartBlock title="コホート retention">
-            <CohortRetentionAreaChart
-              data={buildCohortChartData(data.cohortRetention)}
-              height={220}
-            />
-            {cohortAlert && cohortLatest?.retentionM1 != null && (
-              <Issue title="直近コホートの M+1 低下">
-                最新月 {toPct(cohortLatest.retentionM1)}
-                {cohortPrev?.retentionM1 != null &&
-                  ` (前期 ${toPct(cohortPrev.retentionM1)})`}
-                。Onboarding が機能していない可能性。
-              </Issue>
-            )}
-          </ChartBlock>
+        {cohortAlert && cohortLatest?.retentionM1 != null && (
+          <Issue title="直近コホートの M+1 低下">
+            最新月 {toPct(cohortLatest.retentionM1)}
+            {cohortPrev?.retentionM1 != null &&
+              ` (前期 ${toPct(cohortPrev.retentionM1)})`}
+            。Onboarding が機能していない可能性。
+          </Issue>
         )}
 
-        {data.retentionTrend.length > 0 && (
-          <ChartBlock title="週次 retention">
-            <RetentionWeeklyStackedChart
-              data={data.retentionTrend.map<RetentionWeeklyDatum>((p) => ({
-                week: formatJstDate(p.week),
-                retainedSenders: p.retainedSenders,
-                churnedSenders: p.churnedSenders,
-                returnedSenders: p.returnedSenders,
-                communityActivityRate: p.communityActivityRate ?? null,
-              }))}
-              height={220}
-            />
-          </ChartBlock>
-        )}
+        <Pending items={["週次 retention 推移", "コホート retention 推移", "MAU% 月次推移"]} />
       </Scope>
 
       <Scope title="ユーザー" detailHref={`/sysAdmin/${data.communityId}/users`}>
-        <div className="flex flex-col gap-3">
-          <span className="text-xs text-muted-foreground">ステージ分布</span>
-          <StageProgressBar
-            counts={{
-              habitual: habitualCount,
-              regular: regularCount,
-              occasional: occasionalCount,
-              latent: latentCount,
-            }}
-            showLabels={false}
-          />
-          <dl className="flex flex-wrap gap-x-6 gap-y-1 text-sm tabular-nums">
-            <StageStat label="習慣化" count={habitualCount} pct={stages.habitual.pct} />
-            <StageStat
-              label="定期"
-              count={regularCount}
-              pct={stages.regular.pct}
-              accent={habitualOverRegular}
-            />
-            <StageStat label="散発" count={occasionalCount} pct={stages.occasional.pct} />
-            <StageStat label="潜在" count={latentCount} pct={stages.latent.pct} />
-          </dl>
-        </div>
+        <KeyMetrics
+          items={[
+            {
+              value: toIntJa(habitualCount),
+              unit: "名",
+              label: `習慣化  ${toPct(stages.habitual.pct)}`,
+            },
+            {
+              value: toIntJa(regularCount),
+              unit: "名",
+              label: `定期  ${toPct(stages.regular.pct)}${habitualOverRegular ? "  ← 習慣化を超過" : ""}`,
+            },
+            {
+              value: toIntJa(latentCount),
+              unit: "名",
+              label: `潜在  ${toPct(stages.latent.pct)}`,
+            },
+          ]}
+        />
 
         {habitualOverRegular && (
           <Issue title="「定期」が「習慣化」を超過">
@@ -248,7 +229,7 @@ export function CommunityDashboardOverview({
           </Issue>
         )}
 
-        <Pending items={["落下リスク", "昇格率"]} />
+        <Pending items={["散発層の人数", "落下リスク", "昇格率", "ステージ遷移行列"]} />
       </Scope>
     </div>
   );
@@ -283,23 +264,6 @@ function Scope({
       </header>
       <div className="flex flex-col gap-3">{children}</div>
     </section>
-  );
-}
-
-function Hero({
-  label,
-  value,
-}: {
-  label: string;
-  value: React.ReactNode;
-}) {
-  return (
-    <div className="flex flex-col gap-1.5 py-2">
-      <span className="text-xs text-muted-foreground">{label}</span>
-      <span className="text-4xl font-semibold tabular-nums leading-none tracking-tight">
-        {value}
-      </span>
-    </div>
   );
 }
 
@@ -392,21 +356,6 @@ function Issue({
   );
 }
 
-function ChartBlock({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="flex flex-col gap-3 rounded-xl border p-4 sm:p-5">
-      <span className="text-xs text-muted-foreground">{title}</span>
-      {children}
-    </div>
-  );
-}
-
 function Pending({ items }: { items: string[] }) {
   return (
     <div className="flex items-baseline gap-2 pt-1 text-xs text-muted-foreground">
@@ -462,26 +411,3 @@ function computeParetoTopShare(
   return 1;
 }
 
-function StageStat({
-  label,
-  count,
-  pct,
-  accent,
-}: {
-  label: string;
-  count: number;
-  pct: number;
-  accent?: boolean;
-}) {
-  return (
-    <div className="flex items-baseline gap-1">
-      <dt className={cn("text-xs", accent ? "text-amber-700" : "text-muted-foreground")}>
-        {label}
-      </dt>
-      <dd className={cn(accent && "font-medium text-amber-900")}>
-        {toIntJa(count)}
-        <span className="text-xs text-muted-foreground"> ({toPct(pct)})</span>
-      </dd>
-    </div>
-  );
-}
