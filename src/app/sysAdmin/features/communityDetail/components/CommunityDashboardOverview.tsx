@@ -178,8 +178,12 @@ export function CommunityDashboardOverview({
           </div>
           <CommunityBand
             ageMonths={ageMonths}
-            totalDonationPoints={summary.totalDonationPointsAllTime}
             avgMonthlyThroughput={avgMonthlyThroughput}
+            avgMonthlyPerMember={
+              avgMonthlyThroughput != null && totalMembers > 0
+                ? avgMonthlyThroughput / totalMembers
+                : null
+            }
           />
         </header>
       )}
@@ -633,18 +637,22 @@ function Issue({
 
 function CommunityBand({
   ageMonths,
-  totalDonationPoints,
   avgMonthlyThroughput,
+  avgMonthlyPerMember,
 }: {
   ageMonths: number | null;
-  totalDonationPoints: number;
   avgMonthlyThroughput: number | null;
+  /** 規模補正 = avgMonthlyThroughput / totalMembers。civicship 哲学的に
+   * 「コミュニティ全体の絶対額」より「メンバー 1 人あたりの月次活動量」が
+   * 比較可能で意味がある。 */
+  avgMonthlyPerMember: number | null;
 }) {
   const parts: string[] = [];
   if (ageMonths != null) parts.push(`活動 ${ageMonths} ヶ月`);
-  parts.push(`累計 ${toCompactJa(totalDonationPoints)} pt`);
   if (avgMonthlyThroughput != null)
-    parts.push(`平均月次 ${toCompactJa(avgMonthlyThroughput)} pt`);
+    parts.push(`月次 ${toCompactJa(avgMonthlyThroughput)} pt`);
+  if (avgMonthlyPerMember != null)
+    parts.push(`1 人あたり ${toCompactJa(avgMonthlyPerMember)} pt/月`);
   return (
     <p className="text-xs text-muted-foreground tabular-nums">
       {parts.join(" · ")}

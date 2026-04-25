@@ -61,7 +61,7 @@ export function CommunityRow({ row, onClick }: Props) {
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5">
           <KpiPill label="MAU" value={toPct(activityRate)} delta={growthRateActivity} />
           <KpiPill label="Hub" value={toPct(hubUserPct)} />
-          <KpiPill label="Δ" value={`↑${toIntJa(newlyActivated)} ↓${toIntJa(churned)}`} />
+          <KpiPill label="Δ" value={`新規${toIntJa(newlyActivated)} / 休眠${toIntJa(churned)}`} />
         </div>
       </ItemFooter>
     </Item>
