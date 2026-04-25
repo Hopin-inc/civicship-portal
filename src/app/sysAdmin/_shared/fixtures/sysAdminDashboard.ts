@@ -76,6 +76,8 @@ export const makePlatformSummary = (
 const DEFAULT_TIER1_RATIO = 0.33;
 const DEFAULT_TIER2_RATIO = 0.58;
 const DEFAULT_PASSIVE_RATIO = 0.21;
+// network-axis hub ratio (independent of node-axis tier1).
+const DEFAULT_HUB_RATIO = 0.18;
 
 function defaultSegmentCountsFor(total: number): GqlSysAdminSegmentCounts {
   return {
@@ -92,16 +94,23 @@ export const makeCommunityOverview = (
   overrides: Partial<GqlSysAdminCommunityOverview> = {},
 ): GqlSysAdminCommunityOverview => {
   const totalMembers = overrides.totalMembers ?? 120;
+  const windowActivity = overrides.windowActivity ?? makeWindowActivity();
+  // Invariant: hubMemberCount <= windowActivity.senderCount <= totalMembers.
+  // Resolve the effective windowActivity first, then clamp the hub default
+  // so story overrides that lower senderCount don't push Hub% above MAU%.
+  const hubMemberCount =
+    overrides.hubMemberCount ??
+    Math.min(Math.round(totalMembers * DEFAULT_HUB_RATIO), windowActivity.senderCount);
   return {
     __typename: "SysAdminCommunityOverview",
-    communityId: "community-a",
-    communityName: "コミュニティA",
+    communityId: overrides.communityId ?? "community-a",
+    communityName: overrides.communityName ?? "コミュニティA",
     totalMembers,
-    segmentCounts: defaultSegmentCountsFor(totalMembers),
-    windowActivity: makeWindowActivity(),
-    weeklyRetention: makeWeeklyRetention(),
-    latestCohort: makeLatestCohort(),
-    ...overrides,
+    hubMemberCount,
+    segmentCounts: overrides.segmentCounts ?? defaultSegmentCountsFor(totalMembers),
+    windowActivity,
+    weeklyRetention: overrides.weeklyRetention ?? makeWeeklyRetention(),
+    latestCohort: overrides.latestCohort ?? makeLatestCohort(),
   };
 };
 

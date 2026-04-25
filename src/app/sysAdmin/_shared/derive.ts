@@ -35,16 +35,19 @@ export function deriveLatestCohortRetentionM1(
   return row.latestCohort.activeAtM1 / row.latestCohort.size;
 }
 
-// Hub user share: tier1 segment (userSendRate >= tier1 threshold, default 0.7).
-// "Hub" frames the highest stage as the network-role layer that anchors
-// the donation graph, distinct from generic "habitual" individual behavior.
+// Hub user share — pure network-axis metric.
+// Hub member = sent DONATION to >= hubBreadthThreshold (default 3) distinct
+// recipients within the parametric window. Independent of userSendRate
+// (the node-axis tier1/2/passive segments live in segmentCounts).
 //
-// NOTE: provisional. Pareto-based redefinition (top users covering 80%
-// of donation volume) is pending backend support; once shipped, this
-// derive switches to the Pareto count.
+//   ratio = hubMemberCount / totalMembers
+//
+// "Hub" labels the relational-breadth layer of the donation graph; the
+// node-axis "habitual / regular / occasional / latent" stage hierarchy
+// is orthogonal and surfaces in L2 detail.
 export function deriveHubUserPct(row: GqlSysAdminCommunityOverview): number {
   if (row.totalMembers === 0) return 0;
-  return row.segmentCounts.tier1Count / row.totalMembers;
+  return row.hubMemberCount / row.totalMembers;
 }
 
 // Activity-flow leaky-bucket pair derived from windowActivity raw counts.
