@@ -94,17 +94,23 @@ export const makeCommunityOverview = (
   overrides: Partial<GqlSysAdminCommunityOverview> = {},
 ): GqlSysAdminCommunityOverview => {
   const totalMembers = overrides.totalMembers ?? 120;
+  const windowActivity = overrides.windowActivity ?? makeWindowActivity();
+  // Invariant: hubMemberCount <= windowActivity.senderCount <= totalMembers.
+  // Resolve the effective windowActivity first, then clamp the hub default
+  // so story overrides that lower senderCount don't push Hub% above MAU%.
+  const hubMemberCount =
+    overrides.hubMemberCount ??
+    Math.min(Math.round(totalMembers * DEFAULT_HUB_RATIO), windowActivity.senderCount);
   return {
     __typename: "SysAdminCommunityOverview",
-    communityId: "community-a",
-    communityName: "コミュニティA",
+    communityId: overrides.communityId ?? "community-a",
+    communityName: overrides.communityName ?? "コミュニティA",
     totalMembers,
-    hubMemberCount: Math.round(totalMembers * DEFAULT_HUB_RATIO),
-    segmentCounts: defaultSegmentCountsFor(totalMembers),
-    windowActivity: makeWindowActivity(),
-    weeklyRetention: makeWeeklyRetention(),
-    latestCohort: makeLatestCohort(),
-    ...overrides,
+    hubMemberCount,
+    segmentCounts: overrides.segmentCounts ?? defaultSegmentCountsFor(totalMembers),
+    windowActivity,
+    weeklyRetention: overrides.weeklyRetention ?? makeWeeklyRetention(),
+    latestCohort: overrides.latestCohort ?? makeLatestCohort(),
   };
 };
 
