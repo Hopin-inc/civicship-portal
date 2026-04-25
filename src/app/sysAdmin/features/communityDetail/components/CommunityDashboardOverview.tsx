@@ -2,7 +2,24 @@
 
 import React from "react";
 import Link from "next/link";
-import { AlertTriangle, ChevronRight, Clock } from "lucide-react";
+import {
+  Activity,
+  AlertTriangle,
+  CalendarCheck,
+  ChevronRight,
+  Gauge,
+  Link2,
+  type LucideIcon,
+  Moon,
+  Network,
+  PieChart,
+  Repeat,
+  Send,
+  Star,
+  TrendingUp,
+  UserPlus,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 import type { GqlGetSysAdminCommunityDetailQuery } from "@/types/graphql";
 import {
   toCompactJa,
@@ -23,11 +40,18 @@ type Props = {
   newMemberCount?: number;
 };
 
+const SCOPE_COLOR = {
+  network: "text-blue-600",
+  activity: "text-orange-600",
+  user: "text-emerald-600",
+} as const;
+
 /**
  * 4 階層スコープ (コミュニティ ⊃ ネットワーク ⊃ アクティビティ ⊃ ユーザー)
- * を「物語化」した overview。コミュニティはヘッダー直下の stat band に
- * 圧縮、それ以外の 3 scope はヒーロー数値 + 警告 block + 準備中 footer
- * で構成。subpage への CTA は section 見出しの右端。
+ * を Apple Health 風 の塗りカードで縦積みした overview。各 metric が独立
+ * カードで、icon + タイトル(scope 色) + meta(右上) + 大きな数値 + mini viz
+ * (ring / sparkline / なし) という統一フォーマット。未計測は同 shell で
+ * 「未計測」テキストのみ。
  */
 export function CommunityDashboardOverview({
   data,
@@ -40,7 +64,6 @@ export function CommunityDashboardOverview({
   const stages = data.stages;
   const habitualCount = stages.habitual.count;
   const regularCount = stages.regular.count;
-  const occasionalCount = stages.occasional.count;
   const latentCount = stages.latent.count;
 
   const isolatedCount = data.memberList.users.filter(
@@ -51,31 +74,48 @@ export function CommunityDashboardOverview({
   const isolatedRatio = habitualCount > 0 ? isolatedCount / habitualCount : 0;
   const isolatedAlert = habitualCount > 0 && isolatedRatio >= 0.3;
 
-  // network 量: 平均送付先数 (active な人だけで取る — 潜在を分母に含めると
-  // 数字が薄まる)
   const activeMembers = data.memberList.users.filter((u) => u.userSendRate > 0);
   const avgRecipients =
     activeMembers.length > 0
       ? activeMembers.reduce((acc, u) => acc + u.uniqueDonationRecipients, 0) /
         activeMembers.length
       : 0;
-
-  // network 量: 平均流通量 per active user
-  const avgPointsPerActive =
+  const avgSendRate =
     activeMembers.length > 0
-      ? activeMembers.reduce((acc, u) => acc + u.totalPointsOut, 0) /
+      ? activeMembers.reduce((acc, u) => acc + u.userSendRate, 0) /
         activeMembers.length
       : 0;
 
-  // network 質: 連鎖率 (今月 = monthlyActivityTrend の最新点)
+  // 連鎖率 (今月) — monthlyActivityTrend の最新点
   const latestMonth =
     data.monthlyActivityTrend[data.monthlyActivityTrend.length - 1];
   const latestChainPct = latestMonth?.chainPct ?? null;
 
-  // network 質: 流通量集中度 (Pareto)。memberList の totalPointsOut で
-  // 「上位 X% が累計流通の 80% を担う」係数を算出。X が小さいほど集中、
-  // 大きいほど分散。memberList が paginated だと精度落ちるので暫定。
+  // 流通量 MoM
+  const prevMonth =
+    data.monthlyActivityTrend[data.monthlyActivityTrend.length - 2];
+  const donationMoM =
+    latestMonth && prevMonth && prevMonth.donationPointsSum > 0
+      ? (latestMonth.donationPointsSum - prevMonth.donationPointsSum) /
+        prevMonth.donationPointsSum
+      : null;
+
+  // 平均月次流通 = 累計 / 月数
+  const avgMonthlyThroughput =
+    summary.totalDonationPointsAllTime > 0 && data.monthlyActivityTrend.length > 0
+      ? summary.totalDonationPointsAllTime / data.monthlyActivityTrend.length
+      : null;
+
+  // 流通量集中度 (Pareto)
   const paretoTopShare = computeParetoTopShare(activeMembers, 0.8);
+
+  // 週次継続率: retentionTrend の最新週から
+  const latestWeek = data.retentionTrend[data.retentionTrend.length - 1];
+  const weeklyContinuationRate =
+    latestWeek && latestWeek.retainedSenders + latestWeek.churnedSenders > 0
+      ? latestWeek.retainedSenders /
+        (latestWeek.retainedSenders + latestWeek.churnedSenders)
+      : null;
 
   const cohortLatest = data.cohortRetention[data.cohortRetention.length - 1];
   const cohortPrev = data.cohortRetention[data.cohortRetention.length - 2];
@@ -87,6 +127,12 @@ export function CommunityDashboardOverview({
 
   const habitualOverRegular = habitualCount > 0 && regularCount > habitualCount;
 
+  // 新規率 (28d)
+  const newRate =
+    totalMembers > 0 && newMemberCount != null
+      ? newMemberCount / totalMembers
+      : null;
+
   const ageMonths =
     summary.dataFrom && summary.dataTo
       ? Math.round(
@@ -95,9 +141,16 @@ export function CommunityDashboardOverview({
         )
       : null;
 
+  // sparkline data
+  const mauSeries = data.monthlyActivityTrend
+    .map((m) => m.communityActivityRate)
+    .filter((v): v is number => v != null);
+  const throughputSeries = data.monthlyActivityTrend.map(
+    (m) => m.donationPointsSum,
+  );
+
   return (
     <div className="flex flex-col gap-6">
-      {/* page header: community name + member count + COMMUNITY context band */}
       {communityName && (
         <header className="flex flex-col gap-1">
           <div className="flex items-baseline gap-3">
@@ -110,57 +163,105 @@ export function CommunityDashboardOverview({
               </span>
               <span className="text-xs">名</span>
               {newMemberCount != null && (
-                <span className="text-xs">(+{toIntJa(newMemberCount)} 今月)</span>
+                <span className="text-xs">
+                  (+{toIntJa(newMemberCount)} 今月)
+                </span>
               )}
             </div>
           </div>
           <CommunityBand
             ageMonths={ageMonths}
             totalDonationPoints={summary.totalDonationPointsAllTime}
-            maxChainDepth={summary.maxChainDepthAllTime ?? null}
+            avgMonthlyThroughput={avgMonthlyThroughput}
           />
         </header>
       )}
 
-      <Scope title="ネットワーク" detailHref={`/sysAdmin/${data.communityId}/network`}>
-        <KeyMetrics
-          items={[
-            { value: toPct(hubPct), label: "ハブユーザー比率" },
-            {
-              value: avgRecipients > 0 ? avgRecipients.toFixed(1) : "-",
-              unit: "人",
-              label: "平均送付先数",
-            },
-            {
-              prefix: paretoTopShare != null ? "上位" : undefined,
-              value: paretoTopShare != null ? toPct(paretoTopShare) : "-",
-              label: "流通量の偏り",
-            },
-          ]}
+      <Scope
+        title="ネットワーク"
+        detailHref={`/sysAdmin/${data.communityId}/network`}
+      >
+        <MetricCard
+          icon={Network}
+          colorClass={SCOPE_COLOR.network}
+          title="ハブユーザー比率"
+          meta="今月"
+          hero={<Hero value={toPct(hubPct)} />}
+          viz={<Ring value={hubPct} colorClass={SCOPE_COLOR.network} />}
+        />
+        <MetricCard
+          icon={Send}
+          colorClass={SCOPE_COLOR.network}
+          title="平均送付先数"
+          meta="累計"
+          hero={
+            <Hero
+              value={avgRecipients > 0 ? avgRecipients.toFixed(1) : "-"}
+              unit="人"
+            />
+          }
+        />
+        <MetricCard
+          icon={Link2}
+          colorClass={SCOPE_COLOR.network}
+          title="連鎖率"
+          meta="今月"
+          hero={
+            <Hero
+              value={latestChainPct != null ? toPct(latestChainPct) : "-"}
+            />
+          }
+          viz={
+            latestChainPct != null ? (
+              <Ring value={latestChainPct} colorClass={SCOPE_COLOR.network} />
+            ) : undefined
+          }
+        />
+        <MetricCard
+          icon={PieChart}
+          colorClass={SCOPE_COLOR.network}
+          title="流通量の偏り"
+          meta="累計"
+          hero={
+            paretoTopShare != null ? (
+              <Hero
+                prefix="上位"
+                value={toPct(paretoTopShare)}
+              />
+            ) : (
+              <Hero value="-" />
+            )
+          }
+          viz={
+            paretoTopShare != null ? (
+              <Ring
+                value={paretoTopShare}
+                colorClass={SCOPE_COLOR.network}
+              />
+            ) : undefined
+          }
         />
 
         {isolatedAlert && (
           <Issue title="送付先の孤立">
-            習慣化層 {habitualCount} 名のうち {isolatedCount} 名 ({toPct(isolatedRatio)}) が単一相手のみ。送付先の多様化が改善ポイント。
+            習慣化層 {habitualCount} 名のうち {isolatedCount} 名 (
+            {toPct(isolatedRatio)}) が単一相手のみ。送付先の多様化が改善ポイント。
           </Issue>
         )}
-
-        <Pending
-          items={[
-            "連鎖率",
-            "ハブユーザー数",
-            "平均流通量",
-            "連鎖起点率",
-            "送付件数 (今月)",
-          ]}
-        />
       </Scope>
 
-      <Scope title="アクティビティ" detailHref={`/sysAdmin/${data.communityId}/activity`}>
-        <KeyMetrics
-          items={[
-            {
-              value: (
+      <Scope
+        title="アクティビティ"
+        detailHref={`/sysAdmin/${data.communityId}/activity`}
+      >
+        <MetricCard
+          icon={Activity}
+          colorClass={SCOPE_COLOR.activity}
+          title="今月の MAU%"
+          meta="今月"
+          hero={
+            <Hero
+              value={
                 <span className="inline-flex items-baseline gap-2">
                   <span>{toPct(summary.communityActivityRate)}</span>
                   {summary.growthRateActivity != null && (
@@ -170,24 +271,95 @@ export function CommunityDashboardOverview({
                     />
                   )}
                 </span>
-              ),
-              label: "今月の MAU%",
-            },
-            {
-              value:
-                summary.communityActivityRate3mAvg != null
-                  ? toPct(summary.communityActivityRate3mAvg)
-                  : "-",
-              label: "3 ヶ月平均 MAU%",
-            },
-            {
-              value:
+              }
+            />
+          }
+          viz={
+            mauSeries.length > 1 ? (
+              <Sparkline
+                data={mauSeries}
+                colorClass={SCOPE_COLOR.activity}
+              />
+            ) : undefined
+          }
+        />
+        <MetricCard
+          icon={Repeat}
+          colorClass={SCOPE_COLOR.activity}
+          title="週次継続率"
+          meta="直近週"
+          hero={
+            <Hero
+              value={
+                weeklyContinuationRate != null
+                  ? toPct(weeklyContinuationRate)
+                  : "-"
+              }
+            />
+          }
+          viz={
+            weeklyContinuationRate != null ? (
+              <Ring
+                value={weeklyContinuationRate}
+                colorClass={SCOPE_COLOR.activity}
+              />
+            ) : undefined
+          }
+        />
+        <MetricCard
+          icon={CalendarCheck}
+          colorClass={SCOPE_COLOR.activity}
+          title="最新コホート M+1"
+          meta={
+            cohortLatest?.cohortMonth
+              ? formatYearMonth(cohortLatest.cohortMonth)
+              : "-"
+          }
+          hero={
+            <Hero
+              value={
                 cohortLatest?.retentionM1 != null
                   ? toPct(cohortLatest.retentionM1)
-                  : "-",
-              label: "最新コホート M+1",
-            },
-          ]}
+                  : "-"
+              }
+            />
+          }
+          viz={
+            cohortLatest?.retentionM1 != null ? (
+              <Ring
+                value={cohortLatest.retentionM1}
+                colorClass={SCOPE_COLOR.activity}
+              />
+            ) : undefined
+          }
+        />
+        <MetricCard
+          icon={TrendingUp}
+          colorClass={SCOPE_COLOR.activity}
+          title="流通量 MoM"
+          meta="今月 vs 前月"
+          hero={
+            donationMoM != null ? (
+              <Hero
+                value={
+                  <PercentDelta
+                    value={donationMoM}
+                    className="text-4xl tracking-tight"
+                  />
+                }
+              />
+            ) : (
+              <Hero value="-" />
+            )
+          }
+          viz={
+            throughputSeries.length > 1 ? (
+              <Sparkline
+                data={throughputSeries}
+                colorClass={SCOPE_COLOR.activity}
+              />
+            ) : undefined
+          }
         />
 
         {cohortAlert && cohortLatest?.retentionM1 != null && (
@@ -198,29 +370,46 @@ export function CommunityDashboardOverview({
             。Onboarding が機能していない可能性。
           </Issue>
         )}
-
-        <Pending items={["週次 retention 推移", "コホート retention 推移", "MAU% 月次推移"]} />
       </Scope>
 
-      <Scope title="ユーザー" detailHref={`/sysAdmin/${data.communityId}/users`}>
-        <KeyMetrics
-          items={[
-            {
-              value: toIntJa(habitualCount),
-              unit: "名",
-              label: `習慣化  ${toPct(stages.habitual.pct)}`,
-            },
-            {
-              value: toIntJa(regularCount),
-              unit: "名",
-              label: `定期  ${toPct(stages.regular.pct)}${habitualOverRegular ? "  ← 習慣化を超過" : ""}`,
-            },
-            {
-              value: toIntJa(latentCount),
-              unit: "名",
-              label: `潜在  ${toPct(stages.latent.pct)}`,
-            },
-          ]}
+      <Scope
+        title="ユーザー"
+        detailHref={`/sysAdmin/${data.communityId}/users`}
+      >
+        <MetricCard
+          icon={Star}
+          colorClass={SCOPE_COLOR.user}
+          title="習慣化率"
+          meta="現在"
+          hero={<Hero value={toPct(stages.habitual.pct)} />}
+          viz={
+            <Ring value={stages.habitual.pct} colorClass={SCOPE_COLOR.user} />
+          }
+        />
+        <MetricCard
+          icon={UserPlus}
+          colorClass={SCOPE_COLOR.user}
+          title="新規率"
+          meta="直近 28 日"
+          hero={<Hero value={newRate != null ? toPct(newRate) : "-"} />}
+        />
+        <MetricCard
+          icon={Gauge}
+          colorClass={SCOPE_COLOR.user}
+          title="平均送付率"
+          meta="累計"
+          hero={
+            <Hero value={avgSendRate > 0 ? avgSendRate.toFixed(2) : "-"} />
+          }
+          viz={
+            <Ring value={avgSendRate} colorClass={SCOPE_COLOR.user} />
+          }
+        />
+        <MetricCard
+          icon={Moon}
+          colorClass={SCOPE_COLOR.user}
+          title="dormant 化率"
+          status="todo"
         />
 
         {habitualOverRegular && (
@@ -228,8 +417,6 @@ export function CommunityDashboardOverview({
             定期 {regularCount} 名 が 習慣化 {habitualCount} 名 を上回っている。中堅層の習慣化に伸びしろ。
           </Issue>
         )}
-
-        <Pending items={["散発層の人数", "落下リスク", "昇格率", "ステージ遷移行列"]} />
       </Scope>
     </div>
   );
@@ -251,7 +438,7 @@ function Scope({
   return (
     <section className="flex flex-col gap-3">
       <header className="flex items-baseline justify-between gap-3 px-1">
-        <h2 className="text-base font-semibold">{title}</h2>
+        <h2 className="text-lg font-semibold">{title}</h2>
         {detailHref && (
           <Link
             href={detailHref}
@@ -267,74 +454,155 @@ function Scope({
   );
 }
 
-type AxisItem = {
-  /** small / muted prefix shown before the value (e.g. "上位"). */
+function MetricCard({
+  icon: Icon,
+  colorClass,
+  title,
+  meta,
+  hero,
+  viz,
+  status = "ok",
+}: {
+  icon: LucideIcon;
+  colorClass: string;
+  title: string;
+  meta?: string;
+  hero?: React.ReactNode;
+  viz?: React.ReactNode;
+  status?: "ok" | "todo";
+}) {
+  return (
+    <div className="rounded-2xl bg-muted/40 p-5">
+      <header className="flex items-center justify-between gap-3">
+        <div className={cn("flex items-center gap-1.5 text-sm font-medium", colorClass)}>
+          <Icon className="h-4 w-4" aria-hidden />
+          <span>{title}</span>
+        </div>
+        {meta && (
+          <span className="text-xs text-muted-foreground">{meta}</span>
+        )}
+      </header>
+      <div className="mt-3 flex items-end justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          {status === "todo" ? (
+            <span className="text-base text-muted-foreground">未計測</span>
+          ) : (
+            hero
+          )}
+        </div>
+        {status === "ok" && viz && <div className="shrink-0">{viz}</div>}
+      </div>
+    </div>
+  );
+}
+
+function Hero({
+  prefix,
+  value,
+  unit,
+}: {
   prefix?: string;
   value: React.ReactNode;
   unit?: string;
-  label: string;
-};
-
-function KeyMetrics({ items }: { items: AxisItem[] }) {
-  return (
-    <div className="flex flex-col gap-3">
-      {items.map((item, i) => (
-        <div key={i} className="flex flex-col gap-1 rounded-xl border p-4 sm:p-5">
-          <span className="inline-flex items-baseline gap-1 text-3xl font-semibold tabular-nums leading-none tracking-tight">
-            {item.prefix && (
-              <span className="text-xs font-normal text-muted-foreground">
-                {item.prefix}
-              </span>
-            )}
-            {item.value}
-            {item.unit && (
-              <span className="text-base font-medium text-muted-foreground">
-                {item.unit}
-              </span>
-            )}
-          </span>
-          <span className="text-xs text-muted-foreground">{item.label}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function DualAxis({
-  quantity,
-  quality,
-}: {
-  quantity: AxisItem[];
-  quality: AxisItem[];
 }) {
   return (
-    <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
-      <AxisColumn title="量" items={quantity} />
-      <AxisColumn title="質" items={quality} />
-    </div>
+    <span className="inline-flex items-baseline gap-1 text-4xl font-semibold tabular-nums leading-none tracking-tight">
+      {prefix && (
+        <span className="text-xs font-normal text-muted-foreground">
+          {prefix}
+        </span>
+      )}
+      {value}
+      {unit && (
+        <span className="text-base font-medium text-muted-foreground">
+          {unit}
+        </span>
+      )}
+    </span>
   );
 }
 
-function AxisColumn({ title, items }: { title: string; items: AxisItem[] }) {
+function Ring({
+  value,
+  colorClass,
+  size = 48,
+  stroke = 5,
+}: {
+  /** 0–1 範囲。範囲外は clamp。 */
+  value: number;
+  colorClass: string;
+  size?: number;
+  stroke?: number;
+}) {
+  const radius = (size - stroke) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const clamped = Math.max(0, Math.min(1, value));
+  const offset = circumference * (1 - clamped);
   return (
-    <div className="flex flex-col gap-4">
-      <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-        {title}
-      </span>
-      {items.map((item, i) => (
-        <div key={i} className="flex flex-col gap-1">
-          <span className="inline-flex items-baseline gap-1 text-3xl font-semibold tabular-nums leading-none tracking-tight">
-            {item.value}
-            {item.unit && (
-              <span className="text-base font-medium text-muted-foreground">
-                {item.unit}
-              </span>
-            )}
-          </span>
-          <span className="text-xs text-muted-foreground">{item.label}</span>
-        </div>
-      ))}
-    </div>
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden>
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={radius}
+        stroke="currentColor"
+        strokeWidth={stroke}
+        fill="none"
+        className="text-muted-foreground/15"
+      />
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={radius}
+        stroke="currentColor"
+        strokeWidth={stroke}
+        fill="none"
+        strokeLinecap="round"
+        strokeDasharray={circumference}
+        strokeDashoffset={offset}
+        transform={`rotate(-90 ${size / 2} ${size / 2})`}
+        className={colorClass}
+      />
+    </svg>
+  );
+}
+
+function Sparkline({
+  data,
+  colorClass,
+  width = 76,
+  height = 30,
+}: {
+  data: number[];
+  colorClass: string;
+  width?: number;
+  height?: number;
+}) {
+  if (data.length < 2) return null;
+  const min = Math.min(...data);
+  const max = Math.max(...data);
+  const range = max - min || 1;
+  const stepX = width / (data.length - 1);
+  const padY = 2;
+  const usableH = height - padY * 2;
+  const points = data
+    .map((v, i) => {
+      const x = i * stepX;
+      const y = padY + usableH - ((v - min) / range) * usableH;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(" ");
+  return (
+    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} aria-hidden>
+      <polyline
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={1.5}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        points={points}
+        className={colorClass}
+      />
+    </svg>
   );
 }
 
@@ -346,7 +614,7 @@ function Issue({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex gap-3 rounded-md border border-amber-200 bg-amber-50/60 p-3">
+    <div className="flex gap-3 rounded-2xl border border-amber-200 bg-amber-50/60 p-4">
       <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
       <div className="flex flex-col gap-1">
         <p className="text-sm font-medium text-amber-900">{title}</p>
@@ -356,31 +624,20 @@ function Issue({
   );
 }
 
-function Pending({ items }: { items: string[] }) {
-  return (
-    <div className="flex items-baseline gap-2 pt-1 text-xs text-muted-foreground">
-      <Clock className="mt-0.5 h-3 w-3 shrink-0" aria-hidden />
-      <span>準備中: {items.join(" · ")}</span>
-    </div>
-  );
-}
-
 function CommunityBand({
   ageMonths,
   totalDonationPoints,
-  maxChainDepth,
+  avgMonthlyThroughput,
 }: {
   ageMonths: number | null;
   totalDonationPoints: number;
-  maxChainDepth: number | null;
+  avgMonthlyThroughput: number | null;
 }) {
-  // 「コミュニティ」 scope は他 3 scope のような card 群にせず、page header
-  // 直下の小さな "·" 区切り band として表示。値は context として読まれ、
-  // 介入対象でないため card で重く扱わない。
   const parts: string[] = [];
   if (ageMonths != null) parts.push(`活動 ${ageMonths} ヶ月`);
   parts.push(`累計 ${toCompactJa(totalDonationPoints)} pt`);
-  if (maxChainDepth != null) parts.push(`最大連鎖 ${maxChainDepth} 段`);
+  if (avgMonthlyThroughput != null)
+    parts.push(`平均月次 ${toCompactJa(avgMonthlyThroughput)} pt`);
   return (
     <p className="text-xs text-muted-foreground tabular-nums">
       {parts.join(" · ")}
@@ -388,11 +645,6 @@ function CommunityBand({
   );
 }
 
-/**
- * Pareto top-share: cumulative の `coverage` (e.g. 0.8) に達する上位ユーザー
- * の比率。数値が小さいほど集中 (脆弱)、大きいほど分散 (健全)。
- * memberList が paginated の場合は近似値。
- */
 function computeParetoTopShare(
   users: ReadonlyArray<{ totalPointsOut: number }>,
   coverage: number,
@@ -411,3 +663,9 @@ function computeParetoTopShare(
   return 1;
 }
 
+function formatYearMonth(d: Date): string {
+  // JST 相対の表記。Date がそのまま JST 寄り想定 (codegen scalar Datetime → Date)。
+  const y = d.getFullYear();
+  const m = d.getMonth() + 1;
+  return `${y}年${m}月`;
+}
