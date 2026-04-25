@@ -21,6 +21,7 @@ export const GET_SYS_ADMIN_DASHBOARD_SERVER_QUERY = `
         communityId
         communityName
         totalMembers
+        hubMemberCount
         segmentCounts {
           total
           activeCount

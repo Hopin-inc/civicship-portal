@@ -76,6 +76,8 @@ export const makePlatformSummary = (
 const DEFAULT_TIER1_RATIO = 0.33;
 const DEFAULT_TIER2_RATIO = 0.58;
 const DEFAULT_PASSIVE_RATIO = 0.21;
+// network-axis hub ratio (independent of node-axis tier1).
+const DEFAULT_HUB_RATIO = 0.18;
 
 function defaultSegmentCountsFor(total: number): GqlSysAdminSegmentCounts {
   return {
@@ -97,6 +99,7 @@ export const makeCommunityOverview = (
     communityId: "community-a",
     communityName: "コミュニティA",
     totalMembers,
+    hubMemberCount: Math.round(totalMembers * DEFAULT_HUB_RATIO),
     segmentCounts: defaultSegmentCountsFor(totalMembers),
     windowActivity: makeWindowActivity(),
     weeklyRetention: makeWeeklyRetention(),

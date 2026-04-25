@@ -47,6 +47,7 @@ export const SYS_ADMIN_COMMUNITY_OVERVIEW_ROW_FRAGMENT = gql`
     communityId
     communityName
     totalMembers
+    hubMemberCount
     segmentCounts {
       ...SysAdminSegmentCountsFields
     }

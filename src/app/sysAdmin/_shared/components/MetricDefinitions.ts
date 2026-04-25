@@ -24,8 +24,8 @@ export const METRIC_DEFINITIONS: Record<string, MetricDefinition> = {
   },
   hubUserPct: {
     title: "Hub user%",
-    formula: "tier1Count ÷ totalMembers (userSendRate ≥ tier1 を満たすメンバー)",
-    note: "ステージ最上位 (習慣化層) の比率。コミュニティの DONATION 連鎖を支える hub 役のユーザー割合。",
+    formula: "hubMemberCount ÷ totalMembers (直近 28d に hubBreadthThreshold=3 以上の distinct 相手に DONATION した user)",
+    note: "ネットワーク軸の指標。「複数方面に送付している = 関係性を広げている」ユーザーの割合。ノード軸の習慣化 (userSendRate ≥ tier1) とは独立で、低頻度でも複数人に送れば hub、高頻度でも 1 人にしか送らなければ hub ではない。",
     range: "0〜100%",
   },
   newMembers: {
