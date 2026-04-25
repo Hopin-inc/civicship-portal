@@ -28,6 +28,7 @@ export const makeWindowActivity = (
   senderCountPrev: 46,
   newMemberCount: 8,
   newMemberCountPrev: 6,
+  retainedSenders: 38,
   ...overrides,
 });
 

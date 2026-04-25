@@ -24,7 +24,7 @@ type Section = {
 const SECTIONS: Section[] = [
   {
     heading: "主指標",
-    keys: ["mau", "communityActivityRate", "growthRateActivity", "newMembers"],
+    keys: ["mau", "communityActivityRate", "growthRateActivity", "newMembers", "activityFlow"],
   },
   { heading: "ステージ分類", keys: ["stages", "userSendRate", "hubUserPct"] },
   { heading: "コホート", keys: ["cohortRetention"] },

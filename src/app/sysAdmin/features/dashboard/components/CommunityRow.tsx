@@ -9,8 +9,10 @@ import { cn } from "@/lib/utils";
 import {
   deriveActivityRate,
   deriveAlerts,
+  deriveChurnedSenders,
   deriveGrowthRateActivity,
   deriveHubUserPct,
+  deriveNewlyActivatedSenders,
   hasAnyAlert,
 } from "@/app/sysAdmin/_shared/derive";
 import type { GqlSysAdminCommunityOverview } from "@/types/graphql";
@@ -27,6 +29,8 @@ export function CommunityRow({ row, onClick }: Props) {
   const growthRateActivity = deriveGrowthRateActivity(row);
   const hubUserPct = deriveHubUserPct(row);
   const newMemberCount = row.windowActivity.newMemberCount;
+  const newlyActivated = deriveNewlyActivatedSenders(row);
+  const churned = deriveChurnedSenders(row);
   const hasAlert = hasAnyAlert(alerts);
 
   return (
@@ -64,10 +68,7 @@ export function CommunityRow({ row, onClick }: Props) {
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5">
           <KpiPill label="MAU" value={toPct(activityRate)} delta={growthRateActivity} />
           <KpiPill label="Hub" value={toPct(hubUserPct)} />
-          {/* TODO: [Δ] ↑newlyActivated ↓churned pill awaits backend
-              addition of windowActivity.retainedSenders. Once shipped:
-                newlyActivated = senderCount - retainedSenders
-                churned        = senderCountPrev - retainedSenders */}
+          <KpiPill label="Δ" value={`↑${toIntJa(newlyActivated)} ↓${toIntJa(churned)}`} />
         </div>
       </ItemFooter>
     </Item>

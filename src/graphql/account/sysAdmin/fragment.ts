@@ -16,6 +16,7 @@ export const SYS_ADMIN_WINDOW_ACTIVITY_FRAGMENT = gql`
     senderCountPrev
     newMemberCount
     newMemberCountPrev
+    retainedSenders
   }
 `;
 

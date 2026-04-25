@@ -38,9 +38,26 @@ export function deriveLatestCohortRetentionM1(
 // Hub user share: tier1 segment (userSendRate >= tier1 threshold, default 0.7).
 // "Hub" frames the highest stage as the network-role layer that anchors
 // the donation graph, distinct from generic "habitual" individual behavior.
+//
+// NOTE: provisional. Pareto-based redefinition (top users covering 80%
+// of donation volume) is pending backend support; once shipped, this
+// derive switches to the Pareto count.
 export function deriveHubUserPct(row: GqlSysAdminCommunityOverview): number {
   if (row.totalMembers === 0) return 0;
   return row.segmentCounts.tier1Count / row.totalMembers;
+}
+
+// Activity-flow leaky-bucket pair derived from windowActivity raw counts.
+//   newlyActivated = senderCount     - retainedSenders   (entered active pool)
+//   churned        = senderCountPrev - retainedSenders   (left active pool)
+export function deriveNewlyActivatedSenders(
+  row: GqlSysAdminCommunityOverview,
+): number {
+  return row.windowActivity.senderCount - row.windowActivity.retainedSenders;
+}
+
+export function deriveChurnedSenders(row: GqlSysAdminCommunityOverview): number {
+  return row.windowActivity.senderCountPrev - row.windowActivity.retainedSenders;
 }
 
 export type DerivedAlerts = {

@@ -33,6 +33,12 @@ export const METRIC_DEFINITIONS: Record<string, MetricDefinition> = {
     formula: "直近 28 日 (windowDays default) に JOINED で加入したメンバー数",
     note: "row では総メンバー数の隣に `(+12)` の形で表示。0 のときは `(+0)` で「新規加入なし」のシグナルを兼ねる。",
   },
+  activityFlow: {
+    title: "Δ (activity flow)",
+    formula:
+      "↑newlyActivated = senderCount − retainedSenders / ↓churned = senderCountPrev − retainedSenders",
+    note: "leaky-bucket 検出。↑ は前 28d は送付してなく現 28d で送付した sender、↓ は前 28d は送付してたが現 28d で送付してない sender。MAU 数だけ見ても入退室で打ち消されるケースを表面化する。",
+  },
   userSendRate: {
     title: "送付率 (個人)",
     formula: "DONATIONを送った月数 ÷ 在籍月数",
@@ -119,6 +125,7 @@ export type MetricKey =
   | "growthRateActivity"
   | "hubUserPct"
   | "newMembers"
+  | "activityFlow"
   | "userSendRate"
   | "cohortRetention"
   | "wau"

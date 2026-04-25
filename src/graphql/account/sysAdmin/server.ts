@@ -33,6 +33,7 @@ export const GET_SYS_ADMIN_DASHBOARD_SERVER_QUERY = `
           senderCountPrev
           newMemberCount
           newMemberCountPrev
+          retainedSenders
         }
         weeklyRetention {
           retainedSenders
