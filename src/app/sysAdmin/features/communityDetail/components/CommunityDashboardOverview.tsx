@@ -106,53 +106,30 @@ export function CommunityDashboardOverview({
 
   return (
     <div className="flex flex-col gap-6">
-      {/* community-name (page identity, not a card) */}
+      {/* page header: community name + member count + COMMUNITY context band */}
       {communityName && (
-        <header className="flex items-baseline gap-3 pb-1">
-          <h1 className="text-2xl font-semibold leading-tight">
-            {communityName}
-          </h1>
-          <div className="flex items-baseline gap-1 tabular-nums text-muted-foreground">
-            <span className="text-base font-medium">
-              {toIntJa(totalMembers)}
-            </span>
-            <span className="text-xs">名</span>
-            {newMemberCount != null && (
-              <span className="text-xs">(+{toIntJa(newMemberCount)} 今月)</span>
-            )}
+        <header className="flex flex-col gap-1">
+          <div className="flex items-baseline gap-3">
+            <h1 className="text-2xl font-semibold leading-tight">
+              {communityName}
+            </h1>
+            <div className="flex items-baseline gap-1 tabular-nums text-muted-foreground">
+              <span className="text-base font-medium">
+                {toIntJa(totalMembers)}
+              </span>
+              <span className="text-xs">名</span>
+              {newMemberCount != null && (
+                <span className="text-xs">(+{toIntJa(newMemberCount)} 今月)</span>
+              )}
+            </div>
           </div>
+          <CommunityBand
+            ageMonths={ageMonths}
+            totalDonationPoints={summary.totalDonationPointsAllTime}
+            maxChainDepth={summary.maxChainDepthAllTime ?? null}
+          />
         </header>
       )}
-
-      <Scope title="コミュニティ">
-        <KeyMetrics
-          items={[
-            ...(ageMonths != null
-              ? [
-                  {
-                    value: ageMonths,
-                    unit: "ヶ月",
-                    label: "活動期間",
-                  } as AxisItem,
-                ]
-              : []),
-            {
-              value: toCompactJa(summary.totalDonationPointsAllTime),
-              unit: "pt",
-              label: "累計流通",
-            },
-            ...(summary.maxChainDepthAllTime != null
-              ? [
-                  {
-                    value: summary.maxChainDepthAllTime,
-                    unit: "段",
-                    label: "最大連鎖",
-                  } as AxisItem,
-                ]
-              : []),
-          ]}
-        />
-      </Scope>
 
       <Scope title="ネットワーク" detailHref={`/sysAdmin/${data.communityId}/network`}>
         <KeyMetrics
@@ -436,6 +413,29 @@ function Pending({ items }: { items: string[] }) {
       <Clock className="mt-0.5 h-3 w-3 shrink-0" aria-hidden />
       <span>準備中: {items.join(" · ")}</span>
     </div>
+  );
+}
+
+function CommunityBand({
+  ageMonths,
+  totalDonationPoints,
+  maxChainDepth,
+}: {
+  ageMonths: number | null;
+  totalDonationPoints: number;
+  maxChainDepth: number | null;
+}) {
+  // 「コミュニティ」 scope は他 3 scope のような card 群にせず、page header
+  // 直下の小さな "·" 区切り band として表示。値は context として読まれ、
+  // 介入対象でないため card で重く扱わない。
+  const parts: string[] = [];
+  if (ageMonths != null) parts.push(`活動 ${ageMonths} ヶ月`);
+  parts.push(`累計 ${toCompactJa(totalDonationPoints)} pt`);
+  if (maxChainDepth != null) parts.push(`最大連鎖 ${maxChainDepth} 段`);
+  return (
+    <p className="text-xs text-muted-foreground tabular-nums">
+      {parts.join(" · ")}
+    </p>
   );
 }
 
