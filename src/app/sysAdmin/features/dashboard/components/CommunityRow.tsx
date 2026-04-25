@@ -3,17 +3,14 @@
 import React from "react";
 import { Item, ItemContent, ItemFooter, ItemTitle } from "@/components/ui/item";
 import { PercentDelta } from "@/app/sysAdmin/_shared/components/PercentDelta";
-import { PrimaryAlertBadge } from "@/app/sysAdmin/_shared/components/PrimaryAlertBadge";
 import { toIntJa, toPct } from "@/app/sysAdmin/_shared/format/number";
 import { cn } from "@/lib/utils";
 import {
   deriveActivityRate,
-  deriveAlerts,
   deriveChurnedSenders,
   deriveGrowthRateActivity,
   deriveHubUserPct,
   deriveNewlyActivatedSenders,
-  hasAnyAlert,
 } from "@/app/sysAdmin/_shared/derive";
 import type { GqlSysAdminCommunityOverview } from "@/types/graphql";
 
@@ -24,14 +21,12 @@ type Props = {
 
 export function CommunityRow({ row, onClick }: Props) {
   const handleClick = () => onClick?.(row.communityId);
-  const alerts = deriveAlerts(row);
   const activityRate = deriveActivityRate(row);
   const growthRateActivity = deriveGrowthRateActivity(row);
   const hubUserPct = deriveHubUserPct(row);
   const newMemberCount = row.windowActivity.newMemberCount;
   const newlyActivated = deriveNewlyActivatedSenders(row);
   const churned = deriveChurnedSenders(row);
-  const hasAlert = hasAnyAlert(alerts);
 
   return (
     <Item
@@ -50,8 +45,6 @@ export function CommunityRow({ row, onClick }: Props) {
         }
       }}
     >
-      {hasAlert && <PrimaryAlertBadge alerts={alerts} />}
-
       <ItemContent>
         <div className="flex w-full items-baseline justify-between gap-2">
           <ItemTitle className="min-w-0 flex-1 truncate text-base font-semibold">

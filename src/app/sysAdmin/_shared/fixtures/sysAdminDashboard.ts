@@ -22,15 +22,25 @@ export const makeSegmentCounts = (
 
 export const makeWindowActivity = (
   overrides: Partial<GqlSysAdminWindowActivity> = {},
-): GqlSysAdminWindowActivity => ({
-  __typename: "SysAdminWindowActivity",
-  senderCount: 50,
-  senderCountPrev: 46,
-  newMemberCount: 8,
-  newMemberCountPrev: 6,
-  retainedSenders: 38,
-  ...overrides,
-});
+): GqlSysAdminWindowActivity => {
+  const senderCount = overrides.senderCount ?? 50;
+  const senderCountPrev = overrides.senderCountPrev ?? 46;
+  const newMemberCount = overrides.newMemberCount ?? 8;
+  const newMemberCountPrev = overrides.newMemberCountPrev ?? 6;
+  // retained ≤ min(senderCount, senderCountPrev) by definition.
+  // Clamp the default so story overrides that lower senderCount(/Prev)
+  // don't produce negative newlyActivated / churned counts.
+  const retainedSenders =
+    overrides.retainedSenders ?? Math.min(senderCount, senderCountPrev, 38);
+  return {
+    __typename: "SysAdminWindowActivity",
+    senderCount,
+    senderCountPrev,
+    newMemberCount,
+    newMemberCountPrev,
+    retainedSenders,
+  };
+};
 
 export const makeWeeklyRetention = (
   overrides: Partial<GqlSysAdminWeeklyRetention> = {},
