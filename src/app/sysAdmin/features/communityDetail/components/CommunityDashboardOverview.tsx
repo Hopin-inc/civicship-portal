@@ -69,10 +69,22 @@ export function CommunityDashboardOverview({
         activeMembers.length
       : 0;
 
+  // network 量: 平均流通量 per active user
+  const avgPointsPerActive =
+    activeMembers.length > 0
+      ? activeMembers.reduce((acc, u) => acc + u.totalPointsOut, 0) /
+        activeMembers.length
+      : 0;
+
   // network 質: 連鎖率 (今月 = monthlyActivityTrend の最新点)
   const latestMonth =
     data.monthlyActivityTrend[data.monthlyActivityTrend.length - 1];
   const latestChainPct = latestMonth?.chainPct ?? null;
+
+  // network 質: 流通量集中度 (Pareto)。memberList の totalPointsOut で
+  // 「上位 X% が累計流通の 80% を担う」係数を算出。X が小さいほど集中、
+  // 大きいほど分散。memberList が paginated だと精度落ちるので暫定。
+  const paretoTopShare = computeParetoTopShare(activeMembers, 0.8);
 
   const cohortLatest = data.cohortRetention[data.cohortRetention.length - 1];
   const cohortPrev = data.cohortRetention[data.cohortRetention.length - 2];
@@ -146,12 +158,24 @@ export function CommunityDashboardOverview({
               unit: "人",
               label: "平均送付先",
             },
+            {
+              value: avgPointsPerActive > 0 ? toCompactJa(avgPointsPerActive) : "-",
+              unit: "pt",
+              label: "平均流通量",
+            },
           ]}
           quality={[
             { value: toPct(hubPct), label: "ハブユーザー比率" },
             {
               value: latestChainPct != null ? toPct(latestChainPct) : "-",
               label: "連鎖率 (今月)",
+            },
+            {
+              value:
+                paretoTopShare != null
+                  ? `上位 ${toPct(paretoTopShare)}`
+                  : "-",
+              label: "流通量の 80% を担う",
             },
           ]}
         />
@@ -163,12 +187,7 @@ export function CommunityDashboardOverview({
         )}
 
         <Pending
-          items={[
-            "ハブ集中度 (Pareto)",
-            "連鎖起点率",
-            "関係幅分布",
-            "送付件数 (今月)",
-          ]}
+          items={["連鎖起点率", "関係幅分布", "送付件数 (今月)"]}
         />
       </Scope>
 
@@ -387,6 +406,29 @@ function Pending({ items }: { items: string[] }) {
       <span>準備中: {items.join(" · ")}</span>
     </div>
   );
+}
+
+/**
+ * Pareto top-share: cumulative の `coverage` (e.g. 0.8) に達する上位ユーザー
+ * の比率。数値が小さいほど集中 (脆弱)、大きいほど分散 (健全)。
+ * memberList が paginated の場合は近似値。
+ */
+function computeParetoTopShare(
+  users: ReadonlyArray<{ totalPointsOut: number }>,
+  coverage: number,
+): number | null {
+  if (users.length === 0) return null;
+  const sorted = [...users].sort((a, b) => b.totalPointsOut - a.totalPointsOut);
+  const total = sorted.reduce((acc, u) => acc + u.totalPointsOut, 0);
+  if (total === 0) return null;
+  let cumulative = 0;
+  for (let i = 0; i < sorted.length; i++) {
+    cumulative += sorted[i].totalPointsOut;
+    if (cumulative / total >= coverage) {
+      return (i + 1) / sorted.length;
+    }
+  }
+  return 1;
 }
 
 function StageStat({
