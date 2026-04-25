@@ -150,32 +150,24 @@ export function CommunityDashboardOverview({
       )}
 
       <Scope title="ネットワーク" detailHref={`/sysAdmin/${data.communityId}/network`}>
-        <DualAxis
-          quantity={[
-            { value: toIntJa(hubMemberCount), unit: "名", label: "ハブユーザー" },
+        <KeyMetrics
+          items={[
+            { value: toPct(hubPct), label: "ハブユーザー比率" },
             {
               value: avgRecipients > 0 ? avgRecipients.toFixed(1) : "-",
               unit: "人",
-              label: "平均送付先",
-            },
-            {
-              value: avgPointsPerActive > 0 ? toCompactJa(avgPointsPerActive) : "-",
-              unit: "pt",
-              label: "平均流通量",
-            },
-          ]}
-          quality={[
-            { value: toPct(hubPct), label: "ハブユーザー比率" },
-            {
-              value: latestChainPct != null ? toPct(latestChainPct) : "-",
-              label: "連鎖率 (今月)",
+              label: "平均送付先数",
             },
             {
               value:
                 paretoTopShare != null
                   ? `上位 ${toPct(paretoTopShare)}`
                   : "-",
-              label: "流通量の 80% を担う",
+              label: "流通量の偏り",
+            },
+            {
+              value: latestChainPct != null ? toPct(latestChainPct) : "-",
+              label: "連鎖率 (今月)",
             },
           ]}
         />
@@ -187,7 +179,12 @@ export function CommunityDashboardOverview({
         )}
 
         <Pending
-          items={["連鎖起点率", "関係幅分布", "送付件数 (今月)"]}
+          items={[
+            "ハブユーザー数",
+            "平均流通量",
+            "連鎖起点率",
+            "送付件数 (今月)",
+          ]}
         />
       </Scope>
 
@@ -327,6 +324,27 @@ function Hero({
 }
 
 type AxisItem = { value: React.ReactNode; unit?: string; label: string };
+
+function KeyMetrics({ items }: { items: AxisItem[] }) {
+  // 2-col on mobile, full-flex on wider so 3 と 4 metric の両ケースで破綻しない
+  return (
+    <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-4">
+      {items.map((item, i) => (
+        <div key={i} className="flex flex-col gap-1">
+          <span className="inline-flex items-baseline gap-1 text-2xl font-semibold tabular-nums leading-none tracking-tight">
+            {item.value}
+            {item.unit && (
+              <span className="text-sm font-medium text-muted-foreground">
+                {item.unit}
+              </span>
+            )}
+          </span>
+          <span className="text-xs text-muted-foreground">{item.label}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 function DualAxis({
   quantity,
