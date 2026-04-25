@@ -251,7 +251,7 @@ importers:
         version: 3.25.32
       zustand:
         specifier: ^5.0.8
-        version: 5.0.8(@types/react@18.3.23)(react@18.3.1)(use-sync-external-store@1.5.0(react@18.3.1))
+        version: 5.0.8(@types/react@18.3.23)(immer@11.1.4)(react@18.3.1)(use-sync-external-store@1.5.0(react@18.3.1))
     devDependencies:
       '@chromatic-com/storybook':
         specifier: ^4.0.1
@@ -6189,6 +6189,9 @@ packages:
     resolution: {integrity: sha512-IRqXKlaXwgSMAMtpNzZa1ZAe8m+Sa1770Dhk8VkSsP9LS+iHD62Zd8FQKs8fbPiagBE7BzoFX23cxFnwshpV6w==}
     engines: {node: '>=16.x'}
     hasBin: true
+
+  immer@11.1.4:
+    resolution: {integrity: sha512-XREFCPo6ksxVzP4E0ekD5aMdf8WMwmdNaz6vuvxgI40UaEiu6q3p8X52aU6GdyvLY3XXX/8R7JOTXStz/nBbRw==}
 
   immutable@3.7.6:
     resolution: {integrity: sha512-AizQPcaofEtO11RZhPPHBOJRdo/20MKQF9mBLnVkBoyHi1/zXK8fzVdnEpSV9gxqtnh6Qomfp3F0xT5qP/vThw==}
@@ -15850,6 +15853,9 @@ snapshots:
 
   image-size@2.0.2: {}
 
+  immer@11.1.4:
+    optional: true
+
   immutable@3.7.6: {}
 
   immutable@5.1.2: {}
@@ -18839,9 +18845,10 @@ snapshots:
 
   zod@3.25.32: {}
 
-  zustand@5.0.8(@types/react@18.3.23)(react@18.3.1)(use-sync-external-store@1.5.0(react@18.3.1)):
+  zustand@5.0.8(@types/react@18.3.23)(immer@11.1.4)(react@18.3.1)(use-sync-external-store@1.5.0(react@18.3.1)):
     optionalDependencies:
       '@types/react': 18.3.23
+      immer: 11.1.4
       react: 18.3.1
       use-sync-external-store: 1.5.0(react@18.3.1)
 
