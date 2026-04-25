@@ -30,8 +30,6 @@ export const sysAdminDashboardJa = {
   detail: {
     title: "コミュニティ詳細",
     sections: {
-      people: "人",
-      activity: "活動",
       members: "メンバー",
     },
     header: {

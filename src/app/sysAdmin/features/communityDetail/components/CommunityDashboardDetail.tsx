@@ -64,12 +64,11 @@ export function CommunityDashboardDetail({ communityId }: Props) {
 
       {/* 人: 総数 + ステージ分布 */}
       <section className="flex flex-col gap-4 border-t pt-6">
-        <h2 className="text-sm font-medium text-muted-foreground">{s.people}</h2>
-        <div className="flex items-baseline gap-2">
+        <div className="flex flex-col gap-0.5">
+          <span className="text-xs text-muted-foreground">{t.memberSuffix}</span>
           <span className="text-3xl font-semibold tabular-nums leading-tight">
             {toIntJa(summary.totalMembers)}
           </span>
-          <span className="text-sm text-muted-foreground">{t.memberSuffix}</span>
         </div>
         <StageDistributionPanel
           stages={data.stages}
@@ -81,20 +80,21 @@ export function CommunityDashboardDetail({ communityId }: Props) {
 
       {/* 活動: MAU% (大) + 累計pt/最大chain (横並び) + 推移チャート */}
       <section className="flex flex-col gap-6 border-t pt-6">
-        <h2 className="text-sm font-medium text-muted-foreground">{s.activity}</h2>
         <div className="flex flex-col gap-4">
-          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-            <span className="text-3xl font-semibold tabular-nums leading-tight">
-              {toPct(summary.communityActivityRate)}
-            </span>
-            <span className="text-sm text-muted-foreground">MAU%</span>
-            {summary.growthRateActivity != null && (
-              <span className="text-sm" aria-label="MAU% 前月比">
-                (
-                <PercentDelta value={summary.growthRateActivity} className="text-sm" />
-                )
+          <div className="flex flex-col gap-0.5">
+            <span className="text-xs text-muted-foreground">MAU%</span>
+            <div className="flex flex-wrap items-baseline gap-x-2">
+              <span className="text-3xl font-semibold tabular-nums leading-tight">
+                {toPct(summary.communityActivityRate)}
               </span>
-            )}
+              {summary.growthRateActivity != null && (
+                <span className="text-sm" aria-label="MAU% 前月比">
+                  (
+                  <PercentDelta value={summary.growthRateActivity} className="text-sm" />
+                  )
+                </span>
+              )}
+            </div>
           </div>
           <dl className="flex flex-wrap gap-x-6 gap-y-2">
             <div className="flex flex-col gap-0.5">

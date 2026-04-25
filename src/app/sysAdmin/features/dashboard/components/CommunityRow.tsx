@@ -18,7 +18,7 @@ type Props = {
  * 構造:
  * - status (アラートがある場合のみ、タイトル上に小さく)
  * - community name (bold base)
- * - footer: 稼働率・前月比・人数 (xs muted)
+ * - footer: MAU%・前月比・人数 (xs muted)
  */
 export function CommunityRow({ row, onClick }: Props) {
   const handleClick = () => onClick?.(row.communityId);
@@ -53,7 +53,7 @@ export function CommunityRow({ row, onClick }: Props) {
       <ItemFooter className="mt-0">
         <div className="flex flex-wrap items-baseline gap-x-2 text-xs text-muted-foreground">
           <span className="inline-flex items-baseline gap-1">
-            <span>稼働率 {toPct(row.communityActivityRate)}</span>
+            <span>MAU% {toPct(row.communityActivityRate)}</span>
             {row.growthRateActivity != null && (
               <span aria-label="前月比">
                 (
