@@ -5101,6 +5101,7 @@ export type GqlSysAdminWindowActivityFieldsFragment = {
   senderCountPrev: number;
   newMemberCount: number;
   newMemberCountPrev: number;
+  retainedSenders: number;
 };
 
 export type GqlSysAdminWeeklyRetentionFieldsFragment = {
@@ -5141,6 +5142,7 @@ export type GqlSysAdminCommunityOverviewRowFieldsFragment = {
     senderCountPrev: number;
     newMemberCount: number;
     newMemberCountPrev: number;
+    retainedSenders: number;
   };
   weeklyRetention: {
     __typename?: "SysAdminWeeklyRetention";
@@ -5184,6 +5186,7 @@ export type GqlGetSysAdminDashboardQuery = {
         senderCountPrev: number;
         newMemberCount: number;
         newMemberCountPrev: number;
+        retainedSenders: number;
       };
       weeklyRetention: {
         __typename?: "SysAdminWeeklyRetention";
@@ -8576,6 +8579,7 @@ export const SysAdminWindowActivityFieldsFragmentDoc = gql`
     senderCountPrev
     newMemberCount
     newMemberCountPrev
+    retainedSenders
   }
 `;
 export const SysAdminWeeklyRetentionFieldsFragmentDoc = gql`
