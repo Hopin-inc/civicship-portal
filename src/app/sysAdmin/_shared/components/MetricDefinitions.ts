@@ -97,20 +97,20 @@ export const METRIC_DEFINITIONS: Record<string, MetricDefinition> = {
   },
   chainDepth: {
     title: "chain_depth (連鎖深度)",
-    formula: "1 件の DONATION transaction の連鎖位置 (整数)",
+    formula: "1 件の DONATION transaction の連鎖位置 (整数、最小 1)",
     note:
-      "0 = 自発的な送付 (chain の起点)。1 = もらったポイントを 1 度転送した。N = N 段目の転送。例: A → B が depth 0、B が A から受けた pt を C に送ると B → C が depth 1、さらに C → D が depth 2。「もらって即送った深さ」を測る指標。",
+      "1 = chain の root (自前ポイントから送付 / 受信履歴のない初回 donation)。N+1 = 受信した parent transaction の chain_depth に +1 を伝播。例: A → B (depth 1)、B が A から受けた pt を C に送ると B → C (depth 2)、さらに C → D (depth 3)。「受信を起点にどこまで連鎖したか」 を測る指標。",
   },
   maxChainDepthAllTime: {
     title: "最大チェーン深度",
     formula: "全期間の DONATION のうち chain_depth が最大の値",
-    note: "コミュニティ内で観測された最も深い連鎖。深いほど波及効果が高い (例: 4 段なら A→B→C→D→E まで波及)。",
+    note: "コミュニティ内で観測された最も深い連鎖。`1` は連鎖が一度も発生していない (= 全 donation が root)、`>= 2` は受信→送付の伝播が起きている。例: `4` なら A → B → C → D まで 3 段伝播 (root が depth 1)。",
   },
   chainPct: {
     title: "連鎖率",
     formula:
-      "月内 DONATION のうち chain_depth ≥ 1 のトランザクション数 ÷ 全 DONATION 数",
-    note: "「もらったポイントを誰かに転送した」割合。chain_depth = 0 (自発的な起点) と chain_depth ≥ 1 (転送) の比率を見ることで、コミュニティ内でポイントが還流しているかを測る。",
+      "月内 DONATION のうち chain_depth ≥ 2 のトランザクション数 ÷ 全 DONATION 数",
+    note: "「受信を起点に転送した」 transaction の比率。chain_depth = 1 (root、自前起点) と chain_depth ≥ 2 (受信を起点に転送) の比で、コミュニティ内でポイントが還流しているかを測る。",
     range: "0〜100%",
   },
   stages: {
