@@ -29,6 +29,7 @@ import {
   toIntJa,
   toPct,
 } from "@/app/sysAdmin/_shared/format/number";
+import { formatJstMonth } from "@/app/sysAdmin/_shared/format/date";
 import { PercentDelta } from "@/app/sysAdmin/_shared/components/PercentDelta";
 import {
   TenureBar,
@@ -51,10 +52,15 @@ type Props = {
    * 直接乗っていないため、page.tsx 側で L1 と並列 fetch して受け渡す。
    * 未指定の場合は memberList の上位寄与者ベースで近似する。 */
   tenureDistribution?: GqlSysAdminTenureDistribution;
+  /** stage 分類の閾値 (server に渡している値と同じ)。「送付先孤立」アラートの
+   * habitual 判定に使う。未指定時は default tier1=0.7 にフォールバック。 */
+  tier1?: number;
   /** subpage CTA を出すか (storybook design preview 専用、production では
    * subpage 未実装なので default false)。 */
   enableSubpageLinks?: boolean;
 };
+
+const DEFAULT_TIER1 = 0.7;
 
 const SCOPE_COLOR = {
   network: "text-blue-600",
@@ -75,6 +81,7 @@ export function CommunityDashboardOverview({
   communityName,
   newMemberCount,
   tenureDistribution,
+  tier1 = DEFAULT_TIER1,
   enableSubpageLinks = false,
 }: Props) {
   const summary = data.summary;
@@ -84,14 +91,25 @@ export function CommunityDashboardOverview({
   const regularCount = stages.regular.count;
   const latentCount = stages.latent.count;
 
-  const isolatedCount = data.memberList.users.filter(
-    (u) => u.userSendRate >= 0.7 && u.uniqueDonationRecipients <= 1,
+  // 「送付先孤立」アラートは loaded subset で完結させる。memberList は
+  // totalPointsOut DESC で top N (limit=50) のみ。分子 (memberList の中の
+  // habitual ∧ 単一相手) と分母 (memberList の中の habitual) を同じスケール
+  // に揃えることで、stages.habitual.count (server-wide) と memberList を
+  // 混ぜたときの過小評価を防ぐ。tier1 は user-configurable な knob と一致
+  // させる (0.7 hardcode を撤廃)。
+  const loadedHabitual = data.memberList.users.filter(
+    (u) => u.userSendRate >= tier1,
+  );
+  const isolatedCount = loadedHabitual.filter(
+    (u) => u.uniqueDonationRecipients <= 1,
   ).length;
+  const loadedHabitualCount = loadedHabitual.length;
 
   const hubProvided = hubMemberCount !== undefined;
   const hubPct = hubProvided && totalMembers > 0 ? hubMemberCount / totalMembers : 0;
-  const isolatedRatio = habitualCount > 0 ? isolatedCount / habitualCount : 0;
-  const isolatedAlert = habitualCount > 0 && isolatedRatio >= 0.3;
+  const isolatedRatio =
+    loadedHabitualCount > 0 ? isolatedCount / loadedHabitualCount : 0;
+  const isolatedAlert = loadedHabitualCount > 0 && isolatedRatio >= 0.3;
 
   const activeMembers = data.memberList.users.filter((u) => u.userSendRate > 0);
   const avgRecipients =
@@ -280,7 +298,7 @@ export function CommunityDashboardOverview({
 
         {isolatedAlert && (
           <Issue title="送付先の孤立">
-            習慣化層 {habitualCount} 名のうち {isolatedCount} 名 (
+            上位寄与者の習慣化層 {loadedHabitualCount} 名のうち {isolatedCount} 名 (
             {toPct(isolatedRatio)}) が単一相手のみ。送付先の多様化が改善ポイント。
           </Issue>
         )}
@@ -348,7 +366,7 @@ export function CommunityDashboardOverview({
           title="最新コホート M+1"
           meta={
             cohortLatest?.cohortMonth
-              ? formatYearMonth(cohortLatest.cohortMonth)
+              ? formatJstMonth(cohortLatest.cohortMonth)
               : "-"
           }
           hero={
@@ -712,11 +730,4 @@ function computeParetoTopShare(
     }
   }
   return 1;
-}
-
-function formatYearMonth(d: Date): string {
-  // JST 相対の表記。Date がそのまま JST 寄り想定 (codegen scalar Datetime → Date)。
-  const y = d.getFullYear();
-  const m = d.getMonth() + 1;
-  return `${y}年${m}月`;
 }

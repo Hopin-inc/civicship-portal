@@ -144,6 +144,7 @@ export type MetricKey =
   | "donationOutMonths"
   | "totalPointsOut"
   | "totalDonationPointsAllTime"
+  | "chainDepth"
   | "maxChainDepthAllTime"
   | "chainPct"
   | "stages"

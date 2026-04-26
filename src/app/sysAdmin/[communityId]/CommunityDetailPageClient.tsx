@@ -61,6 +61,7 @@ export function CommunityDetailPageClient({
       communityName={data.communityName}
       newMemberCount={newMemberCount}
       tenureDistribution={tenureDistribution ?? undefined}
+      tier1={dashboard.state.tier1}
     />
   );
 }

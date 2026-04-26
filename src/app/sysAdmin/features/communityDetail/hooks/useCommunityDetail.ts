@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useMemo, useRef } from "react";
 import { useApolloClient, type ApolloError, type ApolloQueryResult } from "@apollo/client";
 import {
   GetSysAdminCommunityDetailDocument,
@@ -90,8 +90,14 @@ export function useCommunityDetail({
   // fetchMore handle is bound to a real registered query — so the member-
   // list pagination keeps working past the SSR-skip path. Skip the prior
   // approach (`skip: true` + ad-hoc fallback) where fetchMore was a no-op.
-  const seededRef = useRef(false);
-  if (!seededRef.current && isAtDefaults && initialData) {
+  //
+  // Track seeding by communityId (not bool) so inter-community navigation
+  // (`/sysAdmin/community-a` → `/sysAdmin/community-b`) re-seeds on the
+  // first render of the new id. A `useEffect([communityId])` reset would
+  // run after render and miss the cache lookup window, causing a wasted
+  // network round-trip on every nav.
+  const seededIdRef = useRef<string | null>(null);
+  if (seededIdRef.current !== communityId && isAtDefaults && initialData) {
     client.writeQuery<
       GqlGetSysAdminCommunityDetailQuery,
       GqlGetSysAdminCommunityDetailQueryVariables
@@ -103,12 +109,8 @@ export function useCommunityDetail({
         sysAdminCommunityDetail: initialData,
       },
     });
-    seededRef.current = true;
+    seededIdRef.current = communityId;
   }
-  // Re-seed when communityId changes (route navigation between communities).
-  useEffect(() => {
-    seededRef.current = false;
-  }, [communityId]);
 
   const { data, loading, error, fetchMore, refetch } = useGetSysAdminCommunityDetailQuery({
     variables: { input },
