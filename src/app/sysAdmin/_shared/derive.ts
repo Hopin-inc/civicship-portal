@@ -4,6 +4,21 @@ import type { GqlSysAdminCommunityOverview } from "@/types/graphql";
 // growthRateActivity <= ACTIVE_DROP_THRESHOLD points the alert.
 export const ACTIVE_DROP_THRESHOLD = -0.2;
 
+// Backend `tenureDistribution` の m3to12Months / gte12Months バケット境界
+// (90 日 = 3 ヶ月相当)。stage 分類の minMonthsIn と「3 ヶ月以上 在籍率」
+// メトリクスで同じ閾値を使うことで、バケット表示と分類設定が一致する。
+export const TENURE_THRESHOLD_DAYS = 90;
+
+// `SysAdminCommunityDetailInput.segmentThresholds` の SSR / hook / story
+// 共通デフォルト。tier1/tier2 はユーザーが UI から動かせる knob だが
+// minMonthsIn は短期在籍 artifact (1 ヶ月で 1 回送って habitual 扱い)
+// を運用上排除するための固定値で、UI からは変更しない。
+export const DEFAULT_SEGMENT_THRESHOLDS = {
+  tier1: 0.7,
+  tier2: 0.4,
+  minMonthsIn: 3,
+} as const;
+
 export function deriveActivityRate(row: GqlSysAdminCommunityOverview): number {
   if (row.totalMembers === 0) return 0;
   return row.windowActivity.senderCount / row.totalMembers;

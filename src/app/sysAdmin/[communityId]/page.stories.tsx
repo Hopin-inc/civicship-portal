@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { GetSysAdminCommunityDetailDocument } from "@/types/graphql";
 import { withApollo, withPageShell } from "../../../../.storybook/decorators";
 import { CommunityDetailPageClient } from "./CommunityDetailPageClient";
+import { DEFAULT_SEGMENT_THRESHOLDS } from "../_shared/derive";
 import { makeCommunityDetailPayload } from "../_shared/fixtures/sysAdminDashboard";
 
 // page.tsx は async RSC で SSR fetch するため Storybook から直接 render できない。
@@ -30,7 +31,7 @@ const variables = {
   input: {
     communityId: "community-a",
     asOf: undefined,
-    segmentThresholds: { tier1: 0.7, tier2: 0.4, minMonthsIn: 3 },
+    segmentThresholds: DEFAULT_SEGMENT_THRESHOLDS,
     windowMonths: 3,
     userFilter: {},
     userSort: { field: "TOTAL_POINTS_OUT", order: "DESC" },

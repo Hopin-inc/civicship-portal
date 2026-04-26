@@ -16,6 +16,7 @@ import {
   DEFAULT_PERIOD,
   resolvePeriodToInput,
 } from "@/app/sysAdmin/_shared/components/PeriodPresetSelect";
+import { DEFAULT_SEGMENT_THRESHOLDS } from "@/app/sysAdmin/_shared/derive";
 
 // Use the codegen-derived shape so the typed Apollo query result and our
 // hook return type stay in lockstep (the bare GqlSysAdminCommunityDetailPayload
@@ -52,9 +53,6 @@ const FIXED_USER_SORT = {
   order: GqlSysAdminSortOrder.Desc,
 } as const;
 
-const DEFAULT_TIER1 = 0.7;
-const DEFAULT_TIER2 = 0.4;
-
 export function useCommunityDetail({
   communityId,
   dashboardControls,
@@ -71,10 +69,7 @@ export function useCommunityDetail({
       segmentThresholds: {
         tier1: dashboardControls.tier1,
         tier2: dashboardControls.tier2,
-        // 在籍 3 ヶ月未満の単発送付者を stage 分類から除外する。issue #918 の
-        // 「短期在籍の artifact (1 ヶ月で 1 回送って habitual 扱い) 」を運用上
-        // ノイズとして抑える。閾値はバックエンドの `m1to3Months` 区切りと整合。
-        minMonthsIn: 3,
+        minMonthsIn: DEFAULT_SEGMENT_THRESHOLDS.minMonthsIn,
       },
       windowMonths,
       userFilter: FIXED_USER_FILTER,
@@ -85,8 +80,8 @@ export function useCommunityDetail({
 
   const isAtDefaults =
     dashboardControls.period === DEFAULT_PERIOD &&
-    dashboardControls.tier1 === DEFAULT_TIER1 &&
-    dashboardControls.tier2 === DEFAULT_TIER2;
+    dashboardControls.tier1 === DEFAULT_SEGMENT_THRESHOLDS.tier1 &&
+    dashboardControls.tier2 === DEFAULT_SEGMENT_THRESHOLDS.tier2;
 
   // SSR data injection: write the initialData payload into Apollo's cache
   // for the exact (query, variables) tuple BEFORE the hook's useQuery runs.

@@ -27,6 +27,7 @@ import {
   toPct,
 } from "@/app/sysAdmin/_shared/format/number";
 import { PercentDelta } from "@/app/sysAdmin/_shared/components/PercentDelta";
+import { TENURE_THRESHOLD_DAYS } from "@/app/sysAdmin/_shared/derive";
 
 type DetailPayload = NonNullable<
   GqlGetSysAdminCommunityDetailQuery["sysAdminCommunityDetail"]
@@ -86,15 +87,14 @@ export function CommunityDashboardOverview({
       ? activeMembers.reduce((acc, u) => acc + u.uniqueDonationRecipients, 0) /
         activeMembers.length
       : 0;
-  // 在籍 3 ヶ月以上比率 (loaded 上位 N 名の中での割合)。daysIn >= 90 を 3
-  // ヶ月以上の閾値とする — backend `tenureDistribution.m3to12Months +
-  // gte12Months` のバケット境界 (90 日) と整合。L2 payload に集計済みの
-  // tenureDistribution が来れば community 全体に置き換える想定で、それ
-  // までは memberList の loaded 上位ユーザー (主に donor) ベースで近似。
-  const tenuredUsers = data.memberList.users.filter((u) => u.daysIn >= 90);
+  // memberList は totalPointsOut DESC で top N (limit=50) のみ。L2 payload
+  // が community 全体の tenureDistribution を露出するまでの暫定で、上位
+  // 寄与者の中での比率という偏った近似になる (donor は長期在籍に偏る)。
+  const loadedUserCount = data.memberList.users.length;
   const tenuredRatio =
-    data.memberList.users.length > 0
-      ? tenuredUsers.length / data.memberList.users.length
+    loadedUserCount > 0
+      ? data.memberList.users.filter((u) => u.daysIn >= TENURE_THRESHOLD_DAYS)
+          .length / loadedUserCount
       : null;
 
   // 連鎖率 (今月) — monthlyActivityTrend の最新点
