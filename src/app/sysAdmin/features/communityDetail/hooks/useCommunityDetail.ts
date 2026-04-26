@@ -119,8 +119,13 @@ export function useCommunityDetail({
   });
 
   const detail = useMemo<DetailPayload | null>(() => {
-    return data?.sysAdminCommunityDetail ?? initialData ?? null;
-  }, [data, initialData]);
+    if (data?.sysAdminCommunityDetail) return data.sysAdminCommunityDetail;
+    // initialData は SSR 時のデフォルト controls (period / tier1 / tier2)
+    // で fetch したものなので、ユーザーが controls を変えた直後の loading 中に
+    // フォールバックすると古い defaults データが見えてしまう。
+    // isAtDefaults の時だけ fallback し、それ以外は null (= LoadingIndicator)。
+    return isAtDefaults ? initialData : null;
+  }, [data, initialData, isAtDefaults]);
 
   return {
     loading,
