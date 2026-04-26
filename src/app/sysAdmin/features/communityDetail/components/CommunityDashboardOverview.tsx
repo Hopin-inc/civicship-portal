@@ -143,10 +143,25 @@ export function CommunityDashboardOverview({
         prevMonth.donationPointsSum
       : null;
 
-  // 平均月次流通 = 累計 / 月数
+  // codegen の scalar mapping は `Datetime: Date` だが Apollo に scalar
+  // deserializer は無く、SSR / network から JSON で来るのは ISO 文字列。
+  // 直接 `.getTime()` を呼ぶと runtime で TypeError なので必ず Date でラップ。
+  const ageMonths =
+    summary.dataFrom && summary.dataTo
+      ? Math.round(
+          (new Date(summary.dataTo).getTime() -
+            new Date(summary.dataFrom).getTime()) /
+            (1000 * 60 * 60 * 24 * 30),
+        )
+      : null;
+
+  // 平均月次流通 = 累計 / コミュニティ稼働月数。monthlyActivityTrend.length
+  // は windowMonths (default 3) で頭打ちなので、それを分母にすると長く稼働
+  // している community ほど見かけ上膨れる (24 ヶ月稼働なら 8 倍)。
+  // dataFrom→dataTo から導いた ageMonths を必ず使う。
   const avgMonthlyThroughput =
-    summary.totalDonationPointsAllTime > 0 && data.monthlyActivityTrend.length > 0
-      ? summary.totalDonationPointsAllTime / data.monthlyActivityTrend.length
+    summary.totalDonationPointsAllTime > 0 && ageMonths != null && ageMonths > 0
+      ? summary.totalDonationPointsAllTime / ageMonths
       : null;
 
   // 流通量集中度 (Pareto)
@@ -170,22 +185,11 @@ export function CommunityDashboardOverview({
 
   const habitualOverRegular = habitualCount > 0 && regularCount > habitualCount;
 
-  // 新規率 (28d)
+  // 新規率 (最新月): newMemberCount は L2 detail の monthlyActivityTrend
+  // 最新点 (calendar-month) から渡ってくるので 28 日 rolling 窓ではない。
   const newRate =
     totalMembers > 0 && newMemberCount != null
       ? newMemberCount / totalMembers
-      : null;
-
-  // codegen の scalar mapping は `Datetime: Date` だが Apollo に scalar
-  // deserializer は無く、SSR / network から JSON で来るのは ISO 文字列。
-  // 直接 `.getTime()` を呼ぶと runtime で TypeError なので必ず Date でラップ。
-  const ageMonths =
-    summary.dataFrom && summary.dataTo
-      ? Math.round(
-          (new Date(summary.dataTo).getTime() -
-            new Date(summary.dataFrom).getTime()) /
-            (1000 * 60 * 60 * 24 * 30),
-        )
       : null;
 
   // sparkline data
@@ -448,7 +452,7 @@ export function CommunityDashboardOverview({
           icon={UserPlus}
           colorClass={SCOPE_COLOR.user}
           title="新規率"
-          meta="直近 28 日"
+          meta="最新月"
           hero={<Hero value={newRate != null ? toPct(newRate) : "-"} />}
         />
         <MetricCard
