@@ -18,7 +18,7 @@ export default async function SysAdminCommunityDetailPage({ params }: Props) {
   const initialData = await fetchSysAdminCommunityDetailServer({
     communityId,
     asOf: undefined,
-    segmentThresholds: { tier1: 0.7, tier2: 0.4 },
+    segmentThresholds: { tier1: 0.7, tier2: 0.4, minMonthsIn: 3 },
     windowMonths: 3,
     userFilter: {},
     userSort: {

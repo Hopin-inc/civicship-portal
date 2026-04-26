@@ -86,18 +86,16 @@ export function CommunityDashboardOverview({
       ? activeMembers.reduce((acc, u) => acc + u.uniqueDonationRecipients, 0) /
         activeMembers.length
       : 0;
-  const avgSendRate =
-    activeMembers.length > 0
-      ? activeMembers.reduce((acc, u) => acc + u.userSendRate, 0) /
-        activeMembers.length
-      : 0;
-  // 平均在籍月数: tenure 構造 (member 全員の monthsIn 平均)。"このコミュ
-  // ニティが新興か老舗か" の人視点での補強指標。
-  const avgMonthsIn =
+  // 在籍 3 ヶ月以上比率 (loaded 上位 N 名の中での割合)。daysIn >= 90 を 3
+  // ヶ月以上の閾値とする — backend `tenureDistribution.m3to12Months +
+  // gte12Months` のバケット境界 (90 日) と整合。L2 payload に集計済みの
+  // tenureDistribution が来れば community 全体に置き換える想定で、それ
+  // までは memberList の loaded 上位ユーザー (主に donor) ベースで近似。
+  const tenuredUsers = data.memberList.users.filter((u) => u.daysIn >= 90);
+  const tenuredRatio =
     data.memberList.users.length > 0
-      ? data.memberList.users.reduce((acc, u) => acc + u.monthsIn, 0) /
-        data.memberList.users.length
-      : 0;
+      ? tenuredUsers.length / data.memberList.users.length
+      : null;
 
   // 連鎖率 (今月) — monthlyActivityTrend の最新点
   const latestMonth =
@@ -420,13 +418,15 @@ export function CommunityDashboardOverview({
         <MetricCard
           icon={Hourglass}
           colorClass={SCOPE_COLOR.user}
-          title="平均在籍月数"
-          meta="累計"
+          title="3 ヶ月以上 在籍率"
+          meta="送付者上位"
           hero={
-            <Hero
-              value={avgMonthsIn > 0 ? avgMonthsIn.toFixed(1) : "-"}
-              unit="ヶ月"
-            />
+            <Hero value={tenuredRatio != null ? toPct(tenuredRatio) : "-"} />
+          }
+          viz={
+            tenuredRatio != null ? (
+              <Ring value={tenuredRatio} colorClass={SCOPE_COLOR.user} />
+            ) : undefined
           }
         />
         <MetricCard

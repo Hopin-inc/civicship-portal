@@ -71,6 +71,10 @@ export function useCommunityDetail({
       segmentThresholds: {
         tier1: dashboardControls.tier1,
         tier2: dashboardControls.tier2,
+        // 在籍 3 ヶ月未満の単発送付者を stage 分類から除外する。issue #918 の
+        // 「短期在籍の artifact (1 ヶ月で 1 回送って habitual 扱い) 」を運用上
+        // ノイズとして抑える。閾値はバックエンドの `m1to3Months` 区切りと整合。
+        minMonthsIn: 3,
       },
       windowMonths,
       userFilter: FIXED_USER_FILTER,

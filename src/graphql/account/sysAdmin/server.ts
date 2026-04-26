@@ -29,6 +29,12 @@ export const GET_SYS_ADMIN_DASHBOARD_SERVER_QUERY = `
           tier1Count
           tier2Count
         }
+        tenureDistribution {
+          lt1Month
+          m1to3Months
+          m3to12Months
+          gte12Months
+        }
         windowActivity {
           senderCount
           senderCountPrev
@@ -138,6 +144,8 @@ export const GET_SYS_ADMIN_COMMUNITY_DETAIL_SERVER_QUERY = `
           totalPointsOut
           donationOutMonths
           monthsIn
+          daysIn
+          donationOutDays
           uniqueDonationRecipients
         }
       }

@@ -5306,6 +5306,13 @@ export type GqlSysAdminCommunityOverviewRowFieldsFragment = {
     tier1Count: number;
     tier2Count: number;
   };
+  tenureDistribution: {
+    __typename?: "SysAdminTenureDistribution";
+    lt1Month: number;
+    m1to3Months: number;
+    m3to12Months: number;
+    gte12Months: number;
+  };
   windowActivity: {
     __typename?: "SysAdminWindowActivity";
     senderCount: number;
@@ -5320,6 +5327,14 @@ export type GqlSysAdminCommunityOverviewRowFieldsFragment = {
     churnedSenders: number;
   };
   latestCohort: { __typename?: "SysAdminLatestCohort"; size: number; activeAtM1: number };
+};
+
+export type GqlSysAdminTenureDistributionFieldsFragment = {
+  __typename?: "SysAdminTenureDistribution";
+  lt1Month: number;
+  m1to3Months: number;
+  m3to12Months: number;
+  gte12Months: number;
 };
 
 export type GqlSysAdminAlertFieldsFragment = {
@@ -5427,6 +5442,8 @@ export type GqlSysAdminMemberRowFieldsFragment = {
   totalPointsOut: number;
   donationOutMonths: number;
   monthsIn: number;
+  daysIn: number;
+  donationOutDays: number;
   uniqueDonationRecipients: number;
 };
 
@@ -5458,6 +5475,13 @@ export type GqlGetSysAdminDashboardQuery = {
         passiveCount: number;
         tier1Count: number;
         tier2Count: number;
+      };
+      tenureDistribution: {
+        __typename?: "SysAdminTenureDistribution";
+        lt1Month: number;
+        m1to3Months: number;
+        m3to12Months: number;
+        gte12Months: number;
       };
       windowActivity: {
         __typename?: "SysAdminWindowActivity";
@@ -5583,6 +5607,8 @@ export type GqlGetSysAdminCommunityDetailQuery = {
         totalPointsOut: number;
         donationOutMonths: number;
         monthsIn: number;
+        daysIn: number;
+        donationOutDays: number;
         uniqueDonationRecipients: number;
       }>;
     };
@@ -8985,6 +9011,14 @@ export const SysAdminLatestCohortFieldsFragmentDoc = gql`
     activeAtM1
   }
 `;
+export const SysAdminTenureDistributionFieldsFragmentDoc = gql`
+  fragment SysAdminTenureDistributionFields on SysAdminTenureDistribution {
+    lt1Month
+    m1to3Months
+    m3to12Months
+    gte12Months
+  }
+`;
 export const SysAdminCommunityOverviewRowFieldsFragmentDoc = gql`
   fragment SysAdminCommunityOverviewRowFields on SysAdminCommunityOverview {
     communityId
@@ -8993,6 +9027,9 @@ export const SysAdminCommunityOverviewRowFieldsFragmentDoc = gql`
     hubMemberCount
     segmentCounts {
       ...SysAdminSegmentCountsFields
+    }
+    tenureDistribution {
+      ...SysAdminTenureDistributionFields
     }
     windowActivity {
       ...SysAdminWindowActivityFields
@@ -9005,6 +9042,7 @@ export const SysAdminCommunityOverviewRowFieldsFragmentDoc = gql`
     }
   }
   ${SysAdminSegmentCountsFieldsFragmentDoc}
+  ${SysAdminTenureDistributionFieldsFragmentDoc}
   ${SysAdminWindowActivityFieldsFragmentDoc}
   ${SysAdminWeeklyRetentionFieldsFragmentDoc}
   ${SysAdminLatestCohortFieldsFragmentDoc}
@@ -9095,6 +9133,8 @@ export const SysAdminMemberRowFieldsFragmentDoc = gql`
     totalPointsOut
     donationOutMonths
     monthsIn
+    daysIn
+    donationOutDays
     uniqueDonationRecipients
   }
 `;

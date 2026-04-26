@@ -42,6 +42,15 @@ export const SYS_ADMIN_PLATFORM_SUMMARY_FRAGMENT = gql`
   }
 `;
 
+export const SYS_ADMIN_TENURE_DISTRIBUTION_FRAGMENT = gql`
+  fragment SysAdminTenureDistributionFields on SysAdminTenureDistribution {
+    lt1Month
+    m1to3Months
+    m3to12Months
+    gte12Months
+  }
+`;
+
 export const SYS_ADMIN_COMMUNITY_OVERVIEW_ROW_FRAGMENT = gql`
   fragment SysAdminCommunityOverviewRowFields on SysAdminCommunityOverview {
     communityId
@@ -50,6 +59,9 @@ export const SYS_ADMIN_COMMUNITY_OVERVIEW_ROW_FRAGMENT = gql`
     hubMemberCount
     segmentCounts {
       ...SysAdminSegmentCountsFields
+    }
+    tenureDistribution {
+      ...SysAdminTenureDistributionFields
     }
     windowActivity {
       ...SysAdminWindowActivityFields
@@ -62,6 +74,7 @@ export const SYS_ADMIN_COMMUNITY_OVERVIEW_ROW_FRAGMENT = gql`
     }
   }
   ${SYS_ADMIN_SEGMENT_COUNTS_FRAGMENT}
+  ${SYS_ADMIN_TENURE_DISTRIBUTION_FRAGMENT}
   ${SYS_ADMIN_WINDOW_ACTIVITY_FRAGMENT}
   ${SYS_ADMIN_WEEKLY_RETENTION_FRAGMENT}
   ${SYS_ADMIN_LATEST_COHORT_FRAGMENT}
@@ -164,6 +177,8 @@ export const SYS_ADMIN_MEMBER_ROW_FRAGMENT = gql`
     totalPointsOut
     donationOutMonths
     monthsIn
+    daysIn
+    donationOutDays
     uniqueDonationRecipients
   }
 `;

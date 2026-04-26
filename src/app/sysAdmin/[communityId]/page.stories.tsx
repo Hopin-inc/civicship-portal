@@ -30,7 +30,7 @@ const variables = {
   input: {
     communityId: "community-a",
     asOf: undefined,
-    segmentThresholds: { tier1: 0.7, tier2: 0.4 },
+    segmentThresholds: { tier1: 0.7, tier2: 0.4, minMonthsIn: 3 },
     windowMonths: 3,
     userFilter: {},
     userSort: { field: "TOTAL_POINTS_OUT", order: "DESC" },

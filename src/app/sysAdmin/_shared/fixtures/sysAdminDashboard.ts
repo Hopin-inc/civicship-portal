@@ -15,6 +15,7 @@ import type {
   GqlSysAdminSegmentCounts,
   GqlSysAdminStageBucket,
   GqlSysAdminStageDistribution,
+  GqlSysAdminTenureDistribution,
   GqlSysAdminWeeklyRetention,
   GqlSysAdminWindowActivity,
 } from "@/types/graphql";
@@ -71,6 +72,17 @@ export const makeLatestCohort = (
   ...overrides,
 });
 
+export const makeTenureDistribution = (
+  overrides: Partial<GqlSysAdminTenureDistribution> = {},
+): GqlSysAdminTenureDistribution => ({
+  __typename: "SysAdminTenureDistribution",
+  lt1Month: 12,
+  m1to3Months: 18,
+  m3to12Months: 45,
+  gte12Months: 45,
+  ...overrides,
+});
+
 export const makePlatformSummary = (
   overrides: Partial<GqlSysAdminPlatformSummary> = {},
 ): GqlSysAdminPlatformSummary => ({
@@ -119,6 +131,7 @@ export const makeCommunityOverview = (
     totalMembers,
     hubMemberCount,
     segmentCounts: overrides.segmentCounts ?? defaultSegmentCountsFor(totalMembers),
+    tenureDistribution: overrides.tenureDistribution ?? makeTenureDistribution(),
     windowActivity,
     weeklyRetention: overrides.weeklyRetention ?? makeWeeklyRetention(),
     latestCohort: overrides.latestCohort ?? makeLatestCohort(),
@@ -252,17 +265,23 @@ export const makeCohortRetentionPoint = (
 
 export const makeMemberRow = (
   overrides: Partial<GqlSysAdminMemberRow> = {},
-): GqlSysAdminMemberRow => ({
-  __typename: "SysAdminMemberRow",
-  userId: "user-1",
-  name: "山田 太郎",
-  userSendRate: 0.83,
-  totalPointsOut: 12500,
-  donationOutMonths: 10,
-  monthsIn: 12,
-  uniqueDonationRecipients: 4,
-  ...overrides,
-});
+): GqlSysAdminMemberRow => {
+  const monthsIn = overrides.monthsIn ?? 12;
+  const donationOutMonths = overrides.donationOutMonths ?? 10;
+  return {
+    __typename: "SysAdminMemberRow",
+    userId: "user-1",
+    name: "山田 太郎",
+    userSendRate: 0.83,
+    totalPointsOut: 12500,
+    donationOutMonths,
+    monthsIn,
+    daysIn: overrides.daysIn ?? monthsIn * 30,
+    donationOutDays: overrides.donationOutDays ?? donationOutMonths * 6,
+    uniqueDonationRecipients: 4,
+    ...overrides,
+  };
+};
 
 export const makeMemberList = (
   rows: GqlSysAdminMemberRow[],
