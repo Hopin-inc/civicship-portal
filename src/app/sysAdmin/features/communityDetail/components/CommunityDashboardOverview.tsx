@@ -84,6 +84,46 @@ export function CommunityDashboardOverview({
   tier1 = DEFAULT_TIER1,
   enableSubpageLinks = false,
 }: Props) {
+  // Schema 上は summary / stages / memberList とその nested buckets は全て
+  // non-null だが、production の partial response (network エラー後の
+  // Apollo cache 残り、ロールアウト中の backend 不整合 等) で undefined に
+  // 落ちるケースを観測している。crash させずに「データ取得に失敗」を出す
+  // ように防御。warn を出して原因が手元でも追えるようにする。
+  if (
+    !data.summary ||
+    !data.stages?.habitual ||
+    !data.stages?.regular ||
+    !data.stages?.occasional ||
+    !data.stages?.latent ||
+    !data.memberList ||
+    !data.monthlyActivityTrend ||
+    !data.retentionTrend ||
+    !data.cohortRetention
+  ) {
+    if (typeof window !== "undefined") {
+      // stg は NODE_ENV=production なので env 判定を入れずに常に warn を
+      // 出して原因究明に使う。
+      // eslint-disable-next-line no-console
+      console.warn("[CommunityDashboardOverview] missing required fields", {
+        hasSummary: !!data.summary,
+        hasStages: !!data.stages,
+        hasHabitual: !!data.stages?.habitual,
+        hasRegular: !!data.stages?.regular,
+        hasOccasional: !!data.stages?.occasional,
+        hasLatent: !!data.stages?.latent,
+        hasMemberList: !!data.memberList,
+        hasMonthlyActivityTrend: !!data.monthlyActivityTrend,
+        hasRetentionTrend: !!data.retentionTrend,
+        hasCohortRetention: !!data.cohortRetention,
+      });
+    }
+    return (
+      <div className="rounded-2xl border border-amber-200 bg-amber-50/60 p-6 text-sm text-amber-900">
+        コミュニティ詳細データの一部が取得できませんでした。時間をおいて再度お試しください。
+      </div>
+    );
+  }
+
   const summary = data.summary;
   const totalMembers = summary.totalMembers;
   const stages = data.stages;
