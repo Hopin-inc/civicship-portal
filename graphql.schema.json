@@ -24003,6 +24003,22 @@
             "deprecationReason": null
           },
           {
+            "name": "tenureDistribution",
+            "description": "Tenure-bucket distribution of members at asOf. See\nSysAdminTenureDistribution. Sum of buckets equals totalMembers.\n\nLets the client surface community age structure at L1 without\ndrilling into the L2 member list (which would otherwise force\nan N+1 round trip per community to compute distribution).",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "SysAdminTenureDistribution",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "totalMembers",
             "description": "Total status='JOINED' members as of asOf. Members whose\ncreated_at is after asOf are excluded from the count.",
             "args": [],
@@ -24160,7 +24176,7 @@
           },
           {
             "name": "maxChainDepthAllTime",
-            "description": "Maximum chain depth observed in any DONATION, all-time. null when\nno chained transactions exist.",
+            "description": "Maximum `chain_depth` observed in any DONATION, all-time, in\nthis community. null when no DONATION transactions exist.\n\n`chain_depth` semantics (set in transaction creation —\nsrc/application/domain/transaction/service.ts:89, via\n`findLatestReceivedTx`):\n  - chain_depth = 1: a \"root\" donation. Either the sender\n    had no prior received DONATION (= self-funded gift) or\n    this is treated as the start of a chain.\n  - chain_depth = N + 1: the sender's most recent received\n    DONATION (parentTx) had `chain_depth = N`; the new\n    donation propagates the chain by one step.\n\nExample trace: A donates to B → chain_depth 1.\nB then donates to C, citing the receipt from A → chain_depth 2.\nC donates to D similarly → chain_depth 3.\n\n`maxChainDepthAllTime = 1` therefore means \"no propagation\never happened\" (every donation was a fresh root).\n`maxChainDepthAllTime >= 2` means at least one\nreceive-then-pass-it-on event occurred.",
             "args": [],
             "type": {
               "kind": "SCALAR",
@@ -24482,6 +24498,38 @@
         "description": "One row of the L2 member list. Raw values only — stage classification\n(habitual / regular / occasional / latent) is the client's concern so\nserver-side thresholds can be tuned without a schema change.",
         "isOneOf": null,
         "fields": [
+          {
+            "name": "daysIn",
+            "description": "Tenure in JST calendar days (floor, minimum 1). Daily-grain\ncounterpart to `monthsIn`. Useful when the client wants a\nfiner-grained activity rate than the monthly `userSendRate`,\nor when grouping members into tenure buckets that don't align\nwith calendar-month boundaries.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "donationOutDays",
+            "description": "Distinct JST days the member sent at least one DONATION.\nDaily-grain counterpart to `donationOutMonths`. Combined with\n`daysIn`, the client can compute `donationOutDays / daysIn` as\na daily-cadence rate, complementing the monthly `userSendRate`.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
           {
             "name": "donationOutMonths",
             "description": "Distinct months with at least one DONATION out.",
@@ -24964,6 +25012,18 @@
         "fields": null,
         "inputFields": [
           {
+            "name": "minMonthsIn",
+            "description": "Minimum tenure a member must have before being eligible for\ntier1 / tier2 classification. Expressed in calendar months for\nergonomic operator-facing semantics, but evaluated internally as\n`daysIn >= minMonthsIn × 30` so a member who joined yesterday\nbut happens to straddle a calendar-month boundary cannot sneak\npast the filter. Filters out the short-tenure artifact where a\nbrand-new member who donated once gets\n`userSendRate = 1/1 = 1.0` and is auto-classified as habitual\ndespite no actual track record.\n\nOnly affects `tier1Count` and `tier2Count`; `activeCount`\n(\"ever donated\") and `passiveCount` (\"never donated\") are\nsemantically tenure-independent and remain unfiltered.\n\nDefault 1 → roughly \"must have been around at least 30 days\".\nSet to 3 for \"must have been around 3+ months (~90 days)\" so\nthe operator-facing reading of `tier1Count` matches the\nintuitive meaning of \"habitual sender\".\n\nEffective range 1..120; values outside are silently clamped on\nthe server. The 30-day-per-month conversion matches\n`tenureDistribution`'s bucket boundaries so the stage classifier\nand the tenure-distribution chart agree on what \"1 month\" means.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "defaultValue": "1",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "tier1",
             "description": "Habitual stage threshold. A user with `userSendRate >= tier1` is\ncounted as \"habitual\" (i.e. sends donations in at least tier1 share\nof their tenure). Default 0.7.",
             "type": {
@@ -25172,6 +25232,82 @@
               "ofType": {
                 "kind": "OBJECT",
                 "name": "SysAdminStageBucket",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "SysAdminTenureDistribution",
+        "description": "Tenure-bucket distribution of a community's members at asOf,\nclassified on `daysIn` (JST calendar-day tenure). Lets the L1\ndashboard surface community age structure (e.g. \"lots of brand\nnew members, few established\") without drilling into the L2\nmember list.\n\nBuckets are mutually exclusive and exhaustive; the sum equals\ntotalMembers. Boundaries are intentionally calendar-day rather\nthan month so a 28-day-tenure member doesn't get double-counted\ninto \"1 month\" purely because of `monthsIn`'s GREATEST(1, ...)\nfloor.",
+        "isOneOf": null,
+        "fields": [
+          {
+            "name": "gte12Months",
+            "description": "Members with `daysIn >= 365` — long-time members. Combined\nwith `lt1Month`, signals the community's age structure.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "lt1Month",
+            "description": "Members with `daysIn < 30` — newly joined cohort. Useful for\nspotting communities flooded with new members where downstream\nmetrics (userSendRate, retention) are not yet meaningful.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "m1to3Months",
+            "description": "Members with `30 <= daysIn < 90` — \"still settling in\" cohort.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "m3to12Months",
+            "description": "Members with `90 <= daysIn < 365` — established members.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
                 "ofType": null
               }
             },
