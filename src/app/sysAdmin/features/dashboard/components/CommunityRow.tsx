@@ -3,6 +3,7 @@
 import React from "react";
 import { Item, ItemContent, ItemFooter, ItemTitle } from "@/components/ui/item";
 import { PercentDelta } from "@/app/sysAdmin/_shared/components/PercentDelta";
+import { TenureBar } from "@/app/sysAdmin/_shared/components/TenureBar";
 import { toIntJa, toPct } from "@/app/sysAdmin/_shared/format/number";
 import { cn } from "@/lib/utils";
 import {
@@ -55,11 +56,12 @@ export function CommunityRow({ row, onClick }: Props) {
         </div>
       </ItemContent>
 
-      <ItemFooter className="mt-0">
+      <ItemFooter className="mt-0 w-full flex-col items-stretch gap-2">
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5">
           <KpiPill label="MAU" value={toPct(activityRate)} delta={growthRateActivity} />
           <KpiPill label="Δ" value={`新規${toIntJa(newlyActivated)} / 休眠${toIntJa(churned)}`} />
         </div>
+        <TenureBar distribution={row.tenureDistribution} showLabels={false} />
       </ItemFooter>
     </Item>
   );

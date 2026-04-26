@@ -4,7 +4,10 @@ import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
-import type { GqlGetSysAdminCommunityDetailQuery } from "@/types/graphql";
+import type {
+  GqlGetSysAdminCommunityDetailQuery,
+  GqlSysAdminTenureDistribution,
+} from "@/types/graphql";
 import { useDashboardControls } from "@/app/sysAdmin/features/dashboard/hooks/useDashboardControls";
 import { useCommunityDetail } from "@/app/sysAdmin/features/communityDetail/hooks/useCommunityDetail";
 import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";
@@ -13,9 +16,16 @@ import { CommunityDashboardOverview } from "@/app/sysAdmin/features/communityDet
 type Props = {
   communityId: string;
   initialData: GqlGetSysAdminCommunityDetailQuery["sysAdminCommunityDetail"] | null;
+  /** L1 dashboard 経由で取得した、この community の tenure 分布。L2 schema
+   * が tenureDistribution を露出するまでの SSR 横断の橋渡し。 */
+  tenureDistribution?: GqlSysAdminTenureDistribution | null;
 };
 
-export function CommunityDetailPageClient({ communityId, initialData }: Props) {
+export function CommunityDetailPageClient({
+  communityId,
+  initialData,
+  tenureDistribution,
+}: Props) {
   const dashboard = useDashboardControls();
   const { loading, error, detail: data } = useCommunityDetail({
     communityId,
@@ -50,6 +60,7 @@ export function CommunityDetailPageClient({ communityId, initialData }: Props) {
       data={data}
       communityName={data.communityName}
       newMemberCount={newMemberCount}
+      tenureDistribution={tenureDistribution ?? undefined}
     />
   );
 }

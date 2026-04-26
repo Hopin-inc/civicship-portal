@@ -1,4 +1,5 @@
 import { fetchSysAdminCommunityDetailServer } from "@/app/sysAdmin/_shared/server/fetchSysAdminCommunityDetail";
+import { fetchSysAdminDashboardServer } from "@/app/sysAdmin/_shared/server/fetchSysAdminDashboard";
 import { DEFAULT_SEGMENT_THRESHOLDS } from "@/app/sysAdmin/_shared/derive";
 import {
   GqlSysAdminSortOrder,
@@ -15,23 +16,36 @@ type Props = {
 export default async function SysAdminCommunityDetailPage({ params }: Props) {
   const { communityId } = await params;
 
-  // SSR 用デフォルト input。useDashboardControls / useCommunityDetail のデフォルトと一致させる。
-  const initialData = await fetchSysAdminCommunityDetailServer({
-    communityId,
-    asOf: undefined,
-    segmentThresholds: DEFAULT_SEGMENT_THRESHOLDS,
-    windowMonths: 3,
-    userFilter: {},
-    userSort: {
-      field: GqlSysAdminUserSortField.TotalPointsOut,
-      order: GqlSysAdminSortOrder.Desc,
-    },
-    limit: 50,
-  });
+  // L2 detail と L1 dashboard を並列で SSR fetch。L2 payload は
+  // tenureDistribution を持たないため、L1 の該当 community 行から
+  // 抜き出して overview に渡す。
+  const [initialData, l1Data] = await Promise.all([
+    fetchSysAdminCommunityDetailServer({
+      communityId,
+      asOf: undefined,
+      segmentThresholds: DEFAULT_SEGMENT_THRESHOLDS,
+      windowMonths: 3,
+      userFilter: {},
+      userSort: {
+        field: GqlSysAdminUserSortField.TotalPointsOut,
+        order: GqlSysAdminSortOrder.Desc,
+      },
+      limit: 50,
+    }),
+    fetchSysAdminDashboardServer({ asOf: undefined }),
+  ]);
+
+  const tenureDistribution =
+    l1Data?.communities.find((c) => c.communityId === communityId)
+      ?.tenureDistribution ?? null;
 
   return (
     <div className="mx-auto max-w-7xl p-4">
-      <CommunityDetailPageClient communityId={communityId} initialData={initialData} />
+      <CommunityDetailPageClient
+        communityId={communityId}
+        initialData={initialData}
+        tenureDistribution={tenureDistribution}
+      />
     </div>
   );
 }

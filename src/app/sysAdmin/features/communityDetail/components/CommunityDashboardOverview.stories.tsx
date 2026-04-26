@@ -10,6 +10,7 @@ import {
   makeStageBucket,
   makeStageDistribution,
   makeSummaryCard,
+  makeTenureDistribution,
 } from "../../../_shared/fixtures/sysAdminDashboard";
 
 const meta: Meta<typeof CommunityDashboardOverview> = {
@@ -36,6 +37,12 @@ export const Healthy: Story = {
     communityName: "コミュニティA",
     newMemberCount: 12,
     hubMemberCount: 43,
+    tenureDistribution: makeTenureDistribution({
+      lt1Month: 24,
+      m1to3Months: 36,
+      m3to12Months: 90,
+      gte12Months: 90,
+    }),
     data: makeCommunityDetailPayload({
       payload: {
         summary: makeSummaryCard({
@@ -92,6 +99,12 @@ export const WithIssues: Story = {
     communityName: "コミュニティA",
     newMemberCount: 12,
     hubMemberCount: 43,
+    tenureDistribution: makeTenureDistribution({
+      lt1Month: 60,
+      m1to3Months: 80,
+      m3to12Months: 60,
+      gte12Months: 40,
+    }),
     data: makeCommunityDetailPayload({
       payload: {
         summary: makeSummaryCard({
@@ -151,6 +164,12 @@ export const EmptyData: Story = {
     communityName: "新規コミュニティ",
     newMemberCount: 3,
     hubMemberCount: 0,
+    tenureDistribution: makeTenureDistribution({
+      lt1Month: 5,
+      m1to3Months: 3,
+      m3to12Months: 0,
+      gte12Months: 0,
+    }),
     data: makeCommunityDetailPayload({
       payload: {
         summary: makeSummaryCard({

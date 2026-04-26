@@ -20,13 +20,20 @@ import {
   UserPlus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { GqlGetSysAdminCommunityDetailQuery } from "@/types/graphql";
+import type {
+  GqlGetSysAdminCommunityDetailQuery,
+  GqlSysAdminTenureDistribution,
+} from "@/types/graphql";
 import {
   toCompactJa,
   toIntJa,
   toPct,
 } from "@/app/sysAdmin/_shared/format/number";
 import { PercentDelta } from "@/app/sysAdmin/_shared/components/PercentDelta";
+import {
+  TenureBar,
+  deriveTenuredRatio,
+} from "@/app/sysAdmin/_shared/components/TenureBar";
 import { TENURE_THRESHOLD_DAYS } from "@/app/sysAdmin/_shared/derive";
 
 type DetailPayload = NonNullable<
@@ -40,6 +47,10 @@ type Props = {
   hubMemberCount?: number;
   communityName?: string;
   newMemberCount?: number;
+  /** L1 dashboard で取得した community-wide の在籍分布。L2 payload に
+   * 直接乗っていないため、page.tsx 側で L1 と並列 fetch して受け渡す。
+   * 未指定の場合は memberList の上位寄与者ベースで近似する。 */
+  tenureDistribution?: GqlSysAdminTenureDistribution;
   /** subpage CTA を出すか (storybook design preview 専用、production では
    * subpage 未実装なので default false)。 */
   enableSubpageLinks?: boolean;
@@ -63,6 +74,7 @@ export function CommunityDashboardOverview({
   hubMemberCount,
   communityName,
   newMemberCount,
+  tenureDistribution,
   enableSubpageLinks = false,
 }: Props) {
   const summary = data.summary;
@@ -87,15 +99,17 @@ export function CommunityDashboardOverview({
       ? activeMembers.reduce((acc, u) => acc + u.uniqueDonationRecipients, 0) /
         activeMembers.length
       : 0;
-  // memberList は totalPointsOut DESC で top N (limit=50) のみ。L2 payload
-  // が community 全体の tenureDistribution を露出するまでの暫定で、上位
-  // 寄与者の中での比率という偏った近似になる (donor は長期在籍に偏る)。
-  const loadedUserCount = data.memberList.users.length;
-  const tenuredRatio =
-    loadedUserCount > 0
+  // 「3 ヶ月以上 在籍率」は community 全体の tenureDistribution から計算する
+  // のが正。L1 dashboard 経由で受け取った distribution があればそれを使い、
+  // 無ければ memberList (totalPointsOut DESC top N) で近似する暫定 fallback。
+  // fallback は donor 偏重で長期在籍に偏るので「上位寄与者ベース」と注記。
+  const tenuredRatio: number | null = tenureDistribution
+    ? deriveTenuredRatio(tenureDistribution)
+    : data.memberList.users.length > 0
       ? data.memberList.users.filter((u) => u.daysIn >= TENURE_THRESHOLD_DAYS)
-          .length / loadedUserCount
+          .length / data.memberList.users.length
       : null;
+  const tenuredFromCommunity = tenureDistribution != null;
 
   // 連鎖率 (今月) — monthlyActivityTrend の最新点
   const latestMonth =
@@ -419,13 +433,18 @@ export function CommunityDashboardOverview({
           icon={Hourglass}
           colorClass={SCOPE_COLOR.user}
           title="3 ヶ月以上 在籍率"
-          meta="送付者上位"
+          meta={tenuredFromCommunity ? "コミュニティ全体" : "上位寄与者ベース (暫定)"}
           hero={
             <Hero value={tenuredRatio != null ? toPct(tenuredRatio) : "-"} />
           }
           viz={
             tenuredRatio != null ? (
               <Ring value={tenuredRatio} colorClass={SCOPE_COLOR.user} />
+            ) : undefined
+          }
+          footer={
+            tenureDistribution ? (
+              <TenureBar distribution={tenureDistribution} />
             ) : undefined
           }
         />
@@ -485,6 +504,7 @@ function MetricCard({
   meta,
   hero,
   viz,
+  footer,
   status = "ok",
 }: {
   icon: LucideIcon;
@@ -493,6 +513,8 @@ function MetricCard({
   meta?: string;
   hero?: React.ReactNode;
   viz?: React.ReactNode;
+  /** hero 行の下に積む補足 viz (在籍分布 mini bar など)。 */
+  footer?: React.ReactNode;
   status?: "ok" | "todo";
 }) {
   return (
@@ -516,6 +538,7 @@ function MetricCard({
         </div>
         {status === "ok" && viz && <div className="shrink-0">{viz}</div>}
       </div>
+      {status === "ok" && footer && <div className="mt-3">{footer}</div>}
     </div>
   );
 }
