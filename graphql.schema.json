@@ -23640,6 +23640,18 @@
             "deprecationReason": null
           },
           {
+            "name": "dormantThresholdDays",
+            "description": "Days since a member's most recent DONATION above which they are\nclassified as \"dormant\". Used to populate\n`SysAdminCommunityDetailPayload.dormantCount`. See the same-named\nfield on SysAdminDashboardInput for the full semantic.\n\nDefault 30 (≈ one month of silence). Effective range 1..365;\nvalues outside are silently clamped on the server.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "defaultValue": "30",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "limit",
             "description": "Member list page size (default 50, max 200).",
             "type": {
@@ -23799,6 +23811,22 @@
             "deprecationReason": null
           },
           {
+            "name": "dormantCount",
+            "description": "Members who donated at some point but whose most recent\nDONATION is older than `dormantThresholdDays` (default 30). See\nthe same-named field on `SysAdminCommunityOverview` for the\nfull semantic. Exposed at L2 so the user-scope card can show\nthe dormancy ratio directly without re-aggregating from the\nmember list.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "memberList",
             "description": "Paginated member list — see type doc.",
             "args": [],
@@ -23948,6 +23976,22 @@
               "ofType": {
                 "kind": "SCALAR",
                 "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "dormantCount",
+            "description": "Members who donated at some point but whose most recent\nDONATION is older than `dormantThresholdDays` (default 30).\nDistinct from `segmentCounts.passiveCount` (= \"latent\", never\ndonated): operators care about the difference because the\nintervention is different — re-engage the dormant, onboard the\nlatent.\n\nComputed as\n  COUNT(DISTINCT user_id)\n  WHERE the user has at least one historical DONATION in this\n    community AND `MAX(donation.created_at) < asOf -\n    dormantThresholdDays`\n    AND status='JOINED' at asOf\n\nInvariants the client may assert:\n  0 <= dormantCount <= totalMembers - segmentCounts.passiveCount\n\nThe upper bound holds because dormant members are by\nconstruction ever-donated, which `passiveCount` excludes.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
                 "ofType": null
               }
             },
@@ -24272,6 +24316,18 @@
               "ofType": null
             },
             "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "dormantThresholdDays",
+            "description": "Days since a member's most recent DONATION above which they are\nclassified as \"dormant\" — i.e. they donated at some point but\nhave gone quiet. Used to populate\n`SysAdminCommunityOverview.dormantCount`.\n\nDistinct from `segmentCounts.passiveCount` (= \"latent\", never\ndonated): operators care about the difference because the\nintervention is different (re-engage a sleeper vs onboard a\nnewcomer). A member with `MAX(donation.created_at) < asOf -\ndormantThresholdDays` is dormant.\n\nDefault 30 (≈ one month of silence). Effective range 1..365;\nvalues outside are silently clamped on the server.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "defaultValue": "30",
             "isDeprecated": false,
             "deprecationReason": null
           },
