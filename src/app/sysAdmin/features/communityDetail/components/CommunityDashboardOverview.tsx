@@ -253,6 +253,7 @@ export function CommunityDashboardOverview({
       <Scope
         title="ネットワーク"
         className="max-w-xl"
+        note="関係性の広がりとポイントの還流を測るスコープ。ハブ比率と連鎖率は今月時点の状態、平均送付先数と流通の偏りは全期間の累計を表す。時間軸が混在するため、横並びで比較せず、各カードを単独のシグナルとして読む。"
         detailHref={
           enableSubpageLinks ? `/sysAdmin/${data.communityId}/network` : undefined
         }
@@ -327,6 +328,7 @@ export function CommunityDashboardOverview({
 
       <Scope
         title="アクティビティ"
+        note="時間とともに活動がどう続いているかを測るスコープ。MAU は今月、週次継続率は直近週、コホート M+1 は最新完了月、流通量は前月比と粒度が異なる。横並びで比較せず、各カードを独立のスナップショットとして読む。"
         detailHref={enableSubpageLinks ? `/sysAdmin/${data.communityId}/activity` : undefined}
       >
         <MetricCard
@@ -450,6 +452,7 @@ export function CommunityDashboardOverview({
 
       <Scope
         title="ユーザー"
+        note="asOf 時点での個人状態の分布をスナップショットするスコープ。誰が今コミュニティに居て、どう関わっているかを表す。各指標は現時点の状態のため時間軸の差は無いが、変化の経過はアクティビティと併読。"
         detailHref={enableSubpageLinks ? `/sysAdmin/${data.communityId}/users` : undefined}
       >
         <MetricCard
@@ -512,26 +515,34 @@ export function CommunityDashboardOverview({
 function Scope({
   title,
   detailHref,
+  note,
   children,
   className,
 }: {
   title: string;
   detailHref?: string;
+  /** 見出し直下に muted で表示する短い読み方ガイド (各 ~100 字)。 */
+  note?: string;
   children: React.ReactNode;
   className?: string;
 }) {
   return (
     <section className={cn("flex flex-col gap-3", className)}>
-      <header className="flex items-baseline justify-between gap-3 px-1">
-        <h2 className="text-lg font-semibold">{title}</h2>
-        {detailHref && (
-          <Link
-            href={detailHref}
-            className="inline-flex items-center gap-0.5 text-xs text-muted-foreground hover:underline"
-          >
-            詳細を見る
-            <ChevronRight className="h-3 w-3" />
-          </Link>
+      <header className="flex flex-col gap-1.5 px-1">
+        <div className="flex items-baseline justify-between gap-3">
+          <h2 className="text-lg font-semibold">{title}</h2>
+          {detailHref && (
+            <Link
+              href={detailHref}
+              className="inline-flex items-center gap-0.5 text-xs text-muted-foreground hover:underline"
+            >
+              詳細を見る
+              <ChevronRight className="h-3 w-3" />
+            </Link>
+          )}
+        </div>
+        {note && (
+          <p className="text-xs leading-relaxed text-muted-foreground">{note}</p>
         )}
       </header>
       <div className="flex flex-col gap-3">{children}</div>
