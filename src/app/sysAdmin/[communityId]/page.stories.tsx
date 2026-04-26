@@ -7,11 +7,11 @@ import { DEFAULT_SEGMENT_THRESHOLDS } from "../_shared/derive";
 import { makeCommunityDetailPayload } from "../_shared/fixtures/sysAdminDashboard";
 
 // page.tsx は async RSC で SSR fetch するため Storybook から直接 render できない。
-// Client 部分 (`CommunityDetailPageClient`) と route の container (max-w-7xl p-4)
-// をラップで再現する。initialData=null にして Apollo mock 経路をテスト。
+// Client 部分 (`CommunityDetailPageClient`) と route の container を再現する。
+// initialData=null にして Apollo mock 経路をテスト。
 function CommunityDetailPageShell({ communityId }: { communityId: string }) {
   return (
-    <div className="mx-auto max-w-7xl p-4">
+    <div className="mx-auto max-w-mobile-l p-4 pt-8">
       <CommunityDetailPageClient communityId={communityId} initialData={null} />
     </div>
   );
