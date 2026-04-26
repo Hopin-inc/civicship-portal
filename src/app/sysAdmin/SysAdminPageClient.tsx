@@ -63,13 +63,16 @@ export function SysAdminPageClient({ initialData }: Props) {
           {sysAdminDashboardJa.state.empty}
         </div>
       ) : (
-        // L2 詳細画面は別 PR で導入予定。本 PR では一覧表示のみのため
-        // 行はクリック不可にしている (onClick を渡さない)。
         <div className="flex flex-col">
           {communities.map((community, idx) => (
             <div key={community.communityId}>
               {idx !== 0 && <hr className="border-muted" />}
-              <CommunityRow row={community} />
+              <CommunityRow
+                row={community}
+                onClick={(communityId) =>
+                  router.push(`/sysAdmin/${communityId}`)
+                }
+              />
             </div>
           ))}
         </div>
