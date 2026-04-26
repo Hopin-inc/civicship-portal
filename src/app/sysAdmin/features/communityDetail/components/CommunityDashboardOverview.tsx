@@ -176,10 +176,14 @@ export function CommunityDashboardOverview({
       ? newMemberCount / totalMembers
       : null;
 
+  // codegen の scalar mapping は `Datetime: Date` だが Apollo に scalar
+  // deserializer は無く、SSR / network から JSON で来るのは ISO 文字列。
+  // 直接 `.getTime()` を呼ぶと runtime で TypeError なので必ず Date でラップ。
   const ageMonths =
     summary.dataFrom && summary.dataTo
       ? Math.round(
-          (summary.dataTo.getTime() - summary.dataFrom.getTime()) /
+          (new Date(summary.dataTo).getTime() -
+            new Date(summary.dataFrom).getTime()) /
             (1000 * 60 * 60 * 24 * 30),
         )
       : null;
