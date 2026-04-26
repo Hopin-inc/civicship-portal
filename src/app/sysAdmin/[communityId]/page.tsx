@@ -37,9 +37,11 @@ export default async function SysAdminCommunityDetailPage({ params }: Props) {
     fetchSysAdminDashboardServer({ asOf: undefined }),
   ]);
 
-  const tenureDistribution =
-    l1Data?.communities.find((c) => c.communityId === communityId)
-      ?.tenureDistribution ?? null;
+  const l1Row = l1Data?.communities.find(
+    (c) => c.communityId === communityId,
+  );
+  const tenureDistribution = l1Row?.tenureDistribution ?? null;
+  const hubMemberCount = l1Row?.hubMemberCount ?? null;
 
   return (
     <div className="mx-auto max-w-7xl p-4">
@@ -47,6 +49,7 @@ export default async function SysAdminCommunityDetailPage({ params }: Props) {
         communityId={communityId}
         initialData={initialData}
         tenureDistribution={tenureDistribution}
+        hubMemberCount={hubMemberCount}
       />
     </div>
   );

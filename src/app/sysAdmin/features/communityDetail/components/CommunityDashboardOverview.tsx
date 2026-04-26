@@ -43,8 +43,8 @@ type DetailPayload = NonNullable<
 
 type Props = {
   data: DetailPayload;
-  /** L2 schema には未掲載のため preview として外部から渡す。production
-   * では undefined を渡すと「未計測」表示にフォールバック。 */
+  /** L1 dashboard 経由で取得した hub メンバー数。L2 schema 未掲載のため
+   * page.tsx 側で L1 と並列 fetch して受け渡す。未指定なら「未実装」表示。 */
   hubMemberCount?: number;
   communityName?: string;
   newMemberCount?: number;
@@ -52,15 +52,10 @@ type Props = {
    * 直接乗っていないため、page.tsx 側で L1 と並列 fetch して受け渡す。
    * 未指定の場合は memberList の上位寄与者ベースで近似する。 */
   tenureDistribution?: GqlSysAdminTenureDistribution;
-  /** stage 分類の閾値 (server に渡している値と同じ)。「送付先孤立」アラートの
-   * habitual 判定に使う。未指定時は default tier1=0.7 にフォールバック。 */
-  tier1?: number;
   /** subpage CTA を出すか (storybook design preview 専用、production では
    * subpage 未実装なので default false)。 */
   enableSubpageLinks?: boolean;
 };
-
-const DEFAULT_TIER1 = 0.7;
 
 const SCOPE_COLOR = {
   network: "text-blue-600",
@@ -72,8 +67,8 @@ const SCOPE_COLOR = {
  * 4 階層スコープ (コミュニティ ⊃ ネットワーク ⊃ アクティビティ ⊃ ユーザー)
  * を Apple Health 風 の塗りカードで縦積みした overview。各 metric が独立
  * カードで、icon + タイトル(scope 色) + meta(右上) + 大きな数値 + mini viz
- * (ring / sparkline / なし) という統一フォーマット。未計測は同 shell で
- * 「未計測」テキストのみ。
+ * (ring / sparkline / なし) という統一フォーマット。未実装は同 shell で
+ * 「未実装」テキストのみ。
  */
 export function CommunityDashboardOverview({
   data,
@@ -81,7 +76,6 @@ export function CommunityDashboardOverview({
   communityName,
   newMemberCount,
   tenureDistribution,
-  tier1 = DEFAULT_TIER1,
   enableSubpageLinks = false,
 }: Props) {
   // Schema 上は summary / stages / memberList とその nested buckets は全て
@@ -131,25 +125,8 @@ export function CommunityDashboardOverview({
   const regularCount = stages.regular.count;
   const latentCount = stages.latent.count;
 
-  // 「送付先孤立」アラートは loaded subset で完結させる。memberList は
-  // totalPointsOut DESC で top N (limit=50) のみ。分子 (memberList の中の
-  // habitual ∧ 単一相手) と分母 (memberList の中の habitual) を同じスケール
-  // に揃えることで、stages.habitual.count (server-wide) と memberList を
-  // 混ぜたときの過小評価を防ぐ。tier1 は user-configurable な knob と一致
-  // させる (0.7 hardcode を撤廃)。
-  const loadedHabitual = data.memberList.users.filter(
-    (u) => u.userSendRate >= tier1,
-  );
-  const isolatedCount = loadedHabitual.filter(
-    (u) => u.uniqueDonationRecipients <= 1,
-  ).length;
-  const loadedHabitualCount = loadedHabitual.length;
-
   const hubProvided = hubMemberCount !== undefined;
   const hubPct = hubProvided && totalMembers > 0 ? hubMemberCount / totalMembers : 0;
-  const isolatedRatio =
-    loadedHabitualCount > 0 ? isolatedCount / loadedHabitualCount : 0;
-  const isolatedAlert = loadedHabitualCount > 0 && isolatedRatio >= 0.3;
 
   const activeMembers = data.memberList.users.filter((u) => u.userSendRate > 0);
   const avgRecipients =
@@ -243,7 +220,8 @@ export function CommunityDashboardOverview({
   return (
     <div className="flex flex-col gap-6">
       {communityName && (
-        <header className="flex flex-col gap-1">
+        // px-5: 中身の MetricCard の p-5 と左揃えするため。
+        <header className="flex max-w-xl flex-col gap-1 px-5">
           <div className="flex items-baseline gap-3">
             <h1 className="text-2xl font-semibold leading-tight">
               {communityName}
@@ -274,6 +252,7 @@ export function CommunityDashboardOverview({
 
       <Scope
         title="ネットワーク"
+        className="max-w-xl"
         detailHref={
           enableSubpageLinks ? `/sysAdmin/${data.communityId}/network` : undefined
         }
@@ -344,12 +323,6 @@ export function CommunityDashboardOverview({
           }
         />
 
-        {isolatedAlert && (
-          <Issue title="送付先の孤立">
-            上位寄与者の習慣化層 {loadedHabitualCount} 名のうち {isolatedCount} 名 (
-            {toPct(isolatedRatio)}) が単一相手のみ。送付先の多様化が改善ポイント。
-          </Issue>
-        )}
       </Scope>
 
       <Scope
@@ -447,6 +420,7 @@ export function CommunityDashboardOverview({
                   <PercentDelta
                     value={donationMoM}
                     className="text-4xl tracking-tight"
+                    arrowClassName="mr-1 align-baseline text-xl font-medium"
                   />
                 }
               />
@@ -539,13 +513,15 @@ function Scope({
   title,
   detailHref,
   children,
+  className,
 }: {
   title: string;
   detailHref?: string;
   children: React.ReactNode;
+  className?: string;
 }) {
   return (
-    <section className="flex flex-col gap-3">
+    <section className={cn("flex flex-col gap-3", className)}>
       <header className="flex items-baseline justify-between gap-3 px-1">
         <h2 className="text-lg font-semibold">{title}</h2>
         {detailHref && (
@@ -597,7 +573,7 @@ function MetricCard({
       <div className="mt-3 flex items-end justify-between gap-3">
         <div className="min-w-0 flex-1">
           {status === "todo" ? (
-            <span className="text-base text-muted-foreground">未計測</span>
+            <span className="text-base text-muted-foreground">未実装</span>
           ) : (
             hero
           )}

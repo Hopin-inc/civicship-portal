@@ -19,12 +19,17 @@ type Props = {
   /** L1 dashboard 経由で取得した、この community の tenure 分布。L2 schema
    * が tenureDistribution を露出するまでの SSR 横断の橋渡し。 */
   tenureDistribution?: GqlSysAdminTenureDistribution | null;
+  /** L1 dashboard 経由で取得した、この community の hub メンバー数。L2
+   * schema には未掲載のため、tenureDistribution と同じく page.tsx で
+   * L1 と並列 fetch して受け渡す。 */
+  hubMemberCount?: number | null;
 };
 
 export function CommunityDetailPageClient({
   communityId,
   initialData,
   tenureDistribution,
+  hubMemberCount,
 }: Props) {
   const dashboard = useDashboardControls();
   const { loading, error, detail: data } = useCommunityDetail({
@@ -61,7 +66,7 @@ export function CommunityDetailPageClient({
       communityName={data.communityName}
       newMemberCount={newMemberCount}
       tenureDistribution={tenureDistribution ?? undefined}
-      tier1={dashboard.state.tier1}
+      hubMemberCount={hubMemberCount ?? undefined}
     />
   );
 }
