@@ -25,7 +25,9 @@ export default async function SysAdminCommunityDetailPage({ params }: Props) {
       asOf: undefined,
       segmentThresholds: DEFAULT_SEGMENT_THRESHOLDS,
       windowMonths: 3,
-      userFilter: {},
+      // schema default の minSendRate=0.7 を明示的に外す。詳細は
+      // useCommunityDetail.ts の FIXED_USER_FILTER コメント参照。
+      userFilter: { minSendRate: 0 },
       userSort: {
         field: GqlSysAdminUserSortField.TotalPointsOut,
         order: GqlSysAdminSortOrder.Desc,

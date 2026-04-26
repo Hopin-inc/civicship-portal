@@ -47,7 +47,12 @@ export type CommunityDetailResult = {
 // メンバー絞り込み / 並び替えの UI を撤廃し、Sys Admin 視点で「貢献度の高い順」に
 // 固定する。totalPointsOut は頻度 (送付月数) と金額の双方を内包しているため
 // 単一指標として最も全体把握に向く。
-const FIXED_USER_FILTER = {} as const;
+//
+// minSendRate は明示的に 0 を渡す。schema default が 0.7 (habitual のみ)
+// で、空のまま渡すと server 側で silent に filter され、loaded 上位 N 名で
+// 計算する派生メトリクス (avgRecipients / paretoTopShare / tenuredRatio /
+// isolated alert) が全部 habitual-only に偏る。
+const FIXED_USER_FILTER = { minSendRate: 0 } as const;
 const FIXED_USER_SORT = {
   field: GqlSysAdminUserSortField.TotalPointsOut,
   order: GqlSysAdminSortOrder.Desc,

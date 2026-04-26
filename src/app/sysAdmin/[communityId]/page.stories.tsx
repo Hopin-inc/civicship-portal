@@ -33,7 +33,7 @@ const variables = {
     asOf: undefined,
     segmentThresholds: DEFAULT_SEGMENT_THRESHOLDS,
     windowMonths: 3,
-    userFilter: {},
+    userFilter: { minSendRate: 0 },
     userSort: { field: "TOTAL_POINTS_OUT", order: "DESC" },
     limit: 50,
   },
