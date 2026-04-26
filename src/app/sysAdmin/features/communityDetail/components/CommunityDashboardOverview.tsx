@@ -228,8 +228,8 @@ export function CommunityDashboardOverview({
   return (
     <div className="flex flex-col gap-6">
       {communityName && (
-        // px-5: 中身の MetricCard の p-5 と左揃えするため。
-        <header className="flex max-w-xl flex-col gap-1 px-5">
+        // px-1: ネットワーク等 scope 見出し (px-1) と左揃え。
+        <header className="flex max-w-xl flex-col gap-1 px-1">
           <div className="flex items-baseline gap-3">
             <h1 className="text-2xl font-semibold leading-tight">
               {communityName}
