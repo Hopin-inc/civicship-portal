@@ -209,6 +209,13 @@ export function CommunityDashboardOverview({
       ? newMemberCount / totalMembers
       : null;
 
+  // 休眠化率: 「過去送付経験あり ∧ 直近 dormantThresholdDays (default 30)
+  // 日 送付なし」のメンバー比率。L2 payload の dormantCount は server で
+  // 計算済 (issue #918 + dormant 拡張)。stages.latent (一度も送付なし) と
+  // は別軸 — 「再活性化の余地がある層」を表す。
+  const dormantRate =
+    totalMembers > 0 ? data.dormantCount / totalMembers : null;
+
   // sparkline data
   const mauSeries = data.monthlyActivityTrend
     .map((m) => m.communityActivityRate)
@@ -495,7 +502,15 @@ export function CommunityDashboardOverview({
           icon={Moon}
           colorClass={SCOPE_COLOR.user}
           title="休眠化率"
-          status="todo"
+          meta="直近 30 日"
+          hero={
+            <Hero value={dormantRate != null ? toPct(dormantRate) : "-"} />
+          }
+          viz={
+            dormantRate != null ? (
+              <Ring value={dormantRate} colorClass={SCOPE_COLOR.user} />
+            ) : undefined
+          }
         />
 
         {habitualOverRegular && (

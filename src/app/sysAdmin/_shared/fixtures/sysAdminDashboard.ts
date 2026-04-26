@@ -124,12 +124,19 @@ export const makeCommunityOverview = (
   const hubMemberCount =
     overrides.hubMemberCount ??
     Math.min(Math.round(totalMembers * DEFAULT_HUB_RATIO), windowActivity.senderCount);
+  // dormantCount のデフォルト: 「過去送付経験あり ∧ 直近送付なし」のメンバー
+  // 数。invariant: 0 <= dormantCount <= totalMembers - segmentCounts.passiveCount
+  // (passive は currently active という別カテゴリなので排除する)。簡易に
+  // totalMembers の 12% を当てる。
+  const dormantCount =
+    overrides.dormantCount ?? Math.round(totalMembers * 0.12);
   return {
     __typename: "SysAdminCommunityOverview",
     communityId: overrides.communityId ?? "community-a",
     communityName: overrides.communityName ?? "コミュニティA",
     totalMembers,
     hubMemberCount,
+    dormantCount,
     segmentCounts: overrides.segmentCounts ?? defaultSegmentCountsFor(totalMembers),
     tenureDistribution: overrides.tenureDistribution ?? makeTenureDistribution(),
     windowActivity,
@@ -317,6 +324,7 @@ export const makeCommunityDetailPayload = (
       // windowMonths must match the runtime default (3) so stories that
       // rely on the SSR-skip path don't permanently spin in loading state.
       windowMonths: 3,
+      dormantCount: 14,
       alerts: makeAlerts(),
       summary: makeSummaryCard(),
       stages: makeStageDistribution(),

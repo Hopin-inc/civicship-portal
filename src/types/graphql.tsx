@@ -5363,6 +5363,7 @@ export type GqlSysAdminCommunityOverviewRowFieldsFragment = {
   communityName: string;
   totalMembers: number;
   hubMemberCount: number;
+  dormantCount: number;
   segmentCounts: {
     __typename?: "SysAdminSegmentCounts";
     total: number;
@@ -5525,6 +5526,7 @@ export type GqlGetSysAdminDashboardQuery = {
       communityName: string;
       totalMembers: number;
       hubMemberCount: number;
+      dormantCount: number;
       segmentCounts: {
         __typename?: "SysAdminSegmentCounts";
         total: number;
@@ -5570,6 +5572,7 @@ export type GqlGetSysAdminCommunityDetailQuery = {
     communityId: string;
     communityName: string;
     windowMonths: number;
+    dormantCount: number;
     alerts: {
       __typename?: "SysAdminCommunityAlerts";
       activeDrop: boolean;
@@ -9082,6 +9085,7 @@ export const SysAdminCommunityOverviewRowFieldsFragmentDoc = gql`
     communityName
     totalMembers
     hubMemberCount
+    dormantCount
     segmentCounts {
       ...SysAdminSegmentCountsFields
     }
@@ -11386,6 +11390,7 @@ export const GetSysAdminCommunityDetailDocument = gql`
       communityId
       communityName
       windowMonths
+      dormantCount
       alerts {
         ...SysAdminAlertFields
       }

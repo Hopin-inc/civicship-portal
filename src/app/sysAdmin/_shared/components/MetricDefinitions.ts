@@ -119,6 +119,13 @@ export const METRIC_DEFINITIONS: Record<string, MetricDefinition> = {
       "habitual: send_rate ≥ tier1 / regular: tier2 ≤ send_rate < tier1 / occasional: 0 < send_rate < tier2 / latent: send_rate = 0",
     note: "ノード軸 (個人の頻度継続性) のステージ分類。デフォルト tier1=0.7, tier2=0.4。閾値はステージ分布の「分類設定」から変更可能。ネットワーク軸の `Hub user%` (関係性の広さ) とは別軸で、両者は独立に評価される。",
   },
+  dormantRate: {
+    title: "休眠化率",
+    formula:
+      "dormantCount ÷ totalMembers (default 30 日以上 DONATION 送付がない && 過去に 1 度以上送付経験があるメンバー)",
+    note: "「以前は送ってたが止まった」再活性化の対象層。`stages.latent` (一度も送付なし = 未着手の潜在層) とは別軸。閾値 (`dormantThresholdDays`) はバックエンド入力で変更可能。",
+    range: "0〜100%",
+  },
   asOf: {
     title: "集計日",
     formula: "指定日時点の状態を計算対象にする",
@@ -148,4 +155,5 @@ export type MetricKey =
   | "maxChainDepthAllTime"
   | "chainPct"
   | "stages"
+  | "dormantRate"
   | "asOf";

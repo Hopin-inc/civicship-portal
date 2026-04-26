@@ -34,6 +34,7 @@ export const GET_SYS_ADMIN_COMMUNITY_DETAIL = gql`
       communityId
       communityName
       windowMonths
+      dormantCount
       alerts {
         ...SysAdminAlertFields
       }
