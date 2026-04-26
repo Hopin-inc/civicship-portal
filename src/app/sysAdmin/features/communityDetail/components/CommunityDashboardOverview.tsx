@@ -35,7 +35,11 @@ import {
   TenureBar,
   deriveTenuredRatio,
 } from "@/app/sysAdmin/_shared/components/TenureBar";
-import { TENURE_THRESHOLD_DAYS } from "@/app/sysAdmin/_shared/derive";
+import {
+  TENURE_THRESHOLD_DAYS,
+  deriveDormantRate,
+} from "@/app/sysAdmin/_shared/derive";
+import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";
 
 type DetailPayload = NonNullable<
   GqlGetSysAdminCommunityDetailQuery["sysAdminCommunityDetail"]
@@ -100,7 +104,6 @@ export function CommunityDashboardOverview({
       // eslint-disable-next-line no-console
       console.warn("[CommunityDashboardOverview] missing required fields", {
         hasSummary: !!data.summary,
-        hasStages: !!data.stages,
         hasHabitual: !!data.stages?.habitual,
         hasRegular: !!data.stages?.regular,
         hasOccasional: !!data.stages?.occasional,
@@ -209,12 +212,10 @@ export function CommunityDashboardOverview({
       ? newMemberCount / totalMembers
       : null;
 
-  // 休眠化率: 「過去送付経験あり ∧ 直近 dormantThresholdDays (default 30)
-  // 日 送付なし」のメンバー比率。L2 payload の dormantCount は server で
-  // 計算済 (issue #918 + dormant 拡張)。stages.latent (一度も送付なし) と
-  // は別軸 — 「再活性化の余地がある層」を表す。
-  const dormantRate =
-    totalMembers > 0 ? data.dormantCount / totalMembers : null;
+  const dormantRate = deriveDormantRate({
+    totalMembers: summary.totalMembers,
+    dormantCount: data.dormantCount,
+  });
 
   // sparkline data
   const mauSeries = data.monthlyActivityTrend
@@ -260,7 +261,7 @@ export function CommunityDashboardOverview({
       <Scope
         title="ネットワーク"
         className="max-w-xl"
-        note="関係性の広がりとポイントの還流を測るスコープ。ハブ比率と連鎖率は今月時点の状態、平均送付先数と流通の偏りは全期間の累計を表す。時間軸が混在するため、横並びで比較せず、各カードを単独のシグナルとして読む。"
+        note={sysAdminDashboardJa.scopeNotes.network}
         detailHref={
           enableSubpageLinks ? `/sysAdmin/${data.communityId}/network` : undefined
         }
@@ -335,7 +336,7 @@ export function CommunityDashboardOverview({
 
       <Scope
         title="アクティビティ"
-        note="時間とともに活動がどう続いているかを測るスコープ。MAU は今月、週次継続率は直近週、コホート M+1 は最新完了月、流通量は前月比と粒度が異なる。横並びで比較せず、各カードを独立のスナップショットとして読む。"
+        note={sysAdminDashboardJa.scopeNotes.activity}
         detailHref={enableSubpageLinks ? `/sysAdmin/${data.communityId}/activity` : undefined}
       >
         <MetricCard
@@ -459,7 +460,7 @@ export function CommunityDashboardOverview({
 
       <Scope
         title="ユーザー"
-        note="asOf 時点での個人状態の分布をスナップショットするスコープ。誰が今コミュニティに居て、どう関わっているかを表す。各指標は現時点の状態のため時間軸の差は無いが、変化の経過はアクティビティと併読。"
+        note={sysAdminDashboardJa.scopeNotes.user}
         detailHref={enableSubpageLinks ? `/sysAdmin/${data.communityId}/users` : undefined}
       >
         <MetricCard

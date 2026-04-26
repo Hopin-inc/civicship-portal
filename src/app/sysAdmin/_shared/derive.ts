@@ -65,6 +65,17 @@ export function deriveHubUserPct(row: GqlSysAdminCommunityOverview): number {
   return row.hubMemberCount / row.totalMembers;
 }
 
+// 休眠化率 = dormantCount / totalMembers。dormantCount は server で計算済
+// (「過去送付経験あり ∧ 直近 dormantThresholdDays 日 送付なし」)。
+// stages.latent (一度も送付なし) とは別軸 — 「再活性化の余地」を表す。
+export function deriveDormantRate(row: {
+  totalMembers: number;
+  dormantCount: number;
+}): number | null {
+  if (row.totalMembers === 0) return null;
+  return row.dormantCount / row.totalMembers;
+}
+
 // Activity-flow leaky-bucket pair derived from windowActivity raw counts.
 //   newlyActivated = senderCount     - retainedSenders   (entered active pool)
 //   churned        = senderCountPrev - retainedSenders   (left active pool)

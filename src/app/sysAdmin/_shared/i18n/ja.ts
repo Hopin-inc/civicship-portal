@@ -77,6 +77,17 @@ export const sysAdminDashboardJa = {
   delta: {
     noData: "-",
   },
+  // L2 overview の各 scope 見出し直下に出す muted 読み方ガイド。
+  // 各 ~100 字で「指標ごとの時間軸の違い」を明示。MetricDefinitions は
+  // 個別指標の glossary、こちらは scope 単位の解釈レンズ。
+  scopeNotes: {
+    network:
+      "関係性の広がりとポイントの還流を測るスコープ。ハブ比率と連鎖率は今月時点の状態、平均送付先数と流通の偏りは全期間の累計を表す。時間軸が混在するため、横並びで比較せず、各カードを単独のシグナルとして読む。",
+    activity:
+      "時間とともに活動がどう続いているかを測るスコープ。MAU は今月、週次継続率は直近週、コホート M+1 は最新完了月、流通量は前月比と粒度が異なる。横並びで比較せず、各カードを独立のスナップショットとして読む。",
+    user:
+      "asOf 時点での個人状態の分布をスナップショットするスコープ。誰が今コミュニティに居て、どう関わっているかを表す。各指標は現時点の状態のため時間軸の差は無いが、変化の経過はアクティビティと併読。",
+  },
 } as const;
 
 export type SysAdminDashboardJa = typeof sysAdminDashboardJa;
