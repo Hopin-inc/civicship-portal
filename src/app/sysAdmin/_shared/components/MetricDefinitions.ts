@@ -13,14 +13,16 @@ export const METRIC_DEFINITIONS: Record<string, MetricDefinition> = {
   },
   communityActivityRate: {
     title: "MAU%",
-    formula: "MAU ÷ asOf 時点の総メンバー数 (rolling 窓は windowDays 日、default 28)",
-    note: "コミュニティ単位の MAU%。個人の送付率 (user_send_rate) とは別指標。本ツールでの Active = DONATION 送付者。",
+    formula:
+      "MAU 送付者 ÷ 総メンバー数。L1 は rolling windowDays 日 (default 28) 窓、L2 は最新完了月の暦月集計。",
+    note: "同じコミュニティでも L1 と L2 で数字が異なる場合がある — 時間軸が違うため。L1 = 介入判断用の即時シグナル、L2 = 確定済み月次の実績。個人の送付率 (user_send_rate) とは別指標で、本ツールでの Active = DONATION 送付者。",
     range: "0〜100%",
   },
   growthRateActivity: {
     title: "MAU% 前月比",
-    formula: "(現窓 MAU% − 前窓 MAU%) ÷ 前窓 MAU% (窓は windowDays 日、default 28)",
-    note: "負値は MAU% が前窓より低下。前窓の MAU% が 0 のときは null。",
+    formula:
+      "(現期 MAU% − 前期 MAU%) ÷ 前期 MAU%。L1 は windowDays 日窓ベース、L2 は完了月ベース (MoM)。",
+    note: "負値は MAU% が前期より低下。前期 MAU% が 0 のときは null。",
   },
   hubUserPct: {
     title: "Hub user%",
@@ -93,16 +95,22 @@ export const METRIC_DEFINITIONS: Record<string, MetricDefinition> = {
     formula: "コミュニティ内で過去に送られた DONATION ポイントの全合計",
     note: "MV 集計に依存せず t_transactions を直接集計するため、MV 保持期間の影響を受けない。",
   },
+  chainDepth: {
+    title: "chain_depth (連鎖深度)",
+    formula: "1 件の DONATION transaction の連鎖位置 (整数、最小 1)",
+    note:
+      "1 = chain の root (自前ポイントから送付 / 受信履歴のない初回 donation)。N+1 = 受信した parent transaction の chain_depth に +1 を伝播。例: A → B (depth 1)、B が A から受けた pt を C に送ると B → C (depth 2)、さらに C → D (depth 3)。「受信を起点にどこまで連鎖したか」 を測る指標。",
+  },
   maxChainDepthAllTime: {
     title: "最大チェーン深度",
-    formula: "DONATION の連鎖 (chain_depth) のうち過去最大値",
-    note: "A→B→C→D のように連鎖して送られた場合の最深層。深いほどコミュニティ内の波及効果が高い。",
+    formula: "全期間の DONATION のうち chain_depth が最大の値",
+    note: "コミュニティ内で観測された最も深い連鎖。`1` は連鎖が一度も発生していない (= 全 donation が root)、`>= 2` は受信→送付の伝播が起きている。例: `4` なら A → B → C → D まで 3 段伝播 (root が depth 1)。",
   },
   chainPct: {
-    title: "チェーン率",
+    title: "連鎖率",
     formula:
-      "月内 DONATION のうち chain_depth > 0 のトランザクション数 ÷ 全 DONATION 数",
-    note: "「誰かに送ってもらったポイントをさらに送った」流れの割合。",
+      "月内 DONATION のうち chain_depth ≥ 2 のトランザクション数 ÷ 全 DONATION 数",
+    note: "「受信を起点に転送した」 transaction の比率。chain_depth = 1 (root、自前起点) と chain_depth ≥ 2 (受信を起点に転送) の比で、コミュニティ内でポイントが還流しているかを測る。",
     range: "0〜100%",
   },
   stages: {
@@ -110,6 +118,13 @@ export const METRIC_DEFINITIONS: Record<string, MetricDefinition> = {
     formula:
       "habitual: send_rate ≥ tier1 / regular: tier2 ≤ send_rate < tier1 / occasional: 0 < send_rate < tier2 / latent: send_rate = 0",
     note: "ノード軸 (個人の頻度継続性) のステージ分類。デフォルト tier1=0.7, tier2=0.4。閾値はステージ分布の「分類設定」から変更可能。ネットワーク軸の `Hub user%` (関係性の広さ) とは別軸で、両者は独立に評価される。",
+  },
+  dormantRate: {
+    title: "休眠化率",
+    formula:
+      "dormantCount ÷ totalMembers (default 30 日以上 DONATION 送付がない && 過去に 1 度以上送付経験があるメンバー)",
+    note: "「以前は送ってたが止まった」再活性化の対象層。`stages.latent` (一度も送付なし = 未着手の潜在層) とは別軸。閾値 (`dormantThresholdDays`) はバックエンド入力で変更可能。",
+    range: "0〜100%",
   },
   asOf: {
     title: "集計日",
@@ -136,7 +151,9 @@ export type MetricKey =
   | "donationOutMonths"
   | "totalPointsOut"
   | "totalDonationPointsAllTime"
+  | "chainDepth"
   | "maxChainDepthAllTime"
   | "chainPct"
   | "stages"
+  | "dormantRate"
   | "asOf";
