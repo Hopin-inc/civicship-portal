@@ -226,10 +226,10 @@ export function CommunityDashboardOverview({
   );
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-3">
       {communityName && (
         // px-1: ネットワーク等 scope 見出し (px-1) と左揃え。
-        <header className="flex max-w-xl flex-col gap-1 px-1">
+        <header className="flex flex-col gap-1 px-1">
           <div className="flex items-baseline gap-3">
             <h1 className="text-2xl font-semibold leading-tight">
               {communityName}
@@ -258,9 +258,9 @@ export function CommunityDashboardOverview({
         </header>
       )}
 
+      <div className="flex flex-col gap-6">
       <Scope
         title="ネットワーク"
-        className="max-w-xl"
         note={sysAdminDashboardJa.scopeNotes.network}
         detailHref={
           enableSubpageLinks ? `/sysAdmin/${data.communityId}/network` : undefined
@@ -520,6 +520,7 @@ export function CommunityDashboardOverview({
           </Issue>
         )}
       </Scope>
+      </div>
     </div>
   );
 }
