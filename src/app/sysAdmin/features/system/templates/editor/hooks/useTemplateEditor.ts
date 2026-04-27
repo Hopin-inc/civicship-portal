@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   GqlReportVariant,
   useGetReportTemplateQuery,
@@ -29,7 +29,7 @@ export function useTemplateEditor(variant: GqlReportVariant | null) {
 
   const [save, { loading: saving, error: saveError }] = useUpdateReportTemplateMutation();
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     if (!variant || !template) return;
     await save({
       variables: {
@@ -50,7 +50,7 @@ export function useTemplateEditor(variant: GqlReportVariant | null) {
       },
     });
     await refetch();
-  };
+  }, [variant, template, save, systemPrompt, userPromptTemplate, refetch]);
 
   const isDirty =
     template != null &&

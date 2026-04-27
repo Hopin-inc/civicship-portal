@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
+import { Button } from "@/components/ui/button";
 import { useGetAdminBrowseReportsQuery } from "@/types/graphql";
 import { variantLabel, statusLabel } from "@/app/sysAdmin/features/system/templates/shared/labels";
 
@@ -16,12 +17,14 @@ type Props = {
  * L2 詳細の [レポート] タブ。
  * adminBrowseReports query で community 単位のレポート発行履歴を取得し、
  * status / variant / publishedAt の table を表示。
+ * cursor pagination は「もっと見る」ボタン経由で段階ロード。
  */
 export function CommunityReportsTab({ communityId }: Props) {
-  const { data, loading, error } = useGetAdminBrowseReportsQuery({
+  const { data, loading, error, fetchMore } = useGetAdminBrowseReportsQuery({
     variables: { communityId, first: PAGE_SIZE },
     fetchPolicy: "cache-and-network",
   });
+  const [loadingMore, setLoadingMore] = useState(false);
 
   const reports = useMemo(
     () =>
@@ -32,6 +35,29 @@ export function CommunityReportsTab({ communityId }: Props) {
   );
 
   const totalCount = data?.adminBrowseReports.totalCount ?? 0;
+  const hasNextPage = data?.adminBrowseReports.pageInfo.hasNextPage ?? false;
+  const endCursor = data?.adminBrowseReports.pageInfo.endCursor ?? null;
+
+  const handleLoadMore = async () => {
+    if (!endCursor || loadingMore) return;
+    setLoadingMore(true);
+    try {
+      await fetchMore({
+        variables: { cursor: endCursor, first: PAGE_SIZE },
+        updateQuery: (prev, { fetchMoreResult }) => ({
+          adminBrowseReports: {
+            ...fetchMoreResult.adminBrowseReports,
+            edges: [
+              ...(prev.adminBrowseReports.edges ?? []),
+              ...(fetchMoreResult.adminBrowseReports.edges ?? []),
+            ],
+          },
+        }),
+      });
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   if (loading && reports.length === 0) {
     return <LoadingIndicator fullScreen={false} />;
@@ -53,7 +79,9 @@ export function CommunityReportsTab({ communityId }: Props) {
     <div className="space-y-4 py-4">
       <div className="flex items-baseline justify-between text-body-sm text-muted-foreground">
         <span>レポート発行履歴</span>
-        <span className="tabular-nums">{totalCount} 件</span>
+        <span className="tabular-nums">
+          {reports.length} / {totalCount} 件
+        </span>
       </div>
       <div className="overflow-x-auto rounded border border-border">
         <table className="w-full text-body-sm">
@@ -81,10 +109,17 @@ export function CommunityReportsTab({ communityId }: Props) {
           </tbody>
         </table>
       </div>
-      {data?.adminBrowseReports.pageInfo.hasNextPage && (
-        <p className="text-body-xs text-muted-foreground text-center">
-          {totalCount} 件中 {reports.length} 件を表示中 (古い履歴は省略)
-        </p>
+      {hasNextPage && (
+        <div className="flex justify-center">
+          <Button
+            variant="tertiary"
+            size="sm"
+            onClick={handleLoadMore}
+            disabled={loadingMore}
+          >
+            {loadingMore ? "読み込み中..." : "もっと見る"}
+          </Button>
+        </div>
       )}
     </div>
   );

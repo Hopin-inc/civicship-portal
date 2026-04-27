@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 /**
  * GraphQL Connection 型 (Relay 互換) の最小形。
@@ -83,7 +83,7 @@ export function useCursorPagination<TItem>({
     setHasNextPage(initial.pageInfo.hasNextPage);
   }, [initial]);
 
-  const loadMore = async () => {
+  const loadMore = useCallback(async () => {
     if (loading || !hasNextPage || !endCursor) return;
     setLoading(true);
     try {
@@ -96,13 +96,13 @@ export function useCursorPagination<TItem>({
     } finally {
       setLoading(false);
     }
-  };
+  }, [loading, hasNextPage, endCursor, fetchMore, pageSize, onError]);
 
-  const reset = (next: ConnectionLike<TItem>) => {
+  const reset = useCallback((next: ConnectionLike<TItem>) => {
     setItems(extractItems(next));
     setEndCursor(next.pageInfo.endCursor ?? null);
     setHasNextPage(next.pageInfo.hasNextPage);
-  };
+  }, []);
 
   return { items, hasNextPage, loading, loadMore, reset };
 }
