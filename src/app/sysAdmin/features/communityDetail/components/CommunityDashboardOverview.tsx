@@ -296,25 +296,32 @@ export function CommunityDashboardOverview({
   // の可能性が高いが、null は HistoryBars 側で gap 表示するので問題なし。
   const d30Series = data.cohortRetention.slice(-6).map((c) => c.retentionM1);
 
-  // アクティベーション・ファネル (送付軸 4 ステージ、コミュニティ全体)。
-  //   加入     = totalMembers
-  //   送付経験 = 1 回でも送付したメンバー (latent ではない人)
-  //   反復送付 = 2 ヶ月以上送付したメンバー (memberList から count)
-  //   習慣化   = stages.habitual segment
+  // アクティベーション・ファネル (送付軸 3 ステージ、コミュニティ全体)。
+  // 分母は totalMembers (= 加入 100%) を暗黙の baseline として使い、ファネル
+  // としては「加入」段は描画しない (header band の "385 名" 表示で既知)。
+  //   送付ユーザー = 1 回でも送付した (= latent ではない人)
+  //   継続ユーザー = 2 ヶ月以上送付した (memberList から count)
+  //   定着ユーザー = stages.habitual segment
   // memberList は totalPointsOut DESC で limit=1000 のため、totalMembers が
-  // 1000 を超える community では 反復送付 が過小評価されうる (sample 不足
-  // フラグで明示)。送付経験 / 習慣化 は server-aggregate なので bias なし。
-  const funnelAcquired = totalMembers;
-  const funnelSent = Math.max(0, totalMembers - stages.latent.count);
-  const funnelRepeated = data.memberList.users.filter(
-    (u) => u.donationOutMonths >= 2,
-  ).length;
-  const funnelHabitual = habitualCount;
+  // 1000 を超える community では 継続ユーザー が過小評価されうる
+  // (sampleDependent フラグで明示)。送付 / 定着 は server-aggregate で bias なし。
+  const funnelDenominator = totalMembers;
   const funnelStages = [
-    { label: "加入", count: funnelAcquired },
-    { label: "送付経験", count: funnelSent },
-    { label: "反復送付", count: funnelRepeated },
-    { label: "習慣化", count: funnelHabitual },
+    {
+      label: "送付ユーザー",
+      count: Math.max(0, totalMembers - stages.latent.count),
+      sampleDependent: false,
+    },
+    {
+      label: "継続ユーザー",
+      count: data.memberList.users.filter((u) => u.donationOutMonths >= 2).length,
+      sampleDependent: true,
+    },
+    {
+      label: "定着ユーザー",
+      count: habitualCount,
+      sampleDependent: false,
+    },
   ];
 
   return (
@@ -354,6 +361,7 @@ export function CommunityDashboardOverview({
           くい「ステージ間の脱落幅」を 1 枚で読ませる。 cohortFunnel での詳細
           (cohort 別比較) は L3 /activity 行き。 */}
       <ActivationFunnelCard
+        denominator={funnelDenominator}
         stages={funnelStages}
         memberSampleComplete={memberSampleComplete}
         detailHref={
@@ -775,19 +783,26 @@ function MetricCard({
 }
 
 function ActivationFunnelCard({
+  denominator,
   stages,
   memberSampleComplete,
   detailHref,
 }: {
-  /** 加入 → 送付 → 反復 → 習慣化 の順に渡す。先頭ステージの count を分母に
-   * 各ステージの通過率を計算する。空 array ガードはしない (呼び出し側責任)。 */
-  stages: ReadonlyArray<{ label: string; count: number }>;
-  /** memberList が limit に達して反復送付の集計に bias がかかっている場合は
-   * meta に「サンプル不足」と注記して bar を出さない (誤解防止)。 */
+  /** ファネル baseline (= 100% 段)。通常は totalMembers。各ステージの通過率は
+   * count / denominator で計算する。「加入」段は冗長なので bar 上に出さず、
+   * header band の "385 名" 表示で暗黙の分母として扱う。 */
+  denominator: number;
+  /** 送付 → 継続 → 定着 の順に渡す (3 ステージ前提だが component 側で固定はしない)。
+   * `sampleDependent: true` のステージは memberSampleComplete=false のとき bar を
+   * 空にする (memberList の limit による biased 集計が起きうるため)。 */
+  stages: ReadonlyArray<{
+    label: string;
+    count: number;
+    sampleDependent?: boolean;
+  }>;
   memberSampleComplete: boolean;
   detailHref?: string;
 }) {
-  const acquired = stages[0]?.count ?? 0;
   const showHeader = !memberSampleComplete || detailHref != null;
   return (
     <div className="rounded-2xl bg-muted/40 p-5">
@@ -806,12 +821,12 @@ function ActivationFunnelCard({
         </header>
       )}
       <div className="flex flex-col gap-1.5">
-        {stages.map((s, i) => {
-          // sample 不足のとき「反復送付」(index 2) は bar を空にする。それ以外
-          // は server-aggregate ベースで信頼可能なので always bar 描画。
-          const skipBar = !memberSampleComplete && i === 2;
-          const ratio = acquired > 0 && !skipBar ? s.count / acquired : 0;
-          const ratioLabel = !skipBar && acquired > 0 ? toPct(ratio) : "-";
+        {stages.map((s) => {
+          // server-aggregate な stage は常に描画。memberList sampling 依存の
+          // stage (継続ユーザー) は sample 不足時に bar を空にする (誤解防止)。
+          const skipBar = !memberSampleComplete && s.sampleDependent === true;
+          const ratio = denominator > 0 && !skipBar ? s.count / denominator : 0;
+          const ratioLabel = !skipBar && denominator > 0 ? toPct(ratio) : "-";
           return (
             <div key={s.label} className="flex items-center gap-2">
               <span className="w-16 shrink-0 text-xs text-muted-foreground">
