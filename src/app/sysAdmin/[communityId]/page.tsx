@@ -44,7 +44,7 @@ export default async function SysAdminCommunityDetailPage({ params }: Props) {
   const hubMemberCount = l1Row?.hubMemberCount ?? null;
 
   return (
-    <div className="mx-auto max-w-mobile-l p-4 pt-8">
+    <div className="p-4 pt-8">
       <CommunityDetailPageClient
         communityId={communityId}
         initialData={initialData}

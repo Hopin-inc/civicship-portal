@@ -16,6 +16,8 @@ function CommunityDetailPageShell({ communityId }: { communityId: string }) {
     </div>
   );
 }
+// NOTE: storybook の decorator は layout.tsx を通らないので、max-w-mobile-l を
+// shell 側で残している (production では sysAdmin/layout.tsx が同じ幅で wrap する)。
 
 const meta: Meta<typeof CommunityDetailPageShell> = {
   title: "SysAdmin/Pages/CommunityDetail",

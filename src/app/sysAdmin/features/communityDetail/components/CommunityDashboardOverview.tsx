@@ -5,19 +5,20 @@ import Link from "next/link";
 import {
   Activity,
   AlertTriangle,
-  CalendarCheck,
+  ArrowLeftRight,
   ChevronRight,
   Hourglass,
-  Link2,
   type LucideIcon,
   Moon,
   Network,
   PieChart,
   Repeat,
+  RotateCw,
   Send,
   Star,
   TrendingUp,
   UserPlus,
+  Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type {
@@ -29,7 +30,6 @@ import {
   toIntJa,
   toPct,
 } from "@/app/sysAdmin/_shared/format/number";
-import { formatJstMonth } from "@/app/sysAdmin/_shared/format/date";
 import { PercentDelta } from "@/app/sysAdmin/_shared/components/PercentDelta";
 import {
   TenureBar,
@@ -149,10 +149,8 @@ export function CommunityDashboardOverview({
       : null;
   const tenuredFromCommunity = tenureDistribution != null;
 
-  // 連鎖率 (今月) — monthlyActivityTrend の最新点
   const latestMonth =
     data.monthlyActivityTrend[data.monthlyActivityTrend.length - 1];
-  const latestChainPct = latestMonth?.chainPct ?? null;
 
   // 流通量 MoM
   const prevMonth =
@@ -203,6 +201,21 @@ export function CommunityDashboardOverview({
       : null;
   const cohortAlert = cohortDelta != null && cohortDelta <= -0.05;
 
+  // 新規定着率 (D30 相当): cohortRetention.retentionM1 = 「entry month の翌月に
+  // DONATION out した cohort の比率」。最新コホートは m+1 が未完了で null に
+  // なりがちなので、retentionM1 != null の直近 N コホートの平均を取る。
+  // 「新規が ~30-60 日以内に送付した率」のシグナル。
+  const D30_COHORT_WINDOW = 3;
+  const completedCohorts = data.cohortRetention.filter(
+    (c) => c.retentionM1 != null,
+  );
+  const recentCompletedCohorts = completedCohorts.slice(-D30_COHORT_WINDOW);
+  const d30ActivationRate =
+    recentCompletedCohorts.length > 0
+      ? recentCompletedCohorts.reduce((acc, c) => acc + (c.retentionM1 ?? 0), 0) /
+        recentCompletedCohorts.length
+      : null;
+
   const habitualOverRegular = habitualCount > 0 && regularCount > habitualCount;
 
   // 新規率 (最新月): newMemberCount は L2 detail の monthlyActivityTrend
@@ -216,6 +229,20 @@ export function CommunityDashboardOverview({
     totalMembers: summary.totalMembers,
     dormantCount: data.dormantCount,
   });
+
+  // 復帰率 近似版: retentionTrend.returnedSenders (週次) を直近 4 週分合計し、
+  // 「現在休眠数 + 復帰した人」を 4 週前の休眠 base の近似として使う。
+  // proper な月次復帰率は backend の monthlyActivityTrend に
+  // returnedMembers / dormantCount(履歴) が乗ってから差し替える。
+  const RECOVERY_WINDOW_WEEKS = 4;
+  const recentWeeks = data.retentionTrend.slice(-RECOVERY_WINDOW_WEEKS);
+  const totalReturnedRecent = recentWeeks.reduce(
+    (acc, w) => acc + w.returnedSenders,
+    0,
+  );
+  const dormantBaseApprox = data.dormantCount + totalReturnedRecent;
+  const recoveryRateApprox =
+    dormantBaseApprox > 0 ? totalReturnedRecent / dormantBaseApprox : null;
 
   // sparkline data
   const mauSeries = data.monthlyActivityTrend
@@ -258,86 +285,157 @@ export function CommunityDashboardOverview({
         </header>
       )}
 
+      {/* state group: 関係 (Network) + 個人 (Member) を上に。
+          いずれも累計 / 現在の構造を表す snapshot 系メトリクス。 */}
       <div className="flex flex-col gap-6">
-      <Scope
-        title="ネットワーク"
-        note={sysAdminDashboardJa.scopeNotes.network}
-        detailHref={
-          enableSubpageLinks ? `/sysAdmin/${data.communityId}/network` : undefined
-        }
-      >
-        <MetricCard
-          icon={Network}
-          colorClass={SCOPE_COLOR.network}
-          title="ハブユーザー比率"
-          meta="今月"
-          status={hubProvided ? "ok" : "todo"}
-          hero={hubProvided ? <Hero value={toPct(hubPct)} /> : undefined}
-          viz={
-            hubProvided ? (
-              <Ring value={hubPct} colorClass={SCOPE_COLOR.network} />
-            ) : undefined
+        <Scope
+          title="ネットワーク"
+          note={sysAdminDashboardJa.scopeNotes.network}
+          detailHref={
+            enableSubpageLinks ? `/sysAdmin/${data.communityId}/network` : undefined
           }
-        />
-        <MetricCard
-          icon={Send}
-          colorClass={SCOPE_COLOR.network}
-          title="平均送付先数"
-          meta="累計"
-          hero={
-            <Hero
-              value={avgRecipients > 0 ? avgRecipients.toFixed(1) : "-"}
-              unit="人"
-            />
-          }
-        />
-        <MetricCard
-          icon={Link2}
-          colorClass={SCOPE_COLOR.network}
-          title="連鎖率"
-          meta="今月"
-          hero={
-            <Hero
-              value={latestChainPct != null ? toPct(latestChainPct) : "-"}
-            />
-          }
-          viz={
-            latestChainPct != null ? (
-              <Ring value={latestChainPct} colorClass={SCOPE_COLOR.network} />
-            ) : undefined
-          }
-        />
-        <MetricCard
-          icon={PieChart}
-          colorClass={SCOPE_COLOR.network}
-          title="流通量の偏り"
-          meta="累計"
-          hero={
-            paretoTopShare != null ? (
+        >
+          <MetricCard
+            icon={Network}
+            colorClass={SCOPE_COLOR.network}
+            title="ハブユーザー比率"
+            meta="今月"
+            status={hubProvided ? "ok" : "todo"}
+            hero={hubProvided ? <Hero value={toPct(hubPct)} /> : undefined}
+            viz={
+              hubProvided ? (
+                <Ring value={hubPct} colorClass={SCOPE_COLOR.network} />
+              ) : undefined
+            }
+          />
+          <MetricCard
+            icon={Send}
+            colorClass={SCOPE_COLOR.network}
+            title="平均送付先数"
+            meta="累計"
+            hero={
               <Hero
-                prefix="上位"
-                value={toPct(paretoTopShare)}
+                value={avgRecipients > 0 ? avgRecipients.toFixed(1) : "-"}
+                unit="人"
               />
-            ) : (
-              <Hero value="-" />
-            )
-          }
-          viz={
-            paretoTopShare != null ? (
-              <Ring
-                value={paretoTopShare}
-                colorClass={SCOPE_COLOR.network}
-              />
-            ) : undefined
-          }
-        />
+            }
+          />
+          {/* 受領→送付 転換率: 受領経験者のうち送付経験もある人の比率。
+              ギフトエコノミーにおける互酬到達率。SysAdminMemberRow の incoming
+              field (totalPointsIn 等) が backend で landing するまで placeholder。 */}
+          <MetricCard
+            icon={ArrowLeftRight}
+            colorClass={SCOPE_COLOR.network}
+            title="受領→送付 転換率"
+            meta="累計"
+            status="todo"
+          />
+          <MetricCard
+            icon={PieChart}
+            colorClass={SCOPE_COLOR.network}
+            title="流通量の偏り"
+            meta="累計"
+            hero={
+              paretoTopShare != null ? (
+                <Hero prefix="上位" value={toPct(paretoTopShare)} />
+              ) : (
+                <Hero value="-" />
+              )
+            }
+            viz={
+              paretoTopShare != null ? (
+                <Ring
+                  value={paretoTopShare}
+                  colorClass={SCOPE_COLOR.network}
+                />
+              ) : undefined
+            }
+          />
+        </Scope>
 
-      </Scope>
+        <Scope
+          title="ユーザー"
+          note={sysAdminDashboardJa.scopeNotes.user}
+          detailHref={
+            enableSubpageLinks ? `/sysAdmin/${data.communityId}/users` : undefined
+          }
+        >
+          <MetricCard
+            icon={Star}
+            colorClass={SCOPE_COLOR.user}
+            title="習慣化率"
+            meta="現在"
+            hero={<Hero value={toPct(stages.habitual.pct)} />}
+            viz={
+              <Ring value={stages.habitual.pct} colorClass={SCOPE_COLOR.user} />
+            }
+          />
+          <MetricCard
+            icon={UserPlus}
+            colorClass={SCOPE_COLOR.user}
+            title="新規率"
+            meta="最新月"
+            hero={<Hero value={newRate != null ? toPct(newRate) : "-"} />}
+          />
+          <MetricCard
+            icon={Hourglass}
+            colorClass={SCOPE_COLOR.user}
+            title="3 ヶ月以上 在籍率"
+            meta={
+              tenuredFromCommunity ? "コミュニティ全体" : "上位寄与者ベース (暫定)"
+            }
+            hero={
+              <Hero value={tenuredRatio != null ? toPct(tenuredRatio) : "-"} />
+            }
+            viz={
+              tenuredRatio != null ? (
+                <Ring value={tenuredRatio} colorClass={SCOPE_COLOR.user} />
+              ) : undefined
+            }
+            footer={
+              tenureDistribution ? (
+                <TenureBar distribution={tenureDistribution} />
+              ) : undefined
+            }
+          />
+          <MetricCard
+            icon={Moon}
+            colorClass={SCOPE_COLOR.user}
+            title="休眠化率"
+            meta="直近 30 日"
+            hero={
+              <Hero value={dormantRate != null ? toPct(dormantRate) : "-"} />
+            }
+            viz={
+              dormantRate != null ? (
+                <Ring value={dormantRate} colorClass={SCOPE_COLOR.user} />
+              ) : undefined
+            }
+          />
+
+          {habitualOverRegular && (
+            <Issue title="「定期」が「習慣化」を超過">
+              定期 {regularCount} 名 が 習慣化 {habitualCount} 名 を上回っている。中堅層の習慣化に伸びしろ。
+            </Issue>
+          )}
+        </Scope>
+      </div>
+
+      {/* state -> flow の境界。flow 側 (アクティビティ) は時間軸の指標
+          (月次・週次・直近30日) で構成され、上の state 群とは時間粒度が違う
+          ため明示的に区切る。 */}
+      <div className="flex items-center gap-2 px-1 pt-2 text-xs text-muted-foreground">
+        <span className="h-px flex-1 bg-border" />
+        <span>直近の動き</span>
+        <span className="h-px flex-1 bg-border" />
+      </div>
 
       <Scope
         title="アクティビティ"
         note={sysAdminDashboardJa.scopeNotes.activity}
-        detailHref={enableSubpageLinks ? `/sysAdmin/${data.communityId}/activity` : undefined}
+        detailHref={
+          enableSubpageLinks ? `/sysAdmin/${data.communityId}/activity` : undefined
+        }
       >
         <MetricCard
           icon={Activity}
@@ -361,10 +459,7 @@ export function CommunityDashboardOverview({
           }
           viz={
             mauSeries.length > 1 ? (
-              <Sparkline
-                data={mauSeries}
-                colorClass={SCOPE_COLOR.activity}
-              />
+              <Sparkline data={mauSeries} colorClass={SCOPE_COLOR.activity} />
             ) : undefined
           }
         />
@@ -391,28 +486,24 @@ export function CommunityDashboardOverview({
             ) : undefined
           }
         />
+        {/* 新規定着率 (D30 相当): 直近完了 N コホートの retentionM1 平均。
+            最新コホートは m+1 が未完了で null になるため、完了済みのみ集計。 */}
         <MetricCard
-          icon={CalendarCheck}
+          icon={Zap}
           colorClass={SCOPE_COLOR.activity}
-          title="最新コホート M+1"
-          meta={
-            cohortLatest?.cohortMonth
-              ? formatJstMonth(cohortLatest.cohortMonth)
-              : "-"
-          }
+          title="新規定着率"
+          meta={`直近 ${recentCompletedCohorts.length || D30_COHORT_WINDOW} コホート avg`}
           hero={
             <Hero
               value={
-                cohortLatest?.retentionM1 != null
-                  ? toPct(cohortLatest.retentionM1)
-                  : "-"
+                d30ActivationRate != null ? toPct(d30ActivationRate) : "-"
               }
             />
           }
           viz={
-            cohortLatest?.retentionM1 != null ? (
+            d30ActivationRate != null ? (
               <Ring
-                value={cohortLatest.retentionM1}
+                value={d30ActivationRate}
                 colorClass={SCOPE_COLOR.activity}
               />
             ) : undefined
@@ -447,6 +538,30 @@ export function CommunityDashboardOverview({
             ) : undefined
           }
         />
+        {/* 復帰率 近似版: 直近 4 週の returnedSenders 合計 / (現在休眠数 + 復帰者数)。
+            proper な月次復帰率は monthlyActivityTrend に dormantCount(履歴) と
+            returnedMembers が乗ってから差し替える。 */}
+        <MetricCard
+          icon={RotateCw}
+          colorClass={SCOPE_COLOR.activity}
+          title="復帰率"
+          meta={`直近 ${RECOVERY_WINDOW_WEEKS} 週 (近似)`}
+          hero={
+            <Hero
+              value={
+                recoveryRateApprox != null ? toPct(recoveryRateApprox) : "-"
+              }
+            />
+          }
+          viz={
+            recoveryRateApprox != null ? (
+              <Ring
+                value={recoveryRateApprox}
+                colorClass={SCOPE_COLOR.activity}
+              />
+            ) : undefined
+          }
+        />
 
         {cohortAlert && cohortLatest?.retentionM1 != null && (
           <Issue title="直近コホートの M+1 低下">
@@ -457,70 +572,6 @@ export function CommunityDashboardOverview({
           </Issue>
         )}
       </Scope>
-
-      <Scope
-        title="ユーザー"
-        note={sysAdminDashboardJa.scopeNotes.user}
-        detailHref={enableSubpageLinks ? `/sysAdmin/${data.communityId}/users` : undefined}
-      >
-        <MetricCard
-          icon={Star}
-          colorClass={SCOPE_COLOR.user}
-          title="習慣化率"
-          meta="現在"
-          hero={<Hero value={toPct(stages.habitual.pct)} />}
-          viz={
-            <Ring value={stages.habitual.pct} colorClass={SCOPE_COLOR.user} />
-          }
-        />
-        <MetricCard
-          icon={UserPlus}
-          colorClass={SCOPE_COLOR.user}
-          title="新規率"
-          meta="最新月"
-          hero={<Hero value={newRate != null ? toPct(newRate) : "-"} />}
-        />
-        <MetricCard
-          icon={Hourglass}
-          colorClass={SCOPE_COLOR.user}
-          title="3 ヶ月以上 在籍率"
-          meta={tenuredFromCommunity ? "コミュニティ全体" : "上位寄与者ベース (暫定)"}
-          hero={
-            <Hero value={tenuredRatio != null ? toPct(tenuredRatio) : "-"} />
-          }
-          viz={
-            tenuredRatio != null ? (
-              <Ring value={tenuredRatio} colorClass={SCOPE_COLOR.user} />
-            ) : undefined
-          }
-          footer={
-            tenureDistribution ? (
-              <TenureBar distribution={tenureDistribution} />
-            ) : undefined
-          }
-        />
-        <MetricCard
-          icon={Moon}
-          colorClass={SCOPE_COLOR.user}
-          title="休眠化率"
-          meta="直近 30 日"
-          hero={
-            <Hero value={dormantRate != null ? toPct(dormantRate) : "-"} />
-          }
-          viz={
-            dormantRate != null ? (
-              <Ring value={dormantRate} colorClass={SCOPE_COLOR.user} />
-            ) : undefined
-          }
-        />
-
-        {habitualOverRegular && (
-          <Issue title="「定期」が「習慣化」を超過">
-            定期 {regularCount} 名 が 習慣化 {habitualCount} 名 を上回っている。中堅層の習慣化に伸びしろ。
-          </Issue>
-        )}
-      </Scope>
-      </div>
     </div>
   );
 }
