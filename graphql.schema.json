@@ -23454,6 +23454,142 @@
       },
       {
         "kind": "OBJECT",
+        "name": "SysAdminChainDepthBucket",
+        "description": "One bucket of the all-time DONATION chain-depth histogram. See\n`SysAdminCommunityDetailPayload.chainDepthDistribution`.",
+        "isOneOf": null,
+        "fields": [
+          {
+            "name": "count",
+            "description": "Number of all-time DONATION transactions whose `chain_depth`\nfalls into this bucket. Always non-negative.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "depth",
+            "description": "Chain-depth bucket key. Range 1..5; the 5 bucket aggregates\n`chain_depth >= 5`. See `SysAdminCommunitySummaryCard\n.maxChainDepthAllTime` for the underlying semantic.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "SysAdminCohortFunnelPoint",
+        "description": "One cohort's funnel progression. See\n`SysAdminCommunityDetailPayload.cohortFunnel` for the stage\nsemantics and the JOINED-at-asOf scoping rule.",
+        "isOneOf": null,
+        "fields": [
+          {
+            "name": "acquired",
+            "description": "Cohort size: number of JOINED memberships whose `created_at`\nfalls within this cohort month. The funnel's entry stage —\nthe denominator the client divides downstream stages by to\nderive percentages.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "activatedD30",
+            "description": "Of the cohort, members who sent at least one DONATION within\n30 days of their join (per-member, measured from each\nindividual's `created_at` rather than a calendar-clamped\nwindow). The \"first-30-day activation\" funnel stage.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "cohortMonth",
+            "description": "JST first day of the cohort's entry month, e.g.\n2025-10-01T00:00+09:00. UTC-encoded at JST midnight, same\nconvention as `SysAdminMonthlyActivityPoint.month` and\n`SysAdminCohortRetentionPoint.cohortMonth`.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Datetime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "habitual",
+            "description": "Of the cohort, members currently in the habitual segment\n(`userSendRate >= segmentThresholds.tier1` AND tenure floor).\nTHRESHOLD-DEPENDENT — see the parent field's doc.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "repeated",
+            "description": "Of the cohort, members who sent DONATION in >= 2 distinct JST\nmonths as of asOf. The \"came back at least once\" stage.\nCumulative — once a member has 2+ donation months in their\nhistory they stay counted in this stage even if they later go\nquiet.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
         "name": "SysAdminCohortRetentionPoint",
         "description": "One entry-month cohort's retention curve.",
         "isOneOf": null,
@@ -23652,6 +23788,18 @@
             "deprecationReason": null
           },
           {
+            "name": "hubBreadthThreshold",
+            "description": "Minimum number of distinct DONATION recipients within the trailing\n28-day window ending at each month-end for a member to be classified\nas a hub in that month. Used to populate\n`SysAdminMonthlyActivityPoint.hubMemberCount`. Same semantic as\n`SysAdminDashboardInput.hubBreadthThreshold`, applied at month-end\nrather than at request `asOf`.\n\nDefault 3. Effective range 1..1000; values outside are silently\nclamped on the server. Pass the same value used on\n`SysAdminDashboardInput.hubBreadthThreshold` to keep the L1\nhubMemberCount and the latest entry of\n`monthlyActivityTrend.hubMemberCount` directly comparable.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "defaultValue": "3",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "limit",
             "description": "Member list page size (default 50, max 1000). Raised from the\nprevious max of 200 so client-side aggregations that need every\nmember of a community (e.g. the \"受領→送付 転換率\" /\nrecipient-to-sender conversion rate, hub-persistence cohorts,\nnew-member retention breakdowns) can pull a single full page\nwithout N round-trips. Communities larger than 1000 members\nstill need cursor pagination.",
             "type": {
@@ -23749,6 +23897,54 @@
                 "kind": "SCALAR",
                 "name": "Datetime",
                 "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "chainDepthDistribution",
+            "description": "Distribution of DONATION `chain_depth` values across all-time\nDONATION transactions in this community. Each bucket counts\ndistinct DONATION transactions whose `chain_depth` falls into\nthe bucket key (see `SysAdminCommunitySummaryCard.maxChainDepthAllTime`\nfor the depth semantic — depth 1 is a root donation, depth N+1\nmeans the sender's most recent received DONATION had depth N).\n\nBuckets are `{depth: 1..5, count}`; the depth-5 bucket\naggregates all transactions with `chain_depth >= 5`. Buckets\nare returned in ascending depth order, with every bucket\nemitted (count = 0 for depths with no transactions) so the\nclient can render a contiguous histogram axis without\nzero-padding logic. Adjust the ceiling upward (e.g., to 10+)\nin a follow-up if real-data inspection of `maxChainDepthAllTime`\nshows meaningful population in the 5+ bucket.\n\nPowers the L3 \"/network\" chain-depth histogram: visualizes\nwhether donations propagate deeply (multi-hop reciprocity, tail\npopulated) or shallowly (one-shot direct gifts, mass at depth 1).",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "SysAdminChainDepthBucket",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "cohortFunnel",
+            "description": "Per-cohort funnel progression for the L3 \"/activity\" deep-dive.\nOne entry per JST entry-month within the trailing `windowMonths`\nrange, returned in ascending order (newest cohort last). Stages\nmatch the L2 send-funnel structure:\n\n  acquisition  — cohort size at entry (JOINED memberships\n                 created during the cohort month)\n  activatedD30 — cohort members who sent >= 1 DONATION within\n                 30 days of their join (per-member, not\n                 calendar-clamped)\n  repeated     — cohort members who sent DONATION in >= 2\n                 distinct JST months (cumulative as of asOf)\n  habitual     — cohort members currently in the habitual\n                 segment (`userSendRate >= segmentThresholds\n                 .tier1` AND tenure floor)\n\n⚠ The `habitual` stage is THRESHOLD-DEPENDENT: it is derived\nfrom the request's `segmentThresholds.tier1` (default 0.7),\nsame behaviour as `stages.habitual` and the L2 habitual count\ncard. Cross-request comparisons of the funnel's last stage\nrequire matching threshold inputs. The `acquisition`,\n`activatedD30`, and `repeated` stages are threshold-\nindependent by construction.\n\nAll counts are JOINED-at-asOf scoped — a cohort member who\nlater left the community is excluded from `activatedD30` /\n`repeated` / `habitual` even if they donated during the\nmeasurement window. Same membership filter as `dormantCount`\n/ L1 `senderCount` / L2 monthly `hubMemberCount`.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "SysAdminCohortFunnelPoint",
+                    "ofType": null
+                  }
+                }
               }
             },
             "isDeprecated": false,
@@ -24000,7 +24196,7 @@
           },
           {
             "name": "hubMemberCount",
-            "description": "Number of members classified as a \"hub\" within the parametric\nwindow (`windowDays`):\n\n  hubMemberCount = COUNT(member)\n    WHERE windowUniqueDonationRecipients >= input.hubBreadthThreshold\n\n`windowUniqueDonationRecipients` is the count of DISTINCT users\nthis member sent a DONATION to during\n`[asOf - windowDays JST日, asOf + 1 JST日)` — distinct from the\nL2 `SysAdminMemberRow.uniqueDonationRecipients` field which is\ntenure-wide. The window-scoped variant is computed on demand in\nthis aggregate but not exposed per-member at L1 (members\nthemselves are an L2 concern).\n\nHub classification deliberately uses BREADTH only — a member\nwho reached `hubBreadthThreshold` distinct recipients during\nthe window necessarily transacted at least that many times,\nmaking an explicit frequency floor redundant. This keeps the\nthreshold knobs to one (`hubBreadthThreshold`).\n\nInvariants (the client may assert these):\n  hubMemberCount <= windowActivity.senderCount <= totalMembers\n\nThe first holds because any hub member donated >= 3 times in\nthe window and is therefore a window sender; the second because\nany window sender is a JOINED member at asOf.",
+            "description": "Number of members classified as a \"hub\" within the parametric\nwindow (`windowDays`):\n\n  hubMemberCount = COUNT(member)\n    WHERE windowUniqueDonationRecipients >= input.hubBreadthThreshold\n\n`windowUniqueDonationRecipients` is the count of DISTINCT users\nthis member sent a DONATION to during\n`[asOf - windowDays JST日, asOf + 1 JST日)` — distinct from the\nL2 `SysAdminMemberRow.uniqueDonationRecipients` field which is\ntenure-wide. The window-scoped variant is computed on demand in\nthis aggregate but not exposed per-member at L1 (members\nthemselves are an L2 concern).\n\nHub classification deliberately uses BREADTH only — a member\nwho reached `hubBreadthThreshold` distinct recipients during\nthe window necessarily transacted at least that many times,\nmaking an explicit frequency floor redundant. This keeps the\nthreshold knobs to one (`hubBreadthThreshold`).\n\nInvariants (the client may assert these):\n  hubMemberCount <= windowActivity.senderCount <= totalMembers\n\nThe first holds because any hub member donated >= 3 times in\nthe window and is therefore a window sender; the second\nbecause both `hubMemberCount` and `windowActivity.senderCount`\nare computed from senders restricted to JOINED-at-asOf members\n(a former member who left the community before asOf is excluded\neven if they donated during the window) and totalMembers is\nalso JOINED-at-asOf, so the chain stays consistent.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -24635,6 +24831,18 @@
             "deprecationReason": null
           },
           {
+            "name": "lastDonationAt",
+            "description": "JST date (UTC-encoded at JST midnight) of this member's most\nrecent DONATION out in this community. null when the member has\nnever sent a DONATION (= latent on the sender axis).\n\nPowers the L3 \"/members\" dormancy list: clients sort dormant\nmembers by `lastDonationAt ASC` to surface the longest-quiet\nsenders first, and compute days-since-last-donation as\n`(asOf - lastDonationAt) / 1 day` for the per-row badge. Same\nunderlying signal as `dormantCount`'s threshold check\n(`MAX(donation.created_at) < asOf - dormantThresholdDays`),\nexposed as the raw timestamp so the client can derive multiple\nderived views without a server-side recomputation per request.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Datetime",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "monthsIn",
             "description": "Tenure in JST calendar months (floor, minimum 1).",
             "args": [],
@@ -24826,6 +25034,18 @@
                 "name": "Int",
                 "ofType": null
               }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "hubMemberCount",
+            "description": "Distinct members who, AS OF the END of this month, had sent\nDONATIONs to >= `hubBreadthThreshold` distinct recipients within\nthe trailing 28-day window ending at the month-end. Same\nwindow-scoped semantic as\n`SysAdminCommunityOverview.hubMemberCount`, evaluated at\nmonth-end rather than at request `asOf`.\n\nWindow: `[monthEnd - 28 JST日, monthEnd)`. The 28-day window is\nfixed (independent of any request input) so monthly\nhubMemberCount values across the trend stay comparable to each\nother — same precedent as `dormantCount`'s fixed 30-day window.\n`hubBreadthThreshold` follows\n`SysAdminCommunityDetailInput.hubBreadthThreshold` (default 3).\n\nSenders are restricted to users JOINED in the community at the\nmonth-end timestamp — same membership filter as\n`dormantCount` / L1 `senderCount` / L1 `hubMemberCount`. A\nmember who left the community before this month-end is\nexcluded even if they donated during the trailing window.\n\nWhen the L1 dashboard is queried with the default\n`windowDays = 28` and an `asOf` that falls at or near a JST\nmonth-end, the latest entry of `monthlyActivityTrend.hubMemberCount`\nequals `SysAdminCommunityOverview.hubMemberCount` for the same\ncommunity (provided both queries pass the same\n`hubBreadthThreshold`).\n\nCurrently always returns a non-null integer (0 for months with\nno qualifying senders), matching the precedent set by sibling\nmonthly counters (`senderCount`, `dormantCount`). The field is\ndeclared nullable to preserve forward compatibility for a future\nrefinement that may suppress months entirely outside the\ncommunity's MV data range — clients should still tolerate null.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -25461,6 +25681,74 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "monthlyHistogram",
+            "description": "Detailed monthly histogram for the L3 tenure deep-dive.\n\nEach entry counts currently-JOINED members whose tenure\n(`floor(daysIn / 30)`) falls into the bucket. The 12 bucket\naggregates all members with tenure of 12 months or longer.\nReturned in ascending bucket order (`monthsIn` 0..12), with\nevery bucket emitted (count = 0 for buckets with no members)\nso the client can render a contiguous histogram axis without\nzero-padding.\n\nSum of `count` equals `totalMembers` minus members with a\nnegative tenure (data anomaly — should be impossible because\n`daysIn` is floor-1-clamped at the SQL boundary, but the\ncontract notes the exclusion explicitly so the invariant is\ndocumented).\n\nThe existing 4 coarse buckets (`lt1Month` / `m1to3Months` /\n`m3to12Months` / `gte12Months`) remain for L1 / L2 callers; the\nmonthly histogram is additional, not a replacement.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "SysAdminTenureHistogramBucket",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "SysAdminTenureHistogramBucket",
+        "description": "One bucket of the L3 tenure histogram. See\n`SysAdminTenureDistribution.monthlyHistogram`.",
+        "isOneOf": null,
+        "fields": [
+          {
+            "name": "count",
+            "description": "Number of currently-JOINED members in this bucket.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "monthsIn",
+            "description": "Tenure in JST calendar months, computed as `floor(daysIn / 30)`.\nRange 0..12. The 12 bucket aggregates all members with tenure\nof 12 months or longer; values 0..11 represent exact monthly\nbuckets.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "inputFields": null,
@@ -25700,7 +25988,7 @@
           },
           {
             "name": "senderCount",
-            "description": "Unique users with at least one outgoing DONATION transaction\nduring the current window (donation_out_count > 0 in\nmv_user_transaction_daily).",
+            "description": "Unique users with at least one outgoing DONATION transaction\nduring the current window (donation_out_count > 0 in\nmv_user_transaction_daily). Restricted to users who are still\nJOINED in this community at asOf — a now-departed member who\ndonated during the window is excluded, mirroring the\nmembership filter on `totalMembers`.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -25716,7 +26004,7 @@
           },
           {
             "name": "senderCountPrev",
-            "description": "Same metric for the previous window of equal length.",
+            "description": "Same metric for the previous window of equal length. Same\nJOINED-at-asOf membership restriction applies (so the\n`senderCount` / `senderCountPrev` comparison stays\napples-to-apples even when membership churn happens between\nthe two windows).",
             "args": [],
             "type": {
               "kind": "NON_NULL",
