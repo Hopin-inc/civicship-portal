@@ -45,7 +45,10 @@ export function HistoryBars({
   const numeric = data.filter((v): v is number => v != null);
   const max = numeric.length > 0 ? Math.max(...numeric, 0) : 0;
   const totalGap = gap * (data.length - 1);
-  const barWidth = (width - totalGap) / data.length;
+  // 呼び出し側が極端に小さい width / 大きい gap を渡したケースで負値になり、
+  // SVG rect.width = 負 で render error になるのを防ぐための defensive guard。
+  // 描画上は 0 幅 (= 非表示) になるが、render path 自体は壊さない。
+  const barWidth = Math.max(0, (width - totalGap) / data.length);
 
   return (
     <svg
