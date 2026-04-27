@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 import {
   SYS_ADMIN_ALERT_FRAGMENT,
+  SYS_ADMIN_COHORT_FUNNEL_POINT_FRAGMENT,
   SYS_ADMIN_COHORT_RETENTION_POINT_FRAGMENT,
   SYS_ADMIN_COMMUNITY_DETAIL_SUMMARY_FRAGMENT,
   SYS_ADMIN_COMMUNITY_OVERVIEW_ROW_FRAGMENT,
@@ -53,6 +54,9 @@ export const GET_SYS_ADMIN_COMMUNITY_DETAIL = gql`
       cohortRetention {
         ...SysAdminCohortRetentionPointFields
       }
+      cohortFunnel {
+        ...SysAdminCohortFunnelPointFields
+      }
       memberList {
         hasNextPage
         nextCursor
@@ -68,5 +72,6 @@ export const GET_SYS_ADMIN_COMMUNITY_DETAIL = gql`
   ${SYS_ADMIN_MONTHLY_ACTIVITY_POINT_FRAGMENT}
   ${SYS_ADMIN_RETENTION_TREND_POINT_FRAGMENT}
   ${SYS_ADMIN_COHORT_RETENTION_POINT_FRAGMENT}
+  ${SYS_ADMIN_COHORT_FUNNEL_POINT_FRAGMENT}
   ${SYS_ADMIN_MEMBER_ROW_FRAGMENT}
 `;

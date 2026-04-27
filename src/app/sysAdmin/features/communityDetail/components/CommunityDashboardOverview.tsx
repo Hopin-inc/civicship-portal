@@ -30,6 +30,7 @@ import {
   toIntJa,
   toPct,
 } from "@/app/sysAdmin/_shared/format/number";
+import { HistoryBars } from "@/app/sysAdmin/_shared/components/HistoryBars";
 import { PercentDelta } from "@/app/sysAdmin/_shared/components/PercentDelta";
 import {
   TenureBar,
@@ -262,13 +263,59 @@ export function CommunityDashboardOverview({
       ? latestMonth.returnedMembers / prevMonthForRecovery.dormantCount
       : null;
 
-  // sparkline data
-  const mauSeries = data.monthlyActivityTrend
-    .map((m) => m.communityActivityRate)
-    .filter((v): v is number => v != null);
+  // 12 期間 footer chart 用の time-series。各カードの動的シグナルを統一表示
+  // するために `HistoryBars` (棒グラフ) に流す。null は backend が「この月は
+  // データ範囲外」を示すマーカーで、HistoryBars 側は描画スキップで gap として
+  // 残す ─ value が 0 (= 実データだが値ゼロ) と区別する。
+  const mauSeries = data.monthlyActivityTrend.map((m) => m.communityActivityRate);
   const throughputSeries = data.monthlyActivityTrend.map(
     (m) => m.donationPointsSum,
   );
+  const newMembersSeries = data.monthlyActivityTrend.map((m) => m.newMembers);
+  const dormantSeries = data.monthlyActivityTrend.map((m) => m.dormantCount);
+  const hubSeries = data.monthlyActivityTrend.map((m) => m.hubMemberCount);
+
+  // 復帰率 月次推移: returnedMembers[N] / dormantCount[N-1]。先月データなし or
+  // 分母 0 のセルは null (gap 表示) に倒す。
+  const recoverySeries = data.monthlyActivityTrend.map((m, i, arr) => {
+    if (i === 0) return null;
+    const prev = arr[i - 1];
+    if (m.returnedMembers == null || prev.dormantCount === 0) return null;
+    return m.returnedMembers / prev.dormantCount;
+  });
+
+  // 週次継続率 series: 直近 12 週の retainedSenders / (retained + churned)。
+  const weeklyContinuationSeries = data.retentionTrend
+    .slice(-12)
+    .map((w) => {
+      const total = w.retainedSenders + w.churnedSenders;
+      return total > 0 ? w.retainedSenders / total : null;
+    });
+
+  // D30 series: 直近 6 cohort の retentionM1。最新 cohort は M+1 未完了で null
+  // の可能性が高いが、null は HistoryBars 側で gap 表示するので問題なし。
+  const d30Series = data.cohortRetention.slice(-6).map((c) => c.retentionM1);
+
+  // アクティベーション・ファネル (送付軸 4 ステージ、コミュニティ全体)。
+  //   加入     = totalMembers
+  //   送付経験 = 1 回でも送付したメンバー (latent ではない人)
+  //   反復送付 = 2 ヶ月以上送付したメンバー (memberList から count)
+  //   習慣化   = stages.habitual segment
+  // memberList は totalPointsOut DESC で limit=1000 のため、totalMembers が
+  // 1000 を超える community では 反復送付 が過小評価されうる (sample 不足
+  // フラグで明示)。送付経験 / 習慣化 は server-aggregate なので bias なし。
+  const funnelAcquired = totalMembers;
+  const funnelSent = Math.max(0, totalMembers - stages.latent.count);
+  const funnelRepeated = data.memberList.users.filter(
+    (u) => u.donationOutMonths >= 2,
+  ).length;
+  const funnelHabitual = habitualCount;
+  const funnelStages = [
+    { label: "加入", count: funnelAcquired },
+    { label: "送付経験", count: funnelSent },
+    { label: "反復送付", count: funnelRepeated },
+    { label: "習慣化", count: funnelHabitual },
+  ];
 
   return (
     <div className="flex flex-col gap-3">
@@ -303,6 +350,17 @@ export function CommunityDashboardOverview({
         </header>
       )}
 
+      {/* highlight: アクティベーション・ファネル。L2 単一値カードでは見えに
+          くい「ステージ間の脱落幅」を 1 枚で読ませる。 cohortFunnel での詳細
+          (cohort 別比較) は L3 /activity 行き。 */}
+      <ActivationFunnelCard
+        stages={funnelStages}
+        memberSampleComplete={memberSampleComplete}
+        detailHref={
+          enableSubpageLinks ? `/sysAdmin/${data.communityId}/activity#funnel` : undefined
+        }
+      />
+
       {/* state group: 関係 (Network) + 個人 (Member) を上に。
           いずれも累計 / 現在の構造を表す snapshot 系メトリクス。 */}
       <div className="flex flex-col gap-6">
@@ -323,6 +381,14 @@ export function CommunityDashboardOverview({
             viz={
               hubProvided ? (
                 <Ring value={hubPct} colorClass={SCOPE_COLOR.network} />
+              ) : undefined
+            }
+            footer={
+              hubProvided ? (
+                <HistoryBars
+                  data={hubSeries}
+                  colorClass={SCOPE_COLOR.network}
+                />
               ) : undefined
             }
           />
@@ -410,6 +476,12 @@ export function CommunityDashboardOverview({
             title="新規率"
             meta="最新月"
             hero={<Hero value={newRate != null ? toPct(newRate) : "-"} />}
+            footer={
+              <HistoryBars
+                data={newMembersSeries}
+                colorClass={SCOPE_COLOR.user}
+              />
+            }
           />
           <MetricCard
             icon={Hourglass}
@@ -444,6 +516,12 @@ export function CommunityDashboardOverview({
               dormantRate != null ? (
                 <Ring value={dormantRate} colorClass={SCOPE_COLOR.user} />
               ) : undefined
+            }
+            footer={
+              <HistoryBars
+                data={dormantSeries}
+                colorClass={SCOPE_COLOR.user}
+              />
             }
           />
 
@@ -482,10 +560,8 @@ export function CommunityDashboardOverview({
               }
             />
           }
-          viz={
-            mauSeries.length > 1 ? (
-              <Sparkline data={mauSeries} colorClass={SCOPE_COLOR.activity} />
-            ) : undefined
+          footer={
+            <HistoryBars data={mauSeries} colorClass={SCOPE_COLOR.activity} />
           }
         />
         <MetricCard
@@ -509,6 +585,12 @@ export function CommunityDashboardOverview({
                 colorClass={SCOPE_COLOR.activity}
               />
             ) : undefined
+          }
+          footer={
+            <HistoryBars
+              data={weeklyContinuationSeries}
+              colorClass={SCOPE_COLOR.activity}
+            />
           }
         />
         {/* 新規定着率 (D30 相当): 直近完了 N コホートの retentionM1 平均。
@@ -537,6 +619,9 @@ export function CommunityDashboardOverview({
               />
             ) : undefined
           }
+          footer={
+            <HistoryBars data={d30Series} colorClass={SCOPE_COLOR.activity} />
+          }
         />
         <MetricCard
           icon={TrendingUp}
@@ -558,13 +643,11 @@ export function CommunityDashboardOverview({
               <Hero value="-" />
             )
           }
-          viz={
-            throughputSeries.length > 1 ? (
-              <Sparkline
-                data={throughputSeries}
-                colorClass={SCOPE_COLOR.activity}
-              />
-            ) : undefined
+          footer={
+            <HistoryBars
+              data={throughputSeries}
+              colorClass={SCOPE_COLOR.activity}
+            />
           }
         />
         {/* 復帰率: 今月 returnedMembers / 前月 dormantCount。
@@ -581,6 +664,12 @@ export function CommunityDashboardOverview({
             recoveryRate != null ? (
               <Ring value={recoveryRate} colorClass={SCOPE_COLOR.activity} />
             ) : undefined
+          }
+          footer={
+            <HistoryBars
+              data={recoverySeries}
+              colorClass={SCOPE_COLOR.activity}
+            />
           }
         />
 
@@ -685,6 +774,71 @@ function MetricCard({
   );
 }
 
+function ActivationFunnelCard({
+  stages,
+  memberSampleComplete,
+  detailHref,
+}: {
+  /** 加入 → 送付 → 反復 → 習慣化 の順に渡す。先頭ステージの count を分母に
+   * 各ステージの通過率を計算する。空 array ガードはしない (呼び出し側責任)。 */
+  stages: ReadonlyArray<{ label: string; count: number }>;
+  /** memberList が limit に達して反復送付の集計に bias がかかっている場合は
+   * meta に「サンプル不足」と注記して bar を出さない (誤解防止)。 */
+  memberSampleComplete: boolean;
+  detailHref?: string;
+}) {
+  const acquired = stages[0]?.count ?? 0;
+  return (
+    <div className="rounded-2xl bg-muted/40 p-5">
+      <header className="flex items-center justify-between gap-3">
+        <span className="text-sm font-medium">
+          アクティベーション・ファネル
+        </span>
+        {!memberSampleComplete && (
+          <span className="text-xs text-muted-foreground">サンプル不足</span>
+        )}
+        {detailHref && (
+          <Link
+            href={detailHref}
+            className="ml-auto inline-flex items-center gap-0.5 text-xs text-muted-foreground hover:underline"
+          >
+            詳細を見る
+            <ChevronRight className="h-3 w-3" />
+          </Link>
+        )}
+      </header>
+      <div className="mt-3 flex flex-col gap-1.5">
+        {stages.map((s, i) => {
+          // sample 不足のとき「反復送付」(index 2) は bar を空にする。それ以外
+          // は server-aggregate ベースで信頼可能なので always bar 描画。
+          const skipBar = !memberSampleComplete && i === 2;
+          const ratio = acquired > 0 && !skipBar ? s.count / acquired : 0;
+          const ratioLabel = !skipBar && acquired > 0 ? toPct(ratio) : "-";
+          return (
+            <div key={s.label} className="flex items-center gap-2">
+              <span className="w-16 shrink-0 text-xs text-muted-foreground">
+                {s.label}
+              </span>
+              <div className="relative h-2.5 flex-1 overflow-hidden rounded-full bg-muted">
+                <div
+                  className="h-full rounded-full bg-current text-orange-600"
+                  style={{ width: `${Math.min(1, ratio) * 100}%` }}
+                />
+              </div>
+              <span className="w-24 shrink-0 text-right text-xs tabular-nums text-muted-foreground">
+                {ratioLabel}
+                {!skipBar && (
+                  <span className="ml-1 opacity-70">({toIntJa(s.count)})</span>
+                )}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function Hero({
   prefix,
   value,
@@ -749,46 +903,6 @@ function Ring({
         strokeDasharray={circumference}
         strokeDashoffset={offset}
         transform={`rotate(-90 ${size / 2} ${size / 2})`}
-        className={colorClass}
-      />
-    </svg>
-  );
-}
-
-function Sparkline({
-  data,
-  colorClass,
-  width = 76,
-  height = 30,
-}: {
-  data: number[];
-  colorClass: string;
-  width?: number;
-  height?: number;
-}) {
-  if (data.length < 2) return null;
-  const min = Math.min(...data);
-  const max = Math.max(...data);
-  const range = max - min || 1;
-  const stepX = width / (data.length - 1);
-  const padY = 2;
-  const usableH = height - padY * 2;
-  const points = data
-    .map((v, i) => {
-      const x = i * stepX;
-      const y = padY + usableH - ((v - min) / range) * usableH;
-      return `${x.toFixed(1)},${y.toFixed(1)}`;
-    })
-    .join(" ");
-  return (
-    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} aria-hidden>
-      <polyline
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={1.5}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        points={points}
         className={colorClass}
       />
     </svg>
