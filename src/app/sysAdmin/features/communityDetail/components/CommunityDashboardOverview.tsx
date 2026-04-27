@@ -140,13 +140,20 @@ export function CommunityDashboardOverview({
 
   // 受領→送付 転換率 (互酬到達率): 受領経験者のうち送付経験もある人の比率。
   // ギフトエコノミーが配給型 (一方通行) か相互参加型かの本質指標。
-  // memberList は L2 で limit=1000 (max) で引いているため、メンバー数 1000
-  // 未満のコミュニティでは正確、それを超える community では top contributors に
-  // 寄った近似になる (server cursor pagination での graduate 余地あり)。
-  const recipientsAll = data.memberList.users.filter((u) => u.totalPointsIn > 0);
+  //
+  // memberList は totalPointsOut DESC で並ぶため、limit に達していると
+  // 「受領のみで送付なし (totalPointsOut == 0)」のメンバーが末尾で切り捨て
+  // られ、分母 (受領経験者) が過小評価されて転換率が実態より高く出る。
+  // hasNextPage が立っているときは undersampled なので null を返し、UI 側で
+  // 全件取得 (cursor pagination) を実装するか server-side 集計 (Option B) を
+  // backend に追加するまで値を出さない。
+  const memberSampleComplete = !data.memberList.hasNextPage;
+  const recipientsAll = memberSampleComplete
+    ? data.memberList.users.filter((u) => u.totalPointsIn > 0)
+    : [];
   const recipientSenders = recipientsAll.filter((u) => u.totalPointsOut > 0);
   const recipientToSenderRate =
-    recipientsAll.length > 0
+    memberSampleComplete && recipientsAll.length > 0
       ? recipientSenders.length / recipientsAll.length
       : null;
   // 「3 ヶ月以上 在籍率」は community 全体の tenureDistribution から計算する
@@ -338,7 +345,7 @@ export function CommunityDashboardOverview({
             icon={ArrowLeftRight}
             colorClass={SCOPE_COLOR.network}
             title="受領→送付 転換率"
-            meta="累計"
+            meta={memberSampleComplete ? "累計" : "サンプル不足"}
             hero={
               <Hero
                 value={
@@ -519,7 +526,11 @@ export function CommunityDashboardOverview({
           icon={Zap}
           colorClass={SCOPE_COLOR.activity}
           title="新規定着率"
-          meta={`直近 ${recentCompletedCohorts.length || D30_COHORT_WINDOW} コホート avg`}
+          meta={
+            recentCompletedCohorts.length > 0
+              ? `直近 ${recentCompletedCohorts.length} コホート avg`
+              : "完了コホートなし"
+          }
           hero={
             <Hero
               value={
