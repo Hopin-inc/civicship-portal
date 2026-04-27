@@ -5552,6 +5552,8 @@ export type GqlSysAdminMonthlyActivityPointFieldsFragment = {
   newMembers: number;
   donationPointsSum: number;
   chainPct?: number | null;
+  dormantCount: number;
+  returnedMembers?: number | null;
 };
 
 export type GqlSysAdminRetentionTrendPointFieldsFragment = {
@@ -5584,6 +5586,10 @@ export type GqlSysAdminMemberRowFieldsFragment = {
   daysIn: number;
   donationOutDays: number;
   uniqueDonationRecipients: number;
+  totalPointsIn: number;
+  donationInMonths: number;
+  donationInDays: number;
+  uniqueDonationSenders: number;
 };
 
 export type GqlGetSysAdminDashboardQueryVariables = Exact<{
@@ -5718,6 +5724,8 @@ export type GqlGetSysAdminCommunityDetailQuery = {
       newMembers: number;
       donationPointsSum: number;
       chainPct?: number | null;
+      dormantCount: number;
+      returnedMembers?: number | null;
     }>;
     retentionTrend: Array<{
       __typename?: "SysAdminRetentionTrendPoint";
@@ -5751,6 +5759,10 @@ export type GqlGetSysAdminCommunityDetailQuery = {
         daysIn: number;
         donationOutDays: number;
         uniqueDonationRecipients: number;
+        totalPointsIn: number;
+        donationInMonths: number;
+        donationInDays: number;
+        uniqueDonationSenders: number;
       }>;
     };
   };
@@ -9246,6 +9258,8 @@ export const SysAdminMonthlyActivityPointFieldsFragmentDoc = gql`
     newMembers
     donationPointsSum
     chainPct
+    dormantCount
+    returnedMembers
   }
 `;
 export const SysAdminRetentionTrendPointFieldsFragmentDoc = gql`
@@ -9278,6 +9292,10 @@ export const SysAdminMemberRowFieldsFragmentDoc = gql`
     daysIn
     donationOutDays
     uniqueDonationRecipients
+    totalPointsIn
+    donationInMonths
+    donationInDays
+    uniqueDonationSenders
   }
 `;
 export const PlaceFieldsFragmentDoc = gql`

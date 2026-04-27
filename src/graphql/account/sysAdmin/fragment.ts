@@ -146,6 +146,8 @@ export const SYS_ADMIN_MONTHLY_ACTIVITY_POINT_FRAGMENT = gql`
     newMembers
     donationPointsSum
     chainPct
+    dormantCount
+    returnedMembers
   }
 `;
 
@@ -181,5 +183,9 @@ export const SYS_ADMIN_MEMBER_ROW_FRAGMENT = gql`
     daysIn
     donationOutDays
     uniqueDonationRecipients
+    totalPointsIn
+    donationInMonths
+    donationInDays
+    uniqueDonationSenders
   }
 `;

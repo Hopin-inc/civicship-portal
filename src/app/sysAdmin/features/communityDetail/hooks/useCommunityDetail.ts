@@ -62,7 +62,7 @@ export function useCommunityDetail({
   communityId,
   dashboardControls,
   initialData = null,
-  limit = 50,
+  limit = 1000,
 }: Args): CommunityDetailResult {
   const client = useApolloClient();
 

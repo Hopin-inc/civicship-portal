@@ -37,7 +37,7 @@ const variables = {
     windowMonths: 3,
     userFilter: { minSendRate: 0 },
     userSort: { field: "TOTAL_POINTS_OUT", order: "DESC" },
-    limit: 50,
+    limit: 1000,
   },
 };
 

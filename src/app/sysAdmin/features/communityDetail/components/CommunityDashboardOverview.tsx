@@ -137,6 +137,18 @@ export function CommunityDashboardOverview({
       ? activeMembers.reduce((acc, u) => acc + u.uniqueDonationRecipients, 0) /
         activeMembers.length
       : 0;
+
+  // 受領→送付 転換率 (互酬到達率): 受領経験者のうち送付経験もある人の比率。
+  // ギフトエコノミーが配給型 (一方通行) か相互参加型かの本質指標。
+  // memberList は L2 で limit=1000 (max) で引いているため、メンバー数 1000
+  // 未満のコミュニティでは正確、それを超える community では top contributors に
+  // 寄った近似になる (server cursor pagination での graduate 余地あり)。
+  const recipientsAll = data.memberList.users.filter((u) => u.totalPointsIn > 0);
+  const recipientSenders = recipientsAll.filter((u) => u.totalPointsOut > 0);
+  const recipientToSenderRate =
+    recipientsAll.length > 0
+      ? recipientSenders.length / recipientsAll.length
+      : null;
   // 「3 ヶ月以上 在籍率」は community 全体の tenureDistribution から計算する
   // のが正。L1 dashboard 経由で受け取った distribution があればそれを使い、
   // 無ければ memberList (totalPointsOut DESC top N) で近似する暫定 fallback。
@@ -230,19 +242,18 @@ export function CommunityDashboardOverview({
     dormantCount: data.dormantCount,
   });
 
-  // 復帰率 近似版: retentionTrend.returnedSenders (週次) を直近 4 週分合計し、
-  // 「現在休眠数 + 復帰した人」を 4 週前の休眠 base の近似として使う。
-  // proper な月次復帰率は backend の monthlyActivityTrend に
-  // returnedMembers / dormantCount(履歴) が乗ってから差し替える。
-  const RECOVERY_WINDOW_WEEKS = 4;
-  const recentWeeks = data.retentionTrend.slice(-RECOVERY_WINDOW_WEEKS);
-  const totalReturnedRecent = recentWeeks.reduce(
-    (acc, w) => acc + w.returnedSenders,
-    0,
-  );
-  const dormantBaseApprox = data.dormantCount + totalReturnedRecent;
-  const recoveryRateApprox =
-    dormantBaseApprox > 0 ? totalReturnedRecent / dormantBaseApprox : null;
+  // 復帰率 (月次): 「先月末時点で休眠だった人のうち、今月送付した人の比率」。
+  // 分子は今月点の returnedMembers、分母は前月点の dormantCount。
+  // 直前月が無い (series 最初) / returnedMembers が null / 前月 dormantCount が
+  // 0 のいずれかで null。
+  const prevMonthForRecovery =
+    data.monthlyActivityTrend[data.monthlyActivityTrend.length - 2];
+  const recoveryRate =
+    latestMonth?.returnedMembers != null &&
+    prevMonthForRecovery != null &&
+    prevMonthForRecovery.dormantCount > 0
+      ? latestMonth.returnedMembers / prevMonthForRecovery.dormantCount
+      : null;
 
   // sparkline data
   const mauSeries = data.monthlyActivityTrend
@@ -321,14 +332,30 @@ export function CommunityDashboardOverview({
             }
           />
           {/* 受領→送付 転換率: 受領経験者のうち送付経験もある人の比率。
-              ギフトエコノミーにおける互酬到達率。SysAdminMemberRow の incoming
-              field (totalPointsIn 等) が backend で landing するまで placeholder。 */}
+              ギフトエコノミーにおける互酬到達率。memberList から
+              totalPointsIn / totalPointsOut で client-side 集計。 */}
           <MetricCard
             icon={ArrowLeftRight}
             colorClass={SCOPE_COLOR.network}
             title="受領→送付 転換率"
             meta="累計"
-            status="todo"
+            hero={
+              <Hero
+                value={
+                  recipientToSenderRate != null
+                    ? toPct(recipientToSenderRate)
+                    : "-"
+                }
+              />
+            }
+            viz={
+              recipientToSenderRate != null ? (
+                <Ring
+                  value={recipientToSenderRate}
+                  colorClass={SCOPE_COLOR.network}
+                />
+              ) : undefined
+            }
           />
           <MetricCard
             icon={PieChart}
@@ -538,27 +565,19 @@ export function CommunityDashboardOverview({
             ) : undefined
           }
         />
-        {/* 復帰率 近似版: 直近 4 週の returnedSenders 合計 / (現在休眠数 + 復帰者数)。
-            proper な月次復帰率は monthlyActivityTrend に dormantCount(履歴) と
-            returnedMembers が乗ってから差し替える。 */}
+        {/* 復帰率: 今月 returnedMembers / 前月 dormantCount。
+            両方とも monthlyActivityTrend から server 計算済の値を取る。 */}
         <MetricCard
           icon={RotateCw}
           colorClass={SCOPE_COLOR.activity}
           title="復帰率"
-          meta={`直近 ${RECOVERY_WINDOW_WEEKS} 週 (近似)`}
+          meta="先月休眠 → 今月活動"
           hero={
-            <Hero
-              value={
-                recoveryRateApprox != null ? toPct(recoveryRateApprox) : "-"
-              }
-            />
+            <Hero value={recoveryRate != null ? toPct(recoveryRate) : "-"} />
           }
           viz={
-            recoveryRateApprox != null ? (
-              <Ring
-                value={recoveryRateApprox}
-                colorClass={SCOPE_COLOR.activity}
-              />
+            recoveryRate != null ? (
+              <Ring value={recoveryRate} colorClass={SCOPE_COLOR.activity} />
             ) : undefined
           }
         />
