@@ -43,7 +43,8 @@ export function HistoryBars({
   if (data.length < 2) return null;
 
   const numeric = data.filter((v): v is number => v != null);
-  const max = numeric.length > 0 ? Math.max(...numeric, 0) : 0;
+  if (numeric.length === 0) return null;
+  const max = Math.max(...numeric, 0);
   const totalGap = gap * (data.length - 1);
   // 呼び出し側が極端に小さい width / 大きい gap を渡したケースで負値になり、
   // SVG rect.width = 負 で render error になるのを防ぐための defensive guard。

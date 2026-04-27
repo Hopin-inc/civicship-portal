@@ -8,7 +8,11 @@ export type MetricDefinition = {
 // 説明文は「運営オペレーターが popover を開いた瞬間に意味が分かる」を目的に
 // プレーンな日本語で書く。実装詳細 (MV / windowDays / fragment 名等) は note に
 // 入れない (engineer 向けの context は source code コメントで参照する)。
-export const METRIC_DEFINITIONS: Record<string, MetricDefinition> = {
+//
+// `satisfies` で MetricDefinition への適合を強制しつつ、key の literal 型を保つ。
+// MetricKey はここから自動導出するので、key の追加 / 削除で union を別途
+// 更新する必要がない (= 同期忘れを構造的に防ぐ)。
+const DEFS = {
   mau: {
     title: "MAU",
     formula: "今月ギフトを送ったメンバーの人数",
@@ -204,42 +208,7 @@ export const METRIC_DEFINITIONS: Record<string, MetricDefinition> = {
     note: "週単位の継続性。短期 retention の即時シグナルで、ファネル段の「継続」(累計 2 ヶ月以上送付) とは時間軸が違う (こちらは週 vs 週、ファネルは累計の milestone)。",
     range: "0〜100%",
   },
-};
+} satisfies Record<string, MetricDefinition>;
 
-export type MetricKey =
-  | "mau"
-  | "communityActivityRate"
-  | "growthRateActivity"
-  | "hubUserPct"
-  | "newMembers"
-  | "activityFlow"
-  | "userSendRate"
-  | "cohortRetention"
-  | "wau"
-  | "retainedSenders"
-  | "churnedSenders"
-  | "returnedSenders"
-  | "monthsIn"
-  | "donationOutMonths"
-  | "totalPointsOut"
-  | "totalDonationPointsAllTime"
-  | "chainDepth"
-  | "maxChainDepthAllTime"
-  | "chainPct"
-  | "stages"
-  | "dormantRate"
-  | "asOf"
-  | "funnelOverview"
-  | "funnelSent"
-  | "funnelRepeated"
-  | "funnelHabitual"
-  | "recipientToSenderRate"
-  | "newD30ActivationRate"
-  | "recoveryRate"
-  | "habitualPct"
-  | "avgRecipients"
-  | "paretoTopShare"
-  | "donationMoM"
-  | "newRate"
-  | "tenuredRatio"
-  | "weeklySenderContinuationRate";
+export type MetricKey = keyof typeof DEFS;
+export const METRIC_DEFINITIONS: Record<MetricKey, MetricDefinition> = DEFS;
