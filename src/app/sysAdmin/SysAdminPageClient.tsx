@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { Plus } from "lucide-react";
+import { Plus, Settings } from "lucide-react";
 import { useAppRouter } from "@/lib/navigation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { Button } from "@/components/ui/button";
@@ -42,6 +42,15 @@ export function SysAdminPageClient({ initialData }: Props) {
         </h2>
         <div className="flex items-center gap-2">
           <MetricGlossaryButton />
+          <Button
+            onClick={() => router.push("/sysAdmin/system")}
+            variant="tertiary"
+            size="sm"
+            className="gap-1"
+          >
+            <Settings className="h-4 w-4" />
+            設定
+          </Button>
           <Button
             onClick={() => router.push("/sysAdmin/create")}
             variant="primary"
