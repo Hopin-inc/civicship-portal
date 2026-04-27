@@ -11,10 +11,6 @@ import type {
 import { useDashboardControls } from "@/app/sysAdmin/features/dashboard/hooks/useDashboardControls";
 import { useCommunityDetail } from "@/app/sysAdmin/features/communityDetail/hooks/useCommunityDetail";
 import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";
-import {
-  L2_GLOSSARY_SECTIONS,
-  MetricGlossaryButton,
-} from "@/app/sysAdmin/_shared/components/MetricGlossary";
 import { CommunityDashboardOverview } from "@/app/sysAdmin/features/communityDetail/components/CommunityDashboardOverview";
 
 type Props = {
@@ -47,10 +43,6 @@ export function CommunityDetailPageClient({
       title: data?.communityName ?? sysAdminDashboardJa.detail.title,
       showLogo: false,
       showBackButton: true,
-      // L2 専用の用語集 (ファネル / 各種指標の定義) を Header action slot
-      // から開けるようにする。L1 と同じ「用語」ボタンだが sections だけが
-      // L2 仕様になっている (= L2_GLOSSARY_SECTIONS で全カードを網羅)。
-      action: <MetricGlossaryButton sections={L2_GLOSSARY_SECTIONS} />,
     }),
     [data?.communityName],
   );

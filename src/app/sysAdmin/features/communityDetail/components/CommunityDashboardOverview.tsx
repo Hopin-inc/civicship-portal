@@ -31,6 +31,8 @@ import {
   toPct,
 } from "@/app/sysAdmin/_shared/format/number";
 import { HistoryBars } from "@/app/sysAdmin/_shared/components/HistoryBars";
+import type { MetricKey } from "@/app/sysAdmin/_shared/components/MetricDefinitions";
+import { MetricInfoButton } from "@/app/sysAdmin/_shared/components/MetricInfoButton";
 import { PercentDelta } from "@/app/sysAdmin/_shared/components/PercentDelta";
 import {
   TenureBar,
@@ -384,6 +386,7 @@ export function CommunityDashboardOverview({
             colorClass={SCOPE_COLOR.network}
             title="ハブユーザー比率"
             meta="今月"
+            infoMetricKey="hubUserPct"
             status={hubProvided ? "ok" : "todo"}
             hero={hubProvided ? <Hero value={toPct(hubPct)} /> : undefined}
             viz={
@@ -405,6 +408,7 @@ export function CommunityDashboardOverview({
             colorClass={SCOPE_COLOR.network}
             title="平均送付先数"
             meta="累計"
+            infoMetricKey="avgRecipients"
             hero={
               <Hero
                 value={avgRecipients > 0 ? avgRecipients.toFixed(1) : "-"}
@@ -420,6 +424,7 @@ export function CommunityDashboardOverview({
             colorClass={SCOPE_COLOR.network}
             title="受領→送付 転換率"
             meta={memberSampleComplete ? "累計" : "サンプル不足"}
+            infoMetricKey="recipientToSenderRate"
             hero={
               <Hero
                 value={
@@ -443,6 +448,7 @@ export function CommunityDashboardOverview({
             colorClass={SCOPE_COLOR.network}
             title="流通量の偏り"
             meta="累計"
+            infoMetricKey="paretoTopShare"
             hero={
               paretoTopShare != null ? (
                 <Hero prefix="上位" value={toPct(paretoTopShare)} />
@@ -473,6 +479,7 @@ export function CommunityDashboardOverview({
             colorClass={SCOPE_COLOR.user}
             title="定着率"
             meta="現在"
+            infoMetricKey="habitualPct"
             hero={<Hero value={toPct(stages.habitual.pct)} />}
             viz={
               <Ring value={stages.habitual.pct} colorClass={SCOPE_COLOR.user} />
@@ -483,6 +490,7 @@ export function CommunityDashboardOverview({
             colorClass={SCOPE_COLOR.user}
             title="新規率"
             meta="最新月"
+            infoMetricKey="newRate"
             hero={<Hero value={newRate != null ? toPct(newRate) : "-"} />}
             footer={
               <HistoryBars
@@ -498,6 +506,7 @@ export function CommunityDashboardOverview({
             meta={
               tenuredFromCommunity ? "コミュニティ全体" : "上位寄与者ベース (暫定)"
             }
+            infoMetricKey="tenuredRatio"
             hero={
               <Hero value={tenuredRatio != null ? toPct(tenuredRatio) : "-"} />
             }
@@ -517,6 +526,7 @@ export function CommunityDashboardOverview({
             colorClass={SCOPE_COLOR.user}
             title="休眠化率"
             meta="直近 30 日"
+            infoMetricKey="dormantRate"
             hero={
               <Hero value={dormantRate != null ? toPct(dormantRate) : "-"} />
             }
@@ -553,6 +563,7 @@ export function CommunityDashboardOverview({
           colorClass={SCOPE_COLOR.activity}
           title="今月の MAU%"
           meta="今月"
+          infoMetricKey="communityActivityRate"
           hero={
             <Hero
               value={
@@ -577,6 +588,7 @@ export function CommunityDashboardOverview({
           colorClass={SCOPE_COLOR.activity}
           title="週次送付継続率"
           meta="直近週"
+          infoMetricKey="weeklySenderContinuationRate"
           hero={
             <Hero
               value={
@@ -611,9 +623,10 @@ export function CommunityDashboardOverview({
           title="初回送付率"
           meta={
             recentCompletedCohorts.length > 0
-              ? `直近 ${recentCompletedCohorts.length} コホート avg`
+              ? `直近 ${recentCompletedCohorts.length} コホート平均`
               : "完了コホートなし"
           }
+          infoMetricKey="newD30ActivationRate"
           hero={
             <Hero
               value={
@@ -638,6 +651,7 @@ export function CommunityDashboardOverview({
           colorClass={SCOPE_COLOR.activity}
           title="流通量 MoM"
           meta="今月 vs 前月"
+          infoMetricKey="donationMoM"
           hero={
             donationMoM != null ? (
               <Hero
@@ -671,6 +685,7 @@ export function CommunityDashboardOverview({
           colorClass={SCOPE_COLOR.activity}
           title="復帰率"
           meta="先月休眠 → 今月活動"
+          infoMetricKey="recoveryRate"
           hero={
             <Hero value={recoveryRate != null ? toPct(recoveryRate) : "-"} />
           }
@@ -751,6 +766,7 @@ function MetricCard({
   viz,
   footer,
   status = "ok",
+  infoMetricKey,
 }: {
   icon: LucideIcon;
   colorClass: string;
@@ -761,6 +777,9 @@ function MetricCard({
   /** hero 行の下に積む補足 viz (在籍分布 mini bar など)。 */
   footer?: React.ReactNode;
   status?: "ok" | "todo";
+  /** 指定すると header の右側 meta の隣に Info icon を出して、tap で
+   * 該当指標の定義 popover を開く。MetricDefinitions の key を渡す。 */
+  infoMetricKey?: MetricKey;
 }) {
   return (
     <div className="rounded-2xl bg-muted/40 p-5">
@@ -769,9 +788,12 @@ function MetricCard({
           <Icon className="h-4 w-4" aria-hidden />
           <span>{title}</span>
         </div>
-        {meta && (
-          <span className="text-xs text-muted-foreground">{meta}</span>
-        )}
+        <div className="flex items-center gap-1.5">
+          {meta && (
+            <span className="text-xs text-muted-foreground">{meta}</span>
+          )}
+          {infoMetricKey && <MetricInfoButton metricKey={infoMetricKey} />}
+        </div>
       </header>
       <div className="mt-3 flex items-end justify-between gap-3">
         <div className="min-w-0 flex-1">
@@ -809,23 +831,21 @@ function ActivationFunnelCard({
   memberSampleComplete: boolean;
   detailHref?: string;
 }) {
-  const showHeader = !memberSampleComplete || detailHref != null;
   return (
     <div className="rounded-2xl bg-muted/40 p-5">
-      {showHeader && (
-        <header className="mb-3 flex items-center gap-3 text-xs text-muted-foreground">
-          {!memberSampleComplete && <span>サンプル不足</span>}
-          {detailHref && (
-            <Link
-              href={detailHref}
-              className="ml-auto inline-flex items-center gap-0.5 hover:underline"
-            >
-              詳細を見る
-              <ChevronRight className="h-3 w-3" />
-            </Link>
-          )}
-        </header>
-      )}
+      <header className="mb-3 flex items-center gap-2 text-xs text-muted-foreground">
+        {!memberSampleComplete && <span>サンプル不足</span>}
+        <MetricInfoButton metricKey="funnelOverview" className="ml-auto" />
+        {detailHref && (
+          <Link
+            href={detailHref}
+            className="inline-flex items-center gap-0.5 hover:underline"
+          >
+            詳細を見る
+            <ChevronRight className="h-3 w-3" />
+          </Link>
+        )}
+      </header>
       <div className="flex flex-col gap-1.5">
         {stages.map((s) => {
           // server-aggregate な stage は常に描画。memberList sampling 依存の

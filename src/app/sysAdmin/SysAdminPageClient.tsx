@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
 import type { GqlGetSysAdminDashboardQuery } from "@/types/graphql";
-import { MetricGlossaryButton } from "./_shared/components/MetricGlossary";
 import { CommunityRow } from "./features/dashboard/components/CommunityRow";
 import { useDashboardControls } from "./features/dashboard/hooks/useDashboardControls";
 import { useDashboardOverview } from "./features/dashboard/hooks/useDashboardOverview";
@@ -40,18 +39,15 @@ export function SysAdminPageClient({ initialData }: Props) {
         <h2 className="text-body-sm text-muted-foreground pl-4">
           コミュニティ一覧
         </h2>
-        <div className="flex items-center gap-2">
-          <MetricGlossaryButton />
-          <Button
-            onClick={() => router.push("/sysAdmin/create")}
-            variant="primary"
-            size="sm"
-            className="gap-1"
-          >
-            <Plus className="h-4 w-4" />
-            作成
-          </Button>
-        </div>
+        <Button
+          onClick={() => router.push("/sysAdmin/create")}
+          variant="primary"
+          size="sm"
+          className="gap-1"
+        >
+          <Plus className="h-4 w-4" />
+          作成
+        </Button>
       </div>
 
       {loading && communities.length === 0 ? (
