@@ -5,12 +5,15 @@ import { Settings } from "lucide-react";
 import { useAppRouter } from "@/lib/navigation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { Button } from "@/components/ui/button";
+import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { ErrorState } from "@/components/shared/ErrorState";
 import { TemplateRow } from "@/app/sysAdmin/features/system/templates/list/components/TemplateRow";
-import { MOCK_VARIANT_SUMMARIES } from "@/app/sysAdmin/features/system/templates/shared/fixtures";
+import { useVariantSummaries } from "@/app/sysAdmin/features/system/templates/list/hooks/useVariantSummaries";
 import { variantToSlug } from "@/app/sysAdmin/features/system/templates/shared/variantSlug";
 
 export default function SysAdminSystemTemplatesPage() {
   const router = useAppRouter();
+  const { summaries, loading, error } = useVariantSummaries();
 
   const headerConfig = useMemo(
     () => ({
@@ -39,28 +42,30 @@ export default function SysAdminSystemTemplatesPage() {
         </Button>
       </div>
 
-      <p className="text-body-xs text-muted-foreground mb-4 px-1">
-        ※ 一覧は mock data。backend の reportTemplateStatsBreakdown 実装後に実データに置換。
-      </p>
-
-      <div className="flex flex-col">
-        {MOCK_VARIANT_SUMMARIES.map((summary, idx) => {
-          const slug = variantToSlug(summary.variant);
-          return (
-            <div key={summary.variant}>
-              {idx !== 0 && <hr className="border-muted" />}
-              <TemplateRow
-                summary={summary}
-                onClick={
-                  slug
-                    ? () => router.push(`/sysAdmin/system/templates/${slug}`)
-                    : undefined
-                }
-              />
-            </div>
-          );
-        })}
-      </div>
+      {loading && summaries.every((s) => s.activeTemplateCount === 0) ? (
+        <LoadingIndicator fullScreen={false} />
+      ) : error ? (
+        <ErrorState title="テンプレート一覧の取得に失敗しました" />
+      ) : (
+        <div className="flex flex-col">
+          {summaries.map((summary, idx) => {
+            const slug = variantToSlug(summary.variant);
+            return (
+              <div key={summary.variant}>
+                {idx !== 0 && <hr className="border-muted" />}
+                <TemplateRow
+                  summary={summary}
+                  onClick={
+                    slug
+                      ? () => router.push(`/sysAdmin/system/templates/${slug}`)
+                      : undefined
+                  }
+                />
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

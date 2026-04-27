@@ -6,6 +6,7 @@ export const REPORT_TEMPLATE_FRAGMENT = gql`
     variant
     version
     scope
+    kind
     model
     maxTokens
     temperature
@@ -34,6 +35,24 @@ export const REPORT_TEMPLATE_STATS_FRAGMENT = gql`
   fragment ReportTemplateStatsFields on ReportTemplateStats {
     variant
     version
+    feedbackCount
+    avgRating
+    avgJudgeScore
+    judgeHumanCorrelation
+    correlationWarning
+  }
+`;
+
+export const REPORT_TEMPLATE_STATS_BREAKDOWN_ROW_FRAGMENT = gql`
+  fragment ReportTemplateStatsBreakdownRowFields on ReportTemplateStatsBreakdownRow {
+    templateId
+    version
+    scope
+    kind
+    experimentKey
+    isActive
+    isEnabled
+    trafficWeight
     feedbackCount
     avgRating
     avgJudgeScore

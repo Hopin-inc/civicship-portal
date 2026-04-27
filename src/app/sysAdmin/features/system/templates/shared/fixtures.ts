@@ -1,43 +1,34 @@
 import {
+  GqlReportTemplateKind,
   GqlReportTemplateScope,
   GqlReportVariant,
+  type GqlReportTemplateStatsBreakdownRowFieldsFragment,
 } from "@/types/graphql";
+import { aggregateVariantSummary, type VariantSummary } from "./aggregate";
 import { SUPPORTED_VARIANTS } from "./variantSlug";
 
 /**
- * Backend PR landing 前の mock data 用ローカル型。
- * 新 query (reportTemplateStatsBreakdown) の戻り値 row に対応。
- * 型は backend Plan の `ReportTemplateStatsBreakdownRow` に合わせる。
- *
- * Backend 実装後、`GqlReportTemplateStatsBreakdownRow` に置換予定。
+ * Breakdown row の alias。生成型をそのまま使う。
+ * 過去は local 型を持っていたが、`reportTemplateStatsBreakdown` query の
+ * landing 後は generated 型に統一。
  */
-export type TemplateBreakdownRow = {
-  templateId: string;
-  version: number;
-  scope: GqlReportTemplateScope;
-  // kind: 'GENERATION' | 'JUDGE'  — backend 未対応のため省略 (PR landing 後に追加)
-  experimentKey: string | null;
-  isActive: boolean;
-  isEnabled: boolean;
-  trafficWeight: number;
-  feedbackCount: number;
-  avgRating: number | null;
-  avgJudgeScore: number | null;
-  judgeHumanCorrelation: number | null;
-  correlationWarning: boolean;
-};
+export type TemplateBreakdownRow = GqlReportTemplateStatsBreakdownRowFieldsFragment;
 
 /**
  * 各 variant に対し、複数 version × 複数 experimentKey の組み合わせを mock。
  * 「current active 行 + 過去 version 行 + 同 version 内 A/B」を含むシナリオを再現。
+ *
+ * Storybook / 単体テスト用。本番ページでは real query (`useTemplateBreakdown`)
+ * を使う。
  */
 function makeBreakdownRows(variantPrefix: string): TemplateBreakdownRow[] {
   return [
-    // Latest version with A/B split
     {
+      __typename: "ReportTemplateStatsBreakdownRow",
       templateId: `tmpl_${variantPrefix}_v3_baseline`,
       version: 3,
       scope: GqlReportTemplateScope.System,
+      kind: GqlReportTemplateKind.Generation,
       experimentKey: "baseline",
       isActive: true,
       isEnabled: true,
@@ -49,9 +40,11 @@ function makeBreakdownRows(variantPrefix: string): TemplateBreakdownRow[] {
       correlationWarning: false,
     },
     {
+      __typename: "ReportTemplateStatsBreakdownRow",
       templateId: `tmpl_${variantPrefix}_v3_concise`,
       version: 3,
       scope: GqlReportTemplateScope.System,
+      kind: GqlReportTemplateKind.Generation,
       experimentKey: "exp_concise",
       isActive: true,
       isEnabled: true,
@@ -62,11 +55,12 @@ function makeBreakdownRows(variantPrefix: string): TemplateBreakdownRow[] {
       judgeHumanCorrelation: 0.79,
       correlationWarning: false,
     },
-    // Previous version (rollback candidate)
     {
+      __typename: "ReportTemplateStatsBreakdownRow",
       templateId: `tmpl_${variantPrefix}_v2_baseline`,
       version: 2,
       scope: GqlReportTemplateScope.System,
+      kind: GqlReportTemplateKind.Generation,
       experimentKey: "baseline",
       isActive: false,
       isEnabled: true,
@@ -77,11 +71,12 @@ function makeBreakdownRows(variantPrefix: string): TemplateBreakdownRow[] {
       judgeHumanCorrelation: 0.65,
       correlationWarning: true,
     },
-    // Initial version (history)
     {
+      __typename: "ReportTemplateStatsBreakdownRow",
       templateId: `tmpl_${variantPrefix}_v1_baseline`,
       version: 1,
       scope: GqlReportTemplateScope.System,
+      kind: GqlReportTemplateKind.Generation,
       experimentKey: null,
       isActive: false,
       isEnabled: false,
@@ -108,48 +103,13 @@ export function mockBreakdown(variant: GqlReportVariant): TemplateBreakdownRow[]
   return makeBreakdownRows(PREFIX_BY_VARIANT[variant]);
 }
 
-/**
- * L1 list view 用の variant ごとサマリ。
- * 各 variant の現行 active 行から avgRating / feedbackCount を集約。
- */
-export type VariantSummary = {
-  variant: GqlReportVariant;
-  currentVersion: number;
-  activeTemplateCount: number;
-  totalFeedbackCount: number;
-  weightedAvgRating: number | null;
-  hasWarning: boolean;
-};
-
 export function mockVariantSummary(variant: GqlReportVariant): VariantSummary {
-  const rows = mockBreakdown(variant);
-  const activeRows = rows.filter((r) => r.isActive && r.isEnabled);
-  const currentVersion = Math.max(...activeRows.map((r) => r.version), 0);
-
-  const totalFeedbackCount = activeRows.reduce(
-    (sum, r) => sum + r.feedbackCount,
-    0,
-  );
-  const weightedSum = activeRows.reduce(
-    (sum, r) => (r.avgRating != null ? sum + r.avgRating * r.feedbackCount : sum),
-    0,
-  );
-  const weightedAvgRating =
-    totalFeedbackCount > 0 ? weightedSum / totalFeedbackCount : null;
-
-  const hasWarning = activeRows.some((r) => r.correlationWarning);
-
-  return {
-    variant,
-    currentVersion,
-    activeTemplateCount: activeRows.length,
-    totalFeedbackCount,
-    weightedAvgRating,
-    hasWarning,
-  };
+  return aggregateVariantSummary(variant, mockBreakdown(variant));
 }
 
 /** L1 list view 用、4 variant 分のサマリ。 */
 export const MOCK_VARIANT_SUMMARIES: VariantSummary[] = SUPPORTED_VARIANTS.map(
   mockVariantSummary,
 );
+
+export type { VariantSummary };

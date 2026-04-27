@@ -12,6 +12,7 @@ import { MetricGlossaryButton } from "./_shared/components/MetricGlossary";
 import { CommunityRow } from "./features/dashboard/components/CommunityRow";
 import { useDashboardControls } from "./features/dashboard/hooks/useDashboardControls";
 import { useDashboardOverview } from "./features/dashboard/hooks/useDashboardOverview";
+import { useReportSummariesByCommunity } from "./features/dashboard/hooks/useReportSummariesByCommunity";
 import { sysAdminDashboardJa } from "./_shared/i18n/ja";
 
 type Props = {
@@ -23,6 +24,7 @@ export function SysAdminPageClient({ initialData }: Props) {
   const router = useAppRouter();
   const { state } = useDashboardControls();
   const { loading, error, communities } = useDashboardOverview(state, initialData);
+  const { summariesByCommunity } = useReportSummariesByCommunity();
 
   const headerConfig = useMemo(
     () => ({
@@ -78,6 +80,7 @@ export function SysAdminPageClient({ initialData }: Props) {
               {idx !== 0 && <hr className="border-muted" />}
               <CommunityRow
                 row={community}
+                reportSummary={summariesByCommunity.get(community.communityId)}
                 onClick={(communityId) =>
                   router.push(`/sysAdmin/${communityId}`)
                 }
