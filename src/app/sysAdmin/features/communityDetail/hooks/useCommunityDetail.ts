@@ -58,6 +58,10 @@ const FIXED_USER_SORT = {
   order: GqlSysAdminSortOrder.Desc,
 } as const;
 
+// L2 の HistoryBars footer は 12 期間表示を前提にしているため、period preset
+// が 3 ヶ月などでも query 側は最低 12 ヶ月分の trend を返してもらう。
+const L2_MIN_WINDOW_MONTHS = 12;
+
 export function useCommunityDetail({
   communityId,
   dashboardControls,
@@ -76,7 +80,10 @@ export function useCommunityDetail({
         tier2: dashboardControls.tier2,
         minMonthsIn: DEFAULT_SEGMENT_THRESHOLDS.minMonthsIn,
       },
-      windowMonths,
+      // L2 の HistoryBars / cohortFunnel が 12 期間表示を前提にしているため、
+      // period preset (default 3 ヶ月など) よりも常に 12 を下限とする。
+      // 「全期間」(36 ヶ月) を選んだ場合はその値を使う。
+      windowMonths: Math.max(L2_MIN_WINDOW_MONTHS, windowMonths),
       userFilter: FIXED_USER_FILTER,
       userSort: FIXED_USER_SORT,
       limit,
