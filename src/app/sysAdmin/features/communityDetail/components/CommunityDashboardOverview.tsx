@@ -834,12 +834,18 @@ function ActivationFunnelCard({
   return (
     <div className="rounded-2xl bg-muted/40 p-5">
       <header className="mb-3 flex items-center gap-2 text-xs text-muted-foreground">
-        {!memberSampleComplete && <span>サンプル不足</span>}
-        <MetricInfoButton metricKey="funnelOverview" className="ml-auto" />
+        <span className="text-sm font-medium text-foreground">ファネル</span>
+        <MetricInfoButton metricKey="funnelOverview" />
+        {!memberSampleComplete && (
+          <span className="ml-auto">サンプル不足</span>
+        )}
         {detailHref && (
           <Link
             href={detailHref}
-            className="inline-flex items-center gap-0.5 hover:underline"
+            className={cn(
+              "inline-flex items-center gap-0.5 hover:underline",
+              memberSampleComplete && "ml-auto",
+            )}
           >
             詳細を見る
             <ChevronRight className="h-3 w-3" />
