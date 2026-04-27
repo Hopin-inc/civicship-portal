@@ -14,12 +14,22 @@ import {
 } from "@/app/sysAdmin/_shared/derive";
 import type { GqlSysAdminCommunityOverview } from "@/types/graphql";
 
+/**
+ * Phase 2 で backend 提供予定の adminReportSummary の community 単位サマリ。
+ * 未 landing のため optional。値があれば「最終Report 発行 N日前」を pill 表示する。
+ */
+export type CommunityReportSummary = {
+  daysSinceLastPublish: number | null;
+  publishedCountLast90Days: number;
+};
+
 type Props = {
   row: GqlSysAdminCommunityOverview;
+  reportSummary?: CommunityReportSummary | null;
   onClick?: (communityId: string) => void;
 };
 
-export function CommunityRow({ row, onClick }: Props) {
+export function CommunityRow({ row, reportSummary, onClick }: Props) {
   const handleClick = () => onClick?.(row.communityId);
   const activityRate = deriveActivityRate(row);
   const growthRateActivity = deriveGrowthRateActivity(row);
@@ -60,11 +70,24 @@ export function CommunityRow({ row, onClick }: Props) {
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5">
           <KpiPill label="MAU" value={toPct(activityRate)} delta={growthRateActivity} />
           <KpiPill label="Δ" value={`新規${toIntJa(newlyActivated)} / 休眠${toIntJa(churned)}`} />
+          {reportSummary !== undefined && reportSummary !== null && (
+            <KpiPill label="Report" value={formatReportRecency(reportSummary)} />
+          )}
         </div>
         <TenureBar distribution={row.tenureDistribution} showLabels={false} />
       </ItemFooter>
     </Item>
   );
+}
+
+function formatReportRecency(summary: CommunityReportSummary): string {
+  const days = summary.daysSinceLastPublish;
+  if (days === null) return "未公開";
+  if (days === 0) return "本日";
+  if (days < 7) return `${days}日前`;
+  if (days < 30) return `${Math.floor(days / 7)}週前`;
+  if (days < 365) return `${Math.floor(days / 30)}ヶ月前`;
+  return `${Math.floor(days / 365)}年前`;
 }
 
 type KpiPillProps = {

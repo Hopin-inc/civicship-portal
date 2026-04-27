@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type {
   GqlGetSysAdminCommunityDetailQuery,
   GqlSysAdminTenureDistribution,
@@ -12,6 +13,7 @@ import { useDashboardControls } from "@/app/sysAdmin/features/dashboard/hooks/us
 import { useCommunityDetail } from "@/app/sysAdmin/features/communityDetail/hooks/useCommunityDetail";
 import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";
 import { CommunityDashboardOverview } from "@/app/sysAdmin/features/communityDetail/components/CommunityDashboardOverview";
+import { CommunityReportsTab } from "@/app/sysAdmin/features/communityDetail/components/CommunityReportsTab";
 
 type Props = {
   communityId: string;
@@ -61,12 +63,23 @@ export function CommunityDetailPageClient({
   const newMemberCount = latestMonth?.newMembers;
 
   return (
-    <CommunityDashboardOverview
-      data={data}
-      communityName={data.communityName}
-      newMemberCount={newMemberCount}
-      tenureDistribution={tenureDistribution ?? undefined}
-      hubMemberCount={hubMemberCount ?? undefined}
-    />
+    <Tabs defaultValue="dashboard" className="w-full">
+      <TabsList className="mb-4">
+        <TabsTrigger value="dashboard">ダッシュボード</TabsTrigger>
+        <TabsTrigger value="reports">レポート</TabsTrigger>
+      </TabsList>
+      <TabsContent value="dashboard">
+        <CommunityDashboardOverview
+          data={data}
+          communityName={data.communityName}
+          newMemberCount={newMemberCount}
+          tenureDistribution={tenureDistribution ?? undefined}
+          hubMemberCount={hubMemberCount ?? undefined}
+        />
+      </TabsContent>
+      <TabsContent value="reports">
+        <CommunityReportsTab communityId={communityId} />
+      </TabsContent>
+    </Tabs>
   );
 }
