@@ -788,26 +788,24 @@ function ActivationFunnelCard({
   detailHref?: string;
 }) {
   const acquired = stages[0]?.count ?? 0;
+  const showHeader = !memberSampleComplete || detailHref != null;
   return (
     <div className="rounded-2xl bg-muted/40 p-5">
-      <header className="flex items-center justify-between gap-3">
-        <span className="text-sm font-medium">
-          アクティベーション・ファネル
-        </span>
-        {!memberSampleComplete && (
-          <span className="text-xs text-muted-foreground">サンプル不足</span>
-        )}
-        {detailHref && (
-          <Link
-            href={detailHref}
-            className="ml-auto inline-flex items-center gap-0.5 text-xs text-muted-foreground hover:underline"
-          >
-            詳細を見る
-            <ChevronRight className="h-3 w-3" />
-          </Link>
-        )}
-      </header>
-      <div className="mt-3 flex flex-col gap-1.5">
+      {showHeader && (
+        <header className="mb-3 flex items-center gap-3 text-xs text-muted-foreground">
+          {!memberSampleComplete && <span>サンプル不足</span>}
+          {detailHref && (
+            <Link
+              href={detailHref}
+              className="ml-auto inline-flex items-center gap-0.5 hover:underline"
+            >
+              詳細を見る
+              <ChevronRight className="h-3 w-3" />
+            </Link>
+          )}
+        </header>
+      )}
+      <div className="flex flex-col gap-1.5">
         {stages.map((s, i) => {
           // sample 不足のとき「反復送付」(index 2) は bar を空にする。それ以外
           // は server-aggregate ベースで信頼可能なので always bar 描画。
