@@ -18,8 +18,8 @@ type Section = {
 };
 
 // L1 row に表示している指標とその直接的な前提だけに絞る。L2 詳細で必要な
-// 個人指標 / コホート / WAU 構成は別途 L2 側で glossary を持つ想定。
-const SECTIONS: Section[] = [
+// 個人指標 / コホート / WAU 構成は L2_GLOSSARY_SECTIONS で別出し。
+const L1_GLOSSARY_SECTIONS: Section[] = [
   {
     heading: "主指標",
     keys: ["mau", "communityActivityRate", "growthRateActivity", "newMembers", "activityFlow"],
@@ -28,11 +28,62 @@ const SECTIONS: Section[] = [
   { heading: "設定", keys: ["asOf"] },
 ];
 
+// L2 overview / ファネル card / scope tile / 各種 footer chart で出てくる
+// 全指標を網羅する。section 順は L2 上の縦並びとほぼ揃え、上から「ファネル」
+// → 「ネットワーク」「メンバー」(state 系) → 「アクティビティ」(flow 系) の
+// 順で読めるようにしている。
+export const L2_GLOSSARY_SECTIONS: Section[] = [
+  {
+    heading: "アクティベーション・ファネル",
+    keys: ["funnelOverview", "funnelSent", "funnelRepeated", "funnelHabitual"],
+  },
+  {
+    heading: "ネットワーク",
+    keys: ["hubUserPct", "avgRecipients", "recipientToSenderRate", "paretoTopShare"],
+  },
+  {
+    heading: "メンバー (構造)",
+    keys: ["habitualPct", "newRate", "tenuredRatio", "dormantRate"],
+  },
+  {
+    heading: "アクティビティ (時系列)",
+    keys: [
+      "communityActivityRate",
+      "weeklySenderContinuationRate",
+      "newD30ActivationRate",
+      "donationMoM",
+      "recoveryRate",
+    ],
+  },
+  {
+    heading: "WAU 構成",
+    keys: ["wau", "retainedSenders", "churnedSenders", "returnedSenders"],
+  },
+  {
+    heading: "個人 (member-level)",
+    keys: [
+      "userSendRate",
+      "monthsIn",
+      "donationOutMonths",
+      "totalPointsOut",
+      "chainDepth",
+      "maxChainDepthAllTime",
+      "stages",
+    ],
+  },
+  { heading: "設定", keys: ["asOf"] },
+];
+
 type Props = {
   className?: string;
+  /** 表示するセクション一覧。省略時は L1 用 (主指標 + ステージ + 設定)。 */
+  sections?: Section[];
 };
 
-export function MetricGlossaryButton({ className }: Props) {
+export function MetricGlossaryButton({
+  className,
+  sections = L1_GLOSSARY_SECTIONS,
+}: Props) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -55,7 +106,7 @@ export function MetricGlossaryButton({ className }: Props) {
             </DialogTitle>
           </DialogHeader>
           <div className="flex flex-col gap-5 text-muted-foreground">
-            {SECTIONS.map((section) => (
+            {sections.map((section) => (
               <section key={section.heading} className="flex flex-col gap-2">
                 <h3 className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground/70">
                   {section.heading}

@@ -132,6 +132,101 @@ export const METRIC_DEFINITIONS: Record<string, MetricDefinition> = {
     note:
       "画面上の MAU% ・ステージ分布・コホート retention 等、すべての指標は この日時点のスナップショット。未指定時は今日 (実行時) を使う。",
   },
+
+  // L2 新規指標 — 「定着」「初回送付」「ファネル」など、PR #1184 で追加
+  // した概念。L1 row には出ないが L2 overview / 将来の L3 で参照される。
+  funnelOverview: {
+    title: "アクティベーション・ファネル",
+    formula:
+      "加入 → 送付 → 継続 → 定着 の 4 段階。L2 では先頭の「加入」(= 100%) は省略して 3 段で表示する",
+    note:
+      "1 メンバーが「ギフトを贈る側」に育つまでの journey。各ゲートでの脱落率を一覧することで、コミュニティが「welcome 文化が薄い (送付段で詰まる)」か「単発で終わる (継続段で詰まる)」かを切り分ける。受領側 (受け取るだけのメンバー) はこのファネルとは別レンズで、「受領→送付 転換率」が橋指標として担当する。",
+  },
+  funnelSent: {
+    title: "送付 (ファネル段)",
+    formula: "totalMembers − stages.latent.count (= 1 度でも DONATION を送ったメンバー)",
+    note: "加入 → 送付 のゲート。「能動参加に至ったか」を測る。server-aggregate なので memberList の limit と無関係に正確。",
+  },
+  funnelRepeated: {
+    title: "継続 (ファネル段)",
+    formula: "memberList のうち donationOutMonths ≥ 2 のメンバー数",
+    note: "送付 → 継続 のゲート。「2 ヶ月以上連続して送付した = 1 回きりで終わらなかった」を測る。memberList を limit=1000 で取得しているため、totalMembers が 1000 を超える community では過小評価されうる (その場合は「サンプル不足」と表示して bar を空にする)。週次送付継続率は WoW、こちらは累計の milestone — 時間軸が異なる。",
+  },
+  funnelHabitual: {
+    title: "定着 (ファネル段)",
+    formula: "stages.habitual.count (= L2 card「定着率」の分子)",
+    note: "継続 → 定着 のゲート。habitual segment (個人の userSendRate ≥ tier1) に到達したメンバー数。tier1 を SettingsDrawer で動かすと値が変動する。",
+  },
+  recipientToSenderRate: {
+    title: "受領→送付 転換率",
+    formula:
+      "count(member where totalPointsIn > 0 AND totalPointsOut > 0) ÷ count(member where totalPointsIn > 0)",
+    note:
+      "受領経験者のうち送付経験もある人の比率 (互酬到達率)。ギフトエコノミーが配給型 (一方通行) か相互参加型かを区別する本質指標。memberList が hasNextPage=true のとき (= 1000 名超 community で sample 不足) は分母が過小評価されるため値を出さず「サンプル不足」と表示する。",
+    range: "0〜100%",
+  },
+  newD30ActivationRate: {
+    title: "初回送付率",
+    formula:
+      "直近完了 N コホート (default 3) の retentionM1 平均。retentionM1 = entry month の翌月に DONATION out した cohort の比率",
+    note:
+      "新規メンバーが ~30-60 日以内に送付に至る率の目安。最新 cohort は M+1 が未完了で null のため、retentionM1 が確定済みの cohort のみ集計する。L2 ファネル card の「送付」段とは目線が違う (こちらは新規 cohort にフォーカス、ファネルは community 全体の現在状態)。",
+    range: "0〜100%",
+  },
+  recoveryRate: {
+    title: "復帰率",
+    formula: "今月 returnedMembers ÷ 前月末 dormantCount",
+    note:
+      "「先月末時点で休眠 (直近 30 日 DONATION out なし) だったメンバーのうち、今月送付した割合」。月初 (asOf=月初付近) のクエリでは分子がほぼ 0 で、月末に近づくほど値が成長する月内累計のシグナル。",
+    range: "0〜100%",
+  },
+  habitualPct: {
+    title: "定着率",
+    formula: "stages.habitual.count ÷ totalMembers (個人の userSendRate ≥ tier1 を満たすメンバー比率)",
+    note:
+      "ノード軸の最終ステージ。SettingsDrawer で tier1 を変えると分子が変動する。L2 ファネル card の「定着」(終端) と同じ概念で、片方は card、もう片方は ファネル diagram での見え方の違い。",
+    range: "0〜100%",
+  },
+  avgRecipients: {
+    title: "平均送付先数",
+    formula: "アクティブメンバー (userSendRate > 0) の uniqueDonationRecipients を単純平均",
+    note:
+      "各メンバーが累計で何人に送ってきたかの「広がり」指標。ハブユーザー比率と相補的 (こちらは一人当たりの幅、ハブ比率は分布のしっぽ)。",
+  },
+  paretoTopShare: {
+    title: "流通量の偏り",
+    formula:
+      "DONATION 流通量 (totalPointsOut) を降順ソートし、coverage (default 80%) に到達するまでの上位寄与者の割合",
+    note:
+      "Pareto curve 上の「上位 X% が 80% を担う」の X。値が小さいほど一握りに集中、大きいほど分散している giver 構造を表す。",
+    range: "0〜100%",
+  },
+  donationMoM: {
+    title: "流通量 MoM",
+    formula: "(今月 donationPointsSum − 前月 donationPointsSum) ÷ 前月 donationPointsSum",
+    note: "前月比の流通量変化。L2 の月次トレンドを 1 値に圧縮した形。負値は減速。",
+  },
+  newRate: {
+    title: "新規率",
+    formula: "最新月 newMembers ÷ totalMembers",
+    note: "最新月の新規加入比率。獲得施策の効果を測るが、定着 (継続的活動) と独立に評価する必要がある。新規率が高いのに定着率が低い community は「漏れバケツ」の可能性。",
+    range: "0〜100%",
+  },
+  tenuredRatio: {
+    title: "3 ヶ月以上 在籍率",
+    formula: "tenureDistribution の m3to12Months + gte12Months ÷ totalMembers",
+    note:
+      "コミュニティ全体に占める 3 ヶ月以上在籍者の割合。短期離脱の少なさ / 中長期定着の指標。footer に在籍分布 4 bucket (1 ヶ月未満 / 1〜3 / 3〜12 / 12+ ヶ月) も同時表示。",
+    range: "0〜100%",
+  },
+  weeklySenderContinuationRate: {
+    title: "週次送付継続率",
+    formula:
+      "今週 retainedSenders ÷ (retainedSenders + churnedSenders) — 先週送付した人のうち今週も送付した人の割合",
+    note:
+      "週次の sender retention。ファネルの「継続」(累計 ≥ 2 ヶ月送付) とは時間軸が違う (こちらは WoW 即時継続、ファネル側は累計 milestone)。",
+    range: "0〜100%",
+  },
 };
 
 export type MetricKey =
@@ -156,4 +251,18 @@ export type MetricKey =
   | "chainPct"
   | "stages"
   | "dormantRate"
-  | "asOf";
+  | "asOf"
+  | "funnelOverview"
+  | "funnelSent"
+  | "funnelRepeated"
+  | "funnelHabitual"
+  | "recipientToSenderRate"
+  | "newD30ActivationRate"
+  | "recoveryRate"
+  | "habitualPct"
+  | "avgRecipients"
+  | "paretoTopShare"
+  | "donationMoM"
+  | "newRate"
+  | "tenuredRatio"
+  | "weeklySenderContinuationRate";
