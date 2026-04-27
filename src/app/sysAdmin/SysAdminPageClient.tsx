@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
 import type { GqlGetSysAdminDashboardQuery } from "@/types/graphql";
-import { MetricGlossaryButton } from "./_shared/components/MetricGlossary";
 import { CommunityRow } from "./features/dashboard/components/CommunityRow";
 import { useDashboardControls } from "./features/dashboard/hooks/useDashboardControls";
 import { useDashboardOverview } from "./features/dashboard/hooks/useDashboardOverview";
@@ -43,7 +42,6 @@ export function SysAdminPageClient({ initialData }: Props) {
           コミュニティ一覧
         </h2>
         <div className="flex items-center gap-2">
-          <MetricGlossaryButton />
           <Button
             onClick={() => router.push("/sysAdmin/system")}
             variant="tertiary"

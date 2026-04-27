@@ -148,6 +148,7 @@ export const SYS_ADMIN_MONTHLY_ACTIVITY_POINT_FRAGMENT = gql`
     chainPct
     dormantCount
     returnedMembers
+    hubMemberCount
   }
 `;
 
@@ -169,6 +170,16 @@ export const SYS_ADMIN_COHORT_RETENTION_POINT_FRAGMENT = gql`
     retentionM1
     retentionM3
     retentionM6
+  }
+`;
+
+export const SYS_ADMIN_COHORT_FUNNEL_POINT_FRAGMENT = gql`
+  fragment SysAdminCohortFunnelPointFields on SysAdminCohortFunnelPoint {
+    cohortMonth
+    acquired
+    activatedD30
+    repeated
+    habitual
   }
 `;
 

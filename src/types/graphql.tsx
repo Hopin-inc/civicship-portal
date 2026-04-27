@@ -6200,6 +6200,7 @@ export type GqlSysAdminMonthlyActivityPointFieldsFragment = {
   chainPct?: number | null;
   dormantCount: number;
   returnedMembers?: number | null;
+  hubMemberCount?: number | null;
 };
 
 export type GqlSysAdminRetentionTrendPointFieldsFragment = {
@@ -6219,6 +6220,15 @@ export type GqlSysAdminCohortRetentionPointFieldsFragment = {
   retentionM1?: number | null;
   retentionM3?: number | null;
   retentionM6?: number | null;
+};
+
+export type GqlSysAdminCohortFunnelPointFieldsFragment = {
+  __typename?: "SysAdminCohortFunnelPoint";
+  cohortMonth: Date;
+  acquired: number;
+  activatedD30: number;
+  repeated: number;
+  habitual: number;
 };
 
 export type GqlSysAdminMemberRowFieldsFragment = {
@@ -6372,6 +6382,7 @@ export type GqlGetSysAdminCommunityDetailQuery = {
       chainPct?: number | null;
       dormantCount: number;
       returnedMembers?: number | null;
+      hubMemberCount?: number | null;
     }>;
     retentionTrend: Array<{
       __typename?: "SysAdminRetentionTrendPoint";
@@ -6389,6 +6400,14 @@ export type GqlGetSysAdminCommunityDetailQuery = {
       retentionM1?: number | null;
       retentionM3?: number | null;
       retentionM6?: number | null;
+    }>;
+    cohortFunnel: Array<{
+      __typename?: "SysAdminCohortFunnelPoint";
+      cohortMonth: Date;
+      acquired: number;
+      activatedD30: number;
+      repeated: number;
+      habitual: number;
     }>;
     memberList: {
       __typename?: "SysAdminMemberList";
@@ -9994,6 +10013,7 @@ export const SysAdminMonthlyActivityPointFieldsFragmentDoc = gql`
     chainPct
     dormantCount
     returnedMembers
+    hubMemberCount
   }
 `;
 export const SysAdminRetentionTrendPointFieldsFragmentDoc = gql`
@@ -10013,6 +10033,15 @@ export const SysAdminCohortRetentionPointFieldsFragmentDoc = gql`
     retentionM1
     retentionM3
     retentionM6
+  }
+`;
+export const SysAdminCohortFunnelPointFieldsFragmentDoc = gql`
+  fragment SysAdminCohortFunnelPointFields on SysAdminCohortFunnelPoint {
+    cohortMonth
+    acquired
+    activatedD30
+    repeated
+    habitual
   }
 `;
 export const SysAdminMemberRowFieldsFragmentDoc = gql`
@@ -12849,6 +12878,9 @@ export const GetSysAdminCommunityDetailDocument = gql`
       cohortRetention {
         ...SysAdminCohortRetentionPointFields
       }
+      cohortFunnel {
+        ...SysAdminCohortFunnelPointFields
+      }
       memberList {
         hasNextPage
         nextCursor
@@ -12864,6 +12896,7 @@ export const GetSysAdminCommunityDetailDocument = gql`
   ${SysAdminMonthlyActivityPointFieldsFragmentDoc}
   ${SysAdminRetentionTrendPointFieldsFragmentDoc}
   ${SysAdminCohortRetentionPointFieldsFragmentDoc}
+  ${SysAdminCohortFunnelPointFieldsFragmentDoc}
   ${SysAdminMemberRowFieldsFragmentDoc}
 `;
 

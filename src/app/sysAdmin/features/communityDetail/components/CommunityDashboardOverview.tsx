@@ -30,6 +30,9 @@ import {
   toIntJa,
   toPct,
 } from "@/app/sysAdmin/_shared/format/number";
+import { HistoryBars } from "@/app/sysAdmin/_shared/components/HistoryBars";
+import type { MetricKey } from "@/app/sysAdmin/_shared/components/MetricDefinitions";
+import { MetricInfoButton } from "@/app/sysAdmin/_shared/components/MetricInfoButton";
 import { PercentDelta } from "@/app/sysAdmin/_shared/components/PercentDelta";
 import {
   TenureBar,
@@ -204,7 +207,7 @@ export function CommunityDashboardOverview({
   // 流通量集中度 (Pareto)
   const paretoTopShare = computeParetoTopShare(activeMembers, 0.8);
 
-  // 週次継続率: retentionTrend の最新週から
+  // 週次送付継続率: retentionTrend の最新週から
   const latestWeek = data.retentionTrend[data.retentionTrend.length - 1];
   const weeklyContinuationRate =
     latestWeek && latestWeek.retainedSenders + latestWeek.churnedSenders > 0
@@ -262,13 +265,66 @@ export function CommunityDashboardOverview({
       ? latestMonth.returnedMembers / prevMonthForRecovery.dormantCount
       : null;
 
-  // sparkline data
-  const mauSeries = data.monthlyActivityTrend
-    .map((m) => m.communityActivityRate)
-    .filter((v): v is number => v != null);
+  // 12 期間 footer chart 用の time-series。各カードの動的シグナルを統一表示
+  // するために `HistoryBars` (棒グラフ) に流す。null は backend が「この月は
+  // データ範囲外」を示すマーカーで、HistoryBars 側は描画スキップで gap として
+  // 残す ─ value が 0 (= 実データだが値ゼロ) と区別する。
+  const mauSeries = data.monthlyActivityTrend.map((m) => m.communityActivityRate);
   const throughputSeries = data.monthlyActivityTrend.map(
     (m) => m.donationPointsSum,
   );
+  const newMembersSeries = data.monthlyActivityTrend.map((m) => m.newMembers);
+  const dormantSeries = data.monthlyActivityTrend.map((m) => m.dormantCount);
+  const hubSeries = data.monthlyActivityTrend.map((m) => m.hubMemberCount);
+
+  // 復帰率 月次推移: returnedMembers[N] / dormantCount[N-1]。先月データなし or
+  // 分母 0 のセルは null (gap 表示) に倒す。
+  const recoverySeries = data.monthlyActivityTrend.map((m, i, arr) => {
+    if (i === 0) return null;
+    const prev = arr[i - 1];
+    if (m.returnedMembers == null || prev.dormantCount === 0) return null;
+    return m.returnedMembers / prev.dormantCount;
+  });
+
+  // 週次送付継続率 series: 直近 12 週の retainedSenders / (retained + churned)。
+  const weeklyContinuationSeries = data.retentionTrend
+    .slice(-12)
+    .map((w) => {
+      const total = w.retainedSenders + w.churnedSenders;
+      return total > 0 ? w.retainedSenders / total : null;
+    });
+
+  // D30 series: 直近 6 cohort の retentionM1。最新 cohort は M+1 未完了で null
+  // の可能性が高いが、null は HistoryBars 側で gap 表示するので問題なし。
+  const d30Series = data.cohortRetention.slice(-6).map((c) => c.retentionM1);
+
+  // アクティベーション・ファネル (送付軸 3 ステージ、コミュニティ全体)。
+  // 分母は totalMembers (= 加入 100%) を暗黙の baseline として使い、ファネル
+  // としては「加入」段は描画しない (header band の "385 名" 表示で既知)。
+  //   送付 = 1 回でも送付した (= latent ではない人)
+  //   継続 = 2 ヶ月以上送付した (memberList から count)
+  //   定着 = stages.habitual segment (= card「定着率」と同じ概念)
+  // memberList は totalPointsOut DESC で limit=1000 のため、totalMembers が
+  // 1000 を超える community では 継続 が過小評価されうる (sampleDependent フラグ
+  // で明示)。送付 / 定着 は server-aggregate で bias なし。
+  const funnelDenominator = totalMembers;
+  const funnelStages = [
+    {
+      label: "送付",
+      count: Math.max(0, totalMembers - stages.latent.count),
+      sampleDependent: false,
+    },
+    {
+      label: "継続",
+      count: data.memberList.users.filter((u) => u.donationOutMonths >= 2).length,
+      sampleDependent: true,
+    },
+    {
+      label: "定着",
+      count: habitualCount,
+      sampleDependent: false,
+    },
+  ];
 
   return (
     <div className="flex flex-col gap-3">
@@ -303,6 +359,18 @@ export function CommunityDashboardOverview({
         </header>
       )}
 
+      {/* highlight: アクティベーション・ファネル。L2 単一値カードでは見えに
+          くい「ステージ間の脱落幅」を 1 枚で読ませる。 cohortFunnel での詳細
+          (cohort 別比較) は L3 /activity 行き。 */}
+      <ActivationFunnelCard
+        denominator={funnelDenominator}
+        stages={funnelStages}
+        memberSampleComplete={memberSampleComplete}
+        detailHref={
+          enableSubpageLinks ? `/sysAdmin/${data.communityId}/activity#funnel` : undefined
+        }
+      />
+
       {/* state group: 関係 (Network) + 個人 (Member) を上に。
           いずれも累計 / 現在の構造を表す snapshot 系メトリクス。 */}
       <div className="flex flex-col gap-6">
@@ -318,11 +386,20 @@ export function CommunityDashboardOverview({
             colorClass={SCOPE_COLOR.network}
             title="ハブユーザー比率"
             meta="今月"
+            infoMetricKey="hubUserPct"
             status={hubProvided ? "ok" : "todo"}
             hero={hubProvided ? <Hero value={toPct(hubPct)} /> : undefined}
             viz={
               hubProvided ? (
                 <Ring value={hubPct} colorClass={SCOPE_COLOR.network} />
+              ) : undefined
+            }
+            footer={
+              hubProvided ? (
+                <HistoryBars
+                  data={hubSeries}
+                  colorClass={SCOPE_COLOR.network}
+                />
               ) : undefined
             }
           />
@@ -331,6 +408,7 @@ export function CommunityDashboardOverview({
             colorClass={SCOPE_COLOR.network}
             title="平均送付先数"
             meta="累計"
+            infoMetricKey="avgRecipients"
             hero={
               <Hero
                 value={avgRecipients > 0 ? avgRecipients.toFixed(1) : "-"}
@@ -346,6 +424,7 @@ export function CommunityDashboardOverview({
             colorClass={SCOPE_COLOR.network}
             title="受領→送付 転換率"
             meta={memberSampleComplete ? "累計" : "サンプル不足"}
+            infoMetricKey="recipientToSenderRate"
             hero={
               <Hero
                 value={
@@ -369,6 +448,7 @@ export function CommunityDashboardOverview({
             colorClass={SCOPE_COLOR.network}
             title="流通量の偏り"
             meta="累計"
+            infoMetricKey="paretoTopShare"
             hero={
               paretoTopShare != null ? (
                 <Hero prefix="上位" value={toPct(paretoTopShare)} />
@@ -397,8 +477,9 @@ export function CommunityDashboardOverview({
           <MetricCard
             icon={Star}
             colorClass={SCOPE_COLOR.user}
-            title="習慣化率"
+            title="定着率"
             meta="現在"
+            infoMetricKey="habitualPct"
             hero={<Hero value={toPct(stages.habitual.pct)} />}
             viz={
               <Ring value={stages.habitual.pct} colorClass={SCOPE_COLOR.user} />
@@ -409,7 +490,14 @@ export function CommunityDashboardOverview({
             colorClass={SCOPE_COLOR.user}
             title="新規率"
             meta="最新月"
+            infoMetricKey="newRate"
             hero={<Hero value={newRate != null ? toPct(newRate) : "-"} />}
+            footer={
+              <HistoryBars
+                data={newMembersSeries}
+                colorClass={SCOPE_COLOR.user}
+              />
+            }
           />
           <MetricCard
             icon={Hourglass}
@@ -418,6 +506,7 @@ export function CommunityDashboardOverview({
             meta={
               tenuredFromCommunity ? "コミュニティ全体" : "上位寄与者ベース (暫定)"
             }
+            infoMetricKey="tenuredRatio"
             hero={
               <Hero value={tenuredRatio != null ? toPct(tenuredRatio) : "-"} />
             }
@@ -437,6 +526,7 @@ export function CommunityDashboardOverview({
             colorClass={SCOPE_COLOR.user}
             title="休眠化率"
             meta="直近 30 日"
+            infoMetricKey="dormantRate"
             hero={
               <Hero value={dormantRate != null ? toPct(dormantRate) : "-"} />
             }
@@ -445,11 +535,17 @@ export function CommunityDashboardOverview({
                 <Ring value={dormantRate} colorClass={SCOPE_COLOR.user} />
               ) : undefined
             }
+            footer={
+              <HistoryBars
+                data={dormantSeries}
+                colorClass={SCOPE_COLOR.user}
+              />
+            }
           />
 
           {habitualOverRegular && (
-            <Issue title="「定期」が「習慣化」を超過">
-              定期 {regularCount} 名 が 習慣化 {habitualCount} 名 を上回っている。中堅層の習慣化に伸びしろ。
+            <Issue title="「定期」が「定着」を超過">
+              定期 {regularCount} 名 が 定着 {habitualCount} 名 を上回っている。中堅層の定着に伸びしろ。
             </Issue>
           )}
         </Scope>
@@ -467,6 +563,7 @@ export function CommunityDashboardOverview({
           colorClass={SCOPE_COLOR.activity}
           title="今月の MAU%"
           meta="今月"
+          infoMetricKey="communityActivityRate"
           hero={
             <Hero
               value={
@@ -482,17 +579,16 @@ export function CommunityDashboardOverview({
               }
             />
           }
-          viz={
-            mauSeries.length > 1 ? (
-              <Sparkline data={mauSeries} colorClass={SCOPE_COLOR.activity} />
-            ) : undefined
+          footer={
+            <HistoryBars data={mauSeries} colorClass={SCOPE_COLOR.activity} />
           }
         />
         <MetricCard
           icon={Repeat}
           colorClass={SCOPE_COLOR.activity}
-          title="週次継続率"
+          title="週次送付継続率"
           meta="直近週"
+          infoMetricKey="weeklySenderContinuationRate"
           hero={
             <Hero
               value={
@@ -510,18 +606,27 @@ export function CommunityDashboardOverview({
               />
             ) : undefined
           }
+          footer={
+            <HistoryBars
+              data={weeklyContinuationSeries}
+              colorClass={SCOPE_COLOR.activity}
+            />
+          }
         />
-        {/* 新規定着率 (D30 相当): 直近完了 N コホートの retentionM1 平均。
-            最新コホートは m+1 が未完了で null になるため、完了済みのみ集計。 */}
+        {/* 初回送付率 (D30 相当): 直近完了 N コホートの retentionM1 平均。
+            最新コホートは m+1 が未完了で null になるため、完了済みのみ集計。
+            ファネル末段の「定着」(= habitual segment、card「定着率」) と
+            意味が違うので「初回送付」という別名で区別する。 */}
         <MetricCard
           icon={Zap}
           colorClass={SCOPE_COLOR.activity}
-          title="新規定着率"
+          title="初回送付率"
           meta={
             recentCompletedCohorts.length > 0
-              ? `直近 ${recentCompletedCohorts.length} コホート avg`
+              ? `直近 ${recentCompletedCohorts.length} コホート平均`
               : "完了コホートなし"
           }
+          infoMetricKey="newD30ActivationRate"
           hero={
             <Hero
               value={
@@ -537,19 +642,27 @@ export function CommunityDashboardOverview({
               />
             ) : undefined
           }
+          footer={
+            <HistoryBars data={d30Series} colorClass={SCOPE_COLOR.activity} />
+          }
         />
         <MetricCard
           icon={TrendingUp}
           colorClass={SCOPE_COLOR.activity}
           title="流通量 MoM"
           meta="今月 vs 前月"
+          infoMetricKey="donationMoM"
           hero={
             donationMoM != null ? (
               <Hero
                 value={
                   <PercentDelta
                     value={donationMoM}
-                    className="text-4xl tracking-tight"
+                    // 緑/赤の sign-based coloring を抑制して default の text
+                    // 色 (foreground) で出す。流通量 MoM は hero がそのまま
+                    // 大数字なので、green/red で色付けすると他カードの落ち着き
+                    // と齟齬が出るため。
+                    className="text-4xl tracking-tight text-foreground"
                     arrowClassName="mr-1 align-baseline text-xl font-medium"
                   />
                 }
@@ -558,13 +671,11 @@ export function CommunityDashboardOverview({
               <Hero value="-" />
             )
           }
-          viz={
-            throughputSeries.length > 1 ? (
-              <Sparkline
-                data={throughputSeries}
-                colorClass={SCOPE_COLOR.activity}
-              />
-            ) : undefined
+          footer={
+            <HistoryBars
+              data={throughputSeries}
+              colorClass={SCOPE_COLOR.activity}
+            />
           }
         />
         {/* 復帰率: 今月 returnedMembers / 前月 dormantCount。
@@ -574,6 +685,7 @@ export function CommunityDashboardOverview({
           colorClass={SCOPE_COLOR.activity}
           title="復帰率"
           meta="先月休眠 → 今月活動"
+          infoMetricKey="recoveryRate"
           hero={
             <Hero value={recoveryRate != null ? toPct(recoveryRate) : "-"} />
           }
@@ -581,6 +693,12 @@ export function CommunityDashboardOverview({
             recoveryRate != null ? (
               <Ring value={recoveryRate} colorClass={SCOPE_COLOR.activity} />
             ) : undefined
+          }
+          footer={
+            <HistoryBars
+              data={recoverySeries}
+              colorClass={SCOPE_COLOR.activity}
+            />
           }
         />
 
@@ -648,6 +766,7 @@ function MetricCard({
   viz,
   footer,
   status = "ok",
+  infoMetricKey,
 }: {
   icon: LucideIcon;
   colorClass: string;
@@ -658,6 +777,9 @@ function MetricCard({
   /** hero 行の下に積む補足 viz (在籍分布 mini bar など)。 */
   footer?: React.ReactNode;
   status?: "ok" | "todo";
+  /** 指定すると header の右側 meta の隣に Info icon を出して、tap で
+   * 該当指標の定義 popover を開く。MetricDefinitions の key を渡す。 */
+  infoMetricKey?: MetricKey;
 }) {
   return (
     <div className="rounded-2xl bg-muted/40 p-5">
@@ -666,9 +788,12 @@ function MetricCard({
           <Icon className="h-4 w-4" aria-hidden />
           <span>{title}</span>
         </div>
-        {meta && (
-          <span className="text-xs text-muted-foreground">{meta}</span>
-        )}
+        <div className="flex items-center gap-1.5">
+          {meta && (
+            <span className="text-xs text-muted-foreground">{meta}</span>
+          )}
+          {infoMetricKey && <MetricInfoButton metricKey={infoMetricKey} />}
+        </div>
       </header>
       <div className="mt-3 flex items-end justify-between gap-3">
         <div className="min-w-0 flex-1">
@@ -681,6 +806,80 @@ function MetricCard({
         {status === "ok" && viz && <div className="shrink-0">{viz}</div>}
       </div>
       {status === "ok" && footer && <div className="mt-3">{footer}</div>}
+    </div>
+  );
+}
+
+function ActivationFunnelCard({
+  denominator,
+  stages,
+  memberSampleComplete,
+  detailHref,
+}: {
+  /** ファネル baseline (= 100% 段)。通常は totalMembers。各ステージの通過率は
+   * count / denominator で計算する。「加入」段は冗長なので bar 上に出さず、
+   * header band の "385 名" 表示で暗黙の分母として扱う。 */
+  denominator: number;
+  /** 送付 → 継続 → 定着 の順に渡す (3 ステージ前提だが component 側で固定はしない)。
+   * `sampleDependent: true` のステージは memberSampleComplete=false のとき bar を
+   * 空にする (memberList の limit による biased 集計が起きうるため)。 */
+  stages: ReadonlyArray<{
+    label: string;
+    count: number;
+    sampleDependent?: boolean;
+  }>;
+  memberSampleComplete: boolean;
+  detailHref?: string;
+}) {
+  return (
+    <div className="rounded-2xl bg-muted/40 p-5">
+      <header className="mb-3 flex items-center gap-2 text-xs text-muted-foreground">
+        <span className="text-sm font-medium text-foreground">ファネル</span>
+        <MetricInfoButton metricKey="funnelOverview" />
+        {!memberSampleComplete && (
+          <span className="ml-auto">サンプル不足</span>
+        )}
+        {detailHref && (
+          <Link
+            href={detailHref}
+            className={cn(
+              "inline-flex items-center gap-0.5 hover:underline",
+              memberSampleComplete && "ml-auto",
+            )}
+          >
+            詳細を見る
+            <ChevronRight className="h-3 w-3" />
+          </Link>
+        )}
+      </header>
+      <div className="flex flex-col gap-1.5">
+        {stages.map((s) => {
+          // server-aggregate な stage は常に描画。memberList sampling 依存の
+          // stage (継続ユーザー) は sample 不足時に bar を空にする (誤解防止)。
+          const skipBar = !memberSampleComplete && s.sampleDependent === true;
+          const ratio = denominator > 0 && !skipBar ? s.count / denominator : 0;
+          const ratioLabel = !skipBar && denominator > 0 ? toPct(ratio) : "-";
+          return (
+            <div key={s.label} className="flex items-center gap-2">
+              <span className="w-16 shrink-0 text-xs text-muted-foreground">
+                {s.label}
+              </span>
+              <div className="relative h-2.5 flex-1 overflow-hidden rounded-full bg-muted">
+                <div
+                  className="h-full rounded-full bg-current text-orange-600"
+                  style={{ width: `${Math.min(1, ratio) * 100}%` }}
+                />
+              </div>
+              <span className="w-24 shrink-0 text-right text-xs tabular-nums text-muted-foreground">
+                {ratioLabel}
+                {!skipBar && (
+                  <span className="ml-1 opacity-70">({toIntJa(s.count)})</span>
+                )}
+              </span>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -749,46 +948,6 @@ function Ring({
         strokeDasharray={circumference}
         strokeDashoffset={offset}
         transform={`rotate(-90 ${size / 2} ${size / 2})`}
-        className={colorClass}
-      />
-    </svg>
-  );
-}
-
-function Sparkline({
-  data,
-  colorClass,
-  width = 76,
-  height = 30,
-}: {
-  data: number[];
-  colorClass: string;
-  width?: number;
-  height?: number;
-}) {
-  if (data.length < 2) return null;
-  const min = Math.min(...data);
-  const max = Math.max(...data);
-  const range = max - min || 1;
-  const stepX = width / (data.length - 1);
-  const padY = 2;
-  const usableH = height - padY * 2;
-  const points = data
-    .map((v, i) => {
-      const x = i * stepX;
-      const y = padY + usableH - ((v - min) / range) * usableH;
-      return `${x.toFixed(1)},${y.toFixed(1)}`;
-    })
-    .join(" ");
-  return (
-    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} aria-hidden>
-      <polyline
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={1.5}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        points={points}
         className={colorClass}
       />
     </svg>

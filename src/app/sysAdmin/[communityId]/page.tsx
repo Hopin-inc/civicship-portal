@@ -24,7 +24,10 @@ export default async function SysAdminCommunityDetailPage({ params }: Props) {
       communityId,
       asOf: undefined,
       segmentThresholds: DEFAULT_SEGMENT_THRESHOLDS,
-      windowMonths: 3,
+      // L2 の HistoryBars / cohortFunnel が 12 期間表示を前提にしているため、
+      // SSR fetch でも windowMonths=12 を渡す。client 側 (useCommunityDetail)
+      // も period preset の値に関わらず最低 12 を保証する。
+      windowMonths: 12,
       // schema default の minSendRate=0.7 を明示的に外す。詳細は
       // useCommunityDetail.ts の FIXED_USER_FILTER コメント参照。
       userFilter: { minSendRate: 0 },
