@@ -455,15 +455,6 @@ export function CommunityDashboardOverview({
         </Scope>
       </div>
 
-      {/* state -> flow の境界。flow 側 (アクティビティ) は時間軸の指標
-          (月次・週次・直近30日) で構成され、上の state 群とは時間粒度が違う
-          ため明示的に区切る。 */}
-      <div className="flex items-center gap-2 px-1 pt-2 text-xs text-muted-foreground">
-        <span className="h-px flex-1 bg-border" />
-        <span>直近の動き</span>
-        <span className="h-px flex-1 bg-border" />
-      </div>
-
       <Scope
         title="アクティビティ"
         note={sysAdminDashboardJa.scopeNotes.activity}
