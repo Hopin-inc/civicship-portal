@@ -205,7 +205,7 @@ export function CommunityDashboardOverview({
   // 流通量集中度 (Pareto)
   const paretoTopShare = computeParetoTopShare(activeMembers, 0.8);
 
-  // 週次継続率: retentionTrend の最新週から
+  // 週次送付継続率: retentionTrend の最新週から
   const latestWeek = data.retentionTrend[data.retentionTrend.length - 1];
   const weeklyContinuationRate =
     latestWeek && latestWeek.retainedSenders + latestWeek.churnedSenders > 0
@@ -284,7 +284,7 @@ export function CommunityDashboardOverview({
     return m.returnedMembers / prev.dormantCount;
   });
 
-  // 週次継続率 series: 直近 12 週の retainedSenders / (retained + churned)。
+  // 週次送付継続率 series: 直近 12 週の retainedSenders / (retained + churned)。
   const weeklyContinuationSeries = data.retentionTrend
     .slice(-12)
     .map((w) => {
@@ -575,7 +575,7 @@ export function CommunityDashboardOverview({
         <MetricCard
           icon={Repeat}
           colorClass={SCOPE_COLOR.activity}
-          title="週次継続率"
+          title="週次送付継続率"
           meta="直近週"
           hero={
             <Hero
