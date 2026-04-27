@@ -32,7 +32,11 @@ export default async function SysAdminCommunityDetailPage({ params }: Props) {
         field: GqlSysAdminUserSortField.TotalPointsOut,
         order: GqlSysAdminSortOrder.Desc,
       },
-      limit: 50,
+      // 受領→送付 転換率 などコミュニティ全体を分母にする集計のため、L2 SSR
+      // では最大件数を引き、1 ページで全メンバー (max 1000 / community) を取得する。
+      // 1000 を超えるコミュニティは backend 側の cursor pagination が必要だが、
+      // 現状の本番ボリュームでは 1 page で収まる。
+      limit: 1000,
     }),
     fetchSysAdminDashboardServer({ asOf: undefined }),
   ]);
@@ -44,7 +48,7 @@ export default async function SysAdminCommunityDetailPage({ params }: Props) {
   const hubMemberCount = l1Row?.hubMemberCount ?? null;
 
   return (
-    <div className="mx-auto max-w-mobile-l p-4 pt-8">
+    <div className="p-4 pt-8">
       <CommunityDetailPageClient
         communityId={communityId}
         initialData={initialData}

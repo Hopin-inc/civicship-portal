@@ -242,6 +242,8 @@ export const makeMonthlyActivityPoint = (
   newMembers: 8,
   donationPointsSum: 125000,
   chainPct: 0.12,
+  dormantCount: 14,
+  returnedMembers: 3,
   ...overrides,
 });
 
@@ -286,6 +288,13 @@ export const makeMemberRow = (
     daysIn: overrides.daysIn ?? monthsIn * 30,
     donationOutDays: overrides.donationOutDays ?? donationOutMonths * 6,
     uniqueDonationRecipients: 4,
+    // 受領→送付 転換率の集計対象。default は「受領経験あり、送付経験あり」=
+    // 双方向参加者として typical な値にする (story override で受領のみの行を
+    // 作って分布を変えられる)。
+    totalPointsIn: 8400,
+    donationInMonths: 8,
+    donationInDays: 24,
+    uniqueDonationSenders: 3,
     ...overrides,
   };
 };

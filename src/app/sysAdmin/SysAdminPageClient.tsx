@@ -35,7 +35,7 @@ export function SysAdminPageClient({ initialData }: Props) {
   useHeaderConfig(headerConfig);
 
   return (
-    <div className="p-4 max-w-2xl mx-auto">
+    <div className="p-4">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-body-sm text-muted-foreground pl-4">
           コミュニティ一覧
