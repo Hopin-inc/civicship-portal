@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
  * GraphQL Connection 型 (Relay 互換) の最小形。
@@ -76,32 +76,54 @@ export function useCursorPagination<TItem>({
   );
   const [loading, setLoading] = useState(false);
 
+  // 同期的な並行制御用 ref。setLoading は非同期反映のため、
+  // rapid loadMore() 呼び出し (例: スクロール / 連打) で重複 fetch が
+  // 起きるのを防ぐ。endCursor / hasNextPage も同様に最新値を保持。
+  const loadingRef = useRef(false);
+  const endCursorRef = useRef<string | null>(initial.pageInfo.endCursor ?? null);
+  const hasNextPageRef = useRef<boolean>(initial.pageInfo.hasNextPage);
+
   // initial が変わった (filter 切替などで親が再 fetch した) ときに同期
   useEffect(() => {
     setItems(extractItems(initial));
     setEndCursor(initial.pageInfo.endCursor ?? null);
     setHasNextPage(initial.pageInfo.hasNextPage);
+    endCursorRef.current = initial.pageInfo.endCursor ?? null;
+    hasNextPageRef.current = initial.pageInfo.hasNextPage;
   }, [initial]);
 
   const loadMore = useCallback(async () => {
-    if (loading || !hasNextPage || !endCursor) return;
+    if (loadingRef.current || !hasNextPageRef.current || !endCursorRef.current) {
+      return;
+    }
+    loadingRef.current = true;
     setLoading(true);
+    const cursor = endCursorRef.current;
     try {
-      const next = await fetchMore(endCursor, pageSize);
+      const next = await fetchMore(cursor, pageSize);
+      const nextEndCursor = next.pageInfo.endCursor ?? null;
+      const nextHasNextPage = next.pageInfo.hasNextPage;
+      endCursorRef.current = nextEndCursor;
+      hasNextPageRef.current = nextHasNextPage;
       setItems((prev) => [...prev, ...extractItems(next)]);
-      setEndCursor(next.pageInfo.endCursor ?? null);
-      setHasNextPage(next.pageInfo.hasNextPage);
+      setEndCursor(nextEndCursor);
+      setHasNextPage(nextHasNextPage);
     } catch (err) {
       onError?.(err);
     } finally {
+      loadingRef.current = false;
       setLoading(false);
     }
-  }, [loading, hasNextPage, endCursor, fetchMore, pageSize, onError]);
+  }, [fetchMore, pageSize, onError]);
 
   const reset = useCallback((next: ConnectionLike<TItem>) => {
+    const nextEndCursor = next.pageInfo.endCursor ?? null;
+    const nextHasNextPage = next.pageInfo.hasNextPage;
+    endCursorRef.current = nextEndCursor;
+    hasNextPageRef.current = nextHasNextPage;
     setItems(extractItems(next));
-    setEndCursor(next.pageInfo.endCursor ?? null);
-    setHasNextPage(next.pageInfo.hasNextPage);
+    setEndCursor(nextEndCursor);
+    setHasNextPage(nextHasNextPage);
   }, []);
 
   return { items, hasNextPage, loading, loadMore, reset };

@@ -31,25 +31,32 @@ export function useTemplateEditor(variant: GqlReportVariant | null) {
 
   const handleSave = useCallback(async () => {
     if (!variant || !template) return;
-    await save({
-      variables: {
-        variant,
-        input: {
-          model: template.model,
-          maxTokens: template.maxTokens,
-          temperature: template.temperature ?? undefined,
-          stopSequences: template.stopSequences,
-          systemPrompt,
-          userPromptTemplate,
-          experimentKey: template.experimentKey ?? undefined,
-          isActive: template.isActive,
-          isEnabled: template.isEnabled,
-          trafficWeight: template.trafficWeight,
-          communityContext: template.communityContext ?? undefined,
+    // ボタン onClick から呼ばれて promise が捨てられるため、ここで例外を握る。
+    // mutation のエラーは Apollo の `saveError` 経由で UI に伝わる。
+    // refetch のエラーは画面状態にだけ影響するので silent fail で十分。
+    try {
+      await save({
+        variables: {
+          variant,
+          input: {
+            model: template.model,
+            maxTokens: template.maxTokens,
+            temperature: template.temperature ?? undefined,
+            stopSequences: template.stopSequences,
+            systemPrompt,
+            userPromptTemplate,
+            experimentKey: template.experimentKey ?? undefined,
+            isActive: template.isActive,
+            isEnabled: template.isEnabled,
+            trafficWeight: template.trafficWeight,
+            communityContext: template.communityContext ?? undefined,
+          },
         },
-      },
-    });
-    await refetch();
+      });
+      await refetch();
+    } catch {
+      // saveError state でハンドル済み
+    }
   }, [variant, template, save, systemPrompt, userPromptTemplate, refetch]);
 
   const isDirty =
