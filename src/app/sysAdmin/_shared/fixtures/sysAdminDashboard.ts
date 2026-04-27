@@ -1,6 +1,7 @@
 import type {
   GqlGetSysAdminCommunityDetailQuery,
   GqlGetSysAdminDashboardQuery,
+  GqlSysAdminCohortFunnelPoint,
   GqlSysAdminCohortRetentionPoint,
   GqlSysAdminCommunityAlerts,
   GqlSysAdminCommunityDetailPayload,
@@ -244,6 +245,7 @@ export const makeMonthlyActivityPoint = (
   chainPct: 0.12,
   dormantCount: 14,
   returnedMembers: 3,
+  hubMemberCount: 5,
   ...overrides,
 });
 
@@ -269,6 +271,18 @@ export const makeCohortRetentionPoint = (
   retentionM1: 0.67,
   retentionM3: 0.56,
   retentionM6: 0.44,
+  ...overrides,
+});
+
+export const makeCohortFunnelPoint = (
+  overrides: Partial<GqlSysAdminCohortFunnelPoint> = {},
+): GqlSysAdminCohortFunnelPoint => ({
+  __typename: "SysAdminCohortFunnelPoint",
+  cohortMonth: new Date("2025-10-01T00:00:00+09:00"),
+  acquired: 18,
+  activatedD30: 11,
+  repeated: 6,
+  habitual: 2,
   ...overrides,
 });
 
@@ -357,6 +371,29 @@ export const makeCommunityDetailPayload = (
           retentionM1: 0.73,
           retentionM3: null,
           retentionM6: null,
+        }),
+      ],
+      cohortFunnel: [
+        makeCohortFunnelPoint({
+          cohortMonth: new Date("2026-02-01T00:00:00+09:00"),
+          acquired: 9,
+          activatedD30: 6,
+          repeated: 4,
+          habitual: 1,
+        }),
+        makeCohortFunnelPoint({
+          cohortMonth: new Date("2026-03-01T00:00:00+09:00"),
+          acquired: 7,
+          activatedD30: 4,
+          repeated: 2,
+          habitual: 0,
+        }),
+        makeCohortFunnelPoint({
+          cohortMonth: new Date("2026-04-01T00:00:00+09:00"),
+          acquired: 10,
+          activatedD30: 5,
+          repeated: 1,
+          habitual: 0,
         }),
       ],
       memberList: makeMemberList(baseMembers),

@@ -1,7 +1,7 @@
 import React from "react";
 
-// 情報階層: 「習慣化だけを色で強調し、それ以外は muted な slate で背景扱い」。
-// 達成度合いを一目で読ませるための二分軸 (習慣化 vs それ以外)。
+// 情報階層: 「定着 (habitual) だけを色で強調し、それ以外は muted な slate で背景扱い」。
+// 達成度合いを一目で読ませるための二分軸 (定着 vs それ以外)。
 // regular/occasional/latent は slate の濃淡で識別するが、admin 視線では
 // 全部「伸びしろ」として同じ扱い。
 const STAGE_DOT_COLORS = {
