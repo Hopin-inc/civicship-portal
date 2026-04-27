@@ -644,7 +644,11 @@ export function CommunityDashboardOverview({
                 value={
                   <PercentDelta
                     value={donationMoM}
-                    className="text-4xl tracking-tight"
+                    // 緑/赤の sign-based coloring を抑制して default の text
+                    // 色 (foreground) で出す。流通量 MoM は hero がそのまま
+                    // 大数字なので、green/red で色付けすると他カードの落ち着き
+                    // と齟齬が出るため。
+                    className="text-4xl tracking-tight text-foreground"
                     arrowClassName="mr-1 align-baseline text-xl font-medium"
                   />
                 }
