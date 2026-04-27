@@ -27,7 +27,7 @@ export const METRIC_DEFINITIONS: Record<string, MetricDefinition> = {
   hubUserPct: {
     title: "Hub user%",
     formula: "hubMemberCount ÷ totalMembers (現窓に hubBreadthThreshold (default 3) 以上の distinct 相手に DONATION した user)",
-    note: "ネットワーク軸の指標。「複数方面に送付している = 関係性を広げている」ユーザーの割合。ノード軸の習慣化 (userSendRate ≥ tier1) とは独立で、低頻度でも複数人に送れば hub、高頻度でも 1 人にしか送らなければ hub ではない。閾値・窓幅は SysAdminDashboardInput で可変。",
+    note: "ネットワーク軸の指標。「複数方面に送付している = 関係性を広げている」ユーザーの割合。ノード軸の定着 (userSendRate ≥ tier1) とは独立で、低頻度でも複数人に送れば hub、高頻度でも 1 人にしか送らなければ hub ではない。閾値・窓幅は SysAdminDashboardInput で可変。",
     range: "0〜100%",
   },
   newMembers: {
@@ -44,7 +44,7 @@ export const METRIC_DEFINITIONS: Record<string, MetricDefinition> = {
   userSendRate: {
     title: "送付率 (個人)",
     formula: "DONATIONを送った月数 ÷ 在籍月数",
-    note: "在籍期間中どれだけ継続的に送っているかのLTV変数。70%以上を習慣化と定義。",
+    note: "在籍期間中どれだけ継続的に送っているかのLTV変数。70%以上を定着と定義。",
     range: "0〜100%",
   },
   cohortRetention: {

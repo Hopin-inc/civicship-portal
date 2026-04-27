@@ -299,26 +299,26 @@ export function CommunityDashboardOverview({
   // アクティベーション・ファネル (送付軸 3 ステージ、コミュニティ全体)。
   // 分母は totalMembers (= 加入 100%) を暗黙の baseline として使い、ファネル
   // としては「加入」段は描画しない (header band の "385 名" 表示で既知)。
-  //   送付ユーザー = 1 回でも送付した (= latent ではない人)
-  //   継続ユーザー = 2 ヶ月以上送付した (memberList から count)
-  //   定着ユーザー = stages.habitual segment
+  //   送付 = 1 回でも送付した (= latent ではない人)
+  //   継続 = 2 ヶ月以上送付した (memberList から count)
+  //   定着 = stages.habitual segment (= card「定着率」と同じ概念)
   // memberList は totalPointsOut DESC で limit=1000 のため、totalMembers が
-  // 1000 を超える community では 継続ユーザー が過小評価されうる
-  // (sampleDependent フラグで明示)。送付 / 定着 は server-aggregate で bias なし。
+  // 1000 を超える community では 継続 が過小評価されうる (sampleDependent フラグ
+  // で明示)。送付 / 定着 は server-aggregate で bias なし。
   const funnelDenominator = totalMembers;
   const funnelStages = [
     {
-      label: "送付ユーザー",
+      label: "送付",
       count: Math.max(0, totalMembers - stages.latent.count),
       sampleDependent: false,
     },
     {
-      label: "継続ユーザー",
+      label: "継続",
       count: data.memberList.users.filter((u) => u.donationOutMonths >= 2).length,
       sampleDependent: true,
     },
     {
-      label: "定着ユーザー",
+      label: "定着",
       count: habitualCount,
       sampleDependent: false,
     },
@@ -471,7 +471,7 @@ export function CommunityDashboardOverview({
           <MetricCard
             icon={Star}
             colorClass={SCOPE_COLOR.user}
-            title="習慣化率"
+            title="定着率"
             meta="現在"
             hero={<Hero value={toPct(stages.habitual.pct)} />}
             viz={
@@ -534,8 +534,8 @@ export function CommunityDashboardOverview({
           />
 
           {habitualOverRegular && (
-            <Issue title="「定期」が「習慣化」を超過">
-              定期 {regularCount} 名 が 習慣化 {habitualCount} 名 を上回っている。中堅層の習慣化に伸びしろ。
+            <Issue title="「定期」が「定着」を超過">
+              定期 {regularCount} 名 が 定着 {habitualCount} 名 を上回っている。中堅層の定着に伸びしろ。
             </Issue>
           )}
         </Scope>
@@ -601,12 +601,14 @@ export function CommunityDashboardOverview({
             />
           }
         />
-        {/* 新規定着率 (D30 相当): 直近完了 N コホートの retentionM1 平均。
-            最新コホートは m+1 が未完了で null になるため、完了済みのみ集計。 */}
+        {/* 初回送付率 (D30 相当): 直近完了 N コホートの retentionM1 平均。
+            最新コホートは m+1 が未完了で null になるため、完了済みのみ集計。
+            ファネル末段の「定着」(= habitual segment、card「定着率」) と
+            意味が違うので「初回送付」という別名で区別する。 */}
         <MetricCard
           icon={Zap}
           colorClass={SCOPE_COLOR.activity}
-          title="新規定着率"
+          title="初回送付率"
           meta={
             recentCompletedCohorts.length > 0
               ? `直近 ${recentCompletedCohorts.length} コホート avg`

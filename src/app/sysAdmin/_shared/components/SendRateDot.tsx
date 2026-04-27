@@ -23,7 +23,7 @@ export function classifySendRate(
 }
 
 // StageColors と同じ palette を使う (視覚的に揃える)。
-// 習慣化だけを色で強調、他は slate の濃淡で muted。
+// 定着 (habitual) だけを色で強調、他は slate の濃淡で muted。
 const COLOR: Record<SendRateTier, string> = {
   habitual: "text-emerald-600",
   regular: "text-slate-500",

@@ -12,7 +12,7 @@ export const sysAdminDashboardJa = {
   controls: {
     asOfLabel: "集計日",
     asOfHint: "すべての数値をこの日時点でスナップショット (未指定で今日)",
-    tier1Label: "習慣化の閾値",
+    tier1Label: "定着の閾値",
     tier2Label: "定期参加の閾値",
     windowMonthsLabel: "集計期間 (月)",
     reset: "リセット",
@@ -40,7 +40,7 @@ export const sysAdminDashboardJa = {
     },
     stages: {
       title: "ステージ分布",
-      habitual: "習慣化",
+      habitual: "定着",
       regular: "定期",
       occasional: "散発",
       latent: "潜在",
@@ -85,7 +85,7 @@ export const sysAdminDashboardJa = {
     network:
       "関係性の広がりと役割への到達を測るスコープ。ハブ比率は今月時点、平均送付先数・転換率・流通の偏りは全期間の累計。コミュニティが取っている「形」を表す。",
     activity:
-      "直近で何が起きているかを測るスコープ。MAU・新規定着率・流通量は月次、週次継続率と復帰率は直近週ベース。短期の動きを評価する。",
+      "直近で何が起きているかを測るスコープ。MAU・初回送付率・流通量は月次、週次継続率と復帰率は直近週ベース。短期の動きを評価する。",
     user:
       "asOf 時点での個人状態の分布をスナップショットするスコープ。誰が今コミュニティに居て、どう関わっているかを表す。直近の動きは「アクティビティ」と併読。",
   },
