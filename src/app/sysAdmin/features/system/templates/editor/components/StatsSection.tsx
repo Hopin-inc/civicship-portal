@@ -14,18 +14,30 @@ type Props = {
 export function StatsSection({ rows }: Props) {
   const totalFeedback = rows.reduce((s, r) => s + r.feedbackCount, 0);
 
-  const weightedSum = rows.reduce(
-    (s, r) => (r.avgRating != null ? s + r.avgRating * r.feedbackCount : s),
+  // 加重平均は値を持つ行だけを使う。母数も同じ部分集合の feedbackCount 合計を
+  // 使わないと、null 値の行の feedback で母数だけ膨らんで平均が歪む。
+  const rowsWithRating = rows.filter((r) => r.avgRating != null);
+  const ratingFeedback = rowsWithRating.reduce(
+    (s, r) => s + r.feedbackCount,
     0,
   );
-  const avgRating = totalFeedback > 0 ? weightedSum / totalFeedback : null;
+  const weightedSum = rowsWithRating.reduce(
+    (s, r) => s + (r.avgRating ?? 0) * r.feedbackCount,
+    0,
+  );
+  const avgRating = ratingFeedback > 0 ? weightedSum / ratingFeedback : null;
 
-  const judgeWeightedSum = rows.reduce(
-    (s, r) =>
-      r.avgJudgeScore != null ? s + r.avgJudgeScore * r.feedbackCount : s,
+  const rowsWithJudge = rows.filter((r) => r.avgJudgeScore != null);
+  const judgeFeedback = rowsWithJudge.reduce(
+    (s, r) => s + r.feedbackCount,
     0,
   );
-  const avgJudgeScore = totalFeedback > 0 ? judgeWeightedSum / totalFeedback : null;
+  const judgeWeightedSum = rowsWithJudge.reduce(
+    (s, r) => s + (r.avgJudgeScore ?? 0) * r.feedbackCount,
+    0,
+  );
+  const avgJudgeScore =
+    judgeFeedback > 0 ? judgeWeightedSum / judgeFeedback : null;
 
   const correlationsAvailable = rows.filter(
     (r) => r.judgeHumanCorrelation != null,

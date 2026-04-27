@@ -48,15 +48,20 @@ export function aggregateVariantSummary(
     (sum, r) => sum + r.feedbackCount,
     0,
   );
-  const weightedSum = activeRows.reduce(
-    (sum, r) =>
-      r.avgRating != null && r.avgRating !== undefined
-        ? sum + r.avgRating * r.feedbackCount
-        : sum,
+  // 加重平均は avgRating を持つ行だけで計算する。
+  // 母数も同じく「avgRating を持つ行の feedbackCount 合計」にしないと、
+  // null avgRating の行の feedback 数で母数だけ膨らんで平均が低めに歪む。
+  const rowsWithRating = activeRows.filter((r) => r.avgRating != null);
+  const ratingFeedbackCount = rowsWithRating.reduce(
+    (sum, r) => sum + r.feedbackCount,
+    0,
+  );
+  const weightedSum = rowsWithRating.reduce(
+    (sum, r) => sum + (r.avgRating ?? 0) * r.feedbackCount,
     0,
   );
   const weightedAvgRating =
-    totalFeedbackCount > 0 ? weightedSum / totalFeedbackCount : null;
+    ratingFeedbackCount > 0 ? weightedSum / ratingFeedbackCount : null;
 
   const hasWarning = activeRows.some((r) => r.correlationWarning);
 
