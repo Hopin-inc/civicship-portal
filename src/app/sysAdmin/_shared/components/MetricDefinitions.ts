@@ -5,226 +5,203 @@ export type MetricDefinition = {
   range?: string;
 };
 
+// 説明文は「運営オペレーターが popover を開いた瞬間に意味が分かる」を目的に
+// プレーンな日本語で書く。実装詳細 (MV / windowDays / fragment 名等) は note に
+// 入れない (engineer 向けの context は source code コメントで参照する)。
 export const METRIC_DEFINITIONS: Record<string, MetricDefinition> = {
   mau: {
     title: "MAU",
-    formula: "直近 windowDays 日 (default 28) に DONATION を送ったユニークユーザー数",
-    note: "本ツールでの Active = DONATION 送付者。MAU% の分子。暦月ではなく rolling 窓。",
+    formula: "今月ギフトを送ったメンバーの人数",
+    note: "active = ギフトを送ったメンバー。受け取っただけの人はカウントされない。",
   },
   communityActivityRate: {
     title: "MAU%",
-    formula:
-      "MAU 送付者 ÷ 総メンバー数。L1 は rolling windowDays 日 (default 28) 窓、L2 は最新完了月の暦月集計。",
-    note: "同じコミュニティでも L1 と L2 で数字が異なる場合がある — 時間軸が違うため。L1 = 介入判断用の即時シグナル、L2 = 確定済み月次の実績。個人の送付率 (user_send_rate) とは別指標で、本ツールでの Active = DONATION 送付者。",
+    formula: "今月ギフトを送ったメンバー ÷ 全メンバー",
+    note: "コミュニティ全体のうち、今月実際にギフトを送った割合。下がっていると活動が冷えてきているサイン。",
     range: "0〜100%",
   },
   growthRateActivity: {
     title: "MAU% 前月比",
-    formula:
-      "(現期 MAU% − 前期 MAU%) ÷ 前期 MAU%。L1 は windowDays 日窓ベース、L2 は完了月ベース (MoM)。",
-    note: "負値は MAU% が前期より低下。前期 MAU% が 0 のときは null。",
+    formula: "(今月の MAU% − 前月の MAU%) ÷ 前月の MAU%",
+    note: "負の値は前月よりアクティブ率が下がっていることを示す。",
   },
   hubUserPct: {
-    title: "Hub user%",
-    formula: "hubMemberCount ÷ totalMembers (現窓に hubBreadthThreshold (default 3) 以上の distinct 相手に DONATION した user)",
-    note: "ネットワーク軸の指標。「複数方面に送付している = 関係性を広げている」ユーザーの割合。ノード軸の定着 (userSendRate ≥ tier1) とは独立で、低頻度でも複数人に送れば hub、高頻度でも 1 人にしか送らなければ hub ではない。閾値・窓幅は SysAdminDashboardInput で可変。",
+    title: "ハブユーザー比率",
+    formula: "3 人以上にギフトを送っているメンバー ÷ 全メンバー",
+    note: "「広く配る人」がコミュニティ内にどれくらいいるか。少数のハブに依存していると、その人が活動を止めたときに流通が一気に止まるリスクがある。",
     range: "0〜100%",
   },
   newMembers: {
-    title: "New",
-    formula: "現窓 (windowDays 日、default 28) に JOINED で加入したメンバー数",
-    note: "row では総メンバー数の隣に `(+12)` の形で表示。0 のときは `(+0)` で「新規加入なし」のシグナルを兼ねる。",
+    title: "新規",
+    formula: "今月新しく加入したメンバー数",
+    note: "数字の隣に「(+12)」の形で表示される。",
   },
   activityFlow: {
-    title: "Δ (activity flow)",
-    formula:
-      "↑newlyActivated = senderCount − retainedSenders / ↓churned = senderCountPrev − retainedSenders",
-    note: "leaky-bucket 検出。↑ は前窓では送付してなく現窓で送付した sender、↓ は前窓では送付してたが現窓で送付してない sender。窓は windowDays 日 (default 28)。MAU 数だけ見ても入退室で打ち消されるケースを表面化する。",
+    title: "活動の出入り",
+    formula: "↑ 新たに送付し始めた人 / ↓ 送付を止めた人",
+    note: "MAU だけ見ると入退室で打ち消される動きを表面化する。↑ より ↓ が多い状態が続くと活動が縮小傾向。",
   },
   userSendRate: {
     title: "送付率 (個人)",
-    formula: "DONATIONを送った月数 ÷ 在籍月数",
-    note: "在籍期間中どれだけ継続的に送っているかのLTV変数。70%以上を定着と定義。",
+    formula: "そのメンバーがギフトを送った月数 ÷ 在籍月数",
+    note: "在籍中どれくらいの頻度で送っているかを示す。70% 以上を「定着」(ほぼ毎月送っている) と定義。",
     range: "0〜100%",
   },
   cohortRetention: {
-    title: "コホートretention",
-    formula:
-      "入会月コホートのうち、N月後にDONATIONを送ったユーザー数 ÷ コホート全員",
-    note: "分母はその月に入会した全メンバー (活動有無問わず)。M+0は全員100%スタート。",
+    title: "コホート retention",
+    formula: "ある月に加入したメンバーのうち、N 月後にギフトを送った人の割合",
+    note: "加入時期ごとに「何ヶ月続いているか」を追える。M+0 はその月の加入者が分母。",
     range: "0〜100%",
   },
   wau: {
     title: "WAU",
-    formula: "今週DONATIONを送ったユニークユーザー数",
-    note: "継続 / 離脱 / 復帰の3カテゴリで分析される。本ツールでの Active = DONATION 送付者。",
+    formula: "今週ギフトを送ったメンバー数",
+    note: "active = ギフトを送ったメンバー。継続 / 離脱 / 復帰の 3 カテゴリで分析される。",
   },
   retainedSenders: {
-    title: "継続 (WAU 構成)",
-    formula: "今週DONATIONを送った ∧ 先週もDONATIONを送ったユーザー数",
-    note: "新規メンバーは先週の活動がないため含まれない。",
+    title: "継続 (週次)",
+    formula: "今週も先週もギフトを送ったメンバー数",
+    note: "新規メンバーは先週の活動がないので含まれない。",
   },
   churnedSenders: {
-    title: "離脱 (WAU 構成)",
-    formula: "先週DONATIONを送った ∧ 今週送っていないユーザー数",
-    note: "churned > retained が続く場合は介入シグナル。",
+    title: "離脱 (週次)",
+    formula: "先週は送ったが今週は送っていないメンバー数",
+    note: "離脱 > 継続 の状態が続くと活動が縮小しているサイン。",
   },
   returnedSenders: {
-    title: "復帰 (WAU 構成)",
-    formula:
-      "今週DONATIONを送った ∧ 先週は送っていない ∧ 過去12週の間に送ったことがある ユーザー数",
-    note: "休眠から復帰したメンバーのシグナル。",
+    title: "復帰 (週次)",
+    formula: "今週送った中で、先週は送っていなかったが過去 12 週のどこかでは送っていたメンバー数",
+    note: "「休眠から戻ってきた」シグナル。",
   },
   monthsIn: {
     title: "在籍月数",
-    formula: "入会月 (JST) 〜 集計日 (JST) の月数 (両端inclusive)",
-    note: "例: 3月15日入会・4月10日集計 → 在籍2ヶ月。最小値は1。",
+    formula: "加入月から今月までの月数",
+    note: "例: 3 月 15 日加入で 4 月 10 日に集計 → 在籍 2 ヶ月。最小値は 1。",
   },
   donationOutMonths: {
     title: "送付月数 (個人)",
-    formula: "そのメンバーが DONATION を 1 回以上送った JST 月数 (distinct)",
-    note: "在籍月数との比が送付率 (user_send_rate) になる。",
+    formula: "そのメンバーが 1 回以上ギフトを送った月の数",
+    note: "在籍月数との比が「送付率」になる。",
   },
   totalPointsOut: {
     title: "累計送付ポイント (個人)",
-    formula: "そのメンバーが過去に送った DONATION ポイントの全合計",
-    note: "全期間集計。一度送られたポイントは減らない。",
+    formula: "そのメンバーがこれまでに送ったギフトポイントの合計",
+    note: "全期間の累計。一度送ったポイントは減らない。",
   },
   totalDonationPointsAllTime: {
     title: "累計送付ポイント (コミュニティ)",
-    formula: "コミュニティ内で過去に送られた DONATION ポイントの全合計",
-    note: "MV 集計に依存せず t_transactions を直接集計するため、MV 保持期間の影響を受けない。",
+    formula: "コミュニティ内でこれまでに送られたギフトポイントの合計",
   },
   chainDepth: {
-    title: "chain_depth (連鎖深度)",
-    formula: "1 件の DONATION transaction の連鎖位置 (整数、最小 1)",
-    note:
-      "1 = chain の root (自前ポイントから送付 / 受信履歴のない初回 donation)。N+1 = 受信した parent transaction の chain_depth に +1 を伝播。例: A → B (depth 1)、B が A から受けた pt を C に送ると B → C (depth 2)、さらに C → D (depth 3)。「受信を起点にどこまで連鎖したか」 を測る指標。",
+    title: "連鎖深度",
+    formula: "1 件のギフト送付の連鎖位置 (1 から始まる整数)",
+    note: "1 = 自分のポイントから送った最初の送付。2 以上 = 受け取ったポイントを誰かに送った (連鎖)。例: A→B (1)、B が A から受けた pt を C に送ると B→C (2)、さらに C→D (3)。",
   },
   maxChainDepthAllTime: {
-    title: "最大チェーン深度",
-    formula: "全期間の DONATION のうち chain_depth が最大の値",
-    note: "コミュニティ内で観測された最も深い連鎖。`1` は連鎖が一度も発生していない (= 全 donation が root)、`>= 2` は受信→送付の伝播が起きている。例: `4` なら A → B → C → D まで 3 段伝播 (root が depth 1)。",
+    title: "最大連鎖深度",
+    formula: "コミュニティ内で観測された最も深い連鎖の段数",
+    note: "1 = 連鎖が発生していない (全員が自分のポイントから直接送っている)。2 以上 = 受け取りから送付への伝播が起きている。",
   },
   chainPct: {
     title: "連鎖率",
-    formula:
-      "月内 DONATION のうち chain_depth ≥ 2 のトランザクション数 ÷ 全 DONATION 数",
-    note: "「受信を起点に転送した」 transaction の比率。chain_depth = 1 (root、自前起点) と chain_depth ≥ 2 (受信を起点に転送) の比で、コミュニティ内でポイントが還流しているかを測る。",
+    formula: "今月のギフトのうち「受け取りを起点に送ったもの」の割合",
+    note: "コミュニティ内でポイントが還流しているか (= 受け取った人が誰かに送り返しているか) を測る。",
     range: "0〜100%",
   },
   stages: {
     title: "ステージ分類",
-    formula:
-      "habitual: send_rate ≥ tier1 / regular: tier2 ≤ send_rate < tier1 / occasional: 0 < send_rate < tier2 / latent: send_rate = 0",
-    note: "ノード軸 (個人の頻度継続性) のステージ分類。デフォルト tier1=0.7, tier2=0.4。閾値はステージ分布の「分類設定」から変更可能。ネットワーク軸の `Hub user%` (関係性の広さ) とは別軸で、両者は独立に評価される。",
+    formula: "送付率に応じて 4 段階に分類: 定着 (70% 以上) / 定期 (40-70%) / 散発 (40% 未満) / 潜在 (一度も送付なし)",
+    note: "個人がコミュニティにどれくらい根付いているかの指標。閾値は分類設定から変更できる。",
   },
   dormantRate: {
     title: "休眠化率",
-    formula:
-      "dormantCount ÷ totalMembers (default 30 日以上 DONATION 送付がない && 過去に 1 度以上送付経験があるメンバー)",
-    note: "「以前は送ってたが止まった」再活性化の対象層。`stages.latent` (一度も送付なし = 未着手の潜在層) とは別軸。閾値 (`dormantThresholdDays`) はバックエンド入力で変更可能。",
+    formula: "ここ 30 日間ギフトを送っていないが過去には送ったことがあるメンバー ÷ 全メンバー",
+    note: "「以前は活動していたが止まった人」の割合。再活性化の対象層。一度も送ったことのない潜在層 (latent) とは別。",
     range: "0〜100%",
   },
   asOf: {
     title: "集計日",
-    formula: "指定日時点の状態を計算対象にする",
-    note:
-      "画面上の MAU% ・ステージ分布・コホート retention 等、すべての指標は この日時点のスナップショット。未指定時は今日 (実行時) を使う。",
+    formula: "この日時点のスナップショットとして全指標を計算する",
+    note: "未指定のときは今日の日付で集計する。",
   },
 
-  // L2 新規指標 — 「定着」「初回送付」「ファネル」など、PR #1184 で追加
-  // した概念。L1 row には出ないが L2 overview / 将来の L3 で参照される。
+  // L2 で新たに登場したファネル / 互酬 / 定着関連の指標。
   funnelOverview: {
     title: "アクティベーション・ファネル",
-    formula:
-      "加入 → 送付 → 継続 → 定着 の 4 段階。L2 では先頭の「加入」(= 100%) は省略して 3 段で表示する",
-    note:
-      "1 メンバーが「ギフトを贈る側」に育つまでの journey。各ゲートでの脱落率を一覧することで、コミュニティが「welcome 文化が薄い (送付段で詰まる)」か「単発で終わる (継続段で詰まる)」かを切り分ける。受領側 (受け取るだけのメンバー) はこのファネルとは別レンズで、「受領→送付 転換率」が橋指標として担当する。",
+    formula: "加入 → 送付 → 継続 → 定着 の 4 段階で、メンバーが「ギフトを贈る側」に育つまでの道のり",
+    note: "段ごとに人数が減っていくので、どのゲートで脱落しているかが視覚的に分かる。送付段で詰まる = 「送ってみよう」のきっかけ作りが弱い、継続段で詰まる = 「単発で終わって続かない」、定着段で詰まる = 「習慣化までの距離が遠い」。L2 では先頭の「加入」(= 100%) は省略して 3 段で表示する。",
   },
   funnelSent: {
-    title: "送付 (ファネル段)",
-    formula: "totalMembers − stages.latent.count (= 1 度でも DONATION を送ったメンバー)",
-    note: "加入 → 送付 のゲート。「能動参加に至ったか」を測る。server-aggregate なので memberList の limit と無関係に正確。",
+    title: "送付 (ファネル)",
+    formula: "1 度でもギフトを送ったことのあるメンバー数",
+    note: "「能動的に贈る側に回ったか」のゲート。受け取りは受け身の動作だが、送付は本人の意思決定が必要。",
   },
   funnelRepeated: {
-    title: "継続 (ファネル段)",
-    formula: "memberList のうち donationOutMonths ≥ 2 のメンバー数",
-    note: "送付 → 継続 のゲート。「2 ヶ月以上連続して送付した = 1 回きりで終わらなかった」を測る。memberList を limit=1000 で取得しているため、totalMembers が 1000 を超える community では過小評価されうる (その場合は「サンプル不足」と表示して bar を空にする)。週次送付継続率は WoW、こちらは累計の milestone — 時間軸が異なる。",
+    title: "継続 (ファネル)",
+    formula: "2 ヶ月以上にわたってギフトを送ったメンバー数",
+    note: "「1 回きりで終わらず、リズムを作れたか」のゲート。送付経験者からこの段に進む人が少ないと、初回後の「次のきっかけ」が作れていない。",
   },
   funnelHabitual: {
-    title: "定着 (ファネル段)",
-    formula: "stages.habitual.count (= L2 card「定着率」の分子)",
-    note: "継続 → 定着 のゲート。habitual segment (個人の userSendRate ≥ tier1) に到達したメンバー数。tier1 を SettingsDrawer で動かすと値が変動する。",
+    title: "定着 (ファネル)",
+    formula: "送付率 70% 以上 (= 在籍中ほぼ毎月送っている) のメンバー数",
+    note: "コミュニティ参加が生活のリズムに溶け込んだ「定着」段階。ファネルの最終ゴール。",
   },
   recipientToSenderRate: {
     title: "受領→送付 転換率",
-    formula:
-      "count(member where totalPointsIn > 0 AND totalPointsOut > 0) ÷ count(member where totalPointsIn > 0)",
-    note:
-      "受領経験者のうち送付経験もある人の比率 (互酬到達率)。ギフトエコノミーが配給型 (一方通行) か相互参加型かを区別する本質指標。memberList が hasNextPage=true のとき (= 1000 名超 community で sample 不足) は分母が過小評価されるため値を出さず「サンプル不足」と表示する。",
+    formula: "受け取ったことのあるメンバーのうち、自分も送ったメンバーの割合",
+    note: "「もらった人が送り返しているか」(互酬) の指標。高い = 健全な相互参加コミュニティ。低い = 一方的に配られているだけの「配給型」コミュニティ。コミュニティが 1000 人を超えるとサンプリングの都合で正確に出せず、「サンプル不足」と表示される。",
     range: "0〜100%",
   },
   newD30ActivationRate: {
     title: "初回送付率",
-    formula:
-      "直近完了 N コホート (default 3) の retentionM1 平均。retentionM1 = entry month の翌月に DONATION out した cohort の比率",
-    note:
-      "新規メンバーが ~30-60 日以内に送付に至る率の目安。最新 cohort は M+1 が未完了で null のため、retentionM1 が確定済みの cohort のみ集計する。L2 ファネル card の「送付」段とは目線が違う (こちらは新規 cohort にフォーカス、ファネルは community 全体の現在状態)。",
+    formula: "新規メンバーが、加入の翌月までにギフトを送った割合 (直近 3 コホートの平均)",
+    note: "新規が早く能動行動に至る率。低い = オンボーディング段階で「贈ってみよう」の動機が作れていない。完了済みのコホートだけを集計する (最新月の cohort はまだ翌月分が未確定なので除く)。",
     range: "0〜100%",
   },
   recoveryRate: {
     title: "復帰率",
-    formula: "今月 returnedMembers ÷ 前月末 dormantCount",
-    note:
-      "「先月末時点で休眠 (直近 30 日 DONATION out なし) だったメンバーのうち、今月送付した割合」。月初 (asOf=月初付近) のクエリでは分子がほぼ 0 で、月末に近づくほど値が成長する月内累計のシグナル。",
+    formula: "今月送付したメンバーのうち先月末時点で休眠だった人 ÷ 先月末の休眠メンバー数",
+    note: "「休眠から戻ってきた人」の割合。休眠化率と合わせて読むと、コミュニティの「漏れと回収のバランス」が見える。月初は分子がほぼ 0 で、月末に近づくほど数字が成長していく。",
     range: "0〜100%",
   },
   habitualPct: {
     title: "定着率",
-    formula: "stages.habitual.count ÷ totalMembers (個人の userSendRate ≥ tier1 を満たすメンバー比率)",
-    note:
-      "ノード軸の最終ステージ。SettingsDrawer で tier1 を変えると分子が変動する。L2 ファネル card の「定着」(終端) と同じ概念で、片方は card、もう片方は ファネル diagram での見え方の違い。",
+    formula: "ほぼ毎月送っているメンバー (送付率 70% 以上) ÷ 全メンバー",
+    note: "コミュニティに「定着」したコアメンバーの割合。ファネルの最終段「定着」と同じ概念で、こちらはカード形式での表示。閾値 (70%) は分類設定から変更できる。",
     range: "0〜100%",
   },
   avgRecipients: {
     title: "平均送付先数",
-    formula: "アクティブメンバー (userSendRate > 0) の uniqueDonationRecipients を単純平均",
-    note:
-      "各メンバーが累計で何人に送ってきたかの「広がり」指標。ハブユーザー比率と相補的 (こちらは一人当たりの幅、ハブ比率は分布のしっぽ)。",
+    formula: "送付経験者が累計で何人に送ってきたかの平均",
+    note: "数字が小さい = 同じ人ばかりに送る関係 / 大きい = 広い関係性。ハブユーザー比率と合わせて読むと、ネットワークの「広さの形」が見える。",
   },
   paretoTopShare: {
     title: "流通量の偏り",
-    formula:
-      "DONATION 流通量 (totalPointsOut) を降順ソートし、coverage (default 80%) に到達するまでの上位寄与者の割合",
-    note:
-      "Pareto curve 上の「上位 X% が 80% を担う」の X。値が小さいほど一握りに集中、大きいほど分散している giver 構造を表す。",
+    formula: "全流通量の 80% を占める上位寄与者の割合",
+    note: "値が小さい (例 10%) = 一握りの人が大半を流通させている。値が大きい = 多くの人が分散して流通させている。少数集中型か、分散型かの構造が分かる。",
     range: "0〜100%",
   },
   donationMoM: {
     title: "流通量 MoM",
-    formula: "(今月 donationPointsSum − 前月 donationPointsSum) ÷ 前月 donationPointsSum",
-    note: "前月比の流通量変化。L2 の月次トレンドを 1 値に圧縮した形。負値は減速。",
+    formula: "(今月の流通量 − 先月の流通量) ÷ 先月の流通量",
+    note: "前月比の流通量変化。負の値は減速、正の値は加速。コミュニティの活気を 1 値に圧縮した指標。",
   },
   newRate: {
     title: "新規率",
-    formula: "最新月 newMembers ÷ totalMembers",
-    note: "最新月の新規加入比率。獲得施策の効果を測るが、定着 (継続的活動) と独立に評価する必要がある。新規率が高いのに定着率が低い community は「漏れバケツ」の可能性。",
+    formula: "今月新しく加入したメンバー ÷ 全メンバー",
+    note: "獲得施策の効果が出ているかの目安。ただし新規率が高くても定着率が低いと「漏れバケツ」(入って来るがすぐ離脱) になっている可能性があるので、定着率と一緒に読む。",
     range: "0〜100%",
   },
   tenuredRatio: {
     title: "3 ヶ月以上 在籍率",
-    formula: "tenureDistribution の m3to12Months + gte12Months ÷ totalMembers",
-    note:
-      "コミュニティ全体に占める 3 ヶ月以上在籍者の割合。短期離脱の少なさ / 中長期定着の指標。footer に在籍分布 4 bucket (1 ヶ月未満 / 1〜3 / 3〜12 / 12+ ヶ月) も同時表示。",
+    formula: "在籍 3 ヶ月以上のメンバー ÷ 全メンバー",
+    note: "短期離脱が多いか、中長期で残るメンバーが多いかの指標。カード下に在籍分布の小バー (1 ヶ月未満 / 1〜3 / 3〜12 / 12 ヶ月以上) も同時表示。",
     range: "0〜100%",
   },
   weeklySenderContinuationRate: {
     title: "週次送付継続率",
-    formula:
-      "今週 retainedSenders ÷ (retainedSenders + churnedSenders) — 先週送付した人のうち今週も送付した人の割合",
-    note:
-      "週次の sender retention。ファネルの「継続」(累計 ≥ 2 ヶ月送付) とは時間軸が違う (こちらは WoW 即時継続、ファネル側は累計 milestone)。",
+    formula: "先週送ったメンバーのうち、今週も送ったメンバーの割合",
+    note: "週単位の継続性。短期 retention の即時シグナルで、ファネル段の「継続」(累計 2 ヶ月以上送付) とは時間軸が違う (こちらは週 vs 週、ファネルは累計の milestone)。",
     range: "0〜100%",
   },
 };
