@@ -117,7 +117,7 @@ export const WithIssues: Story = {
           dataTo: new Date("2026-04-01T00:00:00+09:00"),
         }),
         stages: makeStageDistribution({
-          // regular > habitual: 習慣化伸びしろ警告
+          // regular > habitual: 定着伸びしろ警告
           habitual: makeStageBucket({ count: 60, pct: 0.25 }),
           regular: makeStageBucket({ count: 80, pct: 0.33 }),
           occasional: makeStageBucket({ count: 50, pct: 0.21 }),

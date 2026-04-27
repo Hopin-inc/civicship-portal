@@ -2863,6 +2863,69 @@ export type GqlSubmitReportFeedbackSuccess = {
   feedback: GqlReportFeedback;
 };
 
+/**
+ * One bucket of the all-time DONATION chain-depth histogram. See
+ * `SysAdminCommunityDetailPayload.chainDepthDistribution`.
+ */
+export type GqlSysAdminChainDepthBucket = {
+  __typename?: "SysAdminChainDepthBucket";
+  /**
+   * Number of all-time DONATION transactions whose `chain_depth`
+   * falls into this bucket. Always non-negative.
+   */
+  count: Scalars["Int"]["output"];
+  /**
+   * Chain-depth bucket key. Range 1..5; the 5 bucket aggregates
+   * `chain_depth >= 5`. See `SysAdminCommunitySummaryCard
+   * .maxChainDepthAllTime` for the underlying semantic.
+   */
+  depth: Scalars["Int"]["output"];
+};
+
+/**
+ * One cohort's funnel progression. See
+ * `SysAdminCommunityDetailPayload.cohortFunnel` for the stage
+ * semantics and the JOINED-at-asOf scoping rule.
+ */
+export type GqlSysAdminCohortFunnelPoint = {
+  __typename?: "SysAdminCohortFunnelPoint";
+  /**
+   * Cohort size: number of JOINED memberships whose `created_at`
+   * falls within this cohort month. The funnel's entry stage —
+   * the denominator the client divides downstream stages by to
+   * derive percentages.
+   */
+  acquired: Scalars["Int"]["output"];
+  /**
+   * Of the cohort, members who sent at least one DONATION within
+   * 30 days of their join (per-member, measured from each
+   * individual's `created_at` rather than a calendar-clamped
+   * window). The "first-30-day activation" funnel stage.
+   */
+  activatedD30: Scalars["Int"]["output"];
+  /**
+   * JST first day of the cohort's entry month, e.g.
+   * 2025-10-01T00:00+09:00. UTC-encoded at JST midnight, same
+   * convention as `SysAdminMonthlyActivityPoint.month` and
+   * `SysAdminCohortRetentionPoint.cohortMonth`.
+   */
+  cohortMonth: Scalars["Datetime"]["output"];
+  /**
+   * Of the cohort, members currently in the habitual segment
+   * (`userSendRate >= segmentThresholds.tier1` AND tenure floor).
+   * THRESHOLD-DEPENDENT — see the parent field's doc.
+   */
+  habitual: Scalars["Int"]["output"];
+  /**
+   * Of the cohort, members who sent DONATION in >= 2 distinct JST
+   * months as of asOf. The "came back at least once" stage.
+   * Cumulative — once a member has 2+ donation months in their
+   * history they stay counted in this stage even if they later go
+   * quiet.
+   */
+  repeated: Scalars["Int"]["output"];
+};
+
 /** One entry-month cohort's retention curve. */
 export type GqlSysAdminCohortRetentionPoint = {
   __typename?: "SysAdminCohortRetentionPoint";
@@ -2918,6 +2981,21 @@ export type GqlSysAdminCommunityDetailInput = {
    */
   dormantThresholdDays?: InputMaybe<Scalars["Int"]["input"]>;
   /**
+   * Minimum number of distinct DONATION recipients within the trailing
+   * 28-day window ending at each month-end for a member to be classified
+   * as a hub in that month. Used to populate
+   * `SysAdminMonthlyActivityPoint.hubMemberCount`. Same semantic as
+   * `SysAdminDashboardInput.hubBreadthThreshold`, applied at month-end
+   * rather than at request `asOf`.
+   *
+   * Default 3. Effective range 1..1000; values outside are silently
+   * clamped on the server. Pass the same value used on
+   * `SysAdminDashboardInput.hubBreadthThreshold` to keep the L1
+   * hubMemberCount and the latest entry of
+   * `monthlyActivityTrend.hubMemberCount` directly comparable.
+   */
+  hubBreadthThreshold?: InputMaybe<Scalars["Int"]["input"]>;
+  /**
    * Member list page size (default 50, max 1000). Raised from the
    * previous max of 200 so client-side aggregations that need every
    * member of a community (e.g. the "受領→送付 転換率" /
@@ -2947,6 +3025,60 @@ export type GqlSysAdminCommunityDetailPayload = {
   alerts: GqlSysAdminCommunityAlerts;
   /** As-of timestamp echoed back. */
   asOf: Scalars["Datetime"]["output"];
+  /**
+   * Distribution of DONATION `chain_depth` values across all-time
+   * DONATION transactions in this community. Each bucket counts
+   * distinct DONATION transactions whose `chain_depth` falls into
+   * the bucket key (see `SysAdminCommunitySummaryCard.maxChainDepthAllTime`
+   * for the depth semantic — depth 1 is a root donation, depth N+1
+   * means the sender's most recent received DONATION had depth N).
+   *
+   * Buckets are `{depth: 1..5, count}`; the depth-5 bucket
+   * aggregates all transactions with `chain_depth >= 5`. Buckets
+   * are returned in ascending depth order, with every bucket
+   * emitted (count = 0 for depths with no transactions) so the
+   * client can render a contiguous histogram axis without
+   * zero-padding logic. Adjust the ceiling upward (e.g., to 10+)
+   * in a follow-up if real-data inspection of `maxChainDepthAllTime`
+   * shows meaningful population in the 5+ bucket.
+   *
+   * Powers the L3 "/network" chain-depth histogram: visualizes
+   * whether donations propagate deeply (multi-hop reciprocity, tail
+   * populated) or shallowly (one-shot direct gifts, mass at depth 1).
+   */
+  chainDepthDistribution: Array<GqlSysAdminChainDepthBucket>;
+  /**
+   * Per-cohort funnel progression for the L3 "/activity" deep-dive.
+   * One entry per JST entry-month within the trailing `windowMonths`
+   * range, returned in ascending order (newest cohort last). Stages
+   * match the L2 send-funnel structure:
+   *
+   *   acquisition  — cohort size at entry (JOINED memberships
+   *                  created during the cohort month)
+   *   activatedD30 — cohort members who sent >= 1 DONATION within
+   *                  30 days of their join (per-member, not
+   *                  calendar-clamped)
+   *   repeated     — cohort members who sent DONATION in >= 2
+   *                  distinct JST months (cumulative as of asOf)
+   *   habitual     — cohort members currently in the habitual
+   *                  segment (`userSendRate >= segmentThresholds
+   *                  .tier1` AND tenure floor)
+   *
+   * ⚠ The `habitual` stage is THRESHOLD-DEPENDENT: it is derived
+   * from the request's `segmentThresholds.tier1` (default 0.7),
+   * same behaviour as `stages.habitual` and the L2 habitual count
+   * card. Cross-request comparisons of the funnel's last stage
+   * require matching threshold inputs. The `acquisition`,
+   * `activatedD30`, and `repeated` stages are threshold-
+   * independent by construction.
+   *
+   * All counts are JOINED-at-asOf scoped — a cohort member who
+   * later left the community is excluded from `activatedD30` /
+   * `repeated` / `habitual` even if they donated during the
+   * measurement window. Same membership filter as `dormantCount`
+   * / L1 `senderCount` / L2 monthly `hubMemberCount`.
+   */
+  cohortFunnel: Array<GqlSysAdminCohortFunnelPoint>;
   /**
    * One entry per entry month (length <= windowMonths), newest last.
    * `retentionM*` fields are null when the cohort is empty or too recent.
@@ -3052,8 +3184,12 @@ export type GqlSysAdminCommunityOverview = {
    *   hubMemberCount <= windowActivity.senderCount <= totalMembers
    *
    * The first holds because any hub member donated >= 3 times in
-   * the window and is therefore a window sender; the second because
-   * any window sender is a JOINED member at asOf.
+   * the window and is therefore a window sender; the second
+   * because both `hubMemberCount` and `windowActivity.senderCount`
+   * are computed from senders restricted to JOINED-at-asOf members
+   * (a former member who left the community before asOf is excluded
+   * even if they donated during the window) and totalMembers is
+   * also JOINED-at-asOf, so the chain stays consistent.
    */
   hubMemberCount: Scalars["Int"]["output"];
   /**
@@ -3309,6 +3445,21 @@ export type GqlSysAdminMemberRow = {
   donationOutDays: Scalars["Int"]["output"];
   /** Distinct months with at least one DONATION out. */
   donationOutMonths: Scalars["Int"]["output"];
+  /**
+   * JST date (UTC-encoded at JST midnight) of this member's most
+   * recent DONATION out in this community. null when the member has
+   * never sent a DONATION (= latent on the sender axis).
+   *
+   * Powers the L3 "/members" dormancy list: clients sort dormant
+   * members by `lastDonationAt ASC` to surface the longest-quiet
+   * senders first, and compute days-since-last-donation as
+   * `(asOf - lastDonationAt) / 1 day` for the per-row badge. Same
+   * underlying signal as `dormantCount`'s threshold check
+   * (`MAX(donation.created_at) < asOf - dormantThresholdDays`),
+   * exposed as the raw timestamp so the client can derive multiple
+   * derived views without a server-side recomputation per request.
+   */
+  lastDonationAt?: Maybe<Scalars["Datetime"]["output"]>;
   /** Tenure in JST calendar months (floor, minimum 1). */
   monthsIn: Scalars["Int"]["output"];
   /** User display name (users.name). null when the user has no name set. */
@@ -3399,6 +3550,42 @@ export type GqlSysAdminMonthlyActivityPoint = {
    * requests).
    */
   dormantCount: Scalars["Int"]["output"];
+  /**
+   * Distinct members who, AS OF the END of this month, had sent
+   * DONATIONs to >= `hubBreadthThreshold` distinct recipients within
+   * the trailing 28-day window ending at the month-end. Same
+   * window-scoped semantic as
+   * `SysAdminCommunityOverview.hubMemberCount`, evaluated at
+   * month-end rather than at request `asOf`.
+   *
+   * Window: `[monthEnd - 28 JST日, monthEnd)`. The 28-day window is
+   * fixed (independent of any request input) so monthly
+   * hubMemberCount values across the trend stay comparable to each
+   * other — same precedent as `dormantCount`'s fixed 30-day window.
+   * `hubBreadthThreshold` follows
+   * `SysAdminCommunityDetailInput.hubBreadthThreshold` (default 3).
+   *
+   * Senders are restricted to users JOINED in the community at the
+   * month-end timestamp — same membership filter as
+   * `dormantCount` / L1 `senderCount` / L1 `hubMemberCount`. A
+   * member who left the community before this month-end is
+   * excluded even if they donated during the trailing window.
+   *
+   * When the L1 dashboard is queried with the default
+   * `windowDays = 28` and an `asOf` that falls at or near a JST
+   * month-end, the latest entry of `monthlyActivityTrend.hubMemberCount`
+   * equals `SysAdminCommunityOverview.hubMemberCount` for the same
+   * community (provided both queries pass the same
+   * `hubBreadthThreshold`).
+   *
+   * Currently always returns a non-null integer (0 for months with
+   * no qualifying senders), matching the precedent set by sibling
+   * monthly counters (`senderCount`, `dormantCount`). The field is
+   * declared nullable to preserve forward compatibility for a future
+   * refinement that may suppress months entirely outside the
+   * community's MV data range — clients should still tolerate null.
+   */
+  hubMemberCount?: Maybe<Scalars["Int"]["output"]>;
   /** First day (JST) of the calendar month, e.g. 2025-10-01T00:00+09:00. */
   month: Scalars["Datetime"]["output"];
   /** t_memberships.created_at (status='JOINED') rows falling in the month. */
@@ -3621,6 +3808,45 @@ export type GqlSysAdminTenureDistribution = {
   m1to3Months: Scalars["Int"]["output"];
   /** Members with `90 <= daysIn < 365` — established members. */
   m3to12Months: Scalars["Int"]["output"];
+  /**
+   * Detailed monthly histogram for the L3 tenure deep-dive.
+   *
+   * Each entry counts currently-JOINED members whose tenure
+   * (`floor(daysIn / 30)`) falls into the bucket. The 12 bucket
+   * aggregates all members with tenure of 12 months or longer.
+   * Returned in ascending bucket order (`monthsIn` 0..12), with
+   * every bucket emitted (count = 0 for buckets with no members)
+   * so the client can render a contiguous histogram axis without
+   * zero-padding.
+   *
+   * Sum of `count` equals `totalMembers` minus members with a
+   * negative tenure (data anomaly — should be impossible because
+   * `daysIn` is floor-1-clamped at the SQL boundary, but the
+   * contract notes the exclusion explicitly so the invariant is
+   * documented).
+   *
+   * The existing 4 coarse buckets (`lt1Month` / `m1to3Months` /
+   * `m3to12Months` / `gte12Months`) remain for L1 / L2 callers; the
+   * monthly histogram is additional, not a replacement.
+   */
+  monthlyHistogram: Array<GqlSysAdminTenureHistogramBucket>;
+};
+
+/**
+ * One bucket of the L3 tenure histogram. See
+ * `SysAdminTenureDistribution.monthlyHistogram`.
+ */
+export type GqlSysAdminTenureHistogramBucket = {
+  __typename?: "SysAdminTenureHistogramBucket";
+  /** Number of currently-JOINED members in this bucket. */
+  count: Scalars["Int"]["output"];
+  /**
+   * Tenure in JST calendar months, computed as `floor(daysIn / 30)`.
+   * Range 0..12. The 12 bucket aggregates all members with tenure
+   * of 12 months or longer; values 0..11 represent exact monthly
+   * buckets.
+   */
+  monthsIn: Scalars["Int"]["output"];
 };
 
 /**
@@ -3717,10 +3943,19 @@ export type GqlSysAdminWindowActivity = {
   /**
    * Unique users with at least one outgoing DONATION transaction
    * during the current window (donation_out_count > 0 in
-   * mv_user_transaction_daily).
+   * mv_user_transaction_daily). Restricted to users who are still
+   * JOINED in this community at asOf — a now-departed member who
+   * donated during the window is excluded, mirroring the
+   * membership filter on `totalMembers`.
    */
   senderCount: Scalars["Int"]["output"];
-  /** Same metric for the previous window of equal length. */
+  /**
+   * Same metric for the previous window of equal length. Same
+   * JOINED-at-asOf membership restriction applies (so the
+   * `senderCount` / `senderCountPrev` comparison stays
+   * apples-to-apples even when membership churn happens between
+   * the two windows).
+   */
   senderCountPrev: Scalars["Int"]["output"];
 };
 
@@ -5554,6 +5789,7 @@ export type GqlSysAdminMonthlyActivityPointFieldsFragment = {
   chainPct?: number | null;
   dormantCount: number;
   returnedMembers?: number | null;
+  hubMemberCount?: number | null;
 };
 
 export type GqlSysAdminRetentionTrendPointFieldsFragment = {
@@ -5573,6 +5809,15 @@ export type GqlSysAdminCohortRetentionPointFieldsFragment = {
   retentionM1?: number | null;
   retentionM3?: number | null;
   retentionM6?: number | null;
+};
+
+export type GqlSysAdminCohortFunnelPointFieldsFragment = {
+  __typename?: "SysAdminCohortFunnelPoint";
+  cohortMonth: Date;
+  acquired: number;
+  activatedD30: number;
+  repeated: number;
+  habitual: number;
 };
 
 export type GqlSysAdminMemberRowFieldsFragment = {
@@ -5726,6 +5971,7 @@ export type GqlGetSysAdminCommunityDetailQuery = {
       chainPct?: number | null;
       dormantCount: number;
       returnedMembers?: number | null;
+      hubMemberCount?: number | null;
     }>;
     retentionTrend: Array<{
       __typename?: "SysAdminRetentionTrendPoint";
@@ -5743,6 +5989,14 @@ export type GqlGetSysAdminCommunityDetailQuery = {
       retentionM1?: number | null;
       retentionM3?: number | null;
       retentionM6?: number | null;
+    }>;
+    cohortFunnel: Array<{
+      __typename?: "SysAdminCohortFunnelPoint";
+      cohortMonth: Date;
+      acquired: number;
+      activatedD30: number;
+      repeated: number;
+      habitual: number;
     }>;
     memberList: {
       __typename?: "SysAdminMemberList";
@@ -9260,6 +9514,7 @@ export const SysAdminMonthlyActivityPointFieldsFragmentDoc = gql`
     chainPct
     dormantCount
     returnedMembers
+    hubMemberCount
   }
 `;
 export const SysAdminRetentionTrendPointFieldsFragmentDoc = gql`
@@ -9279,6 +9534,15 @@ export const SysAdminCohortRetentionPointFieldsFragmentDoc = gql`
     retentionM1
     retentionM3
     retentionM6
+  }
+`;
+export const SysAdminCohortFunnelPointFieldsFragmentDoc = gql`
+  fragment SysAdminCohortFunnelPointFields on SysAdminCohortFunnelPoint {
+    cohortMonth
+    acquired
+    activatedD30
+    repeated
+    habitual
   }
 `;
 export const SysAdminMemberRowFieldsFragmentDoc = gql`
@@ -11508,6 +11772,9 @@ export const GetSysAdminCommunityDetailDocument = gql`
       cohortRetention {
         ...SysAdminCohortRetentionPointFields
       }
+      cohortFunnel {
+        ...SysAdminCohortFunnelPointFields
+      }
       memberList {
         hasNextPage
         nextCursor
@@ -11523,6 +11790,7 @@ export const GetSysAdminCommunityDetailDocument = gql`
   ${SysAdminMonthlyActivityPointFieldsFragmentDoc}
   ${SysAdminRetentionTrendPointFieldsFragmentDoc}
   ${SysAdminCohortRetentionPointFieldsFragmentDoc}
+  ${SysAdminCohortFunnelPointFieldsFragmentDoc}
   ${SysAdminMemberRowFieldsFragmentDoc}
 `;
 
