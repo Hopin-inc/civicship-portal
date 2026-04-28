@@ -5,7 +5,7 @@ export const DEFAULT_ASSET_PATHS = {
   SQUARE_LOGO: "/communities/default/logo-square.jpg",
   FAVICON: "https://storage.googleapis.com/prod-civicship-storage-public/communities/default/favicon.ico",
   APPLE_TOUCH_ICON: "/communities/default/apple-touch-icon.png",
-  OG_IMAGE: "/communities/default/ogp.png",
+  OG_IMAGE: "https://storage.googleapis.com/prod-civicship-storage-public/communities/default/ogp.jpg",
 } as const;
 
 export const ACTIVE_COMMUNITY_IDS = [
