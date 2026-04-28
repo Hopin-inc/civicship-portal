@@ -1,19 +1,21 @@
 import {
   GqlReportFeedbackType,
-  type GqlReportFeedback,
+  GqlReportVariant,
+  type GqlGetAdminTemplateFeedbacksQuery,
+  type GqlReportFeedbackWithReportFieldsFragment,
 } from "@/types/graphql";
 
+export type FeedbacksConnection = NonNullable<
+  GqlGetAdminTemplateFeedbacksQuery["adminTemplateFeedbacks"]
+>;
+
 /**
- * Storybook / 単独 mock 用 ReportFeedback。本番 component は backend
- * の `adminTemplateFeedbacks` query (Phase 1.5 で追加依頼) からデータを
- * 取得するが、それまでは mock で UI を完成させる。
- *
- * `user` は実 query では fragment で `{ id, name }` だけ select する想定
- * のため、フル GqlUser ではなく minimal shape にする。
+ * Storybook 用 mock。
+ * 本番 component は backend の `adminTemplateFeedbacks` query から
+ * `ReportFeedbackWithReportFields` fragment 単位の data を受け取るので、
+ * mock もその型に揃えておく。
  */
-export type FeedbackItem = Omit<GqlReportFeedback, "user"> & {
-  user: { __typename?: "User"; id: string; name: string };
-};
+export type FeedbackItem = GqlReportFeedbackWithReportFieldsFragment;
 
 const sampleComments = [
   "導入が冗長で本題が遅い。もっと簡潔に始めてほしい。",
@@ -49,6 +51,12 @@ const feedbackTypes = [
 
 const sectionKeys = ["intro", "highlight", "members", "cta", "closing", null];
 
+const sampleCommunities = [
+  { id: "c_kibotcha", name: "kibotcha" },
+  { id: "c_neoyamacle", name: "neo山くる" },
+  { id: "c_hopin", name: "Hopin" },
+];
+
 /**
  * mock feedback 群 (variant 詳細ページ用)。
  * rating は 2〜5 で散らばらせ、低評価 (= 改善の手がかり) も混ぜる。
@@ -58,20 +66,59 @@ export function makeMockFeedbacks(count: number = 12): FeedbackItem[] {
   return Array.from({ length: count }, (_, i) => {
     const rating = ((i * 7) % 4) + 2; // 2..5 を擬似ランダム
     const daysAgo = i * 2 + 1;
+    const reportIdx = i % 5;
+    const community = sampleCommunities[reportIdx % sampleCommunities.length];
+    const periodTo = new Date(now - daysAgo * 24 * 60 * 60 * 1000);
+    const periodFrom = new Date(periodTo.getTime() - 7 * 24 * 60 * 60 * 1000);
     return {
       __typename: "ReportFeedback",
       id: `fb_${i + 1}`,
-      reportId: `r_${(i % 5) + 1}`,
       rating,
       comment: sampleComments[i % sampleComments.length],
       feedbackType: feedbackTypes[i % feedbackTypes.length],
       sectionKey: sectionKeys[i % sectionKeys.length],
-      createdAt: new Date(now - daysAgo * 24 * 60 * 60 * 1000),
+      createdAt: periodTo,
       user: {
         __typename: "User",
         id: `u_${i + 1}`,
         name: sampleNames[i % sampleNames.length],
       },
+      report: {
+        __typename: "Report",
+        id: `r_${reportIdx + 1}`,
+        variant: GqlReportVariant.MemberNewsletter,
+        periodFrom,
+        periodTo,
+        community: {
+          __typename: "Community",
+          id: community.id,
+          name: community.name,
+        },
+      },
     };
   });
+}
+
+/**
+ * mock feedbacks を `adminTemplateFeedbacks` Connection 形式にラップする
+ * helper。Storybook で Container / page を表示するときに使う。
+ */
+export function makeMockFeedbacksConnection(
+  count: number = 12,
+): FeedbacksConnection {
+  const items = makeMockFeedbacks(count);
+  return {
+    __typename: "ReportFeedbacksConnection",
+    edges: items.map((node, i) => ({
+      __typename: "ReportFeedbackEdge",
+      cursor: `cursor_${i + 1}`,
+      node,
+    })),
+    pageInfo: {
+      __typename: "PageInfo",
+      hasNextPage: false,
+      endCursor: items.length > 0 ? `cursor_${items.length}` : null,
+    },
+    totalCount: count,
+  };
 }

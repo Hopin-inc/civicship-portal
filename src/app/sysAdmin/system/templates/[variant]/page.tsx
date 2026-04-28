@@ -4,6 +4,7 @@ import {
   fetchActiveGenerationTemplateServer,
   fetchActiveJudgeTemplateServer,
 } from "@/app/sysAdmin/_shared/server/fetchActiveTemplate";
+import { fetchAdminTemplateFeedbacksServer } from "@/app/sysAdmin/_shared/server/fetchAdminTemplateFeedbacks";
 import { GqlReportTemplateKind } from "@/types/graphql";
 import { slugToVariant } from "@/app/sysAdmin/features/system/templates/shared/variantSlug";
 import { SysAdminTemplateDetailPageClient } from "./SysAdminTemplateDetailPageClient";
@@ -15,8 +16,8 @@ type PageProps = {
 /**
  * テンプレート variant 詳細。
  *
- * GENERATION / JUDGE 各 breakdown + active template を SSR + cookie で
- * 取得して client へ渡す。client-side fetch は auth race
+ * GENERATION / JUDGE 各 breakdown + active template + feedback 1 ページ目を
+ * SSR + cookie で取得して client へ渡す。client-side fetch は auth race
  * (`IsAdmin authorization FAILED`) の原因になるため SSR に統一。
  */
 export default async function SysAdminSystemTemplateDetailPage({
@@ -31,11 +32,21 @@ export default async function SysAdminSystemTemplateDetailPage({
     judgeBreakdownRows,
     generationTemplate,
     judgeTemplate,
+    generationFeedbacks,
+    judgeFeedbacks,
   ] = await Promise.all([
     fetchTemplateBreakdownServer(variant, GqlReportTemplateKind.Generation),
     fetchTemplateBreakdownServer(variant, GqlReportTemplateKind.Judge),
     fetchActiveGenerationTemplateServer(variant),
     fetchActiveJudgeTemplateServer(variant),
+    fetchAdminTemplateFeedbacksServer({
+      variant,
+      kind: GqlReportTemplateKind.Generation,
+    }),
+    fetchAdminTemplateFeedbacksServer({
+      variant,
+      kind: GqlReportTemplateKind.Judge,
+    }),
   ]);
 
   return (
@@ -43,8 +54,10 @@ export default async function SysAdminSystemTemplateDetailPage({
       variant={variant}
       generationBreakdownRows={generationBreakdownRows}
       generationTemplate={generationTemplate}
+      generationFeedbacks={generationFeedbacks}
       judgeBreakdownRows={judgeBreakdownRows}
       judgeTemplate={judgeTemplate}
+      judgeFeedbacks={judgeFeedbacks}
     />
   );
 }

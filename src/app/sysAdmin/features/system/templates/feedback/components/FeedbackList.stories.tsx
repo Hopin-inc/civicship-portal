@@ -31,6 +31,19 @@ export const HasMore: Story = {
   args: {
     feedbacks,
     totalCount: 47,
+    hasNextPage: true,
+    loadingMore: false,
+    onLoadMore: () => undefined,
+  },
+};
+
+export const LoadingMore: Story = {
+  args: {
+    feedbacks,
+    totalCount: 47,
+    hasNextPage: true,
+    loadingMore: true,
+    onLoadMore: () => undefined,
   },
 };
 

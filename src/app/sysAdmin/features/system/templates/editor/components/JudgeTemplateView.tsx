@@ -13,13 +13,13 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import type {
+  GqlReportFeedbackWithReportFieldsFragment,
   GqlReportTemplateFieldsFragment,
   GqlReportTemplateStatsBreakdownRowFieldsFragment,
 } from "@/types/graphql";
 import { ExperimentSection } from "./ExperimentSection";
 import { VersionSelector } from "./VersionSelector";
 import { FeedbackList } from "../../feedback/components/FeedbackList";
-import type { FeedbackItem } from "../../feedback/fixtures";
 
 export type JudgeTemplateViewProps = {
   rows: GqlReportTemplateStatsBreakdownRowFieldsFragment[];
@@ -30,8 +30,11 @@ export type JudgeTemplateViewProps = {
   templateLoading: boolean;
   templateError: unknown;
 
-  feedbacks: FeedbackItem[];
+  feedbacks: GqlReportFeedbackWithReportFieldsFragment[];
   feedbackTotalCount?: number;
+  feedbacksHasNextPage?: boolean;
+  feedbacksLoadingMore?: boolean;
+  onLoadMoreFeedbacks?: () => void;
 };
 
 /**
@@ -53,6 +56,9 @@ export function JudgeTemplateView({
   templateError,
   feedbacks,
   feedbackTotalCount,
+  feedbacksHasNextPage,
+  feedbacksLoadingMore,
+  onLoadMoreFeedbacks,
 }: JudgeTemplateViewProps) {
   const versions = useMemo(
     () =>
@@ -124,7 +130,13 @@ export function JudgeTemplateView({
         </div>
       )}
 
-      <FeedbackList feedbacks={feedbacks} totalCount={feedbackTotalCount} />
+      <FeedbackList
+        feedbacks={feedbacks}
+        totalCount={feedbackTotalCount}
+        hasNextPage={feedbacksHasNextPage}
+        loadingMore={feedbacksLoadingMore}
+        onLoadMore={onLoadMoreFeedbacks}
+      />
 
       <Accordion type="single" collapsible>
         <AccordionItem value="history" className="border-none">

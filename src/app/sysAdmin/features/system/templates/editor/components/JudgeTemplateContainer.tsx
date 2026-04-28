@@ -1,28 +1,98 @@
 "use client";
 
-import type {
-  GqlReportTemplateFieldsFragment,
-  GqlReportTemplateStatsBreakdownRowFieldsFragment,
+import { useCallback, useState } from "react";
+import { useApolloClient } from "@apollo/client";
+import {
+  GqlReportTemplateKind,
+  type GqlGetAdminTemplateFeedbacksQuery,
+  type GqlGetAdminTemplateFeedbacksQueryVariables,
+  type GqlReportTemplateFieldsFragment,
+  type GqlReportTemplateStatsBreakdownRowFieldsFragment,
+  type GqlReportVariant,
 } from "@/types/graphql";
-import { makeMockFeedbacks } from "../../feedback/fixtures";
+import { GET_ADMIN_TEMPLATE_FEEDBACKS } from "@/graphql/account/adminTemplateFeedbacks/query";
+import { useCursorPagination } from "@/app/sysAdmin/_shared/hooks/useCursorPagination";
 import { JudgeTemplateView } from "./JudgeTemplateView";
 
+type FeedbacksConnection = NonNullable<
+  GqlGetAdminTemplateFeedbacksQuery["adminTemplateFeedbacks"]
+>;
+
 type Props = {
+  variant: GqlReportVariant;
   initialBreakdownRows: GqlReportTemplateStatsBreakdownRowFieldsFragment[];
   initialJudgeTemplate: GqlReportTemplateFieldsFragment | null;
+  initialFeedbacks: FeedbacksConnection | null;
+};
+
+const PAGE_SIZE = 20;
+
+const EMPTY_CONNECTION: FeedbacksConnection = {
+  __typename: "ReportFeedbacksConnection",
+  edges: [],
+  pageInfo: {
+    __typename: "PageInfo",
+    hasNextPage: false,
+    endCursor: null,
+  },
+  totalCount: 0,
 };
 
 /**
- * `JudgeTemplateView` (presentational) と SSR initial data を結ぶ container。
+ * `JudgeTemplateView` (presentational) と SSR initial data + feedback
+ * pagination を結ぶ container。
  *
- * JUDGE は閲覧専用のため mutation も不要。data は SSR で取得して渡される。
+ * JUDGE は閲覧専用のため mutation は使わない。「もっと見る」だけ Apollo
+ * client.query で追加ページを取得する。
  */
 export function JudgeTemplateContainer({
+  variant,
   initialBreakdownRows,
   initialJudgeTemplate,
+  initialFeedbacks,
 }: Props) {
-  // Phase 1.5 の `adminTemplateFeedbacks` query 待ち。それまで mock data を流す。
-  const mockFeedbacks = makeMockFeedbacks(6);
+  const apollo = useApolloClient();
+  const [feedbackTotalCount, setFeedbackTotalCount] = useState(
+    initialFeedbacks?.totalCount ?? 0,
+  );
+
+  const fetchMoreFeedbacks = useCallback(
+    async (cursor: string, first: number) => {
+      const result = await apollo.query<
+        GqlGetAdminTemplateFeedbacksQuery,
+        GqlGetAdminTemplateFeedbacksQueryVariables
+      >({
+        query: GET_ADMIN_TEMPLATE_FEEDBACKS,
+        variables: {
+          variant,
+          kind: GqlReportTemplateKind.Judge,
+          cursor,
+          first,
+        },
+        fetchPolicy: "network-only",
+      });
+      const conn = result.data.adminTemplateFeedbacks ?? EMPTY_CONNECTION;
+      setFeedbackTotalCount(conn.totalCount);
+      return conn;
+    },
+    [apollo, variant],
+  );
+
+  const {
+    items: feedbacks,
+    hasNextPage: feedbacksHasNextPage,
+    loading: feedbacksLoadingMore,
+    loadMore: loadMoreFeedbacks,
+  } = useCursorPagination({
+    initial: initialFeedbacks ?? EMPTY_CONNECTION,
+    fetchMore: fetchMoreFeedbacks,
+    pageSize: PAGE_SIZE,
+    resetKey: `${variant}:JUDGE`,
+  });
+
+  const handleLoadMoreFeedbacks = useCallback(() => {
+    void loadMoreFeedbacks();
+  }, [loadMoreFeedbacks]);
 
   return (
     <JudgeTemplateView
@@ -32,8 +102,11 @@ export function JudgeTemplateContainer({
       template={initialJudgeTemplate}
       templateLoading={false}
       templateError={null}
-      feedbacks={mockFeedbacks}
-      feedbackTotalCount={mockFeedbacks.length}
+      feedbacks={feedbacks}
+      feedbackTotalCount={feedbackTotalCount}
+      feedbacksHasNextPage={feedbacksHasNextPage}
+      feedbacksLoadingMore={feedbacksLoadingMore}
+      onLoadMoreFeedbacks={handleLoadMoreFeedbacks}
     />
   );
 }

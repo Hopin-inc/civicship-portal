@@ -1,14 +1,24 @@
 "use client";
 
-import type { FeedbackItem } from "../fixtures";
+import { Button } from "@/components/ui/button";
+import type { GqlReportFeedbackWithReportFieldsFragment } from "@/types/graphql";
 import { FeedbackCard } from "./FeedbackCard";
 
 type Props = {
-  feedbacks: FeedbackItem[];
+  feedbacks: GqlReportFeedbackWithReportFieldsFragment[];
   totalCount?: number;
+  hasNextPage?: boolean;
+  loadingMore?: boolean;
+  onLoadMore?: () => void;
 };
 
-export function FeedbackList({ feedbacks, totalCount }: Props) {
+export function FeedbackList({
+  feedbacks,
+  totalCount,
+  hasNextPage,
+  loadingMore,
+  onLoadMore,
+}: Props) {
   if (feedbacks.length === 0) {
     return (
       <p className="py-6 text-center text-body-sm text-muted-foreground">
@@ -34,6 +44,18 @@ export function FeedbackList({ feedbacks, totalCount }: Props) {
           <FeedbackCard key={fb.id} feedback={fb} />
         ))}
       </div>
+      {hasNextPage && onLoadMore && (
+        <div className="flex justify-center">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onLoadMore}
+            disabled={loadingMore}
+          >
+            {loadingMore ? "読み込み中..." : "もっと見る"}
+          </Button>
+        </div>
+      )}
     </section>
   );
 }

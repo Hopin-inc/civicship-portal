@@ -1,15 +1,18 @@
 "use client";
 
-import { Star } from "lucide-react";
+import Link from "next/link";
+import { ExternalLink, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { feedbackTypeLabel } from "@/app/sysAdmin/features/system/templates/shared/labels";
-import type { FeedbackItem } from "../fixtures";
+import type { GqlReportFeedbackWithReportFieldsFragment } from "@/types/graphql";
 
 type Props = {
-  feedback: FeedbackItem;
+  feedback: GqlReportFeedbackWithReportFieldsFragment;
 };
 
 export function FeedbackCard({ feedback }: Props) {
+  const reportHref = `/sysAdmin/${feedback.report.community.id}/reports/${feedback.report.id}`;
+
   return (
     <article className="space-y-2 border-b border-muted py-3 last:border-b-0">
       <header className="flex items-baseline justify-between gap-2">
@@ -33,6 +36,16 @@ export function FeedbackCard({ feedback }: Props) {
             {feedback.sectionKey}
           </span>
         )}
+        <Link
+          href={reportHref}
+          className="ml-auto inline-flex items-center gap-1 text-body-xs text-muted-foreground hover:text-foreground"
+        >
+          <span>
+            {feedback.report.community.name ?? feedback.report.community.id}
+          </span>
+          <ExternalLink className="h-3 w-3" aria-hidden />
+          <span className="sr-only">レポートを開く</span>
+        </Link>
       </div>
 
       {feedback.comment ? (

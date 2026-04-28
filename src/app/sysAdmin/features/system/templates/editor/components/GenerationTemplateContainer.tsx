@@ -2,40 +2,71 @@
 
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useApolloClient } from "@apollo/client";
 import {
+  GqlReportTemplateKind,
   useUpdateReportTemplateMutation,
+  type GqlGetAdminTemplateFeedbacksQuery,
+  type GqlGetAdminTemplateFeedbacksQueryVariables,
   type GqlReportTemplateFieldsFragment,
   type GqlReportTemplateStatsBreakdownRowFieldsFragment,
   type GqlReportVariant,
 } from "@/types/graphql";
-import { makeMockFeedbacks } from "../../feedback/fixtures";
+import { GET_ADMIN_TEMPLATE_FEEDBACKS } from "@/graphql/account/adminTemplateFeedbacks/query";
+import { useCursorPagination } from "@/app/sysAdmin/_shared/hooks/useCursorPagination";
 import { GenerationTemplateView } from "./GenerationTemplateView";
+
+type FeedbacksConnection = NonNullable<
+  GqlGetAdminTemplateFeedbacksQuery["adminTemplateFeedbacks"]
+>;
 
 type Props = {
   variant: GqlReportVariant;
   initialBreakdownRows: GqlReportTemplateStatsBreakdownRowFieldsFragment[];
   initialTemplate: GqlReportTemplateFieldsFragment | null;
+  initialFeedbacks: FeedbacksConnection | null;
+};
+
+const PAGE_SIZE = 20;
+
+const EMPTY_CONNECTION: FeedbacksConnection = {
+  __typename: "ReportFeedbacksConnection",
+  edges: [],
+  pageInfo: {
+    __typename: "PageInfo",
+    hasNextPage: false,
+    endCursor: null,
+  },
+  totalCount: 0,
 };
 
 /**
  * `GenerationTemplateView` (presentational) と
- * mutation hook を結ぶ container。
+ * mutation hook + feedback pagination を結ぶ container。
  *
- * 初期 data は SSR で取得して props で受け取る。client-side fetch は
- * auth race の原因になるため使わない。保存後は `router.refresh()` で
- * SSR を再走させ、stats / template を最新化する。
+ * 初期 data (breakdown / template / feedbacks 1 ページ目) は SSR で取得して
+ * props で受け取る。client-side fetch は auth race の原因になるため使わない。
+ * 「もっと見る」だけ Apollo client.query で追加ページを取りに行く。
+ *
+ * 保存後は `router.refresh()` で SSR を再走させ、stats / template / feedbacks
+ * を最新化する。
  */
 export function GenerationTemplateContainer({
   variant,
   initialBreakdownRows,
   initialTemplate,
+  initialFeedbacks,
 }: Props) {
   const router = useRouter();
+  const apollo = useApolloClient();
   const [systemPrompt, setSystemPrompt] = useState(
     initialTemplate?.systemPrompt ?? "",
   );
   const [userPromptTemplate, setUserPromptTemplate] = useState(
     initialTemplate?.userPromptTemplate ?? "",
+  );
+  const [feedbackTotalCount, setFeedbackTotalCount] = useState(
+    initialFeedbacks?.totalCount ?? 0,
   );
 
   const [save, { loading: saving, error: saveError }] =
@@ -76,9 +107,43 @@ export function GenerationTemplateContainer({
     (systemPrompt !== initialTemplate.systemPrompt ||
       userPromptTemplate !== initialTemplate.userPromptTemplate);
 
-  // Phase 1.5 の `adminTemplateFeedbacks` query 待ち。それまで mock data を流す。
-  // backend landing 後は SSR fetch に置換 (page.tsx 側で fetch して props 経由で渡す)。
-  const mockFeedbacks = makeMockFeedbacks(8);
+  const fetchMoreFeedbacks = useCallback(
+    async (cursor: string, first: number) => {
+      const result = await apollo.query<
+        GqlGetAdminTemplateFeedbacksQuery,
+        GqlGetAdminTemplateFeedbacksQueryVariables
+      >({
+        query: GET_ADMIN_TEMPLATE_FEEDBACKS,
+        variables: {
+          variant,
+          kind: GqlReportTemplateKind.Generation,
+          cursor,
+          first,
+        },
+        fetchPolicy: "network-only",
+      });
+      const conn = result.data.adminTemplateFeedbacks ?? EMPTY_CONNECTION;
+      setFeedbackTotalCount(conn.totalCount);
+      return conn;
+    },
+    [apollo, variant],
+  );
+
+  const {
+    items: feedbacks,
+    hasNextPage: feedbacksHasNextPage,
+    loading: feedbacksLoadingMore,
+    loadMore: loadMoreFeedbacks,
+  } = useCursorPagination({
+    initial: initialFeedbacks ?? EMPTY_CONNECTION,
+    fetchMore: fetchMoreFeedbacks,
+    pageSize: PAGE_SIZE,
+    resetKey: `${variant}:GENERATION`,
+  });
+
+  const handleLoadMoreFeedbacks = useCallback(() => {
+    void loadMoreFeedbacks();
+  }, [loadMoreFeedbacks]);
 
   return (
     <GenerationTemplateView
@@ -96,8 +161,11 @@ export function GenerationTemplateContainer({
       setSystemPrompt={setSystemPrompt}
       setUserPromptTemplate={setUserPromptTemplate}
       onSave={handleSave}
-      feedbacks={mockFeedbacks}
-      feedbackTotalCount={mockFeedbacks.length}
+      feedbacks={feedbacks}
+      feedbackTotalCount={feedbackTotalCount}
+      feedbacksHasNextPage={feedbacksHasNextPage}
+      feedbacksLoadingMore={feedbacksLoadingMore}
+      onLoadMoreFeedbacks={handleLoadMoreFeedbacks}
     />
   );
 }
