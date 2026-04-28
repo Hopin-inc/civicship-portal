@@ -165,12 +165,13 @@ export function useCursorPagination<TItem>({
       const nextHasNextPage = next.pageInfo.hasNextPage;
       endCursorRef.current = nextEndCursor;
       hasNextPageRef.current = nextHasNextPage;
-      setItems((prev) => {
-        const appended = [...prev, ...extractItems(next)];
-        // backend が totalCount を返さないケースは累積件数で代替。
-        setTotalCount(next.totalCount ?? appended.length);
-        return appended;
-      });
+      const nextItems = extractItems(next);
+      setItems((prev) => [...prev, ...nextItems]);
+      // backend が totalCount を返さないケースは累積件数で代替。
+      // setItems の updater は純粋関数として保つため、setTotalCount は外側で
+      // 独立に呼ぶ (Strict Mode で updater が二重実行されても副作用が
+      // 漏れないように)。
+      setTotalCount((prev) => next.totalCount ?? prev + nextItems.length);
       setEndCursor(nextEndCursor);
       setHasNextPage(nextHasNextPage);
     } catch (err) {
