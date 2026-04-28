@@ -12,17 +12,19 @@ import { VoteClosedNotice } from "./VoteClosedNotice";
 import { VoteEligibilityNotice } from "./VoteEligibilityNotice";
 import { VoteGateInfoBanner } from "./VoteGateInfoBanner";
 
-function formatRemaining(ms: number): string {
+type Translator = ReturnType<typeof useTranslations>;
+
+function formatRemaining(ms: number, t: Translator): string {
   const totalSeconds = Math.floor(ms / 1000);
   const days = Math.floor(totalSeconds / 86400);
   const hours = Math.floor((totalSeconds % 86400) / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
-  if (days > 0) return `${days}日 ${hours}時間`;
-  if (hours > 0) return `${hours}時間 ${minutes}分`;
-  return minutes > 0 ? `${minutes}分` : "1分未満";
+  if (days > 0) return t("votes.cast.remaining.daysHours", { days, hours });
+  if (hours > 0) return t("votes.cast.remaining.hoursMinutes", { hours, minutes });
+  return minutes > 0 ? t("votes.cast.remaining.minutes", { minutes }) : t("votes.cast.remaining.lessThanMinute");
 }
 
-function useRemainingTime(endsAt: Date, phase: GqlVoteTopicPhase): string | null {
+function useRemainingTime(endsAt: Date, phase: GqlVoteTopicPhase, t: Translator): string | null {
   const [remaining, setRemaining] = useState<string | null>(null);
   useEffect(() => {
     if (phase !== GqlVoteTopicPhase.Open) {
@@ -37,7 +39,7 @@ function useRemainingTime(endsAt: Date, phase: GqlVoteTopicPhase): string | null
         if (timer) clearInterval(timer);
         return;
       }
-      setRemaining(formatRemaining(ms));
+      setRemaining(formatRemaining(ms, t));
     };
     update();
     timer = setInterval(update, 60_000);
@@ -52,7 +54,7 @@ interface VoteCastPageProps {
 
 export function VoteCastPage({ view }: VoteCastPageProps) {
   const t = useTranslations();
-  const remaining = useRemainingTime(view.endsAt, view.phase);
+  const remaining = useRemainingTime(view.endsAt, view.phase, t);
 
   return (
     <div className="px-4 max-w-md mx-auto py-6 space-y-6">
