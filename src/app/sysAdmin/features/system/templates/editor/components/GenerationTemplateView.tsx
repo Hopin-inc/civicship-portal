@@ -18,7 +18,7 @@ import type {
 import { PromptEditor } from "./PromptEditor";
 import { ExperimentSection } from "./ExperimentSection";
 import { VersionSelector } from "./VersionSelector";
-import { FeedbackList } from "../../feedback/components/FeedbackList";
+import { FeedbackList } from "@/app/sysAdmin/_shared/feedback/FeedbackList";
 
 export type GenerationTemplateViewProps = {
   rows: GqlReportTemplateStatsBreakdownRowFieldsFragment[];
@@ -122,9 +122,19 @@ export function GenerationTemplateView({
       <FeedbackList
         feedbacks={feedbacks}
         totalCount={feedbackTotalCount}
-        hasNextPage={feedbacksHasNextPage}
-        loadingMore={feedbacksLoadingMore}
-        onLoadMore={onLoadMoreFeedbacks}
+        reportLinkFor={(fb) => ({
+          href: `/sysAdmin/${fb.report.community.id}/reports/${fb.report.id}`,
+          label: fb.report.community.name ?? fb.report.community.id,
+        })}
+        pagination={
+          onLoadMoreFeedbacks
+            ? {
+                hasNextPage: feedbacksHasNextPage ?? false,
+                loadingMore: feedbacksLoadingMore ?? false,
+                onLoadMore: onLoadMoreFeedbacks,
+              }
+            : undefined
+        }
       />
 
       <Accordion type="single" collapsible>

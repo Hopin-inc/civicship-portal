@@ -4,9 +4,9 @@ import type {
   GqlGetAdminReportQuery,
   GqlReportFeedbackFieldsFragment,
 } from "@/types/graphql";
+import { FeedbackList } from "@/app/sysAdmin/_shared/feedback/FeedbackList";
 import { ReportDetailHeader } from "./ReportDetailHeader";
 import { ReportContentSection } from "./ReportContentSection";
-import { ReportFeedbackList } from "./ReportFeedbackList";
 import {
   ReportFeedbackForm,
   type FeedbackFormInput,
@@ -53,10 +53,7 @@ export function ReportDetailView({
         templateVersion={report.template?.version ?? null}
       />
       <ReportContentSection bodyHtml={bodyHtml} skipReason={report.skipReason} />
-      <ReportFeedbackList
-        feedbacks={feedbacks}
-        totalCount={feedbacksTotalCount}
-      />
+      <FeedbackList feedbacks={feedbacks} totalCount={feedbacksTotalCount} />
       <ReportFeedbackForm
         existingFeedback={report.myFeedback ?? null}
         saving={saving}
