@@ -3,7 +3,6 @@ import { SysAdminPageClient } from "./SysAdminPageClient";
 
 // SSR で初期データを取得することで、初回ナビゲーション時の auth race
 // (Apollo link が idToken 取得前に発火して 401 になり ErrorState が出る) を解消する。
-// クライアント側のコントロール変更で再フェッチが必要になった時のみ Apollo client query が発火する。
 export default async function SysAdminPage() {
   const initialData = await fetchSysAdminDashboardServer({
     asOf: undefined,
