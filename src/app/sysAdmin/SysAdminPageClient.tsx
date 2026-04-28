@@ -18,10 +18,11 @@ type Props = {
   initialData: GqlGetSysAdminDashboardQuery["sysAdminDashboard"] | null;
   /**
    * Community ごとの「最終 Report 発行サマリ」。
-   * Storybook では undefined を渡せば Report pill 抜きで描画される
-   * (View 層は data 層に依存しない)。
+   * RSC → Client の serialization 制約から Record で受ける (Map は React 18
+   * の flight protocol で扱えない)。Storybook では undefined を渡せば Report
+   * pill 抜きで描画される (View 層は data 層に依存しない)。
    */
-  reportSummariesByCommunity?: Map<string, CommunityReportSummary>;
+  reportSummariesByCommunity?: Record<string, CommunityReportSummary>;
 };
 
 export function SysAdminPageClient({
@@ -85,7 +86,7 @@ export function SysAdminPageClient({
               {idx !== 0 && <hr className="border-muted" />}
               <CommunityRow
                 row={community}
-                reportSummary={reportSummariesByCommunity?.get(community.communityId)}
+                reportSummary={reportSummariesByCommunity?.[community.communityId]}
                 onClick={(communityId) =>
                   router.push(`/sysAdmin/${communityId}`)
                 }

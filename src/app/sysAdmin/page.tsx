@@ -19,14 +19,16 @@ export default async function SysAdminPage() {
     fetchAdminReportSummaryServer(),
   ]);
 
-  const reportSummariesByCommunity = new Map<string, CommunityReportSummary>();
+  // RSC → Client component の serialization 制約: React 18 の flight protocol は
+  // Map を扱えないので Record (plain object) に詰める。
+  const reportSummariesByCommunity: Record<string, CommunityReportSummary> = {};
   for (const edge of reportSummary?.edges ?? []) {
     const node = edge?.node;
     if (!node) continue;
-    reportSummariesByCommunity.set(node.community.id, {
+    reportSummariesByCommunity[node.community.id] = {
       daysSinceLastPublish: node.daysSinceLastPublish ?? null,
       publishedCountLast90Days: node.publishedCountLast90Days,
-    });
+    };
   }
 
   return (
