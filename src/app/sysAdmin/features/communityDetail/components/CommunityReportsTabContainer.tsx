@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useApolloClient } from "@apollo/client";
 import { GET_ADMIN_BROWSE_REPORTS } from "@/graphql/account/adminReports/query";
 import type {
@@ -47,33 +47,44 @@ export function CommunityReportsTabContainer({
   const [loadError, setLoadError] = useState<unknown>(null);
   const totalCount = initialReports?.totalCount ?? reports.length;
 
-  const handleLoadMore = useMemo(() => {
-    return async () => {
-      if (!endCursor || loadingMore) return;
-      setLoadingMore(true);
-      setLoadError(null);
-      try {
-        const result = await apollo.query<
-          GqlGetAdminBrowseReportsQuery,
-          GqlGetAdminBrowseReportsQueryVariables
-        >({
-          query: GET_ADMIN_BROWSE_REPORTS,
-          variables: { communityId, cursor: endCursor, first: PAGE_SIZE },
-          fetchPolicy: "network-only",
-        });
-        const next = result.data.adminBrowseReports;
-        setReports((prev) => [...prev, ...extractReports(next)]);
-        setEndCursor(next.pageInfo.endCursor ?? null);
-        setHasNextPage(next.pageInfo.hasNextPage);
-      } catch (err) {
-        // catch しないと button onClick で発火する promise が unhandled rejection に
-        // なる。View 側は error prop を表示できるので state にセットして渡す。
-        setLoadError(err);
-      } finally {
-        setLoadingMore(false);
-      }
-    };
-  }, [apollo, communityId, endCursor, loadingMore]);
+  // setLoadingMore / setEndCursor は state なので非同期で反映される。
+  // rapid に「もっと見る」を連打した時に同じ cursor で重複 fetch しないよう、
+  // 同期的な ref で guard する (useCursorPagination と同じパターン)。
+  const loadingRef = useRef(false);
+  const endCursorRef = useRef<string | null>(
+    initialReports?.pageInfo.endCursor ?? null,
+  );
+
+  const handleLoadMore = useCallback(async () => {
+    if (loadingRef.current || !endCursorRef.current) return;
+    const cursor = endCursorRef.current;
+    loadingRef.current = true;
+    setLoadingMore(true);
+    setLoadError(null);
+    try {
+      const result = await apollo.query<
+        GqlGetAdminBrowseReportsQuery,
+        GqlGetAdminBrowseReportsQueryVariables
+      >({
+        query: GET_ADMIN_BROWSE_REPORTS,
+        variables: { communityId, cursor, first: PAGE_SIZE },
+        fetchPolicy: "network-only",
+      });
+      const next = result.data.adminBrowseReports;
+      const nextEndCursor = next.pageInfo.endCursor ?? null;
+      endCursorRef.current = nextEndCursor;
+      setReports((prev) => [...prev, ...extractReports(next)]);
+      setEndCursor(nextEndCursor);
+      setHasNextPage(next.pageInfo.hasNextPage);
+    } catch (err) {
+      // catch しないと button onClick で発火する promise が unhandled rejection に
+      // なる。View 側は error prop を表示できるので state にセットして渡す。
+      setLoadError(err);
+    } finally {
+      loadingRef.current = false;
+      setLoadingMore(false);
+    }
+  }, [apollo, communityId]);
 
   return (
     <CommunityReportsTab
