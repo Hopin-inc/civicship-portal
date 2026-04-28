@@ -109,7 +109,13 @@ export function useVoteTopicSave({
           error: errorMsg,
           component: "useVoteTopicSave",
         });
-        const isNotEditable = errorMsg.includes("VOTE_TOPIC_NOT_EDITABLE");
+        const gqlErrors =
+          error && typeof error === "object" && "graphQLErrors" in error
+            ? (error as { graphQLErrors: Array<{ extensions?: { code?: string } }> }).graphQLErrors
+            : [];
+        const isNotEditable = gqlErrors.some(
+          (e) => e.extensions?.code === "VOTE_TOPIC_NOT_EDITABLE",
+        );
         if (isNotEditable) {
           toast.error(t("adminVotes.toast.notEditableError"));
         } else {

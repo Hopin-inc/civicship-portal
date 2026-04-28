@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import { useParams, notFound } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useAppRouter } from "@/lib/navigation";
@@ -34,10 +34,13 @@ export default function EditVoteTopicPage() {
   if (error) return <ErrorState title={t("adminVotes.toast.updateError")} />;
   if (!data?.voteTopic) return notFound();
 
-  if (data.voteTopic.phase !== GqlVoteTopicPhase.Upcoming) {
-    router.push(`/admin/votes/${params.topicId}`);
-    return null;
-  }
+  const isNotUpcoming = data.voteTopic.phase !== GqlVoteTopicPhase.Upcoming;
+  useEffect(() => {
+    if (isNotUpcoming) {
+      router.replace(`/admin/votes/${params.topicId}`);
+    }
+  }, [isNotUpcoming, params.topicId, router]);
+  if (isNotUpcoming) return null;
 
   if (!initialValues) return <LoadingIndicator fullScreen={false} />;
 

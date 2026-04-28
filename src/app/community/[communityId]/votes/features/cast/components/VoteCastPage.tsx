@@ -19,7 +19,7 @@ function formatRemaining(ms: number): string {
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   if (days > 0) return `${days}日 ${hours}時間`;
   if (hours > 0) return `${hours}時間 ${minutes}分`;
-  return `${minutes}分`;
+  return minutes > 0 ? `${minutes}分` : "1分未満";
 }
 
 function useRemainingTime(endsAt: Date, phase: GqlVoteTopicPhase): string | null {
