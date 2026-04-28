@@ -8,7 +8,7 @@ export const HostInfoSection = ({ host, hostLabel }: { host: OpportunityHost, ho
     if (!host) return null;
   
     return (
-      <section className="pt-6 pb-8 mt-0 bg-background-hover -mx-4 px-4">
+      <section className="pt-6 pb-8 bg-background-hover -mx-4 px-4">
         <h2 className="text-display-md text-foreground mb-4">{hostLabel}</h2>
         <div className="rounded-xl flex flex-col gap-4">
           <div className="flex items-center gap-4">

@@ -1,14 +1,14 @@
 "use client";
 
 import { useMemo } from "react";
-import { proseClassName } from "@/utils/md";
+import { MarkdownContent } from "@/components/shared/MarkdownContent";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 
 interface PrivacyPageClientProps {
-  html: string;
+  body: string;
 }
 
-export default function PrivacyPageClient({ html }: PrivacyPageClientProps) {
+export default function PrivacyPageClient({ body }: PrivacyPageClientProps) {
   const headerConfig = useMemo(
     () => ({
       title: "プライバシーポリシー",
@@ -21,7 +21,7 @@ export default function PrivacyPageClient({ html }: PrivacyPageClientProps) {
 
   return (
     <div className="max-w-[720px] mx-auto px-4 py-8">
-      <div className={proseClassName} dangerouslySetInnerHTML={{ __html: html }} />
+      <MarkdownContent>{body}</MarkdownContent>
     </div>
   );
 }

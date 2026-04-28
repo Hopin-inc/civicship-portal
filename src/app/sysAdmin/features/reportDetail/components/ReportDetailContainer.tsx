@@ -14,7 +14,7 @@ type Report = NonNullable<GqlGetAdminReportQuery["report"]>;
 
 type Props = {
   report: Report;
-  bodyHtml: string | null;
+  body: string | null;
   feedbacks: GqlReportFeedbackFieldsFragment[];
   feedbacksTotalCount: number;
 };
@@ -31,7 +31,7 @@ type Props = {
  */
 export function ReportDetailContainer({
   report,
-  bodyHtml,
+  body,
   feedbacks,
   feedbacksTotalCount,
 }: Props) {
@@ -72,7 +72,7 @@ export function ReportDetailContainer({
   return (
     <ReportDetailView
       report={report}
-      bodyHtml={bodyHtml}
+      body={body}
       feedbacks={feedbacks}
       feedbacksTotalCount={feedbacksTotalCount}
       saving={saving}

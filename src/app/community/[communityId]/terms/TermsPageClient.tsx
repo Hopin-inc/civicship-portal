@@ -1,14 +1,14 @@
 "use client";
 
 import { useMemo } from "react";
-import { proseClassName } from "@/utils/md";
+import { MarkdownContent } from "@/components/shared/MarkdownContent";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 
 interface TermsPageClientProps {
-  html: string;
+  body: string;
 }
 
-export default function TermsPageClient({ html }: TermsPageClientProps) {
+export default function TermsPageClient({ body }: TermsPageClientProps) {
   const headerConfig = useMemo(
     () => ({
       title: "利用規約",
@@ -21,7 +21,7 @@ export default function TermsPageClient({ html }: TermsPageClientProps) {
 
   return (
     <div className="max-w-[720px] mx-auto px-4 py-8">
-      <div className={proseClassName} dangerouslySetInnerHTML={{ __html: html }} />
+      <MarkdownContent>{body}</MarkdownContent>
     </div>
   );
 }

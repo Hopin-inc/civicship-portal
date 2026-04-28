@@ -13,7 +13,7 @@ const ArticleRecommendations: React.FC<ArticleRecommendationsProps> = ({ title, 
   if (articles.length === 0) return null;
 
   return (
-    <section className="px-4 pt-6 mt-0">
+    <section className="px-4 pt-6">
       <h2 className="text-display-md mb-4">{title}</h2>
       <div className="grid grid-cols-1 gap-6">
         {articles.map((article) => (

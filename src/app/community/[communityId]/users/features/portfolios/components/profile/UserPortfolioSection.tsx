@@ -36,7 +36,7 @@ export function UserPortfolioSection({
   const portfolioViewModels = portfolios.map((p) => presentPortfolioCard(p));
 
   return (
-    <section>
+    <section className="mt-8">
       <div className="space-y-4">
         {activeOpportunityCards.length > 0 && (
           <ActiveOpportunitiesSection opportunities={activeOpportunityCards} />
