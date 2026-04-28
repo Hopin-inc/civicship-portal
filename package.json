@@ -145,7 +145,7 @@
     "eslint-plugin-storybook": "^9.0.17",
     "graphql-cost-analysis": "^1.0.3",
     "graphql-query-complexity": "^1.1.0",
-    "happy-dom": "^20.0.8",
+    "happy-dom": "^20.9.0",
     "playwright": "^1.56.1",
     "postcss": "^8.5.3",
     "prettier": "^3.5.3",
