@@ -12990,7 +12990,6 @@ export type SubmitReportFeedbackMutationOptions = Apollo.BaseMutationOptions<
   GqlSubmitReportFeedbackMutation,
   GqlSubmitReportFeedbackMutationVariables
 >;
-
 export const ApproveReportDocument = gql`
   mutation ApproveReport($id: ID!) {
     approveReport(id: $id) {
@@ -13007,6 +13006,24 @@ export type GqlApproveReportMutationFn = Apollo.MutationFunction<
   GqlApproveReportMutation,
   GqlApproveReportMutationVariables
 >;
+
+/**
+ * __useApproveReportMutation__
+ *
+ * To run a mutation, you first call `useApproveReportMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useApproveReportMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [approveReportMutation, { data, loading, error }] = useApproveReportMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
 export function useApproveReportMutation(
   baseOptions?: Apollo.MutationHookOptions<
     GqlApproveReportMutation,
@@ -13014,21 +13031,17 @@ export function useApproveReportMutation(
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    GqlApproveReportMutation,
-    GqlApproveReportMutationVariables
-  >(ApproveReportDocument, options);
+  return Apollo.useMutation<GqlApproveReportMutation, GqlApproveReportMutationVariables>(
+    ApproveReportDocument,
+    options,
+  );
 }
-export type ApproveReportMutationHookResult = ReturnType<
-  typeof useApproveReportMutation
->;
-export type ApproveReportMutationResult =
-  Apollo.MutationResult<GqlApproveReportMutation>;
+export type ApproveReportMutationHookResult = ReturnType<typeof useApproveReportMutation>;
+export type ApproveReportMutationResult = Apollo.MutationResult<GqlApproveReportMutation>;
 export type ApproveReportMutationOptions = Apollo.BaseMutationOptions<
   GqlApproveReportMutation,
   GqlApproveReportMutationVariables
 >;
-
 export const PublishReportDocument = gql`
   mutation PublishReport($id: ID!, $finalContent: String!) {
     publishReport(id: $id, finalContent: $finalContent) {
@@ -13047,6 +13060,25 @@ export type GqlPublishReportMutationFn = Apollo.MutationFunction<
   GqlPublishReportMutation,
   GqlPublishReportMutationVariables
 >;
+
+/**
+ * __usePublishReportMutation__
+ *
+ * To run a mutation, you first call `usePublishReportMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePublishReportMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [publishReportMutation, { data, loading, error }] = usePublishReportMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      finalContent: // value for 'finalContent'
+ *   },
+ * });
+ */
 export function usePublishReportMutation(
   baseOptions?: Apollo.MutationHookOptions<
     GqlPublishReportMutation,
@@ -13054,21 +13086,17 @@ export function usePublishReportMutation(
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    GqlPublishReportMutation,
-    GqlPublishReportMutationVariables
-  >(PublishReportDocument, options);
+  return Apollo.useMutation<GqlPublishReportMutation, GqlPublishReportMutationVariables>(
+    PublishReportDocument,
+    options,
+  );
 }
-export type PublishReportMutationHookResult = ReturnType<
-  typeof usePublishReportMutation
->;
-export type PublishReportMutationResult =
-  Apollo.MutationResult<GqlPublishReportMutation>;
+export type PublishReportMutationHookResult = ReturnType<typeof usePublishReportMutation>;
+export type PublishReportMutationResult = Apollo.MutationResult<GqlPublishReportMutation>;
 export type PublishReportMutationOptions = Apollo.BaseMutationOptions<
   GqlPublishReportMutation,
   GqlPublishReportMutationVariables
 >;
-
 export const RejectReportDocument = gql`
   mutation RejectReport($id: ID!) {
     rejectReport(id: $id) {
@@ -13085,6 +13113,24 @@ export type GqlRejectReportMutationFn = Apollo.MutationFunction<
   GqlRejectReportMutation,
   GqlRejectReportMutationVariables
 >;
+
+/**
+ * __useRejectReportMutation__
+ *
+ * To run a mutation, you first call `useRejectReportMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRejectReportMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [rejectReportMutation, { data, loading, error }] = useRejectReportMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
 export function useRejectReportMutation(
   baseOptions?: Apollo.MutationHookOptions<
     GqlRejectReportMutation,
@@ -13092,21 +13138,17 @@ export function useRejectReportMutation(
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    GqlRejectReportMutation,
-    GqlRejectReportMutationVariables
-  >(RejectReportDocument, options);
+  return Apollo.useMutation<GqlRejectReportMutation, GqlRejectReportMutationVariables>(
+    RejectReportDocument,
+    options,
+  );
 }
-export type RejectReportMutationHookResult = ReturnType<
-  typeof useRejectReportMutation
->;
-export type RejectReportMutationResult =
-  Apollo.MutationResult<GqlRejectReportMutation>;
+export type RejectReportMutationHookResult = ReturnType<typeof useRejectReportMutation>;
+export type RejectReportMutationResult = Apollo.MutationResult<GqlRejectReportMutation>;
 export type RejectReportMutationOptions = Apollo.BaseMutationOptions<
   GqlRejectReportMutation,
   GqlRejectReportMutationVariables
 >;
-
 export const GetAdminReportDocument = gql`
   query GetAdminReport($id: ID!) {
     report(id: $id) {
