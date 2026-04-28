@@ -43,7 +43,10 @@ export function CommunityReportsTab({
     return <LoadingIndicator fullScreen={false} />;
   }
 
-  if (error) {
+  // 初回ロード失敗のみ全画面 ErrorState。
+  // pagination 失敗 (= 既にデータがある) は table を残して下部にインライン表示する
+  // (load-more ボタンも残るのでリトライ可能)。
+  if (error && reports.length === 0) {
     return <ErrorState title="レポート履歴の取得に失敗しました" />;
   }
 
@@ -89,6 +92,11 @@ export function CommunityReportsTab({
           </tbody>
         </table>
       </div>
+      {error != null && (
+        <p className="text-center text-body-sm text-destructive">
+          追加読み込みに失敗しました
+        </p>
+      )}
       {hasNextPage && (
         <div className="flex justify-center">
           <Button
