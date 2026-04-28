@@ -9,6 +9,7 @@ const meta: Meta<typeof CommunityReportsTab> = {
   title: "SysAdmin/CommunityDetail/CommunityReportsTab",
   component: CommunityReportsTab,
   parameters: { layout: "fullscreen" },
+  args: { communityId: "c_kibotcha" },
   decorators: [
     (Story) => (
       <div className="mx-auto max-w-xl p-4">

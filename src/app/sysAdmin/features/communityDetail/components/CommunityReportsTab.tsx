@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,8 @@ export type ReportRow = {
 };
 
 export type CommunityReportsTabProps = {
+  /** 行クリックで Report detail page (`/sysAdmin/{communityId}/reports/{id}`) に遷移するため */
+  communityId: string;
   reports: ReportRow[];
   totalCount: number;
   hasNextPage: boolean;
@@ -31,6 +34,7 @@ export type CommunityReportsTabProps = {
  * data fetching は `CommunityReportsTabContainer` 側で行う。
  */
 export function CommunityReportsTab({
+  communityId,
   reports,
   totalCount,
   hasNextPage,
@@ -39,6 +43,10 @@ export function CommunityReportsTab({
   loadingMore,
   onLoadMore,
 }: CommunityReportsTabProps) {
+  const router = useRouter();
+  const goToDetail = (id: string) => {
+    router.push(`/sysAdmin/${communityId}/reports/${id}`);
+  };
   if (loading && reports.length === 0) {
     return <LoadingIndicator fullScreen={false} />;
   }
@@ -77,7 +85,19 @@ export function CommunityReportsTab({
           </thead>
           <tbody>
             {reports.map((r) => (
-              <tr key={r.id} className="border-t border-border">
+              <tr
+                key={r.id}
+                className="cursor-pointer border-t border-border hover:bg-muted/40 focus-visible:bg-muted/40 focus-visible:outline-none"
+                tabIndex={0}
+                role="link"
+                onClick={() => goToDetail(r.id)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    goToDetail(r.id);
+                  }
+                }}
+              >
                 <td className="px-2 py-1.5 tabular-nums">
                   {r.publishedAt
                     ? new Date(r.publishedAt).toLocaleDateString("ja-JP")
