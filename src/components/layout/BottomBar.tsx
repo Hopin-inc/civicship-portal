@@ -1,7 +1,7 @@
 "use client";
 
 import { AppLink } from "@/lib/navigation";
-import { Globe, Home, Search, SquareCheck, User } from "lucide-react";
+import { Globe, Home, Search, User } from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
 import React from "react";
 import { cn } from "@/lib/utils";
@@ -47,8 +47,7 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
     pathname.startsWith("/search") ||
     pathname.startsWith("/wallets") ||
     pathname.startsWith("/credentials") ||
-    pathname.startsWith("/transactions") ||
-    (pathname.startsWith("/votes/") && pathname !== "/votes/")
+    pathname.startsWith("/transactions")
   ) {
     return null;
   }
@@ -89,13 +88,6 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
               <span className="text-xs mt-1">{t("navigation.bottomBar.timeline")}</span>
             </AppLink>
           )}
-          <AppLink
-            href="/votes"
-            className={cn(getLinkStyle("/votes", "/votes/*"), "flex-grow")}
-          >
-            <SquareCheck size={24} />
-            <span className="text-xs mt-1">{t("navigation.bottomBar.votes")}</span>
-          </AppLink>
           {communityConfig?.enableFeatures?.includes("places") && (
             <AppLink href="/places" className={cn(getLinkStyle("/places", "/places/*"), "flex-grow")}>
               <Globe size={24} />
