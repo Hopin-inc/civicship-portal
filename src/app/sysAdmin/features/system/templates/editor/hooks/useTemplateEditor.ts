@@ -2,16 +2,15 @@
 
 import { useCallback, useEffect, useState } from "react";
 import {
-  GqlReportVariant,
   useGetReportTemplateQuery,
   useUpdateReportTemplateMutation,
+  type GqlReportVariant,
 } from "@/types/graphql";
 
 export function useTemplateEditor(variant: GqlReportVariant | null) {
   const { data, loading, error, refetch } = useGetReportTemplateQuery({
-    variables: variant
-      ? { variant }
-      : { variant: GqlReportVariant.MemberNewsletter },
+    // skip: !variant のため null 時は呼ばれない。non-null assertion で安全。
+    variables: { variant: variant! },
     skip: !variant,
     fetchPolicy: "cache-and-network",
   });

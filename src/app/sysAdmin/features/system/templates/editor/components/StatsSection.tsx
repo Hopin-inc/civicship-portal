@@ -1,6 +1,7 @@
 "use client";
 
 import { AlertTriangle } from "lucide-react";
+import { cn } from "@/lib/utils";
 import type { TemplateBreakdownRow } from "@/app/sysAdmin/features/system/templates/shared/fixtures";
 
 type Props = {
@@ -27,27 +28,20 @@ export function StatsSection({ rows }: Props) {
   );
   const avgRating = ratingFeedback > 0 ? weightedSum / ratingFeedback : null;
 
-  const rowsWithJudge = rows.filter((r) => r.avgJudgeScore != null);
-  const judgeFeedback = rowsWithJudge.reduce(
+  // judge 相関も avgRating と同じく feedbackCount で加重する。
+  // 単純平均だと feedback の少ないテンプレートの相関値が過大に効いてしまう。
+  const rowsWithCorrelation = rows.filter((r) => r.judgeHumanCorrelation != null);
+  const correlationFeedback = rowsWithCorrelation.reduce(
     (s, r) => s + r.feedbackCount,
     0,
   );
-  const judgeWeightedSum = rowsWithJudge.reduce(
-    (s, r) => s + (r.avgJudgeScore ?? 0) * r.feedbackCount,
+  const correlationWeightedSum = rowsWithCorrelation.reduce(
+    (s, r) => s + (r.judgeHumanCorrelation ?? 0) * r.feedbackCount,
     0,
   );
-  const avgJudgeScore =
-    judgeFeedback > 0 ? judgeWeightedSum / judgeFeedback : null;
-
-  const correlationsAvailable = rows.filter(
-    (r) => r.judgeHumanCorrelation != null,
-  );
   const avgCorrelation =
-    correlationsAvailable.length > 0
-      ? correlationsAvailable.reduce(
-          (s, r) => s + (r.judgeHumanCorrelation as number),
-          0,
-        ) / correlationsAvailable.length
+    correlationFeedback > 0
+      ? correlationWeightedSum / correlationFeedback
       : null;
 
   const hasWarning = rows.some((r) => r.correlationWarning);
@@ -85,10 +79,10 @@ function StatCell({
         {label}
       </div>
       <div
-        className={
-          "text-body-md font-semibold tabular-nums " +
-          (variant === "warning" ? "text-destructive" : "")
-        }
+        className={cn(
+          "text-body-md font-semibold tabular-nums",
+          variant === "warning" && "text-destructive",
+        )}
       >
         {value ?? "—"}
       </div>

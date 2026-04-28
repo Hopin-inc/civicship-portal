@@ -2,9 +2,9 @@
 
 import { useMemo } from "react";
 import {
-  GqlReportVariant,
   useGetReportTemplateStatsBreakdownQuery,
   type GqlReportTemplateStatsBreakdownRowFieldsFragment,
+  type GqlReportVariant,
 } from "@/types/graphql";
 
 const HISTORY_PAGE_SIZE = 50;
@@ -18,13 +18,12 @@ const HISTORY_PAGE_SIZE = 50;
  */
 export function useTemplateBreakdown(variant: GqlReportVariant | null) {
   const { data, loading, error, refetch } = useGetReportTemplateStatsBreakdownQuery({
-    variables: variant
-      ? { variant, includeInactive: true, first: HISTORY_PAGE_SIZE }
-      : {
-          variant: GqlReportVariant.MemberNewsletter,
-          includeInactive: true,
-          first: HISTORY_PAGE_SIZE,
-        },
+    variables: {
+      // skip: !variant のため null 時は呼ばれない。non-null assertion で安全。
+      variant: variant!,
+      includeInactive: true,
+      first: HISTORY_PAGE_SIZE,
+    },
     skip: !variant,
     fetchPolicy: "cache-and-network",
   });
