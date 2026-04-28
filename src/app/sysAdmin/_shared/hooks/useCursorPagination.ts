@@ -31,6 +31,17 @@ type Options<TItem> = {
   fetchMore: FetchMore<TItem>;
   pageSize?: number;
   onError?: (err: unknown) => void;
+  /**
+   * 論理的な「データセットの identity」を表すキー (例: filter のハッシュ、
+   * variant + version など)。これが変わったとき *だけ* 内部 state を
+   * `initial` で再同期する。
+   *
+   * 省略すると `initial` の参照 (object identity) を dep に使うので、
+   * 呼び出し側で `initial` を `useMemo` などでメモ化しないと、毎レンダー
+   * state が wipe されて pagination が破綻する。安全のため `resetKey` の
+   * 利用を推奨。
+   */
+  resetKey?: string | number;
 };
 
 type Result<TItem> = {
@@ -60,12 +71,20 @@ function extractItems<TItem>(conn: ConnectionLike<TItem>): TItem[] {
  * Apollo の useQuery + fetchMore パターンに被せる場合は、
  * fetchMore コールバック内で client.query などを使って次ページを取得する
  * function を渡す。
+ *
+ * ⚠ `initial` は object なので、毎レンダーで違う参照を渡すと内部 state が
+ * 毎回リセットされる。安全策として:
+ *   - `resetKey` を指定する (= filter / variant / version など、論理的な
+ *     identity を表す primitive 値)。これが変わった時だけ state を再同期する。
+ *   - `resetKey` を指定しない場合は呼び出し側で `initial` を useMemo して
+ *     参照安定化させること。
  */
 export function useCursorPagination<TItem>({
   initial,
   fetchMore,
   pageSize = 20,
   onError,
+  resetKey,
 }: Options<TItem>): Result<TItem> {
   const [items, setItems] = useState<TItem[]>(() => extractItems(initial));
   const [endCursor, setEndCursor] = useState<string | null>(
@@ -87,20 +106,30 @@ export function useCursorPagination<TItem>({
   // 競合で stale append が起きないよう、世代カウンタで in-flight 結果を破棄する。
   const generationRef = useRef(0);
 
-  // initial が変わった (filter 切替などで親が再 fetch した) ときに同期
+  // useEffect の dep 切替時に最新の `initial` を読むための ref。
+  // dep に initial を直接入れず resetKey 主軸で fire させたいので、
+  // 中身は ref で覗く。
+  const initialRef = useRef(initial);
+  initialRef.current = initial;
+
+  // resetKey が指定されればそれを dep にし、無ければ initial の参照を dep に
+  // フォールバックする (= caller が useMemo などで stable に保つ前提)。
+  const depKey = resetKey ?? initial;
+
   useEffect(() => {
+    const latest = initialRef.current;
     generationRef.current += 1;
     // in-flight な loadMore の loadingRef が立ったままだと、新しい initial に
     // 対する次の loadMore が「まだ読み込み中」と誤判定されてブロックされる。
     // generation でレスポンスは捨てられるので、guard も明示的にリセットする。
     loadingRef.current = false;
-    setItems(extractItems(initial));
-    setEndCursor(initial.pageInfo.endCursor ?? null);
-    setHasNextPage(initial.pageInfo.hasNextPage);
+    setItems(extractItems(latest));
+    setEndCursor(latest.pageInfo.endCursor ?? null);
+    setHasNextPage(latest.pageInfo.hasNextPage);
     setLoading(false);
-    endCursorRef.current = initial.pageInfo.endCursor ?? null;
-    hasNextPageRef.current = initial.pageInfo.hasNextPage;
-  }, [initial]);
+    endCursorRef.current = latest.pageInfo.endCursor ?? null;
+    hasNextPageRef.current = latest.pageInfo.hasNextPage;
+  }, [depKey]);
 
   const loadMore = useCallback(async () => {
     if (loadingRef.current || !hasNextPageRef.current || !endCursorRef.current) {
