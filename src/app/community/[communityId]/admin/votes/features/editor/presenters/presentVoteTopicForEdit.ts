@@ -31,7 +31,7 @@ export function presentVoteTopicForEdit(
         ? {
             type: GqlVoteGateType.Nft,
             requiredRole: null,
-            nftTokenId: topic.gate.nftToken?.id ?? null,
+            nftTokenId: topic.gate.nftToken?.id ?? "",
           }
         : {
             type: GqlVoteGateType.Membership,
@@ -42,7 +42,7 @@ export function presentVoteTopicForEdit(
       topic.powerPolicy.type === GqlVotePowerPolicyType.NftCount
         ? {
             type: GqlVotePowerPolicyType.NftCount,
-            nftTokenId: topic.powerPolicy.nftToken?.id ?? null,
+            nftTokenId: topic.powerPolicy.nftToken?.id ?? "",
           }
         : {
             type: GqlVotePowerPolicyType.Flat,
