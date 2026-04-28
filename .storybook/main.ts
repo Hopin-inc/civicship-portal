@@ -25,8 +25,10 @@ const config: StorybookConfig = {
       "process.env.ENV": JSON.stringify("STORYBOOK"),
       // Storybook / Chromatic 環境では Firebase 関連の env が無いため、
       // `firebase-config.ts` の module-level `initializeApp()` が
-      // `auth/invalid-api-key` で crash する。stories は実際に auth を
-      // 呼ばないので dummy 値で init を通過させればよい。
+      // `auth/invalid-api-key` で crash する。Auth 依存のあるコンポーネントは
+      // Container/View 分離で View 単体を story 化する設計だが、副作用的に
+      // 一部 import path が AuthProvider に到達するケースに備えて dummy 値を
+      // 用意して init を通過させる。
       "process.env.NEXT_PUBLIC_FIREBASE_API_KEY": JSON.stringify(
         "storybook-dummy-api-key",
       ),

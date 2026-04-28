@@ -7,8 +7,8 @@ import { ErrorState } from "@/components/shared/ErrorState";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { slugToVariant } from "@/app/sysAdmin/features/system/templates/shared/variantSlug";
 import { variantLabel } from "@/app/sysAdmin/features/system/templates/shared/labels";
-import { GenerationTemplateView } from "@/app/sysAdmin/features/system/templates/editor/components/GenerationTemplateView";
-import { JudgeTemplateView } from "@/app/sysAdmin/features/system/templates/editor/components/JudgeTemplateView";
+import { GenerationTemplateContainer } from "@/app/sysAdmin/features/system/templates/editor/components/GenerationTemplateContainer";
+import { JudgeTemplateContainer } from "@/app/sysAdmin/features/system/templates/editor/components/JudgeTemplateContainer";
 
 export default function SysAdminSystemTemplateDetailPage() {
   const params = useParams<{ variant: string }>();
@@ -40,10 +40,10 @@ export default function SysAdminSystemTemplateDetailPage() {
           <TabsTrigger value="judge">評価用</TabsTrigger>
         </TabsList>
         <TabsContent value="generation">
-          <GenerationTemplateView variant={variant} />
+          <GenerationTemplateContainer variant={variant} />
         </TabsContent>
         <TabsContent value="judge">
-          <JudgeTemplateView variant={variant} />
+          <JudgeTemplateContainer variant={variant} />
         </TabsContent>
       </Tabs>
     </div>

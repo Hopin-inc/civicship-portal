@@ -6,19 +6,26 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { GqlReportTemplateKind, type GqlReportVariant } from "@/types/graphql";
-import { useTemplateBreakdown } from "@/app/sysAdmin/features/system/templates/editor/hooks/useTemplateBreakdown";
-import { useActiveJudgeTemplate } from "@/app/sysAdmin/features/system/templates/editor/hooks/useActiveJudgeTemplate";
+import type {
+  GqlReportTemplateFieldsFragment,
+  GqlReportTemplateStatsBreakdownRowFieldsFragment,
+} from "@/types/graphql";
 import { StatsSection } from "./StatsSection";
 import { ExperimentSection } from "./ExperimentSection";
 import { VersionSelector } from "./VersionSelector";
 
-type Props = {
-  variant: GqlReportVariant;
+export type JudgeTemplateViewProps = {
+  rows: GqlReportTemplateStatsBreakdownRowFieldsFragment[];
+  breakdownLoading: boolean;
+  breakdownError: unknown;
+
+  template: GqlReportTemplateFieldsFragment | null;
+  templateLoading: boolean;
+  templateError: unknown;
 };
 
 /**
- * JUDGE template の閲覧専用ビュー。
+ * JUDGE template の閲覧専用 view (presentational only)。
  *
  * - StatsSection / VersionSelector / ExperimentSection は GENERATION と同じ。
  * - prompt は read-only な textarea で表示する。
@@ -27,29 +34,30 @@ type Props = {
  * 将来 backend が `updateReportTemplate` の kind 引数に対応したら、
  * `JudgeWarningModal` を save flow に組み込んで編集可能化する。
  */
-export function JudgeTemplateView({ variant }: Props) {
-  const breakdown = useTemplateBreakdown(variant, GqlReportTemplateKind.Judge);
-  const judge = useActiveJudgeTemplate(variant);
-
+export function JudgeTemplateView({
+  rows,
+  breakdownLoading,
+  breakdownError,
+  template,
+  templateLoading,
+  templateError,
+}: JudgeTemplateViewProps) {
   const versions = useMemo(
     () =>
-      Array.from(new Set(breakdown.rows.map((r) => r.version))).sort(
-        (a, b) => b - a,
-      ),
-    [breakdown.rows],
+      Array.from(new Set(rows.map((r) => r.version))).sort((a, b) => b - a),
+    [rows],
   );
   const [selectedVersion, setSelectedVersion] = useState<number | null>(null);
   const filteredRows = useMemo(
     () =>
       selectedVersion == null
-        ? breakdown.rows
-        : breakdown.rows.filter((r) => r.version === selectedVersion),
-    [breakdown.rows, selectedVersion],
+        ? rows
+        : rows.filter((r) => r.version === selectedVersion),
+    [rows, selectedVersion],
   );
 
   const isInitialLoading =
-    (breakdown.loading && breakdown.rows.length === 0) ||
-    (judge.loading && !judge.template);
+    (breakdownLoading && rows.length === 0) || (templateLoading && !template);
 
   return (
     <div className="space-y-8">
@@ -65,7 +73,7 @@ export function JudgeTemplateView({ variant }: Props) {
 
       {isInitialLoading ? (
         <LoadingIndicator fullScreen={false} />
-      ) : breakdown.error ? (
+      ) : breakdownError ? (
         <ErrorState title="JUDGE 評価指標の取得に失敗しました" />
       ) : (
         <>
@@ -80,9 +88,9 @@ export function JudgeTemplateView({ variant }: Props) {
           <hr className="border-muted" />
 
           <h3 className="text-body-sm font-semibold">prompt (read-only / 現行 active 行)</h3>
-          {judge.error ? (
+          {templateError ? (
             <ErrorState title="JUDGE template の取得に失敗しました" />
-          ) : !judge.template ? (
+          ) : !template ? (
             <p className="text-body-sm text-muted-foreground">
               この variant の JUDGE template は登録されていません
             </p>
@@ -92,15 +100,15 @@ export function JudgeTemplateView({ variant }: Props) {
                 <h4 className="text-body-sm font-semibold">設定</h4>
                 <dl className="grid grid-cols-[120px_1fr] gap-y-1 text-body-sm">
                   <dt className="text-muted-foreground">version</dt>
-                  <dd>v{judge.template.version}</dd>
+                  <dd>v{template.version}</dd>
                   <dt className="text-muted-foreground">model</dt>
-                  <dd className="font-mono text-body-xs">{judge.template.model}</dd>
+                  <dd className="font-mono text-body-xs">{template.model}</dd>
                   <dt className="text-muted-foreground">maxTokens</dt>
-                  <dd>{judge.template.maxTokens}</dd>
-                  {judge.template.temperature != null && (
+                  <dd>{template.maxTokens}</dd>
+                  {template.temperature != null && (
                     <>
                       <dt className="text-muted-foreground">temperature</dt>
-                      <dd>{judge.template.temperature}</dd>
+                      <dd>{template.temperature}</dd>
                     </>
                   )}
                 </dl>
@@ -111,7 +119,7 @@ export function JudgeTemplateView({ variant }: Props) {
                 </Label>
                 <Textarea
                   id="judgeSystemPrompt"
-                  value={judge.template.systemPrompt}
+                  value={template.systemPrompt}
                   readOnly
                   className="min-h-[200px] font-mono text-body-xs"
                 />
@@ -122,7 +130,7 @@ export function JudgeTemplateView({ variant }: Props) {
                 </Label>
                 <Textarea
                   id="judgeUserPrompt"
-                  value={judge.template.userPromptTemplate}
+                  value={template.userPromptTemplate}
                   readOnly
                   className="min-h-[200px] font-mono text-body-xs"
                 />

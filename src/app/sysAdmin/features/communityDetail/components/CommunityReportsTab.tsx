@@ -1,67 +1,44 @@
 "use client";
 
-import { useMemo, useState } from "react";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/contexts/AuthProvider";
-import { useGetAdminBrowseReportsQuery } from "@/types/graphql";
+import {
+  GqlReportStatus,
+  type GqlReportVariant,
+} from "@/types/graphql";
 import { variantLabel, statusLabel } from "@/app/sysAdmin/features/system/templates/shared/labels";
 
-const PAGE_SIZE = 20;
+export type ReportRow = {
+  id: string;
+  variant: GqlReportVariant;
+  status: GqlReportStatus;
+  publishedAt?: Date | null;
+};
 
-type Props = {
-  communityId: string;
+export type CommunityReportsTabProps = {
+  reports: ReportRow[];
+  totalCount: number;
+  hasNextPage: boolean;
+  loading: boolean;
+  error: unknown;
+  loadingMore: boolean;
+  onLoadMore: () => void;
 };
 
 /**
- * L2 詳細の [レポート] タブ。
- * adminBrowseReports query で community 単位のレポート発行履歴を取得し、
- * status / variant / publishedAt の table を表示。
- * cursor pagination は「もっと見る」ボタン経由で段階ロード。
+ * L2 詳細の [レポート] タブ (presentational only)。
+ * data fetching は `CommunityReportsTabContainer` 側で行う。
  */
-export function CommunityReportsTab({ communityId }: Props) {
-  const { user, loading: authLoading } = useAuth();
-  const { data, loading, error, fetchMore } = useGetAdminBrowseReportsQuery({
-    variables: { communityId, first: PAGE_SIZE },
-    skip: authLoading || !user,
-    fetchPolicy: "cache-and-network",
-  });
-  const [loadingMore, setLoadingMore] = useState(false);
-
-  const reports = useMemo(
-    () =>
-      data?.adminBrowseReports.edges
-        ?.map((e) => e?.node)
-        .filter(<T,>(n: T | null | undefined): n is T => n != null) ?? [],
-    [data],
-  );
-
-  const totalCount = data?.adminBrowseReports.totalCount ?? 0;
-  const hasNextPage = data?.adminBrowseReports.pageInfo.hasNextPage ?? false;
-  const endCursor = data?.adminBrowseReports.pageInfo.endCursor ?? null;
-
-  const handleLoadMore = async () => {
-    if (!endCursor || loadingMore) return;
-    setLoadingMore(true);
-    try {
-      await fetchMore({
-        variables: { cursor: endCursor, first: PAGE_SIZE },
-        updateQuery: (prev, { fetchMoreResult }) => ({
-          adminBrowseReports: {
-            ...fetchMoreResult.adminBrowseReports,
-            edges: [
-              ...(prev.adminBrowseReports.edges ?? []),
-              ...(fetchMoreResult.adminBrowseReports.edges ?? []),
-            ],
-          },
-        }),
-      });
-    } finally {
-      setLoadingMore(false);
-    }
-  };
-
+export function CommunityReportsTab({
+  reports,
+  totalCount,
+  hasNextPage,
+  loading,
+  error,
+  loadingMore,
+  onLoadMore,
+}: CommunityReportsTabProps) {
   if (loading && reports.length === 0) {
     return <LoadingIndicator fullScreen={false} />;
   }
@@ -117,7 +94,7 @@ export function CommunityReportsTab({ communityId }: Props) {
           <Button
             variant="tertiary"
             size="sm"
-            onClick={handleLoadMore}
+            onClick={onLoadMore}
             disabled={loadingMore}
           >
             {loadingMore ? "読み込み中..." : "もっと見る"}

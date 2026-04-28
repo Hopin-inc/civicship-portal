@@ -8,22 +8,29 @@ import { Button } from "@/components/ui/button";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
 import type { GqlGetSysAdminDashboardQuery } from "@/types/graphql";
-import { CommunityRow } from "./features/dashboard/components/CommunityRow";
+import { CommunityRow, type CommunityReportSummary } from "./features/dashboard/components/CommunityRow";
 import { useDashboardControls } from "./features/dashboard/hooks/useDashboardControls";
 import { useDashboardOverview } from "./features/dashboard/hooks/useDashboardOverview";
-import { useReportSummariesByCommunity } from "./features/dashboard/hooks/useReportSummariesByCommunity";
 import { sysAdminDashboardJa } from "./_shared/i18n/ja";
 
 type Props = {
   /** SSR で取得した初期データ。null は SSR fetch 失敗 (auth なし等) */
   initialData: GqlGetSysAdminDashboardQuery["sysAdminDashboard"] | null;
+  /**
+   * Community ごとの「最終 Report 発行サマリ」。
+   * Storybook では undefined を渡せば Report pill 抜きで描画される
+   * (View 層は data 層に依存しない)。
+   */
+  reportSummariesByCommunity?: Map<string, CommunityReportSummary>;
 };
 
-export function SysAdminPageClient({ initialData }: Props) {
+export function SysAdminPageClient({
+  initialData,
+  reportSummariesByCommunity,
+}: Props) {
   const router = useAppRouter();
   const { state } = useDashboardControls();
   const { loading, error, communities } = useDashboardOverview(state, initialData);
-  const { summariesByCommunity } = useReportSummariesByCommunity();
 
   const headerConfig = useMemo(
     () => ({
@@ -78,7 +85,7 @@ export function SysAdminPageClient({ initialData }: Props) {
               {idx !== 0 && <hr className="border-muted" />}
               <CommunityRow
                 row={community}
-                reportSummary={summariesByCommunity.get(community.communityId)}
+                reportSummary={reportSummariesByCommunity?.get(community.communityId)}
                 onClick={(communityId) =>
                   router.push(`/sysAdmin/${communityId}`)
                 }

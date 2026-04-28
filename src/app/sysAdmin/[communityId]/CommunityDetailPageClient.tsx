@@ -13,7 +13,7 @@ import { useDashboardControls } from "@/app/sysAdmin/features/dashboard/hooks/us
 import { useCommunityDetail } from "@/app/sysAdmin/features/communityDetail/hooks/useCommunityDetail";
 import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";
 import { CommunityDashboardOverview } from "@/app/sysAdmin/features/communityDetail/components/CommunityDashboardOverview";
-import { CommunityReportsTab } from "@/app/sysAdmin/features/communityDetail/components/CommunityReportsTab";
+import { CommunityReportsTabContainer } from "@/app/sysAdmin/features/communityDetail/components/CommunityReportsTabContainer";
 
 type Props = {
   communityId: string;
@@ -78,7 +78,7 @@ export function CommunityDetailPageClient({
         />
       </TabsContent>
       <TabsContent value="reports">
-        <CommunityReportsTab communityId={communityId} />
+        <CommunityReportsTabContainer communityId={communityId} />
       </TabsContent>
     </Tabs>
   );
