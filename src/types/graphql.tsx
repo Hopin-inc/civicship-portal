@@ -5981,6 +5981,49 @@ export type GqlSubmitReportFeedbackMutation = {
   } | null;
 };
 
+export type GqlApproveReportMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type GqlApproveReportMutation = {
+  __typename?: "Mutation";
+  approveReport?: {
+    __typename?: "ApproveReportSuccess";
+    report: { __typename?: "Report"; id: string; status: GqlReportStatus };
+  } | null;
+};
+
+export type GqlPublishReportMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+  finalContent: Scalars["String"]["input"];
+}>;
+
+export type GqlPublishReportMutation = {
+  __typename?: "Mutation";
+  publishReport?: {
+    __typename?: "PublishReportSuccess";
+    report: {
+      __typename?: "Report";
+      id: string;
+      status: GqlReportStatus;
+      finalContent?: string | null;
+      publishedAt?: Date | null;
+    };
+  } | null;
+};
+
+export type GqlRejectReportMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type GqlRejectReportMutation = {
+  __typename?: "Mutation";
+  rejectReport?: {
+    __typename?: "RejectReportSuccess";
+    report: { __typename?: "Report"; id: string; status: GqlReportStatus };
+  } | null;
+};
+
 export type GqlGetAdminReportQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
@@ -12947,6 +12990,123 @@ export type SubmitReportFeedbackMutationOptions = Apollo.BaseMutationOptions<
   GqlSubmitReportFeedbackMutation,
   GqlSubmitReportFeedbackMutationVariables
 >;
+
+export const ApproveReportDocument = gql`
+  mutation ApproveReport($id: ID!) {
+    approveReport(id: $id) {
+      ... on ApproveReportSuccess {
+        report {
+          id
+          status
+        }
+      }
+    }
+  }
+`;
+export type GqlApproveReportMutationFn = Apollo.MutationFunction<
+  GqlApproveReportMutation,
+  GqlApproveReportMutationVariables
+>;
+export function useApproveReportMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlApproveReportMutation,
+    GqlApproveReportMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    GqlApproveReportMutation,
+    GqlApproveReportMutationVariables
+  >(ApproveReportDocument, options);
+}
+export type ApproveReportMutationHookResult = ReturnType<
+  typeof useApproveReportMutation
+>;
+export type ApproveReportMutationResult =
+  Apollo.MutationResult<GqlApproveReportMutation>;
+export type ApproveReportMutationOptions = Apollo.BaseMutationOptions<
+  GqlApproveReportMutation,
+  GqlApproveReportMutationVariables
+>;
+
+export const PublishReportDocument = gql`
+  mutation PublishReport($id: ID!, $finalContent: String!) {
+    publishReport(id: $id, finalContent: $finalContent) {
+      ... on PublishReportSuccess {
+        report {
+          id
+          status
+          finalContent
+          publishedAt
+        }
+      }
+    }
+  }
+`;
+export type GqlPublishReportMutationFn = Apollo.MutationFunction<
+  GqlPublishReportMutation,
+  GqlPublishReportMutationVariables
+>;
+export function usePublishReportMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlPublishReportMutation,
+    GqlPublishReportMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    GqlPublishReportMutation,
+    GqlPublishReportMutationVariables
+  >(PublishReportDocument, options);
+}
+export type PublishReportMutationHookResult = ReturnType<
+  typeof usePublishReportMutation
+>;
+export type PublishReportMutationResult =
+  Apollo.MutationResult<GqlPublishReportMutation>;
+export type PublishReportMutationOptions = Apollo.BaseMutationOptions<
+  GqlPublishReportMutation,
+  GqlPublishReportMutationVariables
+>;
+
+export const RejectReportDocument = gql`
+  mutation RejectReport($id: ID!) {
+    rejectReport(id: $id) {
+      ... on RejectReportSuccess {
+        report {
+          id
+          status
+        }
+      }
+    }
+  }
+`;
+export type GqlRejectReportMutationFn = Apollo.MutationFunction<
+  GqlRejectReportMutation,
+  GqlRejectReportMutationVariables
+>;
+export function useRejectReportMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlRejectReportMutation,
+    GqlRejectReportMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    GqlRejectReportMutation,
+    GqlRejectReportMutationVariables
+  >(RejectReportDocument, options);
+}
+export type RejectReportMutationHookResult = ReturnType<
+  typeof useRejectReportMutation
+>;
+export type RejectReportMutationResult =
+  Apollo.MutationResult<GqlRejectReportMutation>;
+export type RejectReportMutationOptions = Apollo.BaseMutationOptions<
+  GqlRejectReportMutation,
+  GqlRejectReportMutationVariables
+>;
+
 export const GetAdminReportDocument = gql`
   query GetAdminReport($id: ID!) {
     report(id: $id) {

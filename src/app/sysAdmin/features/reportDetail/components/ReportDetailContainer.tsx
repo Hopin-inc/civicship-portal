@@ -4,6 +4,9 @@ import { useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useApolloClient } from "@apollo/client";
 import {
+  useApproveReportMutation,
+  usePublishReportMutation,
+  useRejectReportMutation,
   useSubmitReportFeedbackMutation,
   type GqlGetAdminReportFeedbacksQuery,
   type GqlGetAdminReportFeedbacksQueryVariables,
@@ -56,6 +59,12 @@ export function ReportDetailContainer({
 
   const [submit, { loading: saving, error: saveError }] =
     useSubmitReportFeedbackMutation();
+  const [approve, { loading: approving, error: approveError }] =
+    useApproveReportMutation();
+  const [publish, { loading: publishing, error: publishError }] =
+    usePublishReportMutation();
+  const [reject, { loading: rejecting, error: rejectError }] =
+    useRejectReportMutation();
 
   const handleSubmit = useCallback(
     async (input: FeedbackFormInput) => {
@@ -86,6 +95,45 @@ export function ReportDetailContainer({
     },
     [handleSubmit],
   );
+
+  // ステータス遷移系: success 後は router.refresh() で SSR 再走させ、
+  // 表示の status / publishedAt / finalContent を最新化する。エラーは
+  // approveError / publishError / rejectError state に残る。
+  const handleApprove = useCallback(() => {
+    void (async () => {
+      try {
+        await approve({ variables: { id: report.id } });
+        router.refresh();
+      } catch {
+        // approveError state でハンドル済み
+      }
+    })();
+  }, [approve, report.id, router]);
+
+  const handlePublish = useCallback(
+    (finalContent: string) => {
+      void (async () => {
+        try {
+          await publish({ variables: { id: report.id, finalContent } });
+          router.refresh();
+        } catch {
+          // publishError state でハンドル済み
+        }
+      })();
+    },
+    [publish, report.id, router],
+  );
+
+  const handleReject = useCallback(() => {
+    void (async () => {
+      try {
+        await reject({ variables: { id: report.id } });
+        router.refresh();
+      } catch {
+        // rejectError state でハンドル済み
+      }
+    })();
+  }, [reject, report.id, router]);
 
   const fetchMoreFeedbacks = useCallback(
     async (cursor: string, first: number) => {
@@ -133,6 +181,15 @@ export function ReportDetailContainer({
       saving={saving}
       saveError={saveError ?? null}
       onSubmitFeedback={handleSubmitSync}
+      approving={approving}
+      publishing={publishing}
+      rejecting={rejecting}
+      approveError={approveError ?? null}
+      publishError={publishError ?? null}
+      rejectError={rejectError ?? null}
+      onApprove={handleApprove}
+      onPublish={handlePublish}
+      onReject={handleReject}
     />
   );
 }
