@@ -55,6 +55,13 @@ export type GqlAdminReportSummaryRow = {
   publishedCountLast90Days: Scalars["Int"]["output"];
 };
 
+export type GqlAdminTemplateFeedbackStats = {
+  __typename?: "AdminTemplateFeedbackStats";
+  avgRating?: Maybe<Scalars["Float"]["output"]>;
+  ratingDistribution: Array<GqlReportFeedbackRatingBucket>;
+  totalCount: Scalars["Int"]["output"];
+};
+
 export type GqlApproveReportPayload = GqlApproveReportSuccess;
 
 export type GqlApproveReportSuccess = {
@@ -2098,6 +2105,7 @@ export type GqlQuery = {
   __typename?: "Query";
   adminBrowseReports: GqlReportsConnection;
   adminReportSummary: GqlAdminReportSummaryConnection;
+  adminTemplateFeedbackStats: GqlAdminTemplateFeedbackStats;
   adminTemplateFeedbacks: GqlReportFeedbacksConnection;
   article?: Maybe<GqlArticle>;
   articles: GqlArticlesConnection;
@@ -2212,6 +2220,12 @@ export type GqlQueryAdminBrowseReportsArgs = {
 export type GqlQueryAdminReportSummaryArgs = {
   cursor?: InputMaybe<Scalars["String"]["input"]>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
+};
+
+export type GqlQueryAdminTemplateFeedbackStatsArgs = {
+  kind?: InputMaybe<GqlReportTemplateKind>;
+  variant: GqlReportVariant;
+  version?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type GqlQueryAdminTemplateFeedbacksArgs = {
@@ -2648,6 +2662,12 @@ export type GqlReportFeedbackEdge = GqlEdge & {
   __typename?: "ReportFeedbackEdge";
   cursor: Scalars["String"]["output"];
   node?: Maybe<GqlReportFeedback>;
+};
+
+export type GqlReportFeedbackRatingBucket = {
+  __typename?: "ReportFeedbackRatingBucket";
+  count: Scalars["Int"]["output"];
+  rating: Scalars["Int"]["output"];
 };
 
 export const GqlReportFeedbackType = {
