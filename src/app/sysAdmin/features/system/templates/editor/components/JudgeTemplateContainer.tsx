@@ -147,7 +147,8 @@ export function JudgeTemplateContainer({
     initial: currentFeedbacks,
     fetchMore: fetchMoreFeedbacks,
     pageSize: PAGE_SIZE,
-    resetKey: `${variant}:JUDGE:${feedbacksFilterKey}`,
+    // resetKey は使わない: 同 GenerationTemplateContainer 参照。state 参照の
+    // 変化 (= refetch 完了 / 初期復帰) に reset を任せる。
   });
 
   const handleLoadMoreFeedbacks = useCallback(() => {

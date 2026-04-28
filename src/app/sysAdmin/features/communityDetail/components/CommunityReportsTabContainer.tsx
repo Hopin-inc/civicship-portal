@@ -154,7 +154,11 @@ export function CommunityReportsTabContainer({
     initial: currentConnection,
     fetchMore: fetchMoreReports,
     pageSize: PAGE_SIZE,
-    resetKey: `${communityId}:${filterKey}`,
+    // resetKey は使わない: filter 変更時の resetKey 切替が currentConnection
+    // の async 更新より先に走るため、hook が古い currentConnection を使って
+    // 一度 reset し、新 connection が届いても useEffect が再 fire しない
+    // (= stale data) という挙動になる。state 参照の変化に reset を任せる
+    // ことで、新 connection が届いた瞬間にだけ reset が走る。
   });
 
   const handleLoadMore = useCallback(() => {

@@ -202,7 +202,10 @@ export function GenerationTemplateContainer({
     initial: currentFeedbacks,
     fetchMore: fetchMoreFeedbacks,
     pageSize: PAGE_SIZE,
-    resetKey: `${variant}:GENERATION:${feedbacksFilterKey}`,
+    // resetKey は使わない: filter 変更時の resetKey 切替が currentFeedbacks
+    // の async 更新より先に走るため、hook が古い currentFeedbacks を使って
+    // 一度 reset し、新 connection が届いても useEffect が再 fire しない
+    // (= stale data) 問題を避ける。state 参照の変化に reset を任せる。
   });
 
   const handleLoadMoreFeedbacks = useCallback(() => {

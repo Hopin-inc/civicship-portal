@@ -86,7 +86,14 @@ export function ReportStatusActions({
           <Button
             variant="primary"
             size="sm"
-            onClick={onApprove}
+            onClick={async () => {
+              try {
+                await onApprove();
+              } catch {
+                // approveError state でハンドル済み。
+                // ここで catch しないと unhandled promise rejection になる。
+              }
+            }}
             disabled={approving || rejecting}
           >
             {approving ? "承認中..." : "承認"}
