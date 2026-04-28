@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { useApolloClient } from "@apollo/client";
 import {
   GqlReportTemplateKind,
@@ -57,9 +57,6 @@ export function JudgeTemplateContainer({
   initialStats,
 }: Props) {
   const apollo = useApolloClient();
-  const [feedbackTotalCount, setFeedbackTotalCount] = useState(
-    initialFeedbacks?.totalCount ?? 0,
-  );
 
   const fetchMoreFeedbacks = useCallback(
     async (cursor: string, first: number) => {
@@ -76,15 +73,14 @@ export function JudgeTemplateContainer({
         },
         fetchPolicy: "network-only",
       });
-      const conn = result.data.adminTemplateFeedbacks ?? EMPTY_CONNECTION;
-      setFeedbackTotalCount(conn.totalCount);
-      return conn;
+      return result.data.adminTemplateFeedbacks ?? EMPTY_CONNECTION;
     },
     [apollo, variant],
   );
 
   const {
     items: feedbacks,
+    totalCount: feedbackTotalCount,
     hasNextPage: feedbacksHasNextPage,
     loading: feedbacksLoadingMore,
     loadMore: loadMoreFeedbacks,

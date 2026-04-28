@@ -1,12 +1,13 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback } from "react";
 import { useApolloClient } from "@apollo/client";
 import { GET_ADMIN_BROWSE_REPORTS } from "@/graphql/account/adminReports/query";
 import type {
   GqlGetAdminBrowseReportsQuery,
   GqlGetAdminBrowseReportsQueryVariables,
 } from "@/types/graphql";
+import { useCursorPagination } from "@/app/sysAdmin/_shared/hooks/useCursorPagination";
 import {
   CommunityReportsTab,
   type ReportRow,
@@ -14,101 +15,88 @@ import {
 
 const PAGE_SIZE = 20;
 
+type ReportsConnection = NonNullable<
+  GqlGetAdminBrowseReportsQuery["adminBrowseReports"]
+>;
+
 type Props = {
   communityId: string;
-  initialReports: GqlGetAdminBrowseReportsQuery["adminBrowseReports"] | null;
+  initialReports: ReportsConnection | null;
+};
+
+const EMPTY_CONNECTION: ReportsConnection = {
+  __typename: "ReportsConnection",
+  edges: [],
+  pageInfo: {
+    __typename: "PageInfo",
+    hasNextPage: false,
+    endCursor: null,
+  },
+  totalCount: 0,
 };
 
 /**
  * `CommunityReportsTab` (View) のための data wiring。
  *
  * 初期 1 ページは SSR (`fetchAdminBrowseReportsServer`) で取得して props で
- * 受け取る。「もっと見る」での追加ページは Apollo client.query で fetch して
- * local state に append する。
+ * 受け取る。以降は generic な `useCursorPagination` フックに任せ、totalCount /
+ * error / loading / loadMore を一括管理する (= テンプレ詳細の Container と
+ * 同じパターン)。
  *
- * Apollo の `useQuery` 経路を使わない理由: SSR と整合させたいので Apollo
- * cache を経由せず、SSR data を一次ソースとして扱う。
+ * `useCursorPagination` を使う方針: SSR と整合させたいので Apollo cache を
+ * 経由せず、SSR data を `initial` として hook に渡す。fetchMore は client.query
+ * で都度叩く。
+ *
+ * `resetKey={communityId}` でコミュニティ切替 (= 同コンポーネントが別 community
+ * 用に再利用される) 時に内部 state を再同期する。
  */
 export function CommunityReportsTabContainer({
   communityId,
   initialReports,
 }: Props) {
   const apollo = useApolloClient();
-  const [reports, setReports] = useState<ReportRow[]>(
-    () => extractReports(initialReports),
-  );
-  const [endCursor, setEndCursor] = useState<string | null>(
-    initialReports?.pageInfo.endCursor ?? null,
-  );
-  const [hasNextPage, setHasNextPage] = useState<boolean>(
-    initialReports?.pageInfo.hasNextPage ?? false,
-  );
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [loadError, setLoadError] = useState<unknown>(null);
-  // totalCount は initial で SSR 値を入れ、各 fetchMore レスポンスでも更新する。
-  // backend が「全体件数」を返す前提で、追加ロード中に totalCount が増減しても
-  // 表示と一致させるため (= "48 / 47 件" のような stale 表示を防ぐ)。
-  const [totalCount, setTotalCount] = useState<number>(
-    initialReports?.totalCount ?? 0,
-  );
 
-  // setLoadingMore / setEndCursor / setHasNextPage は state なので非同期で反映
-  // される。rapid に「もっと見る」を連打した時に同じ cursor で重複 fetch しない
-  // よう、同期的な ref で guard する (useCursorPagination と同じパターン)。
-  // Relay 実装によっては最終ページでも `endCursor` が non-null で返ることが
-  // あるので、`hasNextPageRef` を必ず併用する。
-  const loadingRef = useRef(false);
-  const endCursorRef = useRef<string | null>(
-    initialReports?.pageInfo.endCursor ?? null,
-  );
-  const hasNextPageRef = useRef<boolean>(
-    initialReports?.pageInfo.hasNextPage ?? false,
-  );
-
-  const handleLoadMore = useCallback(async () => {
-    if (
-      loadingRef.current ||
-      !hasNextPageRef.current ||
-      !endCursorRef.current
-    ) {
-      return;
-    }
-    const cursor = endCursorRef.current;
-    loadingRef.current = true;
-    setLoadingMore(true);
-    setLoadError(null);
-    try {
+  const fetchMoreReports = useCallback(
+    async (cursor: string, first: number) => {
       const result = await apollo.query<
         GqlGetAdminBrowseReportsQuery,
         GqlGetAdminBrowseReportsQueryVariables
       >({
         query: GET_ADMIN_BROWSE_REPORTS,
-        variables: { communityId, cursor, first: PAGE_SIZE },
+        variables: { communityId, cursor, first },
         fetchPolicy: "network-only",
       });
-      const next = result.data.adminBrowseReports;
-      const nextEndCursor = next.pageInfo.endCursor ?? null;
-      const nextHasNextPage = next.pageInfo.hasNextPage;
-      endCursorRef.current = nextEndCursor;
-      hasNextPageRef.current = nextHasNextPage;
-      setReports((prev) => [...prev, ...extractReports(next)]);
-      setEndCursor(nextEndCursor);
-      setHasNextPage(nextHasNextPage);
-      setTotalCount(next.totalCount);
-    } catch (err) {
-      // catch しないと button onClick で発火する promise が unhandled rejection に
-      // なる。View 側は error prop を表示できるので state にセットして渡す。
-      setLoadError(err);
-    } finally {
-      loadingRef.current = false;
-      setLoadingMore(false);
-    }
-  }, [apollo, communityId]);
+      return result.data.adminBrowseReports ?? EMPTY_CONNECTION;
+    },
+    [apollo, communityId],
+  );
+
+  const {
+    items: reports,
+    totalCount,
+    hasNextPage,
+    loading: loadingMore,
+    error: loadError,
+    loadMore,
+  } = useCursorPagination({
+    initial: initialReports ?? EMPTY_CONNECTION,
+    fetchMore: fetchMoreReports,
+    pageSize: PAGE_SIZE,
+    resetKey: communityId,
+  });
+
+  const handleLoadMore = useCallback(() => {
+    void loadMore();
+  }, [loadMore]);
+
+  // backend fragment (`AdminBrowseReportFields`) は ReportRow の super set
+  // (id/variant/status/publishedAt + community{id,name}) なので構造的に互換。
+  const reportRows: ReportRow[] = reports;
 
   return (
     <CommunityReportsTab
       communityId={communityId}
-      reports={reports}
+      reports={reportRows}
       totalCount={totalCount}
       hasNextPage={hasNextPage}
       loading={false}
@@ -116,16 +104,5 @@ export function CommunityReportsTabContainer({
       loadingMore={loadingMore}
       onLoadMore={handleLoadMore}
     />
-  );
-}
-
-function extractReports(
-  conn: GqlGetAdminBrowseReportsQuery["adminBrowseReports"] | null | undefined,
-): ReportRow[] {
-  if (!conn) return [];
-  return (
-    conn.edges
-      ?.map((e) => e?.node)
-      .filter(<T,>(n: T | null | undefined): n is T => n != null) ?? []
   );
 }
