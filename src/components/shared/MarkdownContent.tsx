@@ -1,5 +1,3 @@
-"use client";
-
 import { ExternalLink } from "lucide-react";
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -18,6 +16,9 @@ type Props = {
   children: string;
   className?: string;
 };
+
+// `http://`, `https://`, プロトコル相対 (`//`) のいずれも外部リンクとして扱う。
+const EXTERNAL_HREF = /^(https?:)?\/\//;
 
 const components: Components = {
   h1: ({ className, ...props }) => (
@@ -75,7 +76,7 @@ const components: Components = {
     />
   ),
   a: ({ className, children, ...props }) => {
-    const isExternal = props.href?.startsWith("http") ?? false;
+    const isExternal = EXTERNAL_HREF.test(props.href ?? "");
     return (
       <a
         className={cn(
@@ -150,12 +151,36 @@ const components: Components = {
       {...props}
     />
   ),
-  table: ({ children }) => <Table className="my-4">{children}</Table>,
-  thead: ({ children }) => <TableHeader>{children}</TableHeader>,
-  tbody: ({ children }) => <TableBody>{children}</TableBody>,
-  tr: ({ children }) => <TableRow>{children}</TableRow>,
-  th: ({ children, style }) => <TableHead style={style}>{children}</TableHead>,
-  td: ({ children, style }) => <TableCell style={style}>{children}</TableCell>,
+  table: ({ className, children, ...props }) => (
+    <Table className={cn("my-4", className)} {...props}>
+      {children}
+    </Table>
+  ),
+  thead: ({ className, children, ...props }) => (
+    <TableHeader className={className} {...props}>
+      {children}
+    </TableHeader>
+  ),
+  tbody: ({ className, children, ...props }) => (
+    <TableBody className={className} {...props}>
+      {children}
+    </TableBody>
+  ),
+  tr: ({ className, children, ...props }) => (
+    <TableRow className={className} {...props}>
+      {children}
+    </TableRow>
+  ),
+  th: ({ className, children, ...props }) => (
+    <TableHead className={className} {...props}>
+      {children}
+    </TableHead>
+  ),
+  td: ({ className, children, ...props }) => (
+    <TableCell className={className} {...props}>
+      {children}
+    </TableCell>
+  ),
   img: ({ className, alt, ...props }) => (
     // eslint-disable-next-line @next/next/no-img-element
     <img

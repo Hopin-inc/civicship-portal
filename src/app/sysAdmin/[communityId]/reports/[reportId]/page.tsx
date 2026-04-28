@@ -14,7 +14,9 @@ type PageProps = {
  *
  * SSR + cookie で `report(id)` と `report.feedbacks` を並行取得して
  * client wrapper に渡す。本文 markdown は client 側で `react-markdown` が
- * パース + React 側のエスケープでサニタイズされる。
+ * パースする。`react-markdown` はデフォルトで生 HTML をレンダリングせず、
+ * リンク / 画像 URL について `javascript:` 等の危険プロトコルを除外する
+ * ため、別途 sanitize ライブラリは不要。
  *
  * Report と feedbacks Connection を別 query にしているのは Armor の cost
  * limit 回避のため (`graphql/account/report/server.ts` のコメント参照)。
