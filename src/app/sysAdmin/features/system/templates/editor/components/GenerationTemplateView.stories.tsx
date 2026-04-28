@@ -4,7 +4,10 @@ import {
   mockActiveTemplate,
   mockBreakdown,
 } from "@/app/sysAdmin/features/system/templates/shared/fixtures";
-import { makeMockFeedbacks } from "@/app/sysAdmin/features/system/templates/feedback/fixtures";
+import {
+  makeMockFeedbackStats,
+  makeMockFeedbacks,
+} from "@/app/sysAdmin/features/system/templates/feedback/fixtures";
 import { GqlReportVariant } from "@/types/graphql";
 import { GenerationTemplateView } from "./GenerationTemplateView";
 
@@ -27,6 +30,7 @@ type Story = StoryObj<typeof GenerationTemplateView>;
 const template = mockActiveTemplate(GqlReportVariant.MemberNewsletter);
 const rows = mockBreakdown(GqlReportVariant.MemberNewsletter);
 const feedbacks = makeMockFeedbacks(8);
+const feedbackStats = makeMockFeedbackStats(feedbacks.length);
 
 function StatefulView() {
   const [systemPrompt, setSystemPrompt] = useState(template.systemPrompt);
@@ -54,6 +58,7 @@ function StatefulView() {
       onSave={() => undefined}
       feedbacks={feedbacks}
       feedbackTotalCount={feedbacks.length}
+      feedbackStats={feedbackStats}
     />
   );
 }
@@ -79,6 +84,7 @@ export const Loading: Story = {
     setUserPromptTemplate: () => undefined,
     onSave: () => undefined,
     feedbacks: [],
+    feedbackStats: null,
   },
 };
 
@@ -99,6 +105,7 @@ export const NoTemplate: Story = {
     setUserPromptTemplate: () => undefined,
     onSave: () => undefined,
     feedbacks: [],
+    feedbackStats: null,
   },
 };
 
@@ -120,5 +127,6 @@ export const BreakdownError: Story = {
     onSave: () => undefined,
     feedbacks: feedbacks,
     feedbackTotalCount: feedbacks.length,
+    feedbackStats,
   },
 };

@@ -1,6 +1,9 @@
 import { addTypenameToDocument } from "@apollo/client/utilities";
 import { print } from "graphql/language/printer";
-import { GetAdminTemplateFeedbacksDocument } from "@/types/graphql";
+import {
+  GetAdminTemplateFeedbackStatsDocument,
+  GetAdminTemplateFeedbacksDocument,
+} from "@/types/graphql";
 
 /**
  * adminTemplateFeedbacks の SSR 用 string query。
@@ -8,4 +11,8 @@ import { GetAdminTemplateFeedbacksDocument } from "@/types/graphql";
  */
 export const GET_ADMIN_TEMPLATE_FEEDBACKS_SERVER_QUERY = print(
   addTypenameToDocument(GetAdminTemplateFeedbacksDocument),
+);
+
+export const GET_ADMIN_TEMPLATE_FEEDBACK_STATS_SERVER_QUERY = print(
+  addTypenameToDocument(GetAdminTemplateFeedbackStatsDocument),
 );

@@ -6,6 +6,7 @@ import { useApolloClient } from "@apollo/client";
 import {
   GqlReportTemplateKind,
   useUpdateReportTemplateMutation,
+  type GqlGetAdminTemplateFeedbackStatsQuery,
   type GqlGetAdminTemplateFeedbacksQuery,
   type GqlGetAdminTemplateFeedbacksQueryVariables,
   type GqlReportTemplateFieldsFragment,
@@ -19,12 +20,15 @@ import { GenerationTemplateView } from "./GenerationTemplateView";
 type FeedbacksConnection = NonNullable<
   GqlGetAdminTemplateFeedbacksQuery["adminTemplateFeedbacks"]
 >;
+type FeedbackStats =
+  GqlGetAdminTemplateFeedbackStatsQuery["adminTemplateFeedbackStats"];
 
 type Props = {
   variant: GqlReportVariant;
   initialBreakdownRows: GqlReportTemplateStatsBreakdownRowFieldsFragment[];
   initialTemplate: GqlReportTemplateFieldsFragment | null;
   initialFeedbacks: FeedbacksConnection | null;
+  initialStats: FeedbackStats | null;
 };
 
 const PAGE_SIZE = 20;
@@ -56,6 +60,7 @@ export function GenerationTemplateContainer({
   initialBreakdownRows,
   initialTemplate,
   initialFeedbacks,
+  initialStats,
 }: Props) {
   const router = useRouter();
   const apollo = useApolloClient();
@@ -166,6 +171,7 @@ export function GenerationTemplateContainer({
       feedbacksHasNextPage={feedbacksHasNextPage}
       feedbacksLoadingMore={feedbacksLoadingMore}
       onLoadMoreFeedbacks={handleLoadMoreFeedbacks}
+      feedbackStats={initialStats}
     />
   );
 }

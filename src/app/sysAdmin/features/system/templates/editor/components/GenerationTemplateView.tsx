@@ -11,6 +11,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import type {
+  GqlGetAdminTemplateFeedbackStatsQuery,
   GqlReportFeedbackWithReportFieldsFragment,
   GqlReportTemplateFieldsFragment,
   GqlReportTemplateStatsBreakdownRowFieldsFragment,
@@ -19,6 +20,10 @@ import { PromptEditor } from "./PromptEditor";
 import { ExperimentSection } from "./ExperimentSection";
 import { VersionSelector } from "./VersionSelector";
 import { FeedbackList } from "@/app/sysAdmin/_shared/feedback/FeedbackList";
+import { RatingSummary } from "@/app/sysAdmin/_shared/feedback/RatingSummary";
+
+type FeedbackStats =
+  GqlGetAdminTemplateFeedbackStatsQuery["adminTemplateFeedbackStats"];
 
 export type GenerationTemplateViewProps = {
   rows: GqlReportTemplateStatsBreakdownRowFieldsFragment[];
@@ -43,6 +48,11 @@ export type GenerationTemplateViewProps = {
   feedbacksHasNextPage?: boolean;
   feedbacksLoadingMore?: boolean;
   onLoadMoreFeedbacks?: () => void;
+  /**
+   * `adminTemplateFeedbackStats` の SSR 結果。null = 取得失敗 / 未認証。
+   * RatingSummary をフィードバック一覧の上に出すために使う。
+   */
+  feedbackStats: FeedbackStats | null;
 };
 
 /**
@@ -74,6 +84,7 @@ export function GenerationTemplateView({
   feedbacksHasNextPage,
   feedbacksLoadingMore,
   onLoadMoreFeedbacks,
+  feedbackStats,
 }: GenerationTemplateViewProps) {
   const versions = useMemo(
     () =>
@@ -126,6 +137,15 @@ export function GenerationTemplateView({
           href: `/sysAdmin/${fb.report.community.id}/reports/${fb.report.id}`,
           label: fb.report.community.name ?? fb.report.community.id,
         })}
+        summary={
+          feedbackStats ? (
+            <RatingSummary
+              avgRating={feedbackStats.avgRating ?? null}
+              totalCount={feedbackStats.totalCount}
+              distribution={feedbackStats.ratingDistribution}
+            />
+          ) : undefined
+        }
         pagination={
           onLoadMoreFeedbacks
             ? {

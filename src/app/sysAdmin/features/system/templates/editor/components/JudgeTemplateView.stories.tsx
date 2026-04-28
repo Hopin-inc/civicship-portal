@@ -3,7 +3,10 @@ import {
   mockActiveTemplate,
   mockBreakdown,
 } from "@/app/sysAdmin/features/system/templates/shared/fixtures";
-import { makeMockFeedbacks } from "@/app/sysAdmin/features/system/templates/feedback/fixtures";
+import {
+  makeMockFeedbackStats,
+  makeMockFeedbacks,
+} from "@/app/sysAdmin/features/system/templates/feedback/fixtures";
 import { GqlReportTemplateKind, GqlReportVariant } from "@/types/graphql";
 import { JudgeTemplateView } from "./JudgeTemplateView";
 
@@ -32,6 +35,7 @@ const judgeRows = mockBreakdown(GqlReportVariant.MemberNewsletter).map((r) => ({
   kind: GqlReportTemplateKind.Judge,
 }));
 const feedbacks = makeMockFeedbacks(6);
+const feedbackStats = makeMockFeedbackStats(feedbacks.length);
 
 export const WithData: Story = {
   args: {
@@ -43,6 +47,7 @@ export const WithData: Story = {
     templateError: null,
     feedbacks,
     feedbackTotalCount: feedbacks.length,
+    feedbackStats,
   },
 };
 
@@ -55,6 +60,7 @@ export const NoTemplate: Story = {
     templateLoading: false,
     templateError: null,
     feedbacks: [],
+    feedbackStats: null,
   },
 };
 
@@ -67,6 +73,7 @@ export const Loading: Story = {
     templateLoading: true,
     templateError: null,
     feedbacks: [],
+    feedbackStats: null,
   },
 };
 
@@ -79,5 +86,6 @@ export const FetchError: Story = {
     templateLoading: false,
     templateError: null,
     feedbacks: [],
+    feedbackStats: null,
   },
 };

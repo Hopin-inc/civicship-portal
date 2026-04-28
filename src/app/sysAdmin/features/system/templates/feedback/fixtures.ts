@@ -1,6 +1,7 @@
 import {
   GqlReportFeedbackType,
   GqlReportVariant,
+  type GqlGetAdminTemplateFeedbackStatsQuery,
   type GqlGetAdminTemplateFeedbacksQuery,
   type GqlReportFeedbackWithReportFieldsFragment,
 } from "@/types/graphql";
@@ -8,6 +9,9 @@ import {
 export type FeedbacksConnection = NonNullable<
   GqlGetAdminTemplateFeedbacksQuery["adminTemplateFeedbacks"]
 >;
+
+export type FeedbackStats =
+  GqlGetAdminTemplateFeedbackStatsQuery["adminTemplateFeedbackStats"];
 
 /**
  * Storybook 用 mock。
@@ -97,6 +101,34 @@ export function makeMockFeedbacks(count: number = 12): FeedbackItem[] {
       },
     };
   });
+}
+
+/**
+ * mock な `adminTemplateFeedbackStats` のレスポンス。
+ * Storybook で `RatingSummary` の動作確認に使う。
+ */
+export function makeMockFeedbackStats(
+  totalCount: number = 8,
+  distribution: { rating: number; count: number }[] = [
+    { rating: 1, count: 0 },
+    { rating: 2, count: 0 },
+    { rating: 3, count: 1 },
+    { rating: 4, count: 3 },
+    { rating: 5, count: 4 },
+  ],
+): FeedbackStats {
+  const sum = distribution.reduce((s, b) => s + b.rating * b.count, 0);
+  const totalRated = distribution.reduce((s, b) => s + b.count, 0);
+  const avgRating = totalRated > 0 ? sum / totalRated : null;
+  return {
+    __typename: "AdminTemplateFeedbackStats",
+    totalCount,
+    avgRating,
+    ratingDistribution: distribution.map((b) => ({
+      __typename: "ReportFeedbackRatingBucket",
+      ...b,
+    })),
+  };
 }
 
 /**

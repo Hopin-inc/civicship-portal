@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type {
+  GqlGetAdminTemplateFeedbackStatsQuery,
   GqlGetAdminTemplateFeedbacksQuery,
   GqlReportTemplateFieldsFragment,
   GqlReportTemplateStatsBreakdownRowFieldsFragment,
@@ -16,15 +17,19 @@ import { JudgeTemplateContainer } from "@/app/sysAdmin/features/system/templates
 type FeedbacksConnection = NonNullable<
   GqlGetAdminTemplateFeedbacksQuery["adminTemplateFeedbacks"]
 >;
+type FeedbackStats =
+  GqlGetAdminTemplateFeedbackStatsQuery["adminTemplateFeedbackStats"];
 
 type Props = {
   variant: GqlReportVariant;
   generationBreakdownRows: GqlReportTemplateStatsBreakdownRowFieldsFragment[];
   generationTemplate: GqlReportTemplateFieldsFragment | null;
   generationFeedbacks: FeedbacksConnection | null;
+  generationStats: FeedbackStats | null;
   judgeBreakdownRows: GqlReportTemplateStatsBreakdownRowFieldsFragment[];
   judgeTemplate: GqlReportTemplateFieldsFragment | null;
   judgeFeedbacks: FeedbacksConnection | null;
+  judgeStats: FeedbackStats | null;
 };
 
 /**
@@ -36,9 +41,11 @@ export function SysAdminTemplateDetailPageClient({
   generationBreakdownRows,
   generationTemplate,
   generationFeedbacks,
+  generationStats,
   judgeBreakdownRows,
   judgeTemplate,
   judgeFeedbacks,
+  judgeStats,
 }: Props) {
   const headerConfig = useMemo(
     () => ({
@@ -63,6 +70,7 @@ export function SysAdminTemplateDetailPageClient({
             initialBreakdownRows={generationBreakdownRows}
             initialTemplate={generationTemplate}
             initialFeedbacks={generationFeedbacks}
+            initialStats={generationStats}
           />
         </TabsContent>
         <TabsContent value="judge">
@@ -71,6 +79,7 @@ export function SysAdminTemplateDetailPageClient({
             initialBreakdownRows={judgeBreakdownRows}
             initialJudgeTemplate={judgeTemplate}
             initialFeedbacks={judgeFeedbacks}
+            initialStats={judgeStats}
           />
         </TabsContent>
       </Tabs>

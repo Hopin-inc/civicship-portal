@@ -4,6 +4,7 @@ import { useCallback, useState } from "react";
 import { useApolloClient } from "@apollo/client";
 import {
   GqlReportTemplateKind,
+  type GqlGetAdminTemplateFeedbackStatsQuery,
   type GqlGetAdminTemplateFeedbacksQuery,
   type GqlGetAdminTemplateFeedbacksQueryVariables,
   type GqlReportTemplateFieldsFragment,
@@ -17,12 +18,15 @@ import { JudgeTemplateView } from "./JudgeTemplateView";
 type FeedbacksConnection = NonNullable<
   GqlGetAdminTemplateFeedbacksQuery["adminTemplateFeedbacks"]
 >;
+type FeedbackStats =
+  GqlGetAdminTemplateFeedbackStatsQuery["adminTemplateFeedbackStats"];
 
 type Props = {
   variant: GqlReportVariant;
   initialBreakdownRows: GqlReportTemplateStatsBreakdownRowFieldsFragment[];
   initialJudgeTemplate: GqlReportTemplateFieldsFragment | null;
   initialFeedbacks: FeedbacksConnection | null;
+  initialStats: FeedbackStats | null;
 };
 
 const PAGE_SIZE = 20;
@@ -50,6 +54,7 @@ export function JudgeTemplateContainer({
   initialBreakdownRows,
   initialJudgeTemplate,
   initialFeedbacks,
+  initialStats,
 }: Props) {
   const apollo = useApolloClient();
   const [feedbackTotalCount, setFeedbackTotalCount] = useState(
@@ -107,6 +112,7 @@ export function JudgeTemplateContainer({
       feedbacksHasNextPage={feedbacksHasNextPage}
       feedbacksLoadingMore={feedbacksLoadingMore}
       onLoadMoreFeedbacks={handleLoadMoreFeedbacks}
+      feedbackStats={initialStats}
     />
   );
 }

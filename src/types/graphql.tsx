@@ -5286,6 +5286,26 @@ export type GqlGetAdminTemplateFeedbacksQuery = {
   };
 };
 
+export type GqlGetAdminTemplateFeedbackStatsQueryVariables = Exact<{
+  variant: GqlReportVariant;
+  version?: InputMaybe<Scalars["Int"]["input"]>;
+  kind?: InputMaybe<GqlReportTemplateKind>;
+}>;
+
+export type GqlGetAdminTemplateFeedbackStatsQuery = {
+  __typename?: "Query";
+  adminTemplateFeedbackStats: {
+    __typename?: "AdminTemplateFeedbackStats";
+    totalCount: number;
+    avgRating?: number | null;
+    ratingDistribution: Array<{
+      __typename?: "ReportFeedbackRatingBucket";
+      rating: number;
+      count: number;
+    }>;
+  };
+};
+
 export type GqlCommunityFieldsFragment = {
   __typename?: "Community";
   id: string;
@@ -11076,6 +11096,97 @@ export type GetAdminTemplateFeedbacksSuspenseQueryHookResult = ReturnType<
 export type GetAdminTemplateFeedbacksQueryResult = Apollo.QueryResult<
   GqlGetAdminTemplateFeedbacksQuery,
   GqlGetAdminTemplateFeedbacksQueryVariables
+>;
+export const GetAdminTemplateFeedbackStatsDocument = gql`
+  query GetAdminTemplateFeedbackStats(
+    $variant: ReportVariant!
+    $version: Int
+    $kind: ReportTemplateKind
+  ) {
+    adminTemplateFeedbackStats(variant: $variant, version: $version, kind: $kind) {
+      totalCount
+      avgRating
+      ratingDistribution {
+        rating
+        count
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetAdminTemplateFeedbackStatsQuery__
+ *
+ * To run a query within a React component, call `useGetAdminTemplateFeedbackStatsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAdminTemplateFeedbackStatsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAdminTemplateFeedbackStatsQuery({
+ *   variables: {
+ *      variant: // value for 'variant'
+ *      version: // value for 'version'
+ *      kind: // value for 'kind'
+ *   },
+ * });
+ */
+export function useGetAdminTemplateFeedbackStatsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GqlGetAdminTemplateFeedbackStatsQuery,
+    GqlGetAdminTemplateFeedbackStatsQueryVariables
+  > &
+    (
+      | { variables: GqlGetAdminTemplateFeedbackStatsQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GqlGetAdminTemplateFeedbackStatsQuery,
+    GqlGetAdminTemplateFeedbackStatsQueryVariables
+  >(GetAdminTemplateFeedbackStatsDocument, options);
+}
+export function useGetAdminTemplateFeedbackStatsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetAdminTemplateFeedbackStatsQuery,
+    GqlGetAdminTemplateFeedbackStatsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GqlGetAdminTemplateFeedbackStatsQuery,
+    GqlGetAdminTemplateFeedbackStatsQueryVariables
+  >(GetAdminTemplateFeedbackStatsDocument, options);
+}
+export function useGetAdminTemplateFeedbackStatsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetAdminTemplateFeedbackStatsQuery,
+        GqlGetAdminTemplateFeedbackStatsQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GqlGetAdminTemplateFeedbackStatsQuery,
+    GqlGetAdminTemplateFeedbackStatsQueryVariables
+  >(GetAdminTemplateFeedbackStatsDocument, options);
+}
+export type GetAdminTemplateFeedbackStatsQueryHookResult = ReturnType<
+  typeof useGetAdminTemplateFeedbackStatsQuery
+>;
+export type GetAdminTemplateFeedbackStatsLazyQueryHookResult = ReturnType<
+  typeof useGetAdminTemplateFeedbackStatsLazyQuery
+>;
+export type GetAdminTemplateFeedbackStatsSuspenseQueryHookResult = ReturnType<
+  typeof useGetAdminTemplateFeedbackStatsSuspenseQuery
+>;
+export type GetAdminTemplateFeedbackStatsQueryResult = Apollo.QueryResult<
+  GqlGetAdminTemplateFeedbackStatsQuery,
+  GqlGetAdminTemplateFeedbackStatsQueryVariables
 >;
 export const CommunityCreateDocument = gql`
   mutation CommunityCreate($input: CommunityCreateInput!) {

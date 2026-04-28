@@ -13,6 +13,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import type {
+  GqlGetAdminTemplateFeedbackStatsQuery,
   GqlReportFeedbackWithReportFieldsFragment,
   GqlReportTemplateFieldsFragment,
   GqlReportTemplateStatsBreakdownRowFieldsFragment,
@@ -20,6 +21,10 @@ import type {
 import { ExperimentSection } from "./ExperimentSection";
 import { VersionSelector } from "./VersionSelector";
 import { FeedbackList } from "@/app/sysAdmin/_shared/feedback/FeedbackList";
+import { RatingSummary } from "@/app/sysAdmin/_shared/feedback/RatingSummary";
+
+type FeedbackStats =
+  GqlGetAdminTemplateFeedbackStatsQuery["adminTemplateFeedbackStats"];
 
 export type JudgeTemplateViewProps = {
   rows: GqlReportTemplateStatsBreakdownRowFieldsFragment[];
@@ -35,6 +40,7 @@ export type JudgeTemplateViewProps = {
   feedbacksHasNextPage?: boolean;
   feedbacksLoadingMore?: boolean;
   onLoadMoreFeedbacks?: () => void;
+  feedbackStats: FeedbackStats | null;
 };
 
 /**
@@ -59,6 +65,7 @@ export function JudgeTemplateView({
   feedbacksHasNextPage,
   feedbacksLoadingMore,
   onLoadMoreFeedbacks,
+  feedbackStats,
 }: JudgeTemplateViewProps) {
   const versions = useMemo(
     () =>
@@ -137,6 +144,15 @@ export function JudgeTemplateView({
           href: `/sysAdmin/${fb.report.community.id}/reports/${fb.report.id}`,
           label: fb.report.community.name ?? fb.report.community.id,
         })}
+        summary={
+          feedbackStats ? (
+            <RatingSummary
+              avgRating={feedbackStats.avgRating ?? null}
+              totalCount={feedbackStats.totalCount}
+              distribution={feedbackStats.ratingDistribution}
+            />
+          ) : undefined
+        }
         pagination={
           onLoadMoreFeedbacks
             ? {
