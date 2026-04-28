@@ -83,6 +83,7 @@ export function CommunityDetailPageClient({
       </TabsContent>
       <TabsContent value="reports">
         <CommunityReportsTabContainer
+          key={communityId}
           communityId={communityId}
           initialReports={initialReports ?? null}
         />
