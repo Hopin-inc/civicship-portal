@@ -22,15 +22,15 @@ const meta: Meta<typeof ReportDetailView> = {
 export default meta;
 type Story = StoryObj<typeof ReportDetailView>;
 
-const baseBodyHtml = `
-<h1>4 月第 4 週のニュースレター</h1>
-<p>今週は <strong>3 件のイベント</strong> が開催され、合計 <strong>42 名</strong> のメンバーが参加しました。</p>
-<h2>ハイライト</h2>
-<ul>
-  <li>火曜の朝活でメンバー同士のつながりが生まれた</li>
-  <li>木曜のワークショップは満席</li>
-  <li>週末のフィールドワークで新規参加者 5 名</li>
-</ul>
+const baseBody = `# 4 月第 4 週のニュースレター
+
+今週は **3 件のイベント** が開催され、合計 **42 名** のメンバーが参加しました。
+
+## ハイライト
+
+- 火曜の朝活でメンバー同士のつながりが生まれた
+- 木曜のワークショップは満席
+- 週末のフィールドワークで新規参加者 5 名
 `;
 
 const feedbacks = mockReportFeedbacks(3);
@@ -38,7 +38,7 @@ const feedbacks = mockReportFeedbacks(3);
 export const WithFeedbacks: Story = {
   args: {
     report: mockReport(),
-    bodyHtml: baseBodyHtml,
+    body: baseBody,
     feedbacks,
     feedbacksTotalCount: feedbacks.length,
     saving: false,
@@ -50,7 +50,7 @@ export const WithFeedbacks: Story = {
 export const WithMyFeedback: Story = {
   args: {
     report: mockReport({ myFeedback: mockReportFeedback(0) }),
-    bodyHtml: baseBodyHtml,
+    body: baseBody,
     feedbacks,
     feedbacksTotalCount: feedbacks.length,
     saving: false,
@@ -62,7 +62,7 @@ export const WithMyFeedback: Story = {
 export const NoFeedbacks: Story = {
   args: {
     report: mockReport({ myFeedback: null }),
-    bodyHtml: baseBodyHtml,
+    body: baseBody,
     feedbacks: [],
     feedbacksTotalCount: 0,
     saving: false,
@@ -78,7 +78,7 @@ export const Skipped: Story = {
       finalContent: null,
       skipReason: "対象期間中の活動が少なくスキップしました",
     }),
-    bodyHtml: null,
+    body: null,
     feedbacks: [],
     feedbacksTotalCount: 0,
     saving: false,
@@ -90,7 +90,7 @@ export const Skipped: Story = {
 export const Submitting: Story = {
   args: {
     report: mockReport(),
-    bodyHtml: baseBodyHtml,
+    body: baseBody,
     feedbacks,
     feedbacksTotalCount: feedbacks.length,
     saving: true,
@@ -102,7 +102,7 @@ export const Submitting: Story = {
 export const SubmitError: Story = {
   args: {
     report: mockReport(),
-    bodyHtml: baseBodyHtml,
+    body: baseBody,
     feedbacks,
     feedbacksTotalCount: feedbacks.length,
     saving: false,

@@ -23,7 +23,7 @@ export const ActivitiesCarouselSection: React.FC<Props> = ({
   const formattedOpportunities = opportunities.map(formatOpportunities);
 
   return (
-    <section className="pl-4 pr-0 mt-0 pt-6">
+    <section className="pl-4 pr-0 pt-6">
       <h2 className="text-display-md">{title}</h2>
       <div className="mt-4 flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
         {formattedOpportunities.map((opportunity) => (

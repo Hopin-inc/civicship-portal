@@ -45,7 +45,7 @@ export function UserProfileView({ viewModel, isOwner }: UserProfileViewProps) {
       </div>
 
       {viewModel.nftInstances && viewModel.nftInstances.length > 0 && (
-        <section className="py-6 mt-0">
+        <section className="py-6">
           <h2 className="text-body-md font-semibold text-foreground pt-4">
             {t("users.profileView.certificatesTitle")}
           </h2>

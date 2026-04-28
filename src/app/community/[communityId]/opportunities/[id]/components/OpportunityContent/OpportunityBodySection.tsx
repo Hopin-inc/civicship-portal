@@ -64,7 +64,7 @@ export const OpportunityBodySection = ({ body, title }: OpportunityBodySectionPr
   });
 
   return (
-    <section className="pt-6 pb-8 mt-0 max-w-mobile-l">
+    <section className="pt-6 pb-8 max-w-mobile-l">
       <h2 className="text-display-md text-foreground mb-4">{title}</h2>
       <div className="relative">
         <p

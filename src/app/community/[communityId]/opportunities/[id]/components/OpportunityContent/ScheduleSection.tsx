@@ -34,7 +34,7 @@ export const ScheduleSection = ({
     const hasSchedule = slots.length > 0;
   
     return (
-      <section className="pt-6 pb-8 mt-0">
+      <section className="pt-6 pb-8">
         <h2 className="text-display-md text-foreground mb-4">開催日</h2>
         <div className="relative">
           {hasSchedule ? (

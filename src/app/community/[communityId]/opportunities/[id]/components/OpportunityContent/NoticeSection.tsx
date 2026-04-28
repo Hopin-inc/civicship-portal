@@ -9,7 +9,7 @@ export const NoticeSection: FC = () => {
   const noticeItems = getNoticeItems(config?.communityId ?? null);
 
   return (
-    <section className="pt-6 pb-8 mt-0 bg-background-hover -mx-4 px-4">
+    <section className="pt-6 pb-8 bg-background-hover -mx-4 px-4">
       <h2 className="text-display-md text-foreground mb-4">注意事項</h2>
       <div className="space-y-4">
         {noticeItems.map((item, index) => (
