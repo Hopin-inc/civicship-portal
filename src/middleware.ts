@@ -16,7 +16,7 @@ const EXCLUDED_REDIRECT_PATTERNS = [
   "/images",    // 静的アセット
   "/communities", // コミュニティアセット
   "/icons",     // アイコン
-  "/create",    // コミュニティ作成ページ（SYS_ADMIN 専用）
+  "/sysAdmin",  // SYS_ADMIN 専用ルート（コミュニティ作成など）
 ];
 
 export async function middleware(request: NextRequest) {
@@ -46,10 +46,10 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // /create はコミュニティスコープ外の SYS_ADMIN 専用ページ。
+  // /sysAdmin はコミュニティスコープ外の SYS_ADMIN 専用ルート。
   // ホストやクッキーで communityId を解決できない場合は最初の active community を
   // 認証コンテキスト用フォールバックとして使用する（SYS_ADMIN は全テナントで有効）。
-  if (!communityId && (pathname === "/create" || pathname.startsWith("/create/"))) {
+  if (!communityId && (pathname === "/sysAdmin" || pathname.startsWith("/sysAdmin/"))) {
     communityId = (ACTIVE_COMMUNITY_IDS as readonly string[])[0] ?? null;
     if (communityId) communityIdSource = "fallback";
   }
@@ -109,9 +109,9 @@ export async function middleware(request: NextRequest) {
   });
 
   // 3. DBから動的設定を取得（存在しないコミュニティは404）
-  // /create はコミュニティスコープ外のため DB 設定チェックをスキップ。
+  // /sysAdmin はコミュニティスコープ外のため DB 設定チェックをスキップ。
   // Cookie の設定より前に early return することで x-community-id cookie を汚染しない。
-  if (pathname === "/create" || pathname.startsWith("/create/")) {
+  if (pathname === "/sysAdmin" || pathname.startsWith("/sysAdmin/")) {
     if (shouldClearSessionCookies) {
       clearLegacySessionCookies(res);
     }

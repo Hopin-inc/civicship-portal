@@ -23,6 +23,10 @@ const EXCLUDED_PATH_PATTERNS = [
 
   // API ルート
   "/api/**",
+
+  // SYS_ADMIN 専用ルート（コミュニティスコープ外）
+  "/sysAdmin",
+  "/sysAdmin/**",
 ];
 
 /**

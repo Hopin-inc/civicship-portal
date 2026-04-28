@@ -3,3 +3,4 @@ export { default as DangerSection } from "./components/DangerSection";
 export { default as HelpSection } from "./components/HelpSection";
 export { default as PromiseSection } from "./components/PromiseSection";
 export { default as SettingSection } from "./components/SettingSection";
+export { default as SystemAdminSection } from "./components/SystemAdminSection";

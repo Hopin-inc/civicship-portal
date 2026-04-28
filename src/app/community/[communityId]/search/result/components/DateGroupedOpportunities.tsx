@@ -31,7 +31,7 @@ const DateGroupedOpportunities: React.FC<DateGroupedOpportunitiesProps> = ({
   }
 
   return (
-    <section>
+    <section className="mt-8">
       {sortedEntries.map(([dateKey, opportunities]) => {
         if (opportunities.length === 0) return null;
         const first = opportunities[0];

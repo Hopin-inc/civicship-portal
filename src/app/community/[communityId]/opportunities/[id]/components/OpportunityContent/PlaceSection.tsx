@@ -5,7 +5,7 @@ export const PlaceSection = ({ place }: { place: OpportunityPlace }) => {
     if (!place) return null;
   
     return (
-      <section className="pt-6 pb-8 mt-0">
+      <section className="pt-6 pb-8">
         <h2 className="text-display-md text-foreground mb-4">集合場所</h2>
         <div>
           <p className="text-body-md font-bold">{place.name}</p>
