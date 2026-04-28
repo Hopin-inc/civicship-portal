@@ -1,51 +1,50 @@
-"use client";
-
-import { useMemo } from "react";
-import { useParams } from "next/navigation";
-import useHeaderConfig from "@/hooks/useHeaderConfig";
-import { ErrorState } from "@/components/shared/ErrorState";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { notFound } from "next/navigation";
+import { fetchTemplateBreakdownServer } from "@/app/sysAdmin/_shared/server/fetchTemplateBreakdown";
+import {
+  fetchActiveGenerationTemplateServer,
+  fetchActiveJudgeTemplateServer,
+} from "@/app/sysAdmin/_shared/server/fetchActiveTemplate";
+import { GqlReportTemplateKind } from "@/types/graphql";
 import { slugToVariant } from "@/app/sysAdmin/features/system/templates/shared/variantSlug";
-import { variantLabel } from "@/app/sysAdmin/features/system/templates/shared/labels";
-import { GenerationTemplateContainer } from "@/app/sysAdmin/features/system/templates/editor/components/GenerationTemplateContainer";
-import { JudgeTemplateContainer } from "@/app/sysAdmin/features/system/templates/editor/components/JudgeTemplateContainer";
+import { SysAdminTemplateDetailPageClient } from "./SysAdminTemplateDetailPageClient";
 
-export default function SysAdminSystemTemplateDetailPage() {
-  const params = useParams<{ variant: string }>();
-  const variant = slugToVariant(params.variant);
+type PageProps = {
+  params: Promise<{ variant: string }>;
+};
 
-  const headerConfig = useMemo(
-    () => ({
-      title: variant ? variantLabel(variant) : "テンプレート詳細",
-      showBackButton: true,
-      showLogo: false,
-    }),
-    [variant],
-  );
-  useHeaderConfig(headerConfig);
+/**
+ * テンプレート variant 詳細。
+ *
+ * GENERATION / JUDGE 各 breakdown + active template を SSR + cookie で
+ * 取得して client へ渡す。client-side fetch は auth race
+ * (`IsAdmin authorization FAILED`) の原因になるため SSR に統一。
+ */
+export default async function SysAdminSystemTemplateDetailPage({
+  params,
+}: PageProps) {
+  const { variant: slug } = await params;
+  const variant = slugToVariant(slug);
+  if (!variant) notFound();
 
-  if (!variant) {
-    return (
-      <div className="max-w-xl mx-auto mt-8 px-4">
-        <ErrorState title={`未対応の variant: ${params.variant}`} />
-      </div>
-    );
-  }
+  const [
+    generationBreakdownRows,
+    judgeBreakdownRows,
+    generationTemplate,
+    judgeTemplate,
+  ] = await Promise.all([
+    fetchTemplateBreakdownServer(variant, GqlReportTemplateKind.Generation),
+    fetchTemplateBreakdownServer(variant, GqlReportTemplateKind.Judge),
+    fetchActiveGenerationTemplateServer(variant),
+    fetchActiveJudgeTemplateServer(variant),
+  ]);
 
   return (
-    <div className="max-w-xl mx-auto mt-8 px-4">
-      <Tabs defaultValue="generation" className="w-full">
-        <TabsList className="mb-6">
-          <TabsTrigger value="generation">生成用</TabsTrigger>
-          <TabsTrigger value="judge">評価用</TabsTrigger>
-        </TabsList>
-        <TabsContent value="generation">
-          <GenerationTemplateContainer variant={variant} />
-        </TabsContent>
-        <TabsContent value="judge">
-          <JudgeTemplateContainer variant={variant} />
-        </TabsContent>
-      </Tabs>
-    </div>
+    <SysAdminTemplateDetailPageClient
+      variant={variant}
+      generationBreakdownRows={generationBreakdownRows}
+      generationTemplate={generationTemplate}
+      judgeBreakdownRows={judgeBreakdownRows}
+      judgeTemplate={judgeTemplate}
+    />
   );
 }

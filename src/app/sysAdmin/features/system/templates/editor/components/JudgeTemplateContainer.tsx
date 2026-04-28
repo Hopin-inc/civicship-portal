@@ -1,30 +1,33 @@
 "use client";
 
-import { GqlReportTemplateKind, type GqlReportVariant } from "@/types/graphql";
-import { useTemplateBreakdown } from "@/app/sysAdmin/features/system/templates/editor/hooks/useTemplateBreakdown";
-import { useActiveJudgeTemplate } from "@/app/sysAdmin/features/system/templates/editor/hooks/useActiveJudgeTemplate";
+import type {
+  GqlReportTemplateFieldsFragment,
+  GqlReportTemplateStatsBreakdownRowFieldsFragment,
+} from "@/types/graphql";
 import { JudgeTemplateView } from "./JudgeTemplateView";
 
 type Props = {
-  variant: GqlReportVariant;
+  initialBreakdownRows: GqlReportTemplateStatsBreakdownRowFieldsFragment[];
+  initialJudgeTemplate: GqlReportTemplateFieldsFragment | null;
 };
 
 /**
- * `JudgeTemplateView` (presentational) と
- * `useTemplateBreakdown` / `useActiveJudgeTemplate` (data) を結ぶ container。
+ * `JudgeTemplateView` (presentational) と SSR initial data を結ぶ container。
+ *
+ * JUDGE は閲覧専用のため mutation も不要。data は SSR で取得して渡される。
  */
-export function JudgeTemplateContainer({ variant }: Props) {
-  const breakdown = useTemplateBreakdown(variant, GqlReportTemplateKind.Judge);
-  const judge = useActiveJudgeTemplate(variant);
-
+export function JudgeTemplateContainer({
+  initialBreakdownRows,
+  initialJudgeTemplate,
+}: Props) {
   return (
     <JudgeTemplateView
-      rows={breakdown.rows}
-      breakdownLoading={breakdown.loading}
-      breakdownError={breakdown.error}
-      template={judge.template}
-      templateLoading={judge.loading}
-      templateError={judge.error}
+      rows={initialBreakdownRows}
+      breakdownLoading={false}
+      breakdownError={null}
+      template={initialJudgeTemplate}
+      templateLoading={false}
+      templateError={null}
     />
   );
 }

@@ -1,8 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useAuth } from "@/contexts/AuthProvider";
-import { useGetAdminBrowseReportsQuery } from "@/types/graphql";
+import { useApolloClient } from "@apollo/client";
+import { GET_ADMIN_BROWSE_REPORTS } from "@/graphql/account/adminReports/query";
+import type {
+  GqlGetAdminBrowseReportsQuery,
+  GqlGetAdminBrowseReportsQueryVariables,
+} from "@/types/graphql";
 import {
   CommunityReportsTab,
   type ReportRow,
@@ -12,65 +16,79 @@ const PAGE_SIZE = 20;
 
 type Props = {
   communityId: string;
+  initialReports: GqlGetAdminBrowseReportsQuery["adminBrowseReports"] | null;
 };
 
 /**
- * `CommunityReportsTab` (View) と `useGetAdminBrowseReportsQuery` (data) を
- * 結ぶ container。
+ * `CommunityReportsTab` (View) のための data wiring。
  *
- * 認証 race 回避のため `isAuthenticated` まで query を skip する。
+ * 初期 1 ページは SSR (`fetchAdminBrowseReportsServer`) で取得して props で
+ * 受け取る。「もっと見る」での追加ページは Apollo client.query で fetch して
+ * local state に append する。
+ *
+ * Apollo の `useQuery` 経路を使わない理由: SSR と整合させたいので Apollo
+ * cache を経由せず、SSR data を一次ソースとして扱う。
  */
-export function CommunityReportsTabContainer({ communityId }: Props) {
-  const { isAuthenticated } = useAuth();
-  const { data, loading, error, fetchMore } = useGetAdminBrowseReportsQuery({
-    variables: { communityId, first: PAGE_SIZE },
-    skip: !isAuthenticated,
-    fetchPolicy: "cache-and-network",
-  });
-  const [loadingMore, setLoadingMore] = useState(false);
-
-  const reports: ReportRow[] = useMemo(
-    () =>
-      data?.adminBrowseReports.edges
-        ?.map((e) => e?.node)
-        .filter(<T,>(n: T | null | undefined): n is T => n != null) ?? [],
-    [data],
+export function CommunityReportsTabContainer({
+  communityId,
+  initialReports,
+}: Props) {
+  const apollo = useApolloClient();
+  const [reports, setReports] = useState<ReportRow[]>(
+    () => extractReports(initialReports),
   );
+  const [endCursor, setEndCursor] = useState<string | null>(
+    initialReports?.pageInfo.endCursor ?? null,
+  );
+  const [hasNextPage, setHasNextPage] = useState<boolean>(
+    initialReports?.pageInfo.hasNextPage ?? false,
+  );
+  const [loadingMore, setLoadingMore] = useState(false);
+  const totalCount = initialReports?.totalCount ?? reports.length;
 
-  const totalCount = data?.adminBrowseReports.totalCount ?? 0;
-  const hasNextPage = data?.adminBrowseReports.pageInfo.hasNextPage ?? false;
-  const endCursor = data?.adminBrowseReports.pageInfo.endCursor ?? null;
-
-  const handleLoadMore = async () => {
-    if (!endCursor || loadingMore) return;
-    setLoadingMore(true);
-    try {
-      await fetchMore({
-        variables: { cursor: endCursor, first: PAGE_SIZE },
-        updateQuery: (prev, { fetchMoreResult }) => ({
-          adminBrowseReports: {
-            ...fetchMoreResult.adminBrowseReports,
-            edges: [
-              ...(prev.adminBrowseReports.edges ?? []),
-              ...(fetchMoreResult.adminBrowseReports.edges ?? []),
-            ],
-          },
-        }),
-      });
-    } finally {
-      setLoadingMore(false);
-    }
-  };
+  const handleLoadMore = useMemo(() => {
+    return async () => {
+      if (!endCursor || loadingMore) return;
+      setLoadingMore(true);
+      try {
+        const result = await apollo.query<
+          GqlGetAdminBrowseReportsQuery,
+          GqlGetAdminBrowseReportsQueryVariables
+        >({
+          query: GET_ADMIN_BROWSE_REPORTS,
+          variables: { communityId, cursor: endCursor, first: PAGE_SIZE },
+          fetchPolicy: "network-only",
+        });
+        const next = result.data.adminBrowseReports;
+        setReports((prev) => [...prev, ...extractReports(next)]);
+        setEndCursor(next.pageInfo.endCursor ?? null);
+        setHasNextPage(next.pageInfo.hasNextPage);
+      } finally {
+        setLoadingMore(false);
+      }
+    };
+  }, [apollo, communityId, endCursor, loadingMore]);
 
   return (
     <CommunityReportsTab
       reports={reports}
       totalCount={totalCount}
       hasNextPage={hasNextPage}
-      loading={loading}
-      error={error}
+      loading={false}
+      error={null}
       loadingMore={loadingMore}
       onLoadMore={handleLoadMore}
     />
+  );
+}
+
+function extractReports(
+  conn: GqlGetAdminBrowseReportsQuery["adminBrowseReports"] | null | undefined,
+): ReportRow[] {
+  if (!conn) return [];
+  return (
+    conn.edges
+      ?.map((e) => e?.node)
+      .filter(<T,>(n: T | null | undefined): n is T => n != null) ?? []
   );
 }

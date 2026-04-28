@@ -1,78 +1,41 @@
-"use client";
-
-import { useMemo } from "react";
-import { useAppRouter } from "@/lib/navigation";
-import useHeaderConfig from "@/hooks/useHeaderConfig";
-import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { ErrorState } from "@/components/shared/ErrorState";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { fetchTemplateBreakdownServer } from "@/app/sysAdmin/_shared/server/fetchTemplateBreakdown";
 import { GqlReportTemplateKind } from "@/types/graphql";
-import { TemplateRow } from "@/app/sysAdmin/features/system/templates/list/components/TemplateRow";
-import { useVariantSummaries } from "@/app/sysAdmin/features/system/templates/list/hooks/useVariantSummaries";
-import { variantToSlug } from "@/app/sysAdmin/features/system/templates/shared/variantSlug";
-import type { VariantSummary } from "@/app/sysAdmin/features/system/templates/shared/aggregate";
+import { aggregateVariantSummary } from "@/app/sysAdmin/features/system/templates/shared/aggregate";
+import { SUPPORTED_VARIANTS } from "@/app/sysAdmin/features/system/templates/shared/variantSlug";
+import { SysAdminSystemTemplatesPageClient } from "./SysAdminSystemTemplatesPageClient";
 
-export default function SysAdminSystemTemplatesPage() {
-  const headerConfig = useMemo(
-    () => ({
-      title: "テンプレート",
-      showBackButton: true,
-      showLogo: false,
-    }),
-    [],
+/**
+ * テンプレート一覧 (生成用 / 評価用)。
+ *
+ * GENERATION / JUDGE 各 4 variant 分の breakdown を SSR + cookie で取得し、
+ * client へ summaries として渡す。client-side fetch は auth race
+ * (`IsAdmin authorization FAILED`) の原因になるため SSR に統一。
+ */
+export default async function SysAdminSystemTemplatesPage() {
+  const [generationRowsByVariant, judgeRowsByVariant] = await Promise.all([
+    Promise.all(
+      SUPPORTED_VARIANTS.map((variant) =>
+        fetchTemplateBreakdownServer(variant, GqlReportTemplateKind.Generation),
+      ),
+    ),
+    Promise.all(
+      SUPPORTED_VARIANTS.map((variant) =>
+        fetchTemplateBreakdownServer(variant, GqlReportTemplateKind.Judge),
+      ),
+    ),
+  ]);
+
+  const generationSummaries = SUPPORTED_VARIANTS.map((variant, i) =>
+    aggregateVariantSummary(variant, generationRowsByVariant[i]),
   );
-  useHeaderConfig(headerConfig);
+  const judgeSummaries = SUPPORTED_VARIANTS.map((variant, i) =>
+    aggregateVariantSummary(variant, judgeRowsByVariant[i]),
+  );
 
   return (
-    <div className="p-4 max-w-xl mx-auto">
-      <Tabs defaultValue="generation" className="w-full">
-        <TabsList className="mb-4">
-          <TabsTrigger value="generation">生成用</TabsTrigger>
-          <TabsTrigger value="judge">評価用</TabsTrigger>
-        </TabsList>
-        <TabsContent value="generation">
-          <KindList kind={GqlReportTemplateKind.Generation} />
-        </TabsContent>
-        <TabsContent value="judge">
-          <KindList kind={GqlReportTemplateKind.Judge} />
-        </TabsContent>
-      </Tabs>
-    </div>
-  );
-}
-
-function KindList({ kind }: { kind: GqlReportTemplateKind }) {
-  const router = useAppRouter();
-  const { summaries, loading, error } = useVariantSummaries(kind);
-
-  const isEmpty = summaries.every((s: VariantSummary) => s.activeTemplateCount === 0);
-
-  if (loading && isEmpty) {
-    return <LoadingIndicator fullScreen={false} />;
-  }
-
-  if (error) {
-    return <ErrorState title="テンプレート一覧の取得に失敗しました" />;
-  }
-
-  return (
-    <div className="flex flex-col">
-      {summaries.map((summary, idx) => {
-        const slug = variantToSlug(summary.variant);
-        return (
-          <div key={summary.variant}>
-            {idx !== 0 && <hr className="border-muted" />}
-            <TemplateRow
-              summary={summary}
-              onClick={
-                slug
-                  ? () => router.push(`/sysAdmin/system/templates/${slug}`)
-                  : undefined
-              }
-            />
-          </div>
-        );
-      })}
-    </div>
+    <SysAdminSystemTemplatesPageClient
+      generationSummaries={generationSummaries}
+      judgeSummaries={judgeSummaries}
+    />
   );
 }

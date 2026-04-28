@@ -1,5 +1,6 @@
 import { fetchSysAdminCommunityDetailServer } from "@/app/sysAdmin/_shared/server/fetchSysAdminCommunityDetail";
 import { fetchSysAdminDashboardServer } from "@/app/sysAdmin/_shared/server/fetchSysAdminDashboard";
+import { fetchAdminBrowseReportsServer } from "@/app/sysAdmin/_shared/server/fetchAdminBrowseReports";
 import { DEFAULT_SEGMENT_THRESHOLDS } from "@/app/sysAdmin/_shared/derive";
 import {
   GqlSysAdminSortOrder,
@@ -16,10 +17,10 @@ type Props = {
 export default async function SysAdminCommunityDetailPage({ params }: Props) {
   const { communityId } = await params;
 
-  // L2 detail と L1 dashboard を並列で SSR fetch。L2 payload は
-  // tenureDistribution を持たないため、L1 の該当 community 行から
-  // 抜き出して overview に渡す。
-  const [initialData, l1Data] = await Promise.all([
+  // L2 detail / L1 dashboard / レポート発行履歴 を並列で SSR fetch。
+  // - L2 payload は tenureDistribution を持たないため L1 から抜き出す
+  // - レポート履歴は client-side fetch だと auth race の原因になるため SSR
+  const [initialData, l1Data, initialReports] = await Promise.all([
     fetchSysAdminCommunityDetailServer({
       communityId,
       asOf: undefined,
@@ -42,6 +43,7 @@ export default async function SysAdminCommunityDetailPage({ params }: Props) {
       limit: 1000,
     }),
     fetchSysAdminDashboardServer({ asOf: undefined }),
+    fetchAdminBrowseReportsServer(communityId),
   ]);
 
   const l1Row = l1Data?.communities.find(
@@ -57,6 +59,7 @@ export default async function SysAdminCommunityDetailPage({ params }: Props) {
         initialData={initialData}
         tenureDistribution={tenureDistribution}
         hubMemberCount={hubMemberCount}
+        initialReports={initialReports}
       />
     </div>
   );

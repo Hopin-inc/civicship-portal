@@ -6,6 +6,7 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type {
+  GqlGetAdminBrowseReportsQuery,
   GqlGetSysAdminCommunityDetailQuery,
   GqlSysAdminTenureDistribution,
 } from "@/types/graphql";
@@ -25,6 +26,8 @@ type Props = {
    * schema には未掲載のため、tenureDistribution と同じく page.tsx で
    * L1 と並列 fetch して受け渡す。 */
   hubMemberCount?: number | null;
+  /** SSR で取得した「レポート発行履歴」初期 1 ページ。 */
+  initialReports?: GqlGetAdminBrowseReportsQuery["adminBrowseReports"] | null;
 };
 
 export function CommunityDetailPageClient({
@@ -32,6 +35,7 @@ export function CommunityDetailPageClient({
   initialData,
   tenureDistribution,
   hubMemberCount,
+  initialReports,
 }: Props) {
   const dashboard = useDashboardControls();
   const { loading, error, detail: data } = useCommunityDetail({
@@ -78,7 +82,10 @@ export function CommunityDetailPageClient({
         />
       </TabsContent>
       <TabsContent value="reports">
-        <CommunityReportsTabContainer communityId={communityId} />
+        <CommunityReportsTabContainer
+          communityId={communityId}
+          initialReports={initialReports ?? null}
+        />
       </TabsContent>
     </Tabs>
   );

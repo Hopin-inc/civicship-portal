@@ -1,38 +1,96 @@
 "use client";
 
-import { GqlReportTemplateKind, type GqlReportVariant } from "@/types/graphql";
-import { useTemplateBreakdown } from "@/app/sysAdmin/features/system/templates/editor/hooks/useTemplateBreakdown";
-import { useTemplateEditor } from "@/app/sysAdmin/features/system/templates/editor/hooks/useTemplateEditor";
+import { useCallback, useState } from "react";
+import { useRouter } from "next/navigation";
+import {
+  useUpdateReportTemplateMutation,
+  type GqlReportTemplateFieldsFragment,
+  type GqlReportTemplateStatsBreakdownRowFieldsFragment,
+  type GqlReportVariant,
+} from "@/types/graphql";
 import { GenerationTemplateView } from "./GenerationTemplateView";
 
 type Props = {
   variant: GqlReportVariant;
+  initialBreakdownRows: GqlReportTemplateStatsBreakdownRowFieldsFragment[];
+  initialTemplate: GqlReportTemplateFieldsFragment | null;
 };
 
 /**
  * `GenerationTemplateView` (presentational) と
- * `useTemplateEditor` / `useTemplateBreakdown` (data) を結ぶ container。
+ * mutation hook を結ぶ container。
+ *
+ * 初期 data は SSR で取得して props で受け取る。client-side fetch は
+ * auth race の原因になるため使わない。保存後は `router.refresh()` で
+ * SSR を再走させ、stats / template を最新化する。
  */
-export function GenerationTemplateContainer({ variant }: Props) {
-  const editor = useTemplateEditor(variant);
-  const breakdown = useTemplateBreakdown(variant, GqlReportTemplateKind.Generation);
+export function GenerationTemplateContainer({
+  variant,
+  initialBreakdownRows,
+  initialTemplate,
+}: Props) {
+  const router = useRouter();
+  const [systemPrompt, setSystemPrompt] = useState(
+    initialTemplate?.systemPrompt ?? "",
+  );
+  const [userPromptTemplate, setUserPromptTemplate] = useState(
+    initialTemplate?.userPromptTemplate ?? "",
+  );
+
+  const [save, { loading: saving, error: saveError }] =
+    useUpdateReportTemplateMutation();
+
+  const handleSave = useCallback(async () => {
+    if (!initialTemplate) return;
+    // ボタン onClick から呼ばれて promise が捨てられるため、ここで例外を握る。
+    // mutation のエラーは Apollo の `saveError` 経由で UI に伝わる。
+    try {
+      await save({
+        variables: {
+          variant,
+          input: {
+            model: initialTemplate.model,
+            maxTokens: initialTemplate.maxTokens,
+            temperature: initialTemplate.temperature ?? undefined,
+            stopSequences: initialTemplate.stopSequences,
+            systemPrompt,
+            userPromptTemplate,
+            experimentKey: initialTemplate.experimentKey ?? undefined,
+            isActive: initialTemplate.isActive,
+            isEnabled: initialTemplate.isEnabled,
+            trafficWeight: initialTemplate.trafficWeight,
+            communityContext: initialTemplate.communityContext ?? undefined,
+          },
+        },
+      });
+      // SSR 経路の data を最新化する
+      router.refresh();
+    } catch {
+      // saveError state でハンドル済み
+    }
+  }, [initialTemplate, save, variant, systemPrompt, userPromptTemplate, router]);
+
+  const isDirty =
+    initialTemplate != null &&
+    (systemPrompt !== initialTemplate.systemPrompt ||
+      userPromptTemplate !== initialTemplate.userPromptTemplate);
 
   return (
     <GenerationTemplateView
-      rows={breakdown.rows}
-      breakdownLoading={breakdown.loading}
-      breakdownError={breakdown.error}
-      template={editor.template}
-      editorLoading={editor.loading}
-      editorError={editor.error}
-      systemPrompt={editor.systemPrompt}
-      userPromptTemplate={editor.userPromptTemplate}
-      isDirty={editor.isDirty}
-      saving={editor.saving}
-      saveError={editor.saveError ?? null}
-      setSystemPrompt={editor.setSystemPrompt}
-      setUserPromptTemplate={editor.setUserPromptTemplate}
-      onSave={editor.handleSave}
+      rows={initialBreakdownRows}
+      breakdownLoading={false}
+      breakdownError={null}
+      template={initialTemplate}
+      editorLoading={false}
+      editorError={null}
+      systemPrompt={systemPrompt}
+      userPromptTemplate={userPromptTemplate}
+      isDirty={isDirty}
+      saving={saving}
+      saveError={saveError ?? null}
+      setSystemPrompt={setSystemPrompt}
+      setUserPromptTemplate={setUserPromptTemplate}
+      onSave={handleSave}
     />
   );
 }
