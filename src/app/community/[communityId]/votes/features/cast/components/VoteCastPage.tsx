@@ -44,7 +44,7 @@ function useRemainingTime(endsAt: Date, phase: GqlVoteTopicPhase, t: Translator)
     update();
     timer = setInterval(update, 60_000);
     return () => { if (timer) clearInterval(timer); };
-  }, [endsAt, phase]);
+  }, [endsAt, phase, t]);
   return remaining;
 }
 
