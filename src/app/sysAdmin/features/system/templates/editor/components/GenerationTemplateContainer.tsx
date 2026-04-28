@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useApolloClient } from "@apollo/client";
 import {
@@ -68,9 +68,6 @@ export function GenerationTemplateContainer({
 }: Props) {
   const router = useRouter();
   const apollo = useApolloClient();
-  const [feedbackTotalCount, setFeedbackTotalCount] = useState(
-    initialFeedbacks?.totalCount ?? 0,
-  );
 
   const [save, { loading: saving, error: saveError }] =
     useUpdateReportTemplateMutation();
@@ -129,15 +126,14 @@ export function GenerationTemplateContainer({
         },
         fetchPolicy: "network-only",
       });
-      const conn = result.data.adminTemplateFeedbacks ?? EMPTY_CONNECTION;
-      setFeedbackTotalCount(conn.totalCount);
-      return conn;
+      return result.data.adminTemplateFeedbacks ?? EMPTY_CONNECTION;
     },
     [apollo, variant],
   );
 
   const {
     items: feedbacks,
+    totalCount: feedbackTotalCount,
     hasNextPage: feedbacksHasNextPage,
     loading: feedbacksLoadingMore,
     loadMore: loadMoreFeedbacks,

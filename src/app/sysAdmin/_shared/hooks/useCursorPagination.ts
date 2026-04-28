@@ -48,6 +48,10 @@ type Result<TItem> = {
   items: TItem[];
   hasNextPage: boolean;
   loading: boolean;
+  /** 母集団件数。SSR initial と各 fetchMore レスポンスから常に最新を保つ。 */
+  totalCount: number;
+  /** 直近の loadMore で発生した例外。次回成功時に null に戻る。 */
+  error: unknown;
   loadMore: () => Promise<void>;
   reset: (next: ConnectionLike<TItem>) => void;
 };
@@ -66,7 +70,7 @@ function extractItems<TItem>(conn: ConnectionLike<TItem>): TItem[] {
  * 以下の流れを抽象化:
  *   1. 初期 Connection を items にバラす
  *   2. loadMore 呼び出しで fetchMore(cursor) → 結果を items に append
- *   3. hasNextPage / endCursor を内部 state で管理
+ *   3. hasNextPage / endCursor / totalCount / error を内部 state で管理
  *
  * Apollo の useQuery + fetchMore パターンに被せる場合は、
  * fetchMore コールバック内で client.query などを使って次ページを取得する
@@ -94,6 +98,10 @@ export function useCursorPagination<TItem>({
     initial.pageInfo.hasNextPage,
   );
   const [loading, setLoading] = useState(false);
+  const [totalCount, setTotalCount] = useState<number>(
+    initial.totalCount ?? extractItems(initial).length,
+  );
+  const [error, setError] = useState<unknown>(null);
 
   // 同期的な並行制御用 ref。setLoading は非同期反映のため、
   // rapid loadMore() 呼び出し (例: スクロール / 連打) で重複 fetch が
@@ -123,20 +131,30 @@ export function useCursorPagination<TItem>({
     // 対する次の loadMore が「まだ読み込み中」と誤判定されてブロックされる。
     // generation でレスポンスは捨てられるので、guard も明示的にリセットする。
     loadingRef.current = false;
-    setItems(extractItems(latest));
+    const latestItems = extractItems(latest);
+    setItems(latestItems);
     setEndCursor(latest.pageInfo.endCursor ?? null);
     setHasNextPage(latest.pageInfo.hasNextPage);
     setLoading(false);
+    setTotalCount(latest.totalCount ?? latestItems.length);
+    setError(null);
     endCursorRef.current = latest.pageInfo.endCursor ?? null;
     hasNextPageRef.current = latest.pageInfo.hasNextPage;
   }, [depKey]);
 
   const loadMore = useCallback(async () => {
-    if (loadingRef.current || !hasNextPageRef.current || !endCursorRef.current) {
+    // 空文字 cursor も「終端」ではなく有効値として扱うため、null/undefined を
+    // 明示的にチェックする (`!cursor` だと "" が偽になる)。
+    if (
+      loadingRef.current ||
+      !hasNextPageRef.current ||
+      endCursorRef.current == null
+    ) {
       return;
     }
     loadingRef.current = true;
     setLoading(true);
+    setError(null);
     const cursor = endCursorRef.current;
     const requestGeneration = generationRef.current;
     try {
@@ -147,11 +165,17 @@ export function useCursorPagination<TItem>({
       const nextHasNextPage = next.pageInfo.hasNextPage;
       endCursorRef.current = nextEndCursor;
       hasNextPageRef.current = nextHasNextPage;
-      setItems((prev) => [...prev, ...extractItems(next)]);
+      setItems((prev) => {
+        const appended = [...prev, ...extractItems(next)];
+        // backend が totalCount を返さないケースは累積件数で代替。
+        setTotalCount(next.totalCount ?? appended.length);
+        return appended;
+      });
       setEndCursor(nextEndCursor);
       setHasNextPage(nextHasNextPage);
     } catch (err) {
       if (requestGeneration === generationRef.current) {
+        setError(err);
         onError?.(err);
       }
     } finally {
@@ -172,11 +196,22 @@ export function useCursorPagination<TItem>({
     const nextHasNextPage = next.pageInfo.hasNextPage;
     endCursorRef.current = nextEndCursor;
     hasNextPageRef.current = nextHasNextPage;
-    setItems(extractItems(next));
+    const nextItems = extractItems(next);
+    setItems(nextItems);
     setEndCursor(nextEndCursor);
     setHasNextPage(nextHasNextPage);
     setLoading(false);
+    setTotalCount(next.totalCount ?? nextItems.length);
+    setError(null);
   }, []);
 
-  return { items, hasNextPage, loading, loadMore, reset };
+  return {
+    items,
+    hasNextPage,
+    loading,
+    totalCount,
+    error,
+    loadMore,
+    reset,
+  };
 }
