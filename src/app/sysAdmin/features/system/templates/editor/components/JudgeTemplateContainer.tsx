@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useApolloClient } from "@apollo/client";
 import {
   GqlReportTemplateKind,
@@ -14,7 +14,12 @@ import {
 import { GET_ADMIN_TEMPLATE_FEEDBACKS } from "@/graphql/account/adminTemplateFeedbacks/query";
 import { useCursorPagination } from "@/app/sysAdmin/_shared/hooks/useCursorPagination";
 import { createEmptyConnection } from "@/app/sysAdmin/_shared/pagination/emptyConnection";
+import { stableFilterKey } from "@/app/sysAdmin/_shared/pagination/filterKey";
 import { JudgeTemplateView } from "./JudgeTemplateView";
+import {
+  EMPTY_FEEDBACKS_FILTER,
+  type TemplateFeedbacksFilterValue,
+} from "./TemplateFeedbacksFilter";
 
 type FeedbacksConnection = NonNullable<
   GqlGetAdminTemplateFeedbacksQuery["adminTemplateFeedbacks"]
@@ -52,6 +57,57 @@ export function JudgeTemplateContainer({
 }: Props) {
   const apollo = useApolloClient();
 
+  const [feedbacksFilter, setFeedbacksFilter] =
+    useState<TemplateFeedbacksFilterValue>(EMPTY_FEEDBACKS_FILTER);
+  const feedbacksFilterKey = useMemo(
+    () => stableFilterKey({ ...feedbacksFilter }),
+    [feedbacksFilter],
+  );
+
+  const [currentFeedbacks, setCurrentFeedbacks] = useState<FeedbacksConnection>(
+    initialFeedbacks ?? EMPTY_CONNECTION,
+  );
+  const [refetchingFeedbacks, setRefetchingFeedbacks] = useState(false);
+
+  useEffect(() => {
+    if (feedbacksFilterKey === "") {
+      setCurrentFeedbacks(initialFeedbacks ?? EMPTY_CONNECTION);
+      setRefetchingFeedbacks(false);
+      return;
+    }
+    let cancelled = false;
+    setRefetchingFeedbacks(true);
+    void (async () => {
+      try {
+        const result = await apollo.query<
+          GqlGetAdminTemplateFeedbacksQuery,
+          GqlGetAdminTemplateFeedbacksQueryVariables
+        >({
+          query: GET_ADMIN_TEMPLATE_FEEDBACKS,
+          variables: {
+            variant,
+            kind: GqlReportTemplateKind.Judge,
+            feedbackType: feedbacksFilter.feedbackType ?? undefined,
+            maxRating: feedbacksFilter.maxRating ?? undefined,
+            first: PAGE_SIZE,
+          },
+          fetchPolicy: "network-only",
+        });
+        if (cancelled) return;
+        setCurrentFeedbacks(
+          result.data.adminTemplateFeedbacks ?? EMPTY_CONNECTION,
+        );
+      } catch {
+        if (!cancelled) setCurrentFeedbacks(EMPTY_CONNECTION);
+      } finally {
+        if (!cancelled) setRefetchingFeedbacks(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [feedbacksFilterKey, variant, apollo, feedbacksFilter, initialFeedbacks]);
+
   const fetchMoreFeedbacks = useCallback(
     async (cursor: string, first: number) => {
       const result = await apollo.query<
@@ -62,6 +118,8 @@ export function JudgeTemplateContainer({
         variables: {
           variant,
           kind: GqlReportTemplateKind.Judge,
+          feedbackType: feedbacksFilter.feedbackType ?? undefined,
+          maxRating: feedbacksFilter.maxRating ?? undefined,
           cursor,
           first,
         },
@@ -69,7 +127,7 @@ export function JudgeTemplateContainer({
       });
       return result.data.adminTemplateFeedbacks ?? EMPTY_CONNECTION;
     },
-    [apollo, variant],
+    [apollo, variant, feedbacksFilter],
   );
 
   const {
@@ -80,10 +138,10 @@ export function JudgeTemplateContainer({
     error: feedbacksError,
     loadMore: loadMoreFeedbacks,
   } = useCursorPagination({
-    initial: initialFeedbacks ?? EMPTY_CONNECTION,
+    initial: currentFeedbacks,
     fetchMore: fetchMoreFeedbacks,
     pageSize: PAGE_SIZE,
-    resetKey: `${variant}:JUDGE`,
+    resetKey: `${variant}:JUDGE:${feedbacksFilterKey}`,
   });
 
   const handleLoadMoreFeedbacks = useCallback(() => {
@@ -105,6 +163,9 @@ export function JudgeTemplateContainer({
       feedbacksError={feedbacksError}
       onLoadMoreFeedbacks={handleLoadMoreFeedbacks}
       feedbackStats={initialStats}
+      feedbacksFilter={feedbacksFilter}
+      onFeedbacksFilterChange={setFeedbacksFilter}
+      feedbacksFilterRefetching={refetchingFeedbacks}
     />
   );
 }

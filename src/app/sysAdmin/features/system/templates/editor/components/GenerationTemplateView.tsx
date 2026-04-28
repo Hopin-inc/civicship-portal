@@ -23,6 +23,10 @@ import { ExperimentSection } from "./ExperimentSection";
 import { VersionSelector } from "./VersionSelector";
 import { FeedbackList } from "@/app/sysAdmin/_shared/feedback/FeedbackList";
 import { RatingSummary } from "@/app/sysAdmin/_shared/feedback/RatingSummary";
+import {
+  TemplateFeedbacksFilter,
+  type TemplateFeedbacksFilterValue,
+} from "./TemplateFeedbacksFilter";
 
 type FeedbackStats =
   GqlGetAdminTemplateFeedbackStatsQuery["adminTemplateFeedbackStats"];
@@ -51,6 +55,10 @@ export type GenerationTemplateViewProps = {
    * RatingSummary をフィードバック一覧の上に出すために使う。
    */
   feedbackStats: FeedbackStats | null;
+
+  feedbacksFilter?: TemplateFeedbacksFilterValue;
+  onFeedbacksFilterChange?: (next: TemplateFeedbacksFilterValue) => void;
+  feedbacksFilterRefetching?: boolean;
 };
 
 /**
@@ -79,6 +87,9 @@ export function GenerationTemplateView({
   feedbacksError,
   onLoadMoreFeedbacks,
   feedbackStats,
+  feedbacksFilter,
+  onFeedbacksFilterChange,
+  feedbacksFilterRefetching,
 }: GenerationTemplateViewProps) {
   const versions = useMemo(
     () =>
@@ -118,6 +129,14 @@ export function GenerationTemplateView({
           onSubmit={onSubmitPrompt}
           saving={saving}
           saveError={saveError}
+        />
+      )}
+
+      {feedbacksFilter && onFeedbacksFilterChange && (
+        <TemplateFeedbacksFilter
+          value={feedbacksFilter}
+          onChange={onFeedbacksFilterChange}
+          loading={feedbacksFilterRefetching}
         />
       )}
 

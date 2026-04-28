@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useApolloClient } from "@apollo/client";
 import {
@@ -16,7 +16,12 @@ import {
 import { GET_ADMIN_TEMPLATE_FEEDBACKS } from "@/graphql/account/adminTemplateFeedbacks/query";
 import { useCursorPagination } from "@/app/sysAdmin/_shared/hooks/useCursorPagination";
 import { createEmptyConnection } from "@/app/sysAdmin/_shared/pagination/emptyConnection";
+import { stableFilterKey } from "@/app/sysAdmin/_shared/pagination/filterKey";
 import { GenerationTemplateView } from "./GenerationTemplateView";
+import {
+  EMPTY_FEEDBACKS_FILTER,
+  type TemplateFeedbacksFilterValue,
+} from "./TemplateFeedbacksFilter";
 import type { PromptFormValues } from "./PromptEditor";
 
 type FeedbacksConnection = NonNullable<
@@ -105,6 +110,59 @@ export function GenerationTemplateContainer({
     [handleSubmitPrompt],
   );
 
+  const [feedbacksFilter, setFeedbacksFilter] =
+    useState<TemplateFeedbacksFilterValue>(EMPTY_FEEDBACKS_FILTER);
+  const feedbacksFilterKey = useMemo(
+    () => stableFilterKey({ ...feedbacksFilter }),
+    [feedbacksFilter],
+  );
+
+  // SSR で取った 1 ページ目はフィルタ無し。フィルタ設定時のみ client refetch
+  // して initial を差し替え、resetKey 連動で `useCursorPagination` を初期化。
+  const [currentFeedbacks, setCurrentFeedbacks] = useState<FeedbacksConnection>(
+    initialFeedbacks ?? EMPTY_CONNECTION,
+  );
+  const [refetchingFeedbacks, setRefetchingFeedbacks] = useState(false);
+
+  useEffect(() => {
+    if (feedbacksFilterKey === "") {
+      setCurrentFeedbacks(initialFeedbacks ?? EMPTY_CONNECTION);
+      setRefetchingFeedbacks(false);
+      return;
+    }
+    let cancelled = false;
+    setRefetchingFeedbacks(true);
+    void (async () => {
+      try {
+        const result = await apollo.query<
+          GqlGetAdminTemplateFeedbacksQuery,
+          GqlGetAdminTemplateFeedbacksQueryVariables
+        >({
+          query: GET_ADMIN_TEMPLATE_FEEDBACKS,
+          variables: {
+            variant,
+            kind: GqlReportTemplateKind.Generation,
+            feedbackType: feedbacksFilter.feedbackType ?? undefined,
+            maxRating: feedbacksFilter.maxRating ?? undefined,
+            first: PAGE_SIZE,
+          },
+          fetchPolicy: "network-only",
+        });
+        if (cancelled) return;
+        setCurrentFeedbacks(
+          result.data.adminTemplateFeedbacks ?? EMPTY_CONNECTION,
+        );
+      } catch {
+        if (!cancelled) setCurrentFeedbacks(EMPTY_CONNECTION);
+      } finally {
+        if (!cancelled) setRefetchingFeedbacks(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [feedbacksFilterKey, variant, apollo, feedbacksFilter, initialFeedbacks]);
+
   const fetchMoreFeedbacks = useCallback(
     async (cursor: string, first: number) => {
       const result = await apollo.query<
@@ -115,6 +173,8 @@ export function GenerationTemplateContainer({
         variables: {
           variant,
           kind: GqlReportTemplateKind.Generation,
+          feedbackType: feedbacksFilter.feedbackType ?? undefined,
+          maxRating: feedbacksFilter.maxRating ?? undefined,
           cursor,
           first,
         },
@@ -122,7 +182,7 @@ export function GenerationTemplateContainer({
       });
       return result.data.adminTemplateFeedbacks ?? EMPTY_CONNECTION;
     },
-    [apollo, variant],
+    [apollo, variant, feedbacksFilter],
   );
 
   const {
@@ -133,10 +193,10 @@ export function GenerationTemplateContainer({
     error: feedbacksError,
     loadMore: loadMoreFeedbacks,
   } = useCursorPagination({
-    initial: initialFeedbacks ?? EMPTY_CONNECTION,
+    initial: currentFeedbacks,
     fetchMore: fetchMoreFeedbacks,
     pageSize: PAGE_SIZE,
-    resetKey: `${variant}:GENERATION`,
+    resetKey: `${variant}:GENERATION:${feedbacksFilterKey}`,
   });
 
   const handleLoadMoreFeedbacks = useCallback(() => {
@@ -161,6 +221,9 @@ export function GenerationTemplateContainer({
       feedbacksError={feedbacksError}
       onLoadMoreFeedbacks={handleLoadMoreFeedbacks}
       feedbackStats={initialStats}
+      feedbacksFilter={feedbacksFilter}
+      onFeedbacksFilterChange={setFeedbacksFilter}
+      feedbacksFilterRefetching={refetchingFeedbacks}
     />
   );
 }

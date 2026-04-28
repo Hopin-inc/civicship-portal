@@ -17,6 +17,10 @@ import {
   type GqlReportVariant,
 } from "@/types/graphql";
 import { variantLabel, statusLabel } from "@/app/sysAdmin/features/system/templates/shared/labels";
+import {
+  CommunityReportsFilter,
+  type CommunityReportsFilterValue,
+} from "./CommunityReportsFilter";
 
 export type ReportRow = {
   id: string;
@@ -35,6 +39,9 @@ export type CommunityReportsTabProps = {
   error: unknown;
   loadingMore: boolean;
   onLoadMore: () => void;
+  filter: CommunityReportsFilterValue;
+  onFilterChange: (next: CommunityReportsFilterValue) => void;
+  filterRefetching: boolean;
 };
 
 /**
@@ -50,11 +57,20 @@ export function CommunityReportsTab({
   error,
   loadingMore,
   onLoadMore,
+  filter,
+  onFilterChange,
+  filterRefetching,
 }: CommunityReportsTabProps) {
   const router = useRouter();
   const goToDetail = (id: string) => {
     router.push(`/sysAdmin/${communityId}/reports/${id}`);
   };
+  const isFiltered =
+    filter.status !== null ||
+    filter.variant !== null ||
+    filter.publishedAfter !== null ||
+    filter.publishedBefore !== null;
+
   if (loading && reports.length === 0) {
     return <LoadingIndicator fullScreen={false} />;
   }
@@ -62,20 +78,26 @@ export function CommunityReportsTab({
   // 初回ロード失敗のみ全画面 ErrorState。
   // pagination 失敗 (= 既にデータがある) は table を残して下部にインライン表示する
   // (load-more ボタンも残るのでリトライ可能)。
-  if (error && reports.length === 0) {
+  if (error && reports.length === 0 && !isFiltered) {
     return <ErrorState title="レポート履歴の取得に失敗しました" />;
-  }
-
-  if (reports.length === 0) {
-    return (
-      <div className="py-8 text-center text-body-sm text-muted-foreground">
-        この community のレポートはまだ発行されていません
-      </div>
-    );
   }
 
   return (
     <div className="space-y-4 py-4">
+      <CommunityReportsFilter
+        value={filter}
+        onChange={onFilterChange}
+        loading={filterRefetching}
+      />
+
+      {reports.length === 0 ? (
+        <div className="py-8 text-center text-body-sm text-muted-foreground">
+          {isFiltered
+            ? "条件に一致するレポートはありません"
+            : "この community のレポートはまだ発行されていません"}
+        </div>
+      ) : (
+        <>
       <div className="flex items-baseline justify-between text-body-sm text-muted-foreground">
         <span>レポート発行履歴</span>
         <span className="tabular-nums">
@@ -138,6 +160,8 @@ export function CommunityReportsTab({
             {loadingMore ? "読み込み中..." : "もっと見る"}
           </Button>
         </div>
+      )}
+        </>
       )}
     </div>
   );

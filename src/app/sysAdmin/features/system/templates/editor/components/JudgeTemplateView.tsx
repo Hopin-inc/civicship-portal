@@ -24,6 +24,10 @@ import { ExperimentSection } from "./ExperimentSection";
 import { VersionSelector } from "./VersionSelector";
 import { FeedbackList } from "@/app/sysAdmin/_shared/feedback/FeedbackList";
 import { RatingSummary } from "@/app/sysAdmin/_shared/feedback/RatingSummary";
+import {
+  TemplateFeedbacksFilter,
+  type TemplateFeedbacksFilterValue,
+} from "./TemplateFeedbacksFilter";
 
 type FeedbackStats =
   GqlGetAdminTemplateFeedbackStatsQuery["adminTemplateFeedbackStats"];
@@ -44,6 +48,10 @@ export type JudgeTemplateViewProps = {
   feedbacksError?: unknown;
   onLoadMoreFeedbacks?: () => void;
   feedbackStats: FeedbackStats | null;
+
+  feedbacksFilter?: TemplateFeedbacksFilterValue;
+  onFeedbacksFilterChange?: (next: TemplateFeedbacksFilterValue) => void;
+  feedbacksFilterRefetching?: boolean;
 };
 
 /**
@@ -70,6 +78,9 @@ export function JudgeTemplateView({
   feedbacksError,
   onLoadMoreFeedbacks,
   feedbackStats,
+  feedbacksFilter,
+  onFeedbacksFilterChange,
+  feedbacksFilterRefetching,
 }: JudgeTemplateViewProps) {
   const versions = useMemo(
     () =>
@@ -137,6 +148,14 @@ export function JudgeTemplateView({
             />
           </section>
         </div>
+      )}
+
+      {feedbacksFilter && onFeedbacksFilterChange && (
+        <TemplateFeedbacksFilter
+          value={feedbacksFilter}
+          onChange={onFeedbacksFilterChange}
+          loading={feedbacksFilterRefetching}
+        />
       )}
 
       <FeedbackList
