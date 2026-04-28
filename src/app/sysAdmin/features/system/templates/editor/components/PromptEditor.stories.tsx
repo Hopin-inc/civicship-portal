@@ -21,50 +21,51 @@ type Story = StoryObj<typeof PromptEditor>;
 
 const template = mockActiveTemplate(GqlReportVariant.MemberNewsletter);
 
+function StatefulEditor({
+  initialSystemPrompt,
+  initialUserPromptTemplate,
+}: {
+  initialSystemPrompt: string;
+  initialUserPromptTemplate: string;
+}) {
+  const [systemPrompt, setSystemPrompt] = useState(initialSystemPrompt);
+  const [userPromptTemplate, setUserPromptTemplate] = useState(
+    initialUserPromptTemplate,
+  );
+  const isDirty =
+    systemPrompt !== template.systemPrompt ||
+    userPromptTemplate !== template.userPromptTemplate;
+  return (
+    <PromptEditor
+      template={template}
+      systemPrompt={systemPrompt}
+      setSystemPrompt={setSystemPrompt}
+      userPromptTemplate={userPromptTemplate}
+      setUserPromptTemplate={setUserPromptTemplate}
+      onSave={() => undefined}
+      saving={false}
+      isDirty={isDirty}
+      saveError={null}
+    />
+  );
+}
+
 export const Pristine: Story = {
-  render: () => {
-    const [systemPrompt, setSystemPrompt] = useState(template.systemPrompt);
-    const [userPromptTemplate, setUserPromptTemplate] = useState(
-      template.userPromptTemplate,
-    );
-    return (
-      <PromptEditor
-        template={template}
-        systemPrompt={systemPrompt}
-        setSystemPrompt={setSystemPrompt}
-        userPromptTemplate={userPromptTemplate}
-        setUserPromptTemplate={setUserPromptTemplate}
-        onSave={() => undefined}
-        saving={false}
-        isDirty={false}
-        saveError={null}
-      />
-    );
-  },
+  render: () => (
+    <StatefulEditor
+      initialSystemPrompt={template.systemPrompt}
+      initialUserPromptTemplate={template.userPromptTemplate}
+    />
+  ),
 };
 
 export const Dirty: Story = {
-  render: () => {
-    const [systemPrompt, setSystemPrompt] = useState(
-      template.systemPrompt + "\n\n# 編集中",
-    );
-    const [userPromptTemplate, setUserPromptTemplate] = useState(
-      template.userPromptTemplate,
-    );
-    return (
-      <PromptEditor
-        template={template}
-        systemPrompt={systemPrompt}
-        setSystemPrompt={setSystemPrompt}
-        userPromptTemplate={userPromptTemplate}
-        setUserPromptTemplate={setUserPromptTemplate}
-        onSave={() => undefined}
-        saving={false}
-        isDirty={true}
-        saveError={null}
-      />
-    );
-  },
+  render: () => (
+    <StatefulEditor
+      initialSystemPrompt={template.systemPrompt + "\n\n# 編集中"}
+      initialUserPromptTemplate={template.userPromptTemplate}
+    />
+  ),
 };
 
 export const Saving: Story = {

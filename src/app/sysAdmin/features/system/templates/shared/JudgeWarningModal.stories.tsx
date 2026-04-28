@@ -12,39 +12,27 @@ const meta: Meta<typeof JudgeWarningModal> = {
 export default meta;
 type Story = StoryObj<typeof JudgeWarningModal>;
 
+function StatefulModalDemo({ saving = false }: { saving?: boolean }) {
+  const [open, setOpen] = useState(true);
+  return (
+    <div className="p-8">
+      <Button variant="tertiary" size="sm" onClick={() => setOpen(true)}>
+        modal を開く
+      </Button>
+      <JudgeWarningModal
+        open={open}
+        onOpenChange={setOpen}
+        onConfirm={() => setOpen(false)}
+        saving={saving}
+      />
+    </div>
+  );
+}
+
 export const Default: Story = {
-  render: () => {
-    const [open, setOpen] = useState(true);
-    return (
-      <div className="p-8">
-        <Button variant="tertiary" size="sm" onClick={() => setOpen(true)}>
-          modal を開く
-        </Button>
-        <JudgeWarningModal
-          open={open}
-          onOpenChange={setOpen}
-          onConfirm={() => setOpen(false)}
-        />
-      </div>
-    );
-  },
+  render: () => <StatefulModalDemo />,
 };
 
 export const Saving: Story = {
-  render: () => {
-    const [open, setOpen] = useState(true);
-    return (
-      <div className="p-8">
-        <Button variant="tertiary" size="sm" onClick={() => setOpen(true)}>
-          modal を開く
-        </Button>
-        <JudgeWarningModal
-          open={open}
-          onOpenChange={setOpen}
-          onConfirm={() => undefined}
-          saving
-        />
-      </div>
-    );
-  },
+  render: () => <StatefulModalDemo saving />,
 };

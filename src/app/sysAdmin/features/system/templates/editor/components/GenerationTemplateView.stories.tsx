@@ -26,34 +26,36 @@ type Story = StoryObj<typeof GenerationTemplateView>;
 const template = mockActiveTemplate(GqlReportVariant.MemberNewsletter);
 const rows = mockBreakdown(GqlReportVariant.MemberNewsletter);
 
+function StatefulView() {
+  const [systemPrompt, setSystemPrompt] = useState(template.systemPrompt);
+  const [userPromptTemplate, setUserPromptTemplate] = useState(
+    template.userPromptTemplate,
+  );
+  return (
+    <GenerationTemplateView
+      rows={rows}
+      breakdownLoading={false}
+      breakdownError={null}
+      template={template}
+      editorLoading={false}
+      editorError={null}
+      systemPrompt={systemPrompt}
+      userPromptTemplate={userPromptTemplate}
+      isDirty={
+        systemPrompt !== template.systemPrompt ||
+        userPromptTemplate !== template.userPromptTemplate
+      }
+      saving={false}
+      saveError={null}
+      setSystemPrompt={setSystemPrompt}
+      setUserPromptTemplate={setUserPromptTemplate}
+      onSave={() => undefined}
+    />
+  );
+}
+
 export const WithData: Story = {
-  render: () => {
-    const [systemPrompt, setSystemPrompt] = useState(template.systemPrompt);
-    const [userPromptTemplate, setUserPromptTemplate] = useState(
-      template.userPromptTemplate,
-    );
-    return (
-      <GenerationTemplateView
-        rows={rows}
-        breakdownLoading={false}
-        breakdownError={null}
-        template={template}
-        editorLoading={false}
-        editorError={null}
-        systemPrompt={systemPrompt}
-        userPromptTemplate={userPromptTemplate}
-        isDirty={
-          systemPrompt !== template.systemPrompt ||
-          userPromptTemplate !== template.userPromptTemplate
-        }
-        saving={false}
-        saveError={null}
-        setSystemPrompt={setSystemPrompt}
-        setUserPromptTemplate={setUserPromptTemplate}
-        onSave={() => undefined}
-      />
-    );
-  },
+  render: () => <StatefulView />,
 };
 
 export const Loading: Story = {

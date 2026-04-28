@@ -17,54 +17,31 @@ const meta: Meta<typeof VersionSelector> = {
 export default meta;
 type Story = StoryObj<typeof VersionSelector>;
 
+function StatefulSelector({
+  versions,
+  initialSelected,
+}: {
+  versions: number[];
+  initialSelected: number | null;
+}) {
+  const [selected, setSelected] = useState<number | null>(initialSelected);
+  return (
+    <VersionSelector versions={versions} selected={selected} onSelect={setSelected} />
+  );
+}
+
 export const Default: Story = {
-  render: () => {
-    const [selected, setSelected] = useState<number | null>(null);
-    return (
-      <VersionSelector
-        versions={[3, 2, 1]}
-        selected={selected}
-        onSelect={setSelected}
-      />
-    );
-  },
+  render: () => <StatefulSelector versions={[3, 2, 1]} initialSelected={null} />,
 };
 
 export const SpecificVersionSelected: Story = {
-  render: () => {
-    const [selected, setSelected] = useState<number | null>(2);
-    return (
-      <VersionSelector
-        versions={[3, 2, 1]}
-        selected={selected}
-        onSelect={setSelected}
-      />
-    );
-  },
+  render: () => <StatefulSelector versions={[3, 2, 1]} initialSelected={2} />,
 };
 
 export const SingleVersion: Story = {
-  render: () => {
-    const [selected, setSelected] = useState<number | null>(null);
-    return (
-      <VersionSelector
-        versions={[1]}
-        selected={selected}
-        onSelect={setSelected}
-      />
-    );
-  },
+  render: () => <StatefulSelector versions={[1]} initialSelected={null} />,
 };
 
 export const Empty: Story = {
-  render: () => {
-    const [selected, setSelected] = useState<number | null>(null);
-    return (
-      <VersionSelector
-        versions={[]}
-        selected={selected}
-        onSelect={setSelected}
-      />
-    );
-  },
+  render: () => <StatefulSelector versions={[]} initialSelected={null} />,
 };
