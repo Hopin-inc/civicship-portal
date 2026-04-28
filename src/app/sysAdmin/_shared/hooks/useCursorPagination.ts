@@ -83,8 +83,13 @@ export function useCursorPagination<TItem>({
   const endCursorRef = useRef<string | null>(initial.pageInfo.endCursor ?? null);
   const hasNextPageRef = useRef<boolean>(initial.pageInfo.hasNextPage);
 
+  // initial 切替 (= filter 変更などで親が再 fetch) と in-flight な loadMore の
+  // 競合で stale append が起きないよう、世代カウンタで in-flight 結果を破棄する。
+  const generationRef = useRef(0);
+
   // initial が変わった (filter 切替などで親が再 fetch した) ときに同期
   useEffect(() => {
+    generationRef.current += 1;
     setItems(extractItems(initial));
     setEndCursor(initial.pageInfo.endCursor ?? null);
     setHasNextPage(initial.pageInfo.hasNextPage);
@@ -99,8 +104,11 @@ export function useCursorPagination<TItem>({
     loadingRef.current = true;
     setLoading(true);
     const cursor = endCursorRef.current;
+    const requestGeneration = generationRef.current;
     try {
       const next = await fetchMore(cursor, pageSize);
+      // 取得中に initial が再投入された場合は結果を捨てる (stale page を append しない)
+      if (requestGeneration !== generationRef.current) return;
       const nextEndCursor = next.pageInfo.endCursor ?? null;
       const nextHasNextPage = next.pageInfo.hasNextPage;
       endCursorRef.current = nextEndCursor;
@@ -109,7 +117,9 @@ export function useCursorPagination<TItem>({
       setEndCursor(nextEndCursor);
       setHasNextPage(nextHasNextPage);
     } catch (err) {
-      onError?.(err);
+      if (requestGeneration === generationRef.current) {
+        onError?.(err);
+      }
     } finally {
       loadingRef.current = false;
       setLoading(false);
@@ -117,6 +127,7 @@ export function useCursorPagination<TItem>({
   }, [fetchMore, pageSize, onError]);
 
   const reset = useCallback((next: ConnectionLike<TItem>) => {
+    generationRef.current += 1;
     const nextEndCursor = next.pageInfo.endCursor ?? null;
     const nextHasNextPage = next.pageInfo.hasNextPage;
     endCursorRef.current = nextEndCursor;
