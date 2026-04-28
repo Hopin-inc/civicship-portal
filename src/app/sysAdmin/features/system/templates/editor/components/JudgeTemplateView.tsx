@@ -165,7 +165,7 @@ function InlineHeader({
   const segments: string[] = [];
   if (template) {
     segments.push(`v${template.version}`);
-    if (template.experimentKey) segments.push(template.experimentKey);
+    if (template.experimentKey) segments.push(`ブランチ: ${template.experimentKey}`);
   }
   segments.push(
     `評価 ${avgRating != null ? avgRating.toFixed(2) : "—"} (${totalFeedback})`,

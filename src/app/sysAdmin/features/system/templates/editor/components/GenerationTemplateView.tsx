@@ -175,14 +175,14 @@ function InlineHeader({
   const segments: string[] = [];
   if (template) {
     segments.push(`v${template.version}`);
-    if (template.experimentKey) segments.push(template.experimentKey);
-    segments.push(`active ${template.trafficWeight}%`);
+    if (template.experimentKey) segments.push(`ブランチ: ${template.experimentKey}`);
+    segments.push(`配信比率 ${template.trafficWeight}%`);
   }
   segments.push(
     `評価 ${avgRating != null ? avgRating.toFixed(2) : "—"} (${totalFeedback})`,
   );
   segments.push(
-    `相関 ${avgCorrelation != null ? avgCorrelation.toFixed(2) : "—"}`,
+    `LLM-人間 一致度 ${avgCorrelation != null ? avgCorrelation.toFixed(2) : "—"}`,
   );
 
   return (
