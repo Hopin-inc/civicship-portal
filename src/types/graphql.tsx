@@ -33,6 +33,35 @@ export type GqlAccumulatedPointView = {
   walletId?: Maybe<Scalars["String"]["output"]>;
 };
 
+export type GqlAdminReportSummaryConnection = {
+  __typename?: "AdminReportSummaryConnection";
+  edges?: Maybe<Array<Maybe<GqlAdminReportSummaryEdge>>>;
+  pageInfo: GqlPageInfo;
+  totalCount: Scalars["Int"]["output"];
+};
+
+export type GqlAdminReportSummaryEdge = GqlEdge & {
+  __typename?: "AdminReportSummaryEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<GqlAdminReportSummaryRow>;
+};
+
+export type GqlAdminReportSummaryRow = {
+  __typename?: "AdminReportSummaryRow";
+  community: GqlCommunity;
+  daysSinceLastPublish?: Maybe<Scalars["Int"]["output"]>;
+  lastPublishedAt?: Maybe<Scalars["Datetime"]["output"]>;
+  lastPublishedReport?: Maybe<GqlReport>;
+  publishedCountLast90Days: Scalars["Int"]["output"];
+};
+
+export type GqlAdminTemplateFeedbackStats = {
+  __typename?: "AdminTemplateFeedbackStats";
+  avgRating?: Maybe<Scalars["Float"]["output"]>;
+  ratingDistribution: Array<GqlReportFeedbackRatingBucket>;
+  totalCount: Scalars["Int"]["output"];
+};
+
 export type GqlApproveReportPayload = GqlApproveReportSuccess;
 
 export type GqlApproveReportSuccess = {
@@ -2074,6 +2103,10 @@ export const GqlPublishStatus = {
 export type GqlPublishStatus = (typeof GqlPublishStatus)[keyof typeof GqlPublishStatus];
 export type GqlQuery = {
   __typename?: "Query";
+  adminBrowseReports: GqlReportsConnection;
+  adminReportSummary: GqlAdminReportSummaryConnection;
+  adminTemplateFeedbackStats: GqlAdminTemplateFeedbackStats;
+  adminTemplateFeedbacks: GqlReportFeedbacksConnection;
   article?: Maybe<GqlArticle>;
   articles: GqlArticlesConnection;
   cities: GqlCitiesConnection;
@@ -2115,6 +2148,8 @@ export type GqlQuery = {
   report?: Maybe<GqlReport>;
   reportTemplate?: Maybe<GqlReportTemplate>;
   reportTemplateStats: GqlReportTemplateStats;
+  reportTemplateStatsBreakdown: GqlReportTemplateStatsBreakdownConnection;
+  reportTemplates: Array<GqlReportTemplate>;
   reports: GqlReportsConnection;
   reservation?: Maybe<GqlReservation>;
   reservationHistories: GqlReservationHistoriesConnection;
@@ -2170,6 +2205,37 @@ export type GqlQuery = {
   voteTopics: GqlVoteTopicsConnection;
   wallet?: Maybe<GqlWallet>;
   wallets: GqlWalletsConnection;
+};
+
+export type GqlQueryAdminBrowseReportsArgs = {
+  communityId?: InputMaybe<Scalars["ID"]["input"]>;
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  publishedAfter?: InputMaybe<Scalars["Datetime"]["input"]>;
+  publishedBefore?: InputMaybe<Scalars["Datetime"]["input"]>;
+  status?: InputMaybe<GqlReportStatus>;
+  variant?: InputMaybe<GqlReportVariant>;
+};
+
+export type GqlQueryAdminReportSummaryArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+};
+
+export type GqlQueryAdminTemplateFeedbackStatsArgs = {
+  kind?: InputMaybe<GqlReportTemplateKind>;
+  variant: GqlReportVariant;
+  version?: InputMaybe<Scalars["Int"]["input"]>;
+};
+
+export type GqlQueryAdminTemplateFeedbacksArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  feedbackType?: InputMaybe<GqlReportFeedbackType>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  kind?: InputMaybe<GqlReportTemplateKind>;
+  maxRating?: InputMaybe<Scalars["Int"]["input"]>;
+  variant: GqlReportVariant;
+  version?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type GqlQueryArticleArgs = {
@@ -2351,6 +2417,22 @@ export type GqlQueryReportTemplateArgs = {
 export type GqlQueryReportTemplateStatsArgs = {
   variant: GqlReportVariant;
   version?: InputMaybe<Scalars["Int"]["input"]>;
+};
+
+export type GqlQueryReportTemplateStatsBreakdownArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  includeInactive?: InputMaybe<Scalars["Boolean"]["input"]>;
+  kind?: InputMaybe<GqlReportTemplateKind>;
+  variant: GqlReportVariant;
+  version?: InputMaybe<Scalars["Int"]["input"]>;
+};
+
+export type GqlQueryReportTemplatesArgs = {
+  communityId?: InputMaybe<Scalars["ID"]["input"]>;
+  includeInactive?: InputMaybe<Scalars["Boolean"]["input"]>;
+  kind?: InputMaybe<GqlReportTemplateKind>;
+  variant: GqlReportVariant;
 };
 
 export type GqlQueryReportsArgs = {
@@ -2570,6 +2652,7 @@ export type GqlReportFeedback = {
   feedbackType?: Maybe<GqlReportFeedbackType>;
   id: Scalars["ID"]["output"];
   rating: Scalars["Int"]["output"];
+  report: GqlReport;
   reportId: Scalars["ID"]["output"];
   sectionKey?: Maybe<Scalars["String"]["output"]>;
   user: GqlUser;
@@ -2579,6 +2662,12 @@ export type GqlReportFeedbackEdge = GqlEdge & {
   __typename?: "ReportFeedbackEdge";
   cursor: Scalars["String"]["output"];
   node?: Maybe<GqlReportFeedback>;
+};
+
+export type GqlReportFeedbackRatingBucket = {
+  __typename?: "ReportFeedbackRatingBucket";
+  count: Scalars["Int"]["output"];
+  rating: Scalars["Int"]["output"];
 };
 
 export const GqlReportFeedbackType = {
@@ -2617,6 +2706,7 @@ export type GqlReportTemplate = {
   id: Scalars["ID"]["output"];
   isActive: Scalars["Boolean"]["output"];
   isEnabled: Scalars["Boolean"]["output"];
+  kind: GqlReportTemplateKind;
   maxTokens: Scalars["Int"]["output"];
   model: Scalars["String"]["output"];
   scope: GqlReportTemplateScope;
@@ -2631,6 +2721,13 @@ export type GqlReportTemplate = {
   version: Scalars["Int"]["output"];
 };
 
+export const GqlReportTemplateKind = {
+  Generation: "GENERATION",
+  Judge: "JUDGE",
+} as const;
+
+export type GqlReportTemplateKind =
+  (typeof GqlReportTemplateKind)[keyof typeof GqlReportTemplateKind];
 export const GqlReportTemplateScope = {
   Community: "COMMUNITY",
   System: "SYSTEM",
@@ -2647,6 +2744,36 @@ export type GqlReportTemplateStats = {
   judgeHumanCorrelation?: Maybe<Scalars["Float"]["output"]>;
   variant: GqlReportVariant;
   version?: Maybe<Scalars["Int"]["output"]>;
+};
+
+export type GqlReportTemplateStatsBreakdownConnection = {
+  __typename?: "ReportTemplateStatsBreakdownConnection";
+  edges?: Maybe<Array<Maybe<GqlReportTemplateStatsBreakdownEdge>>>;
+  pageInfo: GqlPageInfo;
+  totalCount: Scalars["Int"]["output"];
+};
+
+export type GqlReportTemplateStatsBreakdownEdge = GqlEdge & {
+  __typename?: "ReportTemplateStatsBreakdownEdge";
+  cursor: Scalars["String"]["output"];
+  node?: Maybe<GqlReportTemplateStatsBreakdownRow>;
+};
+
+export type GqlReportTemplateStatsBreakdownRow = {
+  __typename?: "ReportTemplateStatsBreakdownRow";
+  avgJudgeScore?: Maybe<Scalars["Float"]["output"]>;
+  avgRating?: Maybe<Scalars["Float"]["output"]>;
+  correlationWarning: Scalars["Boolean"]["output"];
+  experimentKey?: Maybe<Scalars["String"]["output"]>;
+  feedbackCount: Scalars["Int"]["output"];
+  isActive: Scalars["Boolean"]["output"];
+  isEnabled: Scalars["Boolean"]["output"];
+  judgeHumanCorrelation?: Maybe<Scalars["Float"]["output"]>;
+  kind: GqlReportTemplateKind;
+  scope: GqlReportTemplateScope;
+  templateId: Scalars["ID"]["output"];
+  trafficWeight: Scalars["Int"]["output"];
+  version: Scalars["Int"]["output"];
 };
 
 export const GqlReportVariant = {
@@ -5029,6 +5156,156 @@ export type GqlGetCitiesQuery = {
   };
 };
 
+export type GqlAdminReportSummaryRowFieldsFragment = {
+  __typename?: "AdminReportSummaryRow";
+  lastPublishedAt?: Date | null;
+  daysSinceLastPublish?: number | null;
+  publishedCountLast90Days: number;
+  community: { __typename?: "Community"; id: string; name?: string | null };
+  lastPublishedReport?: {
+    __typename?: "Report";
+    id: string;
+    variant: GqlReportVariant;
+    status: GqlReportStatus;
+    publishedAt?: Date | null;
+  } | null;
+};
+
+export type GqlAdminBrowseReportFieldsFragment = {
+  __typename?: "Report";
+  id: string;
+  variant: GqlReportVariant;
+  status: GqlReportStatus;
+  publishedAt?: Date | null;
+  createdAt: Date;
+  community: { __typename?: "Community"; id: string; name?: string | null };
+};
+
+export type GqlGetAdminBrowseReportsQueryVariables = Exact<{
+  communityId?: InputMaybe<Scalars["ID"]["input"]>;
+  status?: InputMaybe<GqlReportStatus>;
+  variant?: InputMaybe<GqlReportVariant>;
+  publishedAfter?: InputMaybe<Scalars["Datetime"]["input"]>;
+  publishedBefore?: InputMaybe<Scalars["Datetime"]["input"]>;
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+}>;
+
+export type GqlGetAdminBrowseReportsQuery = {
+  __typename?: "Query";
+  adminBrowseReports: {
+    __typename?: "ReportsConnection";
+    totalCount: number;
+    edges?: Array<{
+      __typename?: "ReportEdge";
+      cursor: string;
+      node?: {
+        __typename?: "Report";
+        id: string;
+        variant: GqlReportVariant;
+        status: GqlReportStatus;
+        publishedAt?: Date | null;
+        createdAt: Date;
+        community: { __typename?: "Community"; id: string; name?: string | null };
+      } | null;
+    } | null> | null;
+    pageInfo: { __typename?: "PageInfo"; hasNextPage: boolean; endCursor?: string | null };
+  };
+};
+
+export type GqlGetAdminReportSummaryQueryVariables = Exact<{
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+}>;
+
+export type GqlGetAdminReportSummaryQuery = {
+  __typename?: "Query";
+  adminReportSummary: {
+    __typename?: "AdminReportSummaryConnection";
+    totalCount: number;
+    edges?: Array<{
+      __typename?: "AdminReportSummaryEdge";
+      cursor: string;
+      node?: {
+        __typename?: "AdminReportSummaryRow";
+        lastPublishedAt?: Date | null;
+        daysSinceLastPublish?: number | null;
+        publishedCountLast90Days: number;
+        community: { __typename?: "Community"; id: string; name?: string | null };
+        lastPublishedReport?: {
+          __typename?: "Report";
+          id: string;
+          variant: GqlReportVariant;
+          status: GqlReportStatus;
+          publishedAt?: Date | null;
+        } | null;
+      } | null;
+    } | null> | null;
+    pageInfo: { __typename?: "PageInfo"; hasNextPage: boolean; endCursor?: string | null };
+  };
+};
+
+export type GqlGetAdminTemplateFeedbacksQueryVariables = Exact<{
+  variant: GqlReportVariant;
+  version?: InputMaybe<Scalars["Int"]["input"]>;
+  kind?: InputMaybe<GqlReportTemplateKind>;
+  feedbackType?: InputMaybe<GqlReportFeedbackType>;
+  maxRating?: InputMaybe<Scalars["Int"]["input"]>;
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+}>;
+
+export type GqlGetAdminTemplateFeedbacksQuery = {
+  __typename?: "Query";
+  adminTemplateFeedbacks: {
+    __typename?: "ReportFeedbacksConnection";
+    totalCount: number;
+    edges?: Array<{
+      __typename?: "ReportFeedbackEdge";
+      cursor: string;
+      node?: {
+        __typename?: "ReportFeedback";
+        id: string;
+        rating: number;
+        comment?: string | null;
+        feedbackType?: GqlReportFeedbackType | null;
+        sectionKey?: string | null;
+        createdAt: Date;
+        report: {
+          __typename?: "Report";
+          id: string;
+          variant: GqlReportVariant;
+          periodFrom: Date;
+          periodTo: Date;
+          community: { __typename?: "Community"; id: string; name?: string | null };
+        };
+        user: { __typename?: "User"; id: string; name: string };
+      } | null;
+    } | null> | null;
+    pageInfo: { __typename?: "PageInfo"; hasNextPage: boolean; endCursor?: string | null };
+  };
+};
+
+export type GqlGetAdminTemplateFeedbackStatsQueryVariables = Exact<{
+  variant: GqlReportVariant;
+  version?: InputMaybe<Scalars["Int"]["input"]>;
+  kind?: InputMaybe<GqlReportTemplateKind>;
+}>;
+
+export type GqlGetAdminTemplateFeedbackStatsQuery = {
+  __typename?: "Query";
+  adminTemplateFeedbackStats: {
+    __typename?: "AdminTemplateFeedbackStats";
+    totalCount: number;
+    avgRating?: number | null;
+    ratingDistribution: Array<{
+      __typename?: "ReportFeedbackRatingBucket";
+      rating: number;
+      count: number;
+    }>;
+  };
+};
+
 export type GqlCommunityFieldsFragment = {
   __typename?: "Community";
   id: string;
@@ -5642,6 +5919,385 @@ export type GqlGetNftInstanceWithDidQuery = {
       };
     } | null;
   } | null;
+};
+
+export type GqlAdminReportDetailFieldsFragment = {
+  __typename?: "Report";
+  id: string;
+  variant: GqlReportVariant;
+  status: GqlReportStatus;
+  publishedAt?: Date | null;
+  createdAt: Date;
+  updatedAt?: Date | null;
+  periodFrom: Date;
+  periodTo: Date;
+  outputMarkdown?: string | null;
+  finalContent?: string | null;
+  skipReason?: string | null;
+  regenerateCount: number;
+  community: { __typename?: "Community"; id: string; name?: string | null };
+  template?: {
+    __typename?: "ReportTemplate";
+    id: string;
+    variant: GqlReportVariant;
+    version: number;
+    kind: GqlReportTemplateKind;
+    experimentKey?: string | null;
+    trafficWeight: number;
+  } | null;
+  generatedByUser?: { __typename?: "User"; id: string; name: string } | null;
+  publishedByUser?: { __typename?: "User"; id: string; name: string } | null;
+  myFeedback?: {
+    __typename?: "ReportFeedback";
+    id: string;
+    rating: number;
+    comment?: string | null;
+    feedbackType?: GqlReportFeedbackType | null;
+    sectionKey?: string | null;
+    createdAt: Date;
+    user: { __typename?: "User"; id: string; name: string };
+  } | null;
+};
+
+export type GqlSubmitReportFeedbackMutationVariables = Exact<{
+  input: GqlSubmitReportFeedbackInput;
+  permission: GqlCheckCommunityPermissionInput;
+}>;
+
+export type GqlSubmitReportFeedbackMutation = {
+  __typename?: "Mutation";
+  submitReportFeedback?: {
+    __typename?: "SubmitReportFeedbackSuccess";
+    feedback: {
+      __typename?: "ReportFeedback";
+      id: string;
+      rating: number;
+      comment?: string | null;
+      feedbackType?: GqlReportFeedbackType | null;
+      sectionKey?: string | null;
+      createdAt: Date;
+      user: { __typename?: "User"; id: string; name: string };
+    };
+  } | null;
+};
+
+export type GqlGetAdminReportQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type GqlGetAdminReportQuery = {
+  __typename?: "Query";
+  report?: {
+    __typename?: "Report";
+    id: string;
+    variant: GqlReportVariant;
+    status: GqlReportStatus;
+    publishedAt?: Date | null;
+    createdAt: Date;
+    updatedAt?: Date | null;
+    periodFrom: Date;
+    periodTo: Date;
+    outputMarkdown?: string | null;
+    finalContent?: string | null;
+    skipReason?: string | null;
+    regenerateCount: number;
+    community: { __typename?: "Community"; id: string; name?: string | null };
+    template?: {
+      __typename?: "ReportTemplate";
+      id: string;
+      variant: GqlReportVariant;
+      version: number;
+      kind: GqlReportTemplateKind;
+      experimentKey?: string | null;
+      trafficWeight: number;
+    } | null;
+    generatedByUser?: { __typename?: "User"; id: string; name: string } | null;
+    publishedByUser?: { __typename?: "User"; id: string; name: string } | null;
+    myFeedback?: {
+      __typename?: "ReportFeedback";
+      id: string;
+      rating: number;
+      comment?: string | null;
+      feedbackType?: GqlReportFeedbackType | null;
+      sectionKey?: string | null;
+      createdAt: Date;
+      user: { __typename?: "User"; id: string; name: string };
+    } | null;
+  } | null;
+};
+
+export type GqlGetAdminReportFeedbacksQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+}>;
+
+export type GqlGetAdminReportFeedbacksQuery = {
+  __typename?: "Query";
+  report?: {
+    __typename?: "Report";
+    id: string;
+    feedbacks: {
+      __typename?: "ReportFeedbacksConnection";
+      totalCount: number;
+      edges?: Array<{
+        __typename?: "ReportFeedbackEdge";
+        cursor: string;
+        node?: {
+          __typename?: "ReportFeedback";
+          id: string;
+          rating: number;
+          comment?: string | null;
+          feedbackType?: GqlReportFeedbackType | null;
+          sectionKey?: string | null;
+          createdAt: Date;
+          user: { __typename?: "User"; id: string; name: string };
+        } | null;
+      } | null> | null;
+      pageInfo: { __typename?: "PageInfo"; hasNextPage: boolean; endCursor?: string | null };
+    };
+  } | null;
+};
+
+export type GqlReportFeedbackFieldsFragment = {
+  __typename?: "ReportFeedback";
+  id: string;
+  rating: number;
+  comment?: string | null;
+  feedbackType?: GqlReportFeedbackType | null;
+  sectionKey?: string | null;
+  createdAt: Date;
+  user: { __typename?: "User"; id: string; name: string };
+};
+
+export type GqlReportFeedbackWithReportFieldsFragment = {
+  __typename?: "ReportFeedback";
+  id: string;
+  rating: number;
+  comment?: string | null;
+  feedbackType?: GqlReportFeedbackType | null;
+  sectionKey?: string | null;
+  createdAt: Date;
+  report: {
+    __typename?: "Report";
+    id: string;
+    variant: GqlReportVariant;
+    periodFrom: Date;
+    periodTo: Date;
+    community: { __typename?: "Community"; id: string; name?: string | null };
+  };
+  user: { __typename?: "User"; id: string; name: string };
+};
+
+export type GqlReportTemplateFieldsFragment = {
+  __typename?: "ReportTemplate";
+  id: string;
+  variant: GqlReportVariant;
+  version: number;
+  scope: GqlReportTemplateScope;
+  kind: GqlReportTemplateKind;
+  model: string;
+  maxTokens: number;
+  temperature?: number | null;
+  systemPrompt: string;
+  userPromptTemplate: string;
+  stopSequences: Array<string>;
+  trafficWeight: number;
+  isActive: boolean;
+  isEnabled: boolean;
+  experimentKey?: string | null;
+  communityContext?: string | null;
+  createdAt: Date;
+  updatedAt?: Date | null;
+  community?: { __typename?: "Community"; id: string; name?: string | null } | null;
+  updatedByUser?: { __typename?: "User"; id: string; name: string } | null;
+};
+
+export type GqlReportTemplateStatsFieldsFragment = {
+  __typename?: "ReportTemplateStats";
+  variant: GqlReportVariant;
+  version?: number | null;
+  feedbackCount: number;
+  avgRating?: number | null;
+  avgJudgeScore?: number | null;
+  judgeHumanCorrelation?: number | null;
+  correlationWarning: boolean;
+};
+
+export type GqlReportTemplateStatsBreakdownRowFieldsFragment = {
+  __typename?: "ReportTemplateStatsBreakdownRow";
+  templateId: string;
+  version: number;
+  scope: GqlReportTemplateScope;
+  kind: GqlReportTemplateKind;
+  experimentKey?: string | null;
+  isActive: boolean;
+  isEnabled: boolean;
+  trafficWeight: number;
+  feedbackCount: number;
+  avgRating?: number | null;
+  avgJudgeScore?: number | null;
+  judgeHumanCorrelation?: number | null;
+  correlationWarning: boolean;
+};
+
+export type GqlUpdateReportTemplateMutationVariables = Exact<{
+  variant: GqlReportVariant;
+  input: GqlUpdateReportTemplateInput;
+  communityId?: InputMaybe<Scalars["ID"]["input"]>;
+}>;
+
+export type GqlUpdateReportTemplateMutation = {
+  __typename?: "Mutation";
+  updateReportTemplate?: {
+    __typename?: "UpdateReportTemplateSuccess";
+    reportTemplate: {
+      __typename?: "ReportTemplate";
+      id: string;
+      variant: GqlReportVariant;
+      version: number;
+      scope: GqlReportTemplateScope;
+      kind: GqlReportTemplateKind;
+      model: string;
+      maxTokens: number;
+      temperature?: number | null;
+      systemPrompt: string;
+      userPromptTemplate: string;
+      stopSequences: Array<string>;
+      trafficWeight: number;
+      isActive: boolean;
+      isEnabled: boolean;
+      experimentKey?: string | null;
+      communityContext?: string | null;
+      createdAt: Date;
+      updatedAt?: Date | null;
+      community?: { __typename?: "Community"; id: string; name?: string | null } | null;
+      updatedByUser?: { __typename?: "User"; id: string; name: string } | null;
+    };
+  } | null;
+};
+
+export type GqlGetReportTemplateQueryVariables = Exact<{
+  variant: GqlReportVariant;
+  communityId?: InputMaybe<Scalars["ID"]["input"]>;
+}>;
+
+export type GqlGetReportTemplateQuery = {
+  __typename?: "Query";
+  reportTemplate?: {
+    __typename?: "ReportTemplate";
+    id: string;
+    variant: GqlReportVariant;
+    version: number;
+    scope: GqlReportTemplateScope;
+    kind: GqlReportTemplateKind;
+    model: string;
+    maxTokens: number;
+    temperature?: number | null;
+    systemPrompt: string;
+    userPromptTemplate: string;
+    stopSequences: Array<string>;
+    trafficWeight: number;
+    isActive: boolean;
+    isEnabled: boolean;
+    experimentKey?: string | null;
+    communityContext?: string | null;
+    createdAt: Date;
+    updatedAt?: Date | null;
+    community?: { __typename?: "Community"; id: string; name?: string | null } | null;
+    updatedByUser?: { __typename?: "User"; id: string; name: string } | null;
+  } | null;
+};
+
+export type GqlGetReportTemplateStatsQueryVariables = Exact<{
+  variant: GqlReportVariant;
+  version?: InputMaybe<Scalars["Int"]["input"]>;
+}>;
+
+export type GqlGetReportTemplateStatsQuery = {
+  __typename?: "Query";
+  reportTemplateStats: {
+    __typename?: "ReportTemplateStats";
+    variant: GqlReportVariant;
+    version?: number | null;
+    feedbackCount: number;
+    avgRating?: number | null;
+    avgJudgeScore?: number | null;
+    judgeHumanCorrelation?: number | null;
+    correlationWarning: boolean;
+  };
+};
+
+export type GqlGetReportTemplatesQueryVariables = Exact<{
+  variant: GqlReportVariant;
+  communityId?: InputMaybe<Scalars["ID"]["input"]>;
+  kind?: InputMaybe<GqlReportTemplateKind>;
+  includeInactive?: InputMaybe<Scalars["Boolean"]["input"]>;
+}>;
+
+export type GqlGetReportTemplatesQuery = {
+  __typename?: "Query";
+  reportTemplates: Array<{
+    __typename?: "ReportTemplate";
+    id: string;
+    variant: GqlReportVariant;
+    version: number;
+    scope: GqlReportTemplateScope;
+    kind: GqlReportTemplateKind;
+    model: string;
+    maxTokens: number;
+    temperature?: number | null;
+    systemPrompt: string;
+    userPromptTemplate: string;
+    stopSequences: Array<string>;
+    trafficWeight: number;
+    isActive: boolean;
+    isEnabled: boolean;
+    experimentKey?: string | null;
+    communityContext?: string | null;
+    createdAt: Date;
+    updatedAt?: Date | null;
+    community?: { __typename?: "Community"; id: string; name?: string | null } | null;
+    updatedByUser?: { __typename?: "User"; id: string; name: string } | null;
+  }>;
+};
+
+export type GqlGetReportTemplateStatsBreakdownQueryVariables = Exact<{
+  variant: GqlReportVariant;
+  version?: InputMaybe<Scalars["Int"]["input"]>;
+  kind?: InputMaybe<GqlReportTemplateKind>;
+  includeInactive?: InputMaybe<Scalars["Boolean"]["input"]>;
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+}>;
+
+export type GqlGetReportTemplateStatsBreakdownQuery = {
+  __typename?: "Query";
+  reportTemplateStatsBreakdown: {
+    __typename?: "ReportTemplateStatsBreakdownConnection";
+    totalCount: number;
+    edges?: Array<{
+      __typename?: "ReportTemplateStatsBreakdownEdge";
+      cursor: string;
+      node?: {
+        __typename?: "ReportTemplateStatsBreakdownRow";
+        templateId: string;
+        version: number;
+        scope: GqlReportTemplateScope;
+        kind: GqlReportTemplateKind;
+        experimentKey?: string | null;
+        isActive: boolean;
+        isEnabled: boolean;
+        trafficWeight: number;
+        feedbackCount: number;
+        avgRating?: number | null;
+        avgJudgeScore?: number | null;
+        judgeHumanCorrelation?: number | null;
+        correlationWarning: boolean;
+      } | null;
+    } | null> | null;
+    pageInfo: { __typename?: "PageInfo"; hasNextPage: boolean; endCursor?: string | null };
+  };
 };
 
 export type GqlSysAdminSegmentCountsFieldsFragment = {
@@ -9373,6 +10029,36 @@ export type GqlGetVoteTopicQuery = {
   } | null;
 };
 
+export const AdminReportSummaryRowFieldsFragmentDoc = gql`
+  fragment AdminReportSummaryRowFields on AdminReportSummaryRow {
+    community {
+      id
+      name
+    }
+    lastPublishedReport {
+      id
+      variant
+      status
+      publishedAt
+    }
+    lastPublishedAt
+    daysSinceLastPublish
+    publishedCountLast90Days
+  }
+`;
+export const AdminBrowseReportFieldsFragmentDoc = gql`
+  fragment AdminBrowseReportFields on Report {
+    id
+    variant
+    status
+    publishedAt
+    createdAt
+    community {
+      id
+      name
+    }
+  }
+`;
 export const CommunityFieldsFragmentDoc = gql`
   fragment CommunityFields on Community {
     id
@@ -9395,6 +10081,134 @@ export const MembershipFieldsFragmentDoc = gql`
     role
     status
     reason
+  }
+`;
+export const ReportFeedbackFieldsFragmentDoc = gql`
+  fragment ReportFeedbackFields on ReportFeedback {
+    id
+    rating
+    comment
+    feedbackType
+    sectionKey
+    createdAt
+    user {
+      id
+      name
+    }
+  }
+`;
+export const AdminReportDetailFieldsFragmentDoc = gql`
+  fragment AdminReportDetailFields on Report {
+    id
+    variant
+    status
+    publishedAt
+    createdAt
+    updatedAt
+    periodFrom
+    periodTo
+    outputMarkdown
+    finalContent
+    skipReason
+    regenerateCount
+    community {
+      id
+      name
+    }
+    template {
+      id
+      variant
+      version
+      kind
+      experimentKey
+      trafficWeight
+    }
+    generatedByUser {
+      id
+      name
+    }
+    publishedByUser {
+      id
+      name
+    }
+    myFeedback {
+      ...ReportFeedbackFields
+    }
+  }
+  ${ReportFeedbackFieldsFragmentDoc}
+`;
+export const ReportFeedbackWithReportFieldsFragmentDoc = gql`
+  fragment ReportFeedbackWithReportFields on ReportFeedback {
+    ...ReportFeedbackFields
+    report {
+      id
+      variant
+      periodFrom
+      periodTo
+      community {
+        id
+        name
+      }
+    }
+  }
+  ${ReportFeedbackFieldsFragmentDoc}
+`;
+export const ReportTemplateFieldsFragmentDoc = gql`
+  fragment ReportTemplateFields on ReportTemplate {
+    id
+    variant
+    version
+    scope
+    kind
+    model
+    maxTokens
+    temperature
+    systemPrompt
+    userPromptTemplate
+    stopSequences
+    trafficWeight
+    isActive
+    isEnabled
+    experimentKey
+    communityContext
+    createdAt
+    updatedAt
+    community {
+      id
+      name
+    }
+    updatedByUser {
+      id
+      name
+    }
+  }
+`;
+export const ReportTemplateStatsFieldsFragmentDoc = gql`
+  fragment ReportTemplateStatsFields on ReportTemplateStats {
+    variant
+    version
+    feedbackCount
+    avgRating
+    avgJudgeScore
+    judgeHumanCorrelation
+    correlationWarning
+  }
+`;
+export const ReportTemplateStatsBreakdownRowFieldsFragmentDoc = gql`
+  fragment ReportTemplateStatsBreakdownRowFields on ReportTemplateStatsBreakdownRow {
+    templateId
+    version
+    scope
+    kind
+    experimentKey
+    isActive
+    isEnabled
+    trafficWeight
+    feedbackCount
+    avgRating
+    avgJudgeScore
+    judgeHumanCorrelation
+    correlationWarning
   }
 `;
 export const SysAdminPlatformSummaryFieldsFragmentDoc = gql`
@@ -9979,6 +10793,400 @@ export type GetCitiesSuspenseQueryHookResult = ReturnType<typeof useGetCitiesSus
 export type GetCitiesQueryResult = Apollo.QueryResult<
   GqlGetCitiesQuery,
   GqlGetCitiesQueryVariables
+>;
+export const GetAdminBrowseReportsDocument = gql`
+  query GetAdminBrowseReports(
+    $communityId: ID
+    $status: ReportStatus
+    $variant: ReportVariant
+    $publishedAfter: Datetime
+    $publishedBefore: Datetime
+    $cursor: String
+    $first: Int
+  ) {
+    adminBrowseReports(
+      communityId: $communityId
+      status: $status
+      variant: $variant
+      publishedAfter: $publishedAfter
+      publishedBefore: $publishedBefore
+      cursor: $cursor
+      first: $first
+    ) {
+      edges {
+        cursor
+        node {
+          ...AdminBrowseReportFields
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      totalCount
+    }
+  }
+  ${AdminBrowseReportFieldsFragmentDoc}
+`;
+
+/**
+ * __useGetAdminBrowseReportsQuery__
+ *
+ * To run a query within a React component, call `useGetAdminBrowseReportsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAdminBrowseReportsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAdminBrowseReportsQuery({
+ *   variables: {
+ *      communityId: // value for 'communityId'
+ *      status: // value for 'status'
+ *      variant: // value for 'variant'
+ *      publishedAfter: // value for 'publishedAfter'
+ *      publishedBefore: // value for 'publishedBefore'
+ *      cursor: // value for 'cursor'
+ *      first: // value for 'first'
+ *   },
+ * });
+ */
+export function useGetAdminBrowseReportsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GqlGetAdminBrowseReportsQuery,
+    GqlGetAdminBrowseReportsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetAdminBrowseReportsQuery, GqlGetAdminBrowseReportsQueryVariables>(
+    GetAdminBrowseReportsDocument,
+    options,
+  );
+}
+export function useGetAdminBrowseReportsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetAdminBrowseReportsQuery,
+    GqlGetAdminBrowseReportsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetAdminBrowseReportsQuery, GqlGetAdminBrowseReportsQueryVariables>(
+    GetAdminBrowseReportsDocument,
+    options,
+  );
+}
+export function useGetAdminBrowseReportsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetAdminBrowseReportsQuery,
+        GqlGetAdminBrowseReportsQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GqlGetAdminBrowseReportsQuery,
+    GqlGetAdminBrowseReportsQueryVariables
+  >(GetAdminBrowseReportsDocument, options);
+}
+export type GetAdminBrowseReportsQueryHookResult = ReturnType<typeof useGetAdminBrowseReportsQuery>;
+export type GetAdminBrowseReportsLazyQueryHookResult = ReturnType<
+  typeof useGetAdminBrowseReportsLazyQuery
+>;
+export type GetAdminBrowseReportsSuspenseQueryHookResult = ReturnType<
+  typeof useGetAdminBrowseReportsSuspenseQuery
+>;
+export type GetAdminBrowseReportsQueryResult = Apollo.QueryResult<
+  GqlGetAdminBrowseReportsQuery,
+  GqlGetAdminBrowseReportsQueryVariables
+>;
+export const GetAdminReportSummaryDocument = gql`
+  query GetAdminReportSummary($cursor: String, $first: Int) {
+    adminReportSummary(cursor: $cursor, first: $first) {
+      edges {
+        cursor
+        node {
+          ...AdminReportSummaryRowFields
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      totalCount
+    }
+  }
+  ${AdminReportSummaryRowFieldsFragmentDoc}
+`;
+
+/**
+ * __useGetAdminReportSummaryQuery__
+ *
+ * To run a query within a React component, call `useGetAdminReportSummaryQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAdminReportSummaryQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAdminReportSummaryQuery({
+ *   variables: {
+ *      cursor: // value for 'cursor'
+ *      first: // value for 'first'
+ *   },
+ * });
+ */
+export function useGetAdminReportSummaryQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GqlGetAdminReportSummaryQuery,
+    GqlGetAdminReportSummaryQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetAdminReportSummaryQuery, GqlGetAdminReportSummaryQueryVariables>(
+    GetAdminReportSummaryDocument,
+    options,
+  );
+}
+export function useGetAdminReportSummaryLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetAdminReportSummaryQuery,
+    GqlGetAdminReportSummaryQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetAdminReportSummaryQuery, GqlGetAdminReportSummaryQueryVariables>(
+    GetAdminReportSummaryDocument,
+    options,
+  );
+}
+export function useGetAdminReportSummarySuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetAdminReportSummaryQuery,
+        GqlGetAdminReportSummaryQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GqlGetAdminReportSummaryQuery,
+    GqlGetAdminReportSummaryQueryVariables
+  >(GetAdminReportSummaryDocument, options);
+}
+export type GetAdminReportSummaryQueryHookResult = ReturnType<typeof useGetAdminReportSummaryQuery>;
+export type GetAdminReportSummaryLazyQueryHookResult = ReturnType<
+  typeof useGetAdminReportSummaryLazyQuery
+>;
+export type GetAdminReportSummarySuspenseQueryHookResult = ReturnType<
+  typeof useGetAdminReportSummarySuspenseQuery
+>;
+export type GetAdminReportSummaryQueryResult = Apollo.QueryResult<
+  GqlGetAdminReportSummaryQuery,
+  GqlGetAdminReportSummaryQueryVariables
+>;
+export const GetAdminTemplateFeedbacksDocument = gql`
+  query GetAdminTemplateFeedbacks(
+    $variant: ReportVariant!
+    $version: Int
+    $kind: ReportTemplateKind
+    $feedbackType: ReportFeedbackType
+    $maxRating: Int
+    $cursor: String
+    $first: Int
+  ) {
+    adminTemplateFeedbacks(
+      variant: $variant
+      version: $version
+      kind: $kind
+      feedbackType: $feedbackType
+      maxRating: $maxRating
+      cursor: $cursor
+      first: $first
+    ) {
+      edges {
+        cursor
+        node {
+          ...ReportFeedbackWithReportFields
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      totalCount
+    }
+  }
+  ${ReportFeedbackWithReportFieldsFragmentDoc}
+`;
+
+/**
+ * __useGetAdminTemplateFeedbacksQuery__
+ *
+ * To run a query within a React component, call `useGetAdminTemplateFeedbacksQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAdminTemplateFeedbacksQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAdminTemplateFeedbacksQuery({
+ *   variables: {
+ *      variant: // value for 'variant'
+ *      version: // value for 'version'
+ *      kind: // value for 'kind'
+ *      feedbackType: // value for 'feedbackType'
+ *      maxRating: // value for 'maxRating'
+ *      cursor: // value for 'cursor'
+ *      first: // value for 'first'
+ *   },
+ * });
+ */
+export function useGetAdminTemplateFeedbacksQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GqlGetAdminTemplateFeedbacksQuery,
+    GqlGetAdminTemplateFeedbacksQueryVariables
+  > &
+    ({ variables: GqlGetAdminTemplateFeedbacksQueryVariables; skip?: boolean } | { skip: boolean }),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GqlGetAdminTemplateFeedbacksQuery,
+    GqlGetAdminTemplateFeedbacksQueryVariables
+  >(GetAdminTemplateFeedbacksDocument, options);
+}
+export function useGetAdminTemplateFeedbacksLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetAdminTemplateFeedbacksQuery,
+    GqlGetAdminTemplateFeedbacksQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GqlGetAdminTemplateFeedbacksQuery,
+    GqlGetAdminTemplateFeedbacksQueryVariables
+  >(GetAdminTemplateFeedbacksDocument, options);
+}
+export function useGetAdminTemplateFeedbacksSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetAdminTemplateFeedbacksQuery,
+        GqlGetAdminTemplateFeedbacksQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GqlGetAdminTemplateFeedbacksQuery,
+    GqlGetAdminTemplateFeedbacksQueryVariables
+  >(GetAdminTemplateFeedbacksDocument, options);
+}
+export type GetAdminTemplateFeedbacksQueryHookResult = ReturnType<
+  typeof useGetAdminTemplateFeedbacksQuery
+>;
+export type GetAdminTemplateFeedbacksLazyQueryHookResult = ReturnType<
+  typeof useGetAdminTemplateFeedbacksLazyQuery
+>;
+export type GetAdminTemplateFeedbacksSuspenseQueryHookResult = ReturnType<
+  typeof useGetAdminTemplateFeedbacksSuspenseQuery
+>;
+export type GetAdminTemplateFeedbacksQueryResult = Apollo.QueryResult<
+  GqlGetAdminTemplateFeedbacksQuery,
+  GqlGetAdminTemplateFeedbacksQueryVariables
+>;
+export const GetAdminTemplateFeedbackStatsDocument = gql`
+  query GetAdminTemplateFeedbackStats(
+    $variant: ReportVariant!
+    $version: Int
+    $kind: ReportTemplateKind
+  ) {
+    adminTemplateFeedbackStats(variant: $variant, version: $version, kind: $kind) {
+      totalCount
+      avgRating
+      ratingDistribution {
+        rating
+        count
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetAdminTemplateFeedbackStatsQuery__
+ *
+ * To run a query within a React component, call `useGetAdminTemplateFeedbackStatsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAdminTemplateFeedbackStatsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAdminTemplateFeedbackStatsQuery({
+ *   variables: {
+ *      variant: // value for 'variant'
+ *      version: // value for 'version'
+ *      kind: // value for 'kind'
+ *   },
+ * });
+ */
+export function useGetAdminTemplateFeedbackStatsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GqlGetAdminTemplateFeedbackStatsQuery,
+    GqlGetAdminTemplateFeedbackStatsQueryVariables
+  > &
+    (
+      | { variables: GqlGetAdminTemplateFeedbackStatsQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GqlGetAdminTemplateFeedbackStatsQuery,
+    GqlGetAdminTemplateFeedbackStatsQueryVariables
+  >(GetAdminTemplateFeedbackStatsDocument, options);
+}
+export function useGetAdminTemplateFeedbackStatsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetAdminTemplateFeedbackStatsQuery,
+    GqlGetAdminTemplateFeedbackStatsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GqlGetAdminTemplateFeedbackStatsQuery,
+    GqlGetAdminTemplateFeedbackStatsQueryVariables
+  >(GetAdminTemplateFeedbackStatsDocument, options);
+}
+export function useGetAdminTemplateFeedbackStatsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetAdminTemplateFeedbackStatsQuery,
+        GqlGetAdminTemplateFeedbackStatsQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GqlGetAdminTemplateFeedbackStatsQuery,
+    GqlGetAdminTemplateFeedbackStatsQueryVariables
+  >(GetAdminTemplateFeedbackStatsDocument, options);
+}
+export type GetAdminTemplateFeedbackStatsQueryHookResult = ReturnType<
+  typeof useGetAdminTemplateFeedbackStatsQuery
+>;
+export type GetAdminTemplateFeedbackStatsLazyQueryHookResult = ReturnType<
+  typeof useGetAdminTemplateFeedbackStatsLazyQuery
+>;
+export type GetAdminTemplateFeedbackStatsSuspenseQueryHookResult = ReturnType<
+  typeof useGetAdminTemplateFeedbackStatsSuspenseQuery
+>;
+export type GetAdminTemplateFeedbackStatsQueryResult = Apollo.QueryResult<
+  GqlGetAdminTemplateFeedbackStatsQuery,
+  GqlGetAdminTemplateFeedbackStatsQueryVariables
 >;
 export const CommunityCreateDocument = gql`
   mutation CommunityCreate($input: CommunityCreateInput!) {
@@ -11679,6 +12887,640 @@ export type GetNftInstanceWithDidSuspenseQueryHookResult = ReturnType<
 export type GetNftInstanceWithDidQueryResult = Apollo.QueryResult<
   GqlGetNftInstanceWithDidQuery,
   GqlGetNftInstanceWithDidQueryVariables
+>;
+export const SubmitReportFeedbackDocument = gql`
+  mutation SubmitReportFeedback(
+    $input: SubmitReportFeedbackInput!
+    $permission: CheckCommunityPermissionInput!
+  ) {
+    submitReportFeedback(input: $input, permission: $permission) {
+      ... on SubmitReportFeedbackSuccess {
+        feedback {
+          ...ReportFeedbackFields
+        }
+      }
+    }
+  }
+  ${ReportFeedbackFieldsFragmentDoc}
+`;
+export type GqlSubmitReportFeedbackMutationFn = Apollo.MutationFunction<
+  GqlSubmitReportFeedbackMutation,
+  GqlSubmitReportFeedbackMutationVariables
+>;
+
+/**
+ * __useSubmitReportFeedbackMutation__
+ *
+ * To run a mutation, you first call `useSubmitReportFeedbackMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSubmitReportFeedbackMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [submitReportFeedbackMutation, { data, loading, error }] = useSubmitReportFeedbackMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *      permission: // value for 'permission'
+ *   },
+ * });
+ */
+export function useSubmitReportFeedbackMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlSubmitReportFeedbackMutation,
+    GqlSubmitReportFeedbackMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    GqlSubmitReportFeedbackMutation,
+    GqlSubmitReportFeedbackMutationVariables
+  >(SubmitReportFeedbackDocument, options);
+}
+export type SubmitReportFeedbackMutationHookResult = ReturnType<
+  typeof useSubmitReportFeedbackMutation
+>;
+export type SubmitReportFeedbackMutationResult =
+  Apollo.MutationResult<GqlSubmitReportFeedbackMutation>;
+export type SubmitReportFeedbackMutationOptions = Apollo.BaseMutationOptions<
+  GqlSubmitReportFeedbackMutation,
+  GqlSubmitReportFeedbackMutationVariables
+>;
+export const GetAdminReportDocument = gql`
+  query GetAdminReport($id: ID!) {
+    report(id: $id) {
+      ...AdminReportDetailFields
+    }
+  }
+  ${AdminReportDetailFieldsFragmentDoc}
+`;
+
+/**
+ * __useGetAdminReportQuery__
+ *
+ * To run a query within a React component, call `useGetAdminReportQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAdminReportQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAdminReportQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetAdminReportQuery(
+  baseOptions: Apollo.QueryHookOptions<GqlGetAdminReportQuery, GqlGetAdminReportQueryVariables> &
+    ({ variables: GqlGetAdminReportQueryVariables; skip?: boolean } | { skip: boolean }),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetAdminReportQuery, GqlGetAdminReportQueryVariables>(
+    GetAdminReportDocument,
+    options,
+  );
+}
+export function useGetAdminReportLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetAdminReportQuery,
+    GqlGetAdminReportQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetAdminReportQuery, GqlGetAdminReportQueryVariables>(
+    GetAdminReportDocument,
+    options,
+  );
+}
+export function useGetAdminReportSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GqlGetAdminReportQuery, GqlGetAdminReportQueryVariables>,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetAdminReportQuery, GqlGetAdminReportQueryVariables>(
+    GetAdminReportDocument,
+    options,
+  );
+}
+export type GetAdminReportQueryHookResult = ReturnType<typeof useGetAdminReportQuery>;
+export type GetAdminReportLazyQueryHookResult = ReturnType<typeof useGetAdminReportLazyQuery>;
+export type GetAdminReportSuspenseQueryHookResult = ReturnType<
+  typeof useGetAdminReportSuspenseQuery
+>;
+export type GetAdminReportQueryResult = Apollo.QueryResult<
+  GqlGetAdminReportQuery,
+  GqlGetAdminReportQueryVariables
+>;
+export const GetAdminReportFeedbacksDocument = gql`
+  query GetAdminReportFeedbacks($id: ID!, $cursor: String, $first: Int) {
+    report(id: $id) {
+      id
+      feedbacks(after: $cursor, first: $first) {
+        edges {
+          cursor
+          node {
+            ...ReportFeedbackFields
+          }
+        }
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
+        totalCount
+      }
+    }
+  }
+  ${ReportFeedbackFieldsFragmentDoc}
+`;
+
+/**
+ * __useGetAdminReportFeedbacksQuery__
+ *
+ * To run a query within a React component, call `useGetAdminReportFeedbacksQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAdminReportFeedbacksQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAdminReportFeedbacksQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *      cursor: // value for 'cursor'
+ *      first: // value for 'first'
+ *   },
+ * });
+ */
+export function useGetAdminReportFeedbacksQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GqlGetAdminReportFeedbacksQuery,
+    GqlGetAdminReportFeedbacksQueryVariables
+  > &
+    ({ variables: GqlGetAdminReportFeedbacksQueryVariables; skip?: boolean } | { skip: boolean }),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetAdminReportFeedbacksQuery, GqlGetAdminReportFeedbacksQueryVariables>(
+    GetAdminReportFeedbacksDocument,
+    options,
+  );
+}
+export function useGetAdminReportFeedbacksLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetAdminReportFeedbacksQuery,
+    GqlGetAdminReportFeedbacksQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GqlGetAdminReportFeedbacksQuery,
+    GqlGetAdminReportFeedbacksQueryVariables
+  >(GetAdminReportFeedbacksDocument, options);
+}
+export function useGetAdminReportFeedbacksSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetAdminReportFeedbacksQuery,
+        GqlGetAdminReportFeedbacksQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GqlGetAdminReportFeedbacksQuery,
+    GqlGetAdminReportFeedbacksQueryVariables
+  >(GetAdminReportFeedbacksDocument, options);
+}
+export type GetAdminReportFeedbacksQueryHookResult = ReturnType<
+  typeof useGetAdminReportFeedbacksQuery
+>;
+export type GetAdminReportFeedbacksLazyQueryHookResult = ReturnType<
+  typeof useGetAdminReportFeedbacksLazyQuery
+>;
+export type GetAdminReportFeedbacksSuspenseQueryHookResult = ReturnType<
+  typeof useGetAdminReportFeedbacksSuspenseQuery
+>;
+export type GetAdminReportFeedbacksQueryResult = Apollo.QueryResult<
+  GqlGetAdminReportFeedbacksQuery,
+  GqlGetAdminReportFeedbacksQueryVariables
+>;
+export const UpdateReportTemplateDocument = gql`
+  mutation UpdateReportTemplate(
+    $variant: ReportVariant!
+    $input: UpdateReportTemplateInput!
+    $communityId: ID
+  ) {
+    updateReportTemplate(variant: $variant, input: $input, communityId: $communityId) {
+      ... on UpdateReportTemplateSuccess {
+        reportTemplate {
+          ...ReportTemplateFields
+        }
+      }
+    }
+  }
+  ${ReportTemplateFieldsFragmentDoc}
+`;
+export type GqlUpdateReportTemplateMutationFn = Apollo.MutationFunction<
+  GqlUpdateReportTemplateMutation,
+  GqlUpdateReportTemplateMutationVariables
+>;
+
+/**
+ * __useUpdateReportTemplateMutation__
+ *
+ * To run a mutation, you first call `useUpdateReportTemplateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateReportTemplateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateReportTemplateMutation, { data, loading, error }] = useUpdateReportTemplateMutation({
+ *   variables: {
+ *      variant: // value for 'variant'
+ *      input: // value for 'input'
+ *      communityId: // value for 'communityId'
+ *   },
+ * });
+ */
+export function useUpdateReportTemplateMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GqlUpdateReportTemplateMutation,
+    GqlUpdateReportTemplateMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    GqlUpdateReportTemplateMutation,
+    GqlUpdateReportTemplateMutationVariables
+  >(UpdateReportTemplateDocument, options);
+}
+export type UpdateReportTemplateMutationHookResult = ReturnType<
+  typeof useUpdateReportTemplateMutation
+>;
+export type UpdateReportTemplateMutationResult =
+  Apollo.MutationResult<GqlUpdateReportTemplateMutation>;
+export type UpdateReportTemplateMutationOptions = Apollo.BaseMutationOptions<
+  GqlUpdateReportTemplateMutation,
+  GqlUpdateReportTemplateMutationVariables
+>;
+export const GetReportTemplateDocument = gql`
+  query GetReportTemplate($variant: ReportVariant!, $communityId: ID) {
+    reportTemplate(variant: $variant, communityId: $communityId) {
+      ...ReportTemplateFields
+    }
+  }
+  ${ReportTemplateFieldsFragmentDoc}
+`;
+
+/**
+ * __useGetReportTemplateQuery__
+ *
+ * To run a query within a React component, call `useGetReportTemplateQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetReportTemplateQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetReportTemplateQuery({
+ *   variables: {
+ *      variant: // value for 'variant'
+ *      communityId: // value for 'communityId'
+ *   },
+ * });
+ */
+export function useGetReportTemplateQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GqlGetReportTemplateQuery,
+    GqlGetReportTemplateQueryVariables
+  > &
+    ({ variables: GqlGetReportTemplateQueryVariables; skip?: boolean } | { skip: boolean }),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetReportTemplateQuery, GqlGetReportTemplateQueryVariables>(
+    GetReportTemplateDocument,
+    options,
+  );
+}
+export function useGetReportTemplateLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetReportTemplateQuery,
+    GqlGetReportTemplateQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetReportTemplateQuery, GqlGetReportTemplateQueryVariables>(
+    GetReportTemplateDocument,
+    options,
+  );
+}
+export function useGetReportTemplateSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetReportTemplateQuery,
+        GqlGetReportTemplateQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetReportTemplateQuery, GqlGetReportTemplateQueryVariables>(
+    GetReportTemplateDocument,
+    options,
+  );
+}
+export type GetReportTemplateQueryHookResult = ReturnType<typeof useGetReportTemplateQuery>;
+export type GetReportTemplateLazyQueryHookResult = ReturnType<typeof useGetReportTemplateLazyQuery>;
+export type GetReportTemplateSuspenseQueryHookResult = ReturnType<
+  typeof useGetReportTemplateSuspenseQuery
+>;
+export type GetReportTemplateQueryResult = Apollo.QueryResult<
+  GqlGetReportTemplateQuery,
+  GqlGetReportTemplateQueryVariables
+>;
+export const GetReportTemplateStatsDocument = gql`
+  query GetReportTemplateStats($variant: ReportVariant!, $version: Int) {
+    reportTemplateStats(variant: $variant, version: $version) {
+      ...ReportTemplateStatsFields
+    }
+  }
+  ${ReportTemplateStatsFieldsFragmentDoc}
+`;
+
+/**
+ * __useGetReportTemplateStatsQuery__
+ *
+ * To run a query within a React component, call `useGetReportTemplateStatsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetReportTemplateStatsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetReportTemplateStatsQuery({
+ *   variables: {
+ *      variant: // value for 'variant'
+ *      version: // value for 'version'
+ *   },
+ * });
+ */
+export function useGetReportTemplateStatsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GqlGetReportTemplateStatsQuery,
+    GqlGetReportTemplateStatsQueryVariables
+  > &
+    ({ variables: GqlGetReportTemplateStatsQueryVariables; skip?: boolean } | { skip: boolean }),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetReportTemplateStatsQuery, GqlGetReportTemplateStatsQueryVariables>(
+    GetReportTemplateStatsDocument,
+    options,
+  );
+}
+export function useGetReportTemplateStatsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetReportTemplateStatsQuery,
+    GqlGetReportTemplateStatsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GqlGetReportTemplateStatsQuery,
+    GqlGetReportTemplateStatsQueryVariables
+  >(GetReportTemplateStatsDocument, options);
+}
+export function useGetReportTemplateStatsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetReportTemplateStatsQuery,
+        GqlGetReportTemplateStatsQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GqlGetReportTemplateStatsQuery,
+    GqlGetReportTemplateStatsQueryVariables
+  >(GetReportTemplateStatsDocument, options);
+}
+export type GetReportTemplateStatsQueryHookResult = ReturnType<
+  typeof useGetReportTemplateStatsQuery
+>;
+export type GetReportTemplateStatsLazyQueryHookResult = ReturnType<
+  typeof useGetReportTemplateStatsLazyQuery
+>;
+export type GetReportTemplateStatsSuspenseQueryHookResult = ReturnType<
+  typeof useGetReportTemplateStatsSuspenseQuery
+>;
+export type GetReportTemplateStatsQueryResult = Apollo.QueryResult<
+  GqlGetReportTemplateStatsQuery,
+  GqlGetReportTemplateStatsQueryVariables
+>;
+export const GetReportTemplatesDocument = gql`
+  query GetReportTemplates(
+    $variant: ReportVariant!
+    $communityId: ID
+    $kind: ReportTemplateKind
+    $includeInactive: Boolean
+  ) {
+    reportTemplates(
+      variant: $variant
+      communityId: $communityId
+      kind: $kind
+      includeInactive: $includeInactive
+    ) {
+      ...ReportTemplateFields
+    }
+  }
+  ${ReportTemplateFieldsFragmentDoc}
+`;
+
+/**
+ * __useGetReportTemplatesQuery__
+ *
+ * To run a query within a React component, call `useGetReportTemplatesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetReportTemplatesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetReportTemplatesQuery({
+ *   variables: {
+ *      variant: // value for 'variant'
+ *      communityId: // value for 'communityId'
+ *      kind: // value for 'kind'
+ *      includeInactive: // value for 'includeInactive'
+ *   },
+ * });
+ */
+export function useGetReportTemplatesQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GqlGetReportTemplatesQuery,
+    GqlGetReportTemplatesQueryVariables
+  > &
+    ({ variables: GqlGetReportTemplatesQueryVariables; skip?: boolean } | { skip: boolean }),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetReportTemplatesQuery, GqlGetReportTemplatesQueryVariables>(
+    GetReportTemplatesDocument,
+    options,
+  );
+}
+export function useGetReportTemplatesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetReportTemplatesQuery,
+    GqlGetReportTemplatesQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetReportTemplatesQuery, GqlGetReportTemplatesQueryVariables>(
+    GetReportTemplatesDocument,
+    options,
+  );
+}
+export function useGetReportTemplatesSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetReportTemplatesQuery,
+        GqlGetReportTemplatesQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GqlGetReportTemplatesQuery, GqlGetReportTemplatesQueryVariables>(
+    GetReportTemplatesDocument,
+    options,
+  );
+}
+export type GetReportTemplatesQueryHookResult = ReturnType<typeof useGetReportTemplatesQuery>;
+export type GetReportTemplatesLazyQueryHookResult = ReturnType<
+  typeof useGetReportTemplatesLazyQuery
+>;
+export type GetReportTemplatesSuspenseQueryHookResult = ReturnType<
+  typeof useGetReportTemplatesSuspenseQuery
+>;
+export type GetReportTemplatesQueryResult = Apollo.QueryResult<
+  GqlGetReportTemplatesQuery,
+  GqlGetReportTemplatesQueryVariables
+>;
+export const GetReportTemplateStatsBreakdownDocument = gql`
+  query GetReportTemplateStatsBreakdown(
+    $variant: ReportVariant!
+    $version: Int
+    $kind: ReportTemplateKind
+    $includeInactive: Boolean
+    $cursor: String
+    $first: Int
+  ) {
+    reportTemplateStatsBreakdown(
+      variant: $variant
+      version: $version
+      kind: $kind
+      includeInactive: $includeInactive
+      cursor: $cursor
+      first: $first
+    ) {
+      edges {
+        cursor
+        node {
+          ...ReportTemplateStatsBreakdownRowFields
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      totalCount
+    }
+  }
+  ${ReportTemplateStatsBreakdownRowFieldsFragmentDoc}
+`;
+
+/**
+ * __useGetReportTemplateStatsBreakdownQuery__
+ *
+ * To run a query within a React component, call `useGetReportTemplateStatsBreakdownQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetReportTemplateStatsBreakdownQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetReportTemplateStatsBreakdownQuery({
+ *   variables: {
+ *      variant: // value for 'variant'
+ *      version: // value for 'version'
+ *      kind: // value for 'kind'
+ *      includeInactive: // value for 'includeInactive'
+ *      cursor: // value for 'cursor'
+ *      first: // value for 'first'
+ *   },
+ * });
+ */
+export function useGetReportTemplateStatsBreakdownQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GqlGetReportTemplateStatsBreakdownQuery,
+    GqlGetReportTemplateStatsBreakdownQueryVariables
+  > &
+    (
+      | { variables: GqlGetReportTemplateStatsBreakdownQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GqlGetReportTemplateStatsBreakdownQuery,
+    GqlGetReportTemplateStatsBreakdownQueryVariables
+  >(GetReportTemplateStatsBreakdownDocument, options);
+}
+export function useGetReportTemplateStatsBreakdownLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetReportTemplateStatsBreakdownQuery,
+    GqlGetReportTemplateStatsBreakdownQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GqlGetReportTemplateStatsBreakdownQuery,
+    GqlGetReportTemplateStatsBreakdownQueryVariables
+  >(GetReportTemplateStatsBreakdownDocument, options);
+}
+export function useGetReportTemplateStatsBreakdownSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetReportTemplateStatsBreakdownQuery,
+        GqlGetReportTemplateStatsBreakdownQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GqlGetReportTemplateStatsBreakdownQuery,
+    GqlGetReportTemplateStatsBreakdownQueryVariables
+  >(GetReportTemplateStatsBreakdownDocument, options);
+}
+export type GetReportTemplateStatsBreakdownQueryHookResult = ReturnType<
+  typeof useGetReportTemplateStatsBreakdownQuery
+>;
+export type GetReportTemplateStatsBreakdownLazyQueryHookResult = ReturnType<
+  typeof useGetReportTemplateStatsBreakdownLazyQuery
+>;
+export type GetReportTemplateStatsBreakdownSuspenseQueryHookResult = ReturnType<
+  typeof useGetReportTemplateStatsBreakdownSuspenseQuery
+>;
+export type GetReportTemplateStatsBreakdownQueryResult = Apollo.QueryResult<
+  GqlGetReportTemplateStatsBreakdownQuery,
+  GqlGetReportTemplateStatsBreakdownQueryVariables
 >;
 export const GetSysAdminDashboardDocument = gql`
   query GetSysAdminDashboard($input: SysAdminDashboardInput) {

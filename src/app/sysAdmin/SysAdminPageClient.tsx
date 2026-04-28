@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { Plus } from "lucide-react";
+import { Plus, Settings } from "lucide-react";
 import { useAppRouter } from "@/lib/navigation";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { Button } from "@/components/ui/button";
@@ -39,15 +39,26 @@ export function SysAdminPageClient({ initialData }: Props) {
         <h2 className="text-body-sm text-muted-foreground pl-4">
           コミュニティ一覧
         </h2>
-        <Button
-          onClick={() => router.push("/sysAdmin/create")}
-          variant="primary"
-          size="sm"
-          className="gap-1"
-        >
-          <Plus className="h-4 w-4" />
-          作成
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={() => router.push("/sysAdmin/system/templates")}
+            variant="tertiary"
+            size="sm"
+            className="gap-1"
+          >
+            <Settings className="h-4 w-4" />
+            設定
+          </Button>
+          <Button
+            onClick={() => router.push("/sysAdmin/create")}
+            variant="primary"
+            size="sm"
+            className="gap-1"
+          >
+            <Plus className="h-4 w-4" />
+            作成
+          </Button>
+        </div>
       </div>
 
       {loading && communities.length === 0 ? (
@@ -76,4 +87,3 @@ export function SysAdminPageClient({ initialData }: Props) {
     </div>
   );
 }
-
