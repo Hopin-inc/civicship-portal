@@ -4,6 +4,7 @@ import type {
   GqlReportTemplateFieldsFragment,
   GqlReportTemplateStatsBreakdownRowFieldsFragment,
 } from "@/types/graphql";
+import { makeMockFeedbacks } from "../../feedback/fixtures";
 import { JudgeTemplateView } from "./JudgeTemplateView";
 
 type Props = {
@@ -20,6 +21,9 @@ export function JudgeTemplateContainer({
   initialBreakdownRows,
   initialJudgeTemplate,
 }: Props) {
+  // Phase 1.5 の `adminTemplateFeedbacks` query 待ち。それまで mock data を流す。
+  const mockFeedbacks = makeMockFeedbacks(6);
+
   return (
     <JudgeTemplateView
       rows={initialBreakdownRows}
@@ -28,6 +32,8 @@ export function JudgeTemplateContainer({
       template={initialJudgeTemplate}
       templateLoading={false}
       templateError={null}
+      feedbacks={mockFeedbacks}
+      feedbackTotalCount={mockFeedbacks.length}
     />
   );
 }

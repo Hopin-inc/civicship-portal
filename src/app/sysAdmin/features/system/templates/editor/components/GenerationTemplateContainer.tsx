@@ -8,6 +8,7 @@ import {
   type GqlReportTemplateStatsBreakdownRowFieldsFragment,
   type GqlReportVariant,
 } from "@/types/graphql";
+import { makeMockFeedbacks } from "../../feedback/fixtures";
 import { GenerationTemplateView } from "./GenerationTemplateView";
 
 type Props = {
@@ -75,6 +76,10 @@ export function GenerationTemplateContainer({
     (systemPrompt !== initialTemplate.systemPrompt ||
       userPromptTemplate !== initialTemplate.userPromptTemplate);
 
+  // Phase 1.5 の `adminTemplateFeedbacks` query 待ち。それまで mock data を流す。
+  // backend landing 後は SSR fetch に置換 (page.tsx 側で fetch して props 経由で渡す)。
+  const mockFeedbacks = makeMockFeedbacks(8);
+
   return (
     <GenerationTemplateView
       rows={initialBreakdownRows}
@@ -91,6 +96,8 @@ export function GenerationTemplateContainer({
       setSystemPrompt={setSystemPrompt}
       setUserPromptTemplate={setUserPromptTemplate}
       onSave={handleSave}
+      feedbacks={mockFeedbacks}
+      feedbackTotalCount={mockFeedbacks.length}
     />
   );
 }

@@ -6,13 +6,20 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import type {
   GqlReportTemplateFieldsFragment,
   GqlReportTemplateStatsBreakdownRowFieldsFragment,
 } from "@/types/graphql";
-import { StatsSection } from "./StatsSection";
 import { ExperimentSection } from "./ExperimentSection";
 import { VersionSelector } from "./VersionSelector";
+import { FeedbackList } from "../../feedback/components/FeedbackList";
+import type { FeedbackItem } from "../../feedback/fixtures";
 
 export type JudgeTemplateViewProps = {
   rows: GqlReportTemplateStatsBreakdownRowFieldsFragment[];
@@ -22,17 +29,20 @@ export type JudgeTemplateViewProps = {
   template: GqlReportTemplateFieldsFragment | null;
   templateLoading: boolean;
   templateError: unknown;
+
+  feedbacks: FeedbackItem[];
+  feedbackTotalCount?: number;
 };
 
 /**
- * JUDGE template の閲覧専用 view (presentational only)。
+ * JUDGE template の閲覧専用 view。
  *
- * - StatsSection / VersionSelector / ExperimentSection は GENERATION と同じ。
- * - prompt は read-only な textarea で表示する。
- * - 「JUDGE prompt の編集は seed 投入で運用」警告を常時表示。
- *
- * 将来 backend が `updateReportTemplate` の kind 引数に対応したら、
- * `JudgeWarningModal` を save flow に組み込んで編集可能化する。
+ * GENERATION と構造を揃える: inline header → prompt (read-only) →
+ * フィードバック → 折りたたみ「履歴・A/B」。
+ * JUDGE は内部評価用の prompt なので、admin UI から編集すると過去の
+ * judgeScore との比較が断絶する。本 view は閲覧のみで、警告バナーを
+ * 常時表示する。将来 backend が JUDGE 対応 mutation を追加したら、
+ * `JudgeWarningModal` を save 前に挟んで編集可能化する。
  */
 export function JudgeTemplateView({
   rows,
@@ -41,6 +51,8 @@ export function JudgeTemplateView({
   template,
   templateLoading,
   templateError,
+  feedbacks,
+  feedbackTotalCount,
 }: JudgeTemplateViewProps) {
   const versions = useMemo(
     () =>
@@ -59,8 +71,12 @@ export function JudgeTemplateView({
   const isInitialLoading =
     (breakdownLoading && rows.length === 0) || (templateLoading && !template);
 
+  if (isInitialLoading) {
+    return <LoadingIndicator fullScreen={false} />;
+  }
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div className="flex items-start gap-2 rounded border border-destructive/40 bg-destructive/5 p-3">
         <AlertTriangle className="h-4 w-4 shrink-0 text-destructive mt-0.5" />
         <div className="space-y-1 text-body-sm">
@@ -71,74 +87,98 @@ export function JudgeTemplateView({
         </div>
       </div>
 
-      {isInitialLoading ? (
-        <LoadingIndicator fullScreen={false} />
-      ) : breakdownError ? (
+      <InlineHeader rows={rows} template={template} />
+
+      {breakdownError ? (
         <ErrorState title="JUDGE 評価指標の取得に失敗しました" />
+      ) : templateError ? (
+        <ErrorState title="JUDGE template の取得に失敗しました" />
+      ) : !template ? (
+        <p className="text-body-sm text-muted-foreground">
+          この variant の JUDGE template は登録されていません
+        </p>
       ) : (
-        <>
-          <StatsSection rows={filteredRows} />
-          <VersionSelector
-            versions={versions}
-            selected={selectedVersion}
-            onSelect={setSelectedVersion}
-          />
-          <ExperimentSection rows={filteredRows} />
-
-          <hr className="border-muted" />
-
-          <h3 className="text-body-sm font-semibold">prompt (read-only / 現行 active 行)</h3>
-          {templateError ? (
-            <ErrorState title="JUDGE template の取得に失敗しました" />
-          ) : !template ? (
-            <p className="text-body-sm text-muted-foreground">
-              この variant の JUDGE template は登録されていません
-            </p>
-          ) : (
-            <div className="space-y-6">
-              <section className="space-y-2">
-                <h4 className="text-body-sm font-semibold">設定</h4>
-                <dl className="grid grid-cols-[120px_1fr] gap-y-1 text-body-sm">
-                  <dt className="text-muted-foreground">version</dt>
-                  <dd>v{template.version}</dd>
-                  <dt className="text-muted-foreground">model</dt>
-                  <dd className="font-mono text-body-xs">{template.model}</dd>
-                  <dt className="text-muted-foreground">maxTokens</dt>
-                  <dd>{template.maxTokens}</dd>
-                  {template.temperature != null && (
-                    <>
-                      <dt className="text-muted-foreground">temperature</dt>
-                      <dd>{template.temperature}</dd>
-                    </>
-                  )}
-                </dl>
-              </section>
-              <section className="space-y-2">
-                <Label htmlFor="judgeSystemPrompt" className="text-body-sm font-semibold">
-                  system prompt
-                </Label>
-                <Textarea
-                  id="judgeSystemPrompt"
-                  value={template.systemPrompt}
-                  readOnly
-                  className="min-h-[200px] font-mono text-body-xs"
-                />
-              </section>
-              <section className="space-y-2">
-                <Label htmlFor="judgeUserPrompt" className="text-body-sm font-semibold">
-                  user prompt template
-                </Label>
-                <Textarea
-                  id="judgeUserPrompt"
-                  value={template.userPromptTemplate}
-                  readOnly
-                  className="min-h-[200px] font-mono text-body-xs"
-                />
-              </section>
-            </div>
-          )}
-        </>
+        <div className="space-y-4">
+          <section className="space-y-2">
+            <Label htmlFor="judgeSystemPrompt" className="text-body-sm font-semibold">
+              system prompt
+            </Label>
+            <Textarea
+              id="judgeSystemPrompt"
+              value={template.systemPrompt}
+              readOnly
+              className="min-h-[240px] font-mono text-body-xs"
+            />
+          </section>
+          <section className="space-y-2">
+            <Label htmlFor="judgeUserPrompt" className="text-body-sm font-semibold">
+              user prompt template
+            </Label>
+            <Textarea
+              id="judgeUserPrompt"
+              value={template.userPromptTemplate}
+              readOnly
+              className="min-h-[240px] font-mono text-body-xs"
+            />
+          </section>
+        </div>
       )}
+
+      <FeedbackList feedbacks={feedbacks} totalCount={feedbackTotalCount} />
+
+      <Accordion type="single" collapsible>
+        <AccordionItem value="history" className="border-none">
+          <AccordionTrigger className="text-body-sm font-semibold">
+            履歴・A/B 比較
+          </AccordionTrigger>
+          <AccordionContent className="space-y-4">
+            <VersionSelector
+              versions={versions}
+              selected={selectedVersion}
+              onSelect={setSelectedVersion}
+            />
+            <ExperimentSection rows={filteredRows} />
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+    </div>
+  );
+}
+
+function InlineHeader({
+  rows,
+  template,
+}: {
+  rows: GqlReportTemplateStatsBreakdownRowFieldsFragment[];
+  template: GqlReportTemplateFieldsFragment | null;
+}) {
+  const activeRows = rows.filter((r) => r.isActive && r.isEnabled);
+  const totalFeedback = activeRows.reduce((s, r) => s + r.feedbackCount, 0);
+  const rated = activeRows.filter((r) => r.avgRating != null);
+  const ratedFeedback = rated.reduce((s, r) => s + r.feedbackCount, 0);
+  const avgRating =
+    ratedFeedback > 0
+      ? rated.reduce((s, r) => s + (r.avgRating ?? 0) * r.feedbackCount, 0) /
+        ratedFeedback
+      : null;
+
+  const segments: string[] = [];
+  if (template) {
+    segments.push(`v${template.version}`);
+    if (template.experimentKey) segments.push(template.experimentKey);
+  }
+  segments.push(
+    `評価 ${avgRating != null ? avgRating.toFixed(2) : "—"} (${totalFeedback})`,
+  );
+
+  return (
+    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-body-sm tabular-nums text-muted-foreground">
+      {segments.map((s, i) => (
+        <span key={i} className="inline-flex items-center gap-1">
+          {i > 0 && <span className="text-muted">·</span>}
+          <span>{s}</span>
+        </span>
+      ))}
     </div>
   );
 }

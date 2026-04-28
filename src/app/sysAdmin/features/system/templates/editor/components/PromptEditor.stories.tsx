@@ -37,7 +37,6 @@ function StatefulEditor({
     userPromptTemplate !== template.userPromptTemplate;
   return (
     <PromptEditor
-      template={template}
       systemPrompt={systemPrompt}
       setSystemPrompt={setSystemPrompt}
       userPromptTemplate={userPromptTemplate}
@@ -70,7 +69,6 @@ export const Dirty: Story = {
 
 export const Saving: Story = {
   args: {
-    template,
     systemPrompt: template.systemPrompt + "\n\n# 編集中",
     setSystemPrompt: () => undefined,
     userPromptTemplate: template.userPromptTemplate,
@@ -84,7 +82,6 @@ export const Saving: Story = {
 
 export const SaveError: Story = {
   args: {
-    template,
     systemPrompt: template.systemPrompt + "\n\n# 編集中",
     setSystemPrompt: () => undefined,
     userPromptTemplate: template.userPromptTemplate,

@@ -3,10 +3,8 @@
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { GqlReportTemplateFieldsFragment } from "@/types/graphql";
 
 type Props = {
-  template: GqlReportTemplateFieldsFragment;
   systemPrompt: string;
   setSystemPrompt: (v: string) => void;
   userPromptTemplate: string;
@@ -17,8 +15,13 @@ type Props = {
   saveError?: { message: string } | null;
 };
 
+/**
+ * Prompt 編集の主役 UI。
+ * version / model / experimentKey 等のメタデータは ExperimentSection
+ * の table と重複するため、ここでは表示しない (= 親 View が inline 1 行
+ * のヘッダで集約表示する)。
+ */
 export function PromptEditor({
-  template,
   systemPrompt,
   setSystemPrompt,
   userPromptTemplate,
@@ -29,33 +32,7 @@ export function PromptEditor({
   saveError,
 }: Props) {
   return (
-    <div className="space-y-6">
-      <section className="space-y-2">
-        <h3 className="text-body-sm font-semibold">設定</h3>
-        <dl className="grid grid-cols-[120px_1fr] gap-y-1 text-body-sm">
-          <dt className="text-muted-foreground">version</dt>
-          <dd>v{template.version}</dd>
-          <dt className="text-muted-foreground">scope</dt>
-          <dd>{template.scope}</dd>
-          <dt className="text-muted-foreground">model</dt>
-          <dd className="font-mono text-body-xs">{template.model}</dd>
-          <dt className="text-muted-foreground">maxTokens</dt>
-          <dd>{template.maxTokens}</dd>
-          {template.temperature != null && (
-            <>
-              <dt className="text-muted-foreground">temperature</dt>
-              <dd>{template.temperature}</dd>
-            </>
-          )}
-          <dt className="text-muted-foreground">trafficWeight</dt>
-          <dd>{template.trafficWeight}%</dd>
-          <dt className="text-muted-foreground">isActive / isEnabled</dt>
-          <dd>
-            {template.isActive ? "✓" : "−"} / {template.isEnabled ? "✓" : "−"}
-          </dd>
-        </dl>
-      </section>
-
+    <div className="space-y-4">
       <section className="space-y-2">
         <Label htmlFor="systemPrompt" className="text-body-sm font-semibold">
           system prompt
@@ -64,7 +41,7 @@ export function PromptEditor({
           id="systemPrompt"
           value={systemPrompt}
           onChange={(e) => setSystemPrompt(e.target.value)}
-          className="min-h-[200px] font-mono text-body-xs"
+          className="min-h-[240px] font-mono text-body-xs"
           disabled={saving}
         />
       </section>
@@ -77,7 +54,7 @@ export function PromptEditor({
           id="userPromptTemplate"
           value={userPromptTemplate}
           onChange={(e) => setUserPromptTemplate(e.target.value)}
-          className="min-h-[200px] font-mono text-body-xs"
+          className="min-h-[240px] font-mono text-body-xs"
           disabled={saving}
         />
       </section>
