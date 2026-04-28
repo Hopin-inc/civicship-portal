@@ -44,6 +44,7 @@ export type GenerationTemplateViewProps = {
   feedbackTotalCount?: number;
   feedbacksHasNextPage?: boolean;
   feedbacksLoadingMore?: boolean;
+  feedbacksError?: unknown;
   onLoadMoreFeedbacks?: () => void;
   /**
    * `adminTemplateFeedbackStats` の SSR 結果。null = 取得失敗 / 未認証。
@@ -75,6 +76,7 @@ export function GenerationTemplateView({
   feedbackTotalCount,
   feedbacksHasNextPage,
   feedbacksLoadingMore,
+  feedbacksError,
   onLoadMoreFeedbacks,
   feedbackStats,
 }: GenerationTemplateViewProps) {
@@ -141,6 +143,7 @@ export function GenerationTemplateView({
                 hasNextPage: feedbacksHasNextPage ?? false,
                 loadingMore: feedbacksLoadingMore ?? false,
                 onLoadMore: onLoadMoreFeedbacks,
+                error: feedbacksError,
               }
             : undefined
         }

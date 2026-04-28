@@ -36,19 +36,11 @@ export default async function SysAdminReportDetailPage({ params }: PageProps) {
 
   const body = report.finalContent ?? report.outputMarkdown ?? null;
 
-  const feedbacks =
-    feedbacksConnection?.edges
-      ?.map((e) => e?.node)
-      .filter((n): n is NonNullable<typeof n> => n != null) ?? [];
-  const feedbacksTotalCount =
-    feedbacksConnection?.totalCount ?? feedbacks.length;
-
   return (
     <SysAdminReportDetailPageClient
       report={report}
       body={body}
-      feedbacks={feedbacks}
-      feedbacksTotalCount={feedbacksTotalCount}
+      initialFeedbacksConnection={feedbacksConnection ?? null}
     />
   );
 }

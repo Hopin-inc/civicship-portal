@@ -26,6 +26,12 @@ type Props<T extends GqlReportFeedbackFieldsFragment> = {
     hasNextPage: boolean;
     loadingMore: boolean;
     onLoadMore: () => void;
+    /**
+     * 直近の loadMore で発生したエラー。null/undefined ならエラー無し。
+     * 既にデータがある状態での pagination 失敗をユーザーに知らせるための
+     * inline メッセージ用 (`CommunityReportsTab` と同じパターン)。
+     */
+    error?: unknown;
   };
 };
 
@@ -89,6 +95,12 @@ export function FeedbackList<T extends GqlReportFeedbackFieldsFragment>({
             {pagination.loadingMore ? "読み込み中..." : "もっと見る"}
           </Button>
         </div>
+      )}
+
+      {pagination?.error != null && (
+        <p className="text-center text-body-sm text-destructive">
+          追加読み込みに失敗しました
+        </p>
       )}
     </section>
   );

@@ -1,6 +1,7 @@
 import {
   GqlReportFeedbackType,
   GqlReportStatus,
+  GqlReportTemplateKind,
   GqlReportTemplateScope,
   GqlReportVariant,
 } from "@/types/graphql";
@@ -52,8 +53,16 @@ export function feedbackTypeLabel(type: GqlReportFeedbackType): string {
   return FEEDBACK_TYPE_LABELS[type] ?? type;
 }
 
-// TODO: backend PR landing 後、ReportTemplateKind 用 label を追加
-// export const KIND_LABELS: Record<GqlReportTemplateKind, string> = {
-//   GENERATION: "運営向け生成",
-//   JUDGE: "品質評価",
-// };
+/**
+ * テンプレートの種別 (生成用 / 評価用) の日本語表示名。
+ * 文字列は既存タブ文言 ("生成用" / "評価用") に揃える (UI 文言を変えずに
+ * enum→ラベル関数化のみ行う方針)。
+ */
+export const KIND_LABELS: Record<GqlReportTemplateKind, string> = {
+  [GqlReportTemplateKind.Generation]: "生成用",
+  [GqlReportTemplateKind.Judge]: "評価用",
+};
+
+export function kindLabel(kind: GqlReportTemplateKind): string {
+  return KIND_LABELS[kind] ?? kind;
+}

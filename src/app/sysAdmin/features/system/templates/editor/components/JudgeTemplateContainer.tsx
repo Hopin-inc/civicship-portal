@@ -13,6 +13,7 @@ import {
 } from "@/types/graphql";
 import { GET_ADMIN_TEMPLATE_FEEDBACKS } from "@/graphql/account/adminTemplateFeedbacks/query";
 import { useCursorPagination } from "@/app/sysAdmin/_shared/hooks/useCursorPagination";
+import { createEmptyConnection } from "@/app/sysAdmin/_shared/pagination/emptyConnection";
 import { JudgeTemplateView } from "./JudgeTemplateView";
 
 type FeedbacksConnection = NonNullable<
@@ -31,16 +32,9 @@ type Props = {
 
 const PAGE_SIZE = 20;
 
-const EMPTY_CONNECTION: FeedbacksConnection = {
-  __typename: "ReportFeedbacksConnection",
-  edges: [],
-  pageInfo: {
-    __typename: "PageInfo",
-    hasNextPage: false,
-    endCursor: null,
-  },
-  totalCount: 0,
-};
+const EMPTY_CONNECTION = createEmptyConnection(
+  "ReportFeedbacksConnection",
+) as FeedbacksConnection;
 
 /**
  * `JudgeTemplateView` (presentational) と SSR initial data + feedback
@@ -83,6 +77,7 @@ export function JudgeTemplateContainer({
     totalCount: feedbackTotalCount,
     hasNextPage: feedbacksHasNextPage,
     loading: feedbacksLoadingMore,
+    error: feedbacksError,
     loadMore: loadMoreFeedbacks,
   } = useCursorPagination({
     initial: initialFeedbacks ?? EMPTY_CONNECTION,
@@ -107,6 +102,7 @@ export function JudgeTemplateContainer({
       feedbackTotalCount={feedbackTotalCount}
       feedbacksHasNextPage={feedbacksHasNextPage}
       feedbacksLoadingMore={feedbacksLoadingMore}
+      feedbacksError={feedbacksError}
       onLoadMoreFeedbacks={handleLoadMoreFeedbacks}
       feedbackStats={initialStats}
     />

@@ -3,14 +3,18 @@
 import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type {
-  GqlGetAdminTemplateFeedbackStatsQuery,
-  GqlGetAdminTemplateFeedbacksQuery,
-  GqlReportTemplateFieldsFragment,
-  GqlReportTemplateStatsBreakdownRowFieldsFragment,
-  GqlReportVariant,
+import {
+  GqlReportTemplateKind,
+  type GqlGetAdminTemplateFeedbackStatsQuery,
+  type GqlGetAdminTemplateFeedbacksQuery,
+  type GqlReportTemplateFieldsFragment,
+  type GqlReportTemplateStatsBreakdownRowFieldsFragment,
+  type GqlReportVariant,
 } from "@/types/graphql";
-import { variantLabel } from "@/app/sysAdmin/features/system/templates/shared/labels";
+import {
+  kindLabel,
+  variantLabel,
+} from "@/app/sysAdmin/features/system/templates/shared/labels";
 import { GenerationTemplateContainer } from "@/app/sysAdmin/features/system/templates/editor/components/GenerationTemplateContainer";
 import { JudgeTemplateContainer } from "@/app/sysAdmin/features/system/templates/editor/components/JudgeTemplateContainer";
 
@@ -61,8 +65,12 @@ export function SysAdminTemplateDetailPageClient({
     <div className="max-w-xl mx-auto mt-8 px-4">
       <Tabs defaultValue="generation" className="w-full">
         <TabsList className="grid w-full grid-cols-2 mb-6">
-          <TabsTrigger value="generation">生成用</TabsTrigger>
-          <TabsTrigger value="judge">評価用</TabsTrigger>
+          <TabsTrigger value="generation">
+            {kindLabel(GqlReportTemplateKind.Generation)}
+          </TabsTrigger>
+          <TabsTrigger value="judge">
+            {kindLabel(GqlReportTemplateKind.Judge)}
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="generation">
           <GenerationTemplateContainer

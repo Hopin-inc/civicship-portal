@@ -2,26 +2,43 @@
 
 import { useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useApolloClient } from "@apollo/client";
 import {
   useSubmitReportFeedbackMutation,
+  type GqlGetAdminReportFeedbacksQuery,
+  type GqlGetAdminReportFeedbacksQueryVariables,
   type GqlGetAdminReportQuery,
-  type GqlReportFeedbackFieldsFragment,
 } from "@/types/graphql";
+import { GET_ADMIN_REPORT_FEEDBACKS } from "@/graphql/account/report/query";
+import { useCursorPagination } from "@/app/sysAdmin/_shared/hooks/useCursorPagination";
+import { createEmptyConnection } from "@/app/sysAdmin/_shared/pagination/emptyConnection";
 import { ReportDetailView } from "./ReportDetailView";
 import type { FeedbackFormInput } from "./ReportFeedbackForm";
 
 type Report = NonNullable<GqlGetAdminReportQuery["report"]>;
+type FeedbacksConnection = NonNullable<
+  NonNullable<GqlGetAdminReportFeedbacksQuery["report"]>["feedbacks"]
+>;
 
 type Props = {
   report: Report;
   body: string | null;
-  feedbacks: GqlReportFeedbackFieldsFragment[];
-  feedbacksTotalCount: number;
+  initialFeedbacksConnection: FeedbacksConnection | null;
 };
+
+const PAGE_SIZE = 20;
+
+const EMPTY_CONNECTION = createEmptyConnection(
+  "ReportFeedbacksConnection",
+) as FeedbacksConnection;
 
 /**
  * `ReportDetailView` (presentational) と submitReportFeedback mutation を
  * 結ぶ container。
+ *
+ * フィードバック一覧は SSR 1 ページ目を `initialFeedbacksConnection` として
+ * 受け取り、`useCursorPagination` で「もっと見る」を担当する
+ * (テンプレート詳細の `GenerationTemplateContainer` と同じパターン)。
  *
  * 投稿成功後は `router.refresh()` で SSR を再走させ、`myFeedback` と
  * `feedbacks` connection を最新化する。Apollo cache を直接書き換える形に
@@ -32,10 +49,11 @@ type Props = {
 export function ReportDetailContainer({
   report,
   body,
-  feedbacks,
-  feedbacksTotalCount,
+  initialFeedbacksConnection,
 }: Props) {
   const router = useRouter();
+  const apollo = useApolloClient();
+
   const [submit, { loading: saving, error: saveError }] =
     useSubmitReportFeedbackMutation();
 
@@ -69,12 +87,49 @@ export function ReportDetailContainer({
     [handleSubmit],
   );
 
+  const fetchMoreFeedbacks = useCallback(
+    async (cursor: string, first: number) => {
+      const result = await apollo.query<
+        GqlGetAdminReportFeedbacksQuery,
+        GqlGetAdminReportFeedbacksQueryVariables
+      >({
+        query: GET_ADMIN_REPORT_FEEDBACKS,
+        variables: { id: report.id, cursor, first },
+        fetchPolicy: "network-only",
+      });
+      return result.data.report?.feedbacks ?? EMPTY_CONNECTION;
+    },
+    [apollo, report.id],
+  );
+
+  const {
+    items: feedbacks,
+    totalCount: feedbacksTotalCount,
+    hasNextPage: feedbacksHasNextPage,
+    loading: feedbacksLoadingMore,
+    error: feedbacksError,
+    loadMore: loadMoreFeedbacks,
+  } = useCursorPagination({
+    initial: initialFeedbacksConnection ?? EMPTY_CONNECTION,
+    fetchMore: fetchMoreFeedbacks,
+    pageSize: PAGE_SIZE,
+    resetKey: report.id,
+  });
+
+  const handleLoadMoreFeedbacks = useCallback(() => {
+    void loadMoreFeedbacks();
+  }, [loadMoreFeedbacks]);
+
   return (
     <ReportDetailView
       report={report}
       body={body}
       feedbacks={feedbacks}
       feedbacksTotalCount={feedbacksTotalCount}
+      feedbacksHasNextPage={feedbacksHasNextPage}
+      feedbacksLoadingMore={feedbacksLoadingMore}
+      feedbacksError={feedbacksError}
+      onLoadMoreFeedbacks={handleLoadMoreFeedbacks}
       saving={saving}
       saveError={saveError ?? null}
       onSubmitFeedback={handleSubmitSync}

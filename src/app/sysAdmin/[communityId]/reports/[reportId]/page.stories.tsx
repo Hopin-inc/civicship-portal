@@ -38,12 +38,28 @@ const baseBody = `# 4 月第 4 週のニュースレター
 
 const feedbacks = mockReportFeedbacks(3);
 
+const buildFeedbacksConnection = (
+  nodes: ReturnType<typeof mockReportFeedbacks>,
+) => ({
+  __typename: "ReportFeedbacksConnection" as const,
+  edges: nodes.map((node, i) => ({
+    __typename: "ReportFeedbackEdge" as const,
+    cursor: `c${i}`,
+    node,
+  })),
+  pageInfo: {
+    __typename: "PageInfo" as const,
+    hasNextPage: false,
+    endCursor: null,
+  },
+  totalCount: nodes.length,
+});
+
 export const WithItems: Story = {
   args: {
     report: mockReport(),
     body: baseBody,
-    feedbacks,
-    feedbacksTotalCount: feedbacks.length,
+    initialFeedbacksConnection: buildFeedbacksConnection(feedbacks),
   },
 };
 
@@ -55,7 +71,6 @@ export const Skipped: Story = {
       skipReason: "対象期間中の活動が少なくスキップしました",
     }),
     body: null,
-    feedbacks: [],
-    feedbacksTotalCount: 0,
+    initialFeedbacksConnection: buildFeedbacksConnection([]),
   },
 };

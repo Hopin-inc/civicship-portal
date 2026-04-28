@@ -8,6 +8,7 @@ import type {
   GqlGetAdminBrowseReportsQueryVariables,
 } from "@/types/graphql";
 import { useCursorPagination } from "@/app/sysAdmin/_shared/hooks/useCursorPagination";
+import { createEmptyConnection } from "@/app/sysAdmin/_shared/pagination/emptyConnection";
 import {
   CommunityReportsTab,
   type ReportRow,
@@ -24,16 +25,7 @@ type Props = {
   initialReports: ReportsConnection | null;
 };
 
-const EMPTY_CONNECTION: ReportsConnection = {
-  __typename: "ReportsConnection",
-  edges: [],
-  pageInfo: {
-    __typename: "PageInfo",
-    hasNextPage: false,
-    endCursor: null,
-  },
-  totalCount: 0,
-};
+const EMPTY_CONNECTION = createEmptyConnection("ReportsConnection") as ReportsConnection;
 
 /**
  * `CommunityReportsTab` (View) のための data wiring。

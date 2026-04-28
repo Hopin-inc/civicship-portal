@@ -41,6 +41,7 @@ export type JudgeTemplateViewProps = {
   feedbackTotalCount?: number;
   feedbacksHasNextPage?: boolean;
   feedbacksLoadingMore?: boolean;
+  feedbacksError?: unknown;
   onLoadMoreFeedbacks?: () => void;
   feedbackStats: FeedbackStats | null;
 };
@@ -66,6 +67,7 @@ export function JudgeTemplateView({
   feedbackTotalCount,
   feedbacksHasNextPage,
   feedbacksLoadingMore,
+  feedbacksError,
   onLoadMoreFeedbacks,
   feedbackStats,
 }: JudgeTemplateViewProps) {
@@ -159,6 +161,7 @@ export function JudgeTemplateView({
                 hasNextPage: feedbacksHasNextPage ?? false,
                 loadingMore: feedbacksLoadingMore ?? false,
                 onLoadMore: onLoadMoreFeedbacks,
+                error: feedbacksError,
               }
             : undefined
         }

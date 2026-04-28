@@ -3,19 +3,21 @@
 import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import type {
+  GqlGetAdminReportFeedbacksQuery,
   GqlGetAdminReportQuery,
-  GqlReportFeedbackFieldsFragment,
 } from "@/types/graphql";
 import { variantLabel } from "@/app/sysAdmin/features/system/templates/shared/labels";
 import { ReportDetailContainer } from "@/app/sysAdmin/features/reportDetail/components/ReportDetailContainer";
 
 type Report = NonNullable<GqlGetAdminReportQuery["report"]>;
+type FeedbacksConnection = NonNullable<
+  NonNullable<GqlGetAdminReportFeedbacksQuery["report"]>["feedbacks"]
+>;
 
 type Props = {
   report: Report;
   body: string | null;
-  feedbacks: GqlReportFeedbackFieldsFragment[];
-  feedbacksTotalCount: number;
+  initialFeedbacksConnection: FeedbacksConnection | null;
 };
 
 /**
@@ -25,8 +27,7 @@ type Props = {
 export function SysAdminReportDetailPageClient({
   report,
   body,
-  feedbacks,
-  feedbacksTotalCount,
+  initialFeedbacksConnection,
 }: Props) {
   const headerConfig = useMemo(
     () => ({
@@ -43,8 +44,7 @@ export function SysAdminReportDetailPageClient({
       <ReportDetailContainer
         report={report}
         body={body}
-        feedbacks={feedbacks}
-        feedbacksTotalCount={feedbacksTotalCount}
+        initialFeedbacksConnection={initialFeedbacksConnection}
       />
     </div>
   );
