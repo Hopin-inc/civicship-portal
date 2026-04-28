@@ -47,7 +47,7 @@ const feedbackTypes = [
   GqlReportFeedbackType.Other,
 ];
 
-const sectionKeys = ["intro", "body", "data", "summary", "cta", null];
+const sectionKeys = ["intro", "highlight", "members", "cta", "closing", null];
 
 /**
  * mock feedback 群 (variant 詳細ページ用)。

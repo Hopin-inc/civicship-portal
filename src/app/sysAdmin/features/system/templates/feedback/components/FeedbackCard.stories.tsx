@@ -44,7 +44,7 @@ export const LowRating: Story = {
       rating: 2,
       comment: "数字が違う。先月の値が混ざっている可能性。",
       feedbackType: GqlReportFeedbackType.Accuracy,
-      sectionKey: "data",
+      sectionKey: "highlight",
       createdAt: new Date("2026-04-23"),
       user: baseUser,
     },
