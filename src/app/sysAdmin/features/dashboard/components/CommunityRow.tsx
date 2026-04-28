@@ -12,14 +12,23 @@ import {
   deriveGrowthRateActivity,
   deriveNewlyActivatedSenders,
 } from "@/app/sysAdmin/_shared/derive";
-import type { GqlSysAdminCommunityOverview } from "@/types/graphql";
+import type {
+  GqlAdminReportSummaryRowFieldsFragment,
+  GqlSysAdminCommunityOverview,
+} from "@/types/graphql";
 
 type Props = {
   row: GqlSysAdminCommunityOverview;
+  /**
+   * `GET_ADMIN_REPORT_SUMMARY` から取得した、この community の最新公開状況。
+   * 取得失敗時は undefined。表示すべき情報が無いときは Pill が出ないだけで
+   * 既存 row レイアウトに影響しない。
+   */
+  reportSummary?: GqlAdminReportSummaryRowFieldsFragment;
   onClick?: (communityId: string) => void;
 };
 
-export function CommunityRow({ row, onClick }: Props) {
+export function CommunityRow({ row, reportSummary, onClick }: Props) {
   const handleClick = () => onClick?.(row.communityId);
   const activityRate = deriveActivityRate(row);
   const growthRateActivity = deriveGrowthRateActivity(row);
@@ -60,6 +69,9 @@ export function CommunityRow({ row, onClick }: Props) {
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5">
           <KpiPill label="MAU" value={toPct(activityRate)} delta={growthRateActivity} />
           <KpiPill label="Δ" value={`新規${toIntJa(newlyActivated)} / 休眠${toIntJa(churned)}`} />
+          {reportSummary && (
+            <ReportPills summary={reportSummary} />
+          )}
         </div>
         <TenureBar distribution={row.tenureDistribution} showLabels={false} />
       </ItemFooter>
@@ -86,5 +98,54 @@ function KpiPill({ label, value, delta }: KpiPillProps) {
         </span>
       )}
     </span>
+  );
+}
+
+type ReportPillsProps = {
+  summary: GqlAdminReportSummaryRowFieldsFragment;
+};
+
+/**
+ * Report 公開状況の Pill 群。
+ * - 「最終公開」: daysSinceLastPublish に応じて 今日 / Nd 前 / 未公開 を出す。
+ *   31 日以上は destructive 寄りの色で停滞を強調。
+ * - 「90d」: 直近 90 日の公開数。0 件のときも表示してエンゲージ低下を可視化。
+ */
+function ReportPills({ summary }: ReportPillsProps) {
+  const days = summary.daysSinceLastPublish;
+  let lastLabel: string;
+  let stale = false;
+  if (days == null) {
+    lastLabel = "未公開";
+  } else if (days <= 0) {
+    lastLabel = "今日";
+  } else {
+    lastLabel = `${toIntJa(days)}d 前`;
+    stale = days >= 31;
+  }
+
+  return (
+    <>
+      <span className="inline-flex items-baseline gap-1">
+        <span className="rounded-md border border-border px-1.5 py-px text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+          Report
+        </span>
+        <span
+          className={cn(
+            "text-sm font-medium tabular-nums",
+            stale && "text-destructive",
+            days == null && "text-muted-foreground",
+          )}
+        >
+          {lastLabel}
+        </span>
+      </span>
+      <span className="inline-flex items-baseline gap-1 text-xs text-muted-foreground">
+        <span>90d</span>
+        <span className="tabular-nums">
+          {toIntJa(summary.publishedCountLast90Days)}
+        </span>
+      </span>
+    </>
   );
 }

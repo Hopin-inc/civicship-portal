@@ -7,7 +7,10 @@ import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { Button } from "@/components/ui/button";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
-import type { GqlGetSysAdminDashboardQuery } from "@/types/graphql";
+import type {
+  GqlAdminReportSummaryRowFieldsFragment,
+  GqlGetSysAdminDashboardQuery,
+} from "@/types/graphql";
 import { CommunityRow } from "./features/dashboard/components/CommunityRow";
 import { useDashboardControls } from "./features/dashboard/hooks/useDashboardControls";
 import { useDashboardOverview } from "./features/dashboard/hooks/useDashboardOverview";
@@ -16,12 +19,26 @@ import { sysAdminDashboardJa } from "./_shared/i18n/ja";
 type Props = {
   /** SSR で取得した初期データ。null は SSR fetch 失敗 (auth なし等) */
   initialData: GqlGetSysAdminDashboardQuery["sysAdminDashboard"] | null;
+  /**
+   * SSR で取得した Report Summary 配列。`communityId` で索けるように
+   * 受け取り側で Map にする。null は summary 取得失敗 (= Report Pill 無しで
+   * 描画する fail-soft フォールバック)。
+   */
+  reportSummaries: GqlAdminReportSummaryRowFieldsFragment[] | null;
 };
 
-export function SysAdminPageClient({ initialData }: Props) {
+export function SysAdminPageClient({ initialData, reportSummaries }: Props) {
   const router = useAppRouter();
   const { state } = useDashboardControls();
   const { loading, error, communities } = useDashboardOverview(state, initialData);
+
+  const reportSummaryByCommunity = useMemo(() => {
+    const map = new Map<string, GqlAdminReportSummaryRowFieldsFragment>();
+    for (const row of reportSummaries ?? []) {
+      if (row.community?.id) map.set(row.community.id, row);
+    }
+    return map;
+  }, [reportSummaries]);
 
   const headerConfig = useMemo(
     () => ({
@@ -76,6 +93,9 @@ export function SysAdminPageClient({ initialData }: Props) {
               {idx !== 0 && <hr className="border-muted" />}
               <CommunityRow
                 row={community}
+                reportSummary={reportSummaryByCommunity.get(
+                  community.communityId,
+                )}
                 onClick={(communityId) =>
                   router.push(`/sysAdmin/${communityId}`)
                 }
