@@ -67,7 +67,7 @@ export function CommunityDetailPageClient({
   const newMemberCount = latestMonth?.newMembers;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-2">
       {/* community 概況 (header + funnel) は常時表示。
           ファネル以下の詳細とレポートはタブで切替する。 */}
       <CommunityDashboardOverview
@@ -79,7 +79,7 @@ export function CommunityDetailPageClient({
         slot="summary"
       />
       <Tabs defaultValue="dashboard" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-4">
+        <TabsList className="grid w-full grid-cols-2 mb-6">
           <TabsTrigger value="dashboard">ダッシュボード</TabsTrigger>
           <TabsTrigger value="reports">レポート</TabsTrigger>
         </TabsList>
