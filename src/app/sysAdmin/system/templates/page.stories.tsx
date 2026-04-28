@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { withPageShell } from "../../../../../.storybook/decorators";
+import { withApollo, withPageShell } from "../../../../../.storybook/decorators";
 import { mockBreakdown } from "@/app/sysAdmin/features/system/templates/shared/fixtures";
 import { aggregateVariantSummary } from "@/app/sysAdmin/features/system/templates/shared/aggregate";
 import { SUPPORTED_VARIANTS } from "@/app/sysAdmin/features/system/templates/shared/variantSlug";
@@ -10,7 +10,7 @@ const meta: Meta<typeof SysAdminSystemTemplatesPageClient> = {
   title: "SysAdmin/Pages/SystemTemplatesList",
   component: SysAdminSystemTemplatesPageClient,
   parameters: { layout: "fullscreen" },
-  decorators: [withPageShell],
+  decorators: [withPageShell, withApollo],
 };
 
 export default meta;

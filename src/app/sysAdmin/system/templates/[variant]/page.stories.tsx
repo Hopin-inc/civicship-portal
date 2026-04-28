@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { withPageShell } from "../../../../../../.storybook/decorators";
+import { withApollo, withPageShell } from "../../../../../../.storybook/decorators";
 import {
   mockActiveTemplate,
   mockBreakdown,
@@ -11,7 +11,7 @@ const meta: Meta<typeof SysAdminTemplateDetailPageClient> = {
   title: "SysAdmin/Pages/SystemTemplateDetail",
   component: SysAdminTemplateDetailPageClient,
   parameters: { layout: "fullscreen" },
-  decorators: [withPageShell],
+  decorators: [withPageShell, withApollo],
 };
 
 export default meta;
