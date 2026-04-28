@@ -69,7 +69,7 @@ export function CommunityReportsTabContainer({
     if (
       loadingRef.current ||
       !hasNextPageRef.current ||
-      !endCursorRef.current
+      endCursorRef.current == null
     ) {
       return;
     }

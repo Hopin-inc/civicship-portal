@@ -132,7 +132,11 @@ export function useCursorPagination<TItem>({
   }, [depKey]);
 
   const loadMore = useCallback(async () => {
-    if (loadingRef.current || !hasNextPageRef.current || !endCursorRef.current) {
+    if (
+      loadingRef.current ||
+      !hasNextPageRef.current ||
+      endCursorRef.current == null
+    ) {
       return;
     }
     loadingRef.current = true;
