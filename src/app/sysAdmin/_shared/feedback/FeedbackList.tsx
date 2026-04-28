@@ -36,39 +36,48 @@ export function FeedbackList<T extends GqlReportFeedbackFieldsFragment>({
   summary,
   pagination,
 }: Props<T>) {
-  if (feedbacks.length === 0) {
-    return (
-      <section className="space-y-3">
-        {summary}
+  // summary の有無で header の見せ方を変える:
+  //   - summary あり (テンプレ詳細): "フィードバック" を大きく見出しとして出し、
+  //     件数は summary が責任を持つ (= "全 N 件のフィードバック")
+  //   - summary なし (Report detail): 1 行 header に件数 chip を併置
+  return (
+    <section className="space-y-6">
+      {summary ? (
+        <>
+          <h2 className="text-2xl font-bold">フィードバック</h2>
+          {summary}
+        </>
+      ) : (
+        <header className="flex items-baseline justify-between">
+          <h3 className="text-body-sm font-semibold">フィードバック</h3>
+          {feedbacks.length > 0 && (
+            <span className="text-body-xs text-muted-foreground tabular-nums">
+              {feedbacks.length}
+              {totalCount != null && totalCount !== feedbacks.length
+                ? ` / ${totalCount}`
+                : ""}{" "}
+              件
+            </span>
+          )}
+        </header>
+      )}
+
+      {feedbacks.length === 0 ? (
         <p className="rounded border border-dashed border-border py-6 text-center text-body-sm text-muted-foreground">
           まだフィードバックはありません
         </p>
-      </section>
-    );
-  }
+      ) : (
+        <div className="space-y-3">
+          {feedbacks.map((fb) => (
+            <FeedbackCard
+              key={fb.id}
+              feedback={fb}
+              reportLink={reportLinkFor?.(fb) ?? undefined}
+            />
+          ))}
+        </div>
+      )}
 
-  return (
-    <section className="space-y-3">
-      {summary}
-      <header className="flex items-baseline justify-between">
-        <h3 className="text-body-sm font-semibold">フィードバック</h3>
-        <span className="text-body-xs text-muted-foreground tabular-nums">
-          {feedbacks.length}
-          {totalCount != null && totalCount !== feedbacks.length
-            ? ` / ${totalCount}`
-            : ""}{" "}
-          件
-        </span>
-      </header>
-      <div className="space-y-2">
-        {feedbacks.map((fb) => (
-          <FeedbackCard
-            key={fb.id}
-            feedback={fb}
-            reportLink={reportLinkFor?.(fb) ?? undefined}
-          />
-        ))}
-      </div>
       {pagination?.hasNextPage && (
         <div className="flex justify-center">
           <Button

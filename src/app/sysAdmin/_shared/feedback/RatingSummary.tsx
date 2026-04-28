@@ -1,3 +1,4 @@
+import { Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Stars } from "./Stars";
 
@@ -24,13 +25,15 @@ type Props = {
  *
  * 表示:
  *   ┌──────────────────────────────────┐
- *   │           4.3                    │
- *   │         ★★★★☆                    │
- *   │      Based on 6 reviews          │
+ *   │              4.3                 │
+ *   │           ★★★★☆                  │
+ *   │       全 6 件のフィードバック    │
  *   │                                  │
- *   │  5★ ████████ 3                   │
- *   │  4★ █████ 2                      │
- *   │  ...                             │
+ *   │  5★ [████████░░░░░░░] 3          │
+ *   │  4★ [█████░░░░░░░░░░] 2          │
+ *   │  3★ [██░░░░░░░░░░░░░] 1          │
+ *   │  2★ [░░░░░░░░░░░░░░░] 0          │
+ *   │  1★ [░░░░░░░░░░░░░░░] 0          │
  *   └──────────────────────────────────┘
  *
  * `distribution` が無いときは下半分 (bar chart) を省略し、上の集計値だけ出す。
@@ -47,19 +50,19 @@ export function RatingSummary({
     : 0;
 
   return (
-    <section className={cn("space-y-3 text-center", className)}>
-      <div className="space-y-1">
-        <p className="text-display-md font-bold tabular-nums">
+    <section className={cn("space-y-6", className)}>
+      <div className="flex flex-col items-center gap-2">
+        <p className="text-6xl font-bold tabular-nums leading-none">
           {avgRating != null ? avgRating.toFixed(1) : "—"}
         </p>
-        <Stars rating={rounded} size="md" className="justify-center" />
+        <Stars rating={rounded} size="lg" />
         <p className="text-body-sm text-muted-foreground tabular-nums">
-          {totalCount} 件のフィードバック
+          全 {totalCount} 件のフィードバック
         </p>
       </div>
 
       {distribution && distribution.length > 0 && (
-        <ul className="space-y-1">
+        <ul className="space-y-2">
           {[5, 4, 3, 2, 1].map((rating) => {
             const bucket = distribution.find((b) => b.rating === rating);
             const count = bucket?.count ?? 0;
@@ -67,15 +70,18 @@ export function RatingSummary({
             return (
               <li
                 key={rating}
-                className="grid grid-cols-[2.5rem_1fr_2rem] items-center gap-2 text-body-xs text-muted-foreground"
+                className="grid grid-cols-[3rem_1fr_2rem] items-center gap-3 text-body-sm text-muted-foreground"
               >
-                <span className="text-left tabular-nums">
-                  {rating}
-                  <span className="ml-0.5 text-muted-foreground">★</span>
+                <span className="inline-flex items-center gap-1 tabular-nums">
+                  <span>{rating}</span>
+                  <Star
+                    className="h-3.5 w-3.5 fill-foreground text-foreground"
+                    aria-hidden
+                  />
                 </span>
-                <span className="relative h-2 overflow-hidden rounded-full bg-muted/40">
+                <span className="relative h-3 overflow-hidden rounded-full bg-muted">
                   <span
-                    className="absolute inset-y-0 left-0 rounded-full bg-foreground/80"
+                    className="absolute inset-y-0 left-0 rounded-full bg-foreground"
                     style={{ width: `${ratio * 100}%` }}
                     aria-hidden
                   />
