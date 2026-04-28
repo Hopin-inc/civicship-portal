@@ -43,7 +43,7 @@ export function SysAdminPageClient({ initialData }: Props) {
         </h2>
         <div className="flex items-center gap-2">
           <Button
-            onClick={() => router.push("/sysAdmin/system")}
+            onClick={() => router.push("/sysAdmin/system/templates")}
             variant="tertiary"
             size="sm"
             className="gap-1"
