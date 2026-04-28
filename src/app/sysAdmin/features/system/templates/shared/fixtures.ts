@@ -2,6 +2,7 @@ import {
   GqlReportTemplateKind,
   GqlReportTemplateScope,
   GqlReportVariant,
+  type GqlReportTemplateFieldsFragment,
   type GqlReportTemplateStatsBreakdownRowFieldsFragment,
 } from "@/types/graphql";
 import { aggregateVariantSummary, type VariantSummary } from "./aggregate";
@@ -113,3 +114,35 @@ export const MOCK_VARIANT_SUMMARIES: VariantSummary[] = SUPPORTED_VARIANTS.map(
 );
 
 export type { VariantSummary };
+
+/** PromptEditor / GenerationTemplateView 用の active template mock。 */
+export function mockActiveTemplate(
+  variant: GqlReportVariant,
+  kind: GqlReportTemplateKind = GqlReportTemplateKind.Generation,
+): GqlReportTemplateFieldsFragment {
+  return {
+    __typename: "ReportTemplate",
+    id: `tmpl_${variant}_v3_baseline`,
+    variant,
+    version: 3,
+    scope: GqlReportTemplateScope.System,
+    kind,
+    model: "claude-sonnet-4-5",
+    maxTokens: 8000,
+    temperature: 0.7,
+    systemPrompt:
+      "あなたは community 運営者向けのレポートを書く編集アシスタントです。\n以下の data を元に、簡潔で読みやすい日本語のニュースレターを生成してください。",
+    userPromptTemplate:
+      "以下が今週の community data です:\n{{data}}\n\n上記を元に、メンバーが読みたくなるニュースレターを書いてください。",
+    stopSequences: [],
+    trafficWeight: 70,
+    isActive: true,
+    isEnabled: true,
+    experimentKey: "baseline",
+    communityContext: null,
+    createdAt: new Date("2026-04-01T00:00:00Z"),
+    updatedAt: new Date("2026-04-15T00:00:00Z"),
+    community: null,
+    updatedByUser: { __typename: "User", id: "user_admin", name: "Admin" },
+  };
+}

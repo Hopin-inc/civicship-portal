@@ -30,7 +30,7 @@ export function SysAdminSystemTemplatesPageClient({
   return (
     <div className="p-4 max-w-xl mx-auto">
       <Tabs defaultValue="generation" className="w-full">
-        <TabsList className="mb-4">
+        <TabsList className="grid w-full grid-cols-2 mb-4">
           <TabsTrigger value="generation">生成用</TabsTrigger>
           <TabsTrigger value="judge">評価用</TabsTrigger>
         </TabsList>

@@ -68,7 +68,7 @@ export function CommunityDetailPageClient({
 
   return (
     <Tabs defaultValue="dashboard" className="w-full">
-      <TabsList className="mb-4">
+      <TabsList className="grid w-full grid-cols-2 mb-4">
         <TabsTrigger value="dashboard">ダッシュボード</TabsTrigger>
         <TabsTrigger value="reports">レポート</TabsTrigger>
       </TabsList>

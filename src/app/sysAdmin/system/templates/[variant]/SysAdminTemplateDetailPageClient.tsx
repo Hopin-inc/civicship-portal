@@ -44,7 +44,7 @@ export function SysAdminTemplateDetailPageClient({
   return (
     <div className="max-w-xl mx-auto mt-8 px-4">
       <Tabs defaultValue="generation" className="w-full">
-        <TabsList className="mb-6">
+        <TabsList className="grid w-full grid-cols-2 mb-6">
           <TabsTrigger value="generation">生成用</TabsTrigger>
           <TabsTrigger value="judge">評価用</TabsTrigger>
         </TabsList>

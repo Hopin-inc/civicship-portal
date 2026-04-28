@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
 import type { GqlGetSysAdminDashboardQuery } from "@/types/graphql";
-import { CommunityRow, type CommunityReportSummary } from "./features/dashboard/components/CommunityRow";
+import { CommunityRow } from "./features/dashboard/components/CommunityRow";
 import { useDashboardControls } from "./features/dashboard/hooks/useDashboardControls";
 import { useDashboardOverview } from "./features/dashboard/hooks/useDashboardOverview";
 import { sysAdminDashboardJa } from "./_shared/i18n/ja";
@@ -16,19 +16,9 @@ import { sysAdminDashboardJa } from "./_shared/i18n/ja";
 type Props = {
   /** SSR で取得した初期データ。null は SSR fetch 失敗 (auth なし等) */
   initialData: GqlGetSysAdminDashboardQuery["sysAdminDashboard"] | null;
-  /**
-   * Community ごとの「最終 Report 発行サマリ」。
-   * RSC → Client の serialization 制約から Record で受ける (Map は React 18
-   * の flight protocol で扱えない)。Storybook では undefined を渡せば Report
-   * pill 抜きで描画される (View 層は data 層に依存しない)。
-   */
-  reportSummariesByCommunity?: Record<string, CommunityReportSummary>;
 };
 
-export function SysAdminPageClient({
-  initialData,
-  reportSummariesByCommunity,
-}: Props) {
+export function SysAdminPageClient({ initialData }: Props) {
   const router = useAppRouter();
   const { state } = useDashboardControls();
   const { loading, error, communities } = useDashboardOverview(state, initialData);
@@ -86,7 +76,6 @@ export function SysAdminPageClient({
               {idx !== 0 && <hr className="border-muted" />}
               <CommunityRow
                 row={community}
-                reportSummary={reportSummariesByCommunity?.[community.communityId]}
                 onClick={(communityId) =>
                   router.push(`/sysAdmin/${communityId}`)
                 }
@@ -98,4 +87,3 @@ export function SysAdminPageClient({
     </div>
   );
 }
-
