@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { useAuth } from "@/contexts/AuthProvider";
 import { useGetAdminReportSummaryQuery } from "@/types/graphql";
 import type { CommunityReportSummary } from "@/app/sysAdmin/features/dashboard/components/CommunityRow";
 
@@ -14,8 +15,11 @@ const PAGE_SIZE = 100;
  * 将来規模が増えたら useCursorPagination で wrap する。
  */
 export function useReportSummariesByCommunity() {
+  const { user, loading: authLoading } = useAuth();
+
   const { data, loading, error } = useGetAdminReportSummaryQuery({
     variables: { first: PAGE_SIZE },
+    skip: authLoading || !user,
     fetchPolicy: "cache-and-network",
   });
 

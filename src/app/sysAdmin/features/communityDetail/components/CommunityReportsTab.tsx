@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthProvider";
 import { useGetAdminBrowseReportsQuery } from "@/types/graphql";
 import { variantLabel, statusLabel } from "@/app/sysAdmin/features/system/templates/shared/labels";
 
@@ -20,8 +21,10 @@ type Props = {
  * cursor pagination は「もっと見る」ボタン経由で段階ロード。
  */
 export function CommunityReportsTab({ communityId }: Props) {
+  const { user, loading: authLoading } = useAuth();
   const { data, loading, error, fetchMore } = useGetAdminBrowseReportsQuery({
     variables: { communityId, first: PAGE_SIZE },
+    skip: authLoading || !user,
     fetchPolicy: "cache-and-network",
   });
   const [loadingMore, setLoadingMore] = useState(false);

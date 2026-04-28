@@ -1,7 +1,9 @@
 "use client";
 
 import { useMemo } from "react";
+import { useAuth } from "@/contexts/AuthProvider";
 import {
+  GqlReportTemplateKind,
   GqlReportVariant,
   useGetReportTemplateStatsBreakdownQuery,
   type GqlReportTemplateStatsBreakdownRowFieldsFragment,
@@ -16,24 +18,36 @@ import {
  *
  * Apollo armor の alias 制限 (3 個) があるため、1 query で全 variant を
  * 並べることはできず、variant ごとに useQuery を fan-out している。
- * Apollo Client が並列 batch を内部処理するため、ネットワーク的には
- * concurrent な 4 リクエスト。
+ *
+ * `kind` を切替えることで GENERATION / JUDGE のどちらの一覧も取得できる。
+ *
+ * 認証が確立する前に発火すると backend が 401/500 を返すため、`useAuth().user`
+ * が確定するまで skip する。
  */
-export function useVariantSummaries() {
+export function useVariantSummaries(
+  kind: GqlReportTemplateKind = GqlReportTemplateKind.Generation,
+) {
+  const { user, loading: authLoading } = useAuth();
+  const skip = authLoading || !user;
+
   const newsletter = useGetReportTemplateStatsBreakdownQuery({
-    variables: { variant: GqlReportVariant.MemberNewsletter },
+    variables: { variant: GqlReportVariant.MemberNewsletter, kind },
+    skip,
     fetchPolicy: "cache-and-network",
   });
   const weekly = useGetReportTemplateStatsBreakdownQuery({
-    variables: { variant: GqlReportVariant.WeeklySummary },
+    variables: { variant: GqlReportVariant.WeeklySummary, kind },
+    skip,
     fetchPolicy: "cache-and-network",
   });
   const grant = useGetReportTemplateStatsBreakdownQuery({
-    variables: { variant: GqlReportVariant.GrantApplication },
+    variables: { variant: GqlReportVariant.GrantApplication, kind },
+    skip,
     fetchPolicy: "cache-and-network",
   });
   const media = useGetReportTemplateStatsBreakdownQuery({
-    variables: { variant: GqlReportVariant.MediaPr },
+    variables: { variant: GqlReportVariant.MediaPr, kind },
+    skip,
     fetchPolicy: "cache-and-network",
   });
 

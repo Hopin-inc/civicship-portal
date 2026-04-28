@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useAuth } from "@/contexts/AuthProvider";
 import {
   useGetReportTemplateQuery,
   useUpdateReportTemplateMutation,
@@ -8,10 +9,12 @@ import {
 } from "@/types/graphql";
 
 export function useTemplateEditor(variant: GqlReportVariant | null) {
+  const { user, loading: authLoading } = useAuth();
+
   const { data, loading, error, refetch } = useGetReportTemplateQuery({
-    // skip: !variant のため null 時は呼ばれない。non-null assertion で安全。
+    // skip により null variant 時は呼ばれないので non-null assertion で安全。
     variables: { variant: variant! },
-    skip: !variant,
+    skip: !variant || authLoading || !user,
     fetchPolicy: "cache-and-network",
   });
 
