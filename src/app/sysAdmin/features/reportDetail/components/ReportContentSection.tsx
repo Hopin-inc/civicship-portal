@@ -1,19 +1,20 @@
 "use client";
 
+import { MarkdownContent } from "@/components/shared/MarkdownContent";
+
 type Props = {
   /**
-   * SSR で `convertMarkdownToHtml` 済みの sanitize 済み HTML 文字列。
-   * 何も無い (生成中 / skipped) 場合は null を渡し、placeholder を表示する。
+   * Report 本文の markdown 文字列。生成中 / skipped の場合は null。
    */
-  bodyHtml: string | null;
+  body: string | null;
   skipReason?: string | null;
 };
 
 /**
- * Report 本文の表示。markdown は SSR で sanitize 済み HTML に変換して
- * 渡される前提のため、ここでは dangerouslySetInnerHTML で挿入するだけ。
+ * Report 本文の表示。markdown は client 側で `react-markdown` がパースし、
+ * shadcn ベースのコンポーネントへマッピングして描画する。
  */
-export function ReportContentSection({ bodyHtml, skipReason }: Props) {
+export function ReportContentSection({ body, skipReason }: Props) {
   if (skipReason) {
     return (
       <section className="rounded border border-dashed border-border p-4 text-body-sm text-muted-foreground">
@@ -23,7 +24,7 @@ export function ReportContentSection({ bodyHtml, skipReason }: Props) {
     );
   }
 
-  if (!bodyHtml) {
+  if (!body) {
     return (
       <p className="py-6 text-center text-body-sm text-muted-foreground">
         本文がまだ生成されていません
@@ -32,9 +33,8 @@ export function ReportContentSection({ bodyHtml, skipReason }: Props) {
   }
 
   return (
-    <article
-      className="prose prose-sm max-w-none"
-      dangerouslySetInnerHTML={{ __html: bodyHtml }}
-    />
+    <article>
+      <MarkdownContent>{body}</MarkdownContent>
+    </article>
   );
 }

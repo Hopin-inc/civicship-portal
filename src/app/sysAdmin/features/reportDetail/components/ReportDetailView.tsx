@@ -16,7 +16,7 @@ type Report = NonNullable<GqlGetAdminReportQuery["report"]>;
 
 export type ReportDetailViewProps = {
   report: Report;
-  bodyHtml: string | null;
+  body: string | null;
   feedbacks: GqlReportFeedbackFieldsFragment[];
   feedbacksTotalCount: number;
   saving: boolean;
@@ -36,7 +36,7 @@ export type ReportDetailViewProps = {
  */
 export function ReportDetailView({
   report,
-  bodyHtml,
+  body,
   feedbacks,
   feedbacksTotalCount,
   saving,
@@ -52,7 +52,7 @@ export function ReportDetailView({
         periodTo={report.periodTo}
         templateVersion={report.template?.version ?? null}
       />
-      <ReportContentSection bodyHtml={bodyHtml} skipReason={report.skipReason} />
+      <ReportContentSection body={body} skipReason={report.skipReason} />
       <FeedbackList feedbacks={feedbacks} totalCount={feedbacksTotalCount} />
       <ReportFeedbackForm
         existingFeedback={report.myFeedback ?? null}
