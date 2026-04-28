@@ -85,19 +85,10 @@ const components: Components = {
     />
   ),
   ul: ({ className, ...props }) => (
-    <ul
-      className={cn("my-3 ml-6 list-disc space-y-1 [&>li]:list-disc [&>li]:ml-0", className)}
-      {...props}
-    />
+    <ul className={cn("my-3 ml-6 list-disc space-y-1", className)} {...props} />
   ),
   ol: ({ className, ...props }) => (
-    <ol
-      className={cn(
-        "my-3 ml-6 list-decimal space-y-1 [&>li]:list-decimal [&>li]:ml-0",
-        className,
-      )}
-      {...props}
-    />
+    <ol className={cn("my-3 ml-6 list-decimal space-y-1", className)} {...props} />
   ),
   li: ({ className, ...props }) => (
     <li className={cn("leading-7 [&>p]:my-0", className)} {...props} />

@@ -22,7 +22,7 @@ export const SimilarOpportunities: React.FC<SimilarOpportunitiesProps> = ({
   if (filteredOpportunities.length === 0) return null;
   const formattedOpportunities = filteredOpportunities.map(formatOpportunities)
   return (
-    <section className="pt-6 pb-8 mt-0">
+    <section className="pt-6 pb-8">
       <h2 className="text-display-md text-foreground mb-4">{header}</h2>
       <div className="mt-6 flex gap-4 overflow-x-auto pb-8 scrollbar-hide">
         {formattedOpportunities.map((opportunity) => (
