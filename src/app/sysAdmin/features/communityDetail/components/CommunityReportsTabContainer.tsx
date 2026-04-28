@@ -44,12 +44,14 @@ export function CommunityReportsTabContainer({
     initialReports?.pageInfo.hasNextPage ?? false,
   );
   const [loadingMore, setLoadingMore] = useState(false);
+  const [loadError, setLoadError] = useState<unknown>(null);
   const totalCount = initialReports?.totalCount ?? reports.length;
 
   const handleLoadMore = useMemo(() => {
     return async () => {
       if (!endCursor || loadingMore) return;
       setLoadingMore(true);
+      setLoadError(null);
       try {
         const result = await apollo.query<
           GqlGetAdminBrowseReportsQuery,
@@ -63,6 +65,10 @@ export function CommunityReportsTabContainer({
         setReports((prev) => [...prev, ...extractReports(next)]);
         setEndCursor(next.pageInfo.endCursor ?? null);
         setHasNextPage(next.pageInfo.hasNextPage);
+      } catch (err) {
+        // catch しないと button onClick で発火する promise が unhandled rejection に
+        // なる。View 側は error prop を表示できるので state にセットして渡す。
+        setLoadError(err);
       } finally {
         setLoadingMore(false);
       }
@@ -75,7 +81,7 @@ export function CommunityReportsTabContainer({
       totalCount={totalCount}
       hasNextPage={hasNextPage}
       loading={false}
-      error={null}
+      error={loadError}
       loadingMore={loadingMore}
       onLoadMore={handleLoadMore}
     />
