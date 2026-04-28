@@ -125,6 +125,11 @@ export function CommunityDashboardOverview({
         hasCohortRetention: !!data.cohortRetention,
       });
     }
+    // slot="details" のときは error バナーを描画しない。
+    // CommunityDetailPageClient が summary と details の 2 回 render するため、
+    // そのまま両方で出すとバナーが画面に 2 つ並んでしまう。summary 側が必ず
+    // 先に render されるので、そこに集約する。
+    if (slot === "details") return null;
     return (
       <div className="rounded-2xl border border-amber-200 bg-amber-50/60 p-6 text-sm text-amber-900">
         コミュニティ詳細データの一部が取得できませんでした。時間をおいて再度お試しください。

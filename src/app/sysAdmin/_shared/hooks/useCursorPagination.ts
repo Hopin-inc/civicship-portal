@@ -126,8 +126,13 @@ export function useCursorPagination<TItem>({
         onError?.(err);
       }
     } finally {
-      loadingRef.current = false;
-      setLoading(false);
+      // generation が一致する request だけが loadingRef を解除できる。
+      // stale な finally で解除すると、その間に始まった新 generation の
+      // loadMore の guard を誤ってクリアしてしまう。
+      if (requestGeneration === generationRef.current) {
+        loadingRef.current = false;
+        setLoading(false);
+      }
     }
   }, [fetchMore, pageSize, onError]);
 
