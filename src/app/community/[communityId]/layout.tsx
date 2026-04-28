@@ -43,7 +43,6 @@ export async function generateMetadata({
     description: config.description,
     icons: {
       icon: [{ url: DEFAULT_ASSET_PATHS.FAVICON }],
-      apple: [{ url: DEFAULT_ASSET_PATHS.APPLE_TOUCH_ICON }],
     },
     openGraph: {
       title: config.title,
