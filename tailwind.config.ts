@@ -212,56 +212,6 @@ const config = {
   				}
   			]
   		},
-  		typography: {
-  			DEFAULT: {
-  				css: {
-  					maxWidth: 'none',
-  					color: 'hsl(var(--foreground))',
-  					h1: {
-  						fontSize: 'var(--font-size-huge)',
-  						color: 'hsl(var(--foreground))',
-  						fontWeight: '700'
-  					},
-  					h2: {
-  						fontSize: 'var(--font-size-xxl)',
-  						color: 'hsl(var(--foreground))',
-  						fontWeight: '700'
-  					},
-  					h3: {
-  						fontSize: 'var(--font-size-xl)',
-  						color: 'hsl(var(--foreground))',
-  						fontWeight: '700'
-  					},
-  					h4: {
-  						fontSize: 'var(--font-size-lg)',
-  						color: 'hsl(var(--foreground))',
-  						fontWeight: '600'
-  					},
-  					'h5,h6': {
-  						fontSize: 'var(--font-size-md)',
-  						color: 'hsl(var(--foreground))'
-  					},
-  					a: {
-  						fontSize: 'var(--font-size-md)',
-  						color: 'hsl(var(--primary))',
-  						'&:hover': {
-  							color: 'hsl(var(--primary-hover))'
-  						}
-  					},
-  					p: {
-  						fontSize: 'var(--font-size-md)',
-  						color: 'hsl(var(--foreground))'
-  					},
-  					li: {
-  						fontSize: 'var(--font-size-md)',
-  						color: 'hsl(var(--foreground))'
-  					},
-  					img: {
-  						borderRadius: '0.5rem'
-  					}
-  				}
-  			}
-  		},
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
@@ -309,7 +259,6 @@ const config = {
   },
   plugins: [
     require("tailwindcss-animate"),
-    require("@tailwindcss/typography"),
     function ({ addUtilities }: { addUtilities: any }) {
       addUtilities({
         ".scrollbar-hide": {
