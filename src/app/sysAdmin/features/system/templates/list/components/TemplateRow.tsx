@@ -3,10 +3,7 @@
 import { AlertTriangle } from "lucide-react";
 import { Item, ItemContent, ItemFooter, ItemTitle } from "@/components/ui/item";
 import { cn } from "@/lib/utils";
-import {
-  type VariantSummary,
-} from "@/app/sysAdmin/features/system/templates/shared/fixtures";
-import { variantLabel } from "@/app/sysAdmin/features/system/templates/shared/labels";
+import { type VariantSummary } from "@/app/sysAdmin/features/system/templates/shared/fixtures";
 
 type Props = {
   summary: VariantSummary;
@@ -34,39 +31,33 @@ export function TemplateRow({ summary, onClick }: Props) {
     >
       <ItemContent>
         <div className="flex w-full items-baseline justify-between gap-2">
-          <ItemTitle className="min-w-0 flex-1 truncate text-base font-semibold">
-            {variantLabel(summary.variant)}
+          <ItemTitle className="min-w-0 flex-1 truncate text-base font-mono font-semibold">
+            {summary.variant}
           </ItemTitle>
-          <div className="flex shrink-0 items-baseline gap-1 tabular-nums text-muted-foreground">
-            <span className="text-xs">現行</span>
-            <span className="text-base font-medium">v{summary.currentVersion}</span>
-          </div>
+          {summary.currentVersion > 0 && (
+            <span className="shrink-0 rounded-full border border-border px-2 py-0.5 text-sm font-medium tabular-nums text-muted-foreground">
+              v{summary.currentVersion}
+            </span>
+          )}
         </div>
       </ItemContent>
 
       <ItemFooter className="mt-0 w-full flex-row items-baseline gap-x-4 gap-y-1 text-body-sm text-muted-foreground tabular-nums">
         <span>
-          avgRating{" "}
+          評価{" "}
           <span className="font-medium text-foreground">
             {summary.weightedAvgRating != null
               ? summary.weightedAvgRating.toFixed(2)
               : "—"}
-          </span>
+          </span>{" "}
+          ({summary.totalFeedbackCount})
         </span>
         <span>
-          feedback{" "}
+          A/B{" "}
           <span className="font-medium text-foreground">
-            {summary.totalFeedbackCount}
+            {summary.activeTemplateCount}
           </span>
         </span>
-        {summary.activeTemplateCount > 1 && (
-          <span>
-            A/B{" "}
-            <span className="font-medium text-foreground">
-              {summary.activeTemplateCount}
-            </span>
-          </span>
-        )}
         {summary.hasWarning && (
           <span className="ml-auto inline-flex items-center gap-1 text-destructive">
             <AlertTriangle className="h-3 w-3" />
