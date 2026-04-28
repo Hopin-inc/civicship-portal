@@ -48,7 +48,6 @@ export function ReportDetailContainer({
               reportId: report.id,
               rating: input.rating,
               feedbackType: input.feedbackType ?? undefined,
-              sectionKey: input.sectionKey ?? undefined,
               comment: input.comment ?? undefined,
             },
             permission: { communityId: report.community.id },

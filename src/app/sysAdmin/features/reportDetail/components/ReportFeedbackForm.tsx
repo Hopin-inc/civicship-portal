@@ -1,11 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn } from "@/lib/utils";
 import {
   GqlReportFeedbackType,
@@ -19,9 +29,22 @@ import {
 export type FeedbackFormInput = {
   rating: number;
   feedbackType: GqlReportFeedbackType | null;
-  sectionKey: string | null;
   comment: string | null;
 };
+
+const FEEDBACK_TYPES = Object.keys(FEEDBACK_TYPE_LABELS) as GqlReportFeedbackType[];
+
+const formSchema = z.object({
+  rating: z
+    .number({ required_error: "評価を選んでください" })
+    .int()
+    .min(1, "評価を選んでください")
+    .max(5),
+  feedbackType: z.nativeEnum(GqlReportFeedbackType).nullable(),
+  comment: z.string().nullable(),
+});
+
+type FormValues = z.infer<typeof formSchema>;
 
 type Props = {
   /** 過去に投稿済みの feedback (= myFeedback)。あれば「投稿済み」として下に表示する。 */
@@ -31,14 +54,17 @@ type Props = {
   onSubmit: (input: FeedbackFormInput) => void;
 };
 
-const FEEDBACK_TYPES = Object.keys(FEEDBACK_TYPE_LABELS) as GqlReportFeedbackType[];
-
 /**
  * sysAdmin 代行投稿用 feedback フォーム。
  *
- * `submitReportFeedback` の input そのまま (rating + comment + feedbackType +
- * sectionKey) を扱う。送信は container 側で mutation + cache 更新を行うので
- * 本コンポーネントは入力 UI と onSubmit 通知だけに責務を絞る。
+ * `submitReportFeedback` の input そのまま (rating + comment + feedbackType)
+ * を扱う。送信は container 側で mutation + cache 更新を行うので、本コンポーネント
+ * は入力 UI と onSubmit 通知だけに責務を絞る。
+ *
+ * 入力部品はすべて shadcn / radix primitives:
+ *   - Form (react-hook-form + zod)
+ *   - ToggleGroup type="single" (rating の星選択 / feedbackType の chip 選択)
+ *   - Textarea (comment)
  */
 export function ReportFeedbackForm({
   existingFeedback,
@@ -46,21 +72,31 @@ export function ReportFeedbackForm({
   saveError,
   onSubmit,
 }: Props) {
-  const [rating, setRating] = useState(0);
-  const [feedbackType, setFeedbackType] =
-    useState<GqlReportFeedbackType | null>(null);
-  const [sectionKey, setSectionKey] = useState("");
-  const [comment, setComment] = useState("");
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      rating: 0,
+      feedbackType: null,
+      comment: "",
+    },
+  });
 
-  const canSubmit = rating > 0 && !saving;
+  // 投稿成功で saving が false に戻ったタイミングで form をリセットする。
+  // saveError がある場合は入力を残してもう一度送れるようにしておく。
+  useEffect(() => {
+    if (!saving && form.formState.isSubmitSuccessful && !saveError) {
+      form.reset({ rating: 0, feedbackType: null, comment: "" });
+    }
+  }, [saving, saveError, form]);
 
-  const handleSubmit = () => {
-    if (!canSubmit) return;
+  const handleValid = (values: FormValues) => {
     onSubmit({
-      rating,
-      feedbackType,
-      sectionKey: sectionKey.trim() === "" ? null : sectionKey.trim(),
-      comment: comment.trim() === "" ? null : comment.trim(),
+      rating: values.rating,
+      feedbackType: values.feedbackType,
+      comment:
+        values.comment != null && values.comment.trim() !== ""
+          ? values.comment.trim()
+          : null,
     });
   };
 
@@ -75,104 +111,111 @@ export function ReportFeedbackForm({
         </p>
       )}
 
-      <div className="space-y-1">
-        <Label className="text-body-xs">評価</Label>
-        <RatingPicker value={rating} onChange={setRating} />
-      </div>
-
-      <div className="space-y-1">
-        <Label className="text-body-xs">種類 (任意)</Label>
-        <div className="flex flex-wrap gap-1">
-          {FEEDBACK_TYPES.map((t) => {
-            const selected = feedbackType === t;
-            return (
-              <button
-                key={t}
-                type="button"
-                onClick={() => setFeedbackType(selected ? null : t)}
-                className={cn(
-                  "rounded-md border px-2 py-px text-body-xs",
-                  selected
-                    ? "border-foreground bg-foreground text-background"
-                    : "border-border text-muted-foreground hover:text-foreground",
-                )}
-              >
-                {feedbackTypeLabel(t)}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="space-y-1">
-        <Label htmlFor="sectionKey" className="text-body-xs">
-          セクションキー (任意)
-        </Label>
-        <Input
-          id="sectionKey"
-          value={sectionKey}
-          onChange={(e) => setSectionKey(e.target.value)}
-          placeholder="intro / highlight など"
-          className="text-body-sm font-mono"
-        />
-      </div>
-
-      <div className="space-y-1">
-        <Label htmlFor="comment" className="text-body-xs">
-          コメント (任意)
-        </Label>
-        <Textarea
-          id="comment"
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          rows={4}
-          className="text-body-sm"
-        />
-      </div>
-
-      {saveError && (
-        <p className="text-body-xs text-destructive">{saveError.message}</p>
-      )}
-
-      <div className="flex justify-end">
-        <Button
-          type="button"
-          onClick={handleSubmit}
-          disabled={!canSubmit}
-          size="sm"
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(handleValid)}
+          className="space-y-4"
         >
-          {saving ? "送信中..." : "送信"}
-        </Button>
-      </div>
-    </section>
-  );
-}
-
-function RatingPicker({
-  value,
-  onChange,
-}: {
-  value: number;
-  onChange: (n: number) => void;
-}) {
-  return (
-    <div className="flex items-center gap-1">
-      {[1, 2, 3, 4, 5].map((n) => (
-        <button
-          key={n}
-          type="button"
-          onClick={() => onChange(value === n ? 0 : n)}
-          className="rounded p-0.5 hover:bg-muted/40"
-          aria-label={`${n} / 5`}
-        >
-          <Star
-            className={cn(
-              "h-5 w-5",
-              n <= value ? "fill-amber-400 text-amber-400" : "text-muted",
+          <FormField
+            control={form.control}
+            name="rating"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-body-xs">評価</FormLabel>
+                <FormControl>
+                  <ToggleGroup
+                    type="single"
+                    value={field.value > 0 ? String(field.value) : ""}
+                    onValueChange={(v) => field.onChange(v ? Number(v) : 0)}
+                    className="justify-start"
+                    aria-label="評価"
+                  >
+                    {[1, 2, 3, 4, 5].map((n) => (
+                      <ToggleGroupItem
+                        key={n}
+                        value={String(n)}
+                        aria-label={`${n} / 5`}
+                        className="h-9 w-9 px-0"
+                      >
+                        <Star
+                          className={cn(
+                            "h-5 w-5",
+                            n <= field.value
+                              ? "fill-amber-400 text-amber-400"
+                              : "text-muted-foreground",
+                          )}
+                        />
+                      </ToggleGroupItem>
+                    ))}
+                  </ToggleGroup>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
             )}
           />
-        </button>
-      ))}
-    </div>
+
+          <FormField
+            control={form.control}
+            name="feedbackType"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-body-xs">種類 (任意)</FormLabel>
+                <FormControl>
+                  <ToggleGroup
+                    type="single"
+                    value={field.value ?? ""}
+                    onValueChange={(v) =>
+                      field.onChange(v ? (v as GqlReportFeedbackType) : null)
+                    }
+                    className="flex-wrap justify-start"
+                    aria-label="種類"
+                  >
+                    {FEEDBACK_TYPES.map((t) => (
+                      <ToggleGroupItem
+                        key={t}
+                        value={t}
+                        className="h-7 px-2 text-body-xs"
+                      >
+                        {feedbackTypeLabel(t)}
+                      </ToggleGroupItem>
+                    ))}
+                  </ToggleGroup>
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="comment"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-body-xs">
+                  コメント (任意)
+                </FormLabel>
+                <FormControl>
+                  <Textarea
+                    {...field}
+                    value={field.value ?? ""}
+                    rows={4}
+                    className="text-body-sm"
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          {saveError && (
+            <p className="text-body-xs text-destructive">{saveError.message}</p>
+          )}
+
+          <div className="flex justify-end">
+            <Button type="submit" size="sm" disabled={saving}>
+              {saving ? "送信中..." : "送信"}
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </section>
   );
 }
