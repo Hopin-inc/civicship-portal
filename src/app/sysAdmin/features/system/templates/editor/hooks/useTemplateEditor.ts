@@ -9,12 +9,16 @@ import {
 } from "@/types/graphql";
 
 export function useTemplateEditor(variant: GqlReportVariant | null) {
-  const { user, loading: authLoading } = useAuth();
+  // `isAuthenticated` (= authenticationState ∈ {line_authenticated, ...})
+  // を gate として使う。`!user` だけだと SSR currentUser が先に立ち上がって
+  // Apollo の auth link がまだ firebaseUser を読めないタイミングで発火し、
+  // backend が `IsAdmin authorization FAILED` を返す race が起きる。
+  const { isAuthenticated } = useAuth();
 
   const { data, loading, error, refetch } = useGetReportTemplateQuery({
     // skip により null variant 時は呼ばれないので non-null assertion で安全。
     variables: { variant: variant! },
-    skip: !variant || authLoading || !user,
+    skip: !variant || !isAuthenticated,
     fetchPolicy: "cache-and-network",
   });
 

@@ -21,14 +21,16 @@ import {
  *
  * `kind` を切替えることで GENERATION / JUDGE のどちらの一覧も取得できる。
  *
- * 認証が確立する前に発火すると backend が 401/500 を返すため、`useAuth().user`
- * が確定するまで skip する。
+ * 認証が確立する前に発火すると backend が `IsAdmin authorization FAILED` を
+ * 返すため、`isAuthenticated` (= authenticationState 確定) まで skip する。
+ * `useAuth().user` だけだと SSR currentUser が先に立って Apollo の auth link
+ * がまだ firebaseUser を読めない race が起きる。
  */
 export function useVariantSummaries(
   kind: GqlReportTemplateKind = GqlReportTemplateKind.Generation,
 ) {
-  const { user, loading: authLoading } = useAuth();
-  const skip = authLoading || !user;
+  const { isAuthenticated } = useAuth();
+  const skip = !isAuthenticated;
 
   const newsletter = useGetReportTemplateStatsBreakdownQuery({
     variables: { variant: GqlReportVariant.MemberNewsletter, kind },

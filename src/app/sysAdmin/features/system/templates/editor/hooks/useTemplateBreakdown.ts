@@ -24,7 +24,8 @@ export function useTemplateBreakdown(
   variant: GqlReportVariant | null,
   kind: GqlReportTemplateKind = GqlReportTemplateKind.Generation,
 ) {
-  const { user, loading: authLoading } = useAuth();
+  // `isAuthenticated` を gate として使う理由は `useTemplateEditor` のコメント参照。
+  const { isAuthenticated } = useAuth();
 
   const { data, loading, error, refetch } = useGetReportTemplateStatsBreakdownQuery({
     variables: {
@@ -34,7 +35,7 @@ export function useTemplateBreakdown(
       includeInactive: true,
       first: HISTORY_PAGE_SIZE,
     },
-    skip: !variant || authLoading || !user,
+    skip: !variant || !isAuthenticated,
     fetchPolicy: "cache-and-network",
   });
 

@@ -20,7 +20,8 @@ import {
  * の最初を取る。
  */
 export function useActiveJudgeTemplate(variant: GqlReportVariant | null) {
-  const { user, loading: authLoading } = useAuth();
+  // `isAuthenticated` を gate として使う理由は `useTemplateEditor` のコメント参照。
+  const { isAuthenticated } = useAuth();
 
   const { data, loading, error } = useGetReportTemplatesQuery({
     variables: {
@@ -29,7 +30,7 @@ export function useActiveJudgeTemplate(variant: GqlReportVariant | null) {
       kind: GqlReportTemplateKind.Judge,
       includeInactive: false,
     },
-    skip: !variant || authLoading || !user,
+    skip: !variant || !isAuthenticated,
     fetchPolicy: "cache-and-network",
   });
 

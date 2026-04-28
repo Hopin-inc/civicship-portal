@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useAuth } from "@/contexts/AuthProvider";
 import { useGetAdminBrowseReportsQuery } from "@/types/graphql";
 import {
   CommunityReportsTab,
@@ -16,10 +17,14 @@ type Props = {
 /**
  * `CommunityReportsTab` (View) と `useGetAdminBrowseReportsQuery` (data) を
  * 結ぶ container。
+ *
+ * 認証 race 回避のため `isAuthenticated` まで query を skip する。
  */
 export function CommunityReportsTabContainer({ communityId }: Props) {
+  const { isAuthenticated } = useAuth();
   const { data, loading, error, fetchMore } = useGetAdminBrowseReportsQuery({
     variables: { communityId, first: PAGE_SIZE },
+    skip: !isAuthenticated,
     fetchPolicy: "cache-and-network",
   });
   const [loadingMore, setLoadingMore] = useState(false);
