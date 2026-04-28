@@ -123,15 +123,19 @@ export function GenerationTemplateContainer({
     initialFeedbacks ?? EMPTY_CONNECTION,
   );
   const [refetchingFeedbacks, setRefetchingFeedbacks] = useState(false);
+  const [feedbacksRefetchError, setFeedbacksRefetchError] =
+    useState<unknown>(null);
 
   useEffect(() => {
     if (feedbacksFilterKey === "") {
       setCurrentFeedbacks(initialFeedbacks ?? EMPTY_CONNECTION);
       setRefetchingFeedbacks(false);
+      setFeedbacksRefetchError(null);
       return;
     }
     let cancelled = false;
     setRefetchingFeedbacks(true);
+    setFeedbacksRefetchError(null);
     void (async () => {
       try {
         const result = await apollo.query<
@@ -152,8 +156,10 @@ export function GenerationTemplateContainer({
         setCurrentFeedbacks(
           result.data.adminTemplateFeedbacks ?? EMPTY_CONNECTION,
         );
-      } catch {
-        if (!cancelled) setCurrentFeedbacks(EMPTY_CONNECTION);
+      } catch (err) {
+        if (cancelled) return;
+        setCurrentFeedbacks(EMPTY_CONNECTION);
+        setFeedbacksRefetchError(err);
       } finally {
         if (!cancelled) setRefetchingFeedbacks(false);
       }
@@ -218,7 +224,9 @@ export function GenerationTemplateContainer({
       feedbackTotalCount={feedbackTotalCount}
       feedbacksHasNextPage={feedbacksHasNextPage}
       feedbacksLoadingMore={feedbacksLoadingMore}
-      feedbacksError={feedbacksError}
+      // フィルタ refetch のエラーと「もっと見る」のエラーは UI 上同じ
+      // inline 表示でハンドルする (どちらもネットワーク経由のフェッチ失敗)。
+      feedbacksError={feedbacksRefetchError ?? feedbacksError}
       onLoadMoreFeedbacks={handleLoadMoreFeedbacks}
       feedbackStats={initialStats}
       feedbacksFilter={feedbacksFilter}

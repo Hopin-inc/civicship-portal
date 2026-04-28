@@ -4,12 +4,18 @@ import {
   GqlReportVariant,
 } from "@/types/graphql";
 import { CommunityReportsTab, type ReportRow } from "./CommunityReportsTab";
+import { EMPTY_FILTER } from "./CommunityReportsFilter";
 
 const meta: Meta<typeof CommunityReportsTab> = {
   title: "SysAdmin/CommunityDetail/CommunityReportsTab",
   component: CommunityReportsTab,
   parameters: { layout: "fullscreen" },
-  args: { communityId: "c_kibotcha" },
+  args: {
+    communityId: "c_kibotcha",
+    filter: EMPTY_FILTER,
+    onFilterChange: () => undefined,
+    filterRefetching: false,
+  },
   decorators: [
     (Story) => (
       <div className="mx-auto max-w-xl p-4">

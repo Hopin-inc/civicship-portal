@@ -63,6 +63,12 @@ export function CommunityReportsTabContainer({
     initialReports ?? EMPTY_CONNECTION,
   );
   const [refetching, setRefetching] = useState(false);
+  /**
+   * フィルタ変更時の refetch で発生したエラー。null = エラー無し。
+   * 握り潰すと UI 上は「該当無し」と区別がつかないので state に残し、
+   * Tab 側で empty 表示の上に inline で見せる。
+   */
+  const [refetchError, setRefetchError] = useState<unknown>(null);
 
   // filter 変更の追従:
   //   - default に戻ったら SSR data に戻す
@@ -71,10 +77,12 @@ export function CommunityReportsTabContainer({
     if (filterKey === "") {
       setCurrentConnection(initialReports ?? EMPTY_CONNECTION);
       setRefetching(false);
+      setRefetchError(null);
       return;
     }
     let cancelled = false;
     setRefetching(true);
+    setRefetchError(null);
     void (async () => {
       try {
         const result = await apollo.query<
@@ -94,11 +102,13 @@ export function CommunityReportsTabContainer({
         });
         if (cancelled) return;
         setCurrentConnection(result.data.adminBrowseReports ?? EMPTY_CONNECTION);
-      } catch {
-        // useCursorPagination 側で error が出るのは追加ロード時のみ。
-        // ここでは「フィルタ中の初回取得失敗」として空 Connection を入れて、
-        // table の empty / error は presentational 側に任せる。
-        if (!cancelled) setCurrentConnection(EMPTY_CONNECTION);
+      } catch (err) {
+        if (cancelled) return;
+        // empty 表示と区別するため error state に立てる。connection 自体は
+        // 直前の状態を残しても良いが、stale data を見せる方が混乱するので
+        // 空 Connection に置く。
+        setCurrentConnection(EMPTY_CONNECTION);
+        setRefetchError(err);
       } finally {
         if (!cancelled) setRefetching(false);
       }
@@ -168,23 +178,28 @@ export function CommunityReportsTabContainer({
       filter={filter}
       onFilterChange={setFilter}
       filterRefetching={refetching}
+      filterError={refetchError}
     />
   );
 }
 
 /**
- * "YYYY-MM-DD" を Date (start of day, UTC) に変換。
+ * "YYYY-MM-DD" を Date (start of day, JST) に変換。
  * backend が `Datetime` スカラ (codegen 上は Date) を期待する。
+ *
+ * 管理画面の利用者は JST で日付を入力する想定なので、UTC ではなく
+ * `+09:00` を明示してパースする。例: "2026-04-01" → 2026-04-01T00:00:00+09:00
+ * (= 2026-03-31T15:00:00Z)。
  */
 function toIsoStart(date: string | null | undefined): Date | null {
   if (!date) return null;
-  return new Date(`${date}T00:00:00.000Z`);
+  return new Date(`${date}T00:00:00+09:00`);
 }
 
 /**
- * "YYYY-MM-DD" を Date (end of day, UTC) に変換。
+ * "YYYY-MM-DD" を Date (end of day, JST) に変換。
  */
 function toIsoEnd(date: string | null | undefined): Date | null {
   if (!date) return null;
-  return new Date(`${date}T23:59:59.999Z`);
+  return new Date(`${date}T23:59:59.999+09:00`);
 }

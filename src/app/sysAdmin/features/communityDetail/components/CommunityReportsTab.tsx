@@ -42,6 +42,8 @@ export type CommunityReportsTabProps = {
   filter: CommunityReportsFilterValue;
   onFilterChange: (next: CommunityReportsFilterValue) => void;
   filterRefetching: boolean;
+  /** フィルタ refetch のエラー (null = エラー無し)。empty と区別して表示するため。 */
+  filterError?: unknown;
 };
 
 /**
@@ -60,6 +62,7 @@ export function CommunityReportsTab({
   filter,
   onFilterChange,
   filterRefetching,
+  filterError,
 }: CommunityReportsTabProps) {
   const router = useRouter();
   const goToDetail = (id: string) => {
@@ -90,13 +93,19 @@ export function CommunityReportsTab({
         loading={filterRefetching}
       />
 
-      {reports.length === 0 ? (
+      {filterError != null && (
+        <p className="text-center text-body-sm text-destructive">
+          フィルタ条件での取得に失敗しました
+        </p>
+      )}
+
+      {reports.length === 0 && filterError == null ? (
         <div className="py-8 text-center text-body-sm text-muted-foreground">
           {isFiltered
             ? "条件に一致するレポートはありません"
             : "この community のレポートはまだ発行されていません"}
         </div>
-      ) : (
+      ) : reports.length === 0 ? null : (
         <>
       <div className="flex items-baseline justify-between text-body-sm text-muted-foreground">
         <span>レポート発行履歴</span>

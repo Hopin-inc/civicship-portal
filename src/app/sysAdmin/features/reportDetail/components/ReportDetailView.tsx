@@ -34,9 +34,9 @@ export type ReportDetailViewProps = {
   approveError: { message: string } | null;
   publishError: { message: string } | null;
   rejectError: { message: string } | null;
-  onApprove: () => void;
-  onPublish: (finalContent: string) => void;
-  onReject: () => void;
+  onApprove: () => Promise<void>;
+  onPublish: (finalContent: string) => Promise<void>;
+  onReject: () => Promise<void>;
 };
 
 /**
@@ -80,6 +80,12 @@ export function ReportDetailView({
         templateVersion={report.template?.version ?? null}
       />
       <ReportStatusActions
+        // 別 Report に切り替わったら ReportStatusActions を unmount → mount
+        // して draftFinalContent などの内部 state を新 Report の initial で
+        // 自然に置き換える。同一 Report 内の Dialog 開閉や mutation 失敗で
+        // は state を維持して編集内容を失わないため、key には report.id 以外
+        // 入れない。
+        key={report.id}
         status={report.status}
         initialFinalContent={
           report.finalContent ?? report.outputMarkdown ?? ""

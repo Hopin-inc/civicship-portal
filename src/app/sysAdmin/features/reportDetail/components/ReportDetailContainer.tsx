@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useApolloClient } from "@apollo/client";
 import {
@@ -99,40 +99,24 @@ export function ReportDetailContainer({
   // ステータス遷移系: success 後は router.refresh() で SSR 再走させ、
   // 表示の status / publishedAt / finalContent を最新化する。エラーは
   // approveError / publishError / rejectError state に残る。
-  const handleApprove = useCallback(() => {
-    void (async () => {
-      try {
-        await approve({ variables: { id: report.id } });
-        router.refresh();
-      } catch {
-        // approveError state でハンドル済み
-      }
-    })();
+  // Dialog (publish / reject) 側で「成功したら閉じる、失敗したら開いたまま」
+  // を実装するため、handler は Promise を返す。
+  const handleApprove = useCallback(async () => {
+    await approve({ variables: { id: report.id } });
+    router.refresh();
   }, [approve, report.id, router]);
 
   const handlePublish = useCallback(
-    (finalContent: string) => {
-      void (async () => {
-        try {
-          await publish({ variables: { id: report.id, finalContent } });
-          router.refresh();
-        } catch {
-          // publishError state でハンドル済み
-        }
-      })();
+    async (finalContent: string) => {
+      await publish({ variables: { id: report.id, finalContent } });
+      router.refresh();
     },
     [publish, report.id, router],
   );
 
-  const handleReject = useCallback(() => {
-    void (async () => {
-      try {
-        await reject({ variables: { id: report.id } });
-        router.refresh();
-      } catch {
-        // rejectError state でハンドル済み
-      }
-    })();
+  const handleReject = useCallback(async () => {
+    await reject({ variables: { id: report.id } });
+    router.refresh();
   }, [reject, report.id, router]);
 
   const fetchMoreFeedbacks = useCallback(
@@ -150,6 +134,19 @@ export function ReportDetailContainer({
     [apollo, report.id],
   );
 
+  // `router.refresh()` で SSR 再走 (feedback 投稿後 / status 遷移後) すると
+  // page.tsx 経由で新しい `initialFeedbacksConnection` が prop として届く。
+  // この場合、フィードバック一覧も最新化したい。
+  //
+  // `resetKey: report.id` を使うと report.id が変わらない限り同期されないため、
+  // ここでは resetKey を使わず `initial` 参照変化を depKey として利用する。
+  // `useMemo` で `initialFeedbacksConnection` 自身が変わったときだけ参照が
+  // 変わるよう安定化させ、不要な再レンダーで state が wipe されないようにする。
+  const stableInitialConnection = useMemo(
+    () => initialFeedbacksConnection ?? EMPTY_CONNECTION,
+    [initialFeedbacksConnection],
+  );
+
   const {
     items: feedbacks,
     totalCount: feedbacksTotalCount,
@@ -158,10 +155,9 @@ export function ReportDetailContainer({
     error: feedbacksError,
     loadMore: loadMoreFeedbacks,
   } = useCursorPagination({
-    initial: initialFeedbacksConnection ?? EMPTY_CONNECTION,
+    initial: stableInitialConnection,
     fetchMore: fetchMoreFeedbacks,
     pageSize: PAGE_SIZE,
-    resetKey: report.id,
   });
 
   const handleLoadMoreFeedbacks = useCallback(() => {

@@ -23,9 +23,9 @@ export type ReportStatusActionsProps = {
   approveError: { message: string } | null;
   publishError: { message: string } | null;
   rejectError: { message: string } | null;
-  onApprove: () => void;
-  onPublish: (finalContent: string) => void;
-  onReject: () => void;
+  onApprove: () => Promise<void>;
+  onPublish: (finalContent: string) => Promise<void>;
+  onReject: () => Promise<void>;
 };
 
 /**
@@ -58,6 +58,11 @@ export function ReportStatusActions({
 }: ReportStatusActionsProps) {
   const [publishOpen, setPublishOpen] = useState(false);
   const [rejectOpen, setRejectOpen] = useState(false);
+  // 親コンポーネントで `key={report.id}` を渡すことで、別 Report に切り替わった
+  // ときに Component が unmount → mount し直され、`useState` の初期値で
+  // draftFinalContent も自動的に新 Report の initialFinalContent に置き換わる。
+  // よって同一 Report 内では編集中の内容が Dialog の開閉 / mutation 失敗を
+  // またいで保持される。
   const [draftFinalContent, setDraftFinalContent] = useState(
     initialFinalContent ?? "",
   );
@@ -91,10 +96,7 @@ export function ReportStatusActions({
           <Button
             variant="primary"
             size="sm"
-            onClick={() => {
-              setDraftFinalContent(initialFinalContent ?? "");
-              setPublishOpen(true);
-            }}
+            onClick={() => setPublishOpen(true)}
             disabled={publishing || rejecting}
           >
             {publishing ? "公開中..." : "公開"}
@@ -144,9 +146,14 @@ export function ReportStatusActions({
             <Button
               variant="primary"
               size="sm"
-              onClick={() => {
-                onPublish(draftFinalContent);
-                setPublishOpen(false);
+              onClick={async () => {
+                try {
+                  await onPublish(draftFinalContent);
+                  setPublishOpen(false);
+                } catch {
+                  // 失敗時は Dialog を閉じない: 編集中の draftFinalContent
+                  // が保持され、エラーメッセージは親側で inline 表示される。
+                }
               }}
               disabled={publishing || draftFinalContent.trim() === ""}
             >
@@ -177,9 +184,13 @@ export function ReportStatusActions({
             <Button
               variant="destructive"
               size="sm"
-              onClick={() => {
-                onReject();
-                setRejectOpen(false);
+              onClick={async () => {
+                try {
+                  await onReject();
+                  setRejectOpen(false);
+                } catch {
+                  // 失敗時は Dialog を閉じない (再試行できるように)。
+                }
               }}
               disabled={rejecting}
             >

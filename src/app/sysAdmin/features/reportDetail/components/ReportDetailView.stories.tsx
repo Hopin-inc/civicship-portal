@@ -10,6 +10,21 @@ const meta: Meta<typeof ReportDetailView> = {
   title: "SysAdmin/ReportDetail/ReportDetailView",
   component: ReportDetailView,
   parameters: { layout: "fullscreen" },
+  args: {
+    feedbacksHasNextPage: false,
+    feedbacksLoadingMore: false,
+    feedbacksError: null,
+    onLoadMoreFeedbacks: () => undefined,
+    approving: false,
+    publishing: false,
+    rejecting: false,
+    approveError: null,
+    publishError: null,
+    rejectError: null,
+    onApprove: async () => undefined,
+    onPublish: async () => undefined,
+    onReject: async () => undefined,
+  },
   decorators: [
     (Story) => (
       <div className="mx-auto max-w-xl p-4">
