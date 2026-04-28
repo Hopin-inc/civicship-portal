@@ -10,13 +10,15 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { MetadataChips } from "@/app/sysAdmin/_shared/components/MetadataChips";
 import type {
   GqlGetAdminTemplateFeedbackStatsQuery,
   GqlReportFeedbackWithReportFieldsFragment,
   GqlReportTemplateFieldsFragment,
   GqlReportTemplateStatsBreakdownRowFieldsFragment,
 } from "@/types/graphql";
-import { PromptEditor } from "./PromptEditor";
+import { PromptEditor, type PromptFormValues } from "./PromptEditor";
 import { ExperimentSection } from "./ExperimentSection";
 import { VersionSelector } from "./VersionSelector";
 import { FeedbackList } from "@/app/sysAdmin/_shared/feedback/FeedbackList";
@@ -34,14 +36,9 @@ export type GenerationTemplateViewProps = {
   editorLoading: boolean;
   editorError: unknown;
 
-  systemPrompt: string;
-  userPromptTemplate: string;
-  isDirty: boolean;
   saving: boolean;
   saveError: { message: string } | null;
-  setSystemPrompt: (v: string) => void;
-  setUserPromptTemplate: (v: string) => void;
-  onSave: () => void;
+  onSubmitPrompt: (values: PromptFormValues) => void;
 
   feedbacks: GqlReportFeedbackWithReportFieldsFragment[];
   feedbackTotalCount?: number;
@@ -71,14 +68,9 @@ export function GenerationTemplateView({
   template,
   editorLoading,
   editorError,
-  systemPrompt,
-  userPromptTemplate,
-  isDirty,
   saving,
   saveError,
-  setSystemPrompt,
-  setUserPromptTemplate,
-  onSave,
+  onSubmitPrompt,
   feedbacks,
   feedbackTotalCount,
   feedbacksHasNextPage,
@@ -119,13 +111,10 @@ export function GenerationTemplateView({
         </p>
       ) : (
         <PromptEditor
-          systemPrompt={systemPrompt}
-          setSystemPrompt={setSystemPrompt}
-          userPromptTemplate={userPromptTemplate}
-          setUserPromptTemplate={setUserPromptTemplate}
-          onSave={onSave}
+          initialSystemPrompt={template.systemPrompt}
+          initialUserPromptTemplate={template.userPromptTemplate}
+          onSubmit={onSubmitPrompt}
           saving={saving}
-          isDirty={isDirty}
           saveError={saveError}
         />
       )}
@@ -210,32 +199,26 @@ function InlineHeader({
       : null;
   const hasWarning = activeRows.some((r) => r.correlationWarning);
 
-  const segments: string[] = [];
-  if (template) {
-    segments.push(`v${template.version}`);
-    if (template.experimentKey) segments.push(`ブランチ: ${template.experimentKey}`);
-    segments.push(`配信比率 ${template.trafficWeight}%`);
-  }
-  segments.push(
-    `評価 ${avgRating != null ? avgRating.toFixed(2) : "—"} (${totalFeedback})`,
-  );
-  segments.push(
-    `LLM-人間 一致度 ${avgCorrelation != null ? avgCorrelation.toFixed(2) : "—"}`,
-  );
-
   return (
-    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-body-sm tabular-nums text-muted-foreground">
-      {segments.map((s, i) => (
-        <span key={i} className="inline-flex items-center gap-1">
-          {i > 0 && <span className="text-muted">·</span>}
-          <span>{s}</span>
-        </span>
-      ))}
+    <div className="space-y-2">
+      <MetadataChips
+        items={[
+          template && { label: `v${template.version}`, emphasis: true },
+          template?.experimentKey
+            ? `ブランチ: ${template.experimentKey}`
+            : null,
+          template && `配信比率 ${template.trafficWeight}%`,
+          `評価 ${avgRating != null ? avgRating.toFixed(2) : "—"} (${totalFeedback})`,
+          `LLM-人間 一致度 ${avgCorrelation != null ? avgCorrelation.toFixed(2) : "—"}`,
+        ]}
+      />
       {hasWarning && (
-        <span className="inline-flex items-center gap-1 text-destructive">
-          <AlertTriangle className="h-3 w-3" />
-          <span>警告</span>
-        </span>
+        <Alert variant="destructive" className="py-2">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription className="text-body-xs">
+            この active 行に LLM-人間 一致度の警告があります
+          </AlertDescription>
+        </Alert>
       )}
     </div>
   );

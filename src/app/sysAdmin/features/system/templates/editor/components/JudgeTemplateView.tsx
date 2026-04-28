@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { AlertTriangle } from "lucide-react";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -12,6 +13,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { MetadataChips } from "@/app/sysAdmin/_shared/components/MetadataChips";
 import type {
   GqlGetAdminTemplateFeedbackStatsQuery,
   GqlReportFeedbackWithReportFieldsFragment,
@@ -90,15 +92,13 @@ export function JudgeTemplateView({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start gap-2 rounded border border-destructive/40 bg-destructive/5 p-3">
-        <AlertTriangle className="h-4 w-4 shrink-0 text-destructive mt-0.5" />
-        <div className="space-y-1 text-body-sm">
-          <p className="font-semibold text-destructive">JUDGE template は閲覧専用</p>
-          <p className="text-body-xs text-muted-foreground">
-            prompt の更新は seed 投入で行ってください。admin UI から編集すると過去の judgeScore との比較が断絶し、評価指標の連続性が崩れます。
-          </p>
-        </div>
-      </div>
+      <Alert variant="destructive">
+        <AlertTriangle className="h-4 w-4" />
+        <AlertTitle>JUDGE template は閲覧専用</AlertTitle>
+        <AlertDescription className="text-body-xs">
+          prompt の更新は seed 投入で行ってください。admin UI から編集すると過去の judgeScore との比較が断絶し、評価指標の連続性が崩れます。
+        </AlertDescription>
+      </Alert>
 
       <InlineHeader rows={rows} template={template} />
 
@@ -200,23 +200,13 @@ function InlineHeader({
         ratedFeedback
       : null;
 
-  const segments: string[] = [];
-  if (template) {
-    segments.push(`v${template.version}`);
-    if (template.experimentKey) segments.push(`ブランチ: ${template.experimentKey}`);
-  }
-  segments.push(
-    `評価 ${avgRating != null ? avgRating.toFixed(2) : "—"} (${totalFeedback})`,
-  );
-
   return (
-    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-body-sm tabular-nums text-muted-foreground">
-      {segments.map((s, i) => (
-        <span key={i} className="inline-flex items-center gap-1">
-          {i > 0 && <span className="text-muted">·</span>}
-          <span>{s}</span>
-        </span>
-      ))}
-    </div>
+    <MetadataChips
+      items={[
+        template && { label: `v${template.version}`, emphasis: true },
+        template?.experimentKey ? `ブランチ: ${template.experimentKey}` : null,
+        `評価 ${avgRating != null ? avgRating.toFixed(2) : "—"} (${totalFeedback})`,
+      ]}
+    />
   );
 }

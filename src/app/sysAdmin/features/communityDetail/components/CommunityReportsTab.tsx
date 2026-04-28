@@ -5,6 +5,14 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { Button } from "@/components/ui/button";
 import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
   GqlReportStatus,
   type GqlReportVariant,
 } from "@/types/graphql";
@@ -71,23 +79,22 @@ export function CommunityReportsTab({
       <div className="flex items-baseline justify-between text-body-sm text-muted-foreground">
         <span>レポート発行履歴</span>
         <span className="tabular-nums">
-          {reports.length} / {totalCount} 件
+          {reports.length} / {Math.max(totalCount, reports.length)} 件
         </span>
       </div>
-      <div className="overflow-x-auto rounded border border-border">
-        <table className="w-full text-body-sm">
-          <thead className="bg-muted/50 text-muted-foreground">
-            <tr>
-              <th className="px-2 py-1.5 text-left font-medium">公開日</th>
-              <th className="px-2 py-1.5 text-left font-medium">種類</th>
-              <th className="px-2 py-1.5 text-left font-medium">ステータス</th>
-            </tr>
-          </thead>
-          <tbody>
+      <div className="overflow-hidden rounded border border-border">
+        <Table className="text-body-sm">
+          <TableHeader className="bg-muted/50">
+            <TableRow>
+              <TableHead className="h-9 px-2 py-1.5">公開日</TableHead>
+              <TableHead className="h-9 px-2 py-1.5">種類</TableHead>
+              <TableHead className="h-9 px-2 py-1.5">ステータス</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {reports.map((r) => (
-              <tr
+              <TableRow
                 key={r.id}
-                className="cursor-pointer border-t border-border hover:bg-muted/40 focus-visible:bg-muted/40 focus-visible:outline-none"
                 tabIndex={0}
                 role="link"
                 onClick={() => goToDetail(r.id)}
@@ -97,20 +104,23 @@ export function CommunityReportsTab({
                     goToDetail(r.id);
                   }
                 }}
+                className="cursor-pointer focus-visible:bg-muted/50 focus-visible:outline-none"
               >
-                <td className="px-2 py-1.5 tabular-nums">
+                <TableCell className="px-2 py-1.5 tabular-nums">
                   {r.publishedAt
                     ? new Date(r.publishedAt).toLocaleDateString("ja-JP")
                     : "—"}
-                </td>
-                <td className="px-2 py-1.5">{variantLabel(r.variant)}</td>
-                <td className="px-2 py-1.5 text-muted-foreground">
+                </TableCell>
+                <TableCell className="px-2 py-1.5">
+                  {variantLabel(r.variant)}
+                </TableCell>
+                <TableCell className="px-2 py-1.5 text-muted-foreground">
                   {statusLabel(r.status)}
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
       {error != null && (
         <p className="text-center text-body-sm text-destructive">

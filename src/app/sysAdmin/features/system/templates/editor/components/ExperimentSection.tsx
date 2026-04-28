@@ -1,6 +1,14 @@
 "use client";
 
 import { AlertTriangle } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import type { TemplateBreakdownRow } from "@/app/sysAdmin/features/system/templates/shared/fixtures";
 
@@ -17,7 +25,9 @@ export function ExperimentSection({ rows }: Props) {
     return (
       <section className="space-y-2">
         <h3 className="text-body-sm font-semibold">実験</h3>
-        <p className="text-body-sm text-muted-foreground">対象 template がありません</p>
+        <p className="text-body-sm text-muted-foreground">
+          対象 template がありません
+        </p>
       </section>
     );
   }
@@ -25,39 +35,42 @@ export function ExperimentSection({ rows }: Props) {
   return (
     <section className="space-y-2">
       <h3 className="text-body-sm font-semibold">実験</h3>
-      <div className="overflow-x-auto rounded border border-border">
-        <table className="w-full text-body-xs tabular-nums">
-          <thead className="bg-muted/50 text-muted-foreground">
-            <tr>
-              <Th>ver</Th>
-              <Th>experiment</Th>
-              <Th align="right">weight</Th>
-              <Th align="center">active</Th>
-              <Th align="right">feedback</Th>
-              <Th align="right">avgR</Th>
-              <Th align="right">judge相関</Th>
-            </tr>
-          </thead>
-          <tbody>
+      <div className="overflow-hidden rounded border border-border">
+        <Table className="text-body-xs tabular-nums">
+          <TableHeader className="bg-muted/50">
+            <TableRow>
+              <TableHead className="h-8 px-2 py-1">ver</TableHead>
+              <TableHead className="h-8 px-2 py-1">experiment</TableHead>
+              <TableHead className="h-8 px-2 py-1 text-right">weight</TableHead>
+              <TableHead className="h-8 px-2 py-1 text-center">active</TableHead>
+              <TableHead className="h-8 px-2 py-1 text-right">feedback</TableHead>
+              <TableHead className="h-8 px-2 py-1 text-right">avgR</TableHead>
+              <TableHead className="h-8 px-2 py-1 text-right">judge相関</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {rows.map((row) => (
-              <tr
+              <TableRow
                 key={row.templateId}
-                className={cn(
-                  "border-t border-border",
-                  !row.isActive && "text-muted-foreground",
-                )}
+                className={cn(!row.isActive && "text-muted-foreground")}
               >
-                <Td>v{row.version}</Td>
-                <Td>{row.experimentKey ?? "—"}</Td>
-                <Td align="right">{row.trafficWeight}%</Td>
-                <Td align="center">
+                <TableCell className="px-2 py-1.5">v{row.version}</TableCell>
+                <TableCell className="px-2 py-1.5">
+                  {row.experimentKey ?? "—"}
+                </TableCell>
+                <TableCell className="px-2 py-1.5 text-right">
+                  {row.trafficWeight}%
+                </TableCell>
+                <TableCell className="px-2 py-1.5 text-center">
                   {row.isActive ? (row.isEnabled ? "✓" : "○") : "−"}
-                </Td>
-                <Td align="right">{row.feedbackCount}</Td>
-                <Td align="right">
+                </TableCell>
+                <TableCell className="px-2 py-1.5 text-right">
+                  {row.feedbackCount}
+                </TableCell>
+                <TableCell className="px-2 py-1.5 text-right">
                   {row.avgRating != null ? row.avgRating.toFixed(2) : "—"}
-                </Td>
-                <Td align="right">
+                </TableCell>
+                <TableCell className="px-2 py-1.5 text-right">
                   <span
                     className={cn(
                       "inline-flex items-center gap-1",
@@ -67,56 +80,16 @@ export function ExperimentSection({ rows }: Props) {
                     {row.judgeHumanCorrelation != null
                       ? row.judgeHumanCorrelation.toFixed(2)
                       : "—"}
-                    {row.correlationWarning && <AlertTriangle className="h-3 w-3" />}
+                    {row.correlationWarning && (
+                      <AlertTriangle className="h-3 w-3" />
+                    )}
                   </span>
-                </Td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
     </section>
-  );
-}
-
-function Th({
-  children,
-  align = "left",
-}: {
-  children: React.ReactNode;
-  align?: "left" | "right" | "center";
-}) {
-  return (
-    <th
-      className={cn(
-        "px-2 py-1 font-medium",
-        align === "right" && "text-right",
-        align === "center" && "text-center",
-        align === "left" && "text-left",
-      )}
-    >
-      {children}
-    </th>
-  );
-}
-
-function Td({
-  children,
-  align = "left",
-}: {
-  children: React.ReactNode;
-  align?: "left" | "right" | "center";
-}) {
-  return (
-    <td
-      className={cn(
-        "px-2 py-1.5",
-        align === "right" && "text-right",
-        align === "center" && "text-center",
-        align === "left" && "text-left",
-      )}
-    >
-      {children}
-    </td>
   );
 }

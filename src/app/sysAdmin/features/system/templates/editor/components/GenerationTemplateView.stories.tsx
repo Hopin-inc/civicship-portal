@@ -1,4 +1,3 @@
-import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import {
   mockActiveTemplate,
@@ -32,39 +31,21 @@ const rows = mockBreakdown(GqlReportVariant.MemberNewsletter);
 const feedbacks = makeMockFeedbacks(8);
 const feedbackStats = makeMockFeedbackStats(feedbacks.length);
 
-function StatefulView() {
-  const [systemPrompt, setSystemPrompt] = useState(template.systemPrompt);
-  const [userPromptTemplate, setUserPromptTemplate] = useState(
-    template.userPromptTemplate,
-  );
-  return (
-    <GenerationTemplateView
-      rows={rows}
-      breakdownLoading={false}
-      breakdownError={null}
-      template={template}
-      editorLoading={false}
-      editorError={null}
-      systemPrompt={systemPrompt}
-      userPromptTemplate={userPromptTemplate}
-      isDirty={
-        systemPrompt !== template.systemPrompt ||
-        userPromptTemplate !== template.userPromptTemplate
-      }
-      saving={false}
-      saveError={null}
-      setSystemPrompt={setSystemPrompt}
-      setUserPromptTemplate={setUserPromptTemplate}
-      onSave={() => undefined}
-      feedbacks={feedbacks}
-      feedbackTotalCount={feedbacks.length}
-      feedbackStats={feedbackStats}
-    />
-  );
-}
-
 export const WithData: Story = {
-  render: () => <StatefulView />,
+  args: {
+    rows,
+    breakdownLoading: false,
+    breakdownError: null,
+    template,
+    editorLoading: false,
+    editorError: null,
+    saving: false,
+    saveError: null,
+    onSubmitPrompt: () => undefined,
+    feedbacks,
+    feedbackTotalCount: feedbacks.length,
+    feedbackStats,
+  },
 };
 
 export const Loading: Story = {
@@ -75,14 +56,9 @@ export const Loading: Story = {
     template: null,
     editorLoading: true,
     editorError: null,
-    systemPrompt: "",
-    userPromptTemplate: "",
-    isDirty: false,
     saving: false,
     saveError: null,
-    setSystemPrompt: () => undefined,
-    setUserPromptTemplate: () => undefined,
-    onSave: () => undefined,
+    onSubmitPrompt: () => undefined,
     feedbacks: [],
     feedbackStats: null,
   },
@@ -96,14 +72,9 @@ export const NoTemplate: Story = {
     template: null,
     editorLoading: false,
     editorError: null,
-    systemPrompt: "",
-    userPromptTemplate: "",
-    isDirty: false,
     saving: false,
     saveError: null,
-    setSystemPrompt: () => undefined,
-    setUserPromptTemplate: () => undefined,
-    onSave: () => undefined,
+    onSubmitPrompt: () => undefined,
     feedbacks: [],
     feedbackStats: null,
   },
@@ -117,15 +88,10 @@ export const BreakdownError: Story = {
     template,
     editorLoading: false,
     editorError: null,
-    systemPrompt: template.systemPrompt,
-    userPromptTemplate: template.userPromptTemplate,
-    isDirty: false,
     saving: false,
     saveError: null,
-    setSystemPrompt: () => undefined,
-    setUserPromptTemplate: () => undefined,
-    onSave: () => undefined,
-    feedbacks: feedbacks,
+    onSubmitPrompt: () => undefined,
+    feedbacks,
     feedbackTotalCount: feedbacks.length,
     feedbackStats,
   },

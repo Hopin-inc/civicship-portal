@@ -45,7 +45,12 @@ export function CommunityReportsTabContainer({
   );
   const [loadingMore, setLoadingMore] = useState(false);
   const [loadError, setLoadError] = useState<unknown>(null);
-  const totalCount = initialReports?.totalCount ?? reports.length;
+  // totalCount は initial で SSR 値を入れ、各 fetchMore レスポンスでも更新する。
+  // backend が「全体件数」を返す前提で、追加ロード中に totalCount が増減しても
+  // 表示と一致させるため (= "48 / 47 件" のような stale 表示を防ぐ)。
+  const [totalCount, setTotalCount] = useState<number>(
+    initialReports?.totalCount ?? 0,
+  );
 
   // setLoadingMore / setEndCursor / setHasNextPage は state なので非同期で反映
   // される。rapid に「もっと見る」を連打した時に同じ cursor で重複 fetch しない
@@ -89,6 +94,7 @@ export function CommunityReportsTabContainer({
       setReports((prev) => [...prev, ...extractReports(next)]);
       setEndCursor(nextEndCursor);
       setHasNextPage(nextHasNextPage);
+      setTotalCount(next.totalCount);
     } catch (err) {
       // catch しないと button onClick で発火する promise が unhandled rejection に
       // なる。View 側は error prop を表示できるので state にセットして渡す。

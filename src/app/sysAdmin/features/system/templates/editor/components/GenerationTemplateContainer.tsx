@@ -16,6 +16,7 @@ import {
 import { GET_ADMIN_TEMPLATE_FEEDBACKS } from "@/graphql/account/adminTemplateFeedbacks/query";
 import { useCursorPagination } from "@/app/sysAdmin/_shared/hooks/useCursorPagination";
 import { GenerationTemplateView } from "./GenerationTemplateView";
+import type { PromptFormValues } from "./PromptEditor";
 
 type FeedbacksConnection = NonNullable<
   GqlGetAdminTemplateFeedbacksQuery["adminTemplateFeedbacks"]
@@ -52,6 +53,9 @@ const EMPTY_CONNECTION: FeedbacksConnection = {
  * props で受け取る。client-side fetch は auth race の原因になるため使わない。
  * 「もっと見る」だけ Apollo client.query で追加ページを取りに行く。
  *
+ * Prompt の編集 state は `<PromptEditor>` 内の react-hook-form が管理する
+ * (= Container は initial 値を渡し submit 時の values を受け取るだけ)。
+ *
  * 保存後は `router.refresh()` で SSR を再走させ、stats / template / feedbacks
  * を最新化する。
  */
@@ -64,12 +68,6 @@ export function GenerationTemplateContainer({
 }: Props) {
   const router = useRouter();
   const apollo = useApolloClient();
-  const [systemPrompt, setSystemPrompt] = useState(
-    initialTemplate?.systemPrompt ?? "",
-  );
-  const [userPromptTemplate, setUserPromptTemplate] = useState(
-    initialTemplate?.userPromptTemplate ?? "",
-  );
   const [feedbackTotalCount, setFeedbackTotalCount] = useState(
     initialFeedbacks?.totalCount ?? 0,
   );
@@ -77,40 +75,44 @@ export function GenerationTemplateContainer({
   const [save, { loading: saving, error: saveError }] =
     useUpdateReportTemplateMutation();
 
-  const handleSave = useCallback(async () => {
-    if (!initialTemplate) return;
-    // ボタン onClick から呼ばれて promise が捨てられるため、ここで例外を握る。
-    // mutation のエラーは Apollo の `saveError` 経由で UI に伝わる。
-    try {
-      await save({
-        variables: {
-          variant,
-          input: {
-            model: initialTemplate.model,
-            maxTokens: initialTemplate.maxTokens,
-            temperature: initialTemplate.temperature ?? undefined,
-            stopSequences: initialTemplate.stopSequences,
-            systemPrompt,
-            userPromptTemplate,
-            experimentKey: initialTemplate.experimentKey ?? undefined,
-            isActive: initialTemplate.isActive,
-            isEnabled: initialTemplate.isEnabled,
-            trafficWeight: initialTemplate.trafficWeight,
-            communityContext: initialTemplate.communityContext ?? undefined,
+  const handleSubmitPrompt = useCallback(
+    async (values: PromptFormValues) => {
+      if (!initialTemplate) return;
+      try {
+        await save({
+          variables: {
+            variant,
+            input: {
+              model: initialTemplate.model,
+              maxTokens: initialTemplate.maxTokens,
+              temperature: initialTemplate.temperature ?? undefined,
+              stopSequences: initialTemplate.stopSequences,
+              systemPrompt: values.systemPrompt,
+              userPromptTemplate: values.userPromptTemplate,
+              experimentKey: initialTemplate.experimentKey ?? undefined,
+              isActive: initialTemplate.isActive,
+              isEnabled: initialTemplate.isEnabled,
+              trafficWeight: initialTemplate.trafficWeight,
+              communityContext: initialTemplate.communityContext ?? undefined,
+            },
           },
-        },
-      });
-      // SSR 経路の data を最新化する
-      router.refresh();
-    } catch {
-      // saveError state でハンドル済み
-    }
-  }, [initialTemplate, save, variant, systemPrompt, userPromptTemplate, router]);
+        });
+        // SSR 経路の data を最新化する → PromptEditor の useEffect で
+        // initial が新値に reset される
+        router.refresh();
+      } catch {
+        // saveError state でハンドル済み
+      }
+    },
+    [initialTemplate, save, variant, router],
+  );
 
-  const isDirty =
-    initialTemplate != null &&
-    (systemPrompt !== initialTemplate.systemPrompt ||
-      userPromptTemplate !== initialTemplate.userPromptTemplate);
+  const handleSubmitPromptSync = useCallback(
+    (values: PromptFormValues) => {
+      void handleSubmitPrompt(values);
+    },
+    [handleSubmitPrompt],
+  );
 
   const fetchMoreFeedbacks = useCallback(
     async (cursor: string, first: number) => {
@@ -158,14 +160,9 @@ export function GenerationTemplateContainer({
       template={initialTemplate}
       editorLoading={false}
       editorError={null}
-      systemPrompt={systemPrompt}
-      userPromptTemplate={userPromptTemplate}
-      isDirty={isDirty}
       saving={saving}
       saveError={saveError ?? null}
-      setSystemPrompt={setSystemPrompt}
-      setUserPromptTemplate={setUserPromptTemplate}
-      onSave={handleSave}
+      onSubmitPrompt={handleSubmitPromptSync}
       feedbacks={feedbacks}
       feedbackTotalCount={feedbackTotalCount}
       feedbacksHasNextPage={feedbacksHasNextPage}

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { mockActiveTemplate } from "@/app/sysAdmin/features/system/templates/shared/fixtures";
 import { GqlReportVariant } from "@/types/graphql";
@@ -21,74 +20,32 @@ type Story = StoryObj<typeof PromptEditor>;
 
 const template = mockActiveTemplate(GqlReportVariant.MemberNewsletter);
 
-function StatefulEditor({
-  initialSystemPrompt,
-  initialUserPromptTemplate,
-}: {
-  initialSystemPrompt: string;
-  initialUserPromptTemplate: string;
-}) {
-  const [systemPrompt, setSystemPrompt] = useState(initialSystemPrompt);
-  const [userPromptTemplate, setUserPromptTemplate] = useState(
-    initialUserPromptTemplate,
-  );
-  const isDirty =
-    systemPrompt !== template.systemPrompt ||
-    userPromptTemplate !== template.userPromptTemplate;
-  return (
-    <PromptEditor
-      systemPrompt={systemPrompt}
-      setSystemPrompt={setSystemPrompt}
-      userPromptTemplate={userPromptTemplate}
-      setUserPromptTemplate={setUserPromptTemplate}
-      onSave={() => undefined}
-      saving={false}
-      isDirty={isDirty}
-      saveError={null}
-    />
-  );
-}
-
 export const Pristine: Story = {
-  render: () => (
-    <StatefulEditor
-      initialSystemPrompt={template.systemPrompt}
-      initialUserPromptTemplate={template.userPromptTemplate}
-    />
-  ),
-};
-
-export const Dirty: Story = {
-  render: () => (
-    <StatefulEditor
-      initialSystemPrompt={template.systemPrompt + "\n\n# 編集中"}
-      initialUserPromptTemplate={template.userPromptTemplate}
-    />
-  ),
+  args: {
+    initialSystemPrompt: template.systemPrompt,
+    initialUserPromptTemplate: template.userPromptTemplate,
+    saving: false,
+    saveError: null,
+    onSubmit: () => undefined,
+  },
 };
 
 export const Saving: Story = {
   args: {
-    systemPrompt: template.systemPrompt + "\n\n# 編集中",
-    setSystemPrompt: () => undefined,
-    userPromptTemplate: template.userPromptTemplate,
-    setUserPromptTemplate: () => undefined,
-    onSave: () => undefined,
+    initialSystemPrompt: template.systemPrompt,
+    initialUserPromptTemplate: template.userPromptTemplate,
     saving: true,
-    isDirty: true,
     saveError: null,
+    onSubmit: () => undefined,
   },
 };
 
 export const SaveError: Story = {
   args: {
-    systemPrompt: template.systemPrompt + "\n\n# 編集中",
-    setSystemPrompt: () => undefined,
-    userPromptTemplate: template.userPromptTemplate,
-    setUserPromptTemplate: () => undefined,
-    onSave: () => undefined,
+    initialSystemPrompt: template.systemPrompt,
+    initialUserPromptTemplate: template.userPromptTemplate,
     saving: false,
-    isDirty: true,
     saveError: { message: "Network error: failed to reach server" },
+    onSubmit: () => undefined,
   },
 };
