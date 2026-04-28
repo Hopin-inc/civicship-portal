@@ -1,5 +1,6 @@
 "use client";
 
+import { ExternalLink } from "lucide-react";
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkBreaks from "remark-breaks";
@@ -73,17 +74,31 @@ const components: Components = {
       {...props}
     />
   ),
-  a: ({ className, ...props }) => (
-    <a
-      className={cn(
-        "font-medium text-primary underline underline-offset-4 hover:text-primary-hover",
-        className,
-      )}
-      target={props.href?.startsWith("http") ? "_blank" : undefined}
-      rel={props.href?.startsWith("http") ? "noopener noreferrer" : undefined}
-      {...props}
-    />
-  ),
+  a: ({ className, children, ...props }) => {
+    const isExternal = props.href?.startsWith("http") ?? false;
+    return (
+      <a
+        className={cn(
+          "font-medium text-primary underline underline-offset-4 hover:text-primary-hover",
+          className,
+        )}
+        target={isExternal ? "_blank" : undefined}
+        rel={isExternal ? "noopener noreferrer" : undefined}
+        {...props}
+      >
+        {children}
+        {isExternal && (
+          <>
+            <ExternalLink
+              aria-hidden="true"
+              className="ml-0.5 inline-block h-[0.9em] w-[0.9em] align-[-0.1em]"
+            />
+            <span className="sr-only">（新しいタブで開く）</span>
+          </>
+        )}
+      </a>
+    );
+  },
   ul: ({ className, ...props }) => (
     <ul className={cn("my-3 ml-6 list-disc space-y-1", className)} {...props} />
   ),
@@ -146,6 +161,8 @@ const components: Components = {
     <img
       alt={alt ?? ""}
       className={cn("my-4 max-w-full rounded-md border border-border", className)}
+      loading="lazy"
+      decoding="async"
       {...props}
     />
   ),
