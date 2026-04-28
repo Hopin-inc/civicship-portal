@@ -15,7 +15,7 @@
   "votes.eligibility.requirement.membership": "コミュニティメンバーが投票できます",
   "votes.eligibility.requirement.membershipWithRole": "{role} 以上のメンバーが投票できます",
   "votes.eligibility.requirement.nft": "{tokenName} を保有する人が投票できます",
-  "votes.cast.remaining": "残り {time}",
+  "votes.cast.remainingLabel": "残り {time}",
   "votes.cast.remaining.daysHours": "{days}日 {hours}時間",
   "votes.cast.remaining.hoursMinutes": "{hours}時間 {minutes}分",
   "votes.cast.remaining.minutes": "{minutes}分",

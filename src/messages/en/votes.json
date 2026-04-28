@@ -15,7 +15,7 @@
   "votes.eligibility.requirement.membership": "Community members can vote",
   "votes.eligibility.requirement.membershipWithRole": "Members with {role} role or higher can vote",
   "votes.eligibility.requirement.nft": "Holders of {tokenName} can vote",
-  "votes.cast.remaining": "{time} remaining",
+  "votes.cast.remainingLabel": "{time} remaining",
   "votes.cast.remaining.daysHours": "{days}d {hours}h",
   "votes.cast.remaining.hoursMinutes": "{hours}h {minutes}m",
   "votes.cast.remaining.minutes": "{minutes}m",

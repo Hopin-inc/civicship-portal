@@ -63,7 +63,7 @@ export function VoteCastPage({ view }: VoteCastPageProps) {
           <VotePhaseBadge phase={view.phase} className="w-fit" />
           {remaining && (
             <span className="text-xs text-muted-foreground">
-              {t("votes.cast.remaining", { time: remaining })}
+              {t("votes.cast.remainingLabel", { time: remaining })}
             </span>
           )}
         </div>
