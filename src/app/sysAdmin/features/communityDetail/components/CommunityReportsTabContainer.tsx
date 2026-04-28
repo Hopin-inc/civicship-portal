@@ -47,16 +47,27 @@ export function CommunityReportsTabContainer({
   const [loadError, setLoadError] = useState<unknown>(null);
   const totalCount = initialReports?.totalCount ?? reports.length;
 
-  // setLoadingMore / setEndCursor は state なので非同期で反映される。
-  // rapid に「もっと見る」を連打した時に同じ cursor で重複 fetch しないよう、
-  // 同期的な ref で guard する (useCursorPagination と同じパターン)。
+  // setLoadingMore / setEndCursor / setHasNextPage は state なので非同期で反映
+  // される。rapid に「もっと見る」を連打した時に同じ cursor で重複 fetch しない
+  // よう、同期的な ref で guard する (useCursorPagination と同じパターン)。
+  // Relay 実装によっては最終ページでも `endCursor` が non-null で返ることが
+  // あるので、`hasNextPageRef` を必ず併用する。
   const loadingRef = useRef(false);
   const endCursorRef = useRef<string | null>(
     initialReports?.pageInfo.endCursor ?? null,
   );
+  const hasNextPageRef = useRef<boolean>(
+    initialReports?.pageInfo.hasNextPage ?? false,
+  );
 
   const handleLoadMore = useCallback(async () => {
-    if (loadingRef.current || !endCursorRef.current) return;
+    if (
+      loadingRef.current ||
+      !hasNextPageRef.current ||
+      !endCursorRef.current
+    ) {
+      return;
+    }
     const cursor = endCursorRef.current;
     loadingRef.current = true;
     setLoadingMore(true);
@@ -72,10 +83,12 @@ export function CommunityReportsTabContainer({
       });
       const next = result.data.adminBrowseReports;
       const nextEndCursor = next.pageInfo.endCursor ?? null;
+      const nextHasNextPage = next.pageInfo.hasNextPage;
       endCursorRef.current = nextEndCursor;
+      hasNextPageRef.current = nextHasNextPage;
       setReports((prev) => [...prev, ...extractReports(next)]);
       setEndCursor(nextEndCursor);
-      setHasNextPage(next.pageInfo.hasNextPage);
+      setHasNextPage(nextHasNextPage);
     } catch (err) {
       // catch しないと button onClick で発火する promise が unhandled rejection に
       // なる。View 側は error prop を表示できるので state にセットして渡す。
