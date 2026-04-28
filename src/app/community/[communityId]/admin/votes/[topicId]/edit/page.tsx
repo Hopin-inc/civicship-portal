@@ -29,19 +29,21 @@ export default function EditVoteTopicPage() {
     return presentVoteTopicForEdit(data.voteTopic);
   }, [data]);
 
-  if (!communityId) return null;
-  if (loading) return <LoadingIndicator fullScreen={false} />;
-  if (error) return <ErrorState title={t("adminVotes.toast.updateError")} />;
-  if (!data?.voteTopic) return notFound();
+  const isNotUpcoming =
+    data?.voteTopic != null &&
+    data.voteTopic.phase !== GqlVoteTopicPhase.Upcoming;
 
-  const isNotUpcoming = data.voteTopic.phase !== GqlVoteTopicPhase.Upcoming;
   useEffect(() => {
     if (isNotUpcoming) {
       router.replace(`/admin/votes/${params.topicId}`);
     }
   }, [isNotUpcoming, params.topicId, router]);
-  if (isNotUpcoming) return null;
 
+  if (!communityId) return null;
+  if (loading) return <LoadingIndicator fullScreen={false} />;
+  if (error) return <ErrorState title={t("adminVotes.toast.updateError")} />;
+  if (!data?.voteTopic) return notFound();
+  if (isNotUpcoming) return null;
   if (!initialValues) return <LoadingIndicator fullScreen={false} />;
 
   return (
