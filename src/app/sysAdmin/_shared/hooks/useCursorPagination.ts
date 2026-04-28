@@ -90,9 +90,14 @@ export function useCursorPagination<TItem>({
   // initial が変わった (filter 切替などで親が再 fetch した) ときに同期
   useEffect(() => {
     generationRef.current += 1;
+    // in-flight な loadMore の loadingRef が立ったままだと、新しい initial に
+    // 対する次の loadMore が「まだ読み込み中」と誤判定されてブロックされる。
+    // generation でレスポンスは捨てられるので、guard も明示的にリセットする。
+    loadingRef.current = false;
     setItems(extractItems(initial));
     setEndCursor(initial.pageInfo.endCursor ?? null);
     setHasNextPage(initial.pageInfo.hasNextPage);
+    setLoading(false);
     endCursorRef.current = initial.pageInfo.endCursor ?? null;
     hasNextPageRef.current = initial.pageInfo.hasNextPage;
   }, [initial]);
@@ -128,6 +133,7 @@ export function useCursorPagination<TItem>({
 
   const reset = useCallback((next: ConnectionLike<TItem>) => {
     generationRef.current += 1;
+    loadingRef.current = false;
     const nextEndCursor = next.pageInfo.endCursor ?? null;
     const nextHasNextPage = next.pageInfo.hasNextPage;
     endCursorRef.current = nextEndCursor;
@@ -135,6 +141,7 @@ export function useCursorPagination<TItem>({
     setItems(extractItems(next));
     setEndCursor(nextEndCursor);
     setHasNextPage(nextHasNextPage);
+    setLoading(false);
   }, []);
 
   return { items, hasNextPage, loading, loadMore, reset };
