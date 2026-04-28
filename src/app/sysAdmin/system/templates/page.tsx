@@ -5,37 +5,23 @@ import { SUPPORTED_VARIANTS } from "@/app/sysAdmin/features/system/templates/sha
 import { SysAdminSystemTemplatesPageClient } from "./SysAdminSystemTemplatesPageClient";
 
 /**
- * テンプレート一覧 (生成用 / 評価用)。
+ * テンプレート一覧。GENERATION 4 variant のみ表示する。
+ * JUDGE は variant 詳細ページの [評価用] タブから確認する。
  *
- * GENERATION / JUDGE 各 4 variant 分の breakdown を SSR + cookie で取得し、
- * client へ summaries として渡す。client-side fetch は auth race
- * (`IsAdmin authorization FAILED`) の原因になるため SSR に統一。
+ * SSR + cookie で breakdown を取得し client へ summaries として渡す。
+ * client-side fetch は auth race (`IsAdmin authorization FAILED`) の
+ * 原因になるため SSR に統一。
  */
 export default async function SysAdminSystemTemplatesPage() {
-  const [generationRowsByVariant, judgeRowsByVariant] = await Promise.all([
-    Promise.all(
-      SUPPORTED_VARIANTS.map((variant) =>
-        fetchTemplateBreakdownServer(variant, GqlReportTemplateKind.Generation),
-      ),
+  const generationRowsByVariant = await Promise.all(
+    SUPPORTED_VARIANTS.map((variant) =>
+      fetchTemplateBreakdownServer(variant, GqlReportTemplateKind.Generation),
     ),
-    Promise.all(
-      SUPPORTED_VARIANTS.map((variant) =>
-        fetchTemplateBreakdownServer(variant, GqlReportTemplateKind.Judge),
-      ),
-    ),
-  ]);
+  );
 
-  const generationSummaries = SUPPORTED_VARIANTS.map((variant, i) =>
+  const summaries = SUPPORTED_VARIANTS.map((variant, i) =>
     aggregateVariantSummary(variant, generationRowsByVariant[i]),
   );
-  const judgeSummaries = SUPPORTED_VARIANTS.map((variant, i) =>
-    aggregateVariantSummary(variant, judgeRowsByVariant[i]),
-  );
 
-  return (
-    <SysAdminSystemTemplatesPageClient
-      generationSummaries={generationSummaries}
-      judgeSummaries={judgeSummaries}
-    />
-  );
+  return <SysAdminSystemTemplatesPageClient summaries={summaries} />;
 }
