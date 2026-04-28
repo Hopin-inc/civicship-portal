@@ -29,17 +29,19 @@ function useRemainingTime(endsAt: Date, phase: GqlVoteTopicPhase): string | null
       setRemaining(null);
       return;
     }
+    let timer: ReturnType<typeof setInterval> | null = null;
     const update = () => {
       const ms = new Date(endsAt).getTime() - Date.now();
       if (ms <= 0) {
         setRemaining(null);
+        if (timer) clearInterval(timer);
         return;
       }
       setRemaining(formatRemaining(ms));
     };
     update();
-    const timer = setInterval(update, 60_000);
-    return () => clearInterval(timer);
+    timer = setInterval(update, 60_000);
+    return () => { if (timer) clearInterval(timer); };
   }, [endsAt, phase]);
   return remaining;
 }
