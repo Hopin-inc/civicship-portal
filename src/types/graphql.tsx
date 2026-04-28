@@ -2098,6 +2098,7 @@ export type GqlQuery = {
   __typename?: "Query";
   adminBrowseReports: GqlReportsConnection;
   adminReportSummary: GqlAdminReportSummaryConnection;
+  adminTemplateFeedbacks: GqlReportFeedbacksConnection;
   article?: Maybe<GqlArticle>;
   articles: GqlArticlesConnection;
   cities: GqlCitiesConnection;
@@ -2211,6 +2212,16 @@ export type GqlQueryAdminBrowseReportsArgs = {
 export type GqlQueryAdminReportSummaryArgs = {
   cursor?: InputMaybe<Scalars["String"]["input"]>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
+};
+
+export type GqlQueryAdminTemplateFeedbacksArgs = {
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  feedbackType?: InputMaybe<GqlReportFeedbackType>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  kind?: InputMaybe<GqlReportTemplateKind>;
+  maxRating?: InputMaybe<Scalars["Int"]["input"]>;
+  variant: GqlReportVariant;
+  version?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type GqlQueryArticleArgs = {
@@ -2627,6 +2638,7 @@ export type GqlReportFeedback = {
   feedbackType?: Maybe<GqlReportFeedbackType>;
   id: Scalars["ID"]["output"];
   rating: Scalars["Int"]["output"];
+  report: GqlReport;
   reportId: Scalars["ID"]["output"];
   sectionKey?: Maybe<Scalars["String"]["output"]>;
   user: GqlUser;
