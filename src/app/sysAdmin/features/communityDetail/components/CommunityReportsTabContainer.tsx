@@ -101,6 +101,7 @@ export function CommunityReportsTabContainer({
 
   return (
     <CommunityReportsTab
+      communityId={communityId}
       reports={reports}
       totalCount={totalCount}
       hasNextPage={hasNextPage}

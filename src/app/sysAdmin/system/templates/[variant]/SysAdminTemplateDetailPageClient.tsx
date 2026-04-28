@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type {
+  GqlGetAdminTemplateFeedbacksQuery,
   GqlReportTemplateFieldsFragment,
   GqlReportTemplateStatsBreakdownRowFieldsFragment,
   GqlReportVariant,
@@ -12,12 +13,18 @@ import { variantLabel } from "@/app/sysAdmin/features/system/templates/shared/la
 import { GenerationTemplateContainer } from "@/app/sysAdmin/features/system/templates/editor/components/GenerationTemplateContainer";
 import { JudgeTemplateContainer } from "@/app/sysAdmin/features/system/templates/editor/components/JudgeTemplateContainer";
 
+type FeedbacksConnection = NonNullable<
+  GqlGetAdminTemplateFeedbacksQuery["adminTemplateFeedbacks"]
+>;
+
 type Props = {
   variant: GqlReportVariant;
   generationBreakdownRows: GqlReportTemplateStatsBreakdownRowFieldsFragment[];
   generationTemplate: GqlReportTemplateFieldsFragment | null;
+  generationFeedbacks: FeedbacksConnection | null;
   judgeBreakdownRows: GqlReportTemplateStatsBreakdownRowFieldsFragment[];
   judgeTemplate: GqlReportTemplateFieldsFragment | null;
+  judgeFeedbacks: FeedbacksConnection | null;
 };
 
 /**
@@ -28,8 +35,10 @@ export function SysAdminTemplateDetailPageClient({
   variant,
   generationBreakdownRows,
   generationTemplate,
+  generationFeedbacks,
   judgeBreakdownRows,
   judgeTemplate,
+  judgeFeedbacks,
 }: Props) {
   const headerConfig = useMemo(
     () => ({
@@ -53,12 +62,15 @@ export function SysAdminTemplateDetailPageClient({
             variant={variant}
             initialBreakdownRows={generationBreakdownRows}
             initialTemplate={generationTemplate}
+            initialFeedbacks={generationFeedbacks}
           />
         </TabsContent>
         <TabsContent value="judge">
           <JudgeTemplateContainer
+            variant={variant}
             initialBreakdownRows={judgeBreakdownRows}
             initialJudgeTemplate={judgeTemplate}
+            initialFeedbacks={judgeFeedbacks}
           />
         </TabsContent>
       </Tabs>
