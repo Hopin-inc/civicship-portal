@@ -67,27 +67,40 @@ export function CommunityDetailPageClient({
   const newMemberCount = latestMonth?.newMembers;
 
   return (
-    <Tabs defaultValue="dashboard" className="w-full">
-      <TabsList className="grid w-full grid-cols-2 mb-4">
-        <TabsTrigger value="dashboard">ダッシュボード</TabsTrigger>
-        <TabsTrigger value="reports">レポート</TabsTrigger>
-      </TabsList>
-      <TabsContent value="dashboard">
-        <CommunityDashboardOverview
-          data={data}
-          communityName={data.communityName}
-          newMemberCount={newMemberCount}
-          tenureDistribution={tenureDistribution ?? undefined}
-          hubMemberCount={hubMemberCount ?? undefined}
-        />
-      </TabsContent>
-      <TabsContent value="reports">
-        <CommunityReportsTabContainer
-          key={communityId}
-          communityId={communityId}
-          initialReports={initialReports ?? null}
-        />
-      </TabsContent>
-    </Tabs>
+    <div className="flex flex-col gap-4">
+      {/* community 概況 (header + funnel) は常時表示。
+          ファネル以下の詳細とレポートはタブで切替する。 */}
+      <CommunityDashboardOverview
+        data={data}
+        communityName={data.communityName}
+        newMemberCount={newMemberCount}
+        tenureDistribution={tenureDistribution ?? undefined}
+        hubMemberCount={hubMemberCount ?? undefined}
+        slot="summary"
+      />
+      <Tabs defaultValue="dashboard" className="w-full">
+        <TabsList className="grid w-full grid-cols-2 mb-4">
+          <TabsTrigger value="dashboard">ダッシュボード</TabsTrigger>
+          <TabsTrigger value="reports">レポート</TabsTrigger>
+        </TabsList>
+        <TabsContent value="dashboard">
+          <CommunityDashboardOverview
+            data={data}
+            communityName={data.communityName}
+            newMemberCount={newMemberCount}
+            tenureDistribution={tenureDistribution ?? undefined}
+            hubMemberCount={hubMemberCount ?? undefined}
+            slot="details"
+          />
+        </TabsContent>
+        <TabsContent value="reports">
+          <CommunityReportsTabContainer
+            key={communityId}
+            communityId={communityId}
+            initialReports={initialReports ?? null}
+          />
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 }

@@ -62,6 +62,13 @@ type Props = {
   /** subpage CTA を出すか (storybook design preview 専用、production では
    * subpage 未実装なので default false)。 */
   enableSubpageLinks?: boolean;
+  /**
+   * レンダリング範囲。
+   * - "full" (default): 全体 (header + funnel + scopes)
+   * - "summary": community ヘッダーと funnel まで (タブ「上」に常時表示用)
+   * - "details": funnel より下の scope 群 (タブ「下」用)
+   */
+  slot?: "full" | "summary" | "details";
 };
 
 const SCOPE_COLOR = {
@@ -84,6 +91,7 @@ export function CommunityDashboardOverview({
   newMemberCount,
   tenureDistribution,
   enableSubpageLinks = false,
+  slot = "full",
 }: Props) {
   // Schema 上は summary / stages / memberList とその nested buckets は全て
   // non-null だが、production の partial response (network エラー後の
@@ -326,9 +334,12 @@ export function CommunityDashboardOverview({
     },
   ];
 
+  const showSummary = slot === "full" || slot === "summary";
+  const showDetails = slot === "full" || slot === "details";
+
   return (
     <div className="flex flex-col gap-3">
-      {communityName && (
+      {showSummary && communityName && (
         // px-1: ネットワーク等 scope 見出し (px-1) と左揃え。
         <header className="flex flex-col gap-1 px-1">
           <div className="flex items-baseline gap-3">
@@ -359,18 +370,22 @@ export function CommunityDashboardOverview({
         </header>
       )}
 
-      {/* highlight: アクティベーション・ファネル。L2 単一値カードでは見えに
-          くい「ステージ間の脱落幅」を 1 枚で読ませる。 cohortFunnel での詳細
-          (cohort 別比較) は L3 /activity 行き。 */}
-      <ActivationFunnelCard
-        denominator={funnelDenominator}
-        stages={funnelStages}
-        memberSampleComplete={memberSampleComplete}
-        detailHref={
-          enableSubpageLinks ? `/sysAdmin/${data.communityId}/activity#funnel` : undefined
-        }
-      />
+      {showSummary && (
+        // highlight: アクティベーション・ファネル。L2 単一値カードでは見え
+        // にくい「ステージ間の脱落幅」を 1 枚で読ませる。 cohortFunnel での
+        // 詳細 (cohort 別比較) は L3 /activity 行き。
+        <ActivationFunnelCard
+          denominator={funnelDenominator}
+          stages={funnelStages}
+          memberSampleComplete={memberSampleComplete}
+          detailHref={
+            enableSubpageLinks ? `/sysAdmin/${data.communityId}/activity#funnel` : undefined
+          }
+        />
+      )}
 
+      {showDetails && (
+      <>
       {/* state group: 関係 (Network) + 個人 (Member) を上に。
           いずれも累計 / 現在の構造を表す snapshot 系メトリクス。 */}
       <div className="flex flex-col gap-6">
@@ -711,6 +726,8 @@ export function CommunityDashboardOverview({
           </Issue>
         )}
       </Scope>
+      </>
+      )}
     </div>
   );
 }
