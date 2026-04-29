@@ -80,19 +80,18 @@ export function ReportFeedbackTriggers({
     <>
       {selection && floatPosition && (
         <div
-          className="pointer-events-none fixed z-40"
+          className="pointer-events-none fixed z-[60]"
           style={{ top: floatPosition.top, left: floatPosition.left }}
         >
           <Button
             type="button"
             size="sm"
-            variant="secondary"
             onMouseDown={(e) => {
               // mousedown 時点で選択が消えないよう preventDefault。
               e.preventDefault();
             }}
             onClick={() => openWithQuote(selection.text)}
-            className="pointer-events-auto h-8 gap-1.5 px-2.5 text-body-xs shadow-md"
+            className="pointer-events-auto h-8 gap-1.5 px-2.5 text-body-xs shadow-lg"
           >
             <MessageSquarePlus className="h-3.5 w-3.5" aria-hidden />
             この箇所にレビュー
@@ -105,7 +104,7 @@ export function ReportFeedbackTriggers({
         size="lg"
         onClick={openEmpty}
         aria-label="フィードバックを投稿"
-        className="fixed bottom-6 right-6 z-40 h-12 w-12 rounded-full p-0 shadow-lg"
+        className="fixed bottom-6 right-6 z-[60] h-12 w-12 rounded-full p-0 shadow-lg"
       >
         <MessageSquarePlus className="h-5 w-5" aria-hidden />
       </Button>

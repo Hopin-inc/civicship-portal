@@ -70,7 +70,7 @@ export function ReportDetailHeader({
               <ExternalLink className="h-3 w-3" aria-hidden />
             </Link>
           )}
-          {body && <CopyMarkdownButton text={body} />}
+          {body && <CopyMarkdownButton text={body} className="ml-auto" />}
         </div>
       )}
     </header>
