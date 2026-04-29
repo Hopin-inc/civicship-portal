@@ -4,8 +4,8 @@ import {
   ADMIN_REPORT_SUMMARY_ROW_FRAGMENT,
 } from "./fragment";
 
-export const GET_ADMIN_BROWSE_REPORTS = gql`
-  query GetAdminBrowseReports(
+export const GET_REPORTS_ALL = gql`
+  query GetReportsAll(
     $communityId: ID
     $status: ReportStatus
     $variant: ReportVariant
@@ -14,7 +14,7 @@ export const GET_ADMIN_BROWSE_REPORTS = gql`
     $cursor: String
     $first: Int
   ) {
-    adminBrowseReports(
+    reportsAll(
       communityId: $communityId
       status: $status
       variant: $variant
@@ -39,9 +39,9 @@ export const GET_ADMIN_BROWSE_REPORTS = gql`
   ${ADMIN_BROWSE_REPORT_FIELDS}
 `;
 
-export const GET_ADMIN_REPORT_SUMMARY = gql`
-  query GetAdminReportSummary($cursor: String, $first: Int) {
-    adminReportSummary(cursor: $cursor, first: $first) {
+export const GET_REPORT_SUMMARIES = gql`
+  query GetReportSummaries($cursor: String, $first: Int) {
+    reportSummaries(cursor: $cursor, first: $first) {
       edges {
         cursor
         node {

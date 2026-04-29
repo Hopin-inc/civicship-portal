@@ -1,30 +1,30 @@
 import type {
-  GqlGetSysAdminCommunityDetailQuery,
-  GqlGetSysAdminDashboardQuery,
-  GqlSysAdminCohortFunnelPoint,
-  GqlSysAdminCohortRetentionPoint,
-  GqlSysAdminCommunityAlerts,
-  GqlSysAdminCommunityDetailPayload,
-  GqlSysAdminCommunityOverview,
-  GqlSysAdminCommunitySummaryCard,
-  GqlSysAdminLatestCohort,
-  GqlSysAdminMemberList,
-  GqlSysAdminMemberRow,
-  GqlSysAdminMonthlyActivityPoint,
-  GqlSysAdminPlatformSummary,
-  GqlSysAdminRetentionTrendPoint,
-  GqlSysAdminSegmentCounts,
-  GqlSysAdminStageBucket,
-  GqlSysAdminStageDistribution,
-  GqlSysAdminTenureDistribution,
-  GqlSysAdminWeeklyRetention,
-  GqlSysAdminWindowActivity,
+  GqlGetAnalyticsCommunityQuery,
+  GqlGetAnalyticsDashboardQuery,
+  GqlAnalyticsCohortFunnelPoint,
+  GqlAnalyticsCohortRetentionPoint,
+  GqlAnalyticsCommunityAlerts,
+  GqlAnalyticsCommunityPayload,
+  GqlAnalyticsCommunityOverview,
+  GqlAnalyticsCommunitySummaryCard,
+  GqlAnalyticsLatestCohort,
+  GqlAnalyticsMemberList,
+  GqlAnalyticsMemberRow,
+  GqlAnalyticsMonthlyActivityPoint,
+  GqlAnalyticsPlatformSummary,
+  GqlAnalyticsRetentionTrendPoint,
+  GqlAnalyticsSegmentCounts,
+  GqlAnalyticsStageBucket,
+  GqlAnalyticsStageDistribution,
+  GqlAnalyticsTenureDistribution,
+  GqlAnalyticsWeeklyRetention,
+  GqlAnalyticsWindowActivity,
 } from "@/types/graphql";
 
 export const makeSegmentCounts = (
-  overrides: Partial<GqlSysAdminSegmentCounts> = {},
-): GqlSysAdminSegmentCounts => ({
-  __typename: "SysAdminSegmentCounts",
+  overrides: Partial<GqlAnalyticsSegmentCounts> = {},
+): GqlAnalyticsSegmentCounts => ({
+  __typename: "AnalyticsSegmentCounts",
   total: 120,
   activeCount: 95,
   passiveCount: 25,
@@ -34,8 +34,8 @@ export const makeSegmentCounts = (
 });
 
 export const makeWindowActivity = (
-  overrides: Partial<GqlSysAdminWindowActivity> = {},
-): GqlSysAdminWindowActivity => {
+  overrides: Partial<GqlAnalyticsWindowActivity> = {},
+): GqlAnalyticsWindowActivity => {
   const senderCount = overrides.senderCount ?? 50;
   const senderCountPrev = overrides.senderCountPrev ?? 46;
   const newMemberCount = overrides.newMemberCount ?? 8;
@@ -46,7 +46,7 @@ export const makeWindowActivity = (
   const retainedSenders =
     overrides.retainedSenders ?? Math.min(senderCount, senderCountPrev, 38);
   return {
-    __typename: "SysAdminWindowActivity",
+    __typename: "AnalyticsWindowActivity",
     senderCount,
     senderCountPrev,
     newMemberCount,
@@ -56,38 +56,39 @@ export const makeWindowActivity = (
 };
 
 export const makeWeeklyRetention = (
-  overrides: Partial<GqlSysAdminWeeklyRetention> = {},
-): GqlSysAdminWeeklyRetention => ({
-  __typename: "SysAdminWeeklyRetention",
+  overrides: Partial<GqlAnalyticsWeeklyRetention> = {},
+): GqlAnalyticsWeeklyRetention => ({
+  __typename: "AnalyticsWeeklyRetention",
   retainedSenders: 18,
   churnedSenders: 4,
   ...overrides,
 });
 
 export const makeLatestCohort = (
-  overrides: Partial<GqlSysAdminLatestCohort> = {},
-): GqlSysAdminLatestCohort => ({
-  __typename: "SysAdminLatestCohort",
+  overrides: Partial<GqlAnalyticsLatestCohort> = {},
+): GqlAnalyticsLatestCohort => ({
+  __typename: "AnalyticsLatestCohort",
   size: 12,
   activeAtM1: 8,
   ...overrides,
 });
 
 export const makeTenureDistribution = (
-  overrides: Partial<GqlSysAdminTenureDistribution> = {},
-): GqlSysAdminTenureDistribution => ({
-  __typename: "SysAdminTenureDistribution",
+  overrides: Partial<GqlAnalyticsTenureDistribution> = {},
+): GqlAnalyticsTenureDistribution => ({
+  __typename: "AnalyticsTenureDistribution",
   lt1Month: 12,
   m1to3Months: 18,
   m3to12Months: 45,
   gte12Months: 45,
+  monthlyHistogram: [],
   ...overrides,
 });
 
 export const makePlatformSummary = (
-  overrides: Partial<GqlSysAdminPlatformSummary> = {},
-): GqlSysAdminPlatformSummary => ({
-  __typename: "SysAdminPlatformSummary",
+  overrides: Partial<GqlAnalyticsPlatformSummary> = {},
+): GqlAnalyticsPlatformSummary => ({
+  __typename: "AnalyticsPlatformSummary",
   communitiesCount: 12,
   latestMonthDonationPoints: 1250000,
   totalMembers: 3200,
@@ -103,9 +104,9 @@ const DEFAULT_PASSIVE_RATIO = 0.21;
 // network-axis hub ratio (independent of node-axis tier1).
 const DEFAULT_HUB_RATIO = 0.18;
 
-function defaultSegmentCountsFor(total: number): GqlSysAdminSegmentCounts {
+function defaultSegmentCountsFor(total: number): GqlAnalyticsSegmentCounts {
   return {
-    __typename: "SysAdminSegmentCounts",
+    __typename: "AnalyticsSegmentCounts",
     total,
     activeCount: Math.round(total * (1 - DEFAULT_PASSIVE_RATIO)),
     passiveCount: Math.round(total * DEFAULT_PASSIVE_RATIO),
@@ -115,8 +116,8 @@ function defaultSegmentCountsFor(total: number): GqlSysAdminSegmentCounts {
 }
 
 export const makeCommunityOverview = (
-  overrides: Partial<GqlSysAdminCommunityOverview> = {},
-): GqlSysAdminCommunityOverview => {
+  overrides: Partial<GqlAnalyticsCommunityOverview> = {},
+): GqlAnalyticsCommunityOverview => {
   const totalMembers = overrides.totalMembers ?? 120;
   const windowActivity = overrides.windowActivity ?? makeWindowActivity();
   // Invariant: hubMemberCount <= windowActivity.senderCount <= totalMembers.
@@ -132,7 +133,7 @@ export const makeCommunityOverview = (
   const dormantCount =
     overrides.dormantCount ?? Math.round(totalMembers * 0.12);
   return {
-    __typename: "SysAdminCommunityOverview",
+    __typename: "AnalyticsCommunityOverview",
     communityId: overrides.communityId ?? "community-a",
     communityName: overrides.communityName ?? "コミュニティA",
     totalMembers,
@@ -148,14 +149,14 @@ export const makeCommunityOverview = (
 
 export const makeDashboardPayload = (
   overrides: {
-    platform?: Partial<GqlSysAdminPlatformSummary>;
-    communities?: GqlSysAdminCommunityOverview[];
+    platform?: Partial<GqlAnalyticsPlatformSummary>;
+    communities?: GqlAnalyticsCommunityOverview[];
     asOf?: Date;
   } = {},
-): GqlGetSysAdminDashboardQuery => ({
+): GqlGetAnalyticsDashboardQuery => ({
   __typename: "Query",
-  sysAdminDashboard: {
-    __typename: "SysAdminDashboardPayload",
+  analyticsDashboard: {
+    __typename: "AnalyticsDashboardPayload",
     asOf: overrides.asOf ?? new Date("2026-04-22T00:00:00+09:00"),
     platform: makePlatformSummary(overrides.platform),
     communities:
@@ -182,9 +183,9 @@ export const makeDashboardPayload = (
 // =============================================================================
 
 export const makeAlerts = (
-  overrides: Partial<GqlSysAdminCommunityAlerts> = {},
-): GqlSysAdminCommunityAlerts => ({
-  __typename: "SysAdminCommunityAlerts",
+  overrides: Partial<GqlAnalyticsCommunityAlerts> = {},
+): GqlAnalyticsCommunityAlerts => ({
+  __typename: "AnalyticsCommunityAlerts",
   activeDrop: false,
   churnSpike: false,
   noNewMembers: false,
@@ -192,9 +193,9 @@ export const makeAlerts = (
 });
 
 export const makeSummaryCard = (
-  overrides: Partial<GqlSysAdminCommunitySummaryCard> = {},
-): GqlSysAdminCommunitySummaryCard => ({
-  __typename: "SysAdminCommunitySummaryCard",
+  overrides: Partial<GqlAnalyticsCommunitySummaryCard> = {},
+): GqlAnalyticsCommunitySummaryCard => ({
+  __typename: "AnalyticsCommunitySummaryCard",
   communityId: "community-a",
   communityName: "コミュニティA",
   communityActivityRate: 0.42,
@@ -211,9 +212,9 @@ export const makeSummaryCard = (
 });
 
 export const makeStageBucket = (
-  overrides: Partial<GqlSysAdminStageBucket> = {},
-): GqlSysAdminStageBucket => ({
-  __typename: "SysAdminStageBucket",
+  overrides: Partial<GqlAnalyticsStageBucket> = {},
+): GqlAnalyticsStageBucket => ({
+  __typename: "AnalyticsStageBucket",
   count: 20,
   pct: 0.2,
   avgSendRate: 0.5,
@@ -223,9 +224,9 @@ export const makeStageBucket = (
 });
 
 export const makeStageDistribution = (
-  overrides: Partial<GqlSysAdminStageDistribution> = {},
-): GqlSysAdminStageDistribution => ({
-  __typename: "SysAdminStageDistribution",
+  overrides: Partial<GqlAnalyticsStageDistribution> = {},
+): GqlAnalyticsStageDistribution => ({
+  __typename: "AnalyticsStageDistribution",
   habitual: makeStageBucket({ count: 30, pct: 0.25, avgSendRate: 0.85, pointsContributionPct: 0.55 }),
   regular: makeStageBucket({ count: 40, pct: 0.33, avgSendRate: 0.55, pointsContributionPct: 0.3 }),
   occasional: makeStageBucket({ count: 25, pct: 0.21, avgSendRate: 0.2, pointsContributionPct: 0.15 }),
@@ -234,9 +235,9 @@ export const makeStageDistribution = (
 });
 
 export const makeMonthlyActivityPoint = (
-  overrides: Partial<GqlSysAdminMonthlyActivityPoint> = {},
-): GqlSysAdminMonthlyActivityPoint => ({
-  __typename: "SysAdminMonthlyActivityPoint",
+  overrides: Partial<GqlAnalyticsMonthlyActivityPoint> = {},
+): GqlAnalyticsMonthlyActivityPoint => ({
+  __typename: "AnalyticsMonthlyActivityPoint",
   month: new Date("2026-04-01T00:00:00+09:00"),
   communityActivityRate: 0.42,
   senderCount: 50,
@@ -250,9 +251,9 @@ export const makeMonthlyActivityPoint = (
 });
 
 export const makeRetentionTrendPoint = (
-  overrides: Partial<GqlSysAdminRetentionTrendPoint> = {},
-): GqlSysAdminRetentionTrendPoint => ({
-  __typename: "SysAdminRetentionTrendPoint",
+  overrides: Partial<GqlAnalyticsRetentionTrendPoint> = {},
+): GqlAnalyticsRetentionTrendPoint => ({
+  __typename: "AnalyticsRetentionTrendPoint",
   week: new Date("2026-04-13T00:00:00+09:00"),
   communityActivityRate: 0.34,
   retainedSenders: 30,
@@ -263,9 +264,9 @@ export const makeRetentionTrendPoint = (
 });
 
 export const makeCohortRetentionPoint = (
-  overrides: Partial<GqlSysAdminCohortRetentionPoint> = {},
-): GqlSysAdminCohortRetentionPoint => ({
-  __typename: "SysAdminCohortRetentionPoint",
+  overrides: Partial<GqlAnalyticsCohortRetentionPoint> = {},
+): GqlAnalyticsCohortRetentionPoint => ({
+  __typename: "AnalyticsCohortRetentionPoint",
   cohortMonth: new Date("2025-10-01T00:00:00+09:00"),
   cohortSize: 18,
   retentionM1: 0.67,
@@ -275,9 +276,9 @@ export const makeCohortRetentionPoint = (
 });
 
 export const makeCohortFunnelPoint = (
-  overrides: Partial<GqlSysAdminCohortFunnelPoint> = {},
-): GqlSysAdminCohortFunnelPoint => ({
-  __typename: "SysAdminCohortFunnelPoint",
+  overrides: Partial<GqlAnalyticsCohortFunnelPoint> = {},
+): GqlAnalyticsCohortFunnelPoint => ({
+  __typename: "AnalyticsCohortFunnelPoint",
   cohortMonth: new Date("2025-10-01T00:00:00+09:00"),
   acquired: 18,
   activatedD30: 11,
@@ -287,12 +288,12 @@ export const makeCohortFunnelPoint = (
 });
 
 export const makeMemberRow = (
-  overrides: Partial<GqlSysAdminMemberRow> = {},
-): GqlSysAdminMemberRow => {
+  overrides: Partial<GqlAnalyticsMemberRow> = {},
+): GqlAnalyticsMemberRow => {
   const monthsIn = overrides.monthsIn ?? 12;
   const donationOutMonths = overrides.donationOutMonths ?? 10;
   return {
-    __typename: "SysAdminMemberRow",
+    __typename: "AnalyticsMemberRow",
     userId: "user-1",
     name: "山田 太郎",
     userSendRate: 0.83,
@@ -314,10 +315,10 @@ export const makeMemberRow = (
 };
 
 export const makeMemberList = (
-  rows: GqlSysAdminMemberRow[],
-  overrides: Partial<Omit<GqlSysAdminMemberList, "users">> = {},
-): GqlSysAdminMemberList => ({
-  __typename: "SysAdminMemberList",
+  rows: GqlAnalyticsMemberRow[],
+  overrides: Partial<Omit<GqlAnalyticsMemberList, "users">> = {},
+): GqlAnalyticsMemberList => ({
+  __typename: "AnalyticsMemberList",
   hasNextPage: false,
   nextCursor: null,
   users: rows,
@@ -325,12 +326,12 @@ export const makeMemberList = (
 });
 
 type CommunityDetailOverrides = {
-  payload?: Partial<GqlSysAdminCommunityDetailPayload>;
+  payload?: Partial<GqlAnalyticsCommunityPayload>;
 };
 
 export const makeCommunityDetailPayload = (
   overrides: CommunityDetailOverrides = {},
-): GqlGetSysAdminCommunityDetailQuery => {
+): GqlGetAnalyticsCommunityQuery => {
   const baseMembers = [
     makeMemberRow({ userId: "u1", name: "山田 太郎", userSendRate: 0.91 }),
     makeMemberRow({ userId: "u2", name: "佐藤 花子", userSendRate: 0.78 }),
@@ -339,8 +340,8 @@ export const makeCommunityDetailPayload = (
 
   return {
     __typename: "Query",
-    sysAdminCommunityDetail: {
-      __typename: "SysAdminCommunityDetailPayload",
+    analyticsCommunity: {
+      __typename: "AnalyticsCommunityPayload",
       asOf: new Date("2026-04-22T00:00:00+09:00"),
       communityId: "community-a",
       communityName: "コミュニティA",

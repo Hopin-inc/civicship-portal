@@ -6,7 +6,7 @@ import {
   makeLatestCohort,
   makeWeeklyRetention,
   makeWindowActivity,
-} from "../../../_shared/fixtures/sysAdminDashboard";
+} from "../../../_shared/fixtures/analyticsDashboard";
 
 const meta: Meta<typeof CommunityRow> = {
   title: "SysAdmin/Dashboard/CommunityRow",

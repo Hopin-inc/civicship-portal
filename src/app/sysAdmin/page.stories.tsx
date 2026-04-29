@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { GetSysAdminDashboardDocument } from "@/types/graphql";
+import { GetAnalyticsDashboardDocument } from "@/types/graphql";
 import { withApollo, withPageShell } from "../../../.storybook/decorators";
 import { SysAdminPageClient } from "./SysAdminPageClient";
 import {
@@ -7,7 +7,7 @@ import {
   makeDashboardPayload,
   makeWeeklyRetention,
   makeWindowActivity,
-} from "./_shared/fixtures/sysAdminDashboard";
+} from "./_shared/fixtures/analyticsDashboard";
 
 // page.tsx は async RSC なので Storybook から直接 render できない。
 // Client 部分 (`SysAdminPageClient`) に initialData=null を渡し、
@@ -35,7 +35,7 @@ export const WithItems: Story = {
     apollo: {
       mocks: [
         {
-          request: { query: GetSysAdminDashboardDocument, variables },
+          request: { query: GetAnalyticsDashboardDocument, variables },
           result: {
             data: makeDashboardPayload({
               communities: [
@@ -107,7 +107,7 @@ export const Empty: Story = {
     apollo: {
       mocks: [
         {
-          request: { query: GetSysAdminDashboardDocument, variables },
+          request: { query: GetAnalyticsDashboardDocument, variables },
           result: { data: makeDashboardPayload({ communities: [] }) },
         },
       ],
@@ -120,7 +120,7 @@ export const Loading: Story = {
     apollo: {
       mocks: [
         {
-          request: { query: GetSysAdminDashboardDocument, variables },
+          request: { query: GetAnalyticsDashboardDocument, variables },
           delay: Infinity,
           result: { data: makeDashboardPayload() },
         },
@@ -134,7 +134,7 @@ export const ErrorCase: Story = {
     apollo: {
       mocks: [
         {
-          request: { query: GetSysAdminDashboardDocument, variables },
+          request: { query: GetAnalyticsDashboardDocument, variables },
           error: new Error("GraphQL error"),
         },
       ],

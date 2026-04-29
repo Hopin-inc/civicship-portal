@@ -3,8 +3,8 @@ import { fetchSysAdminDashboardServer } from "@/app/sysAdmin/_shared/server/fetc
 import { fetchAdminBrowseReportsServer } from "@/app/sysAdmin/_shared/server/fetchAdminBrowseReports";
 import { DEFAULT_SEGMENT_THRESHOLDS } from "@/app/sysAdmin/_shared/derive";
 import {
-  GqlSysAdminSortOrder,
-  GqlSysAdminUserSortField,
+  GqlAnalyticsSortOrder,
+  GqlAnalyticsUserSortField,
 } from "@/types/graphql";
 import { CommunityDetailPageClient } from "./CommunityDetailPageClient";
 
@@ -33,8 +33,8 @@ export default async function SysAdminCommunityDetailPage({ params }: Props) {
       // useCommunityDetail.ts の FIXED_USER_FILTER コメント参照。
       userFilter: { minSendRate: 0 },
       userSort: {
-        field: GqlSysAdminUserSortField.TotalPointsOut,
-        order: GqlSysAdminSortOrder.Desc,
+        field: GqlAnalyticsUserSortField.TotalPointsOut,
+        order: GqlAnalyticsSortOrder.Desc,
       },
       // 受領→送付 転換率 などコミュニティ全体を分母にする集計のため、L2 SSR
       // では最大件数を引き、1 ページで全メンバー (max 1000 / community) を取得する。

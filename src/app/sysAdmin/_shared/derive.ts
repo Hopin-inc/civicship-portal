@@ -1,4 +1,4 @@
-import type { GqlSysAdminCommunityOverview } from "@/types/graphql";
+import type { GqlAnalyticsCommunityOverview } from "@/types/graphql";
 
 // MoM (= rolling-window vs preceding window) drop threshold.
 // growthRateActivity <= ACTIVE_DROP_THRESHOLD points the alert.
@@ -9,7 +9,7 @@ export const ACTIVE_DROP_THRESHOLD = -0.2;
 // メトリクスで同じ閾値を使うことで、バケット表示と分類設定が一致する。
 export const TENURE_THRESHOLD_DAYS = 90;
 
-// `SysAdminCommunityDetailInput.segmentThresholds` の SSR / hook / story
+// `AnalyticsCommunityInput.segmentThresholds` の SSR / hook / story
 // 共通デフォルト。tier1/tier2 はユーザーが UI から動かせる knob だが
 // minMonthsIn は短期在籍 artifact (1 ヶ月で 1 回送って habitual 扱い)
 // を運用上排除するための固定値で、UI からは変更しない。
@@ -19,13 +19,13 @@ export const DEFAULT_SEGMENT_THRESHOLDS = {
   minMonthsIn: 3,
 } as const;
 
-export function deriveActivityRate(row: GqlSysAdminCommunityOverview): number {
+export function deriveActivityRate(row: GqlAnalyticsCommunityOverview): number {
   if (row.totalMembers === 0) return 0;
   return row.windowActivity.senderCount / row.totalMembers;
 }
 
 export function deriveActivityRatePrev(
-  row: GqlSysAdminCommunityOverview,
+  row: GqlAnalyticsCommunityOverview,
 ): number {
   if (row.totalMembers === 0) return 0;
   return row.windowActivity.senderCountPrev / row.totalMembers;
@@ -34,7 +34,7 @@ export function deriveActivityRatePrev(
 // null when there is no baseline (prev-window had zero senders or
 // totalMembers is zero); the UI renders "-" in that case.
 export function deriveGrowthRateActivity(
-  row: GqlSysAdminCommunityOverview,
+  row: GqlAnalyticsCommunityOverview,
 ): number | null {
   if (row.totalMembers === 0) return null;
   if (row.windowActivity.senderCountPrev === 0) return null;
@@ -44,7 +44,7 @@ export function deriveGrowthRateActivity(
 }
 
 export function deriveLatestCohortRetentionM1(
-  row: GqlSysAdminCommunityOverview,
+  row: GqlAnalyticsCommunityOverview,
 ): number | null {
   if (row.latestCohort.size === 0) return null;
   return row.latestCohort.activeAtM1 / row.latestCohort.size;
@@ -60,7 +60,7 @@ export function deriveLatestCohortRetentionM1(
 // "Hub" labels the relational-breadth layer of the donation graph; the
 // node-axis "habitual / regular / occasional / latent" stage hierarchy
 // is orthogonal and surfaces in L2 detail.
-export function deriveHubUserPct(row: GqlSysAdminCommunityOverview): number {
+export function deriveHubUserPct(row: GqlAnalyticsCommunityOverview): number {
   if (row.totalMembers === 0) return 0;
   return row.hubMemberCount / row.totalMembers;
 }
@@ -80,12 +80,12 @@ export function deriveDormantRate(row: {
 //   newlyActivated = senderCount     - retainedSenders   (entered active pool)
 //   churned        = senderCountPrev - retainedSenders   (left active pool)
 export function deriveNewlyActivatedSenders(
-  row: GqlSysAdminCommunityOverview,
+  row: GqlAnalyticsCommunityOverview,
 ): number {
   return row.windowActivity.senderCount - row.windowActivity.retainedSenders;
 }
 
-export function deriveChurnedSenders(row: GqlSysAdminCommunityOverview): number {
+export function deriveChurnedSenders(row: GqlAnalyticsCommunityOverview): number {
   return row.windowActivity.senderCountPrev - row.windowActivity.retainedSenders;
 }
 
@@ -95,7 +95,7 @@ export type DerivedAlerts = {
   noNewMembers: boolean;
 };
 
-export function deriveAlerts(row: GqlSysAdminCommunityOverview): DerivedAlerts {
+export function deriveAlerts(row: GqlAnalyticsCommunityOverview): DerivedAlerts {
   const growth = deriveGrowthRateActivity(row);
   return {
     churnSpike:

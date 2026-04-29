@@ -1,10 +1,10 @@
 import React from "react";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { GetSysAdminCommunityDetailDocument } from "@/types/graphql";
+import { GetAnalyticsCommunityDocument } from "@/types/graphql";
 import { withApollo, withPageShell } from "../../../../.storybook/decorators";
 import { CommunityDetailPageClient } from "./CommunityDetailPageClient";
 import { DEFAULT_SEGMENT_THRESHOLDS } from "../_shared/derive";
-import { makeCommunityDetailPayload } from "../_shared/fixtures/sysAdminDashboard";
+import { makeCommunityDetailPayload } from "../_shared/fixtures/analyticsDashboard";
 
 // page.tsx は async RSC で SSR fetch するため Storybook から直接 render できない。
 // Client 部分 (`CommunityDetailPageClient`) と route の container を再現する。
@@ -47,7 +47,7 @@ export const WithItems: Story = {
     apollo: {
       mocks: [
         {
-          request: { query: GetSysAdminCommunityDetailDocument, variables },
+          request: { query: GetAnalyticsCommunityDocument, variables },
           result: { data: makeCommunityDetailPayload() },
         },
       ],
@@ -61,7 +61,7 @@ export const Loading: Story = {
     apollo: {
       mocks: [
         {
-          request: { query: GetSysAdminCommunityDetailDocument, variables },
+          request: { query: GetAnalyticsCommunityDocument, variables },
           delay: Infinity,
           result: { data: makeCommunityDetailPayload() },
         },
@@ -76,7 +76,7 @@ export const ErrorCase: Story = {
     apollo: {
       mocks: [
         {
-          request: { query: GetSysAdminCommunityDetailDocument, variables },
+          request: { query: GetAnalyticsCommunityDocument, variables },
           error: new Error("GraphQL error"),
         },
       ],

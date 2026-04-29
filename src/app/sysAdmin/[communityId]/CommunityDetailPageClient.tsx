@@ -6,9 +6,9 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type {
-  GqlGetAdminBrowseReportsQuery,
-  GqlGetSysAdminCommunityDetailQuery,
-  GqlSysAdminTenureDistribution,
+  GqlGetReportsAllQuery,
+  GqlGetAnalyticsCommunityQuery,
+  GqlAnalyticsTenureDistribution,
 } from "@/types/graphql";
 import { useDashboardControls } from "@/app/sysAdmin/features/dashboard/hooks/useDashboardControls";
 import { useCommunityDetail } from "@/app/sysAdmin/features/communityDetail/hooks/useCommunityDetail";
@@ -18,16 +18,16 @@ import { CommunityReportsTabContainer } from "@/app/sysAdmin/features/communityD
 
 type Props = {
   communityId: string;
-  initialData: GqlGetSysAdminCommunityDetailQuery["sysAdminCommunityDetail"] | null;
+  initialData: GqlGetAnalyticsCommunityQuery["analyticsCommunity"] | null;
   /** L1 dashboard 経由で取得した、この community の tenure 分布。L2 schema
    * が tenureDistribution を露出するまでの SSR 横断の橋渡し。 */
-  tenureDistribution?: GqlSysAdminTenureDistribution | null;
+  tenureDistribution?: GqlAnalyticsTenureDistribution | null;
   /** L1 dashboard 経由で取得した、この community の hub メンバー数。L2
    * schema には未掲載のため、tenureDistribution と同じく page.tsx で
    * L1 と並列 fetch して受け渡す。 */
   hubMemberCount?: number | null;
   /** SSR で取得した「レポート発行履歴」初期 1 ページ。 */
-  initialReports?: GqlGetAdminBrowseReportsQuery["adminBrowseReports"] | null;
+  initialReports?: GqlGetReportsAllQuery["reportsAll"] | null;
 };
 
 export function CommunityDetailPageClient({
@@ -61,7 +61,7 @@ export function CommunityDetailPageClient({
   // L2 detail schema doesn't expose L1's windowActivity, so we approximate
   // newMemberCount from the latest monthly trend point. hubMemberCount stays
   // unprovided (renders as 未計測) until backend exposes it on
-  // SysAdminCommunityDetailPayload.
+  // AnalyticsCommunityPayload.
   const latestMonth =
     data.monthlyActivityTrend[data.monthlyActivityTrend.length - 1];
   const newMemberCount = latestMonth?.newMembers;

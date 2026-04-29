@@ -6,23 +6,23 @@ import { useApolloClient } from "@apollo/client";
 import {
   GqlReportTemplateKind,
   useUpdateReportTemplateMutation,
-  type GqlGetAdminTemplateFeedbackStatsQuery,
-  type GqlGetAdminTemplateFeedbacksQuery,
-  type GqlGetAdminTemplateFeedbacksQueryVariables,
+  type GqlGetReportTemplateFeedbackStatsQuery,
+  type GqlGetReportTemplateFeedbacksQuery,
+  type GqlGetReportTemplateFeedbacksQueryVariables,
   type GqlReportTemplateFieldsFragment,
   type GqlReportTemplateStatsBreakdownRowFieldsFragment,
   type GqlReportVariant,
 } from "@/types/graphql";
-import { GET_ADMIN_TEMPLATE_FEEDBACKS } from "@/graphql/account/adminTemplateFeedbacks/query";
+import { GET_REPORT_TEMPLATE_FEEDBACKS } from "@/graphql/account/reportTemplateFeedbacks/query";
 import { useCursorPagination } from "@/app/sysAdmin/_shared/hooks/useCursorPagination";
 import { GenerationTemplateView } from "./GenerationTemplateView";
 import type { PromptFormValues } from "./PromptEditor";
 
 type FeedbacksConnection = NonNullable<
-  GqlGetAdminTemplateFeedbacksQuery["adminTemplateFeedbacks"]
+  GqlGetReportTemplateFeedbacksQuery["reportTemplateFeedbacks"]
 >;
 type FeedbackStats =
-  GqlGetAdminTemplateFeedbackStatsQuery["adminTemplateFeedbackStats"];
+  GqlGetReportTemplateFeedbackStatsQuery["reportTemplateFeedbackStats"];
 
 type Props = {
   variant: GqlReportVariant;
@@ -114,10 +114,10 @@ export function GenerationTemplateContainer({
   const fetchMoreFeedbacks = useCallback(
     async (cursor: string, first: number) => {
       const result = await apollo.query<
-        GqlGetAdminTemplateFeedbacksQuery,
-        GqlGetAdminTemplateFeedbacksQueryVariables
+        GqlGetReportTemplateFeedbacksQuery,
+        GqlGetReportTemplateFeedbacksQueryVariables
       >({
-        query: GET_ADMIN_TEMPLATE_FEEDBACKS,
+        query: GET_REPORT_TEMPLATE_FEEDBACKS,
         variables: {
           variant,
           kind: GqlReportTemplateKind.Generation,
@@ -126,7 +126,7 @@ export function GenerationTemplateContainer({
         },
         fetchPolicy: "network-only",
       });
-      return result.data.adminTemplateFeedbacks ?? EMPTY_CONNECTION;
+      return result.data.reportTemplateFeedbacks ?? EMPTY_CONNECTION;
     },
     [apollo, variant],
   );

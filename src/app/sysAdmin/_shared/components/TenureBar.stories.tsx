@@ -23,11 +23,12 @@ const dist = (
   m3to12Months: number,
   gte12Months: number,
 ) => ({
-  __typename: "SysAdminTenureDistribution" as const,
+  __typename: "AnalyticsTenureDistribution" as const,
   lt1Month,
   m1to3Months,
   m3to12Months,
   gte12Months,
+  monthlyHistogram: [],
 });
 
 export const Balanced: Story = {

@@ -3,13 +3,13 @@ import "server-only";
 import { executeServerGraphQLQuery } from "@/lib/graphql/server";
 import { hasServerSession } from "@/lib/auth/server/session";
 import { logger } from "@/lib/logging";
-import { GET_SYS_ADMIN_DASHBOARD_SERVER_QUERY } from "@/graphql/account/sysAdmin/server";
+import { GET_ANALYTICS_DASHBOARD_SERVER_QUERY } from "@/graphql/account/sysAdmin/server";
 import type {
-  GqlGetSysAdminDashboardQuery,
-  GqlSysAdminDashboardInput,
+  GqlGetAnalyticsDashboardQuery,
+  GqlAnalyticsDashboardInput,
 } from "@/types/graphql";
 
-type Result = NonNullable<GqlGetSysAdminDashboardQuery["sysAdminDashboard"]>;
+type Result = NonNullable<GqlGetAnalyticsDashboardQuery["analyticsDashboard"]>;
 
 /**
  * `/sysAdmin` の初期描画データを SSR で取得する。
@@ -17,17 +17,17 @@ type Result = NonNullable<GqlGetSysAdminDashboardQuery["sysAdminDashboard"]>;
  * fetch エラーは null に倒してクライアント側 (`SysAdminGuard`) のリダイレクトに任せる。
  */
 export async function fetchSysAdminDashboardServer(
-  input: GqlSysAdminDashboardInput,
+  input: GqlAnalyticsDashboardInput,
 ): Promise<Result | null> {
   const hasSession = await hasServerSession();
   if (!hasSession) return null;
 
   try {
     const data = await executeServerGraphQLQuery<
-      GqlGetSysAdminDashboardQuery,
-      { input: GqlSysAdminDashboardInput }
-    >(GET_SYS_ADMIN_DASHBOARD_SERVER_QUERY, { input });
-    return data.sysAdminDashboard ?? null;
+      GqlGetAnalyticsDashboardQuery,
+      { input: GqlAnalyticsDashboardInput }
+    >(GET_ANALYTICS_DASHBOARD_SERVER_QUERY, { input });
+    return data.analyticsDashboard ?? null;
   } catch (error) {
     logger.warn("[sysAdmin] fetchSysAdminDashboardServer failed", {
       message: (error as Error).message,
