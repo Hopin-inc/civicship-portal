@@ -10,6 +10,7 @@ const withBundleAnalyzer = bundleAnalyzer({
 });
 
 const nextConfig = {
+  output: "standalone",
   env: {
     ENV: process.env.ENV,
   },
