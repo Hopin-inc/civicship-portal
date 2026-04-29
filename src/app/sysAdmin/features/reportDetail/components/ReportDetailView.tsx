@@ -54,6 +54,7 @@ export function ReportDetailView({
         periodFrom={report.periodFrom}
         periodTo={report.periodTo}
         templateVersion={report.template?.version ?? null}
+        body={body}
       />
       <div ref={contentRef}>
         <ReportContentSection body={body} skipReason={report.skipReason} />
