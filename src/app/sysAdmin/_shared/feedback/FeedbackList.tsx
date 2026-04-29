@@ -40,6 +40,12 @@ export function FeedbackList<T extends GqlReportFeedbackFieldsFragment>({
   //   - summary あり (テンプレ詳細): "フィードバック" を大きく見出しとして出し、
   //     件数は summary が責任を持つ (= "全 N 件のフィードバック")
   //   - summary なし (Report detail): 1 行 header に件数 chip を併置
+  // Report detail 文脈で feedback が 0 件のときは section ごと出さない
+  // (空状態の dashed box が冗長なため)。
+  if (!summary && feedbacks.length === 0) {
+    return null;
+  }
+
   return (
     <section className="space-y-6">
       {summary ? (
