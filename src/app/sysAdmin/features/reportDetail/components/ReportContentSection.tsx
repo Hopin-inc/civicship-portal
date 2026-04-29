@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Check, Copy } from "lucide-react";
 import { toast } from "react-toastify";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,12 @@ type Props = {
  */
 export function ReportContentSection({ body, skipReason }: Props) {
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (!copied) return;
+    const timer = setTimeout(() => setCopied(false), 1500);
+    return () => clearTimeout(timer);
+  }, [copied]);
 
   if (skipReason) {
     return (
@@ -42,8 +48,7 @@ export function ReportContentSection({ body, skipReason }: Props) {
     try {
       await navigator.clipboard.writeText(body);
       setCopied(true);
-      toast.success("コピーしました");
-      setTimeout(() => setCopied(false), 1500);
+      toast.success("コピーしました", { toastId: "copy-markdown" });
     } catch (error) {
       console.error("Failed to copy markdown:", error);
       toast.error("コピーに失敗しました");
@@ -58,15 +63,14 @@ export function ReportContentSection({ body, skipReason }: Props) {
           variant="ghost"
           size="sm"
           onClick={handleCopy}
-          aria-label="本文の markdown をコピー"
           className="h-8 gap-1.5 px-2 text-body-xs text-muted-foreground"
         >
           {copied ? (
-            <Check className="h-3.5 w-3.5" />
+            <Check className="h-3.5 w-3.5" aria-hidden />
           ) : (
-            <Copy className="h-3.5 w-3.5" />
+            <Copy className="h-3.5 w-3.5" aria-hidden />
           )}
-          {copied ? "コピー済み" : "markdown をコピー"}
+          {copied ? "コピー済み" : "mdコピー"}
         </Button>
       </div>
       <MarkdownContent>{body}</MarkdownContent>
