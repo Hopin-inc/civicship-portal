@@ -1,1 +1,35 @@
 node_modules
+.next
+.git
+.github
+.vscode
+.idea
+
+# Tests / dev tooling not needed in production image
+e2e
+playwright.config.ts
+playwright-report
+test-results
+coverage
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+**/__tests__
+**/__mocks__
+
+# Storybook artifacts
+storybook-static
+.storybook
+
+# Local env files (build-time vars come from --build-arg)
+.env
+.env.local
+.env.*.local
+
+# Miscellaneous
+*.log
+.DS_Store
+README.md
+LICENSE
+docs
