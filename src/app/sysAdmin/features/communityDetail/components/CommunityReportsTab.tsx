@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { Button } from "@/components/ui/button";
@@ -61,7 +61,6 @@ export function CommunityReportsTab({
   loadingMore,
   onLoadMore,
 }: CommunityReportsTabProps) {
-  const router = useRouter();
   if (loading && reports.length === 0) {
     return <LoadingIndicator fullScreen={false} />;
   }
@@ -94,20 +93,15 @@ export function CommunityReportsTab({
           <Item
             key={r.id}
             asChild
-            className="rounded-none border-transparent"
+            className="rounded-none border-transparent transition-colors hover:bg-accent/50"
           >
-            <a
+            <Link
               href={`/sysAdmin/${communityId}/reports/${r.id}`}
-              onClick={(e) => {
-                if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
-                e.preventDefault();
-                router.push(`/sysAdmin/${communityId}/reports/${r.id}`);
-              }}
               className="flex flex-1 gap-3"
             >
               <div className="flex flex-1 flex-col min-w-0">
                 <ItemContent>
-                  <ItemTitle className="font-bold text-base leading-snug line-clamp-2">
+                  <ItemTitle className="block w-full font-bold text-base leading-snug line-clamp-2">
                     {variantLabel(r.variant)}
                   </ItemTitle>
                 </ItemContent>
@@ -119,7 +113,7 @@ export function CommunityReportsTab({
                           "size-2.5 rounded-full",
                           REPORT_STATUS_COLORS[r.status],
                         )}
-                        aria-label={statusLabel(r.status)}
+                        aria-hidden="true"
                       />
                       {statusLabel(r.status)}・
                       {r.publishedAt
@@ -131,7 +125,7 @@ export function CommunityReportsTab({
                   </div>
                 </ItemFooter>
               </div>
-            </a>
+            </Link>
           </Item>
         ))}
       </ItemGroup>
