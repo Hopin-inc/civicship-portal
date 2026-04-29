@@ -3,6 +3,7 @@
 import { useCallback } from "react";
 import { toast } from "react-toastify";
 import { useTranslations } from "next-intl";
+import { useAppRouter } from "@/lib/navigation";
 import { useDeleteVoteTopicMutation } from "@/types/graphql";
 import { logger } from "@/lib/logging";
 
@@ -12,6 +13,7 @@ interface UseVoteTopicActionsParams {
 }
 
 interface UseVoteTopicActionsReturn {
+  handleEdit: (voteTopicId: string) => void;
   handleDelete: (voteTopicId: string) => Promise<void>;
 }
 
@@ -20,7 +22,15 @@ export function useVoteTopicActions({
   refetch,
 }: UseVoteTopicActionsParams): UseVoteTopicActionsReturn {
   const t = useTranslations();
+  const router = useAppRouter();
   const [deleteVoteTopic] = useDeleteVoteTopicMutation();
+
+  const handleEdit = useCallback(
+    (voteTopicId: string) => {
+      router.push(`/admin/votes/${voteTopicId}/edit`);
+    },
+    [router],
+  );
 
   const handleDelete = useCallback(
     async (voteTopicId: string) => {
@@ -46,5 +56,5 @@ export function useVoteTopicActions({
     [communityId, deleteVoteTopic, refetch, t],
   );
 
-  return { handleDelete };
+  return { handleEdit, handleDelete };
 }

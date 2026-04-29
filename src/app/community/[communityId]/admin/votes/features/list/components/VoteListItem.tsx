@@ -12,6 +12,7 @@ import { VoteActionsMenu } from "./VoteActionsMenu";
 
 interface VoteListItemProps {
   item: VoteListItemModel;
+  onEdit: () => void;
   onDelete: () => void;
 }
 
@@ -49,7 +50,7 @@ function powerPolicySummaryText(
   return t("adminVotes.form.powerPolicy.type.NFT_COUNT");
 }
 
-export function VoteListItem({ item, onDelete }: VoteListItemProps) {
+export function VoteListItem({ item, onEdit, onDelete }: VoteListItemProps) {
   const t = useTranslations();
 
   return (
@@ -86,7 +87,7 @@ export function VoteListItem({ item, onDelete }: VoteListItemProps) {
         </ItemFooter>
       </AppLink>
 
-      <VoteActionsMenu phase={item.phase} onDelete={onDelete} />
+      <VoteActionsMenu phase={item.phase} onEdit={onEdit} onDelete={onDelete} />
     </Item>
   );
 }
