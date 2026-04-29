@@ -21,7 +21,7 @@ RUN --mount=type=cache,id=pnpm-store,target=/root/.local/share/pnpm/store \
     && pnpm install --frozen-lockfile --prefer-offline
 
 # ---- builder: build the Next.js app (standalone output) ----
-FROM base AS builder
+FROM deps AS builder
 ARG NEXT_PUBLIC_FIREBASE_PROJECT_ID
 ARG NEXT_PUBLIC_FIREBASE_API_KEY
 ARG NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
@@ -34,7 +34,6 @@ ARG NEXT_PUBLIC_LOG_LEVEL
 ARG NEXT_PUBLIC_ALLOWED_FRAME_ANCESTORS
 ARG ENV
 
-COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Next.js は NEXT_PUBLIC_* をビルド時に静的に埋め込むため .env 経由で渡す
@@ -58,6 +57,10 @@ RUN --mount=type=cache,id=next-cache,target=/app/.next/cache \
 # ---- runner: minimal production image ----
 FROM node:${NODE_VERSION}-alpine AS runner
 WORKDIR /app
+
+# Next.js standalone bundles native modules (sharp, next-swc) that need
+# glibc-compat shims on Alpine.
+RUN apk add --no-cache libc6-compat
 
 ENV NODE_ENV=production
 ENV PORT=8000
