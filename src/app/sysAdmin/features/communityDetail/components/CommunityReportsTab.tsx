@@ -8,7 +8,6 @@ import {
   Item,
   ItemContent,
   ItemFooter,
-  ItemGroup,
   ItemTitle,
 } from "@/components/ui/item";
 import { cn } from "@/lib/utils";
@@ -88,47 +87,46 @@ export function CommunityReportsTab({
           {reports.length} / {Math.max(totalCount, reports.length)} 件
         </span>
       </div>
-      <ItemGroup className="overflow-hidden rounded border border-border divide-y divide-border">
-        {reports.map((r) => (
-          <Item
-            key={r.id}
-            asChild
-            className="rounded-none border-transparent transition-colors hover:bg-accent/50"
-          >
-            <Link
-              href={`/sysAdmin/${communityId}/reports/${r.id}`}
-              className="flex flex-1 gap-3"
-            >
-              <div className="flex flex-1 flex-col min-w-0">
-                <ItemContent>
-                  <ItemTitle className="block w-full font-bold text-base leading-snug line-clamp-2">
-                    {variantLabel(r.variant)}
-                  </ItemTitle>
-                </ItemContent>
-                <ItemFooter className="mt-2">
-                  <div className="text-xs text-muted-foreground flex items-center gap-2 truncate">
-                    <span className="flex items-center gap-1">
-                      <span
-                        className={cn(
-                          "size-2.5 rounded-full",
-                          REPORT_STATUS_COLORS[r.status],
-                        )}
-                        aria-hidden="true"
-                      />
-                      {statusLabel(r.status)}・
-                      {r.publishedAt
-                        ? new Date(r.publishedAt).toLocaleDateString("ja-JP")
-                        : "未公開"}
-                      <span className="mx-1">・</span>
-                      <span className="tabular-nums">{r.feedbacksCount}件</span>
-                    </span>
-                  </div>
-                </ItemFooter>
-              </div>
-            </Link>
-          </Item>
+      <div className="flex flex-col">
+        {reports.map((r, idx) => (
+          <div key={r.id}>
+            {idx !== 0 && <hr className="border-muted" />}
+            <Item asChild className="transition-colors hover:bg-accent/50">
+              <Link
+                href={`/sysAdmin/${communityId}/reports/${r.id}`}
+                className="flex flex-1 gap-3"
+              >
+                <div className="flex flex-1 flex-col min-w-0">
+                  <ItemContent>
+                    <ItemTitle className="block w-full font-bold text-base leading-snug line-clamp-2">
+                      {variantLabel(r.variant)}
+                    </ItemTitle>
+                  </ItemContent>
+                  <ItemFooter className="mt-2">
+                    <div className="text-xs text-muted-foreground flex items-center gap-2 truncate">
+                      <span className="flex items-center gap-1">
+                        <span
+                          className={cn(
+                            "size-2.5 rounded-full",
+                            REPORT_STATUS_COLORS[r.status],
+                          )}
+                          aria-hidden="true"
+                        />
+                        {statusLabel(r.status)}・
+                        {r.publishedAt
+                          ? new Date(r.publishedAt).toLocaleDateString("ja-JP")
+                          : "未公開"}
+                        <span className="mx-1">・</span>
+                        <span className="tabular-nums">{r.feedbacksCount}件</span>
+                      </span>
+                    </div>
+                  </ItemFooter>
+                </div>
+              </Link>
+            </Item>
+          </div>
         ))}
-      </ItemGroup>
+      </div>
       {error != null && (
         <p className="text-center text-body-sm text-destructive">
           追加読み込みに失敗しました
