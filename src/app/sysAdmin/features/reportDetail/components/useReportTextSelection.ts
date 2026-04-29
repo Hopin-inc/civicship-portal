@@ -11,10 +11,12 @@ export type ReportSelection = {
  * `containerRef` 内のテキスト選択を監視し、選択範囲がある間だけ
  * `{ text, rect }` を返す hook。
  *
- * 「ユーザーが選択し終えた」タイミングを拾うため `mouseup` / `touchend` /
- * `keyup` で即時 update する。`selectionchange` は選択 clear (collapsed)
- * の検知のみに使う。`pointer` 系で取らない理由は、Safari iOS が
- * pointerup を発火しないケースがあるため。
+ * `selectionchange` / `mouseup` / `touchend` / `keyup` を全部拾って
+ * `requestAnimationFrame` で batch する。これにより:
+ *   - Mac / iOS Safari の selectionchange タイミングのバラつき
+ *   - mouseup より selection 確定が後になるブラウザ
+ *   - キーボード (shift+arrow) での選択拡張
+ * いずれの経路でも 1 frame 以内にフロート UI が追従する。
  */
 export function useReportTextSelection(
   containerRef: RefObject<HTMLElement>,
@@ -29,6 +31,8 @@ export function useReportTextSelection(
     }
     if (typeof window === "undefined") return;
 
+    let raf: number | null = null;
+
     const readCurrentSelection = (): ReportSelection | null => {
       const sel = window.getSelection();
       const container = containerRef.current;
@@ -42,46 +46,35 @@ export function useReportTextSelection(
       if (!container.contains(anchor) || !container.contains(focus)) {
         return null;
       }
-      const text = sel.toString().trim();
-      if (text === "") return null;
+      const text = sel.toString();
+      if (text.trim() === "") return null;
       const rect = range.getBoundingClientRect();
       if (rect.width === 0 && rect.height === 0) return null;
-      return { text, rect };
+      return { text: text.trim(), rect };
     };
 
-    const update = () => setSelection(readCurrentSelection());
-
-    // 選択完了 (= mouse / 指を離した) タイミングで即時 update。
-    // setTimeout で 1 tick ずらすのは、mouseup より先に selection が確定する
-    // ブラウザと、後に確定するブラウザがあるため。
-    const onPointerEnd = () => {
-      window.setTimeout(update, 0);
+    const schedule = () => {
+      if (raf != null) return;
+      raf = window.requestAnimationFrame(() => {
+        raf = null;
+        setSelection(readCurrentSelection());
+      });
     };
 
-    // 選択が解除 (collapsed) されたら即座に消す。新規選択の途中で広がっていく
-    // フェーズはこの hook では拾わない (チラつき回避)。
-    const onSelectionChange = () => {
-      const sel = window.getSelection();
-      if (!sel || sel.isCollapsed) setSelection(null);
-    };
-
-    // scroll / resize 中は選択は維持されるので、フロート UI が viewport 上で
-    // 追従するよう rect を取り直す。
-    const onViewportChange = () => update();
-
-    document.addEventListener("mouseup", onPointerEnd);
-    document.addEventListener("touchend", onPointerEnd);
-    document.addEventListener("keyup", onPointerEnd);
-    document.addEventListener("selectionchange", onSelectionChange);
-    window.addEventListener("scroll", onViewportChange, true);
-    window.addEventListener("resize", onViewportChange);
+    document.addEventListener("selectionchange", schedule);
+    document.addEventListener("mouseup", schedule);
+    document.addEventListener("touchend", schedule);
+    document.addEventListener("keyup", schedule);
+    window.addEventListener("scroll", schedule, true);
+    window.addEventListener("resize", schedule);
     return () => {
-      document.removeEventListener("mouseup", onPointerEnd);
-      document.removeEventListener("touchend", onPointerEnd);
-      document.removeEventListener("keyup", onPointerEnd);
-      document.removeEventListener("selectionchange", onSelectionChange);
-      window.removeEventListener("scroll", onViewportChange, true);
-      window.removeEventListener("resize", onViewportChange);
+      if (raf != null) window.cancelAnimationFrame(raf);
+      document.removeEventListener("selectionchange", schedule);
+      document.removeEventListener("mouseup", schedule);
+      document.removeEventListener("touchend", schedule);
+      document.removeEventListener("keyup", schedule);
+      window.removeEventListener("scroll", schedule, true);
+      window.removeEventListener("resize", schedule);
     };
   }, [containerRef, enabled]);
 
