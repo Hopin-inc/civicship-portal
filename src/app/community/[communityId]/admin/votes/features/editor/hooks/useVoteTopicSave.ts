@@ -3,6 +3,7 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import { toast } from "react-toastify";
+import { ApolloError } from "@apollo/client";
 import { useTranslations } from "next-intl";
 import {
   GqlVoteGateType,
@@ -110,9 +111,7 @@ export function useVoteTopicSave({
           component: "useVoteTopicSave",
         });
         const gqlErrors =
-          error && typeof error === "object" && "graphQLErrors" in error
-            ? (error as { graphQLErrors: Array<{ extensions?: { code?: string } }> }).graphQLErrors
-            : [];
+          error instanceof ApolloError ? error.graphQLErrors : [];
         const isNotEditable = gqlErrors.some(
           (e) => e.extensions?.code === "VOTE_TOPIC_NOT_EDITABLE",
         );
