@@ -83,14 +83,15 @@ export function ReportFeedbackForm({
   });
 
   // prefillComment の差し替えに追従する。ユーザーが入力中の場合は上書きしないよう、
-  // dirty な comment は保持する。
+  // 「空 もしくは 直前の prefill のまま (= dirty じゃない)」のときだけ書き換える。
   const prevPrefill = useRef(prefillComment ?? "");
   useEffect(() => {
     const next = prefillComment ?? "";
     if (next === prevPrefill.current) return;
-    prevPrefill.current = next;
     const currentComment = form.getValues("comment") ?? "";
-    if (currentComment === "" || currentComment === prevPrefill.current) {
+    const oldPrefill = prevPrefill.current;
+    prevPrefill.current = next;
+    if (currentComment === "" || currentComment === oldPrefill) {
       form.setValue("comment", next, { shouldDirty: false });
     }
   }, [prefillComment, form]);
