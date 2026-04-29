@@ -39,7 +39,9 @@ const requestLink = setContext(async (operation, prevContext) => {
     );
 
     if (isMutation) {
-      if (authenticationState === "loading") {
+      // session cookie が確定している場合は cookie で認証されるため、
+      // クライアント側の auth-store の loading 状態は無視して通す。
+      if (authenticationState === "loading" && !hasSessionCookie) {
         throw new Error("認証情報を読み込み中です。少し待ってから再度お試しください");
       }
 
