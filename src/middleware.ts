@@ -19,6 +19,13 @@ const EXCLUDED_REDIRECT_PATTERNS = [
   "/sysAdmin",  // SYS_ADMIN 専用ルート（コミュニティ作成など）
 ];
 
+const COMMUNITY_ID_COOKIE_OPTIONS = {
+  path: "/",
+  maxAge: 60 * 60 * 24, // 24時間
+  sameSite: "lax",
+  httpOnly: false, // JS から読み取り可能
+} as const;
+
 export async function middleware(request: NextRequest) {
   const host = request.headers.get("host");
   const origin = request.headers.get("origin");
@@ -110,8 +117,16 @@ export async function middleware(request: NextRequest) {
 
   // 3. DBから動的設定を取得（存在しないコミュニティは404）
   // /sysAdmin はコミュニティスコープ外のため DB 設定チェックをスキップ。
-  // Cookie の設定より前に early return することで x-community-id cookie を汚染しない。
+  // ただし /sysAdmin/{communityId}/... のように URL から community を解決できた場合
+  // (communityIdSource === "path") は、その community の認証テナントで操作する
+  // 必要があるので x-community-id cookie を URL の community に同期する。
+  // 同期しないと、後続のクライアント側 GraphQL リクエストの X-Community-Id ヘッダーや
+  // __session_{communityId} cookie の解決が前の community のままになり、permission
+  // チェック (CheckCommunityPermissionInput) で membership lookup が空になる。
   if (pathname === "/sysAdmin" || pathname.startsWith("/sysAdmin/")) {
+    if (communityIdSource === "path") {
+      res.cookies.set("x-community-id", communityId, COMMUNITY_ID_COOKIE_OPTIONS);
+    }
     if (shouldClearSessionCookies) {
       clearLegacySessionCookies(res);
     }
@@ -121,12 +136,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Cookie にも設定（Client JS から参照可能にする）
-  res.cookies.set("x-community-id", communityId, {
-    path: "/",
-    maxAge: 60 * 60 * 24, // 24時間
-    sameSite: "lax",
-    httpOnly: false, // JS から読み取り可能
-  });
+  res.cookies.set("x-community-id", communityId, COMMUNITY_ID_COOKIE_OPTIONS);
 
   const config = await fetchCommunityConfigForEdge(communityId);
   if (!config) {
@@ -139,12 +149,7 @@ export async function middleware(request: NextRequest) {
   // 4. ルートリダイレクト処理（/community/{communityId} へのアクセス時）
   const redirectRes = handleRootRedirect(request, pathname, rootPath, communityId);
   if (redirectRes) {
-    redirectRes.cookies.set("x-community-id", communityId, {
-      path: "/",
-      maxAge: 60 * 60 * 24, // 24時間
-      sameSite: "lax",
-      httpOnly: false,
-    });
+    redirectRes.cookies.set("x-community-id", communityId, COMMUNITY_ID_COOKIE_OPTIONS);
     if (shouldClearSessionCookies) {
       clearLegacySessionCookies(redirectRes);
     }
@@ -172,11 +177,25 @@ export async function middleware(request: NextRequest) {
 /**
  * パスから communityId を抽出
  * /community/{communityId}/... 形式の場合に communityId を返す
- * ホワイトリストチェックは行わず、DB検証に委ねる
+ * /sysAdmin/{communityId}/... 形式の場合も、{communityId} が ACTIVE_COMMUNITY_IDS
+ * に含まれる場合に限り返す。これは sysAdmin が特定 community のスコープで操作する
+ * 際の認証テナント (X-Community-Id ヘッダー / __session_{communityId} cookie) を
+ * URL の community に揃えるため。`create` `system` 等の予約セグメントは
+ * ACTIVE_COMMUNITY_IDS に無いので誤検出されない。
  */
 function getCommunityIdFromPath(pathname: string): string | null {
-  const match = pathname.match(/^\/community\/([a-zA-Z0-9-]+)/);
-  return match ? match[1] : null;
+  const communityMatch = pathname.match(/^\/community\/([a-zA-Z0-9-]+)/);
+  if (communityMatch) return communityMatch[1];
+
+  const sysAdminMatch = pathname.match(/^\/sysAdmin\/([a-zA-Z0-9-]+)/);
+  if (sysAdminMatch) {
+    const id = sysAdminMatch[1];
+    if ((ACTIVE_COMMUNITY_IDS as readonly string[]).includes(id)) {
+      return id;
+    }
+  }
+
+  return null;
 }
 
 /**
