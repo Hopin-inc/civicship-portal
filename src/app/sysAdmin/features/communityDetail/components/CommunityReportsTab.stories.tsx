@@ -28,25 +28,42 @@ const sampleReports: ReportRow[] = [
     variant: GqlReportVariant.MemberNewsletter,
     status: GqlReportStatus.Published,
     publishedAt: new Date("2026-04-25"),
+    feedbacksCount: 54,
   },
   {
     id: "r2",
     variant: GqlReportVariant.WeeklySummary,
     status: GqlReportStatus.Published,
     publishedAt: new Date("2026-04-18"),
+    feedbacksCount: 12,
   },
   {
     id: "r3",
     variant: GqlReportVariant.MediaPr,
     status: GqlReportStatus.Approved,
     publishedAt: null,
+    feedbacksCount: 0,
+  },
+  {
+    id: "r4",
+    variant: GqlReportVariant.GrantApplication,
+    status: GqlReportStatus.Draft,
+    publishedAt: null,
+    feedbacksCount: 0,
+  },
+  {
+    id: "r5",
+    variant: GqlReportVariant.WeeklySummary,
+    status: GqlReportStatus.Rejected,
+    publishedAt: null,
+    feedbacksCount: 3,
   },
 ];
 
 export const WithReports: Story = {
   args: {
     reports: sampleReports,
-    totalCount: 3,
+    totalCount: 5,
     hasNextPage: false,
     loading: false,
     error: null,

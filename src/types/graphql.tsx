@@ -5179,6 +5179,7 @@ export type GqlAdminBrowseReportFieldsFragment = {
   publishedAt?: Date | null;
   createdAt: Date;
   community: { __typename?: "Community"; id: string; name?: string | null };
+  feedbacks: { __typename?: "ReportFeedbacksConnection"; totalCount: number };
 };
 
 export type GqlGetAdminBrowseReportsQueryVariables = Exact<{
@@ -5207,6 +5208,7 @@ export type GqlGetAdminBrowseReportsQuery = {
         publishedAt?: Date | null;
         createdAt: Date;
         community: { __typename?: "Community"; id: string; name?: string | null };
+        feedbacks: { __typename?: "ReportFeedbacksConnection"; totalCount: number };
       } | null;
     } | null> | null;
     pageInfo: { __typename?: "PageInfo"; hasNextPage: boolean; endCursor?: string | null };
@@ -10294,6 +10296,9 @@ export const AdminBrowseReportFieldsFragmentDoc = gql`
     community {
       id
       name
+    }
+    feedbacks {
+      totalCount
     }
   }
 `;

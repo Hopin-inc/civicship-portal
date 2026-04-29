@@ -29,5 +29,8 @@ export const ADMIN_BROWSE_REPORT_FIELDS = gql`
       id
       name
     }
+    feedbacks {
+      totalCount
+    }
   }
 `;
