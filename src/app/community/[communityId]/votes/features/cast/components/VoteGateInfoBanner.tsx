@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { ShieldCheck } from "lucide-react";
+import { translateRole } from "../utils/translateRole";
 import type { VoteGateInfo } from "../types/VoteCastViewModel";
 
 interface VoteGateInfoBannerProps {
@@ -19,7 +20,7 @@ export function VoteGateInfoBanner({ gate }: VoteGateInfoBannerProps) {
     }
     if (gate.type === "membership" && gate.requiredRoleLabel) {
       return t("votes.eligibility.requirement.membershipWithRole", {
-        role: gate.requiredRoleLabel,
+        role: translateRole(gate.requiredRoleLabel, t),
       });
     }
     return t("votes.eligibility.requirement.membership");

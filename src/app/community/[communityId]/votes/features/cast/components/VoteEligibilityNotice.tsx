@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { ShieldX } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { REASON_I18N_MAP } from "../constants/ineligibleReason";
+import { translateRole } from "../utils/translateRole";
 import type { VoteGateInfo } from "../types/VoteCastViewModel";
 
 interface VoteEligibilityNoticeProps {
@@ -21,7 +22,7 @@ export function VoteEligibilityNotice({
     if (!reason) return null;
     if (reason === "INSUFFICIENT_ROLE" && gate.requiredRoleLabel) {
       return t("votes.eligibility.reason.INSUFFICIENT_ROLE", {
-        role: gate.requiredRoleLabel,
+        role: translateRole(gate.requiredRoleLabel, t),
       });
     }
     if (reason === "REQUIRED_NFT_NOT_FOUND" && gate.nftTokenName) {
@@ -41,7 +42,7 @@ export function VoteEligibilityNotice({
     }
     if (gate.type === "membership" && gate.requiredRoleLabel) {
       return t("votes.eligibility.requirement.membershipWithRole", {
-        role: gate.requiredRoleLabel,
+        role: translateRole(gate.requiredRoleLabel, t),
       });
     }
     return t("votes.eligibility.requirement.membership");
