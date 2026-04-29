@@ -3,14 +3,14 @@ import "server-only";
 import { executeServerGraphQLQuery } from "@/lib/graphql/server";
 import { hasServerSession } from "@/lib/auth/server/session";
 import { logger } from "@/lib/logging";
-import { GET_SYS_ADMIN_COMMUNITY_DETAIL_SERVER_QUERY } from "@/graphql/account/sysAdmin/server";
+import { GET_ANALYTICS_COMMUNITY_SERVER_QUERY } from "@/graphql/account/sysAdmin/server";
 import type {
-  GqlGetSysAdminCommunityDetailQuery,
-  GqlSysAdminCommunityDetailInput,
+  GqlGetAnalyticsCommunityQuery,
+  GqlAnalyticsCommunityInput,
 } from "@/types/graphql";
 
 type Result = NonNullable<
-  GqlGetSysAdminCommunityDetailQuery["sysAdminCommunityDetail"]
+  GqlGetAnalyticsCommunityQuery["analyticsCommunity"]
 >;
 
 /**
@@ -20,17 +20,17 @@ type Result = NonNullable<
  * `SysAdminGuard` のリダイレクトに任せる。
  */
 export async function fetchSysAdminCommunityDetailServer(
-  input: GqlSysAdminCommunityDetailInput,
+  input: GqlAnalyticsCommunityInput,
 ): Promise<Result | null> {
   const hasSession = await hasServerSession();
   if (!hasSession) return null;
 
   try {
     const data = await executeServerGraphQLQuery<
-      GqlGetSysAdminCommunityDetailQuery,
-      { input: GqlSysAdminCommunityDetailInput }
-    >(GET_SYS_ADMIN_COMMUNITY_DETAIL_SERVER_QUERY, { input });
-    return data.sysAdminCommunityDetail ?? null;
+      GqlGetAnalyticsCommunityQuery,
+      { input: GqlAnalyticsCommunityInput }
+    >(GET_ANALYTICS_COMMUNITY_SERVER_QUERY, { input });
+    return data.analyticsCommunity ?? null;
   } catch (error) {
     logger.warn("[sysAdmin] fetchSysAdminCommunityDetailServer failed", {
       message: (error as Error).message,

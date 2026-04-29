@@ -12,7 +12,7 @@ type Props = {
   avgRating: number | null;
   totalCount: number;
   /**
-   * backend の `adminTemplateFeedbackStats.ratingDistribution` をそのまま渡す。
+   * backend の `reportTemplateFeedbackStats.ratingDistribution` をそのまま渡す。
    * dense 5 行 (1..5) で count=0 を含むのが backend 仕様。
    * undefined の場合は distribution bar を出さない (= summary だけ)。
    */

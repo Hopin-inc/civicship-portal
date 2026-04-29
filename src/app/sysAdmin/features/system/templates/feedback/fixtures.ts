@@ -1,21 +1,21 @@
 import {
   GqlReportFeedbackType,
   GqlReportVariant,
-  type GqlGetAdminTemplateFeedbackStatsQuery,
-  type GqlGetAdminTemplateFeedbacksQuery,
+  type GqlGetReportTemplateFeedbackStatsQuery,
+  type GqlGetReportTemplateFeedbacksQuery,
   type GqlReportFeedbackWithReportFieldsFragment,
 } from "@/types/graphql";
 
 export type FeedbacksConnection = NonNullable<
-  GqlGetAdminTemplateFeedbacksQuery["adminTemplateFeedbacks"]
+  GqlGetReportTemplateFeedbacksQuery["reportTemplateFeedbacks"]
 >;
 
 export type FeedbackStats =
-  GqlGetAdminTemplateFeedbackStatsQuery["adminTemplateFeedbackStats"];
+  GqlGetReportTemplateFeedbackStatsQuery["reportTemplateFeedbackStats"];
 
 /**
  * Storybook 用 mock。
- * 本番 component は backend の `adminTemplateFeedbacks` query から
+ * 本番 component は backend の `reportTemplateFeedbacks` query から
  * `ReportFeedbackWithReportFields` fragment 単位の data を受け取るので、
  * mock もその型に揃えておく。
  */
@@ -104,7 +104,7 @@ export function makeMockFeedbacks(count: number = 12): FeedbackItem[] {
 }
 
 /**
- * mock な `adminTemplateFeedbackStats` のレスポンス。
+ * mock な `reportTemplateFeedbackStats` のレスポンス。
  * Storybook で `RatingSummary` の動作確認に使う。
  */
 export function makeMockFeedbackStats(
@@ -132,7 +132,7 @@ export function makeMockFeedbackStats(
 }
 
 /**
- * mock feedbacks を `adminTemplateFeedbacks` Connection 形式にラップする
+ * mock feedbacks を `reportTemplateFeedbacks` Connection 形式にラップする
  * helper。Storybook で Container / page を表示するときに使う。
  */
 export function makeMockFeedbacksConnection(

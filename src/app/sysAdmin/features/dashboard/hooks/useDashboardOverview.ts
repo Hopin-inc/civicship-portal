@@ -3,10 +3,10 @@
 import { useMemo } from "react";
 import type { ApolloError } from "@apollo/client";
 import {
-  type GqlGetSysAdminDashboardQuery,
-  type GqlSysAdminCommunityOverview,
-  type GqlSysAdminPlatformSummary,
-  useGetSysAdminDashboardQuery,
+  type GqlGetAnalyticsDashboardQuery,
+  type GqlAnalyticsCommunityOverview,
+  type GqlAnalyticsPlatformSummary,
+  useGetAnalyticsDashboardQuery,
 } from "@/types/graphql";
 import type { DashboardControlsState } from "./useDashboardControls";
 import { DASHBOARD_CONTROLS_DEFAULTS } from "./useDashboardControls";
@@ -18,8 +18,8 @@ import {
 export type DashboardOverviewResult = {
   loading: boolean;
   error: ApolloError | undefined;
-  platform: GqlSysAdminPlatformSummary | null;
-  communities: GqlSysAdminCommunityOverview[];
+  platform: GqlAnalyticsPlatformSummary | null;
+  communities: GqlAnalyticsCommunityOverview[];
   asOf: Date | null;
 };
 
@@ -36,7 +36,7 @@ const DEFAULT_TIER2 = DASHBOARD_CONTROLS_DEFAULTS.tier2;
  */
 export function useDashboardOverview(
   controls: DashboardControlsState,
-  initialData: GqlGetSysAdminDashboardQuery["sysAdminDashboard"] | null,
+  initialData: GqlGetAnalyticsDashboardQuery["analyticsDashboard"] | null,
 ): DashboardOverviewResult {
   const { asOf: asOfIso } = useMemo(
     () => resolvePeriodToInput(controls.period),
@@ -51,7 +51,7 @@ export function useDashboardOverview(
   // 場合のみ初回クエリをスキップ。コントロールが変わったら Apollo に問い合わせる。
   const skipInitialQuery = isAtDefaults && !!initialData;
 
-  const { data, loading, error } = useGetSysAdminDashboardQuery({
+  const { data, loading, error } = useGetAnalyticsDashboardQuery({
     variables: {
       input: {
         asOf: asOfIso ? new Date(asOfIso) : undefined,
@@ -71,10 +71,10 @@ export function useDashboardOverview(
     // - もしくは Apollo がまだ data を返していない (初回フェッチ中)
     //
     // `data === undefined` で「まだ応答が来ていない」を厳密に判定する。
-    // `!data?.sysAdminDashboard` だと、Apollo が `null` (= 有効な空応答)
+    // `!data?.analyticsDashboard` だと、Apollo が `null` (= 有効な空応答)
     // を返したときに stale な initialData を表示し続けてしまう。
     const useSsr = skipInitialQuery || data === undefined;
-    const source = useSsr ? initialData : data?.sysAdminDashboard ?? null;
+    const source = useSsr ? initialData : data?.analyticsDashboard ?? null;
 
     return {
       // Always reflect the actual Apollo loading state. Previously this

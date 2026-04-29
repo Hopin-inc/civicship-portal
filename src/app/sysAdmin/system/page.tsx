@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
  * リダイレクトする。
  *
  * このファイルが無いと Next.js の動的ルート `[communityId]` が
- * `/sysAdmin/system` を拾ってしまい、`sysAdminCommunityDetail({ communityId: "system" })`
+ * `/sysAdmin/system` を拾ってしまい、`analyticsCommunity({ communityId: "system" })`
  * を叩いて `Community not found (id: system)` で 500 を吐く。
  *
  * システム設定 hub を将来追加する場合はこの redirect を hub ページに置き換える。

@@ -9,8 +9,8 @@ import {
  * variant + version + kind で絞り込み、各 feedback には `report` を含めて
  * card から元のレポートへ飛べるようにする。
  */
-export const GET_ADMIN_TEMPLATE_FEEDBACKS = gql`
-  query GetAdminTemplateFeedbacks(
+export const GET_REPORT_TEMPLATE_FEEDBACKS = gql`
+  query GetReportTemplateFeedbacks(
     $variant: ReportVariant!
     $version: Int
     $kind: ReportTemplateKind
@@ -19,7 +19,7 @@ export const GET_ADMIN_TEMPLATE_FEEDBACKS = gql`
     $cursor: String
     $first: Int
   ) {
-    adminTemplateFeedbacks(
+    reportTemplateFeedbacks(
       variant: $variant
       version: $version
       kind: $kind
@@ -48,17 +48,17 @@ export const GET_ADMIN_TEMPLATE_FEEDBACKS = gql`
 /**
  * テンプレ詳細の summary (avgRating / 件数 / rating 分布) 用 query。
  *
- * `adminTemplateFeedbacks` (list) と引数を揃えてあるので、frontend 側で
+ * `reportTemplateFeedbacks` (list) と引数を揃えてあるので、frontend 側で
  * 1 つの filter object から両方に流せる。`feedbackType` / `maxRating` は
  * stats 側にはあえて含めない (= 母集団の分布を出す)。
  */
-export const GET_ADMIN_TEMPLATE_FEEDBACK_STATS = gql`
-  query GetAdminTemplateFeedbackStats(
+export const GET_REPORT_TEMPLATE_FEEDBACK_STATS = gql`
+  query GetReportTemplateFeedbackStats(
     $variant: ReportVariant!
     $version: Int
     $kind: ReportTemplateKind
   ) {
-    adminTemplateFeedbackStats(
+    reportTemplateFeedbackStats(
       variant: $variant
       version: $version
       kind: $kind

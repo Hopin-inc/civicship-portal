@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { GqlSysAdminCohortRetentionPoint } from "@/types/graphql";
+import type { GqlAnalyticsCohortRetentionPoint } from "@/types/graphql";
 import { buildCohortChartData } from "../buildCohortChartData";
 
 const cohort = (
@@ -7,8 +7,8 @@ const cohort = (
   retentionM1: number | null,
   retentionM3: number | null,
   retentionM6: number | null,
-): GqlSysAdminCohortRetentionPoint => ({
-  __typename: "SysAdminCohortRetentionPoint",
+): GqlAnalyticsCohortRetentionPoint => ({
+  __typename: "AnalyticsCohortRetentionPoint",
   cohortMonth: new Date(month),
   cohortSize: 10,
   retentionM1,

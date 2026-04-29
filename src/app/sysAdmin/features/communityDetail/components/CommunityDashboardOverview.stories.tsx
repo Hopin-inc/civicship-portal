@@ -11,7 +11,7 @@ import {
   makeStageDistribution,
   makeSummaryCard,
   makeTenureDistribution,
-} from "../../../_shared/fixtures/sysAdminDashboard";
+} from "../../../_shared/fixtures/analyticsDashboard";
 
 const meta: Meta<typeof CommunityDashboardOverview> = {
   title: "SysAdmin/Detail/CommunityDashboardOverview",
@@ -87,7 +87,7 @@ export const Healthy: Story = {
           ),
         ),
       },
-    }).sysAdminCommunityDetail!,
+    }).analyticsCommunity!,
   },
 };
 
@@ -152,7 +152,7 @@ export const WithIssues: Story = {
           ),
         ),
       },
-    }).sysAdminCommunityDetail!,
+    }).analyticsCommunity!,
   },
 };
 
@@ -217,6 +217,6 @@ export const EmptyData: Story = {
           }),
         ]),
       },
-    }).sysAdminCommunityDetail!,
+    }).analyticsCommunity!,
   },
 };

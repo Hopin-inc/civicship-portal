@@ -1,4 +1,4 @@
-import type { GqlSysAdminCohortRetentionPoint } from "@/types/graphql";
+import type { GqlAnalyticsCohortRetentionPoint } from "@/types/graphql";
 import { formatJstMonthShort } from "@/app/sysAdmin/_shared/format/date";
 
 export type CohortAxisPoint = "M+0" | "M+1" | "M+3" | "M+6";
@@ -23,7 +23,7 @@ export type CohortChartData = {
  * - cohorts are limited to the most recent `maxCohorts` entries (or all when 0)
  */
 export function buildCohortChartData(
-  rawRows: readonly GqlSysAdminCohortRetentionPoint[],
+  rawRows: readonly GqlAnalyticsCohortRetentionPoint[],
   maxCohorts = 0,
 ): CohortChartData {
   const sliced =

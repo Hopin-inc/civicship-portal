@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
-export const SYS_ADMIN_SEGMENT_COUNTS_FRAGMENT = gql`
-  fragment SysAdminSegmentCountsFields on SysAdminSegmentCounts {
+export const ANALYTICS_SEGMENT_COUNTS_FRAGMENT = gql`
+  fragment AnalyticsSegmentCountsFields on AnalyticsSegmentCounts {
     total
     activeCount
     passiveCount
@@ -10,8 +10,8 @@ export const SYS_ADMIN_SEGMENT_COUNTS_FRAGMENT = gql`
   }
 `;
 
-export const SYS_ADMIN_WINDOW_ACTIVITY_FRAGMENT = gql`
-  fragment SysAdminWindowActivityFields on SysAdminWindowActivity {
+export const ANALYTICS_WINDOW_ACTIVITY_FRAGMENT = gql`
+  fragment AnalyticsWindowActivityFields on AnalyticsWindowActivity {
     senderCount
     senderCountPrev
     newMemberCount
@@ -20,81 +20,85 @@ export const SYS_ADMIN_WINDOW_ACTIVITY_FRAGMENT = gql`
   }
 `;
 
-export const SYS_ADMIN_WEEKLY_RETENTION_FRAGMENT = gql`
-  fragment SysAdminWeeklyRetentionFields on SysAdminWeeklyRetention {
+export const ANALYTICS_WEEKLY_RETENTION_FRAGMENT = gql`
+  fragment AnalyticsWeeklyRetentionFields on AnalyticsWeeklyRetention {
     retainedSenders
     churnedSenders
   }
 `;
 
-export const SYS_ADMIN_LATEST_COHORT_FRAGMENT = gql`
-  fragment SysAdminLatestCohortFields on SysAdminLatestCohort {
+export const ANALYTICS_LATEST_COHORT_FRAGMENT = gql`
+  fragment AnalyticsLatestCohortFields on AnalyticsLatestCohort {
     size
     activeAtM1
   }
 `;
 
-export const SYS_ADMIN_PLATFORM_SUMMARY_FRAGMENT = gql`
-  fragment SysAdminPlatformSummaryFields on SysAdminPlatformSummary {
+export const ANALYTICS_PLATFORM_SUMMARY_FRAGMENT = gql`
+  fragment AnalyticsPlatformSummaryFields on AnalyticsPlatformSummary {
     communitiesCount
     latestMonthDonationPoints
     totalMembers
   }
 `;
 
-export const SYS_ADMIN_TENURE_DISTRIBUTION_FRAGMENT = gql`
-  fragment SysAdminTenureDistributionFields on SysAdminTenureDistribution {
+export const ANALYTICS_TENURE_DISTRIBUTION_FRAGMENT = gql`
+  fragment AnalyticsTenureDistributionFields on AnalyticsTenureDistribution {
     lt1Month
     m1to3Months
     m3to12Months
     gte12Months
+    monthlyHistogram {
+      monthsIn
+      count
+    }
   }
 `;
 
-export const SYS_ADMIN_COMMUNITY_OVERVIEW_ROW_FRAGMENT = gql`
-  fragment SysAdminCommunityOverviewRowFields on SysAdminCommunityOverview {
+export const ANALYTICS_COMMUNITY_OVERVIEW_ROW_FRAGMENT = gql`
+  fragment AnalyticsCommunityOverviewRowFields on AnalyticsCommunityOverview {
     communityId
     communityName
     totalMembers
     hubMemberCount
     dormantCount
     segmentCounts {
-      ...SysAdminSegmentCountsFields
+      ...AnalyticsSegmentCountsFields
     }
     tenureDistribution {
-      ...SysAdminTenureDistributionFields
+      ...AnalyticsTenureDistributionFields
     }
     windowActivity {
-      ...SysAdminWindowActivityFields
+      ...AnalyticsWindowActivityFields
     }
     weeklyRetention {
-      ...SysAdminWeeklyRetentionFields
+      ...AnalyticsWeeklyRetentionFields
     }
     latestCohort {
-      ...SysAdminLatestCohortFields
+      ...AnalyticsLatestCohortFields
     }
   }
-  ${SYS_ADMIN_SEGMENT_COUNTS_FRAGMENT}
-  ${SYS_ADMIN_TENURE_DISTRIBUTION_FRAGMENT}
-  ${SYS_ADMIN_WINDOW_ACTIVITY_FRAGMENT}
-  ${SYS_ADMIN_WEEKLY_RETENTION_FRAGMENT}
-  ${SYS_ADMIN_LATEST_COHORT_FRAGMENT}
+  ${ANALYTICS_SEGMENT_COUNTS_FRAGMENT}
+  ${ANALYTICS_TENURE_DISTRIBUTION_FRAGMENT}
+  ${ANALYTICS_WINDOW_ACTIVITY_FRAGMENT}
+  ${ANALYTICS_WEEKLY_RETENTION_FRAGMENT}
+  ${ANALYTICS_LATEST_COHORT_FRAGMENT}
 `;
 
-// L2 (community detail) fragments. SysAdminCommunityDetailPayload still
+// L2 (community detail) fragments. AnalyticsCommunityPayload still
 // exposes an `alerts` group with the same {activeDrop, churnSpike,
 // noNewMembers} shape as the legacy L1 alert. L1 derives these client-side
 // now; L2 keeps the server-pre-computed signals as-is.
-export const SYS_ADMIN_ALERT_FRAGMENT = gql`
-  fragment SysAdminAlertFields on SysAdminCommunityAlerts {
+export const ANALYTICS_ALERT_FRAGMENT = gql`
+  fragment AnalyticsAlertFields on AnalyticsCommunityAlerts {
     activeDrop
     churnSpike
     noNewMembers
   }
 `;
 
-export const SYS_ADMIN_COMMUNITY_DETAIL_SUMMARY_FRAGMENT = gql`
-  fragment SysAdminCommunityDetailSummaryFields on SysAdminCommunitySummaryCard {
+export const ANALYTICS_COMMUNITY_DETAIL_SUMMARY_FRAGMENT = gql`
+  fragment AnalyticsCommunityDetailSummaryFields on AnalyticsCommunitySummaryCard {
     communityId
     communityName
     communityActivityRate
@@ -110,8 +114,8 @@ export const SYS_ADMIN_COMMUNITY_DETAIL_SUMMARY_FRAGMENT = gql`
   }
 `;
 
-export const SYS_ADMIN_STAGE_BUCKET_FRAGMENT = gql`
-  fragment SysAdminStageBucketFields on SysAdminStageBucket {
+export const ANALYTICS_STAGE_BUCKET_FRAGMENT = gql`
+  fragment AnalyticsStageBucketFields on AnalyticsStageBucket {
     count
     pct
     avgSendRate
@@ -120,26 +124,26 @@ export const SYS_ADMIN_STAGE_BUCKET_FRAGMENT = gql`
   }
 `;
 
-export const SYS_ADMIN_STAGE_DISTRIBUTION_FRAGMENT = gql`
-  fragment SysAdminStageDistributionFields on SysAdminStageDistribution {
+export const ANALYTICS_STAGE_DISTRIBUTION_FRAGMENT = gql`
+  fragment AnalyticsStageDistributionFields on AnalyticsStageDistribution {
     habitual {
-      ...SysAdminStageBucketFields
+      ...AnalyticsStageBucketFields
     }
     regular {
-      ...SysAdminStageBucketFields
+      ...AnalyticsStageBucketFields
     }
     occasional {
-      ...SysAdminStageBucketFields
+      ...AnalyticsStageBucketFields
     }
     latent {
-      ...SysAdminStageBucketFields
+      ...AnalyticsStageBucketFields
     }
   }
-  ${SYS_ADMIN_STAGE_BUCKET_FRAGMENT}
+  ${ANALYTICS_STAGE_BUCKET_FRAGMENT}
 `;
 
-export const SYS_ADMIN_MONTHLY_ACTIVITY_POINT_FRAGMENT = gql`
-  fragment SysAdminMonthlyActivityPointFields on SysAdminMonthlyActivityPoint {
+export const ANALYTICS_MONTHLY_ACTIVITY_POINT_FRAGMENT = gql`
+  fragment AnalyticsMonthlyActivityPointFields on AnalyticsMonthlyActivityPoint {
     month
     communityActivityRate
     senderCount
@@ -152,8 +156,8 @@ export const SYS_ADMIN_MONTHLY_ACTIVITY_POINT_FRAGMENT = gql`
   }
 `;
 
-export const SYS_ADMIN_RETENTION_TREND_POINT_FRAGMENT = gql`
-  fragment SysAdminRetentionTrendPointFields on SysAdminRetentionTrendPoint {
+export const ANALYTICS_RETENTION_TREND_POINT_FRAGMENT = gql`
+  fragment AnalyticsRetentionTrendPointFields on AnalyticsRetentionTrendPoint {
     week
     communityActivityRate
     retainedSenders
@@ -163,8 +167,8 @@ export const SYS_ADMIN_RETENTION_TREND_POINT_FRAGMENT = gql`
   }
 `;
 
-export const SYS_ADMIN_COHORT_RETENTION_POINT_FRAGMENT = gql`
-  fragment SysAdminCohortRetentionPointFields on SysAdminCohortRetentionPoint {
+export const ANALYTICS_COHORT_RETENTION_POINT_FRAGMENT = gql`
+  fragment AnalyticsCohortRetentionPointFields on AnalyticsCohortRetentionPoint {
     cohortMonth
     cohortSize
     retentionM1
@@ -173,8 +177,8 @@ export const SYS_ADMIN_COHORT_RETENTION_POINT_FRAGMENT = gql`
   }
 `;
 
-export const SYS_ADMIN_COHORT_FUNNEL_POINT_FRAGMENT = gql`
-  fragment SysAdminCohortFunnelPointFields on SysAdminCohortFunnelPoint {
+export const ANALYTICS_COHORT_FUNNEL_POINT_FRAGMENT = gql`
+  fragment AnalyticsCohortFunnelPointFields on AnalyticsCohortFunnelPoint {
     cohortMonth
     acquired
     activatedD30
@@ -183,8 +187,8 @@ export const SYS_ADMIN_COHORT_FUNNEL_POINT_FRAGMENT = gql`
   }
 `;
 
-export const SYS_ADMIN_MEMBER_ROW_FRAGMENT = gql`
-  fragment SysAdminMemberRowFields on SysAdminMemberRow {
+export const ANALYTICS_MEMBER_ROW_FRAGMENT = gql`
+  fragment AnalyticsMemberRowFields on AnalyticsMemberRow {
     userId
     name
     userSendRate

@@ -4,8 +4,8 @@ import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type {
-  GqlGetAdminTemplateFeedbackStatsQuery,
-  GqlGetAdminTemplateFeedbacksQuery,
+  GqlGetReportTemplateFeedbackStatsQuery,
+  GqlGetReportTemplateFeedbacksQuery,
   GqlReportTemplateFieldsFragment,
   GqlReportTemplateStatsBreakdownRowFieldsFragment,
   GqlReportVariant,
@@ -15,10 +15,10 @@ import { GenerationTemplateContainer } from "@/app/sysAdmin/features/system/temp
 import { JudgeTemplateContainer } from "@/app/sysAdmin/features/system/templates/editor/components/JudgeTemplateContainer";
 
 type FeedbacksConnection = NonNullable<
-  GqlGetAdminTemplateFeedbacksQuery["adminTemplateFeedbacks"]
+  GqlGetReportTemplateFeedbacksQuery["reportTemplateFeedbacks"]
 >;
 type FeedbackStats =
-  GqlGetAdminTemplateFeedbackStatsQuery["adminTemplateFeedbackStats"];
+  GqlGetReportTemplateFeedbackStatsQuery["reportTemplateFeedbackStats"];
 
 type Props = {
   variant: GqlReportVariant;

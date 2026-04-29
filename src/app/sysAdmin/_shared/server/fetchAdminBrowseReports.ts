@@ -3,8 +3,8 @@ import "server-only";
 import { executeServerGraphQLQuery } from "@/lib/graphql/server";
 import { hasServerSession } from "@/lib/auth/server/session";
 import { logger } from "@/lib/logging";
-import { GET_ADMIN_BROWSE_REPORTS_SERVER_QUERY } from "@/graphql/account/adminReports/server";
-import type { GqlGetAdminBrowseReportsQuery } from "@/types/graphql";
+import { GET_REPORTS_ALL_SERVER_QUERY } from "@/graphql/account/adminReports/server";
+import type { GqlGetReportsAllQuery } from "@/types/graphql";
 
 const PAGE_SIZE = 20;
 
@@ -15,24 +15,24 @@ const PAGE_SIZE = 20;
 export async function fetchAdminBrowseReportsServer(
   communityId: string,
 ): Promise<
-  NonNullable<GqlGetAdminBrowseReportsQuery["adminBrowseReports"]> | null
+  NonNullable<GqlGetReportsAllQuery["reportsAll"]> | null
 > {
   const hasSession = await hasServerSession();
   if (!hasSession) return null;
 
   try {
     const data = await executeServerGraphQLQuery<
-      GqlGetAdminBrowseReportsQuery,
+      GqlGetReportsAllQuery,
       {
         communityId?: string | null;
         first?: number | null;
         cursor?: string | null;
       }
-    >(GET_ADMIN_BROWSE_REPORTS_SERVER_QUERY, {
+    >(GET_REPORTS_ALL_SERVER_QUERY, {
       communityId,
       first: PAGE_SIZE,
     });
-    return data.adminBrowseReports ?? null;
+    return data.reportsAll ?? null;
   } catch (error) {
     logger.warn("[sysAdmin] fetchAdminBrowseReportsServer failed", {
       message: (error as Error).message,

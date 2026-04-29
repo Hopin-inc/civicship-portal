@@ -301,6 +301,2578 @@
         "possibleTypes": null
       },
       {
+        "kind": "OBJECT",
+        "name": "AnalyticsChainDepthBucket",
+        "description": "One bucket of the all-time DONATION chain-depth histogram. See\n`AnalyticsCommunityPayload.chainDepthDistribution`.",
+        "isOneOf": null,
+        "fields": [
+          {
+            "name": "count",
+            "description": "Number of all-time DONATION transactions whose `chain_depth`\nfalls into this bucket. Always non-negative.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "depth",
+            "description": "Chain-depth bucket key. Range 1..5; the 5 bucket aggregates\n`chain_depth >= 5`. See `AnalyticsCommunitySummaryCard\n.maxChainDepthAllTime` for the underlying semantic.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "AnalyticsCohortFunnelPoint",
+        "description": "One cohort's funnel progression. See\n`AnalyticsCommunityPayload.cohortFunnel` for the stage\nsemantics and the JOINED-at-asOf scoping rule.",
+        "isOneOf": null,
+        "fields": [
+          {
+            "name": "acquired",
+            "description": "Cohort size: number of JOINED memberships whose `created_at`\nfalls within this cohort month. The funnel's entry stage —\nthe denominator the client divides downstream stages by to\nderive percentages.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "activatedD30",
+            "description": "Of the cohort, members who sent at least one DONATION within\n30 days of their join (per-member, measured from each\nindividual's `created_at` rather than a calendar-clamped\nwindow). The \"first-30-day activation\" funnel stage.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "cohortMonth",
+            "description": "JST first day of the cohort's entry month, e.g.\n2025-10-01T00:00+09:00. UTC-encoded at JST midnight, same\nconvention as `AnalyticsMonthlyActivityPoint.month` and\n`AnalyticsCohortRetentionPoint.cohortMonth`.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Datetime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "habitual",
+            "description": "Of the cohort, members currently in the habitual segment\n(`userSendRate >= segmentThresholds.tier1` AND tenure floor).\nTHRESHOLD-DEPENDENT — see the parent field's doc.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "repeated",
+            "description": "Of the cohort, members who sent DONATION in >= 2 distinct JST\nmonths as of asOf. The \"came back at least once\" stage.\nCumulative — once a member has 2+ donation months in their\nhistory they stay counted in this stage even if they later go\nquiet.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "AnalyticsCohortRetentionPoint",
+        "description": "One entry-month cohort's retention curve.",
+        "isOneOf": null,
+        "fields": [
+          {
+            "name": "cohortMonth",
+            "description": "Entry month, first day JST (e.g. 2025-10-01T00:00+09:00).",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Datetime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "cohortSize",
+            "description": "Cohort size at entry (status='JOINED' joiners in the month).",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "retentionM1",
+            "description": "Fraction of the cohort with a DONATION out in the SECOND month after\nentry (m+1). null for an empty cohort or a cohort too recent to have\na completed m+1 window.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "retentionM3",
+            "description": "Fraction active in m+3.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "retentionM6",
+            "description": "Fraction active in m+6.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "AnalyticsCommunityAlerts",
+        "description": "API-side alert flags. Boolean only: the server owns the cross-field\njudgement, the client just renders the badge.",
+        "isOneOf": null,
+        "fields": [
+          {
+            "name": "activeDrop",
+            "description": "Month-over-month communityActivityRate change <= -20%.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "churnSpike",
+            "description": "Latest-week churned_senders > retained_senders.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "noNewMembers",
+            "description": "No t_memberships.created_at rows (status='JOINED') in the last 14 days.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "AnalyticsCommunityInput",
+        "description": null,
+        "isOneOf": false,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "asOf",
+            "description": "As-of timestamp (see AnalyticsDashboardInput.asOf).",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Datetime",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "communityId",
+            "description": "Target community id.",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "cursor",
+            "description": "Opaque cursor for pagination. Internally a base64-encoded offset of\nthe prior page's position. Treat as opaque — pass back the cursor\nreturned by the previous response unchanged.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "dormantThresholdDays",
+            "description": "Days since a member's most recent DONATION above which they are\nclassified as \"dormant\". Used to populate\n`AnalyticsCommunityPayload.dormantCount`. See the same-named\nfield on AnalyticsDashboardInput for the full semantic.\n\nDefault 30 (≈ one month of silence). Effective range 1..365;\nvalues outside are silently clamped on the server.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "defaultValue": "30",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "hubBreadthThreshold",
+            "description": "Minimum number of distinct DONATION recipients within the trailing\n28-day window ending at each month-end for a member to be classified\nas a hub in that month. Used to populate\n`AnalyticsMonthlyActivityPoint.hubMemberCount`. Same semantic as\n`AnalyticsDashboardInput.hubBreadthThreshold`, applied at month-end\nrather than at request `asOf`.\n\nDefault 3. Effective range 1..1000; values outside are silently\nclamped on the server. Pass the same value used on\n`AnalyticsDashboardInput.hubBreadthThreshold` to keep the L1\nhubMemberCount and the latest entry of\n`monthlyActivityTrend.hubMemberCount` directly comparable.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "defaultValue": "3",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "limit",
+            "description": "Member list page size (default 50, max 1000). Raised from the\nprevious max of 200 so client-side aggregations that need every\nmember of a community (e.g. the \"受領→送付 転換率\" /\nrecipient-to-sender conversion rate, hub-persistence cohorts,\nnew-member retention breakdowns) can pull a single full page\nwithout N round-trips. Communities larger than 1000 members\nstill need cursor pagination.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "defaultValue": "50",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "segmentThresholds",
+            "description": "Stage-count thresholds for the stage distribution and tier counts.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "AnalyticsSegmentThresholdsInput",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "userFilter",
+            "description": "Member list filter. Defaults to `minSendRate = 0.7` (habitual only).",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "AnalyticsUserListFilter",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "userSort",
+            "description": "Member list sort. Defaults to SEND_RATE DESC.",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "AnalyticsUserListSort",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "windowMonths",
+            "description": "How many trailing JST months to include in the trend / cohort arrays.\nDefault 10.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "defaultValue": "10",
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "AnalyticsCommunityOverview",
+        "description": "One row of the L1 all-community table. Designed for at-a-glance\nintervention judgment: each row carries the raw counts the client\nneeds to derive rates, growth, alerts, sort keys, and filter\npredicates without a second round-trip.\n\nCalendar-month metrics live on the L2 detail card\n(AnalyticsCommunitySummaryCard) — L1 is rolling-window only.",
+        "isOneOf": null,
+        "fields": [
+          {
+            "name": "communityId",
+            "description": "Community id.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "communityName",
+            "description": "Community display name (t_communities.name).",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "dormantCount",
+            "description": "Members who donated at some point but whose most recent\nDONATION is older than `dormantThresholdDays` (default 30).\nDistinct from `segmentCounts.passiveCount` (= \"latent\", never\ndonated): operators care about the difference because the\nintervention is different — re-engage the dormant, onboard the\nlatent.\n\nComputed as\n  COUNT(DISTINCT user_id)\n  WHERE the user has at least one historical DONATION in this\n    community AND `MAX(donation.created_at) < asOf -\n    dormantThresholdDays`\n    AND status='JOINED' at asOf\n\nInvariants the client may assert:\n  0 <= dormantCount <= totalMembers - segmentCounts.passiveCount\n\nThe upper bound holds because dormant members are by\nconstruction ever-donated, which `passiveCount` excludes.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "hubMemberCount",
+            "description": "Number of members classified as a \"hub\" within the parametric\nwindow (`windowDays`):\n\n  hubMemberCount = COUNT(member)\n    WHERE windowUniqueDonationRecipients >= input.hubBreadthThreshold\n\n`windowUniqueDonationRecipients` is the count of DISTINCT users\nthis member sent a DONATION to during\n`[asOf - windowDays JST日, asOf + 1 JST日)` — distinct from the\nL2 `AnalyticsMemberRow.uniqueDonationRecipients` field which is\ntenure-wide. The window-scoped variant is computed on demand in\nthis aggregate but not exposed per-member at L1 (members\nthemselves are an L2 concern).\n\nHub classification deliberately uses BREADTH only — a member\nwho reached `hubBreadthThreshold` distinct recipients during\nthe window necessarily transacted at least that many times,\nmaking an explicit frequency floor redundant. This keeps the\nthreshold knobs to one (`hubBreadthThreshold`).\n\nInvariants (the client may assert these):\n  hubMemberCount <= windowActivity.senderCount <= totalMembers\n\nThe first holds because any hub member sent DONATION to\n`>= hubBreadthThreshold` distinct counterparties during the\nwindow — which requires at least that many DONATION\ntransactions — so they are necessarily a window sender. The\nsecond because both `hubMemberCount` and `windowActivity.senderCount`\nare computed from senders restricted to JOINED-at-asOf members\n(a former member who left the community before asOf is excluded\neven if they donated during the window) and totalMembers is\nalso JOINED-at-asOf, so the chain stays consistent.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "latestCohort",
+            "description": "Latest completed monthly cohort and its M+1 activity. See\nAnalyticsLatestCohort.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AnalyticsLatestCohort",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "segmentCounts",
+            "description": "Per-stage member counts (tier1 / tier2 / passive, cumulative\nper the type doc) classified against input.segmentThresholds.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AnalyticsSegmentCounts",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "tenureDistribution",
+            "description": "Tenure-bucket distribution of members at asOf. See\nAnalyticsTenureDistribution. Sum of buckets equals totalMembers.\n\nLets the client surface community age structure at L1 without\ndrilling into the L2 member list (which would otherwise force\nan N+1 round trip per community to compute distribution).",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AnalyticsTenureDistribution",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "totalMembers",
+            "description": "Total status='JOINED' members as of asOf. Members whose\ncreated_at is after asOf are excluded from the count.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "weeklyRetention",
+            "description": "Latest completed-week retention signals for client-side churn\ndetection. See AnalyticsWeeklyRetention.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AnalyticsWeeklyRetention",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "windowActivity",
+            "description": "Rolling-window DONATION activity. See AnalyticsWindowActivity.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AnalyticsWindowActivity",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "AnalyticsCommunityPayload",
+        "description": "Root payload for analyticsCommunity (L2).",
+        "isOneOf": null,
+        "fields": [
+          {
+            "name": "alerts",
+            "description": "Alert flags (same structure as L1, evaluated for this community).",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AnalyticsCommunityAlerts",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "asOf",
+            "description": "As-of timestamp echoed back.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Datetime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "chainDepthDistribution",
+            "description": "Distribution of DONATION `chain_depth` values across all-time\nDONATION transactions in this community. Each bucket counts\ndistinct DONATION transactions whose `chain_depth` falls into\nthe bucket key (see `AnalyticsCommunitySummaryCard.maxChainDepthAllTime`\nfor the depth semantic — depth 1 is a root donation, depth N+1\nmeans the sender's most recent received DONATION had depth N).\n\nBuckets are `{depth: 1..5, count}`; the depth-5 bucket\naggregates all transactions with `chain_depth >= 5`. Buckets\nare returned in ascending depth order, with every bucket\nemitted (count = 0 for depths with no transactions) so the\nclient can render a contiguous histogram axis without\nzero-padding logic. Adjust the ceiling upward (e.g., to 10+)\nin a follow-up if real-data inspection of `maxChainDepthAllTime`\nshows meaningful population in the 5+ bucket.\n\nPowers the L3 \"/network\" chain-depth histogram: visualizes\nwhether donations propagate deeply (multi-hop reciprocity, tail\npopulated) or shallowly (one-shot direct gifts, mass at depth 1).",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "AnalyticsChainDepthBucket",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "cohortFunnel",
+            "description": "Per-cohort funnel progression for the L3 \"/activity\" deep-dive.\nOne entry per JST entry-month within the trailing `windowMonths`\nrange, returned in ascending order (newest cohort last). Stages\nmatch the L2 send-funnel structure:\n\n  acquisition  — cohort size at entry (JOINED memberships\n                 created during the cohort month)\n  activatedD30 — cohort members who sent >= 1 DONATION within\n                 30 days of their join (per-member, not\n                 calendar-clamped)\n  repeated     — cohort members who sent DONATION in >= 2\n                 distinct JST months (cumulative as of asOf)\n  habitual     — cohort members currently in the habitual\n                 segment (`userSendRate >= segmentThresholds\n                 .tier1` AND tenure floor)\n\n⚠ The `habitual` stage is THRESHOLD-DEPENDENT: it is derived\nfrom the request's `segmentThresholds.tier1` (default 0.7),\nsame behaviour as `stages.habitual` and the L2 habitual count\ncard. Cross-request comparisons of the funnel's last stage\nrequire matching threshold inputs. The `acquisition`,\n`activatedD30`, and `repeated` stages are threshold-\nindependent by construction.\n\nAll counts are JOINED-at-asOf scoped — a cohort member who\nlater left the community is excluded from `activatedD30` /\n`repeated` / `habitual` even if they donated during the\nmeasurement window. Same membership filter as `dormantCount`\n/ L1 `senderCount` / L2 monthly `hubMemberCount`.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "AnalyticsCohortFunnelPoint",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "cohortRetention",
+            "description": "One entry per entry month (length <= windowMonths), newest last.\n`retentionM*` fields are null when the cohort is empty or too recent.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "AnalyticsCohortRetentionPoint",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "communityId",
+            "description": "Community id.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "communityName",
+            "description": "Community display name.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "dormantCount",
+            "description": "Members who donated at some point but whose most recent\nDONATION is older than `dormantThresholdDays` (default 30). See\nthe same-named field on `AnalyticsCommunityOverview` for the\nfull semantic. Exposed at L2 so the user-scope card can show\nthe dormancy ratio directly without re-aggregating from the\nmember list.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "memberList",
+            "description": "Paginated member list — see type doc.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AnalyticsMemberList",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "monthlyActivityTrend",
+            "description": "One entry per month (length <= windowMonths), newest last. Older\nmonths with no MV data are omitted rather than zero-padded.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "AnalyticsMonthlyActivityPoint",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "retentionTrend",
+            "description": "One entry per ISO week, newest last. Length approximates\n`windowMonths * ~4.3` weeks; sparse weeks with no activity still emit\na row with zero counters.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "AnalyticsRetentionTrendPoint",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "stages",
+            "description": "Stage distribution, classified server-side with the request's\nthresholds. Computed over ALL members (independent of member-list\nfilter).",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AnalyticsStageDistribution",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "summary",
+            "description": "Summary card — see type doc.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AnalyticsCommunitySummaryCard",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "windowMonths",
+            "description": "Trailing window length in JST months (echoed back).",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "AnalyticsCommunitySummaryCard",
+        "description": "Summary card for a single community. Fronts the L2 detail screen and\nanswers \"is this community improving?\" in one row of numbers.",
+        "isOneOf": null,
+        "fields": [
+          {
+            "name": "communityActivityRate",
+            "description": "Latest-month communityActivityRate (PRIMARY indicator — see module\ndocstring for the distinction vs userSendRate).",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "communityActivityRate3mAvg",
+            "description": "3-month trailing average of communityActivityRate, ending at the JST\ncalendar month containing asOf (inclusive). null when fewer than 3\nmonths of data exist.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "communityId",
+            "description": "Community id.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "communityName",
+            "description": "Community display name.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "dataFrom",
+            "description": "Oldest date with MV data for this community (JST calendar).",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Datetime",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "dataTo",
+            "description": "Newest date with MV data for this community (JST calendar).",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Datetime",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "growthRateActivity",
+            "description": "Month-over-month % change in communityActivityRate (fraction, e.g.\n-0.2 == -20%). null when the prior month has no data.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "maxChainDepthAllTime",
+            "description": "Maximum `chain_depth` observed in any DONATION, all-time, in\nthis community. null when no DONATION transactions exist.\n\n`chain_depth` semantics (set in transaction creation —\nsrc/application/domain/transaction/service.ts:89, via\n`findLatestReceivedTx`):\n  - chain_depth = 1: a \"root\" donation. Either the sender\n    had no prior received DONATION (= self-funded gift) or\n    this is treated as the start of a chain.\n  - chain_depth = N + 1: the sender's most recent received\n    DONATION (parentTx) had `chain_depth = N`; the new\n    donation propagates the chain by one step.\n\nExample trace: A donates to B → chain_depth 1.\nB then donates to C, citing the receipt from A → chain_depth 2.\nC donates to D similarly → chain_depth 3.\n\n`maxChainDepthAllTime = 1` therefore means \"no propagation\never happened\" (every donation was a fresh root).\n`maxChainDepthAllTime >= 2` means at least one\nreceive-then-pass-it-on event occurred.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "tier2Count",
+            "description": "Cumulative members in tier2 or above under the supplied thresholds.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "tier2Pct",
+            "description": "tier2Count / totalMembers (0.0–1.0).",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "totalDonationPointsAllTime",
+            "description": "Total DONATION points transferred, all-time (no window). Uses\nt_transactions directly so the value is independent of MV retention.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "totalMembers",
+            "description": "Total status='JOINED' members at asOf.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "AnalyticsDashboardInput",
+        "description": "Input for the L1 all-community overview (`analyticsDashboard`).",
+        "isOneOf": false,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "asOf",
+            "description": "As-of timestamp anchor. All trailing-window calculations are\nanchored here:\n  - parametric activity window: [asOf - windowDays, asOf + 1 JST日)\n  - weekly retention: latest completed ISO week before asOf\n  - latest cohort: (asOf JST月 - 2) so its M+1 window is fully past\nDefaults to now when omitted.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Datetime",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "dormantThresholdDays",
+            "description": "Days since a member's most recent DONATION above which they are\nclassified as \"dormant\" — i.e. they donated at some point but\nhave gone quiet. Used to populate\n`AnalyticsCommunityOverview.dormantCount`.\n\nDistinct from `segmentCounts.passiveCount` (= \"latent\", never\ndonated): operators care about the difference because the\nintervention is different (re-engage a sleeper vs onboard a\nnewcomer). A member with `MAX(donation.created_at) < asOf -\ndormantThresholdDays` is dormant.\n\nDefault 30 (≈ one month of silence). Effective range 1..365;\nvalues outside are silently clamped on the server.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "defaultValue": "30",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "hubBreadthThreshold",
+            "description": "Minimum number of distinct DONATION recipients within the\nparametric window (`windowDays`) for a member to be classified\nas a hub. Used to populate `AnalyticsCommunityOverview.hubMemberCount`.\n\nDefaults to 3, meaning \"sent DONATION to at least 3 different\npeople during the window\". The threshold is on **unique\ncounterparties** (set cardinality), not transaction count, so a\nmember who donated 100 times to the same recipient does not\nqualify on this axis alone.\n\nEffective range 1..1000; values outside are silently clamped on\nthe server.\n\nThis is intentionally an absolute threshold rather than a\ncommunity-relative percentile: a percentile-based hub would\nalways classify ~N% of members as hubs by definition, defeating\ncross-community comparison (\"which communities have the highest\nhub ratio?\"). Community size differences are absorbed\nclient-side by displaying `hubMemberCount / totalMembers` rather\nthan the raw count.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "defaultValue": "3",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "segmentThresholds",
+            "description": "Stage classification thresholds (see AnalyticsSegmentThresholdsInput).",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "AnalyticsSegmentThresholdsInput",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "windowDays",
+            "description": "Length of the rolling activity window in JST days. Effective\nrange 7-90; values outside are silently clamped on the server.\nDefaults to 28 (= 4 weeks, absorbs day-of-week variance).",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "defaultValue": "28",
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "AnalyticsDashboardPayload",
+        "description": "Root payload for analyticsDashboard (L1).",
+        "isOneOf": null,
+        "fields": [
+          {
+            "name": "asOf",
+            "description": "As-of timestamp echoed back (UTC instant).",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Datetime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "communities",
+            "description": "One row per community, in dashboard sort order.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "AnalyticsCommunityOverview",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "platform",
+            "description": "Platform-wide aggregate row.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AnalyticsPlatformSummary",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "AnalyticsLatestCohort",
+        "description": "Most recently completed monthly cohort plus its M+1 activity.\n\"M+1\" follows standard cohort-analysis convention: the calendar\nmonth immediately after the joining month.\n\nThe cohort is selected as (asOf's JST month - 2 months) so its\nM+1 window — the JST month immediately preceding asOf's month —\nis fully past. This avoids reporting an artificially low retention\nduring the in-progress month.\n\nRaw counts are returned; the client divides for the retention rate\nand decides how to handle small-N cohorts via `size`.",
+        "isOneOf": null,
+        "fields": [
+          {
+            "name": "activeAtM1",
+            "description": "Of those cohort members, how many sent at least one DONATION\nduring the M+1 month.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "size",
+            "description": "Cohort size: status='JOINED' members whose created_at falls\nwithin the cohort month. 0 when no one joined that month\n(callers should treat M+1 retention as null in that case).",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "AnalyticsMemberList",
+        "description": "Paginated member list for the L2 detail.",
+        "isOneOf": null,
+        "fields": [
+          {
+            "name": "hasNextPage",
+            "description": "Whether more pages exist after this one.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "nextCursor",
+            "description": "Opaque cursor to pass back in `AnalyticsCommunityInput.cursor` to\nfetch the next page. null when no further pages exist.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "users",
+            "description": "Member rows for the current page, matching filter & sort applied\nserver-side.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "AnalyticsMemberRow",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "AnalyticsMemberRow",
+        "description": "One row of the L2 member list. Raw values only — stage classification\n(habitual / regular / occasional / latent) is the client's concern so\nserver-side thresholds can be tuned without a schema change.",
+        "isOneOf": null,
+        "fields": [
+          {
+            "name": "daysIn",
+            "description": "Tenure in JST calendar days (floor, minimum 1). Daily-grain\ncounterpart to `monthsIn`. Useful when the client wants a\nfiner-grained activity rate than the monthly `userSendRate`,\nor when grouping members into tenure buckets that don't align\nwith calendar-month boundaries.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "donationInDays",
+            "description": "Distinct JST days the member received at least one DONATION.\nDaily-grain counterpart to `donationInMonths`. Receiver-side\ncounterpart to `donationOutDays`.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "donationInMonths",
+            "description": "Distinct months with at least one DONATION in. Receiver-side\ncounterpart to `donationOutMonths`. Combined with\n`totalPointsIn`, identifies members who have been part of the\nreceiving side of the gift economy and over how broad a span.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "donationOutDays",
+            "description": "Distinct JST days the member sent at least one DONATION.\nDaily-grain counterpart to `donationOutMonths`. Combined with\n`daysIn`, the client can compute `donationOutDays / daysIn` as\na daily-cadence rate, complementing the monthly `userSendRate`.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "donationOutMonths",
+            "description": "Distinct months with at least one DONATION out.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "lastDonationAt",
+            "description": "JST date (UTC-encoded at JST midnight) of this member's most\nrecent DONATION out in this community. null when the member has\nnever sent a DONATION (= latent on the sender axis).\n\nPowers the L3 \"/members\" dormancy list: clients sort dormant\nmembers by `lastDonationAt ASC` to surface the longest-quiet\nsenders first, and compute days-since-last-donation as\n`(asOf - lastDonationAt) / 1 day` for the per-row badge. Same\nunderlying signal as `dormantCount`'s threshold check\n(`MAX(donation.created_at) < asOf - dormantThresholdDays`),\nexposed as the raw timestamp so the client can derive multiple\nderived views without a server-side recomputation per request.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Datetime",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "monthsIn",
+            "description": "Tenure in JST calendar months (floor, minimum 1).",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "name",
+            "description": "User display name (users.name). null when the user has no name set.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "totalPointsIn",
+            "description": "All-time DONATION points received by this user in this community.\nReceiver-side counterpart to `totalPointsOut`. Sums\n`to_point_change` across DONATION transactions whose receiver\nwallet belongs to this user in this community. Burn / system\nsources (sender wallets without a user_id) are excluded so a\nmember who only received from a system grant scores 0 — same\nscope as `totalPointsOut`.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "totalPointsOut",
+            "description": "All-time DONATION points sent by this user in this community.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "uniqueDonationRecipients",
+            "description": "All-time count of distinct OTHER users this member has sent at\nleast one DONATION to in this community. The \"network breadth\"\nhalf of the donor profile (paired with frequency-based\n`userSendRate` and volume-based `totalPointsOut`):\n\n  breadth × frequency × volume → the client's per-member\n  classification space (e.g. true hub vs single-target loyal vs\n  rare-but-far-reaching).\n\nCounts unique counterparty user_id, not transaction count, so a\nmember who sent 100 donations to the same recipient still scores\n1. Excludes burn / system targets (recipient wallets without a\nuser_id).",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "uniqueDonationSenders",
+            "description": "All-time count of distinct OTHER users that have sent at least\none DONATION to this member in this community. The receiver-side\ncounterpart to `uniqueDonationRecipients`. Counts unique sender\nuser_id, excludes burn / system sources (sender wallets without\na user_id) and self-donations (a user who somehow sent to their\nown wallet does not increment the count). Used by the L2\ndashboard to compute the \"受領→送付 転換率\" (recipient-to-sender\nconversion rate) — share of DONATION recipients who have also\nsent at least one DONATION — distinguishing reciprocal\nparticipation networks from one-way distribution structures.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "userId",
+            "description": "User id.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "userSendRate",
+            "description": "Individual monthly-send rate: `donationOutMonths / monthsIn`, 0.0–1.0,\nrounded to 3 decimals. INDIVIDUAL LTV variable (not the same as\ncommunityActivityRate elsewhere in this schema).",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "AnalyticsMonthlyActivityPoint",
+        "description": "One month of community activity trend.",
+        "isOneOf": null,
+        "fields": [
+          {
+            "name": "chainPct",
+            "description": "Share of DONATION transactions that were part of a chain (chain_depth\n> 0) in the month. 0.0–1.0.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "communityActivityRate",
+            "description": "senderCount / month-end totalMembers. Read alongside newMembers: a\nmonth with many new joiners can dip the rate even if absolute activity\ngrew.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "donationPointsSum",
+            "description": "Sum of DONATION points transferred in the month.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "dormantCount",
+            "description": "Members who had no DONATION out in the trailing 30 days as of\nthe END of this month. Snapshot of the dormant base at\nmonth-end. Pair with the NEXT month's `returnedMembers` to\ncompute the monthly recovery rate\n(`returnedMembers[N] / dormantCount[N-1]`).\n\nAligns with `AnalyticsCommunityOverview.dormantCount` /\n`AnalyticsCommunityPayload.dormantCount` semantics: an\never-donated member whose most recent DONATION is older than\n30 days as of the month-end timestamp. The latest month's\nvalue should equal `AnalyticsCommunityPayload.dormantCount`\nwhen `asOf` falls at or near the JST month-end, modulo the\ndifference between the request's `dormantThresholdDays` input\n(which the trend ignores in favor of a fixed 30-day window so\nmonthly returnedMembers / dormantCount stay comparable across\nrequests).",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "hubMemberCount",
+            "description": "Distinct members who, AS OF the END of this month, had sent\nDONATIONs to >= `hubBreadthThreshold` distinct recipients within\nthe trailing 28-day window ending at the month-end. Same\nwindow-scoped semantic as\n`AnalyticsCommunityOverview.hubMemberCount`, evaluated at\nmonth-end rather than at request `asOf`.\n\nWindow: `[monthEnd - 28 JST days, monthEnd)`. The 28-day window is\nfixed (independent of any request input) so monthly\nhubMemberCount values across the trend stay comparable to each\nother — same precedent as `dormantCount`'s fixed 30-day window.\n`hubBreadthThreshold` follows\n`AnalyticsCommunityInput.hubBreadthThreshold` (default 3).\n\nSenders are restricted to users JOINED in the community at the\nmonth-end timestamp — same membership filter as\n`dormantCount` / L1 `senderCount` / L1 `hubMemberCount`. A\nmember who left the community before this month-end is\nexcluded even if they donated during the trailing window.\n\nWhen the L1 dashboard is queried with the default\n`windowDays = 28` and an `asOf` that falls at or near a JST\nmonth-end, the latest entry of `monthlyActivityTrend.hubMemberCount`\nequals `AnalyticsCommunityOverview.hubMemberCount` for the same\ncommunity (provided both queries pass the same\n`hubBreadthThreshold`).\n\nCurrently always returns a non-null integer (0 for months with\nno qualifying senders), matching the precedent set by sibling\nmonthly counters (`senderCount`, `dormantCount`). The field is\ndeclared nullable to preserve forward compatibility for a future\nrefinement that may suppress months entirely outside the\ncommunity's MV data range — clients should still tolerate null.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "month",
+            "description": "First day (JST) of the calendar month, e.g. 2025-10-01T00:00+09:00.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Datetime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "newMembers",
+            "description": "t_memberships.created_at (status='JOINED') rows falling in the month.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "returnedMembers",
+            "description": "Members who were dormant at the END of the previous calendar\nmonth but had at least one DONATION out in this month. Monthly\ncounterpart to `AnalyticsRetentionTrendPoint.returnedSenders`.\nnull for the first month in the series (no prior month to\nreference).\n\n\"Dormant at the end of previous month\" uses the same threshold\nsemantic as `AnalyticsCommunityOverview.dormantCount` /\n`AnalyticsMonthlyActivityPoint.dormantCount` — no DONATION out in\nthe trailing 30 days as of the previous month-end. This may\ndiverge slightly from the sum of weekly `returnedSenders` over\nthe month because the weekly metric uses a 12-week look-back at\nISO-week granularity while this monthly metric uses the\n30-day-trailing dormant snapshot at month-end. The discrepancy\nis week/month boundary alignment only.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "senderCount",
+            "description": "Distinct DONATION senders in the month.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "AnalyticsPlatformSummary",
+        "description": "Platform-wide headline, computed by summing across every community in\nscope for the caller (which is every community since this query is\nSYS_ADMIN-gated).",
+        "isOneOf": null,
+        "fields": [
+          {
+            "name": "communitiesCount",
+            "description": "Number of communities included in the response.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "latestMonthDonationPoints",
+            "description": "Sum of DONATION points transferred during the JST calendar month\ncontaining `asOf`, across every community.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "totalMembers",
+            "description": "Sum of status='JOINED' members across every community.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "AnalyticsRetentionTrendPoint",
+        "description": "One ISO week of retention signals.",
+        "isOneOf": null,
+        "fields": [
+          {
+            "name": "churnedSenders",
+            "description": "Senders in the prior week who did NOT send this week.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "communityActivityRate",
+            "description": "Community activity rate for the week: distinct senders / totalMembers\nas of week end. null when the community had zero members during the\nweek.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "newMembers",
+            "description": "New t_memberships.created_at rows (status='JOINED') this week.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "retainedSenders",
+            "description": "Senders in both the prior week and this week (same-user on\ndonation_out_count > 0).",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "returnedSenders",
+            "description": "Senders this week who did NOT send last week but DID send some week\nin the prior 12-week window.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "week",
+            "description": "Monday 00:00 JST of the ISO week.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Datetime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "AnalyticsSegmentCounts",
+        "description": "Stage-count snapshot for one community, computed by the server using the\nclient-supplied `AnalyticsSegmentThresholdsInput`. Cumulative semantics:\n`tier2Count` INCLUDES members counted in `tier1Count`.",
+        "isOneOf": null,
+        "fields": [
+          {
+            "name": "activeCount",
+            "description": "Members with userSendRate > 0 (excludes latent).",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "passiveCount",
+            "description": "Members with donationOutMonths == 0 (latent / not-yet-participated).",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "tier1Count",
+            "description": "Members with userSendRate >= tier1.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "tier2Count",
+            "description": "Members with userSendRate >= tier2 (includes tier1).",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "total",
+            "description": "Total status='JOINED' members at asOf.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "AnalyticsSegmentThresholdsInput",
+        "description": "Stage classification thresholds, supplied by the client.\nThresholds define WHERE the boundary between stages sits, but naming\n(habitual / regular / occasional / latent) remains fixed on the server.",
+        "isOneOf": false,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "minMonthsIn",
+            "description": "Minimum tenure a member must have before being eligible for\ntier1 / tier2 classification. Expressed in calendar months for\nergonomic operator-facing semantics, but evaluated internally as\n`daysIn >= minMonthsIn × 30` so a member who joined yesterday\nbut happens to straddle a calendar-month boundary cannot sneak\npast the filter. Filters out the short-tenure artifact where a\nbrand-new member who donated once gets\n`userSendRate = 1/1 = 1.0` and is auto-classified as habitual\ndespite no actual track record.\n\nOnly affects `tier1Count` and `tier2Count`; `activeCount`\n(\"ever donated\") and `passiveCount` (\"never donated\") are\nsemantically tenure-independent and remain unfiltered.\n\nDefault 1 → roughly \"must have been around at least 30 days\".\nSet to 3 for \"must have been around 3+ months (~90 days)\" so\nthe operator-facing reading of `tier1Count` matches the\nintuitive meaning of \"habitual sender\".\n\nEffective range 1..120; values outside are silently clamped on\nthe server. The 30-day-per-month conversion matches\n`tenureDistribution`'s bucket boundaries so the stage classifier\nand the tenure-distribution chart agree on what \"1 month\" means.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "defaultValue": "1",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "tier1",
+            "description": "Habitual stage threshold. A user with `userSendRate >= tier1` is\ncounted as \"habitual\" (i.e. sends donations in at least tier1 share\nof their tenure). Default 0.7.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
+              "ofType": null
+            },
+            "defaultValue": "0.7",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "tier2",
+            "description": "Regular stage threshold. `userSendRate >= tier2` AND `< tier1`\nclassifies as \"regular\". Default 0.4.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
+              "ofType": null
+            },
+            "defaultValue": "0.4",
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "AnalyticsSortOrder",
+        "description": "Sort direction for the member list.",
+        "isOneOf": null,
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "ASC",
+            "description": "Ascending — smallest value first (e.g. SEND_RATE ASC puts latent\nand occasional members before habitual).",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "DESC",
+            "description": "Descending — largest value first (e.g. SEND_RATE DESC puts habitual\nmembers at the top). This is the default.",
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "AnalyticsStageBucket",
+        "description": "Summary for one stage (habitual / regular / occasional / latent).\nStage membership is classified server-side using the thresholds supplied\nin the request. `pointsContributionPct` is the share of total DONATION\npoints-out attributed to members in this stage, in the asOf month.",
+        "isOneOf": null,
+        "fields": [
+          {
+            "name": "avgMonthsIn",
+            "description": "Average monthsIn across members in this stage.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "avgSendRate",
+            "description": "Average userSendRate across members in this stage (0.0–1.0).",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "count",
+            "description": "Number of members in this stage.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "pct",
+            "description": "count / totalMembers (0.0–1.0).",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "pointsContributionPct",
+            "description": "Stage's share of this community's all-time DONATION points-out\n(0.0–1.0). Numerator is the sum of `totalPointsOut` across the\nstage's members; denominator is the same sum across all members.\n0 for the latent stage by definition.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "AnalyticsStageDistribution",
+        "description": "Four-stage distribution of the community's membership.\n`pointsContributionPct` on `latent` is always 0 since latent members\nhaven't donated by definition.",
+        "isOneOf": null,
+        "fields": [
+          {
+            "name": "habitual",
+            "description": "userSendRate >= tier1.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AnalyticsStageBucket",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "latent",
+            "description": "donationOutMonths == 0.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AnalyticsStageBucket",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "occasional",
+            "description": "0 < userSendRate < tier2.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AnalyticsStageBucket",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "regular",
+            "description": "tier2 <= userSendRate < tier1.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AnalyticsStageBucket",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "AnalyticsTenureDistribution",
+        "description": "Tenure-bucket distribution of a community's members at asOf,\nclassified on `daysIn` (JST calendar-day tenure). Lets the L1\ndashboard surface community age structure (e.g. \"lots of brand\nnew members, few established\") without drilling into the L2\nmember list.\n\nBuckets are mutually exclusive and exhaustive; the sum equals\ntotalMembers. Boundaries are intentionally calendar-day rather\nthan month so a 28-day-tenure member doesn't get double-counted\ninto \"1 month\" purely because of `monthsIn`'s GREATEST(1, ...)\nfloor.",
+        "isOneOf": null,
+        "fields": [
+          {
+            "name": "gte12Months",
+            "description": "Members with `daysIn >= 365` — long-time members. Combined\nwith `lt1Month`, signals the community's age structure.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "lt1Month",
+            "description": "Members with `daysIn < 30` — newly joined cohort. Useful for\nspotting communities flooded with new members where downstream\nmetrics (userSendRate, retention) are not yet meaningful.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "m1to3Months",
+            "description": "Members with `30 <= daysIn < 90` — \"still settling in\" cohort.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "m3to12Months",
+            "description": "Members with `90 <= daysIn < 365` — established members.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "monthlyHistogram",
+            "description": "Detailed monthly histogram for the L3 tenure deep-dive.\n\nEach entry counts currently-JOINED members whose `daysIn` falls\ninto the bucket. Bucket boundaries are aligned with the coarse\n`gte12Months` cutoff so the histogram and coarse buckets agree:\n\n  - bucket 0:  daysIn <  30\n  - bucket k (1..10):  k * 30 <= daysIn < (k + 1) * 30\n  - bucket 11: 330 <= daysIn < 365\n  - bucket 12: daysIn >= 365\n\nThe 12 bucket therefore matches `gte12Months` exactly; bucket 11\nis widened from the bare `[330, 360)` slot to `[330, 365)` so a\nmember at 360..364 days lands in 11 rather than 12\n(`floor(daysIn / 30)` would otherwise have placed them in 12,\ncreating an asymmetry with the coarse `m3to12Months` cutoff at\n365).\n\nReturned in ascending bucket order (`monthsIn` 0..12), with every\nbucket emitted (count = 0 for buckets with no members) so the\nclient can render a contiguous histogram axis without\nzero-padding.\n\nSum of `count` equals `totalMembers`. A member with `daysIn < 0`\n(data anomaly — `daysIn` is floor-1-clamped at the SQL boundary\nso this should be impossible) is clamped into bucket 0 rather\nthan excluded, matching the service implementation.\n\nThe existing 4 coarse buckets (`lt1Month` / `m1to3Months` /\n`m3to12Months` / `gte12Months`) remain for L1 / L2 callers; the\nmonthly histogram is additional, not a replacement.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "AnalyticsTenureHistogramBucket",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "AnalyticsTenureHistogramBucket",
+        "description": "One bucket of the L3 tenure histogram. See\n`AnalyticsTenureDistribution.monthlyHistogram`.",
+        "isOneOf": null,
+        "fields": [
+          {
+            "name": "count",
+            "description": "Number of currently-JOINED members in this bucket.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "monthsIn",
+            "description": "Tenure bucket index, range 0..12. The 0 bucket aggregates\n`daysIn < 30`; buckets 1..10 cover `k * 30 <= daysIn <\n(k + 1) * 30`; bucket 11 covers `330 <= daysIn < 365`; the 12\nbucket aggregates `daysIn >= 365` (matching the coarse\n`gte12Months` boundary). Members at 330..364 days land in\nbucket 11, not bucket 12.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "AnalyticsUserListFilter",
+        "description": "Member-list filters for the L2 detail (`analyticsCommunity`).\nAll conditions AND together. Unspecified fields do not filter.",
+        "isOneOf": false,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "maxSendRate",
+            "description": "Inclusive upper bound on userSendRate.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "minDonationOutMonths",
+            "description": "Inclusive lower bound on donationOutMonths.",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "minMonthsIn",
+            "description": "Inclusive lower bound on monthsIn (JST-calendar months).",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "minSendRate",
+            "description": "Inclusive lower bound on userSendRate. Default 0.7 (habitual only).",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
+              "ofType": null
+            },
+            "defaultValue": "0.7",
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "AnalyticsUserListSort",
+        "description": "Sort configuration for the L2 member list. Both fields are optional;\nomitting either falls back to the default (SEND_RATE DESC) so the\n\"top habitual members first\" view renders out of the box.",
+        "isOneOf": false,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "field",
+            "description": "Column to sort on. See AnalyticsUserSortField for what each value\naddresses. Default: SEND_RATE.",
+            "type": {
+              "kind": "ENUM",
+              "name": "AnalyticsUserSortField",
+              "ofType": null
+            },
+            "defaultValue": "SEND_RATE",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "order",
+            "description": "Sort direction. Default: DESC.",
+            "type": {
+              "kind": "ENUM",
+              "name": "AnalyticsSortOrder",
+              "ofType": null
+            },
+            "defaultValue": "DESC",
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "AnalyticsUserSortField",
+        "description": "Sortable columns on the member list.",
+        "isOneOf": null,
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "DONATION_OUT_MONTHS",
+            "description": "donationOutMonths (distinct months with a DONATION out).",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "MONTHS_IN",
+            "description": "monthsIn (tenure in JST calendar months).",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "SEND_RATE",
+            "description": "userSendRate (individual monthly-send rate, 0.0–1.0).",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "TOTAL_POINTS_OUT",
+            "description": "totalPointsOut (lifetime DONATION points sent).",
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "AnalyticsWeeklyRetention",
+        "description": "DONATION sender retention against the most recently completed\nISO week (Monday 00:00 JST). Raw signals only; the client composes\nchurn alerts (e.g. churnedSenders > retainedSenders).",
+        "isOneOf": null,
+        "fields": [
+          {
+            "name": "churnedSenders",
+            "description": "Users who sent DONATION in the week-before-latest but NOT in\nthe latest completed week. \"Lost this week, was engaged last week.\"",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "retainedSenders",
+            "description": "Users who sent DONATION in the latest completed week AND in\nthe week before it. \"Engaged this week, was engaged last week.\"",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "AnalyticsWindowActivity",
+        "description": "DONATION activity within the parametric window driven by\n`AnalyticsDashboardInput.windowDays`. Both the current window and\nthe immediately preceding window of equal length are returned so\nthe client can derive growth rates without a second query.\n\n  current  = [asOf - windowDays JST日, asOf + 1 JST日)\n  previous = [asOf - 2 * windowDays, asOf - windowDays)",
+        "isOneOf": null,
+        "fields": [
+          {
+            "name": "newMemberCount",
+            "description": "New JOINED memberships (t_memberships.created_at within the\ncurrent window, status='JOINED').",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "newMemberCountPrev",
+            "description": "Same metric for the previous window.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "retainedSenders",
+            "description": "Users who sent at least one DONATION in BOTH the current window\nAND the previous window (set intersection on user_id). Same\nshape as AnalyticsWeeklyRetention.retainedSenders but at\nwindowDays scale, enabling client-side leaky-bucket derivation:\n\n  newlyActivatedSenders = senderCount     - retainedSenders\n  churnedSenders        = senderCountPrev - retainedSenders",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "senderCount",
+            "description": "Unique users with at least one outgoing DONATION transaction\nduring the current window (donation_out_count > 0 in\nmv_user_transaction_daily). Restricted to users who are still\nJOINED in this community at asOf — a now-departed member who\ndonated during the window is excluded, mirroring the\nmembership filter on `totalMembers`.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "senderCountPrev",
+            "description": "Same metric for the previous window of equal length. Same\nJOINED-at-asOf membership restriction applies (so the\n`senderCount` / `senderCountPrev` comparison stays\napples-to-apples even when membership churn happens between\nthe two windows).",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
         "kind": "UNION",
         "name": "ApproveReportPayload",
         "description": null,
@@ -17785,8 +20357,8 @@
                 "ofType": null
               }
             },
-            "isDeprecated": false,
-            "deprecationReason": null
+            "isDeprecated": true,
+            "deprecationReason": "Use `reportsAll` instead."
           },
           {
             "name": "adminReportSummary",
@@ -17826,8 +20398,8 @@
                 "ofType": null
               }
             },
-            "isDeprecated": false,
-            "deprecationReason": null
+            "isDeprecated": true,
+            "deprecationReason": "Use `reportSummaries` instead."
           },
           {
             "name": "adminTemplateFeedbackStats",
@@ -17883,8 +20455,8 @@
                 "ofType": null
               }
             },
-            "isDeprecated": false,
-            "deprecationReason": null
+            "isDeprecated": true,
+            "deprecationReason": "Use `reportTemplateFeedbackStats` instead."
           },
           {
             "name": "adminTemplateFeedbacks",
@@ -17985,6 +20557,68 @@
               "ofType": {
                 "kind": "OBJECT",
                 "name": "ReportFeedbacksConnection",
+                "ofType": null
+              }
+            },
+            "isDeprecated": true,
+            "deprecationReason": "Use `reportTemplateFeedbacks` instead."
+          },
+          {
+            "name": "analyticsCommunity",
+            "description": "Single-community analytics detail: summary card, stage distribution,\ntrailing-window trends, cohort retention, and a paginated member list.\nIntended for answering \"what are kibotcha's numbers?\" in an external\nreport conversation.",
+            "args": [
+              {
+                "name": "input",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "AnalyticsCommunityInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AnalyticsCommunityPayload",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "analyticsDashboard",
+            "description": "L1 dashboard: platform totals plus one row per community. Intended\nfor the \"is any community stalling?\" scan. Community fan-out is\nserved with N in-process calls (acceptable at today's community\ncount — switch to a GROUP BY implementation once the platform\nexceeds ~20 communities).",
+            "args": [
+              {
+                "name": "input",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "AnalyticsDashboardInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AnalyticsDashboardPayload",
                 "ofType": null
               }
             },
@@ -19515,6 +22149,47 @@
             "deprecationReason": null
           },
           {
+            "name": "reportSummaries",
+            "description": null,
+            "args": [
+              {
+                "name": "cursor",
+                "description": null,
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "first",
+                "description": null,
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AdminReportSummaryConnection",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "reportTemplate",
             "description": null,
             "args": [
@@ -19551,6 +22226,168 @@
               "kind": "OBJECT",
               "name": "ReportTemplate",
               "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "reportTemplateFeedbackStats",
+            "description": null,
+            "args": [
+              {
+                "name": "kind",
+                "description": null,
+                "type": {
+                  "kind": "ENUM",
+                  "name": "ReportTemplateKind",
+                  "ofType": null
+                },
+                "defaultValue": "GENERATION",
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "variant",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "ENUM",
+                    "name": "ReportVariant",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "version",
+                "description": null,
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AdminTemplateFeedbackStats",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "reportTemplateFeedbacks",
+            "description": null,
+            "args": [
+              {
+                "name": "cursor",
+                "description": null,
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "feedbackType",
+                "description": null,
+                "type": {
+                  "kind": "ENUM",
+                  "name": "ReportFeedbackType",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "first",
+                "description": null,
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": "20",
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "kind",
+                "description": null,
+                "type": {
+                  "kind": "ENUM",
+                  "name": "ReportTemplateKind",
+                  "ofType": null
+                },
+                "defaultValue": "GENERATION",
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "maxRating",
+                "description": null,
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "variant",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "ENUM",
+                    "name": "ReportVariant",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "version",
+                "description": null,
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ReportFeedbacksConnection",
+                "ofType": null
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -19868,6 +22705,107 @@
             "deprecationReason": null
           },
           {
+            "name": "reportsAll",
+            "description": null,
+            "args": [
+              {
+                "name": "communityId",
+                "description": null,
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "ID",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "cursor",
+                "description": null,
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "first",
+                "description": null,
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "publishedAfter",
+                "description": null,
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Datetime",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "publishedBefore",
+                "description": null,
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Datetime",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "status",
+                "description": null,
+                "type": {
+                  "kind": "ENUM",
+                  "name": "ReportStatus",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "variant",
+                "description": null,
+                "type": {
+                  "kind": "ENUM",
+                  "name": "ReportVariant",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ReportsConnection",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "reservation",
             "description": null,
             "args": [
@@ -20139,7 +23077,7 @@
           },
           {
             "name": "sysAdminCommunityDetail",
-            "description": "L2 detail for a single community: summary card, stage distribution,\ntrailing-window trends, cohort retention, and a paginated member list.\nIntended for answering \"what are kibotcha's numbers?\" in an external\nreport conversation.",
+            "description": "L2 detail for a single community.\nUse `analyticsCommunity` instead.",
             "args": [
               {
                 "name": "input",
@@ -20167,12 +23105,12 @@
                 "ofType": null
               }
             },
-            "isDeprecated": false,
-            "deprecationReason": null
+            "isDeprecated": true,
+            "deprecationReason": "Use `analyticsCommunity` instead."
           },
           {
             "name": "sysAdminDashboard",
-            "description": "L1 overview: platform totals plus one row per community. Intended for\nthe \"is any community stalling?\" scan. Community fan-out is served\nwith N in-process calls (acceptable at today's community count —\nswitch to a GROUP BY implementation once the platform exceeds ~20\ncommunities).",
+            "description": "L1 overview: platform totals plus one row per community.\nUse `analyticsDashboard` instead.",
             "args": [
               {
                 "name": "input",
@@ -20196,8 +23134,8 @@
                 "ofType": null
               }
             },
-            "isDeprecated": false,
-            "deprecationReason": null
+            "isDeprecated": true,
+            "deprecationReason": "Use `analyticsDashboard` instead."
           },
           {
             "name": "ticket",
