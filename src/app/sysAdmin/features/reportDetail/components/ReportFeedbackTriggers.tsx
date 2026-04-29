@@ -76,13 +76,6 @@ export function ReportFeedbackTriggers({
     selection?.rect,
   ]);
 
-  // ?debug=selection が付いていれば FAB の上に診断 chip を出す。
-  // 本番では常時表示しないが、storybook / dev で「選択を hook が拾ってるか」
-  // を visual で確認するための補助。
-  const debug =
-    typeof window !== "undefined" &&
-    window.location.search.includes("debug=selection");
-
   return (
     <>
       {selection && floatPosition && (
@@ -103,18 +96,6 @@ export function ReportFeedbackTriggers({
             <MessageSquarePlus className="h-3.5 w-3.5" aria-hidden />
             この箇所にレビュー
           </Button>
-        </div>
-      )}
-
-      {debug && (
-        <div className="fixed bottom-20 right-6 z-[60] max-w-xs rounded-md bg-foreground/90 px-2 py-1 text-[10px] font-mono leading-tight text-background shadow">
-          {selection
-            ? `sel: ${selection.text.length}c, rect.top=${Math.round(
-                selection.rect.top,
-              )} left=${Math.round(selection.rect.left)} ref=${
-                contentRef.current ? "OK" : "NULL"
-              }`
-            : `no selection (ref=${contentRef.current ? "OK" : "NULL"})`}
         </div>
       )}
 
