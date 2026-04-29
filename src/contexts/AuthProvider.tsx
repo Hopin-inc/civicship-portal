@@ -21,6 +21,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
   ssrCurrentUser,
   ssrLineAuthenticated,
   ssrPhoneAuthenticated,
+  ssrHasSession,
 }) => {
   const communityConfig = useCommunityConfig();
   const { liffService, phoneAuthService, authStateManager } = useAuthDependencies(communityConfig);
@@ -44,7 +45,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     });
 
     // ✅ SSR初期状態適用
-    applySsrAuthState(ssrCurrentUser, ssrLineAuthenticated, ssrPhoneAuthenticated);
+    applySsrAuthState(ssrCurrentUser, ssrLineAuthenticated, ssrPhoneAuthenticated, ssrHasSession);
 
     // 🚀 通常の初期化
     void initAuth({
@@ -55,7 +56,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
       ssrLineAuthenticated,
       ssrPhoneAuthenticated,
     });
-  }, [authStateManager, liffService, ssrCurrentUser, ssrLineAuthenticated, ssrPhoneAuthenticated]);
+  }, [
+    authStateManager,
+    liffService,
+    ssrCurrentUser,
+    ssrLineAuthenticated,
+    ssrPhoneAuthenticated,
+    ssrHasSession,
+  ]);
 
   // 認証が完了するまでクエリの自動発火を抑制する。
   // loading/authenticating 中に発火すると Bearer トークンなしの匿名リクエストになり、

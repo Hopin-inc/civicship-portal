@@ -13,6 +13,7 @@ export async function getUserServer(): Promise<{
   user: GqlUser | null;
   lineAuthenticated: boolean;
   phoneAuthenticated: boolean;
+  hasSession: boolean;
 }> {
   const cookieStore = await cookies();
   const hasSession = await hasServerSession();
@@ -24,6 +25,7 @@ export async function getUserServer(): Promise<{
       user: null,
       lineAuthenticated: false,
       phoneAuthenticated: false,
+      hasSession: false,
     };
   }
 
@@ -40,6 +42,7 @@ export async function getUserServer(): Promise<{
       user,
       lineAuthenticated: true, // SSR時点でsessionがあればtrue扱い
       phoneAuthenticated: hasPhoneIdentity,
+      hasSession: true,
     };
   } catch (error) {
     logger.warn("⚠️ Failed to fetch currentUser:", {
@@ -50,6 +53,7 @@ export async function getUserServer(): Promise<{
       user: null,
       lineAuthenticated: true,
       phoneAuthenticated,
+      hasSession: true,
     };
   }
 }

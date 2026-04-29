@@ -15,10 +15,11 @@ export default async function SysAdminLayout({ children }: { children: ReactNode
   const headersList = await headers();
   const communityId = headersList.get("x-community-id") ?? null;
 
-  const [communityConfig, { user, lineAuthenticated, phoneAuthenticated }] = await Promise.all([
-    communityId ? getCommunityConfig(communityId) : Promise.resolve(null),
-    getUserServer(),
-  ]);
+  const [communityConfig, { user, lineAuthenticated, phoneAuthenticated, hasSession }] =
+    await Promise.all([
+      communityId ? getCommunityConfig(communityId) : Promise.resolve(null),
+      getUserServer(),
+    ]);
 
   return (
     <CommunityConfigProvider config={communityConfig} isFromDatabase={!!communityConfig}>
@@ -27,6 +28,7 @@ export default async function SysAdminLayout({ children }: { children: ReactNode
           ssrCurrentUser={user}
           ssrLineAuthenticated={lineAuthenticated}
           ssrPhoneAuthenticated={phoneAuthenticated}
+          ssrHasSession={hasSession}
         >
           <HeaderProvider>
             <div className="min-h-screen flex flex-col max-w-mobile-l mx-auto w-full bg-background">
