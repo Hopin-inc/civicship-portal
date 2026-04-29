@@ -43,7 +43,7 @@ export function CopyMarkdownButton({ text, className }: Props) {
       onClick={handleCopy}
       aria-label={copied ? "コピー済み" : "markdown をコピー"}
       className={cn(
-        "h-6 gap-1 px-1.5 text-body-xs text-muted-foreground",
+        "h-6 gap-1 px-1.5 text-[10px] leading-none text-muted-foreground",
         className,
       )}
     >
