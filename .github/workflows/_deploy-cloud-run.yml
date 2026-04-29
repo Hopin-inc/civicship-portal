@@ -1,0 +1,111 @@
+name: Deploy to Cloud Run (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: GitHub Environment to load secrets/vars from
+        required: true
+        type: string
+      app_env_build_arg:
+        description: Value passed as ENV build-arg (e.g. "staging" for dev; empty for prod)
+        required: false
+        type: string
+        default: ""
+      runtime_env_vars:
+        description: Multiline KEY=VALUE pairs forwarded to Cloud Run as env vars
+        required: true
+        type: string
+      image_tag:
+        description: Additional image tag (typically the commit SHA)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    timeout-minutes: 30
+
+    env:
+      GCP_REGION: ${{ secrets.GCP_REGION }}
+      ARTIFACT_REGISTRY: ${{ secrets.ARTIFACT_REGISTRY }}
+      APPLICATION_NAME: ${{ secrets.APPLICATION_NAME }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - id: auth
+        name: Authenticate to Google Cloud (Workload Identity Federation)
+        uses: google-github-actions/auth@8254fb75a33b976a221574d287e93919e6a36f70 # v2.1.6
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
+          token_format: access_token
+
+      - name: Set up gcloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Login to Artifact Registry
+        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
+        with:
+          registry: ${{ env.GCP_REGION }}-docker.pkg.dev
+          username: oauth2accesstoken
+          password: ${{ steps.auth.outputs.access_token }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@988b5a0280414f521da01fcc63a27aeeb4b104db # v3.6.1
+
+      - name: Compute image references
+        id: image
+        run: |
+          BASE="${ARTIFACT_REGISTRY}/${APPLICATION_NAME}"
+          {
+            echo "base=${BASE}"
+            echo "latest=${BASE}:latest"
+            echo "sha=${BASE}:${{ inputs.image_tag }}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Build and push image
+        uses: docker/build-push-action@5cd11c3a4ced054e52742c5fd54dca954e0edd85 # v6.7.0
+        with:
+          context: .
+          push: true
+          provenance: false
+          tags: |
+            ${{ steps.image.outputs.latest }}
+            ${{ steps.image.outputs.sha }}
+          cache-from: |
+            type=gha,scope=${{ inputs.environment }}
+            type=registry,ref=${{ steps.image.outputs.base }}:buildcache
+          cache-to: |
+            type=gha,mode=max,scope=${{ inputs.environment }}
+            type=registry,ref=${{ steps.image.outputs.base }}:buildcache,mode=max
+          build-args: |
+            NEXT_PUBLIC_FIREBASE_PROJECT_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+            NEXT_PUBLIC_FIREBASE_API_KEY=${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
+            NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
+            NEXT_PUBLIC_FIREBASE_APP_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
+            NEXT_PUBLIC_DOMAIN=${{ secrets.NEXT_PUBLIC_DOMAIN }}
+            NEXT_PUBLIC_API_ENDPOINT=${{ secrets.NEXT_PUBLIC_API_ENDPOINT }}
+            NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT=${{ secrets.NEXT_PUBLIC_LIFF_LOGIN_ENDPOINT }}
+            NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}
+            NEXT_PUBLIC_LOG_LEVEL=${{ vars.NEXT_PUBLIC_LOG_LEVEL }}
+            NEXT_PUBLIC_ALLOWED_FRAME_ANCESTORS=${{ vars.NEXT_PUBLIC_ALLOWED_FRAME_ANCESTORS }}
+            ENV=${{ inputs.app_env_build_arg }}
+
+      - name: Deploy to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: ${{ env.APPLICATION_NAME }}
+          image: ${{ steps.image.outputs.sha }}
+          region: ${{ env.GCP_REGION }}
+          env_vars: ${{ inputs.runtime_env_vars }}
+          flags: >
+            --min-instances=0
+            --max-instances=10
