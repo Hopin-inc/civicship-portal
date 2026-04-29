@@ -89,9 +89,15 @@ export function CommunityReportsTabContainer({
     void loadMore();
   }, [loadMore]);
 
-  // backend fragment (`AdminBrowseReportFields`) は ReportRow の super set
-  // (id/variant/status/publishedAt + community{id,name}) なので構造的に互換。
-  const reportRows: ReportRow[] = reports;
+  // fragment (`AdminBrowseReportFields`) -> ReportRow へのマッピング。
+  // feedbacks.totalCount を平坦化して View 側の表示を簡素化する。
+  const reportRows: ReportRow[] = reports.map((r) => ({
+    id: r.id,
+    variant: r.variant,
+    status: r.status,
+    publishedAt: r.publishedAt,
+    feedbacksCount: r.feedbacks.totalCount,
+  }));
 
   return (
     <CommunityReportsTab

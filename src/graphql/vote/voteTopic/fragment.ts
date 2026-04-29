@@ -36,3 +36,24 @@ export const VOTE_TOPIC_FRAGMENT = gql`
     }
   }
 `;
+
+export const VOTE_TOPIC_USER_FRAGMENT = gql`
+  fragment VoteTopicUserFields on VoteTopic {
+    ...VoteTopicFields
+    myBallot {
+      id
+      option {
+        id
+        label
+      }
+      power
+      createdAt
+    }
+    myEligibility {
+      eligible
+      currentPower
+      reason
+    }
+  }
+  ${VOTE_TOPIC_FRAGMENT}
+`;

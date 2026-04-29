@@ -17,6 +17,7 @@ export default function CreateVoteTopicPage() {
   return (
     <VoteEditorLayout>
       <VoteTopicFormEditor
+        mode="create"
         communityId={communityId}
         onSuccess={() => router.push("/admin/votes")}
       />

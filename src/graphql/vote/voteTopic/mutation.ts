@@ -26,3 +26,38 @@ export const DELETE_VOTE_TOPIC = gql`
     }
   }
 `;
+
+export const VOTE_CAST = gql`
+  mutation VoteCast($input: VoteCastInput!) {
+    voteCast(input: $input) {
+      ... on VoteCastSuccess {
+        ballot {
+          id
+          option {
+            id
+            label
+          }
+          power
+          createdAt
+        }
+      }
+    }
+  }
+`;
+
+export const UPDATE_VOTE_TOPIC = gql`
+  mutation UpdateVoteTopic(
+    $id: ID!
+    $input: VoteTopicUpdateInput!
+    $permission: CheckCommunityPermissionInput!
+  ) {
+    voteTopicUpdate(id: $id, input: $input, permission: $permission) {
+      ... on VoteTopicUpdateSuccess {
+        voteTopic {
+          ...VoteTopicFields
+        }
+      }
+    }
+  }
+  ${VOTE_TOPIC_FRAGMENT}
+`;
