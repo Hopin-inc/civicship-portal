@@ -13,7 +13,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { MetadataChips } from "@/app/sysAdmin/_shared/components/MetadataChips";
 import type {
   GqlGetAdminTemplateFeedbackStatsQuery,
   GqlReportFeedbackWithReportFieldsFragment,
@@ -200,13 +199,37 @@ function InlineHeader({
         ratedFeedback
       : null;
 
+  const items: Array<{ label: string; emphasis?: boolean } | null> = [
+    template ? { label: `v${template.version}`, emphasis: true } : null,
+    template?.experimentKey
+      ? { label: `ブランチ: ${template.experimentKey}` }
+      : null,
+    {
+      label: `評価 ${avgRating != null ? avgRating.toFixed(2) : "—"} (${totalFeedback})`,
+    },
+  ];
+  const visible = items.filter(
+    (i): i is { label: string; emphasis?: boolean } => i != null,
+  );
+
   return (
-    <MetadataChips
-      items={[
-        template && { label: `v${template.version}`, emphasis: true },
-        template?.experimentKey ? `ブランチ: ${template.experimentKey}` : null,
-        `評価 ${avgRating != null ? avgRating.toFixed(2) : "—"} (${totalFeedback})`,
-      ]}
-    />
+    <p className="text-body-xs text-muted-foreground">
+      {visible.map((item, i) => (
+        <span key={i}>
+          {i > 0 && (
+            <span aria-hidden className="mx-1.5">
+              ・
+            </span>
+          )}
+          <span
+            className={
+              item.emphasis ? "font-semibold text-foreground" : "tabular-nums"
+            }
+          >
+            {item.label}
+          </span>
+        </span>
+      ))}
+    </p>
   );
 }

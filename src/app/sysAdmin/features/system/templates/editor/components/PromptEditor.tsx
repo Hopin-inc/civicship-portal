@@ -34,7 +34,7 @@ type Props = {
  * Prompt 編集の主役 UI。shadcn `Form` (react-hook-form + zod) ベース。
  *
  * version / model / experimentKey 等のメタデータは ExperimentSection の
- * table と重複するため、ここでは表示しない (= 親 View が MetadataChips
+ * table と重複するため、ここでは表示しない (= 親 View が inline header
  * で集約表示する)。
  *
  * `initial*` prop が変わったとき (例: 親で `router.refresh()` 後に

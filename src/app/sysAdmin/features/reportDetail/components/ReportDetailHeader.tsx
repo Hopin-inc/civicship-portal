@@ -11,7 +11,6 @@ import {
   variantLabel,
 } from "@/app/sysAdmin/features/system/templates/shared/labels";
 import { variantToSlug } from "@/app/sysAdmin/features/system/templates/shared/variantSlug";
-import { MetadataChips } from "@/app/sysAdmin/_shared/components/MetadataChips";
 
 type Props = {
   variant: GqlReportVariant;
@@ -23,7 +22,7 @@ type Props = {
 
 /**
  * Report detail page の header。
- * 期間 / variant / status を chip 並びで出し、その下にこのレポートを生成した
+ * 期間 / variant / status を inline テキストで出し、その下にこのレポートを生成した
  * テンプレ詳細へのリンクを置く (templateVersion が分かれば付ける)。
  */
 export function ReportDetailHeader({
@@ -40,13 +39,19 @@ export function ReportDetailHeader({
 
   return (
     <header className="space-y-2">
-      <MetadataChips
-        items={[
-          `${formatDate(periodFrom)} 〜 ${formatDate(periodTo)}`,
-          variantLabel(variant),
-          statusLabel(status),
-        ]}
-      />
+      <p className="text-body-xs text-muted-foreground">
+        <span className="tabular-nums">
+          {formatDate(periodFrom)} 〜 {formatDate(periodTo)}
+        </span>
+        <span aria-hidden className="mx-1.5">
+          ・
+        </span>
+        <span>{variantLabel(variant)}</span>
+        <span aria-hidden className="mx-1.5">
+          ・
+        </span>
+        <span>{statusLabel(status)}</span>
+      </p>
       {templateHref && (
         <Link
           href={templateHref}
