@@ -19,6 +19,13 @@ const EXCLUDED_REDIRECT_PATTERNS = [
   "/sysAdmin",  // SYS_ADMIN 専用ルート（コミュニティ作成など）
 ];
 
+const COMMUNITY_ID_COOKIE_OPTIONS = {
+  path: "/",
+  maxAge: 60 * 60 * 24, // 24時間
+  sameSite: "lax",
+  httpOnly: false, // JS から読み取り可能
+} as const;
+
 export async function middleware(request: NextRequest) {
   const host = request.headers.get("host");
   const origin = request.headers.get("origin");
@@ -118,12 +125,7 @@ export async function middleware(request: NextRequest) {
   // チェック (CheckCommunityPermissionInput) で membership lookup が空になる。
   if (pathname === "/sysAdmin" || pathname.startsWith("/sysAdmin/")) {
     if (communityIdSource === "path") {
-      res.cookies.set("x-community-id", communityId, {
-        path: "/",
-        maxAge: 60 * 60 * 24,
-        sameSite: "lax",
-        httpOnly: false,
-      });
+      res.cookies.set("x-community-id", communityId, COMMUNITY_ID_COOKIE_OPTIONS);
     }
     if (shouldClearSessionCookies) {
       clearLegacySessionCookies(res);
@@ -134,12 +136,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Cookie にも設定（Client JS から参照可能にする）
-  res.cookies.set("x-community-id", communityId, {
-    path: "/",
-    maxAge: 60 * 60 * 24, // 24時間
-    sameSite: "lax",
-    httpOnly: false, // JS から読み取り可能
-  });
+  res.cookies.set("x-community-id", communityId, COMMUNITY_ID_COOKIE_OPTIONS);
 
   const config = await fetchCommunityConfigForEdge(communityId);
   if (!config) {
@@ -152,12 +149,7 @@ export async function middleware(request: NextRequest) {
   // 4. ルートリダイレクト処理（/community/{communityId} へのアクセス時）
   const redirectRes = handleRootRedirect(request, pathname, rootPath, communityId);
   if (redirectRes) {
-    redirectRes.cookies.set("x-community-id", communityId, {
-      path: "/",
-      maxAge: 60 * 60 * 24, // 24時間
-      sameSite: "lax",
-      httpOnly: false,
-    });
+    redirectRes.cookies.set("x-community-id", communityId, COMMUNITY_ID_COOKIE_OPTIONS);
     if (shouldClearSessionCookies) {
       clearLegacySessionCookies(redirectRes);
     }
