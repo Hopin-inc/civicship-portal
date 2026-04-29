@@ -14,7 +14,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import type {
-  GqlGetAdminTemplateFeedbackStatsQuery,
+  GqlGetReportTemplateFeedbackStatsQuery,
   GqlReportFeedbackWithReportFieldsFragment,
   GqlReportTemplateFieldsFragment,
   GqlReportTemplateStatsBreakdownRowFieldsFragment,
@@ -25,7 +25,7 @@ import { FeedbackList } from "@/app/sysAdmin/_shared/feedback/FeedbackList";
 import { RatingSummary } from "@/app/sysAdmin/_shared/feedback/RatingSummary";
 
 type FeedbackStats =
-  GqlGetAdminTemplateFeedbackStatsQuery["adminTemplateFeedbackStats"];
+  GqlGetReportTemplateFeedbackStatsQuery["reportTemplateFeedbackStats"];
 
 export type JudgeTemplateViewProps = {
   rows: GqlReportTemplateStatsBreakdownRowFieldsFragment[];

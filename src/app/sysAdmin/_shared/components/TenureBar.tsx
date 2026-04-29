@@ -1,6 +1,6 @@
 import React from "react";
 import { cn } from "@/lib/utils";
-import type { GqlSysAdminTenureDistribution } from "@/types/graphql";
+import type { GqlAnalyticsTenureDistribution } from "@/types/graphql";
 import { toIntJa, toPct } from "@/app/sysAdmin/_shared/format/number";
 
 const BUCKET_KEYS = ["lt1Month", "m1to3Months", "m3to12Months", "gte12Months"] as const;
@@ -22,7 +22,7 @@ const BUCKET_BG: Record<BucketKey, string> = {
 };
 
 type Props = {
-  distribution: GqlSysAdminTenureDistribution;
+  distribution: GqlAnalyticsTenureDistribution;
   /** ラベル (4 バケットの数値) を表示するか。L1 row のような狭い領域では false。 */
   showLabels?: boolean;
   className?: string;
@@ -79,7 +79,7 @@ export function TenureBar({ distribution, showLabels = true, className }: Props)
 
 /** 3 ヶ月以上 在籍率 (m3to12Months + gte12Months) ÷ total. */
 export function deriveTenuredRatio(
-  distribution: GqlSysAdminTenureDistribution,
+  distribution: GqlAnalyticsTenureDistribution,
 ): number | null {
   const total =
     distribution.lt1Month +

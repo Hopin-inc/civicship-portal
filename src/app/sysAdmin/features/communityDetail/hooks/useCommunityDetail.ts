@@ -3,13 +3,13 @@
 import { useMemo, useRef } from "react";
 import { useApolloClient, type ApolloError, type ApolloQueryResult } from "@apollo/client";
 import {
-  GetSysAdminCommunityDetailDocument,
-  GqlSysAdminSortOrder,
-  GqlSysAdminUserSortField,
-  type GqlGetSysAdminCommunityDetailQuery,
-  type GqlGetSysAdminCommunityDetailQueryVariables,
-  type GqlSysAdminCommunityDetailInput,
-  useGetSysAdminCommunityDetailQuery,
+  GetAnalyticsCommunityDocument,
+  GqlAnalyticsSortOrder,
+  GqlAnalyticsUserSortField,
+  type GqlGetAnalyticsCommunityQuery,
+  type GqlGetAnalyticsCommunityQueryVariables,
+  type GqlAnalyticsCommunityInput,
+  useGetAnalyticsCommunityQuery,
 } from "@/types/graphql";
 import type { DashboardControlsState } from "@/app/sysAdmin/features/dashboard/hooks/useDashboardControls";
 import {
@@ -19,10 +19,10 @@ import {
 import { DEFAULT_SEGMENT_THRESHOLDS } from "@/app/sysAdmin/_shared/derive";
 
 // Use the codegen-derived shape so the typed Apollo query result and our
-// hook return type stay in lockstep (the bare GqlSysAdminCommunityDetailPayload
+// hook return type stay in lockstep (the bare GqlAnalyticsCommunityPayload
 // has __typename optional while the query result narrows it to the literal).
 type DetailPayload = NonNullable<
-  GqlGetSysAdminCommunityDetailQuery["sysAdminCommunityDetail"]
+  GqlGetAnalyticsCommunityQuery["analyticsCommunity"]
 >;
 
 type Args = {
@@ -37,11 +37,11 @@ export type CommunityDetailResult = {
   loading: boolean;
   error: ApolloError | undefined;
   detail: DetailPayload | null;
-  input: GqlSysAdminCommunityDetailInput;
+  input: GqlAnalyticsCommunityInput;
   fetchMore: (opts: {
-    variables: { input: GqlSysAdminCommunityDetailInput };
-  }) => Promise<ApolloQueryResult<GqlGetSysAdminCommunityDetailQuery>>;
-  refetch: () => Promise<ApolloQueryResult<GqlGetSysAdminCommunityDetailQuery>>;
+    variables: { input: GqlAnalyticsCommunityInput };
+  }) => Promise<ApolloQueryResult<GqlGetAnalyticsCommunityQuery>>;
+  refetch: () => Promise<ApolloQueryResult<GqlGetAnalyticsCommunityQuery>>;
 };
 
 // メンバー絞り込み / 並び替えの UI を撤廃し、Sys Admin 視点で「貢献度の高い順」に
@@ -54,8 +54,8 @@ export type CommunityDetailResult = {
 // isolated alert) が全部 habitual-only に偏る。
 const FIXED_USER_FILTER = { minSendRate: 0 } as const;
 const FIXED_USER_SORT = {
-  field: GqlSysAdminUserSortField.TotalPointsOut,
-  order: GqlSysAdminSortOrder.Desc,
+  field: GqlAnalyticsUserSortField.TotalPointsOut,
+  order: GqlAnalyticsSortOrder.Desc,
 } as const;
 
 // L2 の HistoryBars footer は 12 期間表示を前提にしているため、period preset
@@ -70,7 +70,7 @@ export function useCommunityDetail({
 }: Args): CommunityDetailResult {
   const client = useApolloClient();
 
-  const input = useMemo<GqlSysAdminCommunityDetailInput>(() => {
+  const input = useMemo<GqlAnalyticsCommunityInput>(() => {
     const { asOf, windowMonths } = resolvePeriodToInput(dashboardControls.period);
     return {
       communityId,
@@ -111,27 +111,27 @@ export function useCommunityDetail({
   const seededIdRef = useRef<string | null>(null);
   if (seededIdRef.current !== communityId && isAtDefaults && initialData) {
     client.writeQuery<
-      GqlGetSysAdminCommunityDetailQuery,
-      GqlGetSysAdminCommunityDetailQueryVariables
+      GqlGetAnalyticsCommunityQuery,
+      GqlGetAnalyticsCommunityQueryVariables
     >({
-      query: GetSysAdminCommunityDetailDocument,
+      query: GetAnalyticsCommunityDocument,
       variables: { input },
       data: {
         __typename: "Query",
-        sysAdminCommunityDetail: initialData,
+        analyticsCommunity: initialData,
       },
     });
     seededIdRef.current = communityId;
   }
 
-  const { data, loading, error, fetchMore, refetch } = useGetSysAdminCommunityDetailQuery({
+  const { data, loading, error, fetchMore, refetch } = useGetAnalyticsCommunityQuery({
     variables: { input },
     fetchPolicy: "cache-first",
     notifyOnNetworkStatusChange: true,
   });
 
   const detail = useMemo<DetailPayload | null>(() => {
-    if (data?.sysAdminCommunityDetail) return data.sysAdminCommunityDetail;
+    if (data?.analyticsCommunity) return data.analyticsCommunity;
     // initialData は SSR 時のデフォルト controls (period / tier1 / tier2)
     // で fetch したものなので、ユーザーが controls を変えた直後の loading 中に
     // フォールバックすると古い defaults データが見えてしまう。

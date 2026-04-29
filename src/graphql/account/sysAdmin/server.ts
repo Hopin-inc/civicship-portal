@@ -18,14 +18,14 @@
 import { addTypenameToDocument } from "@apollo/client/utilities";
 import { print } from "graphql/language/printer";
 import {
-  GetSysAdminCommunityDetailDocument,
-  GetSysAdminDashboardDocument,
+  GetAnalyticsCommunityDocument,
+  GetAnalyticsDashboardDocument,
 } from "@/types/graphql";
 
-export const GET_SYS_ADMIN_DASHBOARD_SERVER_QUERY = print(
-  addTypenameToDocument(GetSysAdminDashboardDocument),
+export const GET_ANALYTICS_DASHBOARD_SERVER_QUERY = print(
+  addTypenameToDocument(GetAnalyticsDashboardDocument),
 );
 
-export const GET_SYS_ADMIN_COMMUNITY_DETAIL_SERVER_QUERY = print(
-  addTypenameToDocument(GetSysAdminCommunityDetailDocument),
+export const GET_ANALYTICS_COMMUNITY_SERVER_QUERY = print(
+  addTypenameToDocument(GetAnalyticsCommunityDocument),
 );

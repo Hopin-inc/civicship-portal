@@ -6354,7 +6354,7 @@ export type GqlAdminBrowseReportFieldsFragment = {
   feedbacks: { __typename?: "ReportFeedbacksConnection"; totalCount: number };
 };
 
-export type GqlGetAdminBrowseReportsQueryVariables = Exact<{
+export type GqlGetReportsAllQueryVariables = Exact<{
   communityId?: InputMaybe<Scalars["ID"]["input"]>;
   status?: InputMaybe<GqlReportStatus>;
   variant?: InputMaybe<GqlReportVariant>;
@@ -6364,9 +6364,9 @@ export type GqlGetAdminBrowseReportsQueryVariables = Exact<{
   first?: InputMaybe<Scalars["Int"]["input"]>;
 }>;
 
-export type GqlGetAdminBrowseReportsQuery = {
+export type GqlGetReportsAllQuery = {
   __typename?: "Query";
-  adminBrowseReports: {
+  reportsAll: {
     __typename?: "ReportsConnection";
     totalCount: number;
     edges?: Array<{
@@ -6387,14 +6387,14 @@ export type GqlGetAdminBrowseReportsQuery = {
   };
 };
 
-export type GqlGetAdminReportSummaryQueryVariables = Exact<{
+export type GqlGetReportSummariesQueryVariables = Exact<{
   cursor?: InputMaybe<Scalars["String"]["input"]>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
 }>;
 
-export type GqlGetAdminReportSummaryQuery = {
+export type GqlGetReportSummariesQuery = {
   __typename?: "Query";
-  adminReportSummary: {
+  reportSummaries: {
     __typename?: "AdminReportSummaryConnection";
     totalCount: number;
     edges?: Array<{
@@ -6416,67 +6416,6 @@ export type GqlGetAdminReportSummaryQuery = {
       } | null;
     } | null> | null;
     pageInfo: { __typename?: "PageInfo"; hasNextPage: boolean; endCursor?: string | null };
-  };
-};
-
-export type GqlGetAdminTemplateFeedbacksQueryVariables = Exact<{
-  variant: GqlReportVariant;
-  version?: InputMaybe<Scalars["Int"]["input"]>;
-  kind?: InputMaybe<GqlReportTemplateKind>;
-  feedbackType?: InputMaybe<GqlReportFeedbackType>;
-  maxRating?: InputMaybe<Scalars["Int"]["input"]>;
-  cursor?: InputMaybe<Scalars["String"]["input"]>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-}>;
-
-export type GqlGetAdminTemplateFeedbacksQuery = {
-  __typename?: "Query";
-  adminTemplateFeedbacks: {
-    __typename?: "ReportFeedbacksConnection";
-    totalCount: number;
-    edges?: Array<{
-      __typename?: "ReportFeedbackEdge";
-      cursor: string;
-      node?: {
-        __typename?: "ReportFeedback";
-        id: string;
-        rating: number;
-        comment?: string | null;
-        feedbackType?: GqlReportFeedbackType | null;
-        sectionKey?: string | null;
-        createdAt: Date;
-        report: {
-          __typename?: "Report";
-          id: string;
-          variant: GqlReportVariant;
-          periodFrom: Date;
-          periodTo: Date;
-          community: { __typename?: "Community"; id: string; name?: string | null };
-        };
-        user: { __typename?: "User"; id: string; name: string };
-      } | null;
-    } | null> | null;
-    pageInfo: { __typename?: "PageInfo"; hasNextPage: boolean; endCursor?: string | null };
-  };
-};
-
-export type GqlGetAdminTemplateFeedbackStatsQueryVariables = Exact<{
-  variant: GqlReportVariant;
-  version?: InputMaybe<Scalars["Int"]["input"]>;
-  kind?: InputMaybe<GqlReportTemplateKind>;
-}>;
-
-export type GqlGetAdminTemplateFeedbackStatsQuery = {
-  __typename?: "Query";
-  adminTemplateFeedbackStats: {
-    __typename?: "AdminTemplateFeedbackStats";
-    totalCount: number;
-    avgRating?: number | null;
-    ratingDistribution: Array<{
-      __typename?: "ReportFeedbackRatingBucket";
-      rating: number;
-      count: number;
-    }>;
   };
 };
 
@@ -7474,8 +7413,69 @@ export type GqlGetReportTemplateStatsBreakdownQuery = {
   };
 };
 
-export type GqlSysAdminSegmentCountsFieldsFragment = {
-  __typename?: "SysAdminSegmentCounts";
+export type GqlGetReportTemplateFeedbacksQueryVariables = Exact<{
+  variant: GqlReportVariant;
+  version?: InputMaybe<Scalars["Int"]["input"]>;
+  kind?: InputMaybe<GqlReportTemplateKind>;
+  feedbackType?: InputMaybe<GqlReportFeedbackType>;
+  maxRating?: InputMaybe<Scalars["Int"]["input"]>;
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+}>;
+
+export type GqlGetReportTemplateFeedbacksQuery = {
+  __typename?: "Query";
+  reportTemplateFeedbacks: {
+    __typename?: "ReportFeedbacksConnection";
+    totalCount: number;
+    edges?: Array<{
+      __typename?: "ReportFeedbackEdge";
+      cursor: string;
+      node?: {
+        __typename?: "ReportFeedback";
+        id: string;
+        rating: number;
+        comment?: string | null;
+        feedbackType?: GqlReportFeedbackType | null;
+        sectionKey?: string | null;
+        createdAt: Date;
+        report: {
+          __typename?: "Report";
+          id: string;
+          variant: GqlReportVariant;
+          periodFrom: Date;
+          periodTo: Date;
+          community: { __typename?: "Community"; id: string; name?: string | null };
+        };
+        user: { __typename?: "User"; id: string; name: string };
+      } | null;
+    } | null> | null;
+    pageInfo: { __typename?: "PageInfo"; hasNextPage: boolean; endCursor?: string | null };
+  };
+};
+
+export type GqlGetReportTemplateFeedbackStatsQueryVariables = Exact<{
+  variant: GqlReportVariant;
+  version?: InputMaybe<Scalars["Int"]["input"]>;
+  kind?: InputMaybe<GqlReportTemplateKind>;
+}>;
+
+export type GqlGetReportTemplateFeedbackStatsQuery = {
+  __typename?: "Query";
+  reportTemplateFeedbackStats: {
+    __typename?: "AdminTemplateFeedbackStats";
+    totalCount: number;
+    avgRating?: number | null;
+    ratingDistribution: Array<{
+      __typename?: "ReportFeedbackRatingBucket";
+      rating: number;
+      count: number;
+    }>;
+  };
+};
+
+export type GqlAnalyticsSegmentCountsFieldsFragment = {
+  __typename?: "AnalyticsSegmentCounts";
   total: number;
   activeCount: number;
   passiveCount: number;
@@ -7483,8 +7483,8 @@ export type GqlSysAdminSegmentCountsFieldsFragment = {
   tier2Count: number;
 };
 
-export type GqlSysAdminWindowActivityFieldsFragment = {
-  __typename?: "SysAdminWindowActivity";
+export type GqlAnalyticsWindowActivityFieldsFragment = {
+  __typename?: "AnalyticsWindowActivity";
   senderCount: number;
   senderCountPrev: number;
   newMemberCount: number;
@@ -7492,42 +7492,47 @@ export type GqlSysAdminWindowActivityFieldsFragment = {
   retainedSenders: number;
 };
 
-export type GqlSysAdminWeeklyRetentionFieldsFragment = {
-  __typename?: "SysAdminWeeklyRetention";
+export type GqlAnalyticsWeeklyRetentionFieldsFragment = {
+  __typename?: "AnalyticsWeeklyRetention";
   retainedSenders: number;
   churnedSenders: number;
 };
 
-export type GqlSysAdminLatestCohortFieldsFragment = {
-  __typename?: "SysAdminLatestCohort";
+export type GqlAnalyticsLatestCohortFieldsFragment = {
+  __typename?: "AnalyticsLatestCohort";
   size: number;
   activeAtM1: number;
 };
 
-export type GqlSysAdminPlatformSummaryFieldsFragment = {
-  __typename?: "SysAdminPlatformSummary";
+export type GqlAnalyticsPlatformSummaryFieldsFragment = {
+  __typename?: "AnalyticsPlatformSummary";
   communitiesCount: number;
   latestMonthDonationPoints: number;
   totalMembers: number;
 };
 
-export type GqlSysAdminTenureDistributionFieldsFragment = {
-  __typename?: "SysAdminTenureDistribution";
+export type GqlAnalyticsTenureDistributionFieldsFragment = {
+  __typename?: "AnalyticsTenureDistribution";
   lt1Month: number;
   m1to3Months: number;
   m3to12Months: number;
   gte12Months: number;
+  monthlyHistogram: Array<{
+    __typename?: "AnalyticsTenureHistogramBucket";
+    monthsIn: number;
+    count: number;
+  }>;
 };
 
-export type GqlSysAdminCommunityOverviewRowFieldsFragment = {
-  __typename?: "SysAdminCommunityOverview";
+export type GqlAnalyticsCommunityOverviewRowFieldsFragment = {
+  __typename?: "AnalyticsCommunityOverview";
   communityId: string;
   communityName: string;
   totalMembers: number;
   hubMemberCount: number;
   dormantCount: number;
   segmentCounts: {
-    __typename?: "SysAdminSegmentCounts";
+    __typename?: "AnalyticsSegmentCounts";
     total: number;
     activeCount: number;
     passiveCount: number;
@@ -7535,14 +7540,19 @@ export type GqlSysAdminCommunityOverviewRowFieldsFragment = {
     tier2Count: number;
   };
   tenureDistribution: {
-    __typename?: "SysAdminTenureDistribution";
+    __typename?: "AnalyticsTenureDistribution";
     lt1Month: number;
     m1to3Months: number;
     m3to12Months: number;
     gte12Months: number;
+    monthlyHistogram: Array<{
+      __typename?: "AnalyticsTenureHistogramBucket";
+      monthsIn: number;
+      count: number;
+    }>;
   };
   windowActivity: {
-    __typename?: "SysAdminWindowActivity";
+    __typename?: "AnalyticsWindowActivity";
     senderCount: number;
     senderCountPrev: number;
     newMemberCount: number;
@@ -7550,22 +7560,22 @@ export type GqlSysAdminCommunityOverviewRowFieldsFragment = {
     retainedSenders: number;
   };
   weeklyRetention: {
-    __typename?: "SysAdminWeeklyRetention";
+    __typename?: "AnalyticsWeeklyRetention";
     retainedSenders: number;
     churnedSenders: number;
   };
-  latestCohort: { __typename?: "SysAdminLatestCohort"; size: number; activeAtM1: number };
+  latestCohort: { __typename?: "AnalyticsLatestCohort"; size: number; activeAtM1: number };
 };
 
-export type GqlSysAdminAlertFieldsFragment = {
-  __typename?: "SysAdminCommunityAlerts";
+export type GqlAnalyticsAlertFieldsFragment = {
+  __typename?: "AnalyticsCommunityAlerts";
   activeDrop: boolean;
   churnSpike: boolean;
   noNewMembers: boolean;
 };
 
-export type GqlSysAdminCommunityDetailSummaryFieldsFragment = {
-  __typename?: "SysAdminCommunitySummaryCard";
+export type GqlAnalyticsCommunityDetailSummaryFieldsFragment = {
+  __typename?: "AnalyticsCommunitySummaryCard";
   communityId: string;
   communityName: string;
   communityActivityRate: number;
@@ -7580,8 +7590,8 @@ export type GqlSysAdminCommunityDetailSummaryFieldsFragment = {
   dataTo?: Date | null;
 };
 
-export type GqlSysAdminStageBucketFieldsFragment = {
-  __typename?: "SysAdminStageBucket";
+export type GqlAnalyticsStageBucketFieldsFragment = {
+  __typename?: "AnalyticsStageBucket";
   count: number;
   pct: number;
   avgSendRate: number;
@@ -7589,10 +7599,10 @@ export type GqlSysAdminStageBucketFieldsFragment = {
   pointsContributionPct: number;
 };
 
-export type GqlSysAdminStageDistributionFieldsFragment = {
-  __typename?: "SysAdminStageDistribution";
+export type GqlAnalyticsStageDistributionFieldsFragment = {
+  __typename?: "AnalyticsStageDistribution";
   habitual: {
-    __typename?: "SysAdminStageBucket";
+    __typename?: "AnalyticsStageBucket";
     count: number;
     pct: number;
     avgSendRate: number;
@@ -7600,7 +7610,7 @@ export type GqlSysAdminStageDistributionFieldsFragment = {
     pointsContributionPct: number;
   };
   regular: {
-    __typename?: "SysAdminStageBucket";
+    __typename?: "AnalyticsStageBucket";
     count: number;
     pct: number;
     avgSendRate: number;
@@ -7608,7 +7618,7 @@ export type GqlSysAdminStageDistributionFieldsFragment = {
     pointsContributionPct: number;
   };
   occasional: {
-    __typename?: "SysAdminStageBucket";
+    __typename?: "AnalyticsStageBucket";
     count: number;
     pct: number;
     avgSendRate: number;
@@ -7616,7 +7626,7 @@ export type GqlSysAdminStageDistributionFieldsFragment = {
     pointsContributionPct: number;
   };
   latent: {
-    __typename?: "SysAdminStageBucket";
+    __typename?: "AnalyticsStageBucket";
     count: number;
     pct: number;
     avgSendRate: number;
@@ -7625,8 +7635,8 @@ export type GqlSysAdminStageDistributionFieldsFragment = {
   };
 };
 
-export type GqlSysAdminMonthlyActivityPointFieldsFragment = {
-  __typename?: "SysAdminMonthlyActivityPoint";
+export type GqlAnalyticsMonthlyActivityPointFieldsFragment = {
+  __typename?: "AnalyticsMonthlyActivityPoint";
   month: Date;
   communityActivityRate: number;
   senderCount: number;
@@ -7638,8 +7648,8 @@ export type GqlSysAdminMonthlyActivityPointFieldsFragment = {
   hubMemberCount?: number | null;
 };
 
-export type GqlSysAdminRetentionTrendPointFieldsFragment = {
-  __typename?: "SysAdminRetentionTrendPoint";
+export type GqlAnalyticsRetentionTrendPointFieldsFragment = {
+  __typename?: "AnalyticsRetentionTrendPoint";
   week: Date;
   communityActivityRate?: number | null;
   retainedSenders: number;
@@ -7648,8 +7658,8 @@ export type GqlSysAdminRetentionTrendPointFieldsFragment = {
   newMembers: number;
 };
 
-export type GqlSysAdminCohortRetentionPointFieldsFragment = {
-  __typename?: "SysAdminCohortRetentionPoint";
+export type GqlAnalyticsCohortRetentionPointFieldsFragment = {
+  __typename?: "AnalyticsCohortRetentionPoint";
   cohortMonth: Date;
   cohortSize: number;
   retentionM1?: number | null;
@@ -7657,8 +7667,8 @@ export type GqlSysAdminCohortRetentionPointFieldsFragment = {
   retentionM6?: number | null;
 };
 
-export type GqlSysAdminCohortFunnelPointFieldsFragment = {
-  __typename?: "SysAdminCohortFunnelPoint";
+export type GqlAnalyticsCohortFunnelPointFieldsFragment = {
+  __typename?: "AnalyticsCohortFunnelPoint";
   cohortMonth: Date;
   acquired: number;
   activatedD30: number;
@@ -7666,8 +7676,8 @@ export type GqlSysAdminCohortFunnelPointFieldsFragment = {
   habitual: number;
 };
 
-export type GqlSysAdminMemberRowFieldsFragment = {
-  __typename?: "SysAdminMemberRow";
+export type GqlAnalyticsMemberRowFieldsFragment = {
+  __typename?: "AnalyticsMemberRow";
   userId: string;
   name?: string | null;
   userSendRate: number;
@@ -7683,30 +7693,30 @@ export type GqlSysAdminMemberRowFieldsFragment = {
   uniqueDonationSenders: number;
 };
 
-export type GqlGetSysAdminDashboardQueryVariables = Exact<{
-  input?: InputMaybe<GqlSysAdminDashboardInput>;
+export type GqlGetAnalyticsDashboardQueryVariables = Exact<{
+  input?: InputMaybe<GqlAnalyticsDashboardInput>;
 }>;
 
-export type GqlGetSysAdminDashboardQuery = {
+export type GqlGetAnalyticsDashboardQuery = {
   __typename?: "Query";
-  sysAdminDashboard: {
-    __typename?: "SysAdminDashboardPayload";
+  analyticsDashboard: {
+    __typename?: "AnalyticsDashboardPayload";
     asOf: Date;
     platform: {
-      __typename?: "SysAdminPlatformSummary";
+      __typename?: "AnalyticsPlatformSummary";
       communitiesCount: number;
       latestMonthDonationPoints: number;
       totalMembers: number;
     };
     communities: Array<{
-      __typename?: "SysAdminCommunityOverview";
+      __typename?: "AnalyticsCommunityOverview";
       communityId: string;
       communityName: string;
       totalMembers: number;
       hubMemberCount: number;
       dormantCount: number;
       segmentCounts: {
-        __typename?: "SysAdminSegmentCounts";
+        __typename?: "AnalyticsSegmentCounts";
         total: number;
         activeCount: number;
         passiveCount: number;
@@ -7714,14 +7724,19 @@ export type GqlGetSysAdminDashboardQuery = {
         tier2Count: number;
       };
       tenureDistribution: {
-        __typename?: "SysAdminTenureDistribution";
+        __typename?: "AnalyticsTenureDistribution";
         lt1Month: number;
         m1to3Months: number;
         m3to12Months: number;
         gte12Months: number;
+        monthlyHistogram: Array<{
+          __typename?: "AnalyticsTenureHistogramBucket";
+          monthsIn: number;
+          count: number;
+        }>;
       };
       windowActivity: {
-        __typename?: "SysAdminWindowActivity";
+        __typename?: "AnalyticsWindowActivity";
         senderCount: number;
         senderCountPrev: number;
         newMemberCount: number;
@@ -7729,36 +7744,36 @@ export type GqlGetSysAdminDashboardQuery = {
         retainedSenders: number;
       };
       weeklyRetention: {
-        __typename?: "SysAdminWeeklyRetention";
+        __typename?: "AnalyticsWeeklyRetention";
         retainedSenders: number;
         churnedSenders: number;
       };
-      latestCohort: { __typename?: "SysAdminLatestCohort"; size: number; activeAtM1: number };
+      latestCohort: { __typename?: "AnalyticsLatestCohort"; size: number; activeAtM1: number };
     }>;
   };
 };
 
-export type GqlGetSysAdminCommunityDetailQueryVariables = Exact<{
-  input: GqlSysAdminCommunityDetailInput;
+export type GqlGetAnalyticsCommunityQueryVariables = Exact<{
+  input: GqlAnalyticsCommunityInput;
 }>;
 
-export type GqlGetSysAdminCommunityDetailQuery = {
+export type GqlGetAnalyticsCommunityQuery = {
   __typename?: "Query";
-  sysAdminCommunityDetail: {
-    __typename?: "SysAdminCommunityDetailPayload";
+  analyticsCommunity: {
+    __typename?: "AnalyticsCommunityPayload";
     asOf: Date;
     communityId: string;
     communityName: string;
     windowMonths: number;
     dormantCount: number;
     alerts: {
-      __typename?: "SysAdminCommunityAlerts";
+      __typename?: "AnalyticsCommunityAlerts";
       activeDrop: boolean;
       churnSpike: boolean;
       noNewMembers: boolean;
     };
     summary: {
-      __typename?: "SysAdminCommunitySummaryCard";
+      __typename?: "AnalyticsCommunitySummaryCard";
       communityId: string;
       communityName: string;
       communityActivityRate: number;
@@ -7773,9 +7788,9 @@ export type GqlGetSysAdminCommunityDetailQuery = {
       dataTo?: Date | null;
     };
     stages: {
-      __typename?: "SysAdminStageDistribution";
+      __typename?: "AnalyticsStageDistribution";
       habitual: {
-        __typename?: "SysAdminStageBucket";
+        __typename?: "AnalyticsStageBucket";
         count: number;
         pct: number;
         avgSendRate: number;
@@ -7783,7 +7798,7 @@ export type GqlGetSysAdminCommunityDetailQuery = {
         pointsContributionPct: number;
       };
       regular: {
-        __typename?: "SysAdminStageBucket";
+        __typename?: "AnalyticsStageBucket";
         count: number;
         pct: number;
         avgSendRate: number;
@@ -7791,7 +7806,7 @@ export type GqlGetSysAdminCommunityDetailQuery = {
         pointsContributionPct: number;
       };
       occasional: {
-        __typename?: "SysAdminStageBucket";
+        __typename?: "AnalyticsStageBucket";
         count: number;
         pct: number;
         avgSendRate: number;
@@ -7799,7 +7814,7 @@ export type GqlGetSysAdminCommunityDetailQuery = {
         pointsContributionPct: number;
       };
       latent: {
-        __typename?: "SysAdminStageBucket";
+        __typename?: "AnalyticsStageBucket";
         count: number;
         pct: number;
         avgSendRate: number;
@@ -7808,7 +7823,7 @@ export type GqlGetSysAdminCommunityDetailQuery = {
       };
     };
     monthlyActivityTrend: Array<{
-      __typename?: "SysAdminMonthlyActivityPoint";
+      __typename?: "AnalyticsMonthlyActivityPoint";
       month: Date;
       communityActivityRate: number;
       senderCount: number;
@@ -7820,7 +7835,7 @@ export type GqlGetSysAdminCommunityDetailQuery = {
       hubMemberCount?: number | null;
     }>;
     retentionTrend: Array<{
-      __typename?: "SysAdminRetentionTrendPoint";
+      __typename?: "AnalyticsRetentionTrendPoint";
       week: Date;
       communityActivityRate?: number | null;
       retainedSenders: number;
@@ -7829,7 +7844,7 @@ export type GqlGetSysAdminCommunityDetailQuery = {
       newMembers: number;
     }>;
     cohortRetention: Array<{
-      __typename?: "SysAdminCohortRetentionPoint";
+      __typename?: "AnalyticsCohortRetentionPoint";
       cohortMonth: Date;
       cohortSize: number;
       retentionM1?: number | null;
@@ -7837,7 +7852,7 @@ export type GqlGetSysAdminCommunityDetailQuery = {
       retentionM6?: number | null;
     }>;
     cohortFunnel: Array<{
-      __typename?: "SysAdminCohortFunnelPoint";
+      __typename?: "AnalyticsCohortFunnelPoint";
       cohortMonth: Date;
       acquired: number;
       activatedD30: number;
@@ -7845,11 +7860,11 @@ export type GqlGetSysAdminCommunityDetailQuery = {
       habitual: number;
     }>;
     memberList: {
-      __typename?: "SysAdminMemberList";
+      __typename?: "AnalyticsMemberList";
       hasNextPage: boolean;
       nextCursor?: string | null;
       users: Array<{
-        __typename?: "SysAdminMemberRow";
+        __typename?: "AnalyticsMemberRow";
         userId: string;
         name?: string | null;
         userSendRate: number;
@@ -11626,15 +11641,15 @@ export const ReportTemplateStatsBreakdownRowFieldsFragmentDoc = gql`
     correlationWarning
   }
 `;
-export const SysAdminPlatformSummaryFieldsFragmentDoc = gql`
-  fragment SysAdminPlatformSummaryFields on SysAdminPlatformSummary {
+export const AnalyticsPlatformSummaryFieldsFragmentDoc = gql`
+  fragment AnalyticsPlatformSummaryFields on AnalyticsPlatformSummary {
     communitiesCount
     latestMonthDonationPoints
     totalMembers
   }
 `;
-export const SysAdminSegmentCountsFieldsFragmentDoc = gql`
-  fragment SysAdminSegmentCountsFields on SysAdminSegmentCounts {
+export const AnalyticsSegmentCountsFieldsFragmentDoc = gql`
+  fragment AnalyticsSegmentCountsFields on AnalyticsSegmentCounts {
     total
     activeCount
     passiveCount
@@ -11642,16 +11657,20 @@ export const SysAdminSegmentCountsFieldsFragmentDoc = gql`
     tier2Count
   }
 `;
-export const SysAdminTenureDistributionFieldsFragmentDoc = gql`
-  fragment SysAdminTenureDistributionFields on SysAdminTenureDistribution {
+export const AnalyticsTenureDistributionFieldsFragmentDoc = gql`
+  fragment AnalyticsTenureDistributionFields on AnalyticsTenureDistribution {
     lt1Month
     m1to3Months
     m3to12Months
     gte12Months
+    monthlyHistogram {
+      monthsIn
+      count
+    }
   }
 `;
-export const SysAdminWindowActivityFieldsFragmentDoc = gql`
-  fragment SysAdminWindowActivityFields on SysAdminWindowActivity {
+export const AnalyticsWindowActivityFieldsFragmentDoc = gql`
+  fragment AnalyticsWindowActivityFields on AnalyticsWindowActivity {
     senderCount
     senderCountPrev
     newMemberCount
@@ -11659,56 +11678,56 @@ export const SysAdminWindowActivityFieldsFragmentDoc = gql`
     retainedSenders
   }
 `;
-export const SysAdminWeeklyRetentionFieldsFragmentDoc = gql`
-  fragment SysAdminWeeklyRetentionFields on SysAdminWeeklyRetention {
+export const AnalyticsWeeklyRetentionFieldsFragmentDoc = gql`
+  fragment AnalyticsWeeklyRetentionFields on AnalyticsWeeklyRetention {
     retainedSenders
     churnedSenders
   }
 `;
-export const SysAdminLatestCohortFieldsFragmentDoc = gql`
-  fragment SysAdminLatestCohortFields on SysAdminLatestCohort {
+export const AnalyticsLatestCohortFieldsFragmentDoc = gql`
+  fragment AnalyticsLatestCohortFields on AnalyticsLatestCohort {
     size
     activeAtM1
   }
 `;
-export const SysAdminCommunityOverviewRowFieldsFragmentDoc = gql`
-  fragment SysAdminCommunityOverviewRowFields on SysAdminCommunityOverview {
+export const AnalyticsCommunityOverviewRowFieldsFragmentDoc = gql`
+  fragment AnalyticsCommunityOverviewRowFields on AnalyticsCommunityOverview {
     communityId
     communityName
     totalMembers
     hubMemberCount
     dormantCount
     segmentCounts {
-      ...SysAdminSegmentCountsFields
+      ...AnalyticsSegmentCountsFields
     }
     tenureDistribution {
-      ...SysAdminTenureDistributionFields
+      ...AnalyticsTenureDistributionFields
     }
     windowActivity {
-      ...SysAdminWindowActivityFields
+      ...AnalyticsWindowActivityFields
     }
     weeklyRetention {
-      ...SysAdminWeeklyRetentionFields
+      ...AnalyticsWeeklyRetentionFields
     }
     latestCohort {
-      ...SysAdminLatestCohortFields
+      ...AnalyticsLatestCohortFields
     }
   }
-  ${SysAdminSegmentCountsFieldsFragmentDoc}
-  ${SysAdminTenureDistributionFieldsFragmentDoc}
-  ${SysAdminWindowActivityFieldsFragmentDoc}
-  ${SysAdminWeeklyRetentionFieldsFragmentDoc}
-  ${SysAdminLatestCohortFieldsFragmentDoc}
+  ${AnalyticsSegmentCountsFieldsFragmentDoc}
+  ${AnalyticsTenureDistributionFieldsFragmentDoc}
+  ${AnalyticsWindowActivityFieldsFragmentDoc}
+  ${AnalyticsWeeklyRetentionFieldsFragmentDoc}
+  ${AnalyticsLatestCohortFieldsFragmentDoc}
 `;
-export const SysAdminAlertFieldsFragmentDoc = gql`
-  fragment SysAdminAlertFields on SysAdminCommunityAlerts {
+export const AnalyticsAlertFieldsFragmentDoc = gql`
+  fragment AnalyticsAlertFields on AnalyticsCommunityAlerts {
     activeDrop
     churnSpike
     noNewMembers
   }
 `;
-export const SysAdminCommunityDetailSummaryFieldsFragmentDoc = gql`
-  fragment SysAdminCommunityDetailSummaryFields on SysAdminCommunitySummaryCard {
+export const AnalyticsCommunityDetailSummaryFieldsFragmentDoc = gql`
+  fragment AnalyticsCommunityDetailSummaryFields on AnalyticsCommunitySummaryCard {
     communityId
     communityName
     communityActivityRate
@@ -11723,8 +11742,8 @@ export const SysAdminCommunityDetailSummaryFieldsFragmentDoc = gql`
     dataTo
   }
 `;
-export const SysAdminStageBucketFieldsFragmentDoc = gql`
-  fragment SysAdminStageBucketFields on SysAdminStageBucket {
+export const AnalyticsStageBucketFieldsFragmentDoc = gql`
+  fragment AnalyticsStageBucketFields on AnalyticsStageBucket {
     count
     pct
     avgSendRate
@@ -11732,25 +11751,25 @@ export const SysAdminStageBucketFieldsFragmentDoc = gql`
     pointsContributionPct
   }
 `;
-export const SysAdminStageDistributionFieldsFragmentDoc = gql`
-  fragment SysAdminStageDistributionFields on SysAdminStageDistribution {
+export const AnalyticsStageDistributionFieldsFragmentDoc = gql`
+  fragment AnalyticsStageDistributionFields on AnalyticsStageDistribution {
     habitual {
-      ...SysAdminStageBucketFields
+      ...AnalyticsStageBucketFields
     }
     regular {
-      ...SysAdminStageBucketFields
+      ...AnalyticsStageBucketFields
     }
     occasional {
-      ...SysAdminStageBucketFields
+      ...AnalyticsStageBucketFields
     }
     latent {
-      ...SysAdminStageBucketFields
+      ...AnalyticsStageBucketFields
     }
   }
-  ${SysAdminStageBucketFieldsFragmentDoc}
+  ${AnalyticsStageBucketFieldsFragmentDoc}
 `;
-export const SysAdminMonthlyActivityPointFieldsFragmentDoc = gql`
-  fragment SysAdminMonthlyActivityPointFields on SysAdminMonthlyActivityPoint {
+export const AnalyticsMonthlyActivityPointFieldsFragmentDoc = gql`
+  fragment AnalyticsMonthlyActivityPointFields on AnalyticsMonthlyActivityPoint {
     month
     communityActivityRate
     senderCount
@@ -11762,8 +11781,8 @@ export const SysAdminMonthlyActivityPointFieldsFragmentDoc = gql`
     hubMemberCount
   }
 `;
-export const SysAdminRetentionTrendPointFieldsFragmentDoc = gql`
-  fragment SysAdminRetentionTrendPointFields on SysAdminRetentionTrendPoint {
+export const AnalyticsRetentionTrendPointFieldsFragmentDoc = gql`
+  fragment AnalyticsRetentionTrendPointFields on AnalyticsRetentionTrendPoint {
     week
     communityActivityRate
     retainedSenders
@@ -11772,8 +11791,8 @@ export const SysAdminRetentionTrendPointFieldsFragmentDoc = gql`
     newMembers
   }
 `;
-export const SysAdminCohortRetentionPointFieldsFragmentDoc = gql`
-  fragment SysAdminCohortRetentionPointFields on SysAdminCohortRetentionPoint {
+export const AnalyticsCohortRetentionPointFieldsFragmentDoc = gql`
+  fragment AnalyticsCohortRetentionPointFields on AnalyticsCohortRetentionPoint {
     cohortMonth
     cohortSize
     retentionM1
@@ -11781,8 +11800,8 @@ export const SysAdminCohortRetentionPointFieldsFragmentDoc = gql`
     retentionM6
   }
 `;
-export const SysAdminCohortFunnelPointFieldsFragmentDoc = gql`
-  fragment SysAdminCohortFunnelPointFields on SysAdminCohortFunnelPoint {
+export const AnalyticsCohortFunnelPointFieldsFragmentDoc = gql`
+  fragment AnalyticsCohortFunnelPointFields on AnalyticsCohortFunnelPoint {
     cohortMonth
     acquired
     activatedD30
@@ -11790,8 +11809,8 @@ export const SysAdminCohortFunnelPointFieldsFragmentDoc = gql`
     habitual
   }
 `;
-export const SysAdminMemberRowFieldsFragmentDoc = gql`
-  fragment SysAdminMemberRowFields on SysAdminMemberRow {
+export const AnalyticsMemberRowFieldsFragmentDoc = gql`
+  fragment AnalyticsMemberRowFields on AnalyticsMemberRow {
     userId
     name
     userSendRate
@@ -12245,8 +12264,8 @@ export type GetCitiesQueryResult = Apollo.QueryResult<
   GqlGetCitiesQuery,
   GqlGetCitiesQueryVariables
 >;
-export const GetAdminBrowseReportsDocument = gql`
-  query GetAdminBrowseReports(
+export const GetReportsAllDocument = gql`
+  query GetReportsAll(
     $communityId: ID
     $status: ReportStatus
     $variant: ReportVariant
@@ -12255,7 +12274,7 @@ export const GetAdminBrowseReportsDocument = gql`
     $cursor: String
     $first: Int
   ) {
-    adminBrowseReports(
+    reportsAll(
       communityId: $communityId
       status: $status
       variant: $variant
@@ -12281,16 +12300,16 @@ export const GetAdminBrowseReportsDocument = gql`
 `;
 
 /**
- * __useGetAdminBrowseReportsQuery__
+ * __useGetReportsAllQuery__
  *
- * To run a query within a React component, call `useGetAdminBrowseReportsQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetAdminBrowseReportsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useGetReportsAllQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetReportsAllQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useGetAdminBrowseReportsQuery({
+ * const { data, loading, error } = useGetReportsAllQuery({
  *   variables: {
  *      communityId: // value for 'communityId'
  *      status: // value for 'status'
@@ -12302,59 +12321,46 @@ export const GetAdminBrowseReportsDocument = gql`
  *   },
  * });
  */
-export function useGetAdminBrowseReportsQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    GqlGetAdminBrowseReportsQuery,
-    GqlGetAdminBrowseReportsQueryVariables
-  >,
+export function useGetReportsAllQuery(
+  baseOptions?: Apollo.QueryHookOptions<GqlGetReportsAllQuery, GqlGetReportsAllQueryVariables>,
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GqlGetAdminBrowseReportsQuery, GqlGetAdminBrowseReportsQueryVariables>(
-    GetAdminBrowseReportsDocument,
+  return Apollo.useQuery<GqlGetReportsAllQuery, GqlGetReportsAllQueryVariables>(
+    GetReportsAllDocument,
     options,
   );
 }
-export function useGetAdminBrowseReportsLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    GqlGetAdminBrowseReportsQuery,
-    GqlGetAdminBrowseReportsQueryVariables
-  >,
+export function useGetReportsAllLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<GqlGetReportsAllQuery, GqlGetReportsAllQueryVariables>,
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GqlGetAdminBrowseReportsQuery, GqlGetAdminBrowseReportsQueryVariables>(
-    GetAdminBrowseReportsDocument,
+  return Apollo.useLazyQuery<GqlGetReportsAllQuery, GqlGetReportsAllQueryVariables>(
+    GetReportsAllDocument,
     options,
   );
 }
-export function useGetAdminBrowseReportsSuspenseQuery(
+export function useGetReportsAllSuspenseQuery(
   baseOptions?:
     | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        GqlGetAdminBrowseReportsQuery,
-        GqlGetAdminBrowseReportsQueryVariables
-      >,
+    | Apollo.SuspenseQueryHookOptions<GqlGetReportsAllQuery, GqlGetReportsAllQueryVariables>,
 ) {
   const options =
     baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    GqlGetAdminBrowseReportsQuery,
-    GqlGetAdminBrowseReportsQueryVariables
-  >(GetAdminBrowseReportsDocument, options);
+  return Apollo.useSuspenseQuery<GqlGetReportsAllQuery, GqlGetReportsAllQueryVariables>(
+    GetReportsAllDocument,
+    options,
+  );
 }
-export type GetAdminBrowseReportsQueryHookResult = ReturnType<typeof useGetAdminBrowseReportsQuery>;
-export type GetAdminBrowseReportsLazyQueryHookResult = ReturnType<
-  typeof useGetAdminBrowseReportsLazyQuery
+export type GetReportsAllQueryHookResult = ReturnType<typeof useGetReportsAllQuery>;
+export type GetReportsAllLazyQueryHookResult = ReturnType<typeof useGetReportsAllLazyQuery>;
+export type GetReportsAllSuspenseQueryHookResult = ReturnType<typeof useGetReportsAllSuspenseQuery>;
+export type GetReportsAllQueryResult = Apollo.QueryResult<
+  GqlGetReportsAllQuery,
+  GqlGetReportsAllQueryVariables
 >;
-export type GetAdminBrowseReportsSuspenseQueryHookResult = ReturnType<
-  typeof useGetAdminBrowseReportsSuspenseQuery
->;
-export type GetAdminBrowseReportsQueryResult = Apollo.QueryResult<
-  GqlGetAdminBrowseReportsQuery,
-  GqlGetAdminBrowseReportsQueryVariables
->;
-export const GetAdminReportSummaryDocument = gql`
-  query GetAdminReportSummary($cursor: String, $first: Int) {
-    adminReportSummary(cursor: $cursor, first: $first) {
+export const GetReportSummariesDocument = gql`
+  query GetReportSummaries($cursor: String, $first: Int) {
+    reportSummaries(cursor: $cursor, first: $first) {
       edges {
         cursor
         node {
@@ -12372,272 +12378,71 @@ export const GetAdminReportSummaryDocument = gql`
 `;
 
 /**
- * __useGetAdminReportSummaryQuery__
+ * __useGetReportSummariesQuery__
  *
- * To run a query within a React component, call `useGetAdminReportSummaryQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetAdminReportSummaryQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useGetReportSummariesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetReportSummariesQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useGetAdminReportSummaryQuery({
+ * const { data, loading, error } = useGetReportSummariesQuery({
  *   variables: {
  *      cursor: // value for 'cursor'
  *      first: // value for 'first'
  *   },
  * });
  */
-export function useGetAdminReportSummaryQuery(
+export function useGetReportSummariesQuery(
   baseOptions?: Apollo.QueryHookOptions<
-    GqlGetAdminReportSummaryQuery,
-    GqlGetAdminReportSummaryQueryVariables
+    GqlGetReportSummariesQuery,
+    GqlGetReportSummariesQueryVariables
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GqlGetAdminReportSummaryQuery, GqlGetAdminReportSummaryQueryVariables>(
-    GetAdminReportSummaryDocument,
+  return Apollo.useQuery<GqlGetReportSummariesQuery, GqlGetReportSummariesQueryVariables>(
+    GetReportSummariesDocument,
     options,
   );
 }
-export function useGetAdminReportSummaryLazyQuery(
+export function useGetReportSummariesLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
-    GqlGetAdminReportSummaryQuery,
-    GqlGetAdminReportSummaryQueryVariables
+    GqlGetReportSummariesQuery,
+    GqlGetReportSummariesQueryVariables
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GqlGetAdminReportSummaryQuery, GqlGetAdminReportSummaryQueryVariables>(
-    GetAdminReportSummaryDocument,
+  return Apollo.useLazyQuery<GqlGetReportSummariesQuery, GqlGetReportSummariesQueryVariables>(
+    GetReportSummariesDocument,
     options,
   );
 }
-export function useGetAdminReportSummarySuspenseQuery(
+export function useGetReportSummariesSuspenseQuery(
   baseOptions?:
     | Apollo.SkipToken
     | Apollo.SuspenseQueryHookOptions<
-        GqlGetAdminReportSummaryQuery,
-        GqlGetAdminReportSummaryQueryVariables
+        GqlGetReportSummariesQuery,
+        GqlGetReportSummariesQueryVariables
       >,
 ) {
   const options =
     baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    GqlGetAdminReportSummaryQuery,
-    GqlGetAdminReportSummaryQueryVariables
-  >(GetAdminReportSummaryDocument, options);
+  return Apollo.useSuspenseQuery<GqlGetReportSummariesQuery, GqlGetReportSummariesQueryVariables>(
+    GetReportSummariesDocument,
+    options,
+  );
 }
-export type GetAdminReportSummaryQueryHookResult = ReturnType<typeof useGetAdminReportSummaryQuery>;
-export type GetAdminReportSummaryLazyQueryHookResult = ReturnType<
-  typeof useGetAdminReportSummaryLazyQuery
+export type GetReportSummariesQueryHookResult = ReturnType<typeof useGetReportSummariesQuery>;
+export type GetReportSummariesLazyQueryHookResult = ReturnType<
+  typeof useGetReportSummariesLazyQuery
 >;
-export type GetAdminReportSummarySuspenseQueryHookResult = ReturnType<
-  typeof useGetAdminReportSummarySuspenseQuery
+export type GetReportSummariesSuspenseQueryHookResult = ReturnType<
+  typeof useGetReportSummariesSuspenseQuery
 >;
-export type GetAdminReportSummaryQueryResult = Apollo.QueryResult<
-  GqlGetAdminReportSummaryQuery,
-  GqlGetAdminReportSummaryQueryVariables
->;
-export const GetAdminTemplateFeedbacksDocument = gql`
-  query GetAdminTemplateFeedbacks(
-    $variant: ReportVariant!
-    $version: Int
-    $kind: ReportTemplateKind
-    $feedbackType: ReportFeedbackType
-    $maxRating: Int
-    $cursor: String
-    $first: Int
-  ) {
-    adminTemplateFeedbacks(
-      variant: $variant
-      version: $version
-      kind: $kind
-      feedbackType: $feedbackType
-      maxRating: $maxRating
-      cursor: $cursor
-      first: $first
-    ) {
-      edges {
-        cursor
-        node {
-          ...ReportFeedbackWithReportFields
-        }
-      }
-      pageInfo {
-        hasNextPage
-        endCursor
-      }
-      totalCount
-    }
-  }
-  ${ReportFeedbackWithReportFieldsFragmentDoc}
-`;
-
-/**
- * __useGetAdminTemplateFeedbacksQuery__
- *
- * To run a query within a React component, call `useGetAdminTemplateFeedbacksQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetAdminTemplateFeedbacksQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetAdminTemplateFeedbacksQuery({
- *   variables: {
- *      variant: // value for 'variant'
- *      version: // value for 'version'
- *      kind: // value for 'kind'
- *      feedbackType: // value for 'feedbackType'
- *      maxRating: // value for 'maxRating'
- *      cursor: // value for 'cursor'
- *      first: // value for 'first'
- *   },
- * });
- */
-export function useGetAdminTemplateFeedbacksQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    GqlGetAdminTemplateFeedbacksQuery,
-    GqlGetAdminTemplateFeedbacksQueryVariables
-  > &
-    ({ variables: GqlGetAdminTemplateFeedbacksQueryVariables; skip?: boolean } | { skip: boolean }),
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    GqlGetAdminTemplateFeedbacksQuery,
-    GqlGetAdminTemplateFeedbacksQueryVariables
-  >(GetAdminTemplateFeedbacksDocument, options);
-}
-export function useGetAdminTemplateFeedbacksLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    GqlGetAdminTemplateFeedbacksQuery,
-    GqlGetAdminTemplateFeedbacksQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    GqlGetAdminTemplateFeedbacksQuery,
-    GqlGetAdminTemplateFeedbacksQueryVariables
-  >(GetAdminTemplateFeedbacksDocument, options);
-}
-export function useGetAdminTemplateFeedbacksSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        GqlGetAdminTemplateFeedbacksQuery,
-        GqlGetAdminTemplateFeedbacksQueryVariables
-      >,
-) {
-  const options =
-    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    GqlGetAdminTemplateFeedbacksQuery,
-    GqlGetAdminTemplateFeedbacksQueryVariables
-  >(GetAdminTemplateFeedbacksDocument, options);
-}
-export type GetAdminTemplateFeedbacksQueryHookResult = ReturnType<
-  typeof useGetAdminTemplateFeedbacksQuery
->;
-export type GetAdminTemplateFeedbacksLazyQueryHookResult = ReturnType<
-  typeof useGetAdminTemplateFeedbacksLazyQuery
->;
-export type GetAdminTemplateFeedbacksSuspenseQueryHookResult = ReturnType<
-  typeof useGetAdminTemplateFeedbacksSuspenseQuery
->;
-export type GetAdminTemplateFeedbacksQueryResult = Apollo.QueryResult<
-  GqlGetAdminTemplateFeedbacksQuery,
-  GqlGetAdminTemplateFeedbacksQueryVariables
->;
-export const GetAdminTemplateFeedbackStatsDocument = gql`
-  query GetAdminTemplateFeedbackStats(
-    $variant: ReportVariant!
-    $version: Int
-    $kind: ReportTemplateKind
-  ) {
-    adminTemplateFeedbackStats(variant: $variant, version: $version, kind: $kind) {
-      totalCount
-      avgRating
-      ratingDistribution {
-        rating
-        count
-      }
-    }
-  }
-`;
-
-/**
- * __useGetAdminTemplateFeedbackStatsQuery__
- *
- * To run a query within a React component, call `useGetAdminTemplateFeedbackStatsQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetAdminTemplateFeedbackStatsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetAdminTemplateFeedbackStatsQuery({
- *   variables: {
- *      variant: // value for 'variant'
- *      version: // value for 'version'
- *      kind: // value for 'kind'
- *   },
- * });
- */
-export function useGetAdminTemplateFeedbackStatsQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    GqlGetAdminTemplateFeedbackStatsQuery,
-    GqlGetAdminTemplateFeedbackStatsQueryVariables
-  > &
-    (
-      | { variables: GqlGetAdminTemplateFeedbackStatsQueryVariables; skip?: boolean }
-      | { skip: boolean }
-    ),
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    GqlGetAdminTemplateFeedbackStatsQuery,
-    GqlGetAdminTemplateFeedbackStatsQueryVariables
-  >(GetAdminTemplateFeedbackStatsDocument, options);
-}
-export function useGetAdminTemplateFeedbackStatsLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    GqlGetAdminTemplateFeedbackStatsQuery,
-    GqlGetAdminTemplateFeedbackStatsQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    GqlGetAdminTemplateFeedbackStatsQuery,
-    GqlGetAdminTemplateFeedbackStatsQueryVariables
-  >(GetAdminTemplateFeedbackStatsDocument, options);
-}
-export function useGetAdminTemplateFeedbackStatsSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        GqlGetAdminTemplateFeedbackStatsQuery,
-        GqlGetAdminTemplateFeedbackStatsQueryVariables
-      >,
-) {
-  const options =
-    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    GqlGetAdminTemplateFeedbackStatsQuery,
-    GqlGetAdminTemplateFeedbackStatsQueryVariables
-  >(GetAdminTemplateFeedbackStatsDocument, options);
-}
-export type GetAdminTemplateFeedbackStatsQueryHookResult = ReturnType<
-  typeof useGetAdminTemplateFeedbackStatsQuery
->;
-export type GetAdminTemplateFeedbackStatsLazyQueryHookResult = ReturnType<
-  typeof useGetAdminTemplateFeedbackStatsLazyQuery
->;
-export type GetAdminTemplateFeedbackStatsSuspenseQueryHookResult = ReturnType<
-  typeof useGetAdminTemplateFeedbackStatsSuspenseQuery
->;
-export type GetAdminTemplateFeedbackStatsQueryResult = Apollo.QueryResult<
-  GqlGetAdminTemplateFeedbackStatsQuery,
-  GqlGetAdminTemplateFeedbackStatsQueryVariables
+export type GetReportSummariesQueryResult = Apollo.QueryResult<
+  GqlGetReportSummariesQuery,
+  GqlGetReportSummariesQueryVariables
 >;
 export const CommunityCreateDocument = gql`
   mutation CommunityCreate($input: CommunityCreateInput!) {
@@ -14973,207 +14778,406 @@ export type GetReportTemplateStatsBreakdownQueryResult = Apollo.QueryResult<
   GqlGetReportTemplateStatsBreakdownQuery,
   GqlGetReportTemplateStatsBreakdownQueryVariables
 >;
-export const GetSysAdminDashboardDocument = gql`
-  query GetSysAdminDashboard($input: SysAdminDashboardInput) {
-    sysAdminDashboard(input: $input) {
-      asOf
-      platform {
-        ...SysAdminPlatformSummaryFields
+export const GetReportTemplateFeedbacksDocument = gql`
+  query GetReportTemplateFeedbacks(
+    $variant: ReportVariant!
+    $version: Int
+    $kind: ReportTemplateKind
+    $feedbackType: ReportFeedbackType
+    $maxRating: Int
+    $cursor: String
+    $first: Int
+  ) {
+    reportTemplateFeedbacks(
+      variant: $variant
+      version: $version
+      kind: $kind
+      feedbackType: $feedbackType
+      maxRating: $maxRating
+      cursor: $cursor
+      first: $first
+    ) {
+      edges {
+        cursor
+        node {
+          ...ReportFeedbackWithReportFields
+        }
       }
-      communities {
-        ...SysAdminCommunityOverviewRowFields
+      pageInfo {
+        hasNextPage
+        endCursor
       }
+      totalCount
     }
   }
-  ${SysAdminPlatformSummaryFieldsFragmentDoc}
-  ${SysAdminCommunityOverviewRowFieldsFragmentDoc}
+  ${ReportFeedbackWithReportFieldsFragmentDoc}
 `;
 
 /**
- * __useGetSysAdminDashboardQuery__
+ * __useGetReportTemplateFeedbacksQuery__
  *
- * To run a query within a React component, call `useGetSysAdminDashboardQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetSysAdminDashboardQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useGetReportTemplateFeedbacksQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetReportTemplateFeedbacksQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useGetSysAdminDashboardQuery({
+ * const { data, loading, error } = useGetReportTemplateFeedbacksQuery({
  *   variables: {
- *      input: // value for 'input'
+ *      variant: // value for 'variant'
+ *      version: // value for 'version'
+ *      kind: // value for 'kind'
+ *      feedbackType: // value for 'feedbackType'
+ *      maxRating: // value for 'maxRating'
+ *      cursor: // value for 'cursor'
+ *      first: // value for 'first'
  *   },
  * });
  */
-export function useGetSysAdminDashboardQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    GqlGetSysAdminDashboardQuery,
-    GqlGetSysAdminDashboardQueryVariables
-  >,
+export function useGetReportTemplateFeedbacksQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GqlGetReportTemplateFeedbacksQuery,
+    GqlGetReportTemplateFeedbacksQueryVariables
+  > &
+    (
+      | { variables: GqlGetReportTemplateFeedbacksQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    ),
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GqlGetSysAdminDashboardQuery, GqlGetSysAdminDashboardQueryVariables>(
-    GetSysAdminDashboardDocument,
-    options,
-  );
+  return Apollo.useQuery<
+    GqlGetReportTemplateFeedbacksQuery,
+    GqlGetReportTemplateFeedbacksQueryVariables
+  >(GetReportTemplateFeedbacksDocument, options);
 }
-export function useGetSysAdminDashboardLazyQuery(
+export function useGetReportTemplateFeedbacksLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
-    GqlGetSysAdminDashboardQuery,
-    GqlGetSysAdminDashboardQueryVariables
+    GqlGetReportTemplateFeedbacksQuery,
+    GqlGetReportTemplateFeedbacksQueryVariables
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GqlGetSysAdminDashboardQuery, GqlGetSysAdminDashboardQueryVariables>(
-    GetSysAdminDashboardDocument,
-    options,
-  );
+  return Apollo.useLazyQuery<
+    GqlGetReportTemplateFeedbacksQuery,
+    GqlGetReportTemplateFeedbacksQueryVariables
+  >(GetReportTemplateFeedbacksDocument, options);
 }
-export function useGetSysAdminDashboardSuspenseQuery(
+export function useGetReportTemplateFeedbacksSuspenseQuery(
   baseOptions?:
     | Apollo.SkipToken
     | Apollo.SuspenseQueryHookOptions<
-        GqlGetSysAdminDashboardQuery,
-        GqlGetSysAdminDashboardQueryVariables
+        GqlGetReportTemplateFeedbacksQuery,
+        GqlGetReportTemplateFeedbacksQueryVariables
       >,
 ) {
   const options =
     baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
   return Apollo.useSuspenseQuery<
-    GqlGetSysAdminDashboardQuery,
-    GqlGetSysAdminDashboardQueryVariables
-  >(GetSysAdminDashboardDocument, options);
+    GqlGetReportTemplateFeedbacksQuery,
+    GqlGetReportTemplateFeedbacksQueryVariables
+  >(GetReportTemplateFeedbacksDocument, options);
 }
-export type GetSysAdminDashboardQueryHookResult = ReturnType<typeof useGetSysAdminDashboardQuery>;
-export type GetSysAdminDashboardLazyQueryHookResult = ReturnType<
-  typeof useGetSysAdminDashboardLazyQuery
+export type GetReportTemplateFeedbacksQueryHookResult = ReturnType<
+  typeof useGetReportTemplateFeedbacksQuery
 >;
-export type GetSysAdminDashboardSuspenseQueryHookResult = ReturnType<
-  typeof useGetSysAdminDashboardSuspenseQuery
+export type GetReportTemplateFeedbacksLazyQueryHookResult = ReturnType<
+  typeof useGetReportTemplateFeedbacksLazyQuery
 >;
-export type GetSysAdminDashboardQueryResult = Apollo.QueryResult<
-  GqlGetSysAdminDashboardQuery,
-  GqlGetSysAdminDashboardQueryVariables
+export type GetReportTemplateFeedbacksSuspenseQueryHookResult = ReturnType<
+  typeof useGetReportTemplateFeedbacksSuspenseQuery
 >;
-export const GetSysAdminCommunityDetailDocument = gql`
-  query GetSysAdminCommunityDetail($input: SysAdminCommunityDetailInput!) {
-    sysAdminCommunityDetail(input: $input) {
+export type GetReportTemplateFeedbacksQueryResult = Apollo.QueryResult<
+  GqlGetReportTemplateFeedbacksQuery,
+  GqlGetReportTemplateFeedbacksQueryVariables
+>;
+export const GetReportTemplateFeedbackStatsDocument = gql`
+  query GetReportTemplateFeedbackStats(
+    $variant: ReportVariant!
+    $version: Int
+    $kind: ReportTemplateKind
+  ) {
+    reportTemplateFeedbackStats(variant: $variant, version: $version, kind: $kind) {
+      totalCount
+      avgRating
+      ratingDistribution {
+        rating
+        count
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetReportTemplateFeedbackStatsQuery__
+ *
+ * To run a query within a React component, call `useGetReportTemplateFeedbackStatsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetReportTemplateFeedbackStatsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetReportTemplateFeedbackStatsQuery({
+ *   variables: {
+ *      variant: // value for 'variant'
+ *      version: // value for 'version'
+ *      kind: // value for 'kind'
+ *   },
+ * });
+ */
+export function useGetReportTemplateFeedbackStatsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GqlGetReportTemplateFeedbackStatsQuery,
+    GqlGetReportTemplateFeedbackStatsQueryVariables
+  > &
+    (
+      | { variables: GqlGetReportTemplateFeedbackStatsQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GqlGetReportTemplateFeedbackStatsQuery,
+    GqlGetReportTemplateFeedbackStatsQueryVariables
+  >(GetReportTemplateFeedbackStatsDocument, options);
+}
+export function useGetReportTemplateFeedbackStatsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetReportTemplateFeedbackStatsQuery,
+    GqlGetReportTemplateFeedbackStatsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GqlGetReportTemplateFeedbackStatsQuery,
+    GqlGetReportTemplateFeedbackStatsQueryVariables
+  >(GetReportTemplateFeedbackStatsDocument, options);
+}
+export function useGetReportTemplateFeedbackStatsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetReportTemplateFeedbackStatsQuery,
+        GqlGetReportTemplateFeedbackStatsQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GqlGetReportTemplateFeedbackStatsQuery,
+    GqlGetReportTemplateFeedbackStatsQueryVariables
+  >(GetReportTemplateFeedbackStatsDocument, options);
+}
+export type GetReportTemplateFeedbackStatsQueryHookResult = ReturnType<
+  typeof useGetReportTemplateFeedbackStatsQuery
+>;
+export type GetReportTemplateFeedbackStatsLazyQueryHookResult = ReturnType<
+  typeof useGetReportTemplateFeedbackStatsLazyQuery
+>;
+export type GetReportTemplateFeedbackStatsSuspenseQueryHookResult = ReturnType<
+  typeof useGetReportTemplateFeedbackStatsSuspenseQuery
+>;
+export type GetReportTemplateFeedbackStatsQueryResult = Apollo.QueryResult<
+  GqlGetReportTemplateFeedbackStatsQuery,
+  GqlGetReportTemplateFeedbackStatsQueryVariables
+>;
+export const GetAnalyticsDashboardDocument = gql`
+  query GetAnalyticsDashboard($input: AnalyticsDashboardInput) {
+    analyticsDashboard(input: $input) {
+      asOf
+      platform {
+        ...AnalyticsPlatformSummaryFields
+      }
+      communities {
+        ...AnalyticsCommunityOverviewRowFields
+      }
+    }
+  }
+  ${AnalyticsPlatformSummaryFieldsFragmentDoc}
+  ${AnalyticsCommunityOverviewRowFieldsFragmentDoc}
+`;
+
+/**
+ * __useGetAnalyticsDashboardQuery__
+ *
+ * To run a query within a React component, call `useGetAnalyticsDashboardQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAnalyticsDashboardQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAnalyticsDashboardQuery({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useGetAnalyticsDashboardQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GqlGetAnalyticsDashboardQuery,
+    GqlGetAnalyticsDashboardQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GqlGetAnalyticsDashboardQuery, GqlGetAnalyticsDashboardQueryVariables>(
+    GetAnalyticsDashboardDocument,
+    options,
+  );
+}
+export function useGetAnalyticsDashboardLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GqlGetAnalyticsDashboardQuery,
+    GqlGetAnalyticsDashboardQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GqlGetAnalyticsDashboardQuery, GqlGetAnalyticsDashboardQueryVariables>(
+    GetAnalyticsDashboardDocument,
+    options,
+  );
+}
+export function useGetAnalyticsDashboardSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GqlGetAnalyticsDashboardQuery,
+        GqlGetAnalyticsDashboardQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GqlGetAnalyticsDashboardQuery,
+    GqlGetAnalyticsDashboardQueryVariables
+  >(GetAnalyticsDashboardDocument, options);
+}
+export type GetAnalyticsDashboardQueryHookResult = ReturnType<typeof useGetAnalyticsDashboardQuery>;
+export type GetAnalyticsDashboardLazyQueryHookResult = ReturnType<
+  typeof useGetAnalyticsDashboardLazyQuery
+>;
+export type GetAnalyticsDashboardSuspenseQueryHookResult = ReturnType<
+  typeof useGetAnalyticsDashboardSuspenseQuery
+>;
+export type GetAnalyticsDashboardQueryResult = Apollo.QueryResult<
+  GqlGetAnalyticsDashboardQuery,
+  GqlGetAnalyticsDashboardQueryVariables
+>;
+export const GetAnalyticsCommunityDocument = gql`
+  query GetAnalyticsCommunity($input: AnalyticsCommunityInput!) {
+    analyticsCommunity(input: $input) {
       asOf
       communityId
       communityName
       windowMonths
       dormantCount
       alerts {
-        ...SysAdminAlertFields
+        ...AnalyticsAlertFields
       }
       summary {
-        ...SysAdminCommunityDetailSummaryFields
+        ...AnalyticsCommunityDetailSummaryFields
       }
       stages {
-        ...SysAdminStageDistributionFields
+        ...AnalyticsStageDistributionFields
       }
       monthlyActivityTrend {
-        ...SysAdminMonthlyActivityPointFields
+        ...AnalyticsMonthlyActivityPointFields
       }
       retentionTrend {
-        ...SysAdminRetentionTrendPointFields
+        ...AnalyticsRetentionTrendPointFields
       }
       cohortRetention {
-        ...SysAdminCohortRetentionPointFields
+        ...AnalyticsCohortRetentionPointFields
       }
       cohortFunnel {
-        ...SysAdminCohortFunnelPointFields
+        ...AnalyticsCohortFunnelPointFields
       }
       memberList {
         hasNextPage
         nextCursor
         users {
-          ...SysAdminMemberRowFields
+          ...AnalyticsMemberRowFields
         }
       }
     }
   }
-  ${SysAdminAlertFieldsFragmentDoc}
-  ${SysAdminCommunityDetailSummaryFieldsFragmentDoc}
-  ${SysAdminStageDistributionFieldsFragmentDoc}
-  ${SysAdminMonthlyActivityPointFieldsFragmentDoc}
-  ${SysAdminRetentionTrendPointFieldsFragmentDoc}
-  ${SysAdminCohortRetentionPointFieldsFragmentDoc}
-  ${SysAdminCohortFunnelPointFieldsFragmentDoc}
-  ${SysAdminMemberRowFieldsFragmentDoc}
+  ${AnalyticsAlertFieldsFragmentDoc}
+  ${AnalyticsCommunityDetailSummaryFieldsFragmentDoc}
+  ${AnalyticsStageDistributionFieldsFragmentDoc}
+  ${AnalyticsMonthlyActivityPointFieldsFragmentDoc}
+  ${AnalyticsRetentionTrendPointFieldsFragmentDoc}
+  ${AnalyticsCohortRetentionPointFieldsFragmentDoc}
+  ${AnalyticsCohortFunnelPointFieldsFragmentDoc}
+  ${AnalyticsMemberRowFieldsFragmentDoc}
 `;
 
 /**
- * __useGetSysAdminCommunityDetailQuery__
+ * __useGetAnalyticsCommunityQuery__
  *
- * To run a query within a React component, call `useGetSysAdminCommunityDetailQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetSysAdminCommunityDetailQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useGetAnalyticsCommunityQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAnalyticsCommunityQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useGetSysAdminCommunityDetailQuery({
+ * const { data, loading, error } = useGetAnalyticsCommunityQuery({
  *   variables: {
  *      input: // value for 'input'
  *   },
  * });
  */
-export function useGetSysAdminCommunityDetailQuery(
+export function useGetAnalyticsCommunityQuery(
   baseOptions: Apollo.QueryHookOptions<
-    GqlGetSysAdminCommunityDetailQuery,
-    GqlGetSysAdminCommunityDetailQueryVariables
+    GqlGetAnalyticsCommunityQuery,
+    GqlGetAnalyticsCommunityQueryVariables
   > &
-    (
-      | { variables: GqlGetSysAdminCommunityDetailQueryVariables; skip?: boolean }
-      | { skip: boolean }
-    ),
+    ({ variables: GqlGetAnalyticsCommunityQueryVariables; skip?: boolean } | { skip: boolean }),
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    GqlGetSysAdminCommunityDetailQuery,
-    GqlGetSysAdminCommunityDetailQueryVariables
-  >(GetSysAdminCommunityDetailDocument, options);
+  return Apollo.useQuery<GqlGetAnalyticsCommunityQuery, GqlGetAnalyticsCommunityQueryVariables>(
+    GetAnalyticsCommunityDocument,
+    options,
+  );
 }
-export function useGetSysAdminCommunityDetailLazyQuery(
+export function useGetAnalyticsCommunityLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
-    GqlGetSysAdminCommunityDetailQuery,
-    GqlGetSysAdminCommunityDetailQueryVariables
+    GqlGetAnalyticsCommunityQuery,
+    GqlGetAnalyticsCommunityQueryVariables
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    GqlGetSysAdminCommunityDetailQuery,
-    GqlGetSysAdminCommunityDetailQueryVariables
-  >(GetSysAdminCommunityDetailDocument, options);
+  return Apollo.useLazyQuery<GqlGetAnalyticsCommunityQuery, GqlGetAnalyticsCommunityQueryVariables>(
+    GetAnalyticsCommunityDocument,
+    options,
+  );
 }
-export function useGetSysAdminCommunityDetailSuspenseQuery(
+export function useGetAnalyticsCommunitySuspenseQuery(
   baseOptions?:
     | Apollo.SkipToken
     | Apollo.SuspenseQueryHookOptions<
-        GqlGetSysAdminCommunityDetailQuery,
-        GqlGetSysAdminCommunityDetailQueryVariables
+        GqlGetAnalyticsCommunityQuery,
+        GqlGetAnalyticsCommunityQueryVariables
       >,
 ) {
   const options =
     baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions };
   return Apollo.useSuspenseQuery<
-    GqlGetSysAdminCommunityDetailQuery,
-    GqlGetSysAdminCommunityDetailQueryVariables
-  >(GetSysAdminCommunityDetailDocument, options);
+    GqlGetAnalyticsCommunityQuery,
+    GqlGetAnalyticsCommunityQueryVariables
+  >(GetAnalyticsCommunityDocument, options);
 }
-export type GetSysAdminCommunityDetailQueryHookResult = ReturnType<
-  typeof useGetSysAdminCommunityDetailQuery
+export type GetAnalyticsCommunityQueryHookResult = ReturnType<typeof useGetAnalyticsCommunityQuery>;
+export type GetAnalyticsCommunityLazyQueryHookResult = ReturnType<
+  typeof useGetAnalyticsCommunityLazyQuery
 >;
-export type GetSysAdminCommunityDetailLazyQueryHookResult = ReturnType<
-  typeof useGetSysAdminCommunityDetailLazyQuery
+export type GetAnalyticsCommunitySuspenseQueryHookResult = ReturnType<
+  typeof useGetAnalyticsCommunitySuspenseQuery
 >;
-export type GetSysAdminCommunityDetailSuspenseQueryHookResult = ReturnType<
-  typeof useGetSysAdminCommunityDetailSuspenseQuery
->;
-export type GetSysAdminCommunityDetailQueryResult = Apollo.QueryResult<
-  GqlGetSysAdminCommunityDetailQuery,
-  GqlGetSysAdminCommunityDetailQueryVariables
+export type GetAnalyticsCommunityQueryResult = Apollo.QueryResult<
+  GqlGetAnalyticsCommunityQuery,
+  GqlGetAnalyticsCommunityQueryVariables
 >;
 export const GetCurrentUserProfileDocument = gql`
   query GetCurrentUserProfile {

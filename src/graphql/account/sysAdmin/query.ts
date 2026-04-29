@@ -1,77 +1,77 @@
 import { gql } from "@apollo/client";
 import {
-  SYS_ADMIN_ALERT_FRAGMENT,
-  SYS_ADMIN_COHORT_FUNNEL_POINT_FRAGMENT,
-  SYS_ADMIN_COHORT_RETENTION_POINT_FRAGMENT,
-  SYS_ADMIN_COMMUNITY_DETAIL_SUMMARY_FRAGMENT,
-  SYS_ADMIN_COMMUNITY_OVERVIEW_ROW_FRAGMENT,
-  SYS_ADMIN_MEMBER_ROW_FRAGMENT,
-  SYS_ADMIN_MONTHLY_ACTIVITY_POINT_FRAGMENT,
-  SYS_ADMIN_PLATFORM_SUMMARY_FRAGMENT,
-  SYS_ADMIN_RETENTION_TREND_POINT_FRAGMENT,
-  SYS_ADMIN_STAGE_DISTRIBUTION_FRAGMENT,
+  ANALYTICS_ALERT_FRAGMENT,
+  ANALYTICS_COHORT_FUNNEL_POINT_FRAGMENT,
+  ANALYTICS_COHORT_RETENTION_POINT_FRAGMENT,
+  ANALYTICS_COMMUNITY_DETAIL_SUMMARY_FRAGMENT,
+  ANALYTICS_COMMUNITY_OVERVIEW_ROW_FRAGMENT,
+  ANALYTICS_MEMBER_ROW_FRAGMENT,
+  ANALYTICS_MONTHLY_ACTIVITY_POINT_FRAGMENT,
+  ANALYTICS_PLATFORM_SUMMARY_FRAGMENT,
+  ANALYTICS_RETENTION_TREND_POINT_FRAGMENT,
+  ANALYTICS_STAGE_DISTRIBUTION_FRAGMENT,
 } from "./fragment";
 
-export const GET_SYS_ADMIN_DASHBOARD = gql`
-  query GetSysAdminDashboard($input: SysAdminDashboardInput) {
-    sysAdminDashboard(input: $input) {
+export const GET_ANALYTICS_DASHBOARD = gql`
+  query GetAnalyticsDashboard($input: AnalyticsDashboardInput) {
+    analyticsDashboard(input: $input) {
       asOf
       platform {
-        ...SysAdminPlatformSummaryFields
+        ...AnalyticsPlatformSummaryFields
       }
       communities {
-        ...SysAdminCommunityOverviewRowFields
+        ...AnalyticsCommunityOverviewRowFields
       }
     }
   }
-  ${SYS_ADMIN_PLATFORM_SUMMARY_FRAGMENT}
-  ${SYS_ADMIN_COMMUNITY_OVERVIEW_ROW_FRAGMENT}
+  ${ANALYTICS_PLATFORM_SUMMARY_FRAGMENT}
+  ${ANALYTICS_COMMUNITY_OVERVIEW_ROW_FRAGMENT}
 `;
 
-export const GET_SYS_ADMIN_COMMUNITY_DETAIL = gql`
-  query GetSysAdminCommunityDetail($input: SysAdminCommunityDetailInput!) {
-    sysAdminCommunityDetail(input: $input) {
+export const GET_ANALYTICS_COMMUNITY = gql`
+  query GetAnalyticsCommunity($input: AnalyticsCommunityInput!) {
+    analyticsCommunity(input: $input) {
       asOf
       communityId
       communityName
       windowMonths
       dormantCount
       alerts {
-        ...SysAdminAlertFields
+        ...AnalyticsAlertFields
       }
       summary {
-        ...SysAdminCommunityDetailSummaryFields
+        ...AnalyticsCommunityDetailSummaryFields
       }
       stages {
-        ...SysAdminStageDistributionFields
+        ...AnalyticsStageDistributionFields
       }
       monthlyActivityTrend {
-        ...SysAdminMonthlyActivityPointFields
+        ...AnalyticsMonthlyActivityPointFields
       }
       retentionTrend {
-        ...SysAdminRetentionTrendPointFields
+        ...AnalyticsRetentionTrendPointFields
       }
       cohortRetention {
-        ...SysAdminCohortRetentionPointFields
+        ...AnalyticsCohortRetentionPointFields
       }
       cohortFunnel {
-        ...SysAdminCohortFunnelPointFields
+        ...AnalyticsCohortFunnelPointFields
       }
       memberList {
         hasNextPage
         nextCursor
         users {
-          ...SysAdminMemberRowFields
+          ...AnalyticsMemberRowFields
         }
       }
     }
   }
-  ${SYS_ADMIN_ALERT_FRAGMENT}
-  ${SYS_ADMIN_COMMUNITY_DETAIL_SUMMARY_FRAGMENT}
-  ${SYS_ADMIN_STAGE_DISTRIBUTION_FRAGMENT}
-  ${SYS_ADMIN_MONTHLY_ACTIVITY_POINT_FRAGMENT}
-  ${SYS_ADMIN_RETENTION_TREND_POINT_FRAGMENT}
-  ${SYS_ADMIN_COHORT_RETENTION_POINT_FRAGMENT}
-  ${SYS_ADMIN_COHORT_FUNNEL_POINT_FRAGMENT}
-  ${SYS_ADMIN_MEMBER_ROW_FRAGMENT}
+  ${ANALYTICS_ALERT_FRAGMENT}
+  ${ANALYTICS_COMMUNITY_DETAIL_SUMMARY_FRAGMENT}
+  ${ANALYTICS_STAGE_DISTRIBUTION_FRAGMENT}
+  ${ANALYTICS_MONTHLY_ACTIVITY_POINT_FRAGMENT}
+  ${ANALYTICS_RETENTION_TREND_POINT_FRAGMENT}
+  ${ANALYTICS_COHORT_RETENTION_POINT_FRAGMENT}
+  ${ANALYTICS_COHORT_FUNNEL_POINT_FRAGMENT}
+  ${ANALYTICS_MEMBER_ROW_FRAGMENT}
 `;

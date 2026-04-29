@@ -2,10 +2,10 @@
 
 import { useCallback } from "react";
 import { useApolloClient } from "@apollo/client";
-import { GET_ADMIN_BROWSE_REPORTS } from "@/graphql/account/adminReports/query";
+import { GET_REPORTS_ALL } from "@/graphql/account/adminReports/query";
 import type {
-  GqlGetAdminBrowseReportsQuery,
-  GqlGetAdminBrowseReportsQueryVariables,
+  GqlGetReportsAllQuery,
+  GqlGetReportsAllQueryVariables,
 } from "@/types/graphql";
 import { useCursorPagination } from "@/app/sysAdmin/_shared/hooks/useCursorPagination";
 import {
@@ -16,7 +16,7 @@ import {
 const PAGE_SIZE = 20;
 
 type ReportsConnection = NonNullable<
-  GqlGetAdminBrowseReportsQuery["adminBrowseReports"]
+  GqlGetReportsAllQuery["reportsAll"]
 >;
 
 type Props = {
@@ -59,14 +59,14 @@ export function CommunityReportsTabContainer({
   const fetchMoreReports = useCallback(
     async (cursor: string, first: number) => {
       const result = await apollo.query<
-        GqlGetAdminBrowseReportsQuery,
-        GqlGetAdminBrowseReportsQueryVariables
+        GqlGetReportsAllQuery,
+        GqlGetReportsAllQueryVariables
       >({
-        query: GET_ADMIN_BROWSE_REPORTS,
+        query: GET_REPORTS_ALL,
         variables: { communityId, cursor, first },
         fetchPolicy: "network-only",
       });
-      return result.data.adminBrowseReports ?? EMPTY_CONNECTION;
+      return result.data.reportsAll ?? EMPTY_CONNECTION;
     },
     [apollo, communityId],
   );

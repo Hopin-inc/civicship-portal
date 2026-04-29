@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/accordion";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import type {
-  GqlGetAdminTemplateFeedbackStatsQuery,
+  GqlGetReportTemplateFeedbackStatsQuery,
   GqlReportFeedbackWithReportFieldsFragment,
   GqlReportTemplateFieldsFragment,
   GqlReportTemplateStatsBreakdownRowFieldsFragment,
@@ -24,7 +24,7 @@ import { FeedbackList } from "@/app/sysAdmin/_shared/feedback/FeedbackList";
 import { RatingSummary } from "@/app/sysAdmin/_shared/feedback/RatingSummary";
 
 type FeedbackStats =
-  GqlGetAdminTemplateFeedbackStatsQuery["adminTemplateFeedbackStats"];
+  GqlGetReportTemplateFeedbackStatsQuery["reportTemplateFeedbackStats"];
 
 export type GenerationTemplateViewProps = {
   rows: GqlReportTemplateStatsBreakdownRowFieldsFragment[];
@@ -45,7 +45,7 @@ export type GenerationTemplateViewProps = {
   feedbacksLoadingMore?: boolean;
   onLoadMoreFeedbacks?: () => void;
   /**
-   * `adminTemplateFeedbackStats` の SSR 結果。null = 取得失敗 / 未認証。
+   * `reportTemplateFeedbackStats` の SSR 結果。null = 取得失敗 / 未認証。
    * RatingSummary をフィードバック一覧の上に出すために使う。
    */
   feedbackStats: FeedbackStats | null;

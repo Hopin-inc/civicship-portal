@@ -7,7 +7,7 @@ import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { Button } from "@/components/ui/button";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared/ErrorState";
-import type { GqlGetSysAdminDashboardQuery } from "@/types/graphql";
+import type { GqlGetAnalyticsDashboardQuery } from "@/types/graphql";
 import { CommunityRow } from "./features/dashboard/components/CommunityRow";
 import { useDashboardControls } from "./features/dashboard/hooks/useDashboardControls";
 import { useDashboardOverview } from "./features/dashboard/hooks/useDashboardOverview";
@@ -15,7 +15,7 @@ import { sysAdminDashboardJa } from "./_shared/i18n/ja";
 
 type Props = {
   /** SSR で取得した初期データ。null は SSR fetch 失敗 (auth なし等) */
-  initialData: GqlGetSysAdminDashboardQuery["sysAdminDashboard"] | null;
+  initialData: GqlGetAnalyticsDashboardQuery["analyticsDashboard"] | null;
 };
 
 export function SysAdminPageClient({ initialData }: Props) {

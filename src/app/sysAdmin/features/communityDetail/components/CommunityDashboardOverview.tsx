@@ -22,8 +22,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type {
-  GqlGetSysAdminCommunityDetailQuery,
-  GqlSysAdminTenureDistribution,
+  GqlGetAnalyticsCommunityQuery,
+  GqlAnalyticsTenureDistribution,
 } from "@/types/graphql";
 import {
   toCompactJa,
@@ -45,7 +45,7 @@ import {
 import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";
 
 type DetailPayload = NonNullable<
-  GqlGetSysAdminCommunityDetailQuery["sysAdminCommunityDetail"]
+  GqlGetAnalyticsCommunityQuery["analyticsCommunity"]
 >;
 
 type Props = {
@@ -58,7 +58,7 @@ type Props = {
   /** L1 dashboard で取得した community-wide の在籍分布。L2 payload に
    * 直接乗っていないため、page.tsx 側で L1 と並列 fetch して受け渡す。
    * 未指定の場合は memberList の上位寄与者ベースで近似する。 */
-  tenureDistribution?: GqlSysAdminTenureDistribution;
+  tenureDistribution?: GqlAnalyticsTenureDistribution;
   /** subpage CTA を出すか (storybook design preview 専用、production では
    * subpage 未実装なので default false)。 */
   enableSubpageLinks?: boolean;

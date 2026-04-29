@@ -12,10 +12,10 @@ import {
   deriveGrowthRateActivity,
   deriveNewlyActivatedSenders,
 } from "@/app/sysAdmin/_shared/derive";
-import type { GqlSysAdminCommunityOverview } from "@/types/graphql";
+import type { GqlAnalyticsCommunityOverview } from "@/types/graphql";
 
 type Props = {
-  row: GqlSysAdminCommunityOverview;
+  row: GqlAnalyticsCommunityOverview;
   onClick?: (communityId: string) => void;
 };
 
