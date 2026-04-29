@@ -17,6 +17,7 @@ const initialAuthState: AuthState = {
   environment: getInitialEnvironment(),
   isAuthenticating: false,
   isAuthInProgress: false,
+  hasSessionCookie: false,
   lineTokens: {
     idToken: null,
     refreshToken: null,

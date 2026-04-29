@@ -7,7 +7,14 @@ export function applySsrAuthState(
   ssrCurrentUser?: GqlUser | null,
   ssrLineAuthenticated?: boolean,
   ssrPhoneAuthenticated?: boolean,
+  ssrHasSession?: boolean,
 ) {
+  // セッション cookie の有無は他の SSR フラグと独立に store へ反映する。
+  // (HttpOnly のためクライアントから直接読めない)
+  if (typeof ssrHasSession === "boolean") {
+    useAuthStore.getState().setState({ hasSessionCookie: ssrHasSession });
+  }
+
   if (!ssrLineAuthenticated && !ssrPhoneAuthenticated && !ssrCurrentUser) return;
 
   let initialState: AuthenticationState = "loading";
@@ -23,6 +30,7 @@ export function applySsrAuthState(
     ssrCurrentUserId: ssrCurrentUser?.id,
     ssrLineAuthenticated,
     ssrPhoneAuthenticated,
+    ssrHasSession,
   });
 
   useAuthStore.getState().setState({

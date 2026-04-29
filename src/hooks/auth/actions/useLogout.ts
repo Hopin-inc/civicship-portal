@@ -34,6 +34,7 @@ export const useLogout = (liffService: LiffService, phoneAuthService: PhoneAuthS
         firebaseUser: null,
         currentUser: null,
         authenticationState: "unauthenticated",
+        hasSessionCookie: false,
         lineTokens: {
           idToken: null,
           refreshToken: null,

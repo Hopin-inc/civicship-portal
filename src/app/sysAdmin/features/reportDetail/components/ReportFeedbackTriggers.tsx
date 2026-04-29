@@ -72,9 +72,10 @@ export function ReportFeedbackTriggers({
     wasSavingRef.current = saving;
   }, [saving, saveError]);
 
-  const floatPosition = useMemo(() => computeFloatPosition(selection?.rect), [
-    selection?.rect,
-  ]);
+  const floatPosition = useMemo(
+    () => computeFloatPosition(selection?.rect, selection?.lineHeight),
+    [selection?.rect, selection?.lineHeight],
+  );
 
   return (
     <>
@@ -86,14 +87,14 @@ export function ReportFeedbackTriggers({
           <Button
             type="button"
             size="sm"
+            variant="tertiary"
             onMouseDown={(e) => {
               // mousedown 時点で選択が消えないよう preventDefault。
               e.preventDefault();
             }}
             onClick={() => openWithQuote(selection.text)}
-            className="pointer-events-auto h-8 gap-1.5 px-2.5 text-body-xs shadow-lg"
+            className="pointer-events-auto h-8 px-2.5 text-body-xs shadow-lg"
           >
-            <MessageSquarePlus className="h-3.5 w-3.5" aria-hidden />
             この箇所にレビュー
           </Button>
         </div>
@@ -155,14 +156,18 @@ function buildQuotePrefix(text: string): string {
 /**
  * 選択範囲の真上にフロートボタンを置く。viewport 上端に近すぎる場合は下に回す。
  * `position: fixed` で配置するため `getBoundingClientRect` の値をそのまま使う。
+ *
+ * gap は選択中テキストの line-height に比例させる。固定値だと見出し等の
+ * 大きいフォントを選択したときにボタンが本文に近づきすぎて窮屈になる。
  */
-function computeFloatPosition(rect: DOMRect | undefined): {
-  top: number;
-  left: number;
-} | null {
+function computeFloatPosition(
+  rect: DOMRect | undefined,
+  lineHeight: number | undefined,
+): { top: number; left: number } | null {
   if (!rect) return null;
   const buttonHeight = 36;
-  const gap = 8;
+  const baseLineHeight = lineHeight && lineHeight > 0 ? lineHeight : 19.2;
+  const gap = Math.round(Math.min(24, Math.max(8, baseLineHeight * 0.5)));
   const minTopMargin = 56; // header の被り回避
   const placeAbove = rect.top - buttonHeight - gap >= minTopMargin;
   const top = placeAbove

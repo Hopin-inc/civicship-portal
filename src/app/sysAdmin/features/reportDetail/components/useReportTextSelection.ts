@@ -5,6 +5,8 @@ import { useEffect, useState, type RefObject } from "react";
 export type ReportSelection = {
   text: string;
   rect: DOMRect;
+  /** 選択開始位置の行の高さ (px)。フロート UI の縦位置をフォントサイズに追従させるために使う。 */
+  lineHeight: number;
 };
 
 /**
@@ -50,7 +52,8 @@ export function useReportTextSelection(
       if (text.trim() === "") return null;
       const rect = range.getBoundingClientRect();
       if (rect.width === 0 && rect.height === 0) return null;
-      return { text: text.trim(), rect };
+      const lineHeight = readLineHeight(anchor);
+      return { text: text.trim(), rect, lineHeight };
     };
 
     const schedule = () => {
@@ -79,4 +82,23 @@ export function useReportTextSelection(
   }, [containerRef, enabled]);
 
   return selection;
+}
+
+/**
+ * 選択開始ノードに最も近い Element の computed line-height を取得。
+ * `normal` の場合は font-size の 1.2 倍、それも不明なら 16px の 1.2 倍にフォールバック。
+ */
+function readLineHeight(node: Node): number {
+  const el =
+    node.nodeType === Node.ELEMENT_NODE
+      ? (node as Element)
+      : node.parentElement;
+  const fallback = 19.2;
+  if (!el || typeof window === "undefined") return fallback;
+  const style = window.getComputedStyle(el);
+  const lh = parseFloat(style.lineHeight);
+  if (!Number.isNaN(lh) && lh > 0) return lh;
+  const fs = parseFloat(style.fontSize);
+  if (!Number.isNaN(fs) && fs > 0) return fs * 1.2;
+  return fallback;
 }
