@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import type {
   GqlGetAdminReportQuery,
   GqlReportFeedbackFieldsFragment,
@@ -7,10 +8,8 @@ import type {
 import { FeedbackList } from "@/app/sysAdmin/_shared/feedback/FeedbackList";
 import { ReportDetailHeader } from "./ReportDetailHeader";
 import { ReportContentSection } from "./ReportContentSection";
-import {
-  ReportFeedbackForm,
-  type FeedbackFormInput,
-} from "./ReportFeedbackForm";
+import { ReportFeedbackTriggers } from "./ReportFeedbackTriggers";
+import type { FeedbackFormInput } from "./ReportFeedbackForm";
 
 type Report = NonNullable<GqlGetAdminReportQuery["report"]>;
 
@@ -27,8 +26,10 @@ export type ReportDetailViewProps = {
 /**
  * Report detail page の presentational layout。
  *
- * Header (期間・variant・status・テンプレリンク) → 本文 →
- * 既存フィードバック一覧 → 投稿フォーム の縦並び。
+ * Header (期間・variant・status・テンプレリンク) → 本文 → 既存フィードバック一覧
+ * の縦並び。フィードバック投稿はモーダルで行うため、本文中のハイライト時に
+ * 出るフロートボタンと、画面右下の FAB の 2 系統の起動口を `ReportFeedbackTriggers`
+ * が提供する。
  *
  * `feedbacks` は SSR で別 query (Armor の cost 制限回避) で取得し、
  * ここでは生の配列として受け取る。pagination は今のところ未対応
@@ -43,6 +44,8 @@ export function ReportDetailView({
   saveError,
   onSubmitFeedback,
 }: ReportDetailViewProps) {
+  const contentRef = useRef<HTMLDivElement>(null);
+
   return (
     <div className="space-y-6">
       <ReportDetailHeader
@@ -52,9 +55,12 @@ export function ReportDetailView({
         periodTo={report.periodTo}
         templateVersion={report.template?.version ?? null}
       />
-      <ReportContentSection body={body} skipReason={report.skipReason} />
+      <div ref={contentRef}>
+        <ReportContentSection body={body} skipReason={report.skipReason} />
+      </div>
       <FeedbackList feedbacks={feedbacks} totalCount={feedbacksTotalCount} />
-      <ReportFeedbackForm
+      <ReportFeedbackTriggers
+        contentRef={contentRef}
         existingFeedback={report.myFeedback ?? null}
         saving={saving}
         saveError={saveError}
