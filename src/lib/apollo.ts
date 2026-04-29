@@ -30,22 +30,22 @@ const requestLink = setContext(async (operation, prevContext) => {
   let firebaseUserTenantId: string | null = null;
 
   if (isBrowser) {
-    const { firebaseUser, authenticationState } = useAuthStore.getState().state;
+    const { firebaseUser, authenticationState, lineTokens, hasSessionCookie } =
+      useAuthStore.getState().state;
 
     // Mutation の場合は認証を厳格にチェック
     const isMutation = operation.query.definitions.some(
       (def) => def.kind === "OperationDefinition" && def.operation === "mutation",
     );
 
-    const { lineTokens } = useAuthStore.getState().state;
-
     if (isMutation) {
       if (authenticationState === "loading") {
         throw new Error("認証情報を読み込み中です。少し待ってから再度お試しください");
       }
 
-      // firebaseUser または lineTokens.idToken（exchange 経由）のいずれかが必要
-      if (!firebaseUser && !lineTokens.idToken) {
+      // firebaseUser / lineTokens.idToken / SSR で発行された session cookie のいずれかが必要。
+      // session cookie は HttpOnly のため SSR から store に流したフラグで判定する。
+      if (!firebaseUser && !lineTokens.idToken && !hasSessionCookie) {
         throw new Error("認証情報が取得できませんでした。ページをリロードしてください");
       }
     }
@@ -58,7 +58,7 @@ const requestLink = setContext(async (operation, prevContext) => {
         firebaseUserTenantId = firebaseUser.tenantId ?? null;
       } catch (error) {
         logger.warn("Failed to get ID token", { error });
-        if (isMutation) {
+        if (isMutation && !hasSessionCookie) {
           throw new Error("認証トークンの取得に失敗しました");
         }
       }
@@ -66,6 +66,12 @@ const requestLink = setContext(async (operation, prevContext) => {
       // Server-side exchange 経由: firebaseUser なし → exchange で取得した idToken を直接使用
       token = lineTokens.idToken;
       authSource = "lineTokens";
+    }
+
+    // Bearer トークンが取れず session cookie だけが頼りの場合は cookie 認証として送る。
+    // (createUploadLink の credentials: "include" で cookie が自動送信される)
+    if (!token && hasSessionCookie) {
+      authMode = "session";
     }
   }
 

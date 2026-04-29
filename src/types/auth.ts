@@ -20,6 +20,7 @@ export type AuthState = {
   environment: AuthEnvironment;
   isAuthenticating: boolean;
   isAuthInProgress: boolean;
+  hasSessionCookie: boolean;
   lineTokens: {
     idToken: string | null;
     refreshToken: string | null;
@@ -85,4 +86,5 @@ export interface AuthProviderProps {
   ssrCurrentUser?: GqlUser | undefined | null;
   ssrLineAuthenticated?: boolean;
   ssrPhoneAuthenticated?: boolean;
+  ssrHasSession?: boolean;
 }
