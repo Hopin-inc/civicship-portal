@@ -3,23 +3,9 @@
 import { useTranslations } from "next-intl";
 import { ShieldX } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { GqlRole } from "@/types/graphql";
 import { REASON_I18N_MAP } from "../constants/ineligibleReason";
+import { translateRole } from "../utils/translateRole";
 import type { VoteGateInfo } from "../types/VoteCastViewModel";
-
-type Translator = ReturnType<typeof useTranslations>;
-
-function translateRole(role: string, t: Translator): string {
-  switch (role) {
-    case GqlRole.Owner:
-      return t("adminVotes.form.gate.requiredRole.OWNER");
-    case GqlRole.Manager:
-      return t("adminVotes.form.gate.requiredRole.MANAGER");
-    case GqlRole.Member:
-    default:
-      return t("adminVotes.form.gate.requiredRole.MEMBER");
-  }
-}
 
 interface VoteEligibilityNoticeProps {
   reason: string | null;
