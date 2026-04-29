@@ -33,7 +33,7 @@ const components: Components = {
   h2: ({ className, ...props }) => (
     <h2
       className={cn(
-        "mt-6 mb-3 scroll-m-20 border-b border-border pb-1 text-xl font-bold tracking-tight first:mt-0",
+        "mt-6 mb-3 scroll-m-20 text-xl font-bold tracking-tight first:mt-0",
         className,
       )}
       {...props}

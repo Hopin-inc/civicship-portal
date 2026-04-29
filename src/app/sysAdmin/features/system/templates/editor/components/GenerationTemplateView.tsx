@@ -11,7 +11,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { MetadataChips } from "@/app/sysAdmin/_shared/components/MetadataChips";
 import type {
   GqlGetAdminTemplateFeedbackStatsQuery,
   GqlReportFeedbackWithReportFieldsFragment,
@@ -199,19 +198,43 @@ function InlineHeader({
       : null;
   const hasWarning = activeRows.some((r) => r.correlationWarning);
 
+  const items: Array<{ label: string; emphasis?: boolean } | null> = [
+    template ? { label: `v${template.version}`, emphasis: true } : null,
+    template?.experimentKey
+      ? { label: `ブランチ: ${template.experimentKey}` }
+      : null,
+    template ? { label: `配信比率 ${template.trafficWeight}%` } : null,
+    {
+      label: `評価 ${avgRating != null ? avgRating.toFixed(2) : "—"} (${totalFeedback})`,
+    },
+    {
+      label: `LLM-人間 一致度 ${avgCorrelation != null ? avgCorrelation.toFixed(2) : "—"}`,
+    },
+  ];
+  const visible = items.filter(
+    (i): i is { label: string; emphasis?: boolean } => i != null,
+  );
+
   return (
     <div className="space-y-2">
-      <MetadataChips
-        items={[
-          template && { label: `v${template.version}`, emphasis: true },
-          template?.experimentKey
-            ? `ブランチ: ${template.experimentKey}`
-            : null,
-          template && `配信比率 ${template.trafficWeight}%`,
-          `評価 ${avgRating != null ? avgRating.toFixed(2) : "—"} (${totalFeedback})`,
-          `LLM-人間 一致度 ${avgCorrelation != null ? avgCorrelation.toFixed(2) : "—"}`,
-        ]}
-      />
+      <p className="text-body-xs text-muted-foreground">
+        {visible.map((item, i) => (
+          <span key={i}>
+            {i > 0 && (
+              <span aria-hidden className="mx-1.5">
+                ・
+              </span>
+            )}
+            <span
+              className={
+                item.emphasis ? "font-semibold text-foreground" : "tabular-nums"
+              }
+            >
+              {item.label}
+            </span>
+          </span>
+        ))}
+      </p>
       {hasWarning && (
         <Alert variant="destructive" className="py-2">
           <AlertTriangle className="h-4 w-4" />

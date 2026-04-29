@@ -13,6 +13,9 @@ type Props = {
 /**
  * Report 本文の表示。markdown は client 側で `react-markdown` がパースし、
  * shadcn ベースのコンポーネントへマッピングして描画する。
+ *
+ * markdown コピーボタンは header 側 (ReportDetailHeader) に併設しているので、
+ * ここでは本文だけを描画する。
  */
 export function ReportContentSection({ body, skipReason }: Props) {
   if (skipReason) {

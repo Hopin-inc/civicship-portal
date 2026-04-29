@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -47,45 +47,61 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 type Props = {
-  /** 過去に投稿済みの feedback (= myFeedback)。あれば「投稿済み」として下に表示する。 */
+  /** 過去に投稿済みの feedback (= myFeedback)。あれば「投稿済み」として上に表示する。 */
   existingFeedback?: GqlReportFeedbackFieldsFragment | null;
+  /** comment 欄の初期値。ハイライト経由起動時の引用 prefix を流し込むのに使う。 */
+  prefillComment?: string;
   saving: boolean;
   saveError: { message: string } | null;
   onSubmit: (input: FeedbackFormInput) => void;
+  /** submit ボタンの右に並べる追加 action (modal の Cancel など)。 */
+  trailing?: React.ReactNode;
 };
 
 /**
- * sysAdmin 代行投稿用 feedback フォーム。
+ * sysAdmin 代行投稿用 feedback フォーム本体。
  *
- * `submitReportFeedback` の input そのまま (rating + comment + feedbackType)
- * を扱う。送信は container 側で mutation + cache 更新を行うので、本コンポーネント
- * は入力 UI と onSubmit 通知だけに責務を絞る。
- *
- * 入力部品はすべて shadcn / radix primitives:
- *   - Form (react-hook-form + zod)
- *   - ToggleGroup type="single" (rating の星選択 / feedbackType の chip 選択)
- *   - Textarea (comment)
+ * 自身は section / 見出しを持たず、modal でも inline でも貼り込めるよう
+ * 入力フィールドと送信ボタンだけを描画する。`prefillComment` が変わったら
+ * (例: 別箇所をハイライトしてモーダルを開き直したとき) form を reset する。
  */
 export function ReportFeedbackForm({
   existingFeedback,
+  prefillComment,
   saving,
   saveError,
   onSubmit,
+  trailing,
 }: Props) {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       rating: 0,
       feedbackType: null,
-      comment: "",
+      comment: prefillComment ?? "",
     },
   });
+
+  // prefillComment の差し替えに追従する。ユーザーが入力中の場合は上書きしないよう、
+  // 「空 もしくは 直前の prefill のまま (= dirty じゃない)」のときだけ書き換える。
+  const prevPrefill = useRef(prefillComment ?? "");
+  useEffect(() => {
+    const next = prefillComment ?? "";
+    if (next === prevPrefill.current) return;
+    const currentComment = form.getValues("comment") ?? "";
+    const oldPrefill = prevPrefill.current;
+    prevPrefill.current = next;
+    if (currentComment === "" || currentComment === oldPrefill) {
+      form.setValue("comment", next, { shouldDirty: false });
+    }
+  }, [prefillComment, form]);
 
   // 投稿成功で saving が false に戻ったタイミングで form をリセットする。
   // saveError がある場合は入力を残してもう一度送れるようにしておく。
   useEffect(() => {
     if (!saving && form.formState.isSubmitSuccessful && !saveError) {
       form.reset({ rating: 0, feedbackType: null, comment: "" });
+      prevPrefill.current = "";
     }
   }, [saving, saveError, form]);
 
@@ -101,9 +117,7 @@ export function ReportFeedbackForm({
   };
 
   return (
-    <section className="space-y-3 rounded border border-border p-4">
-      <h3 className="text-body-sm font-semibold">フィードバックを投稿</h3>
-
+    <div className="space-y-3">
       {existingFeedback && (
         <p className="text-body-xs text-muted-foreground">
           自分の最新投稿: {existingFeedback.rating} / 5
@@ -197,7 +211,7 @@ export function ReportFeedbackForm({
                   <Textarea
                     {...field}
                     value={field.value ?? ""}
-                    rows={4}
+                    rows={5}
                     className="text-body-sm"
                   />
                 </FormControl>
@@ -209,13 +223,14 @@ export function ReportFeedbackForm({
             <p className="text-body-xs text-destructive">{saveError.message}</p>
           )}
 
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-2">
+            {trailing}
             <Button type="submit" size="sm" disabled={saving}>
               {saving ? "送信中..." : "送信"}
             </Button>
           </div>
         </form>
       </Form>
-    </section>
+    </div>
   );
 }
