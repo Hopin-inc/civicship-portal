@@ -6501,7 +6501,7 @@ export type GqlGetCommunitiesQuery = {
     totalCount: number;
     edges?: Array<{
       __typename?: "CommunityEdge";
-      node?: { __typename?: "Community"; id: string; name?: string | null } | null;
+      node?: { __typename?: "Community"; id: string; name?: string | null; image?: string | null } | null;
     }> | null;
   };
 };
@@ -12673,6 +12673,7 @@ export const GetCommunitiesDocument = gql`
         node {
           id
           name
+          image
         }
       }
       totalCount

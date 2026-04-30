@@ -4,43 +4,56 @@ import { presentUserProfile, useUserProfileContext } from "@/app/community/[comm
 import { UserProfileView } from "@/app/community/[communityId]/users/features/profile";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
-import { GqlMembership, GqlRole } from "@/types/graphql";
+import { GqlMembership, GqlRole, useGetCommunitiesQuery } from "@/types/graphql";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useMemo } from "react";
-import { AppLink } from "@/lib/navigation";
-import { Button } from "@/components/ui/button";
-import { useTranslations } from "next-intl";
-import { ArrowLeftRight } from "lucide-react";
+import { CommunitySwitcher } from "@/app/community/[communityId]/users/features/profile";
 
 export default function MyProfilePage() {
   const { gqlUser, isOwner, portfolios } = useUserProfileContext();
   const { user: currentUser } = useAuth();
   const communityConfig = useCommunityConfig();
   const communityId = communityConfig?.communityId;
-  const t = useTranslations();
 
-  // 管理者権限チェック
+  const memberships = useMemo(() => currentUser?.memberships ?? [], [currentUser?.memberships]);
+  const joinedCommunityIds = useMemo(
+    () => new Set(memberships.map((m: GqlMembership) => m.community?.id).filter((id): id is string => !!id)),
+    [memberships],
+  );
+
+  // 管理者権限チェック（現在のコミュニティ）
   const hasAdminRole = useMemo(() => {
-    if (!currentUser?.memberships) return false;
-    const membership = currentUser.memberships.find(
+    const membership = memberships.find(
       (m: GqlMembership) => m.community?.id === communityId,
     );
     return membership?.role === GqlRole.Owner || membership?.role === GqlRole.Manager;
-  }, [currentUser, communityId]);
+  }, [memberships, communityId]);
 
-  // ヘッダー設定
+  const showSwitcher = joinedCommunityIds.size > 1 || hasAdminRole;
+
+  const { data: communitiesData, loading: communitiesLoading } = useGetCommunitiesQuery({
+    skip: !showSwitcher,
+  });
+  const joinedCommunities = useMemo(() => {
+    const communities =
+      communitiesData?.communities?.edges?.flatMap((e) => (e?.node ? [e.node] : [])) ?? [];
+    return communities
+      .filter((c) => joinedCommunityIds.has(c.id))
+      .sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
+  }, [communitiesData, joinedCommunityIds]);
+
   const headerConfig = useMemo(
     () => ({
-      action: hasAdminRole ? (
-        <AppLink href="/admin">
-          <Button variant="tertiary" size="sm">
-            {t("users.profileHeader.adminButton")}
-            <ArrowLeftRight className="w-4 h-4 ml-1" />
-          </Button>
-        </AppLink>
+      action: showSwitcher ? (
+        <CommunitySwitcher
+          communities={joinedCommunities}
+          currentCommunityId={communityId}
+          hasAdminRole={hasAdminRole}
+          loading={communitiesLoading}
+        />
       ) : undefined,
     }),
-    [hasAdminRole, t],
+    [showSwitcher, joinedCommunities, communityId, hasAdminRole, communitiesLoading],
   );
 
   useHeaderConfig(headerConfig);

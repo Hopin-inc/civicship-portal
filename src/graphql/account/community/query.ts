@@ -7,6 +7,7 @@ export const GET_COMMUNITIES = gql`
         node {
           id
           name
+          image
         }
       }
       totalCount
