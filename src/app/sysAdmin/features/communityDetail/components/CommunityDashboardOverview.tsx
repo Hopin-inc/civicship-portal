@@ -39,8 +39,28 @@ import {
   deriveTenuredRatio,
 } from "@/app/sysAdmin/_shared/components/TenureBar";
 import {
-  TENURE_THRESHOLD_DAYS,
+  computeParetoTopShare,
+  countContinuingSenders,
+  D30_COHORT_WINDOW,
+  deriveAvgMonthlyPerMember,
+  deriveAvgMonthlyThroughput,
+  deriveAvgRecipients,
+  deriveCohortM1Delta,
+  deriveCommunityAgeMonths,
+  deriveD30ActivationRate,
+  deriveDonationMoM,
   deriveDormantRate,
+  deriveHubUserPct,
+  deriveNewMemberRate,
+  deriveRecipientToSenderRate,
+  deriveRecoveryRate,
+  deriveRecoverySeries,
+  deriveSentCount,
+  deriveTenuredRatioFromMemberList,
+  deriveWeeklyContinuationRate,
+  deriveWeeklyContinuationSeries,
+  isCohortM1Alert,
+  isRegularOverHabitual,
 } from "@/app/sysAdmin/_shared/derive";
 import { sysAdminDashboardJa } from "@/app/sysAdmin/_shared/i18n/ja";
 
@@ -145,138 +165,62 @@ export function CommunityDashboardOverview({
   const latentCount = stages.latent.count;
 
   const hubProvided = hubMemberCount !== undefined;
-  const hubPct = hubProvided && totalMembers > 0 ? hubMemberCount / totalMembers : 0;
+  // totalMembers 0 のとき null。他の rate 派生 (`deriveDormantRate` 等) と
+  // 揃え、backend `computeActiveRate` の null 規約とも整合。
+  const hubPct = hubProvided
+    ? deriveHubUserPct({ hubMemberCount, totalMembers })
+    : null;
 
   const activeMembers = data.memberList.users.filter((u) => u.userSendRate > 0);
-  const avgRecipients =
-    activeMembers.length > 0
-      ? activeMembers.reduce((acc, u) => acc + u.uniqueDonationRecipients, 0) /
-        activeMembers.length
-      : 0;
+  const avgRecipients = deriveAvgRecipients(activeMembers);
 
-  // 受領→送付 転換率 (互酬到達率): 受領経験者のうち送付経験もある人の比率。
-  // ギフトエコノミーが配給型 (一方通行) か相互参加型かの本質指標。
-  //
-  // memberList は totalPointsOut DESC で並ぶため、limit に達していると
-  // 「受領のみで送付なし (totalPointsOut == 0)」のメンバーが末尾で切り捨て
-  // られ、分母 (受領経験者) が過小評価されて転換率が実態より高く出る。
-  // hasNextPage が立っているときは undersampled なので null を返し、UI 側で
-  // 全件取得 (cursor pagination) を実装するか server-side 集計 (Option B) を
-  // backend に追加するまで値を出さない。
   const memberSampleComplete = !data.memberList.hasNextPage;
-  const recipientsAll = memberSampleComplete
-    ? data.memberList.users.filter((u) => u.totalPointsIn > 0)
-    : [];
-  const recipientSenders = recipientsAll.filter((u) => u.totalPointsOut > 0);
-  const recipientToSenderRate =
-    memberSampleComplete && recipientsAll.length > 0
-      ? recipientSenders.length / recipientsAll.length
-      : null;
+  const recipientToSenderRate = deriveRecipientToSenderRate(
+    data.memberList.users,
+    data.memberList.hasNextPage,
+  );
   // 「3 ヶ月以上 在籍率」は community 全体の tenureDistribution から計算する
   // のが正。L1 dashboard 経由で受け取った distribution があればそれを使い、
-  // 無ければ memberList (totalPointsOut DESC top N) で近似する暫定 fallback。
-  // fallback は donor 偏重で長期在籍に偏るので「上位寄与者ベース」と注記。
+  // 無ければ memberList (totalPointsOut DESC top N) ベースの暫定 fallback。
   const tenuredRatio: number | null = tenureDistribution
     ? deriveTenuredRatio(tenureDistribution)
-    : data.memberList.users.length > 0
-      ? data.memberList.users.filter((u) => u.daysIn >= TENURE_THRESHOLD_DAYS)
-          .length / data.memberList.users.length
-      : null;
+    : deriveTenuredRatioFromMemberList(data.memberList.users);
   const tenuredFromCommunity = tenureDistribution != null;
 
   const latestMonth =
     data.monthlyActivityTrend[data.monthlyActivityTrend.length - 1];
-
-  // 流通量 MoM
   const prevMonth =
     data.monthlyActivityTrend[data.monthlyActivityTrend.length - 2];
-  const donationMoM =
-    latestMonth && prevMonth && prevMonth.donationPointsSum > 0
-      ? (latestMonth.donationPointsSum - prevMonth.donationPointsSum) /
-        prevMonth.donationPointsSum
-      : null;
 
-  // codegen の scalar mapping は `Datetime: Date` だが Apollo に scalar
-  // deserializer は無く、SSR / network から JSON で来るのは ISO 文字列。
-  // 直接 `.getTime()` を呼ぶと runtime で TypeError なので必ず Date でラップ。
-  const ageMonths =
-    summary.dataFrom && summary.dataTo
-      ? Math.round(
-          (new Date(summary.dataTo).getTime() -
-            new Date(summary.dataFrom).getTime()) /
-            (1000 * 60 * 60 * 24 * 30),
-        )
-      : null;
-
-  // 平均月次流通 = 累計 / コミュニティ稼働月数。monthlyActivityTrend.length
-  // は windowMonths (default 3) で頭打ちなので、それを分母にすると長く稼働
-  // している community ほど見かけ上膨れる (24 ヶ月稼働なら 8 倍)。
-  // dataFrom→dataTo から導いた ageMonths を必ず使う。
-  const avgMonthlyThroughput =
-    summary.totalDonationPointsAllTime > 0 && ageMonths != null && ageMonths > 0
-      ? summary.totalDonationPointsAllTime / ageMonths
-      : null;
-
-  // 流通量集中度 (Pareto)
+  const donationMoM = deriveDonationMoM(data.monthlyActivityTrend);
+  const ageMonths = deriveCommunityAgeMonths(summary.dataFrom, summary.dataTo);
+  const avgMonthlyThroughput = deriveAvgMonthlyThroughput(
+    summary.totalDonationPointsAllTime,
+    ageMonths,
+  );
   const paretoTopShare = computeParetoTopShare(activeMembers, 0.8);
 
-  // 週次送付継続率: retentionTrend の最新週から
   const latestWeek = data.retentionTrend[data.retentionTrend.length - 1];
-  const weeklyContinuationRate =
-    latestWeek && latestWeek.retainedSenders + latestWeek.churnedSenders > 0
-      ? latestWeek.retainedSenders /
-        (latestWeek.retainedSenders + latestWeek.churnedSenders)
-      : null;
+  const weeklyContinuationRate = deriveWeeklyContinuationRate(latestWeek);
 
   const cohortLatest = data.cohortRetention[data.cohortRetention.length - 1];
   const cohortPrev = data.cohortRetention[data.cohortRetention.length - 2];
-  const cohortDelta =
-    cohortLatest?.retentionM1 != null && cohortPrev?.retentionM1 != null
-      ? cohortLatest.retentionM1 - cohortPrev.retentionM1
-      : null;
-  const cohortAlert = cohortDelta != null && cohortDelta <= -0.05;
+  const cohortDelta = deriveCohortM1Delta(cohortLatest, cohortPrev);
+  const cohortAlert = isCohortM1Alert(cohortDelta);
 
-  // 新規定着率 (D30 相当): cohortRetention.retentionM1 = 「entry month の翌月に
-  // DONATION out した cohort の比率」。最新コホートは m+1 が未完了で null に
-  // なりがちなので、retentionM1 != null の直近 N コホートの平均を取る。
-  // 「新規が ~30-60 日以内に送付した率」のシグナル。
-  const D30_COHORT_WINDOW = 3;
-  const completedCohorts = data.cohortRetention.filter(
-    (c) => c.retentionM1 != null,
-  );
-  const recentCompletedCohorts = completedCohorts.slice(-D30_COHORT_WINDOW);
-  const d30ActivationRate =
-    recentCompletedCohorts.length > 0
-      ? recentCompletedCohorts.reduce((acc, c) => acc + (c.retentionM1 ?? 0), 0) /
-        recentCompletedCohorts.length
-      : null;
+  const { rate: d30ActivationRate, cohortCount: d30CohortCount } =
+    deriveD30ActivationRate(data.cohortRetention, D30_COHORT_WINDOW);
 
-  const habitualOverRegular = habitualCount > 0 && regularCount > habitualCount;
+  const habitualOverRegular = isRegularOverHabitual(habitualCount, regularCount);
 
-  // 新規率 (最新月): newMemberCount は L2 detail の monthlyActivityTrend
-  // 最新点 (calendar-month) から渡ってくるので 28 日 rolling 窓ではない。
-  const newRate =
-    totalMembers > 0 && newMemberCount != null
-      ? newMemberCount / totalMembers
-      : null;
+  const newRate = deriveNewMemberRate(newMemberCount, totalMembers);
 
   const dormantRate = deriveDormantRate({
     totalMembers: summary.totalMembers,
     dormantCount: data.dormantCount,
   });
 
-  // 復帰率 (月次): 「先月末時点で休眠だった人のうち、今月送付した人の比率」。
-  // 分子は今月点の returnedMembers、分母は前月点の dormantCount。
-  // 直前月が無い (series 最初) / returnedMembers が null / 前月 dormantCount が
-  // 0 のいずれかで null。
-  const prevMonthForRecovery =
-    data.monthlyActivityTrend[data.monthlyActivityTrend.length - 2];
-  const recoveryRate =
-    latestMonth?.returnedMembers != null &&
-    prevMonthForRecovery != null &&
-    prevMonthForRecovery.dormantCount > 0
-      ? latestMonth.returnedMembers / prevMonthForRecovery.dormantCount
-      : null;
+  const recoveryRate = deriveRecoveryRate(latestMonth, prevMonth);
 
   // 12 期間 footer chart 用の time-series。各カードの動的シグナルを統一表示
   // するために `HistoryBars` (棒グラフ) に流す。null は backend が「この月は
@@ -290,22 +234,11 @@ export function CommunityDashboardOverview({
   const dormantSeries = data.monthlyActivityTrend.map((m) => m.dormantCount);
   const hubSeries = data.monthlyActivityTrend.map((m) => m.hubMemberCount);
 
-  // 復帰率 月次推移: returnedMembers[N] / dormantCount[N-1]。先月データなし or
-  // 分母 0 のセルは null (gap 表示) に倒す。
-  const recoverySeries = data.monthlyActivityTrend.map((m, i, arr) => {
-    if (i === 0) return null;
-    const prev = arr[i - 1];
-    if (m.returnedMembers == null || prev.dormantCount === 0) return null;
-    return m.returnedMembers / prev.dormantCount;
-  });
-
-  // 週次送付継続率 series: 直近 12 週の retainedSenders / (retained + churned)。
-  const weeklyContinuationSeries = data.retentionTrend
-    .slice(-12)
-    .map((w) => {
-      const total = w.retainedSenders + w.churnedSenders;
-      return total > 0 ? w.retainedSenders / total : null;
-    });
+  const recoverySeries = deriveRecoverySeries(data.monthlyActivityTrend);
+  const weeklyContinuationSeries = deriveWeeklyContinuationSeries(
+    data.retentionTrend,
+    12,
+  );
 
   // D30 series: 直近 6 cohort の retentionM1。最新 cohort は M+1 未完了で null
   // の可能性が高いが、null は HistoryBars 側で gap 表示するので問題なし。
@@ -324,12 +257,12 @@ export function CommunityDashboardOverview({
   const funnelStages = [
     {
       label: "送付",
-      count: Math.max(0, totalMembers - stages.latent.count),
+      count: deriveSentCount(totalMembers, latentCount),
       sampleDependent: false,
     },
     {
       label: "継続",
-      count: data.memberList.users.filter((u) => u.donationOutMonths >= 2).length,
+      count: countContinuingSenders(data.memberList.users),
       sampleDependent: true,
     },
     {
@@ -366,11 +299,10 @@ export function CommunityDashboardOverview({
           <CommunityBand
             ageMonths={ageMonths}
             avgMonthlyThroughput={avgMonthlyThroughput}
-            avgMonthlyPerMember={
-              avgMonthlyThroughput != null && totalMembers > 0
-                ? avgMonthlyThroughput / totalMembers
-                : null
-            }
+            avgMonthlyPerMember={deriveAvgMonthlyPerMember(
+              avgMonthlyThroughput,
+              totalMembers,
+            )}
           />
         </header>
       )}
@@ -408,9 +340,13 @@ export function CommunityDashboardOverview({
             meta="今月"
             infoMetricKey="hubUserPct"
             status={hubProvided ? "ok" : "todo"}
-            hero={hubProvided ? <Hero value={toPct(hubPct)} /> : undefined}
-            viz={
+            hero={
               hubProvided ? (
+                <Hero value={hubPct != null ? toPct(hubPct) : "-"} />
+              ) : undefined
+            }
+            viz={
+              hubPct != null ? (
                 <Ring value={hubPct} colorClass={SCOPE_COLOR.network} />
               ) : undefined
             }
@@ -642,8 +578,8 @@ export function CommunityDashboardOverview({
           colorClass={SCOPE_COLOR.activity}
           title="初回送付率"
           meta={
-            recentCompletedCohorts.length > 0
-              ? `直近 ${recentCompletedCohorts.length} コホート平均`
+            d30CohortCount > 0
+              ? `直近 ${d30CohortCount} コホート平均`
               : "完了コホートなし"
           }
           infoMetricKey="newD30ActivationRate"
@@ -1019,20 +955,3 @@ function CommunityBand({
   );
 }
 
-function computeParetoTopShare(
-  users: ReadonlyArray<{ totalPointsOut: number }>,
-  coverage: number,
-): number | null {
-  if (users.length === 0) return null;
-  const sorted = [...users].sort((a, b) => b.totalPointsOut - a.totalPointsOut);
-  const total = sorted.reduce((acc, u) => acc + u.totalPointsOut, 0);
-  if (total === 0) return null;
-  let cumulative = 0;
-  for (let i = 0; i < sorted.length; i++) {
-    cumulative += sorted[i].totalPointsOut;
-    if (cumulative / total >= coverage) {
-      return (i + 1) / sorted.length;
-    }
-  }
-  return 1;
-}
