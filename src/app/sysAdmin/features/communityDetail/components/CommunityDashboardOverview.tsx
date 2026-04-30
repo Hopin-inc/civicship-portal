@@ -50,6 +50,7 @@ import {
   deriveD30ActivationRate,
   deriveDonationMoM,
   deriveDormantRate,
+  deriveHubUserPct,
   deriveNewMemberRate,
   deriveRecipientToSenderRate,
   deriveRecoveryRate,
@@ -164,7 +165,11 @@ export function CommunityDashboardOverview({
   const latentCount = stages.latent.count;
 
   const hubProvided = hubMemberCount !== undefined;
-  const hubPct = hubProvided && totalMembers > 0 ? hubMemberCount / totalMembers : 0;
+  // totalMembers 0 のとき null。他の rate 派生 (`deriveDormantRate` 等) と
+  // 揃え、backend `computeActiveRate` の null 規約とも整合。
+  const hubPct = hubProvided
+    ? deriveHubUserPct({ hubMemberCount, totalMembers })
+    : null;
 
   const activeMembers = data.memberList.users.filter((u) => u.userSendRate > 0);
   const avgRecipients = deriveAvgRecipients(activeMembers);
@@ -335,9 +340,13 @@ export function CommunityDashboardOverview({
             meta="今月"
             infoMetricKey="hubUserPct"
             status={hubProvided ? "ok" : "todo"}
-            hero={hubProvided ? <Hero value={toPct(hubPct)} /> : undefined}
-            viz={
+            hero={
               hubProvided ? (
+                <Hero value={hubPct != null ? toPct(hubPct) : "-"} />
+              ) : undefined
+            }
+            viz={
+              hubPct != null ? (
                 <Ring value={hubPct} colorClass={SCOPE_COLOR.network} />
               ) : undefined
             }

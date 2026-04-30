@@ -60,8 +60,14 @@ export function deriveLatestCohortRetentionM1(
 // "Hub" labels the relational-breadth layer of the donation graph; the
 // node-axis "habitual / regular / occasional / latent" stage hierarchy
 // is orthogonal and surfaces in L2 detail.
-export function deriveHubUserPct(row: GqlAnalyticsCommunityOverview): number {
-  if (row.totalMembers === 0) return 0;
+//
+// totalMembers 0 で null を返す (= 未定義)。他の rate 派生 (`deriveDormantRate`
+// 等) と揃え、backend `computeActiveRate` の null 規約とも整合させる。
+export function deriveHubUserPct(row: {
+  hubMemberCount: number;
+  totalMembers: number;
+}): number | null {
+  if (row.totalMembers <= 0) return null;
   return row.hubMemberCount / row.totalMembers;
 }
 

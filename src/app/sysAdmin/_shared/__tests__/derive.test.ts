@@ -11,6 +11,7 @@ import {
   deriveCommunityAgeMonths,
   deriveD30ActivationRate,
   deriveDonationMoM,
+  deriveHubUserPct,
   deriveNewMemberRate,
   deriveRecipientToSenderRate,
   deriveRecoveryRate,
@@ -24,6 +25,28 @@ import {
   isRegularOverHabitual,
   TENURE_THRESHOLD_DAYS,
 } from "../derive";
+
+describe("deriveHubUserPct", () => {
+  it("returns null when totalMembers is 0", () => {
+    expect(deriveHubUserPct({ hubMemberCount: 5, totalMembers: 0 })).toBeNull();
+  });
+
+  it("returns null when totalMembers is negative (defensive)", () => {
+    expect(
+      deriveHubUserPct({ hubMemberCount: 5, totalMembers: -1 }),
+    ).toBeNull();
+  });
+
+  it("computes hubMemberCount / totalMembers", () => {
+    expect(deriveHubUserPct({ hubMemberCount: 30, totalMembers: 100 })).toBe(
+      0.3,
+    );
+  });
+
+  it("returns 0 when hubMemberCount is 0 and totalMembers > 0 (genuine zero, not undefined)", () => {
+    expect(deriveHubUserPct({ hubMemberCount: 0, totalMembers: 100 })).toBe(0);
+  });
+});
 
 describe("deriveRecipientToSenderRate", () => {
   it("returns null when memberList is undersampled (hasNextPage)", () => {
