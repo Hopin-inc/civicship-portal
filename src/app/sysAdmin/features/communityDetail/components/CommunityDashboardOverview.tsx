@@ -211,7 +211,7 @@ export function CommunityDashboardOverview({
   const { rate: d30ActivationRate, cohortCount: d30CohortCount } =
     deriveD30ActivationRate(data.cohortRetention, D30_COHORT_WINDOW);
 
-  const habitualOverRegular = isRegularOverHabitual(habitualCount, regularCount);
+  const regularOverHabitual = isRegularOverHabitual(habitualCount, regularCount);
 
   const newRate = deriveNewMemberRate(newMemberCount, totalMembers);
 
@@ -499,7 +499,7 @@ export function CommunityDashboardOverview({
             }
           />
 
-          {habitualOverRegular && (
+          {regularOverHabitual && (
             <Issue title="「定期」が「定着」を超過">
               定期 {regularCount} 名 が 定着 {habitualCount} 名 を上回っている。中堅層の定着に伸びしろ。
             </Issue>
