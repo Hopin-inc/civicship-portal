@@ -186,7 +186,8 @@ export function deriveCommunityAgeMonths(
   const fromMs = new Date(dataFrom).getTime();
   const toMs = new Date(dataTo).getTime();
   if (!Number.isFinite(fromMs) || !Number.isFinite(toMs)) return null;
-  return Math.round((toMs - fromMs) / MS_PER_APPROX_MONTH);
+  // dataTo < dataFrom の不正データは 0 に clamp (community age は非負量)。
+  return Math.max(0, Math.round((toMs - fromMs) / MS_PER_APPROX_MONTH));
 }
 
 /**

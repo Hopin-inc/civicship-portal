@@ -151,6 +151,12 @@ describe("deriveCommunityAgeMonths", () => {
     // Jan→Feb = 31 days, 31/30 ≈ 1.033 → round to 1
     expect(deriveCommunityAgeMonths(from, to)).toBe(1);
   });
+
+  it("clamps to 0 when dataTo precedes dataFrom (defensive)", () => {
+    expect(
+      deriveCommunityAgeMonths("2026-04-01T00:00:00Z", "2026-01-01T00:00:00Z"),
+    ).toBe(0);
+  });
 });
 
 describe("deriveAvgMonthlyThroughput", () => {
