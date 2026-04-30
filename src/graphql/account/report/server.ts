@@ -3,6 +3,7 @@ import { print } from "graphql/language/printer";
 import {
   GetAdminReportDocument,
   GetAdminReportFeedbacksDocument,
+  SubmitReportFeedbackDocument,
 } from "@/types/graphql";
 
 /**
@@ -20,4 +21,16 @@ export const GET_ADMIN_REPORT_SERVER_QUERY = print(
 
 export const GET_ADMIN_REPORT_FEEDBACKS_SERVER_QUERY = print(
   addTypenameToDocument(GetAdminReportFeedbacksDocument),
+);
+
+/**
+ * sysAdmin の feedback 投稿は client Apollo ではなく server action 経由で叩く。
+ * backend (`firebase-auth.ts`) は X-Community-Id を tenant 解決と identity 検索の
+ * 両方に使うので、sysAdmin の auth identity が住んでいる home community を
+ * X-Community-Id に当てる必要がある。home community は HttpOnly な
+ * `__session_{community}` cookie からしか確実に判定できないため、サーバ側で
+ * 組み立てる。`permission.communityId` には URL の対象 community を入れる。
+ */
+export const SUBMIT_REPORT_FEEDBACK_SERVER_MUTATION = print(
+  addTypenameToDocument(SubmitReportFeedbackDocument),
 );

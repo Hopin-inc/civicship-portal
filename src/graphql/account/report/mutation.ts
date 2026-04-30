@@ -3,12 +3,18 @@ import { REPORT_FEEDBACK_FIELDS } from "../reportFeedback/fragment";
 
 /**
  * Report detail page から admin が代行で投稿する feedback。
- * permission は `CheckCommunityPermissionInput` (community owner 必須)、
- * sysAdmin は全 community のオーナーなので任意の community のレポートに
- * 投稿可能。ただし backend の auth テナントは `X-Community-Id` ヘッダー /
- * `__session_{communityId}` cookie で決まるので、URL 側で
- * `/sysAdmin/{communityId}/...` の community と一致させる必要がある
- * (middleware で URL から community を抽出して同期している)。
+ * permission は `CheckCommunityPermissionInput` で OR チェック (`IsCommunityMember`
+ * または `IsAdmin`)、`IsAdmin` は `User.sysRole = SYS_ADMIN` を見て bypass する。
+ *
+ * ただし backend の auth middleware (`firebase-auth.ts`) は `X-Community-Id` を
+ * Firebase tenant 解決と `identities.some.{uid, communityId}` の検索キーの両方に
+ * 使うので、sysAdmin の identity が住む home community と `X-Community-Id` が
+ * 一致していないと `currentUser=null` になり OR の両側が落ちる。
+ *
+ * sysAdmin が他 community の report に投稿する場合は client mutation ではなく
+ * server action `submitReportFeedbackAction` を使うこと (HttpOnly cookie から
+ * home community を解決して `X-Community-Id` を組み立てる)。この `gql`
+ * テンプレートは generated types / SSR 用 `print` のソースとして残してある。
  */
 export const SUBMIT_REPORT_FEEDBACK = gql`
   mutation SubmitReportFeedback(
