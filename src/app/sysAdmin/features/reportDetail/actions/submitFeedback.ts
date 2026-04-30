@@ -41,11 +41,22 @@ export async function submitReportFeedbackAction(
   input: SubmitFeedbackActionInput,
 ): Promise<SubmitFeedbackActionResult> {
   const cookieStore = await cookies();
-  const homeCommunityId = cookieStore
+  // 複数 community にログイン履歴があると `__session_{id}` が複数存在し、
+  // `find()` は cookie 走査順序依存で非決定的になる。`x-community-id` cookie
+  // (middleware が host / 直前の `/community/{id}/...` 経由で解決した値) を
+  // hint として優先し、それに対応する `__session_{id}` があれば確定で採用、
+  // 無ければ ACTIVE_COMMUNITY_IDS にマッチする最初の session に fallback する。
+  const sessionIds = cookieStore
     .getAll()
     .filter((c) => c.name.startsWith("__session_"))
-    .map((c) => c.name.replace("__session_", ""))
-    .find((id) => (ACTIVE_COMMUNITY_IDS as readonly string[]).includes(id));
+    .map((c) => c.name.replace("__session_", ""));
+  const hintedCommunityId = cookieStore.get("x-community-id")?.value;
+  const homeCommunityId =
+    hintedCommunityId && sessionIds.includes(hintedCommunityId)
+      ? hintedCommunityId
+      : sessionIds.find((id) =>
+          (ACTIVE_COMMUNITY_IDS as readonly string[]).includes(id),
+        );
 
   if (!homeCommunityId) {
     return {
