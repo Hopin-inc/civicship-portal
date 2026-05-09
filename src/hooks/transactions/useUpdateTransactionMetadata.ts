@@ -61,9 +61,6 @@ export function useUpdateTransactionMetadata() {
           ...(!permissionOverride || permissionOverride.type === "self"
             ? { permission: { userId: currentUserId! } }
             : {}),
-          ...(permissionOverride?.type === "community"
-            ? { communityPermission: { communityId: permissionOverride.communityId } }
-            : {}),
         },
       });
 

@@ -87,11 +87,10 @@ export const GET_OPPORTUNITIES = gql`
 export const GET_OPPORTUNITY = gql`
   query GetOpportunity(
     $id: ID!
-    $permission: CheckCommunityPermissionInput!
     $slotFilter: OpportunitySlotFilterInput
     $slotSort: OpportunitySlotSortInput
   ) {
-    opportunity(id: $id, permission: $permission) {
+    opportunity(id: $id) {
       id
       title
       description

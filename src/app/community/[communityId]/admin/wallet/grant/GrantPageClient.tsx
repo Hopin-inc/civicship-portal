@@ -76,7 +76,6 @@ export default function GrantPageClient({ initialConnection }: GrantPageClientPr
           comment,
           images: imagesInput && imagesInput.length > 0 ? imagesInput : undefined,
         },
-        permission: { communityId },
       });
 
       if (res.success) {

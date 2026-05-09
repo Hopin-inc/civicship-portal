@@ -1,11 +1,8 @@
 import { gql } from "@apollo/client";
 
 export const ISSUE_POINT = gql`
-  mutation pointIssue(
-    $input: TransactionIssueCommunityPointInput!
-    $permission: CheckCommunityPermissionInput!
-  ) {
-    transactionIssueCommunityPoint(input: $input, permission: $permission) {
+  mutation pointIssue($input: TransactionIssueCommunityPointInput!) {
+    transactionIssueCommunityPoint(input: $input) {
       ... on TransactionIssueCommunityPointSuccess {
         transaction {
           ...TransactionFields
@@ -16,11 +13,8 @@ export const ISSUE_POINT = gql`
 `;
 
 export const GRANT_POINT = gql`
-  mutation pointGrant(
-    $input: TransactionGrantCommunityPointInput!
-    $permission: CheckCommunityPermissionInput!
-  ) {
-    transactionGrantCommunityPoint(input: $input, permission: $permission) {
+  mutation pointGrant($input: TransactionGrantCommunityPointInput!) {
+    transactionGrantCommunityPoint(input: $input) {
       ... on TransactionGrantCommunityPointSuccess {
         transaction {
           ...TransactionFields
@@ -50,9 +44,8 @@ export const TRANSACTION_UPDATE_METADATA = gql`
     $id: ID!
     $input: TransactionUpdateMetadataInput!
     $permission: CheckIsSelfPermissionInput
-    $communityPermission: CheckCommunityPermissionInput
   ) {
-    transactionUpdateMetadata(id: $id, input: $input, permission: $permission, communityPermission: $communityPermission) {
+    transactionUpdateMetadata(id: $id, input: $input, permission: $permission) {
       ... on TransactionUpdateMetadataSuccess {
         transaction {
           id

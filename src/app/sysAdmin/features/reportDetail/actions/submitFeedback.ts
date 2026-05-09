@@ -79,7 +79,6 @@ export async function submitReportFeedbackAction(
           feedbackType: input.feedbackType ?? undefined,
           comment: input.comment ?? undefined,
         },
-        permission: { communityId: input.targetCommunityId },
       },
       { "X-Community-Id": homeCommunityId },
       15000,

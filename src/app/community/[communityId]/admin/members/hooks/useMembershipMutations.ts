@@ -37,10 +37,7 @@ export const useMembershipCommand = () => {
 
       try {
         const { data } = await mutationFn({
-          variables: {
-            input,
-            permission: { communityId: input.communityId },
-          },
+          variables: { input },
         });
 
         if (data) {

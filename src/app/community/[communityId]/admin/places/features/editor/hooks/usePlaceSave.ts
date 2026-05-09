@@ -55,7 +55,6 @@ export const usePlaceSave = ({ placeId, onSuccess }: UsePlaceSaveOptions = {}) =
             variables: {
               id: placeId,
               input: { ...input, id: placeId },
-              permission: { communityId },
             },
           });
           const updatedId = data?.placeUpdate?.place?.id;
@@ -69,7 +68,6 @@ export const usePlaceSave = ({ placeId, onSuccess }: UsePlaceSaveOptions = {}) =
           const { data } = await createPlace({
             variables: {
               input: { ...input, communityId },
-              permission: { communityId },
             },
           });
           const createdId = data?.placeCreate?.place?.id;

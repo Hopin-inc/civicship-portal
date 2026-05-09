@@ -104,7 +104,6 @@ export default function IssuePointPage() {
           comment: comment.trim() || undefined,
           images: imagesInput.length > 0 ? imagesInput : undefined,
         },
-        permission: { communityId },
       });
 
       if (res.success) {

@@ -42,7 +42,6 @@ export default function AdminOpportunityDetailPage() {
   const { data, loading, error, refetch } = useGetOpportunityQuery({
     variables: {
       id: id ?? "",
-      permission: { communityId: communityId ?? "" },
       slotSort: { startsAt: GqlSortDirection.Asc },
       slotFilter: { hostingStatus: [GqlOpportunitySlotHostingStatus.Scheduled] },
     },

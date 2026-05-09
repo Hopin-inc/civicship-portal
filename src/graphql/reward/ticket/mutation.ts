@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 export const TICKET_ISSUE = gql`
-  mutation ticketIssue($input: TicketIssueInput!, $permission: CheckCommunityPermissionInput!) {
-    ticketIssue(input: $input, permission: $permission) {
+  mutation ticketIssue($input: TicketIssueInput!) {
+    ticketIssue(input: $input) {
       ... on TicketIssueSuccess {
         issue {
           id

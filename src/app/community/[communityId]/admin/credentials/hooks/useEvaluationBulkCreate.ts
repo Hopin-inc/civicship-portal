@@ -32,7 +32,6 @@ export const useEvaluationBulkCreate = ({ onSuccess, onError }: UseEvaluationBul
       const response = await mutate({
         variables: {
           input: { evaluations },
-          permission: { communityId },
         },
       });
       onSuccess?.(response);

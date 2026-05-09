@@ -39,10 +39,7 @@ export function PlaceCardMenu({ placeId, placeName, onDelete }: PlaceCardMenuPro
     setIsDeleting(true);
     try {
       await deletePlace({
-        variables: {
-          id: placeId,
-          permission: { communityId },
-        },
+        variables: { id: placeId },
       });
       toast.success("場所を削除しました");
       onDelete?.();
