@@ -24,9 +24,9 @@ type Props = {
  * 結ぶ container。
  *
  * client Apollo mutation ではなく server action (`submitReportFeedbackAction`)
- * 経由で叩く。理由は同 action ファイルの doc コメント参照 (sysAdmin の
- * `X-Community-Id` を home community に固定する必要があるため、HttpOnly な
- * `__session_*` cookie をサーバ側で読む必要がある)。
+ * 経由で叩く。Apollo client が送る `X-Community-Id` は URL の community に
+ * 固定されてしまうが、sysAdmin は別 community の report にも投稿するので、
+ * リクエストごとに対象 report の community をヘッダに当てる必要がある。
  *
  * 投稿成功後は `router.refresh()` で SSR を再走させ、`myFeedback` と
  * `feedbacks` connection を最新化する。
