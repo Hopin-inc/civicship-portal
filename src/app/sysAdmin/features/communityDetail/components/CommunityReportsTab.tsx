@@ -35,6 +35,13 @@ export type CommunityReportsTabProps = {
   error: unknown;
   loadingMore: boolean;
   onLoadMore: () => void;
+  /**
+   * Report detail ページの遷移先 URL の base。reportId が末尾に付与される。
+   * 例: `/sysAdmin/{communityId}/reports`。community admin から再利用する
+   * 際は `/community/.../admin/analytics/reports` を指定する。
+   * 未指定時は `/sysAdmin/{communityId}/reports` が使われる。
+   */
+  reportHrefBase?: string;
 };
 
 const REPORT_STATUS_COLORS: Record<GqlReportStatus, string> = {
@@ -59,7 +66,9 @@ export function CommunityReportsTab({
   error,
   loadingMore,
   onLoadMore,
+  reportHrefBase,
 }: CommunityReportsTabProps) {
+  const base = reportHrefBase ?? `/sysAdmin/${communityId}/reports`;
   if (loading && reports.length === 0) {
     return <LoadingIndicator fullScreen={false} />;
   }
@@ -93,7 +102,7 @@ export function CommunityReportsTab({
             {idx !== 0 && <hr className="border-muted" />}
             <Item asChild className="transition-colors hover:bg-accent/50">
               <Link
-                href={`/sysAdmin/${communityId}/reports/${r.id}`}
+                href={`${base}/${r.id}`}
                 className="flex flex-1 gap-3"
               >
                 <div className="flex flex-1 flex-col min-w-0">
