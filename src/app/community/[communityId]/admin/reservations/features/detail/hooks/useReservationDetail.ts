@@ -85,11 +85,7 @@ export function useReservationDetail(id: string, mode: ReservationMode | null) {
     setIsSaving(true);
     setIsConfirmDialogOpen(false);
 
-    await saveAttendances(
-      participations,
-      attendanceData,
-      reservation?.opportunitySlot?.opportunity?.community?.id || communityId,
-    );
+    await saveAttendances(participations, attendanceData);
   };
 
   // 予約ステータス

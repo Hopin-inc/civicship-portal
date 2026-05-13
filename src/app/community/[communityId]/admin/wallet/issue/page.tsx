@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "react-toastify";
 import { useTransactionMutations } from "@/app/community/[communityId]/admin/wallet/hooks/useTransactionMutations";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 import { useTranslations } from "next-intl";
@@ -20,8 +19,6 @@ const INT_LIMIT = 9_999_999;
 
 export default function IssuePointPage() {
   const t = useTranslations();
-  const communityConfig = useCommunityConfig();
-  const communityId = communityConfig?.communityId ?? "";
   const router = useAppRouter();
   const track = useAnalytics();
 
