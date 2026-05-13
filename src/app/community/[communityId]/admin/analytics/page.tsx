@@ -1,5 +1,4 @@
 import { fetchSysAdminCommunityDetailServer } from "@/app/sysAdmin/_shared/server/fetchSysAdminCommunityDetail";
-import { fetchSysAdminDashboardServer } from "@/app/sysAdmin/_shared/server/fetchSysAdminDashboard";
 import { fetchAdminBrowseReportsServer } from "@/app/sysAdmin/_shared/server/fetchAdminBrowseReports";
 import { DEFAULT_SEGMENT_THRESHOLDS } from "@/app/sysAdmin/_shared/derive";
 import {
@@ -15,7 +14,10 @@ type Props = {
 export default async function AdminAnalyticsPage({ params }: Props) {
   const { communityId } = await params;
 
-  const [initialData, l1Data, initialReports] = await Promise.all([
+  // L1 dashboard (`analyticsDashboard`) は sysAdmin 限定の cross-community
+  // 集計のため Owner ロールでは叩かない。L1 経由でしか取れない
+  // tenureDistribution / hubMemberCount は未提供のまま (子側で「未計測」表示)。
+  const [initialData, initialReports] = await Promise.all([
     fetchSysAdminCommunityDetailServer({
       communityId,
       asOf: undefined,
@@ -28,23 +30,14 @@ export default async function AdminAnalyticsPage({ params }: Props) {
       },
       limit: 1000,
     }),
-    fetchSysAdminDashboardServer({ asOf: undefined }),
     fetchAdminBrowseReportsServer(communityId),
   ]);
-
-  const l1Row = l1Data?.communities.find(
-    (c) => c.communityId === communityId,
-  );
-  const tenureDistribution = l1Row?.tenureDistribution ?? null;
-  const hubMemberCount = l1Row?.hubMemberCount ?? null;
 
   return (
     <div className="p-4 pt-8">
       <CommunityDetailPageClient
         communityId={communityId}
         initialData={initialData}
-        tenureDistribution={tenureDistribution}
-        hubMemberCount={hubMemberCount}
         initialReports={initialReports}
         reportHrefBase={`/admin/analytics/reports`}
       />
