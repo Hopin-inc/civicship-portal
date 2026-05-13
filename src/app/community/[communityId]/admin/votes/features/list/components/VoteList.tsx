@@ -27,7 +27,7 @@ export function VoteList({ communityId }: VoteListProps) {
   const { items, loading, error, loadMoreRef, hasNextPage, isLoadingMore, refetch } =
     useVoteTopics({ communityId });
   const safeRefetch = () => { void refetch(); };
-  const { handleEdit, handleDelete } = useVoteTopicActions({ communityId, refetch: safeRefetch });
+  const { handleEdit, handleDelete } = useVoteTopicActions({ refetch: safeRefetch });
 
   const refetchRef = useRef<(() => void) | null>(null);
   refetchRef.current = refetch;

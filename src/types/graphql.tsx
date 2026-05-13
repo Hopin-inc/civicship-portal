@@ -2159,18 +2159,15 @@ export type GqlMutationApproveReportArgs = {
 
 export type GqlMutationArticleCreateArgs = {
   input: GqlArticleCreateInput;
-  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlMutationArticleDeleteArgs = {
   id: Scalars["ID"]["input"];
-  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlMutationArticleUpdateContentArgs = {
   id: Scalars["ID"]["input"];
   input: GqlArticleUpdateContentInput;
-  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlMutationCommunityCreateArgs = {
@@ -2179,23 +2176,19 @@ export type GqlMutationCommunityCreateArgs = {
 
 export type GqlMutationCommunityDeleteArgs = {
   id: Scalars["ID"]["input"];
-  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlMutationCommunityUpdateProfileArgs = {
   id: Scalars["ID"]["input"];
   input: GqlCommunityUpdateProfileInput;
-  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlMutationEvaluationBulkCreateArgs = {
   input: GqlEvaluationBulkCreateInput;
-  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlMutationGenerateReportArgs = {
   input: GqlGenerateReportInput;
-  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlMutationIdentityCheckPhoneUserArgs = {
@@ -2204,7 +2197,6 @@ export type GqlMutationIdentityCheckPhoneUserArgs = {
 
 export type GqlMutationIncentiveGrantRetryArgs = {
   input: GqlIncentiveGrantRetryInput;
-  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlMutationLinkPhoneAuthArgs = {
@@ -2219,22 +2211,18 @@ export type GqlMutationMembershipAcceptMyInvitationArgs = {
 
 export type GqlMutationMembershipAssignManagerArgs = {
   input: GqlMembershipSetRoleInput;
-  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlMutationMembershipAssignMemberArgs = {
   input: GqlMembershipSetRoleInput;
-  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlMutationMembershipAssignOwnerArgs = {
   input: GqlMembershipSetRoleInput;
-  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlMutationMembershipCancelInvitationArgs = {
   input: GqlMembershipSetInvitationStatusInput;
-  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlMutationMembershipDenyMyInvitationArgs = {
@@ -2244,12 +2232,10 @@ export type GqlMutationMembershipDenyMyInvitationArgs = {
 
 export type GqlMutationMembershipInviteArgs = {
   input: GqlMembershipInviteInput;
-  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlMutationMembershipRemoveArgs = {
   input: GqlMembershipRemoveInput;
-  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlMutationMembershipWithdrawArgs = {
@@ -2259,7 +2245,6 @@ export type GqlMutationMembershipWithdrawArgs = {
 
 export type GqlMutationOpportunityCreateArgs = {
   input: GqlOpportunityCreateInput;
-  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlMutationOpportunityDeleteArgs = {
@@ -2298,7 +2283,6 @@ export type GqlMutationOpportunityUpdateContentArgs = {
 
 export type GqlMutationParticipationBulkCreateArgs = {
   input: GqlParticipationBulkCreateInput;
-  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlMutationParticipationCreatePersonalRecordArgs = {
@@ -2312,18 +2296,15 @@ export type GqlMutationParticipationDeletePersonalRecordArgs = {
 
 export type GqlMutationPlaceCreateArgs = {
   input: GqlPlaceCreateInput;
-  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlMutationPlaceDeleteArgs = {
   id: Scalars["ID"]["input"];
-  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlMutationPlaceUpdateArgs = {
   id: Scalars["ID"]["input"];
   input: GqlPlaceUpdateInput;
-  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlMutationPublishReportArgs = {
@@ -2367,7 +2348,6 @@ export type GqlMutationStorePhoneAuthTokenArgs = {
 
 export type GqlMutationSubmitReportFeedbackArgs = {
   input: GqlSubmitReportFeedbackInput;
-  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlMutationTicketClaimArgs = {
@@ -2376,12 +2356,10 @@ export type GqlMutationTicketClaimArgs = {
 
 export type GqlMutationTicketIssueArgs = {
   input: GqlTicketIssueInput;
-  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlMutationTicketPurchaseArgs = {
   input: GqlTicketPurchaseInput;
-  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlMutationTicketRefundArgs = {
@@ -2402,16 +2380,13 @@ export type GqlMutationTransactionDonateSelfPointArgs = {
 
 export type GqlMutationTransactionGrantCommunityPointArgs = {
   input: GqlTransactionGrantCommunityPointInput;
-  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlMutationTransactionIssueCommunityPointArgs = {
   input: GqlTransactionIssueCommunityPointInput;
-  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlMutationTransactionUpdateMetadataArgs = {
-  communityPermission?: InputMaybe<GqlCheckCommunityPermissionInput>;
   id: Scalars["ID"]["input"];
   input: GqlTransactionUpdateMetadataInput;
   permission?: InputMaybe<GqlCheckIsSelfPermissionInput>;
@@ -2419,7 +2394,6 @@ export type GqlMutationTransactionUpdateMetadataArgs = {
 
 export type GqlMutationUpdatePortalConfigArgs = {
   input: GqlCommunityPortalConfigInput;
-  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlMutationUpdateReportTemplateArgs = {
@@ -2430,7 +2404,6 @@ export type GqlMutationUpdateReportTemplateArgs = {
 
 export type GqlMutationUpdateSignupBonusConfigArgs = {
   input: GqlUpdateSignupBonusConfigInput;
-  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlMutationUserDeleteMeArgs = {
@@ -2448,24 +2421,20 @@ export type GqlMutationUserUpdateMyProfileArgs = {
 
 export type GqlMutationUtilityCreateArgs = {
   input: GqlUtilityCreateInput;
-  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlMutationUtilityDeleteArgs = {
   id: Scalars["ID"]["input"];
-  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlMutationUtilitySetPublishStatusArgs = {
   id: Scalars["ID"]["input"];
   input: GqlUtilitySetPublishStatusInput;
-  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlMutationUtilityUpdateInfoArgs = {
   id: Scalars["ID"]["input"];
   input: GqlUtilityUpdateInfoInput;
-  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlMutationVoteCastArgs = {
@@ -2474,18 +2443,15 @@ export type GqlMutationVoteCastArgs = {
 
 export type GqlMutationVoteTopicCreateArgs = {
   input: GqlVoteTopicCreateInput;
-  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlMutationVoteTopicDeleteArgs = {
   id: Scalars["ID"]["input"];
-  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlMutationVoteTopicUpdateArgs = {
   id: Scalars["ID"]["input"];
   input: GqlVoteTopicUpdateInput;
-  permission: GqlCheckCommunityPermissionInput;
 };
 
 /** ログインユーザーの投票資格と現状。再投票可能性の判定にも利用する。 */
@@ -3216,14 +3182,6 @@ export const GqlPublishStatus = {
 export type GqlPublishStatus = (typeof GqlPublishStatus)[keyof typeof GqlPublishStatus];
 export type GqlQuery = {
   __typename?: "Query";
-  /** @deprecated Use `reportsAll` instead. */
-  adminBrowseReports: GqlReportsConnection;
-  /** @deprecated Use `reportSummaries` instead. */
-  adminReportSummary: GqlAdminReportSummaryConnection;
-  /** @deprecated Use `reportTemplateFeedbackStats` instead. */
-  adminTemplateFeedbackStats: GqlAdminTemplateFeedbackStats;
-  /** @deprecated Use `reportTemplateFeedbacks` instead. */
-  adminTemplateFeedbacks: GqlReportFeedbacksConnection;
   /**
    * Single-community analytics detail: summary card, stage distribution,
    * trailing-window trends, cohort retention, and a paginated member list.
@@ -3293,18 +3251,6 @@ export type GqlQuery = {
   reservations: GqlReservationsConnection;
   signupBonusConfig?: Maybe<GqlCommunitySignupBonusConfig>;
   states: GqlStatesConnection;
-  /**
-   * L2 detail for a single community.
-   * Use `analyticsCommunity` instead.
-   * @deprecated Use `analyticsCommunity` instead.
-   */
-  sysAdminCommunityDetail: GqlSysAdminCommunityDetailPayload;
-  /**
-   * L1 overview: platform totals plus one row per community.
-   * Use `analyticsDashboard` instead.
-   * @deprecated Use `analyticsDashboard` instead.
-   */
-  sysAdminDashboard: GqlSysAdminDashboardPayload;
   ticket?: Maybe<GqlTicket>;
   ticketClaimLink?: Maybe<GqlTicketClaimLink>;
   ticketClaimLinks: GqlTicketClaimLinksConnection;
@@ -3340,37 +3286,6 @@ export type GqlQuery = {
   wallets: GqlWalletsConnection;
 };
 
-export type GqlQueryAdminBrowseReportsArgs = {
-  communityId?: InputMaybe<Scalars["ID"]["input"]>;
-  cursor?: InputMaybe<Scalars["String"]["input"]>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  publishedAfter?: InputMaybe<Scalars["Datetime"]["input"]>;
-  publishedBefore?: InputMaybe<Scalars["Datetime"]["input"]>;
-  status?: InputMaybe<GqlReportStatus>;
-  variant?: InputMaybe<GqlReportVariant>;
-};
-
-export type GqlQueryAdminReportSummaryArgs = {
-  cursor?: InputMaybe<Scalars["String"]["input"]>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-};
-
-export type GqlQueryAdminTemplateFeedbackStatsArgs = {
-  kind?: InputMaybe<GqlReportTemplateKind>;
-  variant: GqlReportVariant;
-  version?: InputMaybe<Scalars["Int"]["input"]>;
-};
-
-export type GqlQueryAdminTemplateFeedbacksArgs = {
-  cursor?: InputMaybe<Scalars["String"]["input"]>;
-  feedbackType?: InputMaybe<GqlReportFeedbackType>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  kind?: InputMaybe<GqlReportTemplateKind>;
-  maxRating?: InputMaybe<Scalars["Int"]["input"]>;
-  variant: GqlReportVariant;
-  version?: InputMaybe<Scalars["Int"]["input"]>;
-};
-
 export type GqlQueryAnalyticsCommunityArgs = {
   input: GqlAnalyticsCommunityInput;
 };
@@ -3381,7 +3296,6 @@ export type GqlQueryAnalyticsDashboardArgs = {
 
 export type GqlQueryArticleArgs = {
   id: Scalars["ID"]["input"];
-  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlQueryArticlesArgs = {
@@ -3493,7 +3407,6 @@ export type GqlQueryOpportunitiesArgs = {
 
 export type GqlQueryOpportunityArgs = {
   id: Scalars["ID"]["input"];
-  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlQueryOpportunitySlotArgs = {
@@ -3601,7 +3514,6 @@ export type GqlQueryReportsArgs = {
   communityId: Scalars["ID"]["input"];
   cursor?: InputMaybe<Scalars["String"]["input"]>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
-  permission: GqlCheckCommunityPermissionInput;
   status?: InputMaybe<GqlReportStatus>;
   variant?: InputMaybe<GqlReportVariant>;
 };
@@ -3646,14 +3558,6 @@ export type GqlQueryStatesArgs = {
   cursor?: InputMaybe<Scalars["String"]["input"]>;
   filter?: InputMaybe<GqlStatesInput>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
-};
-
-export type GqlQuerySysAdminCommunityDetailArgs = {
-  input: GqlSysAdminCommunityDetailInput;
-};
-
-export type GqlQuerySysAdminDashboardArgs = {
-  input?: InputMaybe<GqlSysAdminDashboardInput>;
 };
 
 export type GqlQueryTicketArgs = {
@@ -3731,7 +3635,6 @@ export type GqlQueryUtilitiesArgs = {
 
 export type GqlQueryUtilityArgs = {
   id: Scalars["ID"]["input"];
-  permission: GqlCheckCommunityPermissionInput;
 };
 
 export type GqlQueryVcIssuanceRequestArgs = {
@@ -4160,1118 +4063,6 @@ export type GqlSubmitReportFeedbackPayload = GqlSubmitReportFeedbackSuccess;
 export type GqlSubmitReportFeedbackSuccess = {
   __typename?: "SubmitReportFeedbackSuccess";
   feedback: GqlReportFeedback;
-};
-
-/**
- * One bucket of the all-time DONATION chain-depth histogram. See
- * `SysAdminCommunityDetailPayload.chainDepthDistribution`.
- */
-export type GqlSysAdminChainDepthBucket = {
-  __typename?: "SysAdminChainDepthBucket";
-  /**
-   * Number of all-time DONATION transactions whose `chain_depth`
-   * falls into this bucket. Always non-negative.
-   */
-  count: Scalars["Int"]["output"];
-  /**
-   * Chain-depth bucket key. Range 1..5; the 5 bucket aggregates
-   * `chain_depth >= 5`. See `SysAdminCommunitySummaryCard
-   * .maxChainDepthAllTime` for the underlying semantic.
-   */
-  depth: Scalars["Int"]["output"];
-};
-
-/**
- * One cohort's funnel progression. See
- * `SysAdminCommunityDetailPayload.cohortFunnel` for the stage
- * semantics and the JOINED-at-asOf scoping rule.
- */
-export type GqlSysAdminCohortFunnelPoint = {
-  __typename?: "SysAdminCohortFunnelPoint";
-  /**
-   * Cohort size: number of JOINED memberships whose `created_at`
-   * falls within this cohort month. The funnel's entry stage —
-   * the denominator the client divides downstream stages by to
-   * derive percentages.
-   */
-  acquired: Scalars["Int"]["output"];
-  /**
-   * Of the cohort, members who sent at least one DONATION within
-   * 30 days of their join (per-member, measured from each
-   * individual's `created_at` rather than a calendar-clamped
-   * window). The "first-30-day activation" funnel stage.
-   */
-  activatedD30: Scalars["Int"]["output"];
-  /**
-   * JST first day of the cohort's entry month, e.g.
-   * 2025-10-01T00:00+09:00. UTC-encoded at JST midnight, same
-   * convention as `SysAdminMonthlyActivityPoint.month` and
-   * `SysAdminCohortRetentionPoint.cohortMonth`.
-   */
-  cohortMonth: Scalars["Datetime"]["output"];
-  /**
-   * Of the cohort, members currently in the habitual segment
-   * (`userSendRate >= segmentThresholds.tier1` AND tenure floor).
-   * THRESHOLD-DEPENDENT — see the parent field's doc.
-   */
-  habitual: Scalars["Int"]["output"];
-  /**
-   * Of the cohort, members who sent DONATION in >= 2 distinct JST
-   * months as of asOf. The "came back at least once" stage.
-   * Cumulative — once a member has 2+ donation months in their
-   * history they stay counted in this stage even if they later go
-   * quiet.
-   */
-  repeated: Scalars["Int"]["output"];
-};
-
-/** One entry-month cohort's retention curve. */
-export type GqlSysAdminCohortRetentionPoint = {
-  __typename?: "SysAdminCohortRetentionPoint";
-  /** Entry month, first day JST (e.g. 2025-10-01T00:00+09:00). */
-  cohortMonth: Scalars["Datetime"]["output"];
-  /** Cohort size at entry (status='JOINED' joiners in the month). */
-  cohortSize: Scalars["Int"]["output"];
-  /**
-   * Fraction of the cohort with a DONATION out in the SECOND month after
-   * entry (m+1). null for an empty cohort or a cohort too recent to have
-   * a completed m+1 window.
-   */
-  retentionM1?: Maybe<Scalars["Float"]["output"]>;
-  /** Fraction active in m+3. */
-  retentionM3?: Maybe<Scalars["Float"]["output"]>;
-  /** Fraction active in m+6. */
-  retentionM6?: Maybe<Scalars["Float"]["output"]>;
-};
-
-/**
- * API-side alert flags. Boolean only: the server owns the cross-field
- * judgement, the client just renders the badge.
- */
-export type GqlSysAdminCommunityAlerts = {
-  __typename?: "SysAdminCommunityAlerts";
-  /** Month-over-month communityActivityRate change <= -20%. */
-  activeDrop: Scalars["Boolean"]["output"];
-  /** Latest-week churned_senders > retained_senders. */
-  churnSpike: Scalars["Boolean"]["output"];
-  /** No t_memberships.created_at rows (status='JOINED') in the last 14 days. */
-  noNewMembers: Scalars["Boolean"]["output"];
-};
-
-export type GqlSysAdminCommunityDetailInput = {
-  /** As-of timestamp (see SysAdminDashboardInput.asOf). */
-  asOf?: InputMaybe<Scalars["Datetime"]["input"]>;
-  /** Target community id. */
-  communityId: Scalars["ID"]["input"];
-  /**
-   * Opaque cursor for pagination. Internally a base64-encoded offset of
-   * the prior page's position. Treat as opaque — pass back the cursor
-   * returned by the previous response unchanged.
-   */
-  cursor?: InputMaybe<Scalars["String"]["input"]>;
-  /**
-   * Days since a member's most recent DONATION above which they are
-   * classified as "dormant". Used to populate
-   * `SysAdminCommunityDetailPayload.dormantCount`. See the same-named
-   * field on SysAdminDashboardInput for the full semantic.
-   *
-   * Default 30 (≈ one month of silence). Effective range 1..365;
-   * values outside are silently clamped on the server.
-   */
-  dormantThresholdDays?: InputMaybe<Scalars["Int"]["input"]>;
-  /**
-   * Minimum number of distinct DONATION recipients within the trailing
-   * 28-day window ending at each month-end for a member to be classified
-   * as a hub in that month. Used to populate
-   * `SysAdminMonthlyActivityPoint.hubMemberCount`. Same semantic as
-   * `SysAdminDashboardInput.hubBreadthThreshold`, applied at month-end
-   * rather than at request `asOf`.
-   *
-   * Default 3. Effective range 1..1000; values outside are silently
-   * clamped on the server. Pass the same value used on
-   * `SysAdminDashboardInput.hubBreadthThreshold` to keep the L1
-   * hubMemberCount and the latest entry of
-   * `monthlyActivityTrend.hubMemberCount` directly comparable.
-   */
-  hubBreadthThreshold?: InputMaybe<Scalars["Int"]["input"]>;
-  /**
-   * Member list page size (default 50, max 1000). Raised from the
-   * previous max of 200 so client-side aggregations that need every
-   * member of a community (e.g. the "受領→送付 転換率" /
-   * recipient-to-sender conversion rate, hub-persistence cohorts,
-   * new-member retention breakdowns) can pull a single full page
-   * without N round-trips. Communities larger than 1000 members
-   * still need cursor pagination.
-   */
-  limit?: InputMaybe<Scalars["Int"]["input"]>;
-  /** Stage-count thresholds for the stage distribution and tier counts. */
-  segmentThresholds?: InputMaybe<GqlSysAdminSegmentThresholdsInput>;
-  /** Member list filter. Defaults to `minSendRate = 0.7` (habitual only). */
-  userFilter?: InputMaybe<GqlSysAdminUserListFilter>;
-  /** Member list sort. Defaults to SEND_RATE DESC. */
-  userSort?: InputMaybe<GqlSysAdminUserListSort>;
-  /**
-   * How many trailing JST months to include in the trend / cohort arrays.
-   * Default 10.
-   */
-  windowMonths?: InputMaybe<Scalars["Int"]["input"]>;
-};
-
-/** Root payload for sysAdminCommunityDetail (L2). */
-export type GqlSysAdminCommunityDetailPayload = {
-  __typename?: "SysAdminCommunityDetailPayload";
-  /** Alert flags (same structure as L1, evaluated for this community). */
-  alerts: GqlSysAdminCommunityAlerts;
-  /** As-of timestamp echoed back. */
-  asOf: Scalars["Datetime"]["output"];
-  /**
-   * Distribution of DONATION `chain_depth` values across all-time
-   * DONATION transactions in this community. Each bucket counts
-   * distinct DONATION transactions whose `chain_depth` falls into
-   * the bucket key (see `SysAdminCommunitySummaryCard.maxChainDepthAllTime`
-   * for the depth semantic — depth 1 is a root donation, depth N+1
-   * means the sender's most recent received DONATION had depth N).
-   *
-   * Buckets are `{depth: 1..5, count}`; the depth-5 bucket
-   * aggregates all transactions with `chain_depth >= 5`. Buckets
-   * are returned in ascending depth order, with every bucket
-   * emitted (count = 0 for depths with no transactions) so the
-   * client can render a contiguous histogram axis without
-   * zero-padding logic. Adjust the ceiling upward (e.g., to 10+)
-   * in a follow-up if real-data inspection of `maxChainDepthAllTime`
-   * shows meaningful population in the 5+ bucket.
-   *
-   * Powers the L3 "/network" chain-depth histogram: visualizes
-   * whether donations propagate deeply (multi-hop reciprocity, tail
-   * populated) or shallowly (one-shot direct gifts, mass at depth 1).
-   */
-  chainDepthDistribution: Array<GqlSysAdminChainDepthBucket>;
-  /**
-   * Per-cohort funnel progression for the L3 "/activity" deep-dive.
-   * One entry per JST entry-month within the trailing `windowMonths`
-   * range, returned in ascending order (newest cohort last). Stages
-   * match the L2 send-funnel structure:
-   *
-   *   acquisition  — cohort size at entry (JOINED memberships
-   *                  created during the cohort month)
-   *   activatedD30 — cohort members who sent >= 1 DONATION within
-   *                  30 days of their join (per-member, not
-   *                  calendar-clamped)
-   *   repeated     — cohort members who sent DONATION in >= 2
-   *                  distinct JST months (cumulative as of asOf)
-   *   habitual     — cohort members currently in the habitual
-   *                  segment (`userSendRate >= segmentThresholds
-   *                  .tier1` AND tenure floor)
-   *
-   * ⚠ The `habitual` stage is THRESHOLD-DEPENDENT: it is derived
-   * from the request's `segmentThresholds.tier1` (default 0.7),
-   * same behaviour as `stages.habitual` and the L2 habitual count
-   * card. Cross-request comparisons of the funnel's last stage
-   * require matching threshold inputs. The `acquisition`,
-   * `activatedD30`, and `repeated` stages are threshold-
-   * independent by construction.
-   *
-   * All counts are JOINED-at-asOf scoped — a cohort member who
-   * later left the community is excluded from `activatedD30` /
-   * `repeated` / `habitual` even if they donated during the
-   * measurement window. Same membership filter as `dormantCount`
-   * / L1 `senderCount` / L2 monthly `hubMemberCount`.
-   */
-  cohortFunnel: Array<GqlSysAdminCohortFunnelPoint>;
-  /**
-   * One entry per entry month (length <= windowMonths), newest last.
-   * `retentionM*` fields are null when the cohort is empty or too recent.
-   */
-  cohortRetention: Array<GqlSysAdminCohortRetentionPoint>;
-  /** Community id. */
-  communityId: Scalars["ID"]["output"];
-  /** Community display name. */
-  communityName: Scalars["String"]["output"];
-  /**
-   * Members who donated at some point but whose most recent
-   * DONATION is older than `dormantThresholdDays` (default 30). See
-   * the same-named field on `SysAdminCommunityOverview` for the
-   * full semantic. Exposed at L2 so the user-scope card can show
-   * the dormancy ratio directly without re-aggregating from the
-   * member list.
-   */
-  dormantCount: Scalars["Int"]["output"];
-  /** Paginated member list — see type doc. */
-  memberList: GqlSysAdminMemberList;
-  /**
-   * One entry per month (length <= windowMonths), newest last. Older
-   * months with no MV data are omitted rather than zero-padded.
-   */
-  monthlyActivityTrend: Array<GqlSysAdminMonthlyActivityPoint>;
-  /**
-   * One entry per ISO week, newest last. Length approximates
-   * `windowMonths * ~4.3` weeks; sparse weeks with no activity still emit
-   * a row with zero counters.
-   */
-  retentionTrend: Array<GqlSysAdminRetentionTrendPoint>;
-  /**
-   * Stage distribution, classified server-side with the request's
-   * thresholds. Computed over ALL members (independent of member-list
-   * filter).
-   */
-  stages: GqlSysAdminStageDistribution;
-  /** Summary card — see type doc. */
-  summary: GqlSysAdminCommunitySummaryCard;
-  /** Trailing window length in JST months (echoed back). */
-  windowMonths: Scalars["Int"]["output"];
-};
-
-/**
- * One row of the L1 all-community table. Designed for at-a-glance
- * intervention judgment: each row carries the raw counts the client
- * needs to derive rates, growth, alerts, sort keys, and filter
- * predicates without a second round-trip.
- *
- * Calendar-month metrics live on the L2 detail card
- * (SysAdminCommunitySummaryCard) — L1 is rolling-window only.
- */
-export type GqlSysAdminCommunityOverview = {
-  __typename?: "SysAdminCommunityOverview";
-  /** Community id. */
-  communityId: Scalars["ID"]["output"];
-  /** Community display name (t_communities.name). */
-  communityName: Scalars["String"]["output"];
-  /**
-   * Members who donated at some point but whose most recent
-   * DONATION is older than `dormantThresholdDays` (default 30).
-   * Distinct from `segmentCounts.passiveCount` (= "latent", never
-   * donated): operators care about the difference because the
-   * intervention is different — re-engage the dormant, onboard the
-   * latent.
-   *
-   * Computed as
-   *   COUNT(DISTINCT user_id)
-   *   WHERE the user has at least one historical DONATION in this
-   *     community AND `MAX(donation.created_at) < asOf -
-   *     dormantThresholdDays`
-   *     AND status='JOINED' at asOf
-   *
-   * Invariants the client may assert:
-   *   0 <= dormantCount <= totalMembers - segmentCounts.passiveCount
-   *
-   * The upper bound holds because dormant members are by
-   * construction ever-donated, which `passiveCount` excludes.
-   */
-  dormantCount: Scalars["Int"]["output"];
-  /**
-   * Number of members classified as a "hub" within the parametric
-   * window (`windowDays`):
-   *
-   *   hubMemberCount = COUNT(member)
-   *     WHERE windowUniqueDonationRecipients >= input.hubBreadthThreshold
-   *
-   * `windowUniqueDonationRecipients` is the count of DISTINCT users
-   * this member sent a DONATION to during
-   * `[asOf - windowDays JST日, asOf + 1 JST日)` — distinct from the
-   * L2 `SysAdminMemberRow.uniqueDonationRecipients` field which is
-   * tenure-wide. The window-scoped variant is computed on demand in
-   * this aggregate but not exposed per-member at L1 (members
-   * themselves are an L2 concern).
-   *
-   * Hub classification deliberately uses BREADTH only — a member
-   * who reached `hubBreadthThreshold` distinct recipients during
-   * the window necessarily transacted at least that many times,
-   * making an explicit frequency floor redundant. This keeps the
-   * threshold knobs to one (`hubBreadthThreshold`).
-   *
-   * Invariants (the client may assert these):
-   *   hubMemberCount <= windowActivity.senderCount <= totalMembers
-   *
-   * The first holds because any hub member sent DONATION to
-   * `>= hubBreadthThreshold` distinct counterparties during the
-   * window — which requires at least that many DONATION
-   * transactions — so they are necessarily a window sender. The
-   * second because both `hubMemberCount` and `windowActivity.senderCount`
-   * are computed from senders restricted to JOINED-at-asOf members
-   * (a former member who left the community before asOf is excluded
-   * even if they donated during the window) and totalMembers is
-   * also JOINED-at-asOf, so the chain stays consistent.
-   */
-  hubMemberCount: Scalars["Int"]["output"];
-  /**
-   * Latest completed monthly cohort and its M+1 activity. See
-   * SysAdminLatestCohort.
-   */
-  latestCohort: GqlSysAdminLatestCohort;
-  /**
-   * Per-stage member counts (tier1 / tier2 / passive, cumulative
-   * per the type doc) classified against input.segmentThresholds.
-   */
-  segmentCounts: GqlSysAdminSegmentCounts;
-  /**
-   * Tenure-bucket distribution of members at asOf. See
-   * SysAdminTenureDistribution. Sum of buckets equals totalMembers.
-   *
-   * Lets the client surface community age structure at L1 without
-   * drilling into the L2 member list (which would otherwise force
-   * an N+1 round trip per community to compute distribution).
-   */
-  tenureDistribution: GqlSysAdminTenureDistribution;
-  /**
-   * Total status='JOINED' members as of asOf. Members whose
-   * created_at is after asOf are excluded from the count.
-   */
-  totalMembers: Scalars["Int"]["output"];
-  /**
-   * Latest completed-week retention signals for client-side churn
-   * detection. See SysAdminWeeklyRetention.
-   */
-  weeklyRetention: GqlSysAdminWeeklyRetention;
-  /** Rolling-window DONATION activity. See SysAdminWindowActivity. */
-  windowActivity: GqlSysAdminWindowActivity;
-};
-
-/**
- * Summary card for a single community. Fronts the L2 detail screen and
- * answers "is this community improving?" in one row of numbers.
- */
-export type GqlSysAdminCommunitySummaryCard = {
-  __typename?: "SysAdminCommunitySummaryCard";
-  /**
-   * Latest-month communityActivityRate (PRIMARY indicator — see module
-   * docstring for the distinction vs userSendRate).
-   */
-  communityActivityRate: Scalars["Float"]["output"];
-  /**
-   * 3-month trailing average of communityActivityRate, ending at the JST
-   * calendar month containing asOf (inclusive). null when fewer than 3
-   * months of data exist.
-   */
-  communityActivityRate3mAvg?: Maybe<Scalars["Float"]["output"]>;
-  /** Community id. */
-  communityId: Scalars["ID"]["output"];
-  /** Community display name. */
-  communityName: Scalars["String"]["output"];
-  /** Oldest date with MV data for this community (JST calendar). */
-  dataFrom?: Maybe<Scalars["Datetime"]["output"]>;
-  /** Newest date with MV data for this community (JST calendar). */
-  dataTo?: Maybe<Scalars["Datetime"]["output"]>;
-  /**
-   * Month-over-month % change in communityActivityRate (fraction, e.g.
-   * -0.2 == -20%). null when the prior month has no data.
-   */
-  growthRateActivity?: Maybe<Scalars["Float"]["output"]>;
-  /**
-   * Maximum `chain_depth` observed in any DONATION, all-time, in
-   * this community. null when no DONATION transactions exist.
-   *
-   * `chain_depth` semantics (set in transaction creation —
-   * src/application/domain/transaction/service.ts:89, via
-   * `findLatestReceivedTx`):
-   *   - chain_depth = 1: a "root" donation. Either the sender
-   *     had no prior received DONATION (= self-funded gift) or
-   *     this is treated as the start of a chain.
-   *   - chain_depth = N + 1: the sender's most recent received
-   *     DONATION (parentTx) had `chain_depth = N`; the new
-   *     donation propagates the chain by one step.
-   *
-   * Example trace: A donates to B → chain_depth 1.
-   * B then donates to C, citing the receipt from A → chain_depth 2.
-   * C donates to D similarly → chain_depth 3.
-   *
-   * `maxChainDepthAllTime = 1` therefore means "no propagation
-   * ever happened" (every donation was a fresh root).
-   * `maxChainDepthAllTime >= 2` means at least one
-   * receive-then-pass-it-on event occurred.
-   */
-  maxChainDepthAllTime?: Maybe<Scalars["Int"]["output"]>;
-  /** Cumulative members in tier2 or above under the supplied thresholds. */
-  tier2Count: Scalars["Int"]["output"];
-  /** tier2Count / totalMembers (0.0–1.0). */
-  tier2Pct: Scalars["Float"]["output"];
-  /**
-   * Total DONATION points transferred, all-time (no window). Uses
-   * t_transactions directly so the value is independent of MV retention.
-   */
-  totalDonationPointsAllTime: Scalars["Float"]["output"];
-  /** Total status='JOINED' members at asOf. */
-  totalMembers: Scalars["Int"]["output"];
-};
-
-/** Input for the L1 all-community overview (`sysAdminDashboard`). */
-export type GqlSysAdminDashboardInput = {
-  /**
-   * As-of timestamp anchor. All trailing-window calculations are
-   * anchored here:
-   *   - parametric activity window: [asOf - windowDays, asOf + 1 JST日)
-   *   - weekly retention: latest completed ISO week before asOf
-   *   - latest cohort: (asOf JST月 - 2) so its M+1 window is fully past
-   * Defaults to now when omitted.
-   */
-  asOf?: InputMaybe<Scalars["Datetime"]["input"]>;
-  /**
-   * Days since a member's most recent DONATION above which they are
-   * classified as "dormant" — i.e. they donated at some point but
-   * have gone quiet. Used to populate
-   * `SysAdminCommunityOverview.dormantCount`.
-   *
-   * Distinct from `segmentCounts.passiveCount` (= "latent", never
-   * donated): operators care about the difference because the
-   * intervention is different (re-engage a sleeper vs onboard a
-   * newcomer). A member with `MAX(donation.created_at) < asOf -
-   * dormantThresholdDays` is dormant.
-   *
-   * Default 30 (≈ one month of silence). Effective range 1..365;
-   * values outside are silently clamped on the server.
-   */
-  dormantThresholdDays?: InputMaybe<Scalars["Int"]["input"]>;
-  /**
-   * Minimum number of distinct DONATION recipients within the
-   * parametric window (`windowDays`) for a member to be classified
-   * as a hub. Used to populate `SysAdminCommunityOverview.hubMemberCount`.
-   *
-   * Defaults to 3, meaning "sent DONATION to at least 3 different
-   * people during the window". The threshold is on **unique
-   * counterparties** (set cardinality), not transaction count, so a
-   * member who donated 100 times to the same recipient does not
-   * qualify on this axis alone.
-   *
-   * Effective range 1..1000; values outside are silently clamped on
-   * the server.
-   *
-   * This is intentionally an absolute threshold rather than a
-   * community-relative percentile: a percentile-based hub would
-   * always classify ~N% of members as hubs by definition, defeating
-   * cross-community comparison ("which communities have the highest
-   * hub ratio?"). Community size differences are absorbed
-   * client-side by displaying `hubMemberCount / totalMembers` rather
-   * than the raw count.
-   */
-  hubBreadthThreshold?: InputMaybe<Scalars["Int"]["input"]>;
-  /** Stage classification thresholds (see SysAdminSegmentThresholdsInput). */
-  segmentThresholds?: InputMaybe<GqlSysAdminSegmentThresholdsInput>;
-  /**
-   * Length of the rolling activity window in JST days. Effective
-   * range 7-90; values outside are silently clamped on the server.
-   * Defaults to 28 (= 4 weeks, absorbs day-of-week variance).
-   */
-  windowDays?: InputMaybe<Scalars["Int"]["input"]>;
-};
-
-/** Root payload for sysAdminDashboard (L1). */
-export type GqlSysAdminDashboardPayload = {
-  __typename?: "SysAdminDashboardPayload";
-  /** As-of timestamp echoed back (UTC instant). */
-  asOf: Scalars["Datetime"]["output"];
-  /** One row per community, in dashboard sort order. */
-  communities: Array<GqlSysAdminCommunityOverview>;
-  /** Platform-wide aggregate row. */
-  platform: GqlSysAdminPlatformSummary;
-};
-
-/**
- * Most recently completed monthly cohort plus its M+1 activity.
- * "M+1" follows standard cohort-analysis convention: the calendar
- * month immediately after the joining month.
- *
- * The cohort is selected as (asOf's JST month - 2 months) so its
- * M+1 window — the JST month immediately preceding asOf's month —
- * is fully past. This avoids reporting an artificially low retention
- * during the in-progress month.
- *
- * Raw counts are returned; the client divides for the retention rate
- * and decides how to handle small-N cohorts via `size`.
- */
-export type GqlSysAdminLatestCohort = {
-  __typename?: "SysAdminLatestCohort";
-  /**
-   * Of those cohort members, how many sent at least one DONATION
-   * during the M+1 month.
-   */
-  activeAtM1: Scalars["Int"]["output"];
-  /**
-   * Cohort size: status='JOINED' members whose created_at falls
-   * within the cohort month. 0 when no one joined that month
-   * (callers should treat M+1 retention as null in that case).
-   */
-  size: Scalars["Int"]["output"];
-};
-
-/** Paginated member list for the L2 detail. */
-export type GqlSysAdminMemberList = {
-  __typename?: "SysAdminMemberList";
-  /** Whether more pages exist after this one. */
-  hasNextPage: Scalars["Boolean"]["output"];
-  /**
-   * Opaque cursor to pass back in `SysAdminCommunityDetailInput.cursor` to
-   * fetch the next page. null when no further pages exist.
-   */
-  nextCursor?: Maybe<Scalars["String"]["output"]>;
-  /**
-   * Member rows for the current page, matching filter & sort applied
-   * server-side.
-   */
-  users: Array<GqlSysAdminMemberRow>;
-};
-
-/**
- * One row of the L2 member list. Raw values only — stage classification
- * (habitual / regular / occasional / latent) is the client's concern so
- * server-side thresholds can be tuned without a schema change.
- */
-export type GqlSysAdminMemberRow = {
-  __typename?: "SysAdminMemberRow";
-  /**
-   * Tenure in JST calendar days (floor, minimum 1). Daily-grain
-   * counterpart to `monthsIn`. Useful when the client wants a
-   * finer-grained activity rate than the monthly `userSendRate`,
-   * or when grouping members into tenure buckets that don't align
-   * with calendar-month boundaries.
-   */
-  daysIn: Scalars["Int"]["output"];
-  /**
-   * Distinct JST days the member received at least one DONATION.
-   * Daily-grain counterpart to `donationInMonths`. Receiver-side
-   * counterpart to `donationOutDays`.
-   */
-  donationInDays: Scalars["Int"]["output"];
-  /**
-   * Distinct months with at least one DONATION in. Receiver-side
-   * counterpart to `donationOutMonths`. Combined with
-   * `totalPointsIn`, identifies members who have been part of the
-   * receiving side of the gift economy and over how broad a span.
-   */
-  donationInMonths: Scalars["Int"]["output"];
-  /**
-   * Distinct JST days the member sent at least one DONATION.
-   * Daily-grain counterpart to `donationOutMonths`. Combined with
-   * `daysIn`, the client can compute `donationOutDays / daysIn` as
-   * a daily-cadence rate, complementing the monthly `userSendRate`.
-   */
-  donationOutDays: Scalars["Int"]["output"];
-  /** Distinct months with at least one DONATION out. */
-  donationOutMonths: Scalars["Int"]["output"];
-  /**
-   * JST date (UTC-encoded at JST midnight) of this member's most
-   * recent DONATION out in this community. null when the member has
-   * never sent a DONATION (= latent on the sender axis).
-   *
-   * Powers the L3 "/members" dormancy list: clients sort dormant
-   * members by `lastDonationAt ASC` to surface the longest-quiet
-   * senders first, and compute days-since-last-donation as
-   * `(asOf - lastDonationAt) / 1 day` for the per-row badge. Same
-   * underlying signal as `dormantCount`'s threshold check
-   * (`MAX(donation.created_at) < asOf - dormantThresholdDays`),
-   * exposed as the raw timestamp so the client can derive multiple
-   * derived views without a server-side recomputation per request.
-   */
-  lastDonationAt?: Maybe<Scalars["Datetime"]["output"]>;
-  /** Tenure in JST calendar months (floor, minimum 1). */
-  monthsIn: Scalars["Int"]["output"];
-  /** User display name (users.name). null when the user has no name set. */
-  name?: Maybe<Scalars["String"]["output"]>;
-  /**
-   * All-time DONATION points received by this user in this community.
-   * Receiver-side counterpart to `totalPointsOut`. Sums
-   * `to_point_change` across DONATION transactions whose receiver
-   * wallet belongs to this user in this community. Burn / system
-   * sources (sender wallets without a user_id) are excluded so a
-   * member who only received from a system grant scores 0 — same
-   * scope as `totalPointsOut`.
-   */
-  totalPointsIn: Scalars["Float"]["output"];
-  /** All-time DONATION points sent by this user in this community. */
-  totalPointsOut: Scalars["Float"]["output"];
-  /**
-   * All-time count of distinct OTHER users this member has sent at
-   * least one DONATION to in this community. The "network breadth"
-   * half of the donor profile (paired with frequency-based
-   * `userSendRate` and volume-based `totalPointsOut`):
-   *
-   *   breadth × frequency × volume → the client's per-member
-   *   classification space (e.g. true hub vs single-target loyal vs
-   *   rare-but-far-reaching).
-   *
-   * Counts unique counterparty user_id, not transaction count, so a
-   * member who sent 100 donations to the same recipient still scores
-   * 1. Excludes burn / system targets (recipient wallets without a
-   * user_id).
-   */
-  uniqueDonationRecipients: Scalars["Int"]["output"];
-  /**
-   * All-time count of distinct OTHER users that have sent at least
-   * one DONATION to this member in this community. The receiver-side
-   * counterpart to `uniqueDonationRecipients`. Counts unique sender
-   * user_id, excludes burn / system sources (sender wallets without
-   * a user_id) and self-donations (a user who somehow sent to their
-   * own wallet does not increment the count). Used by the L2
-   * dashboard to compute the "受領→送付 転換率" (recipient-to-sender
-   * conversion rate) — share of DONATION recipients who have also
-   * sent at least one DONATION — distinguishing reciprocal
-   * participation networks from one-way distribution structures.
-   */
-  uniqueDonationSenders: Scalars["Int"]["output"];
-  /** User id. */
-  userId: Scalars["ID"]["output"];
-  /**
-   * Individual monthly-send rate: `donationOutMonths / monthsIn`, 0.0–1.0,
-   * rounded to 3 decimals. INDIVIDUAL LTV variable (not the same as
-   * communityActivityRate elsewhere in this schema).
-   */
-  userSendRate: Scalars["Float"]["output"];
-};
-
-/** One month of community activity trend. */
-export type GqlSysAdminMonthlyActivityPoint = {
-  __typename?: "SysAdminMonthlyActivityPoint";
-  /**
-   * Share of DONATION transactions that were part of a chain (chain_depth
-   * > 0) in the month. 0.0–1.0.
-   */
-  chainPct?: Maybe<Scalars["Float"]["output"]>;
-  /**
-   * senderCount / month-end totalMembers. Read alongside newMembers: a
-   * month with many new joiners can dip the rate even if absolute activity
-   * grew.
-   */
-  communityActivityRate: Scalars["Float"]["output"];
-  /** Sum of DONATION points transferred in the month. */
-  donationPointsSum: Scalars["Float"]["output"];
-  /**
-   * Members who had no DONATION out in the trailing 30 days as of
-   * the END of this month. Snapshot of the dormant base at
-   * month-end. Pair with the NEXT month's `returnedMembers` to
-   * compute the monthly recovery rate
-   * (`returnedMembers[N] / dormantCount[N-1]`).
-   *
-   * Aligns with `SysAdminCommunityOverview.dormantCount` /
-   * `SysAdminCommunityDetailPayload.dormantCount` semantics: an
-   * ever-donated member whose most recent DONATION is older than
-   * 30 days as of the month-end timestamp. The latest month's
-   * value should equal `SysAdminCommunityDetailPayload.dormantCount`
-   * when `asOf` falls at or near the JST month-end, modulo the
-   * difference between the request's `dormantThresholdDays` input
-   * (which the trend ignores in favor of a fixed 30-day window so
-   * monthly returnedMembers / dormantCount stay comparable across
-   * requests).
-   */
-  dormantCount: Scalars["Int"]["output"];
-  /**
-   * Distinct members who, AS OF the END of this month, had sent
-   * DONATIONs to >= `hubBreadthThreshold` distinct recipients within
-   * the trailing 28-day window ending at the month-end. Same
-   * window-scoped semantic as
-   * `SysAdminCommunityOverview.hubMemberCount`, evaluated at
-   * month-end rather than at request `asOf`.
-   *
-   * Window: `[monthEnd - 28 JST days, monthEnd)`. The 28-day window is
-   * fixed (independent of any request input) so monthly
-   * hubMemberCount values across the trend stay comparable to each
-   * other — same precedent as `dormantCount`'s fixed 30-day window.
-   * `hubBreadthThreshold` follows
-   * `SysAdminCommunityDetailInput.hubBreadthThreshold` (default 3).
-   *
-   * Senders are restricted to users JOINED in the community at the
-   * month-end timestamp — same membership filter as
-   * `dormantCount` / L1 `senderCount` / L1 `hubMemberCount`. A
-   * member who left the community before this month-end is
-   * excluded even if they donated during the trailing window.
-   *
-   * When the L1 dashboard is queried with the default
-   * `windowDays = 28` and an `asOf` that falls at or near a JST
-   * month-end, the latest entry of `monthlyActivityTrend.hubMemberCount`
-   * equals `SysAdminCommunityOverview.hubMemberCount` for the same
-   * community (provided both queries pass the same
-   * `hubBreadthThreshold`).
-   *
-   * Currently always returns a non-null integer (0 for months with
-   * no qualifying senders), matching the precedent set by sibling
-   * monthly counters (`senderCount`, `dormantCount`). The field is
-   * declared nullable to preserve forward compatibility for a future
-   * refinement that may suppress months entirely outside the
-   * community's MV data range — clients should still tolerate null.
-   */
-  hubMemberCount?: Maybe<Scalars["Int"]["output"]>;
-  /** First day (JST) of the calendar month, e.g. 2025-10-01T00:00+09:00. */
-  month: Scalars["Datetime"]["output"];
-  /** t_memberships.created_at (status='JOINED') rows falling in the month. */
-  newMembers: Scalars["Int"]["output"];
-  /**
-   * Members who were dormant at the END of the previous calendar
-   * month but had at least one DONATION out in this month. Monthly
-   * counterpart to `SysAdminRetentionTrendPoint.returnedSenders`.
-   * null for the first month in the series (no prior month to
-   * reference).
-   *
-   * "Dormant at the end of previous month" uses the same threshold
-   * semantic as `SysAdminCommunityOverview.dormantCount` /
-   * `SysAdminMonthlyActivityPoint.dormantCount` — no DONATION out in
-   * the trailing 30 days as of the previous month-end. This may
-   * diverge slightly from the sum of weekly `returnedSenders` over
-   * the month because the weekly metric uses a 12-week look-back at
-   * ISO-week granularity while this monthly metric uses the
-   * 30-day-trailing dormant snapshot at month-end. The discrepancy
-   * is week/month boundary alignment only.
-   */
-  returnedMembers?: Maybe<Scalars["Int"]["output"]>;
-  /** Distinct DONATION senders in the month. */
-  senderCount: Scalars["Int"]["output"];
-};
-
-/**
- * Platform-wide headline, computed by summing across every community in
- * scope for the caller (which is every community since this query is
- * SYS_ADMIN-gated).
- */
-export type GqlSysAdminPlatformSummary = {
-  __typename?: "SysAdminPlatformSummary";
-  /** Number of communities included in the response. */
-  communitiesCount: Scalars["Int"]["output"];
-  /**
-   * Sum of DONATION points transferred during the JST calendar month
-   * containing `asOf`, across every community.
-   */
-  latestMonthDonationPoints: Scalars["Float"]["output"];
-  /** Sum of status='JOINED' members across every community. */
-  totalMembers: Scalars["Int"]["output"];
-};
-
-/** One ISO week of retention signals. */
-export type GqlSysAdminRetentionTrendPoint = {
-  __typename?: "SysAdminRetentionTrendPoint";
-  /** Senders in the prior week who did NOT send this week. */
-  churnedSenders: Scalars["Int"]["output"];
-  /**
-   * Community activity rate for the week: distinct senders / totalMembers
-   * as of week end. null when the community had zero members during the
-   * week.
-   */
-  communityActivityRate?: Maybe<Scalars["Float"]["output"]>;
-  /** New t_memberships.created_at rows (status='JOINED') this week. */
-  newMembers: Scalars["Int"]["output"];
-  /**
-   * Senders in both the prior week and this week (same-user on
-   * donation_out_count > 0).
-   */
-  retainedSenders: Scalars["Int"]["output"];
-  /**
-   * Senders this week who did NOT send last week but DID send some week
-   * in the prior 12-week window.
-   */
-  returnedSenders: Scalars["Int"]["output"];
-  /** Monday 00:00 JST of the ISO week. */
-  week: Scalars["Datetime"]["output"];
-};
-
-/**
- * Stage-count snapshot for one community, computed by the server using the
- * client-supplied `SysAdminSegmentThresholdsInput`. Cumulative semantics:
- * `tier2Count` INCLUDES members counted in `tier1Count`.
- */
-export type GqlSysAdminSegmentCounts = {
-  __typename?: "SysAdminSegmentCounts";
-  /** Members with userSendRate > 0 (excludes latent). */
-  activeCount: Scalars["Int"]["output"];
-  /** Members with donationOutMonths == 0 (latent / not-yet-participated). */
-  passiveCount: Scalars["Int"]["output"];
-  /** Members with userSendRate >= tier1. */
-  tier1Count: Scalars["Int"]["output"];
-  /** Members with userSendRate >= tier2 (includes tier1). */
-  tier2Count: Scalars["Int"]["output"];
-  /** Total status='JOINED' members at asOf. */
-  total: Scalars["Int"]["output"];
-};
-
-/**
- * Stage classification thresholds, supplied by the client.
- * Thresholds define WHERE the boundary between stages sits, but naming
- * (habitual / regular / occasional / latent) remains fixed on the server.
- */
-export type GqlSysAdminSegmentThresholdsInput = {
-  /**
-   * Minimum tenure a member must have before being eligible for
-   * tier1 / tier2 classification. Expressed in calendar months for
-   * ergonomic operator-facing semantics, but evaluated internally as
-   * `daysIn >= minMonthsIn × 30` so a member who joined yesterday
-   * but happens to straddle a calendar-month boundary cannot sneak
-   * past the filter. Filters out the short-tenure artifact where a
-   * brand-new member who donated once gets
-   * `userSendRate = 1/1 = 1.0` and is auto-classified as habitual
-   * despite no actual track record.
-   *
-   * Only affects `tier1Count` and `tier2Count`; `activeCount`
-   * ("ever donated") and `passiveCount` ("never donated") are
-   * semantically tenure-independent and remain unfiltered.
-   *
-   * Default 1 → roughly "must have been around at least 30 days".
-   * Set to 3 for "must have been around 3+ months (~90 days)" so
-   * the operator-facing reading of `tier1Count` matches the
-   * intuitive meaning of "habitual sender".
-   *
-   * Effective range 1..120; values outside are silently clamped on
-   * the server. The 30-day-per-month conversion matches
-   * `tenureDistribution`'s bucket boundaries so the stage classifier
-   * and the tenure-distribution chart agree on what "1 month" means.
-   */
-  minMonthsIn?: InputMaybe<Scalars["Int"]["input"]>;
-  /**
-   * Habitual stage threshold. A user with `userSendRate >= tier1` is
-   * counted as "habitual" (i.e. sends donations in at least tier1 share
-   * of their tenure). Default 0.7.
-   */
-  tier1?: InputMaybe<Scalars["Float"]["input"]>;
-  /**
-   * Regular stage threshold. `userSendRate >= tier2` AND `< tier1`
-   * classifies as "regular". Default 0.4.
-   */
-  tier2?: InputMaybe<Scalars["Float"]["input"]>;
-};
-
-/** Sort direction for the member list. */
-export const GqlSysAdminSortOrder = {
-  /**
-   * Ascending — smallest value first (e.g. SEND_RATE ASC puts latent
-   * and occasional members before habitual).
-   */
-  Asc: "ASC",
-  /**
-   * Descending — largest value first (e.g. SEND_RATE DESC puts habitual
-   * members at the top). This is the default.
-   */
-  Desc: "DESC",
-} as const;
-
-export type GqlSysAdminSortOrder = (typeof GqlSysAdminSortOrder)[keyof typeof GqlSysAdminSortOrder];
-/**
- * Summary for one stage (habitual / regular / occasional / latent).
- * Stage membership is classified server-side using the thresholds supplied
- * in the request. `pointsContributionPct` is the share of total DONATION
- * points-out attributed to members in this stage, in the asOf month.
- */
-export type GqlSysAdminStageBucket = {
-  __typename?: "SysAdminStageBucket";
-  /** Average monthsIn across members in this stage. */
-  avgMonthsIn: Scalars["Float"]["output"];
-  /** Average userSendRate across members in this stage (0.0–1.0). */
-  avgSendRate: Scalars["Float"]["output"];
-  /** Number of members in this stage. */
-  count: Scalars["Int"]["output"];
-  /** count / totalMembers (0.0–1.0). */
-  pct: Scalars["Float"]["output"];
-  /**
-   * Stage's share of this community's all-time DONATION points-out
-   * (0.0–1.0). Numerator is the sum of `totalPointsOut` across the
-   * stage's members; denominator is the same sum across all members.
-   * 0 for the latent stage by definition.
-   */
-  pointsContributionPct: Scalars["Float"]["output"];
-};
-
-/**
- * Four-stage distribution of the community's membership.
- * `pointsContributionPct` on `latent` is always 0 since latent members
- * haven't donated by definition.
- */
-export type GqlSysAdminStageDistribution = {
-  __typename?: "SysAdminStageDistribution";
-  /** userSendRate >= tier1. */
-  habitual: GqlSysAdminStageBucket;
-  /** donationOutMonths == 0. */
-  latent: GqlSysAdminStageBucket;
-  /** 0 < userSendRate < tier2. */
-  occasional: GqlSysAdminStageBucket;
-  /** tier2 <= userSendRate < tier1. */
-  regular: GqlSysAdminStageBucket;
-};
-
-/**
- * Tenure-bucket distribution of a community's members at asOf,
- * classified on `daysIn` (JST calendar-day tenure). Lets the L1
- * dashboard surface community age structure (e.g. "lots of brand
- * new members, few established") without drilling into the L2
- * member list.
- *
- * Buckets are mutually exclusive and exhaustive; the sum equals
- * totalMembers. Boundaries are intentionally calendar-day rather
- * than month so a 28-day-tenure member doesn't get double-counted
- * into "1 month" purely because of `monthsIn`'s GREATEST(1, ...)
- * floor.
- */
-export type GqlSysAdminTenureDistribution = {
-  __typename?: "SysAdminTenureDistribution";
-  /**
-   * Members with `daysIn >= 365` — long-time members. Combined
-   * with `lt1Month`, signals the community's age structure.
-   */
-  gte12Months: Scalars["Int"]["output"];
-  /**
-   * Members with `daysIn < 30` — newly joined cohort. Useful for
-   * spotting communities flooded with new members where downstream
-   * metrics (userSendRate, retention) are not yet meaningful.
-   */
-  lt1Month: Scalars["Int"]["output"];
-  /** Members with `30 <= daysIn < 90` — "still settling in" cohort. */
-  m1to3Months: Scalars["Int"]["output"];
-  /** Members with `90 <= daysIn < 365` — established members. */
-  m3to12Months: Scalars["Int"]["output"];
-  /**
-   * Detailed monthly histogram for the L3 tenure deep-dive.
-   *
-   * Each entry counts currently-JOINED members whose `daysIn` falls
-   * into the bucket. Bucket boundaries are aligned with the coarse
-   * `gte12Months` cutoff so the histogram and coarse buckets agree:
-   *
-   *   - bucket 0:  daysIn <  30
-   *   - bucket k (1..10):  k * 30 <= daysIn < (k + 1) * 30
-   *   - bucket 11: 330 <= daysIn < 365
-   *   - bucket 12: daysIn >= 365
-   *
-   * The 12 bucket therefore matches `gte12Months` exactly; bucket 11
-   * is widened from the bare `[330, 360)` slot to `[330, 365)` so a
-   * member at 360..364 days lands in 11 rather than 12
-   * (`floor(daysIn / 30)` would otherwise have placed them in 12,
-   * creating an asymmetry with the coarse `m3to12Months` cutoff at
-   * 365).
-   *
-   * Returned in ascending bucket order (`monthsIn` 0..12), with every
-   * bucket emitted (count = 0 for buckets with no members) so the
-   * client can render a contiguous histogram axis without
-   * zero-padding.
-   *
-   * Sum of `count` equals `totalMembers`. A member with `daysIn < 0`
-   * (data anomaly — `daysIn` is floor-1-clamped at the SQL boundary
-   * so this should be impossible) is clamped into bucket 0 rather
-   * than excluded, matching the service implementation.
-   *
-   * The existing 4 coarse buckets (`lt1Month` / `m1to3Months` /
-   * `m3to12Months` / `gte12Months`) remain for L1 / L2 callers; the
-   * monthly histogram is additional, not a replacement.
-   */
-  monthlyHistogram: Array<GqlSysAdminTenureHistogramBucket>;
-};
-
-/**
- * One bucket of the L3 tenure histogram. See
- * `SysAdminTenureDistribution.monthlyHistogram`.
- */
-export type GqlSysAdminTenureHistogramBucket = {
-  __typename?: "SysAdminTenureHistogramBucket";
-  /** Number of currently-JOINED members in this bucket. */
-  count: Scalars["Int"]["output"];
-  /**
-   * Tenure bucket index, range 0..12. The 0 bucket aggregates
-   * `daysIn < 30`; buckets 1..10 cover `k * 30 <= daysIn <
-   * (k + 1) * 30`; bucket 11 covers `330 <= daysIn < 365`; the 12
-   * bucket aggregates `daysIn >= 365` (matching the coarse
-   * `gte12Months` boundary). Members at 330..364 days land in
-   * bucket 11, not bucket 12.
-   */
-  monthsIn: Scalars["Int"]["output"];
-};
-
-/**
- * Member-list filters for the L2 detail (`sysAdminCommunityDetail`).
- * All conditions AND together. Unspecified fields do not filter.
- */
-export type GqlSysAdminUserListFilter = {
-  /** Inclusive upper bound on userSendRate. */
-  maxSendRate?: InputMaybe<Scalars["Float"]["input"]>;
-  /** Inclusive lower bound on donationOutMonths. */
-  minDonationOutMonths?: InputMaybe<Scalars["Int"]["input"]>;
-  /** Inclusive lower bound on monthsIn (JST-calendar months). */
-  minMonthsIn?: InputMaybe<Scalars["Int"]["input"]>;
-  /** Inclusive lower bound on userSendRate. Default 0.7 (habitual only). */
-  minSendRate?: InputMaybe<Scalars["Float"]["input"]>;
-};
-
-/**
- * Sort configuration for the L2 member list. Both fields are optional;
- * omitting either falls back to the default (SEND_RATE DESC) so the
- * "top habitual members first" view renders out of the box.
- */
-export type GqlSysAdminUserListSort = {
-  /**
-   * Column to sort on. See SysAdminUserSortField for what each value
-   * addresses. Default: SEND_RATE.
-   */
-  field?: InputMaybe<GqlSysAdminUserSortField>;
-  /** Sort direction. Default: DESC. */
-  order?: InputMaybe<GqlSysAdminSortOrder>;
-};
-
-/** Sortable columns on the member list. */
-export const GqlSysAdminUserSortField = {
-  /** donationOutMonths (distinct months with a DONATION out). */
-  DonationOutMonths: "DONATION_OUT_MONTHS",
-  /** monthsIn (tenure in JST calendar months). */
-  MonthsIn: "MONTHS_IN",
-  /** userSendRate (individual monthly-send rate, 0.0–1.0). */
-  SendRate: "SEND_RATE",
-  /** totalPointsOut (lifetime DONATION points sent). */
-  TotalPointsOut: "TOTAL_POINTS_OUT",
-} as const;
-
-export type GqlSysAdminUserSortField =
-  (typeof GqlSysAdminUserSortField)[keyof typeof GqlSysAdminUserSortField];
-/**
- * DONATION sender retention against the most recently completed
- * ISO week (Monday 00:00 JST). Raw signals only; the client composes
- * churn alerts (e.g. churnedSenders > retainedSenders).
- */
-export type GqlSysAdminWeeklyRetention = {
-  __typename?: "SysAdminWeeklyRetention";
-  /**
-   * Users who sent DONATION in the week-before-latest but NOT in
-   * the latest completed week. "Lost this week, was engaged last week."
-   */
-  churnedSenders: Scalars["Int"]["output"];
-  /**
-   * Users who sent DONATION in the latest completed week AND in
-   * the week before it. "Engaged this week, was engaged last week."
-   */
-  retainedSenders: Scalars["Int"]["output"];
-};
-
-/**
- * DONATION activity within the parametric window driven by
- * `SysAdminDashboardInput.windowDays`. Both the current window and
- * the immediately preceding window of equal length are returned so
- * the client can derive growth rates without a second query.
- *
- *   current  = [asOf - windowDays JST日, asOf + 1 JST日)
- *   previous = [asOf - 2 * windowDays, asOf - windowDays)
- */
-export type GqlSysAdminWindowActivity = {
-  __typename?: "SysAdminWindowActivity";
-  /**
-   * New JOINED memberships (t_memberships.created_at within the
-   * current window, status='JOINED').
-   */
-  newMemberCount: Scalars["Int"]["output"];
-  /** Same metric for the previous window. */
-  newMemberCountPrev: Scalars["Int"]["output"];
-  /**
-   * Users who sent at least one DONATION in BOTH the current window
-   * AND the previous window (set intersection on user_id). Same
-   * shape as SysAdminWeeklyRetention.retainedSenders but at
-   * windowDays scale, enabling client-side leaky-bucket derivation:
-   *
-   *   newlyActivatedSenders = senderCount     - retainedSenders
-   *   churnedSenders        = senderCountPrev - retainedSenders
-   */
-  retainedSenders: Scalars["Int"]["output"];
-  /**
-   * Unique users with at least one outgoing DONATION transaction
-   * during the current window (donation_out_count > 0 in
-   * mv_user_transaction_daily). Restricted to users who are still
-   * JOINED in this community at asOf — a now-departed member who
-   * donated during the window is excluded, mirroring the
-   * membership filter on `totalMembers`.
-   */
-  senderCount: Scalars["Int"]["output"];
-  /**
-   * Same metric for the previous window of equal length. Same
-   * JOINED-at-asOf membership restriction applies (so the
-   * `senderCount` / `senderCountPrev` comparison stays
-   * apples-to-apples even when membership churn happens between
-   * the two windows).
-   */
-  senderCountPrev: Scalars["Int"]["output"];
 };
 
 export const GqlSysRole = {
@@ -6445,7 +5236,6 @@ export type GqlCommunityCreateMutation = {
 
 export type GqlUpdateSignupBonusConfigMutationVariables = Exact<{
   input: GqlUpdateSignupBonusConfigInput;
-  communityId: Scalars["ID"]["input"];
 }>;
 
 export type GqlUpdateSignupBonusConfigMutation = {
@@ -6460,7 +5250,6 @@ export type GqlUpdateSignupBonusConfigMutation = {
 
 export type GqlIncentiveGrantRetryMutationVariables = Exact<{
   incentiveGrantId: Scalars["ID"]["input"];
-  communityId: Scalars["ID"]["input"];
 }>;
 
 export type GqlIncentiveGrantRetryMutation = {
@@ -6474,7 +5263,6 @@ export type GqlIncentiveGrantRetryMutation = {
 
 export type GqlUpdatePortalConfigMutationVariables = Exact<{
   input: GqlCommunityPortalConfigInput;
-  communityId: Scalars["ID"]["input"];
 }>;
 
 export type GqlUpdatePortalConfigMutation = {
@@ -6743,7 +5531,6 @@ export type GqlMembershipFieldsFragment = {
 
 export type GqlAssignOwnerMutationVariables = Exact<{
   input: GqlMembershipSetRoleInput;
-  permission: GqlCheckCommunityPermissionInput;
 }>;
 
 export type GqlAssignOwnerMutation = {
@@ -6763,7 +5550,6 @@ export type GqlAssignOwnerMutation = {
 
 export type GqlAssignManagerMutationVariables = Exact<{
   input: GqlMembershipSetRoleInput;
-  permission: GqlCheckCommunityPermissionInput;
 }>;
 
 export type GqlAssignManagerMutation = {
@@ -6783,7 +5569,6 @@ export type GqlAssignManagerMutation = {
 
 export type GqlAssignMemberMutationVariables = Exact<{
   input: GqlMembershipSetRoleInput;
-  permission: GqlCheckCommunityPermissionInput;
 }>;
 
 export type GqlAssignMemberMutation = {
@@ -7074,7 +5859,6 @@ export type GqlAdminReportDetailFieldsFragment = {
 
 export type GqlSubmitReportFeedbackMutationVariables = Exact<{
   input: GqlSubmitReportFeedbackInput;
-  permission: GqlCheckCommunityPermissionInput;
 }>;
 
 export type GqlSubmitReportFeedbackMutation = {
@@ -8600,7 +7384,6 @@ export type GqlGetArticlesQuery = {
 
 export type GqlGetArticleQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
-  permission: GqlCheckCommunityPermissionInput;
 }>;
 
 export type GqlGetArticleQuery = {
@@ -8764,7 +7547,6 @@ export type GqlGetDidIssuanceRequestsQuery = {
 
 export type GqlEvaluationBulkCreateMutationVariables = Exact<{
   input: GqlEvaluationBulkCreateInput;
-  permission: GqlCheckCommunityPermissionInput;
 }>;
 
 export type GqlEvaluationBulkCreateMutation = {
@@ -8929,7 +7711,6 @@ export type GqlOpportunityFieldsFragment = {
 
 export type GqlCreateOpportunityMutationVariables = Exact<{
   input: GqlOpportunityCreateInput;
-  permission: GqlCheckCommunityPermissionInput;
 }>;
 
 export type GqlCreateOpportunityMutation = {
@@ -9158,7 +7939,6 @@ export type GqlGetOpportunitiesQuery = {
 
 export type GqlGetOpportunityQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
-  permission: GqlCheckCommunityPermissionInput;
   slotFilter?: InputMaybe<GqlOpportunitySlotFilterInput>;
   slotSort?: InputMaybe<GqlOpportunitySlotSortInput>;
 }>;
@@ -9446,7 +8226,6 @@ export type GqlGetSlotReservationsQuery = {
 
 export type GqlParticipationBulkCreateMutationVariables = Exact<{
   input: GqlParticipationBulkCreateInput;
-  permission: GqlCheckCommunityPermissionInput;
 }>;
 
 export type GqlParticipationBulkCreateMutation = {
@@ -10136,7 +8915,6 @@ export type GqlPlaceFieldsFragment = {
 
 export type GqlPlaceCreateMutationVariables = Exact<{
   input: GqlPlaceCreateInput;
-  permission: GqlCheckCommunityPermissionInput;
 }>;
 
 export type GqlPlaceCreateMutation = {
@@ -10170,7 +8948,6 @@ export type GqlPlaceCreateMutation = {
 export type GqlPlaceUpdateMutationVariables = Exact<{
   id: Scalars["ID"]["input"];
   input: GqlPlaceUpdateInput;
-  permission: GqlCheckCommunityPermissionInput;
 }>;
 
 export type GqlPlaceUpdateMutation = {
@@ -10201,7 +8978,6 @@ export type GqlPlaceUpdateMutation = {
 
 export type GqlPlaceDeleteMutationVariables = Exact<{
   id: Scalars["ID"]["input"];
-  permission: GqlCheckCommunityPermissionInput;
 }>;
 
 export type GqlPlaceDeleteMutation = {
@@ -10403,7 +9179,6 @@ export type GqlTicketFieldsFragment = {
 
 export type GqlTicketIssueMutationVariables = Exact<{
   input: GqlTicketIssueInput;
-  permission: GqlCheckCommunityPermissionInput;
 }>;
 
 export type GqlTicketIssueMutation = {
@@ -10657,7 +9432,6 @@ export type GqlUtilityWithOwnerFieldsFragment = {
 
 export type GqlCreateUtilityMutationVariables = Exact<{
   input: GqlUtilityCreateInput;
-  permission: GqlCheckCommunityPermissionInput;
 }>;
 
 export type GqlCreateUtilityMutation = {
@@ -10741,7 +9515,6 @@ export type GqlTransactionFieldsFragment = {
 
 export type GqlPointIssueMutationVariables = Exact<{
   input: GqlTransactionIssueCommunityPointInput;
-  permission: GqlCheckCommunityPermissionInput;
 }>;
 
 export type GqlPointIssueMutation = {
@@ -10764,7 +9537,6 @@ export type GqlPointIssueMutation = {
 
 export type GqlPointGrantMutationVariables = Exact<{
   input: GqlTransactionGrantCommunityPointInput;
-  permission: GqlCheckCommunityPermissionInput;
 }>;
 
 export type GqlPointGrantMutation = {
@@ -10812,7 +9584,6 @@ export type GqlTransactionUpdateMetadataMutationVariables = Exact<{
   id: Scalars["ID"]["input"];
   input: GqlTransactionUpdateMetadataInput;
   permission?: InputMaybe<GqlCheckIsSelfPermissionInput>;
-  communityPermission?: InputMaybe<GqlCheckCommunityPermissionInput>;
 }>;
 
 export type GqlTransactionUpdateMetadataMutation = {
@@ -11102,7 +9873,6 @@ export type GqlVoteTopicUserFieldsFragment = {
 
 export type GqlCreateVoteTopicMutationVariables = Exact<{
   input: GqlVoteTopicCreateInput;
-  permission: GqlCheckCommunityPermissionInput;
 }>;
 
 export type GqlCreateVoteTopicMutation = {
@@ -11146,7 +9916,6 @@ export type GqlCreateVoteTopicMutation = {
 
 export type GqlDeleteVoteTopicMutationVariables = Exact<{
   id: Scalars["ID"]["input"];
-  permission: GqlCheckCommunityPermissionInput;
 }>;
 
 export type GqlDeleteVoteTopicMutation = {
@@ -11175,7 +9944,6 @@ export type GqlVoteCastMutation = {
 export type GqlUpdateVoteTopicMutationVariables = Exact<{
   id: Scalars["ID"]["input"];
   input: GqlVoteTopicUpdateInput;
-  permission: GqlCheckCommunityPermissionInput;
 }>;
 
 export type GqlUpdateVoteTopicMutation = {
@@ -12498,8 +11266,8 @@ export type CommunityCreateMutationOptions = Apollo.BaseMutationOptions<
   GqlCommunityCreateMutationVariables
 >;
 export const UpdateSignupBonusConfigDocument = gql`
-  mutation UpdateSignupBonusConfig($input: UpdateSignupBonusConfigInput!, $communityId: ID!) {
-    updateSignupBonusConfig(input: $input, permission: { communityId: $communityId }) {
+  mutation UpdateSignupBonusConfig($input: UpdateSignupBonusConfigInput!) {
+    updateSignupBonusConfig(input: $input) {
       bonusPoint
       isEnabled
       message
@@ -12525,7 +11293,6 @@ export type GqlUpdateSignupBonusConfigMutationFn = Apollo.MutationFunction<
  * const [updateSignupBonusConfigMutation, { data, loading, error }] = useUpdateSignupBonusConfigMutation({
  *   variables: {
  *      input: // value for 'input'
- *      communityId: // value for 'communityId'
  *   },
  * });
  */
@@ -12551,11 +11318,8 @@ export type UpdateSignupBonusConfigMutationOptions = Apollo.BaseMutationOptions<
   GqlUpdateSignupBonusConfigMutationVariables
 >;
 export const IncentiveGrantRetryDocument = gql`
-  mutation IncentiveGrantRetry($incentiveGrantId: ID!, $communityId: ID!) {
-    incentiveGrantRetry(
-      input: { incentiveGrantId: $incentiveGrantId }
-      permission: { communityId: $communityId }
-    ) {
+  mutation IncentiveGrantRetry($incentiveGrantId: ID!) {
+    incentiveGrantRetry(input: { incentiveGrantId: $incentiveGrantId }) {
       ... on IncentiveGrantRetrySuccess {
         incentiveGrant {
           id
@@ -12586,7 +11350,6 @@ export type GqlIncentiveGrantRetryMutationFn = Apollo.MutationFunction<
  * const [incentiveGrantRetryMutation, { data, loading, error }] = useIncentiveGrantRetryMutation({
  *   variables: {
  *      incentiveGrantId: // value for 'incentiveGrantId'
- *      communityId: // value for 'communityId'
  *   },
  * });
  */
@@ -12612,8 +11375,8 @@ export type IncentiveGrantRetryMutationOptions = Apollo.BaseMutationOptions<
   GqlIncentiveGrantRetryMutationVariables
 >;
 export const UpdatePortalConfigDocument = gql`
-  mutation UpdatePortalConfig($input: CommunityPortalConfigInput!, $communityId: ID!) {
-    updatePortalConfig(input: $input, permission: { communityId: $communityId }) {
+  mutation UpdatePortalConfig($input: CommunityPortalConfigInput!) {
+    updatePortalConfig(input: $input) {
       communityId
       title
       description
@@ -12644,7 +11407,6 @@ export type GqlUpdatePortalConfigMutationFn = Apollo.MutationFunction<
  * const [updatePortalConfigMutation, { data, loading, error }] = useUpdatePortalConfigMutation({
  *   variables: {
  *      input: // value for 'input'
- *      communityId: // value for 'communityId'
  *   },
  * });
  */
@@ -13469,11 +12231,8 @@ export type CurrentUserServerQueryResult = Apollo.QueryResult<
   GqlCurrentUserServerQueryVariables
 >;
 export const AssignOwnerDocument = gql`
-  mutation assignOwner(
-    $input: MembershipSetRoleInput!
-    $permission: CheckCommunityPermissionInput!
-  ) {
-    membershipAssignOwner(input: $input, permission: $permission) {
+  mutation assignOwner($input: MembershipSetRoleInput!) {
+    membershipAssignOwner(input: $input) {
       ... on MembershipSetRoleSuccess {
         membership {
           ...MembershipFields
@@ -13502,7 +12261,6 @@ export type GqlAssignOwnerMutationFn = Apollo.MutationFunction<
  * const [assignOwnerMutation, { data, loading, error }] = useAssignOwnerMutation({
  *   variables: {
  *      input: // value for 'input'
- *      permission: // value for 'permission'
  *   },
  * });
  */
@@ -13522,11 +12280,8 @@ export type AssignOwnerMutationOptions = Apollo.BaseMutationOptions<
   GqlAssignOwnerMutationVariables
 >;
 export const AssignManagerDocument = gql`
-  mutation assignManager(
-    $input: MembershipSetRoleInput!
-    $permission: CheckCommunityPermissionInput!
-  ) {
-    membershipAssignManager(input: $input, permission: $permission) {
+  mutation assignManager($input: MembershipSetRoleInput!) {
+    membershipAssignManager(input: $input) {
       ... on MembershipSetRoleSuccess {
         membership {
           ...MembershipFields
@@ -13555,7 +12310,6 @@ export type GqlAssignManagerMutationFn = Apollo.MutationFunction<
  * const [assignManagerMutation, { data, loading, error }] = useAssignManagerMutation({
  *   variables: {
  *      input: // value for 'input'
- *      permission: // value for 'permission'
  *   },
  * });
  */
@@ -13578,11 +12332,8 @@ export type AssignManagerMutationOptions = Apollo.BaseMutationOptions<
   GqlAssignManagerMutationVariables
 >;
 export const AssignMemberDocument = gql`
-  mutation assignMember(
-    $input: MembershipSetRoleInput!
-    $permission: CheckCommunityPermissionInput!
-  ) {
-    membershipAssignMember(input: $input, permission: $permission) {
+  mutation assignMember($input: MembershipSetRoleInput!) {
+    membershipAssignMember(input: $input) {
       ... on MembershipSetRoleSuccess {
         membership {
           ...MembershipFields
@@ -13611,7 +12362,6 @@ export type GqlAssignMemberMutationFn = Apollo.MutationFunction<
  * const [assignMemberMutation, { data, loading, error }] = useAssignMemberMutation({
  *   variables: {
  *      input: // value for 'input'
- *      permission: // value for 'permission'
  *   },
  * });
  */
@@ -14145,11 +12895,8 @@ export type GetNftInstanceWithDidQueryResult = Apollo.QueryResult<
   GqlGetNftInstanceWithDidQueryVariables
 >;
 export const SubmitReportFeedbackDocument = gql`
-  mutation SubmitReportFeedback(
-    $input: SubmitReportFeedbackInput!
-    $permission: CheckCommunityPermissionInput!
-  ) {
-    submitReportFeedback(input: $input, permission: $permission) {
+  mutation SubmitReportFeedback($input: SubmitReportFeedbackInput!) {
+    submitReportFeedback(input: $input) {
       ... on SubmitReportFeedbackSuccess {
         feedback {
           ...ReportFeedbackFields
@@ -14178,7 +12925,6 @@ export type GqlSubmitReportFeedbackMutationFn = Apollo.MutationFunction<
  * const [submitReportFeedbackMutation, { data, loading, error }] = useSubmitReportFeedbackMutation({
  *   variables: {
  *      input: // value for 'input'
- *      permission: // value for 'permission'
  *   },
  * });
  */
@@ -16098,8 +14844,8 @@ export type GetArticlesQueryResult = Apollo.QueryResult<
   GqlGetArticlesQueryVariables
 >;
 export const GetArticleDocument = gql`
-  query GetArticle($id: ID!, $permission: CheckCommunityPermissionInput!) {
-    article(id: $id, permission: $permission) {
+  query GetArticle($id: ID!) {
+    article(id: $id) {
       ...ArticleFields
       relatedUsers {
         ...UserFields
@@ -16152,7 +14898,6 @@ export const GetArticleDocument = gql`
  * const { data, loading, error } = useGetArticleQuery({
  *   variables: {
  *      id: // value for 'id'
- *      permission: // value for 'permission'
  *   },
  * });
  */
@@ -16280,11 +15025,8 @@ export type GetDidIssuanceRequestsQueryResult = Apollo.QueryResult<
   GqlGetDidIssuanceRequestsQueryVariables
 >;
 export const EvaluationBulkCreateDocument = gql`
-  mutation EvaluationBulkCreate(
-    $input: EvaluationBulkCreateInput!
-    $permission: CheckCommunityPermissionInput!
-  ) {
-    evaluationBulkCreate(input: $input, permission: $permission) {
+  mutation EvaluationBulkCreate($input: EvaluationBulkCreateInput!) {
+    evaluationBulkCreate(input: $input) {
       ... on EvaluationBulkCreateSuccess {
         evaluations {
           ...EvaluationFields
@@ -16313,7 +15055,6 @@ export type GqlEvaluationBulkCreateMutationFn = Apollo.MutationFunction<
  * const [evaluationBulkCreateMutation, { data, loading, error }] = useEvaluationBulkCreateMutation({
  *   variables: {
  *      input: // value for 'input'
- *      permission: // value for 'permission'
  *   },
  * });
  */
@@ -16546,11 +15287,8 @@ export type GetEvaluationQueryResult = Apollo.QueryResult<
   GqlGetEvaluationQueryVariables
 >;
 export const CreateOpportunityDocument = gql`
-  mutation CreateOpportunity(
-    $input: OpportunityCreateInput!
-    $permission: CheckCommunityPermissionInput!
-  ) {
-    opportunityCreate(input: $input, permission: $permission) {
+  mutation CreateOpportunity($input: OpportunityCreateInput!) {
+    opportunityCreate(input: $input) {
       ... on OpportunityCreateSuccess {
         opportunity {
           id
@@ -16605,7 +15343,6 @@ export type GqlCreateOpportunityMutationFn = Apollo.MutationFunction<
  * const [createOpportunityMutation, { data, loading, error }] = useCreateOpportunityMutation({
  *   variables: {
  *      input: // value for 'input'
- *      permission: // value for 'permission'
  *   },
  * });
  */
@@ -17166,11 +15903,10 @@ export type GetOpportunitiesQueryResult = Apollo.QueryResult<
 export const GetOpportunityDocument = gql`
   query GetOpportunity(
     $id: ID!
-    $permission: CheckCommunityPermissionInput!
     $slotFilter: OpportunitySlotFilterInput
     $slotSort: OpportunitySlotSortInput
   ) {
-    opportunity(id: $id, permission: $permission) {
+    opportunity(id: $id) {
       id
       title
       description
@@ -17253,7 +15989,6 @@ export const GetOpportunityDocument = gql`
  * const { data, loading, error } = useGetOpportunityQuery({
  *   variables: {
  *      id: // value for 'id'
- *      permission: // value for 'permission'
  *      slotFilter: // value for 'slotFilter'
  *      slotSort: // value for 'slotSort'
  *   },
@@ -17748,11 +16483,8 @@ export type GetSlotReservationsQueryResult = Apollo.QueryResult<
   GqlGetSlotReservationsQueryVariables
 >;
 export const ParticipationBulkCreateDocument = gql`
-  mutation ParticipationBulkCreate(
-    $input: ParticipationBulkCreateInput!
-    $permission: CheckCommunityPermissionInput!
-  ) {
-    participationBulkCreate(input: $input, permission: $permission) {
+  mutation ParticipationBulkCreate($input: ParticipationBulkCreateInput!) {
+    participationBulkCreate(input: $input) {
       ... on ParticipationBulkCreateSuccess {
         participations {
           ...ParticipationFields
@@ -17781,7 +16513,6 @@ export type GqlParticipationBulkCreateMutationFn = Apollo.MutationFunction<
  * const [participationBulkCreateMutation, { data, loading, error }] = useParticipationBulkCreateMutation({
  *   variables: {
  *      input: // value for 'input'
- *      permission: // value for 'permission'
  *   },
  * });
  */
@@ -18704,8 +17435,8 @@ export type GetVcIssuanceRequestsByUserQueryResult = Apollo.QueryResult<
   GqlGetVcIssuanceRequestsByUserQueryVariables
 >;
 export const PlaceCreateDocument = gql`
-  mutation PlaceCreate($input: PlaceCreateInput!, $permission: CheckCommunityPermissionInput!) {
-    placeCreate(input: $input, permission: $permission) {
+  mutation PlaceCreate($input: PlaceCreateInput!) {
+    placeCreate(input: $input) {
       ... on PlaceCreateSuccess {
         place {
           id
@@ -18755,7 +17486,6 @@ export type GqlPlaceCreateMutationFn = Apollo.MutationFunction<
  * const [placeCreateMutation, { data, loading, error }] = usePlaceCreateMutation({
  *   variables: {
  *      input: // value for 'input'
- *      permission: // value for 'permission'
  *   },
  * });
  */
@@ -18775,12 +17505,8 @@ export type PlaceCreateMutationOptions = Apollo.BaseMutationOptions<
   GqlPlaceCreateMutationVariables
 >;
 export const PlaceUpdateDocument = gql`
-  mutation PlaceUpdate(
-    $id: ID!
-    $input: PlaceUpdateInput!
-    $permission: CheckCommunityPermissionInput!
-  ) {
-    placeUpdate(id: $id, input: $input, permission: $permission) {
+  mutation PlaceUpdate($id: ID!, $input: PlaceUpdateInput!) {
+    placeUpdate(id: $id, input: $input) {
       ... on PlaceUpdateSuccess {
         place {
           id
@@ -18827,7 +17553,6 @@ export type GqlPlaceUpdateMutationFn = Apollo.MutationFunction<
  *   variables: {
  *      id: // value for 'id'
  *      input: // value for 'input'
- *      permission: // value for 'permission'
  *   },
  * });
  */
@@ -18847,8 +17572,8 @@ export type PlaceUpdateMutationOptions = Apollo.BaseMutationOptions<
   GqlPlaceUpdateMutationVariables
 >;
 export const PlaceDeleteDocument = gql`
-  mutation PlaceDelete($id: ID!, $permission: CheckCommunityPermissionInput!) {
-    placeDelete(id: $id, permission: $permission) {
+  mutation PlaceDelete($id: ID!) {
+    placeDelete(id: $id) {
       ... on PlaceDeleteSuccess {
         id
       }
@@ -18874,7 +17599,6 @@ export type GqlPlaceDeleteMutationFn = Apollo.MutationFunction<
  * const [placeDeleteMutation, { data, loading, error }] = usePlaceDeleteMutation({
  *   variables: {
  *      id: // value for 'id'
- *      permission: // value for 'permission'
  *   },
  * });
  */
@@ -19075,8 +17799,8 @@ export type GetPlaceLazyQueryHookResult = ReturnType<typeof useGetPlaceLazyQuery
 export type GetPlaceSuspenseQueryHookResult = ReturnType<typeof useGetPlaceSuspenseQuery>;
 export type GetPlaceQueryResult = Apollo.QueryResult<GqlGetPlaceQuery, GqlGetPlaceQueryVariables>;
 export const TicketIssueDocument = gql`
-  mutation ticketIssue($input: TicketIssueInput!, $permission: CheckCommunityPermissionInput!) {
-    ticketIssue(input: $input, permission: $permission) {
+  mutation ticketIssue($input: TicketIssueInput!) {
+    ticketIssue(input: $input) {
       ... on TicketIssueSuccess {
         issue {
           id
@@ -19113,7 +17837,6 @@ export type GqlTicketIssueMutationFn = Apollo.MutationFunction<
  * const [ticketIssueMutation, { data, loading, error }] = useTicketIssueMutation({
  *   variables: {
  *      input: // value for 'input'
- *      permission: // value for 'permission'
  *   },
  * });
  */
@@ -19632,8 +18355,8 @@ export type GetTicketIssuersQueryResult = Apollo.QueryResult<
   GqlGetTicketIssuersQueryVariables
 >;
 export const CreateUtilityDocument = gql`
-  mutation CreateUtility($input: UtilityCreateInput!, $permission: CheckCommunityPermissionInput!) {
-    utilityCreate(input: $input, permission: $permission) {
+  mutation CreateUtility($input: UtilityCreateInput!) {
+    utilityCreate(input: $input) {
       ... on UtilityCreateSuccess {
         utility {
           ...UtilityFields
@@ -19662,7 +18385,6 @@ export type GqlCreateUtilityMutationFn = Apollo.MutationFunction<
  * const [createUtilityMutation, { data, loading, error }] = useCreateUtilityMutation({
  *   variables: {
  *      input: // value for 'input'
- *      permission: // value for 'permission'
  *   },
  * });
  */
@@ -19780,11 +18502,8 @@ export type GetUtilitiesQueryResult = Apollo.QueryResult<
   GqlGetUtilitiesQueryVariables
 >;
 export const PointIssueDocument = gql`
-  mutation pointIssue(
-    $input: TransactionIssueCommunityPointInput!
-    $permission: CheckCommunityPermissionInput!
-  ) {
-    transactionIssueCommunityPoint(input: $input, permission: $permission) {
+  mutation pointIssue($input: TransactionIssueCommunityPointInput!) {
+    transactionIssueCommunityPoint(input: $input) {
       ... on TransactionIssueCommunityPointSuccess {
         transaction {
           ...TransactionFields
@@ -19813,7 +18532,6 @@ export type GqlPointIssueMutationFn = Apollo.MutationFunction<
  * const [pointIssueMutation, { data, loading, error }] = usePointIssueMutation({
  *   variables: {
  *      input: // value for 'input'
- *      permission: // value for 'permission'
  *   },
  * });
  */
@@ -19833,11 +18551,8 @@ export type PointIssueMutationOptions = Apollo.BaseMutationOptions<
   GqlPointIssueMutationVariables
 >;
 export const PointGrantDocument = gql`
-  mutation pointGrant(
-    $input: TransactionGrantCommunityPointInput!
-    $permission: CheckCommunityPermissionInput!
-  ) {
-    transactionGrantCommunityPoint(input: $input, permission: $permission) {
+  mutation pointGrant($input: TransactionGrantCommunityPointInput!) {
+    transactionGrantCommunityPoint(input: $input) {
       ... on TransactionGrantCommunityPointSuccess {
         transaction {
           ...TransactionFields
@@ -19866,7 +18581,6 @@ export type GqlPointGrantMutationFn = Apollo.MutationFunction<
  * const [pointGrantMutation, { data, loading, error }] = usePointGrantMutation({
  *   variables: {
  *      input: // value for 'input'
- *      permission: // value for 'permission'
  *   },
  * });
  */
@@ -19943,14 +18657,8 @@ export const TransactionUpdateMetadataDocument = gql`
     $id: ID!
     $input: TransactionUpdateMetadataInput!
     $permission: CheckIsSelfPermissionInput
-    $communityPermission: CheckCommunityPermissionInput
   ) {
-    transactionUpdateMetadata(
-      id: $id
-      input: $input
-      permission: $permission
-      communityPermission: $communityPermission
-    ) {
+    transactionUpdateMetadata(id: $id, input: $input, permission: $permission) {
       ... on TransactionUpdateMetadataSuccess {
         transaction {
           id
@@ -19982,7 +18690,6 @@ export type GqlTransactionUpdateMetadataMutationFn = Apollo.MutationFunction<
  *      id: // value for 'id'
  *      input: // value for 'input'
  *      permission: // value for 'permission'
- *      communityPermission: // value for 'communityPermission'
  *   },
  * });
  */
@@ -20406,11 +19113,8 @@ export type VerifyTransactionsQueryResult = Apollo.QueryResult<
   GqlVerifyTransactionsQueryVariables
 >;
 export const CreateVoteTopicDocument = gql`
-  mutation CreateVoteTopic(
-    $input: VoteTopicCreateInput!
-    $permission: CheckCommunityPermissionInput!
-  ) {
-    voteTopicCreate(input: $input, permission: $permission) {
+  mutation CreateVoteTopic($input: VoteTopicCreateInput!) {
+    voteTopicCreate(input: $input) {
       ... on VoteTopicCreateSuccess {
         voteTopic {
           ...VoteTopicFields
@@ -20439,7 +19143,6 @@ export type GqlCreateVoteTopicMutationFn = Apollo.MutationFunction<
  * const [createVoteTopicMutation, { data, loading, error }] = useCreateVoteTopicMutation({
  *   variables: {
  *      input: // value for 'input'
- *      permission: // value for 'permission'
  *   },
  * });
  */
@@ -20462,8 +19165,8 @@ export type CreateVoteTopicMutationOptions = Apollo.BaseMutationOptions<
   GqlCreateVoteTopicMutationVariables
 >;
 export const DeleteVoteTopicDocument = gql`
-  mutation DeleteVoteTopic($id: ID!, $permission: CheckCommunityPermissionInput!) {
-    voteTopicDelete(id: $id, permission: $permission) {
+  mutation DeleteVoteTopic($id: ID!) {
+    voteTopicDelete(id: $id) {
       ... on VoteTopicDeleteSuccess {
         voteTopicId
       }
@@ -20489,7 +19192,6 @@ export type GqlDeleteVoteTopicMutationFn = Apollo.MutationFunction<
  * const [deleteVoteTopicMutation, { data, loading, error }] = useDeleteVoteTopicMutation({
  *   variables: {
  *      id: // value for 'id'
- *      permission: // value for 'permission'
  *   },
  * });
  */
@@ -20566,12 +19268,8 @@ export type VoteCastMutationOptions = Apollo.BaseMutationOptions<
   GqlVoteCastMutationVariables
 >;
 export const UpdateVoteTopicDocument = gql`
-  mutation UpdateVoteTopic(
-    $id: ID!
-    $input: VoteTopicUpdateInput!
-    $permission: CheckCommunityPermissionInput!
-  ) {
-    voteTopicUpdate(id: $id, input: $input, permission: $permission) {
+  mutation UpdateVoteTopic($id: ID!, $input: VoteTopicUpdateInput!) {
+    voteTopicUpdate(id: $id, input: $input) {
       ... on VoteTopicUpdateSuccess {
         voteTopic {
           ...VoteTopicFields
@@ -20601,7 +19299,6 @@ export type GqlUpdateVoteTopicMutationFn = Apollo.MutationFunction<
  *   variables: {
  *      id: // value for 'id'
  *      input: // value for 'input'
- *      permission: // value for 'permission'
  *   },
  * });
  */
