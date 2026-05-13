@@ -179,7 +179,7 @@ export default function TransactionDetailPage({ params }: { params: Promise<{ id
           open={editOpen}
           onOpenChange={setEditOpen}
           onSuccess={() => refetch()}
-          communityId={isOwner && isFromCommunityWallet ? communityId : undefined}
+          asCommunityAdmin={isOwner && isFromCommunityWallet}
         />
       )}
     </div>
