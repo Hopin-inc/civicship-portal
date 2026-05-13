@@ -119,7 +119,7 @@ export default function CredentialRecipientSelector({
 
   const [createParticipation] = useParticipationBulkCreateMutation({
     onCompleted: (response) => {
-      save(response?.participationBulkCreate?.participations ?? [], communityId);
+      save(response?.participationBulkCreate?.participations ?? []);
       toast.success("登録が完了しました");
     },
     onError: (error) => {
