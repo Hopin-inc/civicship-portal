@@ -44,7 +44,7 @@ const adminSettings = [
     requiredFeature: "points" as FeaturesType,
   },
   {
-    title: "チャート・レポート",
+    title: "アナリティクス",
     href: "/admin/analytics",
     icon: BarChart3,
   },
