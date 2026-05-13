@@ -202,7 +202,6 @@ export default function CredentialRecipientSelector({
               userIds: selectedSlot.userIds,
               slotId: selectedSlot.slotId,
             },
-            permission: { communityId },
           },
         });
       } finally {

@@ -4,11 +4,8 @@ import { gql } from "@apollo/client";
 // CREATE OPPORTUNITY
 // =====================================
 export const CREATE_OPPORTUNITY = gql`
-  mutation CreateOpportunity(
-    $input: OpportunityCreateInput!
-    $permission: CheckCommunityPermissionInput!
-  ) {
-    opportunityCreate(input: $input, permission: $permission) {
+  mutation CreateOpportunity($input: OpportunityCreateInput!) {
+    opportunityCreate(input: $input) {
       ... on OpportunityCreateSuccess {
         opportunity {
           id

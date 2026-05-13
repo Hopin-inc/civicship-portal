@@ -27,7 +27,6 @@ export const useSaveAttendances = ({ onSuccess, onError }: UseSaveAttendancesArg
       await mutate({
         variables: {
           input: { evaluations },
-          permission: { communityId },
         },
       });
       toast.success("出欠情報を保存しました");

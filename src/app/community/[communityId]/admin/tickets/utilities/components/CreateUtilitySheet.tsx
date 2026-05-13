@@ -76,7 +76,6 @@ export default function CreateUtilitySheet({ buttonLabel, onUtilityCreated }: Cr
             images: [],
             requiredForOpportunityIds: selectedOpportunityIds.length > 0 ? selectedOpportunityIds : undefined,
           },
-          permission: { communityId },
         },
       });
       const id = res.data?.utilityCreate?.utility?.id;

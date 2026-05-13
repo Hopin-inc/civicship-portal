@@ -17,11 +17,8 @@ import { REPORT_FEEDBACK_FIELDS } from "../reportFeedback/fragment";
  * テンプレートは generated types / SSR 用 `print` のソースとして残してある。
  */
 export const SUBMIT_REPORT_FEEDBACK = gql`
-  mutation SubmitReportFeedback(
-    $input: SubmitReportFeedbackInput!
-    $permission: CheckCommunityPermissionInput!
-  ) {
-    submitReportFeedback(input: $input, permission: $permission) {
+  mutation SubmitReportFeedback($input: SubmitReportFeedbackInput!) {
+    submitReportFeedback(input: $input) {
       ... on SubmitReportFeedbackSuccess {
         feedback {
           ...ReportFeedbackFields

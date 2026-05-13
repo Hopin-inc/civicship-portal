@@ -37,10 +37,7 @@ export function useVoteTopicActions({
       if (!window.confirm(t("adminVotes.list.deleteConfirm"))) return;
       try {
         await deleteVoteTopic({
-          variables: {
-            id: voteTopicId,
-            permission: { communityId },
-          },
+          variables: { id: voteTopicId },
         });
         toast.success(t("adminVotes.toast.deleteSuccess"));
         refetch?.();

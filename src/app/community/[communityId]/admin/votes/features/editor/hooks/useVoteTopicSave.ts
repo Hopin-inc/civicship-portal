@@ -76,7 +76,6 @@ export function useVoteTopicSave({
           const { data } = await createVoteTopic({
             variables: {
               input: { ...input, communityId },
-              permission: { communityId },
             },
           });
           const id = data?.voteTopicCreate?.voteTopic?.id ?? null;
@@ -92,7 +91,6 @@ export function useVoteTopicSave({
             variables: {
               id: topicId,
               input,
-              permission: { communityId },
             },
           });
           const id = data?.voteTopicUpdate?.voteTopic?.id ?? null;

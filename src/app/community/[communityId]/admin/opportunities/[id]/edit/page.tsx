@@ -22,10 +22,7 @@ export default function EditOpportunityPage() {
 
   // 既存データ取得
   const { data, loading, error } = useGetOpportunityQuery({
-    variables: {
-      id: opportunityId,
-      permission: { communityId },
-    },
+    variables: { id: opportunityId },
     fetchPolicy: "network-only",
   });
 
