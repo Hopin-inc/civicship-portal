@@ -16,7 +16,6 @@ export const useSaveAttendances = ({ onSuccess, onError }: UseSaveAttendancesArg
   const save = async (
     participations: GqlParticipation[],
     attendanceData: Record<string, GqlEvaluationStatus>,
-    communityId: string,
   ) => {
     const evaluations = participations.map((p) => ({
       participationId: p.id,

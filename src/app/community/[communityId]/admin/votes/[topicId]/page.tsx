@@ -38,7 +38,6 @@ export default function VoteDetailPage() {
   });
 
   const { handleEdit, handleDelete } = useVoteTopicActions({
-    communityId: communityId ?? "",
     refetch: () => router.push("/admin/votes"),
   });
 
