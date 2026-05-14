@@ -16,11 +16,7 @@ export const useEvaluationBulkCreate = ({ onSuccess, onError }: UseEvaluationBul
     awaitRefetchQueries: true,
   });
 
-  const save = async (
-    participations: GqlParticipation[],
-    communityId: string,
-  ) => {
-
+  const save = async (participations: GqlParticipation[]) => {
     const evaluations = participations.map((p) => {
       return {
         participationId: p.id,
