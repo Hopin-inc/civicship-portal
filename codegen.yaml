@@ -7,7 +7,11 @@ overwrite: true
 # GQL_SCHEMA_SOURCE で上書きする:
 #   GQL_SCHEMA_SOURCE=https://localhost:3000/graphql pnpm gql:generate
 schema:
-  - "${GQL_SCHEMA_SOURCE:https://raw.githubusercontent.com/Hopin-inc/civicship-api/develop/docs/schema.graphql}"
+  # GitHub raw URL の場合 headers は無視され、localhost 等の
+  # GraphQL endpoint に上書きされた場合は X-Community-Id が送られる。
+  - "${GQL_SCHEMA_SOURCE:https://raw.githubusercontent.com/Hopin-inc/civicship-api/develop/docs/schema.graphql}":
+      headers:
+        "X-Community-Id": ${NEXT_PUBLIC_COMMUNITY_ID}
 documents:
   - src/**/*.ts?(x)
   - "!src/types/graphql.tsx"
