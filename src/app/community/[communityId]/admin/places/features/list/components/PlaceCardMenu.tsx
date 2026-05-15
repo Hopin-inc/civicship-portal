@@ -12,7 +12,6 @@ import { useAppRouter } from "@/lib/navigation";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { usePlaceDeleteMutation } from "@/types/graphql";
-import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 interface PlaceCardMenuProps {
   placeId: string;
@@ -22,8 +21,6 @@ interface PlaceCardMenuProps {
 
 export function PlaceCardMenu({ placeId, placeName, onDelete }: PlaceCardMenuProps) {
   const router = useAppRouter();
-  const communityConfig = useCommunityConfig();
-  const communityId = communityConfig?.communityId ?? "";
   const [isDeleting, setIsDeleting] = useState(false);
   const [deletePlace] = usePlaceDeleteMutation();
 
@@ -39,10 +36,7 @@ export function PlaceCardMenu({ placeId, placeName, onDelete }: PlaceCardMenuPro
     setIsDeleting(true);
     try {
       await deletePlace({
-        variables: {
-          id: placeId,
-          permission: { communityId },
-        },
+        variables: { id: placeId },
       });
       toast.success("場所を削除しました");
       onDelete?.();

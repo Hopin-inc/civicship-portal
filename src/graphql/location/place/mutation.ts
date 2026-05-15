@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 export const PLACE_CREATE = gql`
-  mutation PlaceCreate($input: PlaceCreateInput!, $permission: CheckCommunityPermissionInput!) {
-    placeCreate(input: $input, permission: $permission) {
+  mutation PlaceCreate($input: PlaceCreateInput!) {
+    placeCreate(input: $input) {
       ... on PlaceCreateSuccess {
         place {
           id
@@ -35,12 +35,8 @@ export const PLACE_CREATE = gql`
 `;
 
 export const PLACE_UPDATE = gql`
-  mutation PlaceUpdate(
-    $id: ID!
-    $input: PlaceUpdateInput!
-    $permission: CheckCommunityPermissionInput!
-  ) {
-    placeUpdate(id: $id, input: $input, permission: $permission) {
+  mutation PlaceUpdate($id: ID!, $input: PlaceUpdateInput!) {
+    placeUpdate(id: $id, input: $input) {
       ... on PlaceUpdateSuccess {
         place {
           id
@@ -69,8 +65,8 @@ export const PLACE_UPDATE = gql`
 `;
 
 export const PLACE_DELETE = gql`
-  mutation PlaceDelete($id: ID!, $permission: CheckCommunityPermissionInput!) {
-    placeDelete(id: $id, permission: $permission) {
+  mutation PlaceDelete($id: ID!) {
+    placeDelete(id: $id) {
       ... on PlaceDeleteSuccess {
         id
       }

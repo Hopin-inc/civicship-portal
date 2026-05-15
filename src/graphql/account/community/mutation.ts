@@ -15,8 +15,8 @@ export const COMMUNITY_CREATE = gql`
 `;
 
 export const UPDATE_SIGNUP_BONUS_CONFIG = gql`
-  mutation UpdateSignupBonusConfig($input: UpdateSignupBonusConfigInput!, $communityId: ID!) {
-    updateSignupBonusConfig(input: $input, permission: { communityId: $communityId }) {
+  mutation UpdateSignupBonusConfig($input: UpdateSignupBonusConfigInput!) {
+    updateSignupBonusConfig(input: $input) {
       bonusPoint
       isEnabled
       message
@@ -25,11 +25,8 @@ export const UPDATE_SIGNUP_BONUS_CONFIG = gql`
 `;
 
 export const INCENTIVE_GRANT_RETRY = gql`
-  mutation IncentiveGrantRetry($incentiveGrantId: ID!, $communityId: ID!) {
-    incentiveGrantRetry(
-      input: { incentiveGrantId: $incentiveGrantId }
-      permission: { communityId: $communityId }
-    ) {
+  mutation IncentiveGrantRetry($incentiveGrantId: ID!) {
+    incentiveGrantRetry(input: { incentiveGrantId: $incentiveGrantId }) {
       ... on IncentiveGrantRetrySuccess {
         incentiveGrant {
           id
@@ -43,8 +40,8 @@ export const INCENTIVE_GRANT_RETRY = gql`
 `;
 
 export const UPDATE_PORTAL_CONFIG = gql`
-  mutation UpdatePortalConfig($input: CommunityPortalConfigInput!, $communityId: ID!) {
-    updatePortalConfig(input: $input, permission: { communityId: $communityId }) {
+  mutation UpdatePortalConfig($input: CommunityPortalConfigInput!) {
+    updatePortalConfig(input: $input) {
       communityId
       title
       description

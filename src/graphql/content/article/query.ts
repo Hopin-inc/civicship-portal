@@ -33,8 +33,8 @@ export const GET_ARTICLES = gql`
 `;
 
 export const GET_ARTICLE = gql`
-  query GetArticle($id: ID!, $permission: CheckCommunityPermissionInput!) {
-    article(id: $id, permission: $permission) {
+  query GetArticle($id: ID!) {
+    article(id: $id) {
       ...ArticleFields
       relatedUsers {
         ...UserFields

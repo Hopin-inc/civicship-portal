@@ -146,7 +146,6 @@ export const useOpportunitySave = ({
               ...categorySpecificInput,
               slots: slotsInputForCreate,
             },
-            permission: { communityId },
           },
         });
 

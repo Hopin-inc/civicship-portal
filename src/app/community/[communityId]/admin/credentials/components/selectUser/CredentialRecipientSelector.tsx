@@ -118,8 +118,8 @@ export default function CredentialRecipientSelector({
   });
 
   const [createParticipation] = useParticipationBulkCreateMutation({
-    onCompleted: (response) => {
-      save(response?.participationBulkCreate?.participations ?? [], communityId);
+    onCompleted: async (response) => {
+      await save(response?.participationBulkCreate?.participations ?? []);
       toast.success("登録が完了しました");
     },
     onError: (error) => {
@@ -202,7 +202,6 @@ export default function CredentialRecipientSelector({
               userIds: selectedSlot.userIds,
               slotId: selectedSlot.slotId,
             },
-            permission: { communityId },
           },
         });
       } finally {

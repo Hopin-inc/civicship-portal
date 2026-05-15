@@ -1,11 +1,8 @@
 import { gql } from "@apollo/client";
 
 export const ASSIGN_OWNER = gql`
-  mutation assignOwner(
-    $input: MembershipSetRoleInput!
-    $permission: CheckCommunityPermissionInput!
-  ) {
-    membershipAssignOwner(input: $input, permission: $permission) {
+  mutation assignOwner($input: MembershipSetRoleInput!) {
+    membershipAssignOwner(input: $input) {
       ... on MembershipSetRoleSuccess {
         membership {
           ...MembershipFields
@@ -16,11 +13,8 @@ export const ASSIGN_OWNER = gql`
 `;
 
 export const ASSIGN_MANAGER = gql`
-  mutation assignManager(
-    $input: MembershipSetRoleInput!
-    $permission: CheckCommunityPermissionInput!
-  ) {
-    membershipAssignManager(input: $input, permission: $permission) {
+  mutation assignManager($input: MembershipSetRoleInput!) {
+    membershipAssignManager(input: $input) {
       ... on MembershipSetRoleSuccess {
         membership {
           ...MembershipFields
@@ -31,11 +25,8 @@ export const ASSIGN_MANAGER = gql`
 `;
 
 export const ASSIGN_MEMBER = gql`
-  mutation assignMember(
-    $input: MembershipSetRoleInput!
-    $permission: CheckCommunityPermissionInput!
-  ) {
-    membershipAssignMember(input: $input, permission: $permission) {
+  mutation assignMember($input: MembershipSetRoleInput!) {
+    membershipAssignMember(input: $input) {
       ... on MembershipSetRoleSuccess {
         membership {
           ...MembershipFields

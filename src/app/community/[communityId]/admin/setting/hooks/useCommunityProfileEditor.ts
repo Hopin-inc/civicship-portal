@@ -157,7 +157,7 @@ export function useCommunityProfileEditor(communityId: string | undefined) {
       }
 
       const result = await updatePortalConfig({
-        variables: { communityId, input },
+        variables: { input },
         refetchQueries: ["GetCommunityPortalConfig"],
       });
       const updated = result.data?.updatePortalConfig;

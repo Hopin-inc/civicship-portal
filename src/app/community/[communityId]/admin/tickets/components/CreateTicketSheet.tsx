@@ -66,7 +66,6 @@ export default function CreateTicketSheet({ onTicketCreated }: CreateTicketSheet
             utilityId: selectedUtilityId,
             qtyToBeIssued: ticketQty,
           },
-          permission: { communityId },
         },
       });
 

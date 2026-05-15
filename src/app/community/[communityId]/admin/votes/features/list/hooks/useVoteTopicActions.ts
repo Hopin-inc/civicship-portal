@@ -8,7 +8,6 @@ import { useDeleteVoteTopicMutation } from "@/types/graphql";
 import { logger } from "@/lib/logging";
 
 interface UseVoteTopicActionsParams {
-  communityId: string;
   refetch?: () => void;
 }
 
@@ -18,9 +17,8 @@ interface UseVoteTopicActionsReturn {
 }
 
 export function useVoteTopicActions({
-  communityId,
   refetch,
-}: UseVoteTopicActionsParams): UseVoteTopicActionsReturn {
+}: UseVoteTopicActionsParams = {}): UseVoteTopicActionsReturn {
   const t = useTranslations();
   const router = useAppRouter();
   const [deleteVoteTopic] = useDeleteVoteTopicMutation();
@@ -37,10 +35,7 @@ export function useVoteTopicActions({
       if (!window.confirm(t("adminVotes.list.deleteConfirm"))) return;
       try {
         await deleteVoteTopic({
-          variables: {
-            id: voteTopicId,
-            permission: { communityId },
-          },
+          variables: { id: voteTopicId },
         });
         toast.success(t("adminVotes.toast.deleteSuccess"));
         refetch?.();
@@ -53,7 +48,7 @@ export function useVoteTopicActions({
         toast.error(t("adminVotes.toast.deleteError"));
       }
     },
-    [communityId, deleteVoteTopic, refetch, t],
+    [deleteVoteTopic, refetch, t],
   );
 
   return { handleEdit, handleDelete };

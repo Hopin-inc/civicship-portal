@@ -12,15 +12,21 @@ import { useAuthStore } from "@/lib/auth/core/auth-store";
 
 type Result<T> = { success: true; data: T } | { success: false; code: GqlErrorCode };
 
-export type UpdatePermission =
-  | { type: "self" }
-  | { type: "community"; communityId: string };
+export type UpdatePermission = { type: "self" } | { type: "community" };
 
 /**
  * トランザクションのメタデータ（コメント・画像）を更新する汎用 hook。
  * admin 配下の useTransactionMutations に依存せず、
  * ユーザー向けフロー（donate 等）からも安全にインポートできる。
  *
+ * `permissionOverride`:
+ * - `{ type: "self" }` (デフォルト): 自分の transaction を編集。
+ *   `permission: { userId }` を mutation 引数に付与し、backend の IsSelf rule を通す。
+ * - `{ type: "community" }`: community OWNER として community wallet 発の
+ *   transaction を編集。permission 引数は付与せず、Apollo client が送る
+ *   `X-Community-Id` ヘッダの community で backend が OWNER 判定する。
+ *   呼び出し元は `/community/[communityId]/...` 配下にいる前提
+ *   (= Apollo context の community = 対象 community)。
  */
 export function useUpdateTransactionMetadata() {
   const currentUserId = useAuthStore((s) => s.state.currentUser?.id ?? null);
@@ -60,9 +66,6 @@ export function useUpdateTransactionMetadata() {
           input,
           ...(!permissionOverride || permissionOverride.type === "self"
             ? { permission: { userId: currentUserId! } }
-            : {}),
-          ...(permissionOverride?.type === "community"
-            ? { communityPermission: { communityId: permissionOverride.communityId } }
             : {}),
         },
       });

@@ -24,10 +24,7 @@ export const useReservationOpportunity = ({
     error,
     refetch,
   } = useGetOpportunityQuery({
-    variables: {
-      id: opportunityId,
-      permission: { communityId: communityId ?? "" },
-    },
+    variables: { id: opportunityId },
     skip: !opportunityId,
     fetchPolicy: "network-only",
     errorPolicy: "all",

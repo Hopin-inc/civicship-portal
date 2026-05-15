@@ -18,8 +18,12 @@ interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
-  /** Owner がコミュニティウォレット発のトランザクションを編集する場合に渡す */
-  communityId?: string;
+  /**
+   * Owner がコミュニティウォレット発のトランザクションを編集する場合に true。
+   * backend は Apollo client が送る X-Community-Id ヘッダの community で
+   * OWNER 判定するため、URL の community がそのまま対象になる前提。
+   */
+  asCommunityAdmin?: boolean;
 }
 
 async function urlToFile(url: string, onError: (msg: string) => void): Promise<File> {
@@ -45,7 +49,7 @@ export function TransactionMetadataEditSheet({
   open,
   onOpenChange,
   onSuccess,
-  communityId,
+  asCommunityAdmin,
 }: Props) {
   const t = useTranslations();
   const { updateTransactionMetadata } = useUpdateTransactionMetadata();
@@ -129,8 +133,8 @@ export function TransactionMetadataEditSheet({
         return;
       }
 
-      const permission = communityId
-        ? { type: "community" as const, communityId }
+      const permission = asCommunityAdmin
+        ? { type: "community" as const }
         : { type: "self" as const };
 
       const res = await updateTransactionMetadata(

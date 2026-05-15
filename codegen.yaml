@@ -5,6 +5,7 @@ schema:
         "X-Community-Id": ${NEXT_PUBLIC_COMMUNITY_ID}
 documents:
   - src/**/*.ts?(x)
+  - "!src/types/graphql.tsx"
 generates:
   ./src/types/graphql.tsx:
     plugins:
