@@ -28,6 +28,12 @@ type Props = {
   hubMemberCount?: number | null;
   /** SSR で取得した「レポート発行履歴」初期 1 ページ。 */
   initialReports?: GqlGetReportsAllQuery["reportsAll"] | null;
+  /**
+   * レポート詳細ページの URL base。reportId が末尾に付与される。
+   * 既定は `/sysAdmin/{communityId}/reports`。community admin で再利用する
+   * 際は `/community/{communityId}/admin/analytics/reports` を渡す。
+   */
+  reportHrefBase?: string;
 };
 
 export function CommunityDetailPageClient({
@@ -36,6 +42,7 @@ export function CommunityDetailPageClient({
   tenureDistribution,
   hubMemberCount,
   initialReports,
+  reportHrefBase,
 }: Props) {
   const dashboard = useDashboardControls();
   const { loading, error, detail: data } = useCommunityDetail({
@@ -98,6 +105,7 @@ export function CommunityDetailPageClient({
             key={communityId}
             communityId={communityId}
             initialReports={initialReports ?? null}
+            reportHrefBase={reportHrefBase}
           />
         </TabsContent>
       </Tabs>

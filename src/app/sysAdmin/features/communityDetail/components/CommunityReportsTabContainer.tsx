@@ -22,6 +22,7 @@ type ReportsConnection = NonNullable<
 type Props = {
   communityId: string;
   initialReports: ReportsConnection | null;
+  reportHrefBase?: string;
 };
 
 const EMPTY_CONNECTION: ReportsConnection = {
@@ -53,6 +54,7 @@ const EMPTY_CONNECTION: ReportsConnection = {
 export function CommunityReportsTabContainer({
   communityId,
   initialReports,
+  reportHrefBase,
 }: Props) {
   const apollo = useApolloClient();
 
@@ -109,6 +111,7 @@ export function CommunityReportsTabContainer({
       error={loadError}
       loadingMore={loadingMore}
       onLoadMore={handleLoadMore}
+      reportHrefBase={reportHrefBase}
     />
   );
 }

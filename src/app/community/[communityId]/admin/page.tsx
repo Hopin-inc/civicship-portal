@@ -6,6 +6,7 @@ import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import {
   ArrowLeftRight,
+  BarChart3,
   CalendarCheck,
   ClipboardList,
   Gift,
@@ -41,6 +42,11 @@ const adminSettings = [
     href: "/admin/bonuses",
     icon: Gift,
     requiredFeature: "points" as FeaturesType,
+  },
+  {
+    title: "アナリティクス",
+    href: "/admin/analytics",
+    icon: BarChart3,
   },
 ];
 
