@@ -20,7 +20,6 @@ export type Scalars = {
   Int: { input: number; output: number };
   Float: { input: number; output: number };
   BigInt: { input: any; output: any };
-  DateTime: { input: any; output: any };
   Datetime: { input: Date; output: Date };
   Decimal: { input: any; output: any };
   JSON: { input: any; output: any };
@@ -401,6 +400,24 @@ export type GqlAnalyticsCommunityPayload = {
    * member list.
    */
   dormantCount: Scalars["Int"]["output"];
+  /**
+   * Number of members classified as a "hub" within a fixed 28-day
+   * window ending at `asOf`. Same semantic as
+   * `AnalyticsCommunityOverview.hubMemberCount` (L1) — a member
+   * qualifies when they sent DONATION to `>= hubBreadthThreshold`
+   * distinct counterparties during the window. Exposed at L2 so the
+   * community-owner analytics surface can render the "ハブユーザー比率"
+   * KPI (`hubMemberCount / totalMembers`) directly from the L2 payload
+   * without falling back to the SYS_ADMIN-only L1 dashboard row.
+   *
+   * The window is fixed at 28 days regardless of the L2-specific
+   * `windowMonths` input (which drives trend-array length, not the
+   * hub classification window). This matches L1's default
+   * `windowDays = 28` so the value is directly comparable to the
+   * L1 dashboard row for the same community and `hubBreadthThreshold`.
+   * The same JOINED-at-asOf membership filter as L1 applies.
+   */
+  hubMemberCount: Scalars["Int"]["output"];
   /** Paginated member list — see type doc. */
   memberList: GqlAnalyticsMemberList;
   /**
@@ -422,6 +439,15 @@ export type GqlAnalyticsCommunityPayload = {
   stages: GqlAnalyticsStageDistribution;
   /** Summary card — see type doc. */
   summary: GqlAnalyticsCommunitySummaryCard;
+  /**
+   * Tenure-bucket distribution of members at asOf. See
+   * AnalyticsTenureDistribution. Sum of buckets equals totalMembers.
+   * Exposed at L2 mirroring `AnalyticsCommunityOverview.tenureDistribution`
+   * so the community-owner analytics surface can render the
+   * "3ヶ月以上 在籍率" KPI and the in-tenure histogram directly
+   * from the L2 payload — without the SYS_ADMIN-only L1 dashboard row.
+   */
+  tenureDistribution: GqlAnalyticsTenureDistribution;
   /** Trailing window length in JST months (echoed back). */
   windowMonths: Scalars["Int"]["output"];
 };
@@ -1535,13 +1561,21 @@ export type GqlCommunityPortalConfigInput = {
   domain?: InputMaybe<Scalars["String"]["input"]>;
   enableFeatures?: InputMaybe<Array<Scalars["String"]["input"]>>;
   favicon?: InputMaybe<GqlImageInput>;
+  /** @deprecated Use favicon instead */
+  faviconPrefix?: InputMaybe<Scalars["String"]["input"]>;
   logo?: InputMaybe<GqlImageInput>;
+  /** @deprecated Use logo instead */
+  logoPath?: InputMaybe<Scalars["String"]["input"]>;
   ogImage?: InputMaybe<GqlImageInput>;
+  /** @deprecated Use ogImage instead */
+  ogImagePath?: InputMaybe<Scalars["String"]["input"]>;
   regionKey?: InputMaybe<Scalars["String"]["input"]>;
   regionName?: InputMaybe<Scalars["String"]["input"]>;
   rootPath?: InputMaybe<Scalars["String"]["input"]>;
   shortDescription?: InputMaybe<Scalars["String"]["input"]>;
   squareLogo?: InputMaybe<GqlImageInput>;
+  /** @deprecated Use squareLogo instead */
+  squareLogoPath?: InputMaybe<Scalars["String"]["input"]>;
   title?: InputMaybe<Scalars["String"]["input"]>;
   tokenName?: InputMaybe<Scalars["String"]["input"]>;
 };
@@ -2159,15 +2193,18 @@ export type GqlMutationApproveReportArgs = {
 
 export type GqlMutationArticleCreateArgs = {
   input: GqlArticleCreateInput;
+  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
 };
 
 export type GqlMutationArticleDeleteArgs = {
   id: Scalars["ID"]["input"];
+  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
 };
 
 export type GqlMutationArticleUpdateContentArgs = {
   id: Scalars["ID"]["input"];
   input: GqlArticleUpdateContentInput;
+  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
 };
 
 export type GqlMutationCommunityCreateArgs = {
@@ -2176,19 +2213,23 @@ export type GqlMutationCommunityCreateArgs = {
 
 export type GqlMutationCommunityDeleteArgs = {
   id: Scalars["ID"]["input"];
+  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
 };
 
 export type GqlMutationCommunityUpdateProfileArgs = {
   id: Scalars["ID"]["input"];
   input: GqlCommunityUpdateProfileInput;
+  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
 };
 
 export type GqlMutationEvaluationBulkCreateArgs = {
   input: GqlEvaluationBulkCreateInput;
+  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
 };
 
 export type GqlMutationGenerateReportArgs = {
   input: GqlGenerateReportInput;
+  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
 };
 
 export type GqlMutationIdentityCheckPhoneUserArgs = {
@@ -2197,6 +2238,7 @@ export type GqlMutationIdentityCheckPhoneUserArgs = {
 
 export type GqlMutationIncentiveGrantRetryArgs = {
   input: GqlIncentiveGrantRetryInput;
+  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
 };
 
 export type GqlMutationLinkPhoneAuthArgs = {
@@ -2211,18 +2253,22 @@ export type GqlMutationMembershipAcceptMyInvitationArgs = {
 
 export type GqlMutationMembershipAssignManagerArgs = {
   input: GqlMembershipSetRoleInput;
+  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
 };
 
 export type GqlMutationMembershipAssignMemberArgs = {
   input: GqlMembershipSetRoleInput;
+  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
 };
 
 export type GqlMutationMembershipAssignOwnerArgs = {
   input: GqlMembershipSetRoleInput;
+  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
 };
 
 export type GqlMutationMembershipCancelInvitationArgs = {
   input: GqlMembershipSetInvitationStatusInput;
+  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
 };
 
 export type GqlMutationMembershipDenyMyInvitationArgs = {
@@ -2232,10 +2278,12 @@ export type GqlMutationMembershipDenyMyInvitationArgs = {
 
 export type GqlMutationMembershipInviteArgs = {
   input: GqlMembershipInviteInput;
+  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
 };
 
 export type GqlMutationMembershipRemoveArgs = {
   input: GqlMembershipRemoveInput;
+  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
 };
 
 export type GqlMutationMembershipWithdrawArgs = {
@@ -2245,6 +2293,7 @@ export type GqlMutationMembershipWithdrawArgs = {
 
 export type GqlMutationOpportunityCreateArgs = {
   input: GqlOpportunityCreateInput;
+  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
 };
 
 export type GqlMutationOpportunityDeleteArgs = {
@@ -2283,6 +2332,7 @@ export type GqlMutationOpportunityUpdateContentArgs = {
 
 export type GqlMutationParticipationBulkCreateArgs = {
   input: GqlParticipationBulkCreateInput;
+  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
 };
 
 export type GqlMutationParticipationCreatePersonalRecordArgs = {
@@ -2296,15 +2346,18 @@ export type GqlMutationParticipationDeletePersonalRecordArgs = {
 
 export type GqlMutationPlaceCreateArgs = {
   input: GqlPlaceCreateInput;
+  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
 };
 
 export type GqlMutationPlaceDeleteArgs = {
   id: Scalars["ID"]["input"];
+  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
 };
 
 export type GqlMutationPlaceUpdateArgs = {
   id: Scalars["ID"]["input"];
   input: GqlPlaceUpdateInput;
+  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
 };
 
 export type GqlMutationPublishReportArgs = {
@@ -2348,6 +2401,7 @@ export type GqlMutationStorePhoneAuthTokenArgs = {
 
 export type GqlMutationSubmitReportFeedbackArgs = {
   input: GqlSubmitReportFeedbackInput;
+  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
 };
 
 export type GqlMutationTicketClaimArgs = {
@@ -2356,10 +2410,12 @@ export type GqlMutationTicketClaimArgs = {
 
 export type GqlMutationTicketIssueArgs = {
   input: GqlTicketIssueInput;
+  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
 };
 
 export type GqlMutationTicketPurchaseArgs = {
   input: GqlTicketPurchaseInput;
+  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
 };
 
 export type GqlMutationTicketRefundArgs = {
@@ -2380,13 +2436,16 @@ export type GqlMutationTransactionDonateSelfPointArgs = {
 
 export type GqlMutationTransactionGrantCommunityPointArgs = {
   input: GqlTransactionGrantCommunityPointInput;
+  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
 };
 
 export type GqlMutationTransactionIssueCommunityPointArgs = {
   input: GqlTransactionIssueCommunityPointInput;
+  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
 };
 
 export type GqlMutationTransactionUpdateMetadataArgs = {
+  communityPermission?: InputMaybe<GqlCheckCommunityPermissionInput>;
   id: Scalars["ID"]["input"];
   input: GqlTransactionUpdateMetadataInput;
   permission?: InputMaybe<GqlCheckIsSelfPermissionInput>;
@@ -2394,6 +2453,7 @@ export type GqlMutationTransactionUpdateMetadataArgs = {
 
 export type GqlMutationUpdatePortalConfigArgs = {
   input: GqlCommunityPortalConfigInput;
+  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
 };
 
 export type GqlMutationUpdateReportTemplateArgs = {
@@ -2404,6 +2464,7 @@ export type GqlMutationUpdateReportTemplateArgs = {
 
 export type GqlMutationUpdateSignupBonusConfigArgs = {
   input: GqlUpdateSignupBonusConfigInput;
+  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
 };
 
 export type GqlMutationUserDeleteMeArgs = {
@@ -2421,20 +2482,24 @@ export type GqlMutationUserUpdateMyProfileArgs = {
 
 export type GqlMutationUtilityCreateArgs = {
   input: GqlUtilityCreateInput;
+  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
 };
 
 export type GqlMutationUtilityDeleteArgs = {
   id: Scalars["ID"]["input"];
+  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
 };
 
 export type GqlMutationUtilitySetPublishStatusArgs = {
   id: Scalars["ID"]["input"];
   input: GqlUtilitySetPublishStatusInput;
+  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
 };
 
 export type GqlMutationUtilityUpdateInfoArgs = {
   id: Scalars["ID"]["input"];
   input: GqlUtilityUpdateInfoInput;
+  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
 };
 
 export type GqlMutationVoteCastArgs = {
@@ -2443,15 +2508,18 @@ export type GqlMutationVoteCastArgs = {
 
 export type GqlMutationVoteTopicCreateArgs = {
   input: GqlVoteTopicCreateInput;
+  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
 };
 
 export type GqlMutationVoteTopicDeleteArgs = {
   id: Scalars["ID"]["input"];
+  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
 };
 
 export type GqlMutationVoteTopicUpdateArgs = {
   id: Scalars["ID"]["input"];
   input: GqlVoteTopicUpdateInput;
+  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
 };
 
 /** ログインユーザーの投票資格と現状。再投票可能性の判定にも利用する。 */
@@ -3296,6 +3364,7 @@ export type GqlQueryAnalyticsDashboardArgs = {
 
 export type GqlQueryArticleArgs = {
   id: Scalars["ID"]["input"];
+  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
 };
 
 export type GqlQueryArticlesArgs = {
@@ -3407,6 +3476,7 @@ export type GqlQueryOpportunitiesArgs = {
 
 export type GqlQueryOpportunityArgs = {
   id: Scalars["ID"]["input"];
+  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
 };
 
 export type GqlQueryOpportunitySlotArgs = {
@@ -3514,6 +3584,7 @@ export type GqlQueryReportsArgs = {
   communityId: Scalars["ID"]["input"];
   cursor?: InputMaybe<Scalars["String"]["input"]>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
+  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
   status?: InputMaybe<GqlReportStatus>;
   variant?: InputMaybe<GqlReportVariant>;
 };
@@ -3635,6 +3706,7 @@ export type GqlQueryUtilitiesArgs = {
 
 export type GqlQueryUtilityArgs = {
   id: Scalars["ID"]["input"];
+  permission?: InputMaybe<GqlCheckCommunityPermissionInput>;
 };
 
 export type GqlQueryVcIssuanceRequestArgs = {

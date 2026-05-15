@@ -1043,6 +1043,22 @@
             "deprecationReason": null
           },
           {
+            "name": "hubMemberCount",
+            "description": "Number of members classified as a \"hub\" within a fixed 28-day\nwindow ending at `asOf`. Same semantic as\n`AnalyticsCommunityOverview.hubMemberCount` (L1) — a member\nqualifies when they sent DONATION to `>= hubBreadthThreshold`\ndistinct counterparties during the window. Exposed at L2 so the\ncommunity-owner analytics surface can render the \"ハブユーザー比率\"\nKPI (`hubMemberCount / totalMembers`) directly from the L2 payload\nwithout falling back to the SYS_ADMIN-only L1 dashboard row.\n\nThe window is fixed at 28 days regardless of the L2-specific\n`windowMonths` input (which drives trend-array length, not the\nhub classification window). This matches L1's default\n`windowDays = 28` so the value is directly comparable to the\nL1 dashboard row for the same community and `hubBreadthThreshold`.\nThe same JOINED-at-asOf membership filter as L1 applies.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "memberList",
             "description": "Paginated member list — see type doc.",
             "args": [],
@@ -1132,6 +1148,22 @@
               "ofType": {
                 "kind": "OBJECT",
                 "name": "AnalyticsCommunitySummaryCard",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "tenureDistribution",
+            "description": "Tenure-bucket distribution of members at asOf. See\nAnalyticsTenureDistribution. Sum of buckets equals totalMembers.\nExposed at L2 mirroring `AnalyticsCommunityOverview.tenureDistribution`\nso the community-owner analytics surface can render the\n\"3ヶ月以上 在籍率\" KPI and the in-tenure histogram directly\nfrom the L2 payload — without the SYS_ADMIN-only L1 dashboard row.",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "AnalyticsTenureDistribution",
                 "ofType": null
               }
             },
@@ -4207,7 +4239,7 @@
       {
         "kind": "SCALAR",
         "name": "BigInt",
-        "description": "Custom scalar for bigint (serialized as string)",
+        "description": null,
         "isOneOf": null,
         "fields": null,
         "inputFields": null,
@@ -6354,6 +6386,18 @@
             "deprecationReason": null
           },
           {
+            "name": "faviconPrefix",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": true,
+            "deprecationReason": "Use favicon instead"
+          },
+          {
             "name": "logo",
             "description": null,
             "type": {
@@ -6366,6 +6410,18 @@
             "deprecationReason": null
           },
           {
+            "name": "logoPath",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": true,
+            "deprecationReason": "Use logo instead"
+          },
+          {
             "name": "ogImage",
             "description": null,
             "type": {
@@ -6376,6 +6432,18 @@
             "defaultValue": null,
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "ogImagePath",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": true,
+            "deprecationReason": "Use ogImage instead"
           },
           {
             "name": "regionKey",
@@ -6436,6 +6504,18 @@
             "defaultValue": null,
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "squareLogoPath",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": true,
+            "deprecationReason": "Use squareLogo instead"
           },
           {
             "name": "title",
@@ -6796,17 +6876,6 @@
         "possibleTypes": null
       },
       {
-        "kind": "SCALAR",
-        "name": "DateTime",
-        "description": null,
-        "isOneOf": null,
-        "fields": null,
-        "inputFields": null,
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
         "kind": "INPUT_OBJECT",
         "name": "DateTimeRangeFilter",
         "description": null,
@@ -6880,7 +6949,7 @@
       {
         "kind": "SCALAR",
         "name": "Decimal",
-        "description": "Custom scalar for high-precision decimal (serialized as string)",
+        "description": null,
         "isOneOf": null,
         "fields": null,
         "inputFields": null,
@@ -10654,6 +10723,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CheckCommunityPermissionInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": true,
+                "deprecationReason": "Use the `x-community-id` request header instead; this argument is ignored when the header is present."
               }
             ],
             "type": {
@@ -10683,6 +10764,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CheckCommunityPermissionInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": true,
+                "deprecationReason": "Use the `x-community-id` request header instead; this argument is ignored when the header is present."
               }
             ],
             "type": {
@@ -10728,6 +10821,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CheckCommunityPermissionInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": true,
+                "deprecationReason": "Use the `x-community-id` request header instead; this argument is ignored when the header is present."
               }
             ],
             "type": {
@@ -10786,6 +10891,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CheckCommunityPermissionInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": true,
+                "deprecationReason": "Use the `x-community-id` request header instead; this argument is ignored when the header is present."
               }
             ],
             "type": {
@@ -10831,6 +10948,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CheckCommunityPermissionInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": true,
+                "deprecationReason": "Use the `x-community-id` request header instead; this argument is ignored when the header is present."
               }
             ],
             "type": {
@@ -10860,6 +10989,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CheckCommunityPermissionInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": true,
+                "deprecationReason": "Use the `x-community-id` request header instead; this argument is ignored when the header is present."
               }
             ],
             "type": {
@@ -10889,6 +11030,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CheckCommunityPermissionInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": true,
+                "deprecationReason": "Use the `x-community-id` request header instead; this argument is ignored when the header is present."
               }
             ],
             "type": {
@@ -10951,6 +11104,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CheckCommunityPermissionInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": true,
+                "deprecationReason": "Use the `x-community-id` request header instead; this argument is ignored when the header is present."
               }
             ],
             "type": {
@@ -11070,6 +11235,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CheckCommunityPermissionInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": true,
+                "deprecationReason": "Use the `x-community-id` request header instead; this argument is ignored when the header is present."
               }
             ],
             "type": {
@@ -11099,6 +11276,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CheckCommunityPermissionInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": true,
+                "deprecationReason": "Use the `x-community-id` request header instead; this argument is ignored when the header is present."
               }
             ],
             "type": {
@@ -11128,6 +11317,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CheckCommunityPermissionInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": true,
+                "deprecationReason": "Use the `x-community-id` request header instead; this argument is ignored when the header is present."
               }
             ],
             "type": {
@@ -11157,6 +11358,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CheckCommunityPermissionInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": true,
+                "deprecationReason": "Use the `x-community-id` request header instead; this argument is ignored when the header is present."
               }
             ],
             "type": {
@@ -11231,6 +11444,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CheckCommunityPermissionInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": true,
+                "deprecationReason": "Use the `x-community-id` request header instead; this argument is ignored when the header is present."
               }
             ],
             "type": {
@@ -11260,6 +11485,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CheckCommunityPermissionInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": true,
+                "deprecationReason": "Use the `x-community-id` request header instead; this argument is ignored when the header is present."
               }
             ],
             "type": {
@@ -11350,6 +11587,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CheckCommunityPermissionInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": true,
+                "deprecationReason": "Use the `x-community-id` request header instead; this argument is ignored when the header is present."
               }
             ],
             "type": {
@@ -11713,6 +11962,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CheckCommunityPermissionInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": true,
+                "deprecationReason": "Use the `x-community-id` request header instead; this argument is ignored when the header is present."
               }
             ],
             "type": {
@@ -11816,6 +12077,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CheckCommunityPermissionInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": true,
+                "deprecationReason": "Use the `x-community-id` request header instead; this argument is ignored when the header is present."
               }
             ],
             "type": {
@@ -11845,6 +12118,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CheckCommunityPermissionInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": true,
+                "deprecationReason": "Use the `x-community-id` request header instead; this argument is ignored when the header is present."
               }
             ],
             "type": {
@@ -11890,6 +12175,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CheckCommunityPermissionInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": true,
+                "deprecationReason": "Use the `x-community-id` request header instead; this argument is ignored when the header is present."
               }
             ],
             "type": {
@@ -12263,6 +12560,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CheckCommunityPermissionInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": true,
+                "deprecationReason": "Use the `x-community-id` request header instead; this argument is ignored when the header is present."
               }
             ],
             "type": {
@@ -12321,6 +12630,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CheckCommunityPermissionInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": true,
+                "deprecationReason": "Use the `x-community-id` request header instead; this argument is ignored when the header is present."
               }
             ],
             "type": {
@@ -12350,6 +12671,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CheckCommunityPermissionInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": true,
+                "deprecationReason": "Use the `x-community-id` request header instead; this argument is ignored when the header is present."
               }
             ],
             "type": {
@@ -12530,6 +12863,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CheckCommunityPermissionInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": true,
+                "deprecationReason": "Use the `x-community-id` request header instead; this argument is ignored when the header is present."
               }
             ],
             "type": {
@@ -12559,6 +12904,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CheckCommunityPermissionInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": true,
+                "deprecationReason": "Use the `x-community-id` request header instead; this argument is ignored when the header is present."
               }
             ],
             "type": {
@@ -12573,6 +12930,18 @@
             "name": "transactionUpdateMetadata",
             "description": null,
             "args": [
+              {
+                "name": "communityPermission",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CheckCommunityPermissionInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": true,
+                "deprecationReason": "Use the `x-community-id` request header instead; this argument is ignored when the header is present."
+              },
               {
                 "name": "id",
                 "description": null,
@@ -12645,6 +13014,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CheckCommunityPermissionInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": true,
+                "deprecationReason": "Use the `x-community-id` request header instead; this argument is ignored when the header is present."
               }
             ],
             "type": {
@@ -12735,6 +13116,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CheckCommunityPermissionInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": true,
+                "deprecationReason": "Use the `x-community-id` request header instead; this argument is ignored when the header is present."
               }
             ],
             "type": {
@@ -12871,6 +13264,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CheckCommunityPermissionInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": true,
+                "deprecationReason": "Use the `x-community-id` request header instead; this argument is ignored when the header is present."
               }
             ],
             "type": {
@@ -12900,6 +13305,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CheckCommunityPermissionInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": true,
+                "deprecationReason": "Use the `x-community-id` request header instead; this argument is ignored when the header is present."
               }
             ],
             "type": {
@@ -12945,6 +13362,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CheckCommunityPermissionInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": true,
+                "deprecationReason": "Use the `x-community-id` request header instead; this argument is ignored when the header is present."
               }
             ],
             "type": {
@@ -12990,6 +13419,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CheckCommunityPermissionInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": true,
+                "deprecationReason": "Use the `x-community-id` request header instead; this argument is ignored when the header is present."
               }
             ],
             "type": {
@@ -13052,6 +13493,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CheckCommunityPermissionInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": true,
+                "deprecationReason": "Use the `x-community-id` request header instead; this argument is ignored when the header is present."
               }
             ],
             "type": {
@@ -13085,6 +13538,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CheckCommunityPermissionInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": true,
+                "deprecationReason": "Use the `x-community-id` request header instead; this argument is ignored when the header is present."
               }
             ],
             "type": {
@@ -13134,6 +13599,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CheckCommunityPermissionInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": true,
+                "deprecationReason": "Use the `x-community-id` request header instead; this argument is ignored when the header is present."
               }
             ],
             "type": {
@@ -19800,6 +20277,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CheckCommunityPermissionInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": true,
+                "deprecationReason": "Use the `x-community-id` request header instead; this argument is ignored when the header is present."
               }
             ],
             "type": {
@@ -20800,6 +21289,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CheckCommunityPermissionInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": true,
+                "deprecationReason": "Use the `x-community-id` request header instead; this argument is ignored when the header is present."
               }
             ],
             "type": {
@@ -21774,6 +22275,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CheckCommunityPermissionInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": true,
+                "deprecationReason": "Use the `x-community-id` request header instead; this argument is ignored when the header is present."
               },
               {
                 "name": "status",
@@ -22831,6 +23344,18 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "permission",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "CheckCommunityPermissionInput",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": true,
+                "deprecationReason": "Use the `x-community-id` request header instead; this argument is ignored when the header is present."
               }
             ],
             "type": {
@@ -30168,7 +30693,7 @@
       {
         "kind": "SCALAR",
         "name": "Upload",
-        "description": "The `Upload` scalar type represents a file upload.",
+        "description": null,
         "isOneOf": null,
         "fields": null,
         "inputFields": null,
