@@ -29,9 +29,9 @@ const DEFS = {
     range: "0〜100%",
   },
   growthRateActivity: {
-    title: "MAU% 前月比",
+    title: "MAU% 前期比",
     formula: "(今期の MAU% − 前期の MAU%) ÷ 前期の MAU%",
-    note: "負の値は前期よりアクティブ率が下がっていることを示す。前期は直前の 28 日間。",
+    note: "負の値は前期よりアクティブ率が下がっていることを示す。前期は直前の 28 日間 (= 今期の rolling window の 1 つ手前)。",
   },
   hubUserPct: {
     title: "ハブユーザー比率",
