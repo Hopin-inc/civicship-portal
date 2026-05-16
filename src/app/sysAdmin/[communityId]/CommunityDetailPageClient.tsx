@@ -19,12 +19,13 @@ import { CommunityReportsTabContainer } from "@/app/sysAdmin/features/communityD
 type Props = {
   communityId: string;
   initialData: GqlGetAnalyticsCommunityQuery["analyticsCommunity"] | null;
-  /** L1 dashboard 経由で取得した、この community の tenure 分布。L2 schema
-   * が tenureDistribution を露出するまでの SSR 横断の橋渡し。 */
+  /** L2 payload が `tenureDistribution` を返さなかった場合の fallback。
+   * 通常は `useCommunityDetail` が返す最新の `data.tenureDistribution` が
+   * 優先される。sysAdmin route が L1 dashboard 経由で渡すケース向け。 */
   tenureDistribution?: GqlAnalyticsTenureDistribution | null;
-  /** L1 dashboard 経由で取得した、この community の hub メンバー数。L2
-   * schema には未掲載のため、tenureDistribution と同じく page.tsx で
-   * L1 と並列 fetch して受け渡す。 */
+  /** L2 payload が `hubMemberCount` を返さなかった場合の fallback。
+   * 通常は `useCommunityDetail` が返す最新の `data.hubMemberCount` が
+   * 優先される。sysAdmin route が L1 dashboard 経由で渡すケース向け。 */
   hubMemberCount?: number | null;
   /** SSR で取得した「レポート発行履歴」初期 1 ページ。 */
   initialReports?: GqlGetReportsAllQuery["reportsAll"] | null;
@@ -66,12 +67,18 @@ export function CommunityDetailPageClient({
   if (!data) return null;
 
   // L2 detail schema doesn't expose L1's windowActivity, so we approximate
-  // newMemberCount from the latest monthly trend point. hubMemberCount stays
-  // unprovided (renders as 未計測) until backend exposes it on
-  // AnalyticsCommunityPayload.
+  // newMemberCount from the latest monthly trend point.
   const latestMonth =
     data.monthlyActivityTrend[data.monthlyActivityTrend.length - 1];
   const newMemberCount = latestMonth?.newMembers;
+
+  // L2 payload では tenureDistribution / hubMemberCount を直接持つため、
+  // refetch (フィルター変更等) でも追従するよう `data` を優先する。
+  // sysAdmin route で L1 から渡される prop は L2 が null を返す場合の fallback。
+  const effectiveTenureDistribution =
+    data.tenureDistribution ?? tenureDistribution ?? undefined;
+  const effectiveHubMemberCount =
+    data.hubMemberCount ?? hubMemberCount ?? undefined;
 
   return (
     <div className="flex flex-col gap-6">
@@ -81,8 +88,8 @@ export function CommunityDetailPageClient({
         data={data}
         communityName={data.communityName}
         newMemberCount={newMemberCount}
-        tenureDistribution={tenureDistribution ?? undefined}
-        hubMemberCount={hubMemberCount ?? undefined}
+        tenureDistribution={effectiveTenureDistribution}
+        hubMemberCount={effectiveHubMemberCount}
         slot="summary"
       />
       <Tabs defaultValue="dashboard" className="w-full">
@@ -95,8 +102,8 @@ export function CommunityDetailPageClient({
             data={data}
             communityName={data.communityName}
             newMemberCount={newMemberCount}
-            tenureDistribution={tenureDistribution ?? undefined}
-            hubMemberCount={hubMemberCount ?? undefined}
+            tenureDistribution={effectiveTenureDistribution}
+            hubMemberCount={effectiveHubMemberCount}
             slot="details"
           />
         </TabsContent>

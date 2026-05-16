@@ -15,8 +15,8 @@ export default async function AdminAnalyticsPage({ params }: Props) {
   const { communityId } = await params;
 
   // L1 dashboard (`analyticsDashboard`) は sysAdmin 限定の cross-community
-  // 集計のため Owner ロールでは叩かない。L1 経由でしか取れない
-  // tenureDistribution / hubMemberCount は未提供のまま (子側で「未計測」表示)。
+  // 集計のため Owner ロールでは叩かない。
+  // tenureDistribution / hubMemberCount は L2 payload から取得して提供する。
   const [initialData, initialReports] = await Promise.all([
     fetchSysAdminCommunityDetailServer({
       communityId,
@@ -38,8 +38,10 @@ export default async function AdminAnalyticsPage({ params }: Props) {
       <CommunityDetailPageClient
         communityId={communityId}
         initialData={initialData}
+        tenureDistribution={initialData?.tenureDistribution}
+        hubMemberCount={initialData?.hubMemberCount}
         initialReports={initialReports}
-        reportHrefBase={`/admin/analytics/reports`}
+        reportHrefBase={`/community/${communityId}/admin/analytics/reports`}
       />
     </div>
   );

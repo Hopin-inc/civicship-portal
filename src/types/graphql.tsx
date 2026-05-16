@@ -6622,6 +6622,19 @@ export type GqlGetAnalyticsCommunityQuery = {
     communityName: string;
     windowMonths: number;
     dormantCount: number;
+    hubMemberCount: number;
+    tenureDistribution: {
+      __typename?: "AnalyticsTenureDistribution";
+      lt1Month: number;
+      m1to3Months: number;
+      m3to12Months: number;
+      gte12Months: number;
+      monthlyHistogram: Array<{
+        __typename?: "AnalyticsTenureHistogramBucket";
+        monthsIn: number;
+        count: number;
+      }>;
+    };
     alerts: {
       __typename?: "AnalyticsCommunityAlerts";
       activeDrop: boolean;
@@ -13890,6 +13903,10 @@ export const GetAnalyticsCommunityDocument = gql`
       communityName
       windowMonths
       dormantCount
+      hubMemberCount
+      tenureDistribution {
+        ...AnalyticsTenureDistributionFields
+      }
       alerts {
         ...AnalyticsAlertFields
       }
@@ -13920,6 +13937,7 @@ export const GetAnalyticsCommunityDocument = gql`
       }
     }
   }
+  ${AnalyticsTenureDistributionFieldsFragmentDoc}
   ${AnalyticsAlertFieldsFragmentDoc}
   ${AnalyticsCommunityDetailSummaryFieldsFragmentDoc}
   ${AnalyticsStageDistributionFieldsFragmentDoc}
