@@ -32,6 +32,7 @@ import {
 } from "@/app/sysAdmin/_shared/format/number";
 import { HistoryBars } from "@/app/sysAdmin/_shared/components/HistoryBars";
 import type { MetricKey } from "@/app/sysAdmin/_shared/components/MetricDefinitions";
+import { GlossaryButton } from "@/app/sysAdmin/_shared/components/GlossaryButton";
 import { MetricInfoButton } from "@/app/sysAdmin/_shared/components/MetricInfoButton";
 import { PercentDelta } from "@/app/sysAdmin/_shared/components/PercentDelta";
 import {
@@ -280,21 +281,24 @@ export function CommunityDashboardOverview({
       {showSummary && communityName && (
         // px-1: ネットワーク等 scope 見出し (px-1) と左揃え。
         <header className="flex flex-col gap-1 px-1">
-          <div className="flex items-baseline gap-3">
-            <h1 className="text-2xl font-semibold leading-tight">
-              {communityName}
-            </h1>
-            <div className="flex items-baseline gap-1 tabular-nums text-muted-foreground">
-              <span className="text-base font-medium">
-                {toIntJa(totalMembers)}
-              </span>
-              <span className="text-xs">名</span>
-              {newMemberCount != null && (
-                <span className="text-xs">
-                  (+{toIntJa(newMemberCount)} 今月)
+          <div className="flex items-baseline justify-between gap-3">
+            <div className="flex items-baseline gap-3">
+              <h1 className="text-2xl font-semibold leading-tight">
+                {communityName}
+              </h1>
+              <div className="flex items-baseline gap-1 tabular-nums text-muted-foreground">
+                <span className="text-base font-medium">
+                  {toIntJa(totalMembers)}
                 </span>
-              )}
+                <span className="text-xs">名</span>
+                {newMemberCount != null && (
+                  <span className="text-xs">
+                    (+{toIntJa(newMemberCount)} 今月)
+                  </span>
+                )}
+              </div>
             </div>
+            <GlossaryButton className="self-center" />
           </div>
           <CommunityBand
             ageMonths={ageMonths}
@@ -337,7 +341,7 @@ export function CommunityDashboardOverview({
             icon={Network}
             colorClass={SCOPE_COLOR.network}
             title="ハブユーザー比率"
-            meta="今月"
+            meta="直近 28 日"
             infoMetricKey="hubUserPct"
             status={hubProvided ? "ok" : "todo"}
             hero={
@@ -517,8 +521,8 @@ export function CommunityDashboardOverview({
         <MetricCard
           icon={Activity}
           colorClass={SCOPE_COLOR.activity}
-          title="今月の MAU%"
-          meta="今月"
+          title="MAU%"
+          meta="直近 28 日"
           infoMetricKey="communityActivityRate"
           hero={
             <Hero
