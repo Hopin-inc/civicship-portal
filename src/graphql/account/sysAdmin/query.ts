@@ -10,6 +10,7 @@ import {
   ANALYTICS_PLATFORM_SUMMARY_FRAGMENT,
   ANALYTICS_RETENTION_TREND_POINT_FRAGMENT,
   ANALYTICS_STAGE_DISTRIBUTION_FRAGMENT,
+  ANALYTICS_TENURE_DISTRIBUTION_FRAGMENT,
 } from "./fragment";
 
 export const GET_ANALYTICS_DASHBOARD = gql`
@@ -36,6 +37,10 @@ export const GET_ANALYTICS_COMMUNITY = gql`
       communityName
       windowMonths
       dormantCount
+      hubMemberCount
+      tenureDistribution {
+        ...AnalyticsTenureDistributionFields
+      }
       alerts {
         ...AnalyticsAlertFields
       }
@@ -67,6 +72,7 @@ export const GET_ANALYTICS_COMMUNITY = gql`
     }
   }
   ${ANALYTICS_ALERT_FRAGMENT}
+  ${ANALYTICS_TENURE_DISTRIBUTION_FRAGMENT}
   ${ANALYTICS_COMMUNITY_DETAIL_SUMMARY_FRAGMENT}
   ${ANALYTICS_STAGE_DISTRIBUTION_FRAGMENT}
   ${ANALYTICS_MONTHLY_ACTIVITY_POINT_FRAGMENT}

@@ -19,12 +19,11 @@ import { CommunityReportsTabContainer } from "@/app/sysAdmin/features/communityD
 type Props = {
   communityId: string;
   initialData: GqlGetAnalyticsCommunityQuery["analyticsCommunity"] | null;
-  /** L1 dashboard 経由で取得した、この community の tenure 分布。L2 schema
-   * が tenureDistribution を露出するまでの SSR 横断の橋渡し。 */
+  /** この community の tenure 分布。sysAdmin route では L1 dashboard 経由、
+   * community admin route では L2 payload から取得して受け渡す。 */
   tenureDistribution?: GqlAnalyticsTenureDistribution | null;
-  /** L1 dashboard 経由で取得した、この community の hub メンバー数。L2
-   * schema には未掲載のため、tenureDistribution と同じく page.tsx で
-   * L1 と並列 fetch して受け渡す。 */
+  /** この community の hub メンバー数。sysAdmin route では L1 dashboard 経由、
+   * community admin route では L2 payload から取得して受け渡す。 */
   hubMemberCount?: number | null;
   /** SSR で取得した「レポート発行履歴」初期 1 ページ。 */
   initialReports?: GqlGetReportsAllQuery["reportsAll"] | null;
