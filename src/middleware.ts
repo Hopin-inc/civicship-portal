@@ -17,6 +17,7 @@ const EXCLUDED_REDIRECT_PATTERNS = [
   "/communities", // コミュニティアセット
   "/icons",     // アイコン
   "/sysAdmin",  // SYS_ADMIN 専用ルート（コミュニティ作成など）
+  "/.well-known", // /.well-known/* (security.txt 等)
 ];
 
 const COMMUNITY_ID_COOKIE_OPTIONS = {
@@ -372,5 +373,5 @@ function getCommunityIdFromHost(host: string | null): string | null {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|robots.txt|images/|icons/|communities/|api/).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|robots.txt|images/|icons/|communities/|api/|\\.well-known/).*)"],
 };
