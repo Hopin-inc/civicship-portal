@@ -57,12 +57,22 @@ export async function createCommunityAction(
   // X-Community-Id として明示的に渡す。
   // auto-resolve に任せると middleware が cookie の stale な communityId（削除済み等）を
   // ヘッダーにセットしてしまい、バックエンドの Firebase テナント検索が失敗するため。
+  //
+  // 現在の navigation context (x-community-id cookie) に対応するセッションがあれば
+  // それを優先することで、ヘッダーと cookie の不一致による TENANT_MISMATCH 警告を回避し、
+  // 選ばれるテナントを cookie 反復順ではなくユーザーが今いるコミュニティに揃える。
   const cookieStore = await cookies();
-  const authCommunityId = cookieStore
-    .getAll()
-    .filter((c) => c.name.startsWith("__session_"))
-    .map((c) => c.name.replace("__session_", ""))
-    .find((id) => (ACTIVE_COMMUNITY_IDS as readonly string[]).includes(id)) ?? "";
+  const currentCommunityId = cookieStore.get("x-community-id")?.value;
+  const hasCurrentSession =
+    !!currentCommunityId && !!cookieStore.get(`__session_${currentCommunityId}`);
+
+  const authCommunityId = hasCurrentSession
+    ? currentCommunityId!
+    : cookieStore
+        .getAll()
+        .filter((c) => c.name.startsWith("__session_"))
+        .map((c) => c.name.replace("__session_", ""))
+        .find((id) => (ACTIVE_COMMUNITY_IDS as readonly string[]).includes(id)) ?? "";
 
   if (!authCommunityId) {
     return { error: "有効なセッションが見つかりません。いずれかのコミュニティにログインしてから再試行してください" };
