@@ -361,12 +361,12 @@ function getCommunityIdFromHost(host: string | null): string | null {
     }
   }
 
-  if (extractedId && (ACTIVE_COMMUNITY_IDS as readonly string[]).includes(extractedId)) {
+  if (extractedId) {
     return extractedId;
   }
 
   console.warn(
-    `[Middleware Debug] Unknown community ID from host: ${hostName} (extracted: ${extractedId || "(none)"})`,
+    `[Middleware Debug] Could not extract community ID from host: ${hostName}`,
   );
   return null;
 }
