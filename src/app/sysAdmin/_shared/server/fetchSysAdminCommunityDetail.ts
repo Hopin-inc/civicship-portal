@@ -13,6 +13,13 @@ type Result = NonNullable<
   GqlGetAnalyticsCommunityQuery["analyticsCommunity"]
 >;
 
+// analyticsCommunity は 12 ヶ月トレンド + 週次リテンション + コホート 2 種 +
+// 最大 1000 件のメンバー集計を含む重いクエリで、executeServerGraphQLQuery の
+// デフォルト 5 秒では SSR がタイムアウトしやすい。タイムアウトすると initialData が
+// null になり、クライアント側フォールバッククエリ（cross-origin で認証が乗らず失敗する）
+// に落ちるため、この SSR フェッチだけ長めのタイムアウトを取る。
+const ANALYTICS_COMMUNITY_SERVER_TIMEOUT_MS = 20000;
+
 /**
  * `/sysAdmin/[communityId]` の初期描画データを SSR で取得する。
  * SYS_ADMIN ロールがない / コミュニティが存在しない場合は null を返し、
@@ -29,7 +36,12 @@ export async function fetchSysAdminCommunityDetailServer(
     const data = await executeServerGraphQLQuery<
       GqlGetAnalyticsCommunityQuery,
       { input: GqlAnalyticsCommunityInput }
-    >(GET_ANALYTICS_COMMUNITY_SERVER_QUERY, { input });
+    >(
+      GET_ANALYTICS_COMMUNITY_SERVER_QUERY,
+      { input },
+      {},
+      ANALYTICS_COMMUNITY_SERVER_TIMEOUT_MS,
+    );
     return data.analyticsCommunity ?? null;
   } catch (error) {
     logger.warn("[sysAdmin] fetchSysAdminCommunityDetailServer failed", {
