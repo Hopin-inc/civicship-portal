@@ -24,13 +24,14 @@ export default function UserVotePage() {
     [data],
   );
 
+  const title = t("votes.detail.title");
   const headerConfig = useMemo(
     () => ({
-      title: t("votes.detail.title"),
+      title,
       showLogo: false,
       showBackButton: true,
     }),
-    [t],
+    [title],
   );
   useHeaderConfig(headerConfig);
 
