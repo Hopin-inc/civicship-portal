@@ -1,5 +1,6 @@
 {
   "votes.page.title": "Vote",
+  "votes.detail.title": "Vote Details",
   "votes.cast.submitButton": "Vote",
   "votes.cast.changeButton": "Change vote",
   "votes.cast.submitting": "Voting...",

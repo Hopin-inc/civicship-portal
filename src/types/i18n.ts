@@ -524,6 +524,7 @@ export type TranslationKey =
   | "votes.list.emptyTitle"
   | "votes.list.loadError"
   | "votes.list.notEligible"
+  | "votes.detail.title"
   | "votes.list.title"
   | "votes.list.votedFor"
   | "votes.page.loadError"

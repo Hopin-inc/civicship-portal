@@ -26,11 +26,11 @@ export default function UserVotePage() {
 
   const headerConfig = useMemo(
     () => ({
-      title: view?.title ?? t("votes.page.title"),
+      title: t("votes.detail.title"),
       showLogo: false,
       showBackButton: true,
     }),
-    [view, t],
+    [t],
   );
   useHeaderConfig(headerConfig);
 
