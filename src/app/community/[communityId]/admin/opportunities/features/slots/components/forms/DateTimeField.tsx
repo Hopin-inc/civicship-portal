@@ -30,16 +30,26 @@ export function DateTimeField({
   const date = value ? dayjs(value).toDate() : undefined;
   const time = value ? dayjs(value).format("HH:mm") : defaultTime;
 
+  // 選択中の日付が当日の場合、現在時刻より前は選べない（votes/募集スロット共通）
+  const isToday = date ? dayjs(date).isSame(dayjs(), "day") : false;
+  const minTime = isToday ? dayjs().format("HH:mm") : undefined;
+
+  // 過去（現在の分より前）にならないよう補正する
+  const clampFuture = (candidate: dayjs.Dayjs) => {
+    const now = dayjs();
+    return candidate.isBefore(now, "minute") ? now : candidate;
+  };
+
   const handleDateChange = (d?: Date) => {
     if (!d) return;
     const [h, m] = time.split(":").map(Number);
-    onChange(dayjs(d).hour(h).minute(m).format("YYYY-MM-DDTHH:mm"));
+    onChange(clampFuture(dayjs(d).hour(h).minute(m)).format("YYYY-MM-DDTHH:mm"));
   };
 
   const handleTimeChange = (t: string) => {
     if (!date) return;
     const [h, m] = t.split(":").map(Number);
-    onChange(dayjs(date).hour(h).minute(m).format("YYYY-MM-DDTHH:mm"));
+    onChange(clampFuture(dayjs(date).hour(h).minute(m)).format("YYYY-MM-DDTHH:mm"));
   };
 
   return (
@@ -77,6 +87,7 @@ export function DateTimeField({
             <Input
               type="time"
               value={time}
+              min={minTime}
               onChange={(e) => handleTimeChange(e.target.value)}
               disabled={disabled}
             />
