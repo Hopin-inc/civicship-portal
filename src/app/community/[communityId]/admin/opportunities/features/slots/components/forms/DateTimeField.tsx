@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { clampToFuture, resolveMinTime } from "./dateTimeUtils";
 
 interface DateTimeFieldProps {
   label: string;
@@ -31,25 +32,18 @@ export function DateTimeField({
   const time = value ? dayjs(value).format("HH:mm") : defaultTime;
 
   // 選択中の日付が当日の場合、現在時刻より前は選べない（votes/募集スロット共通）
-  const isToday = date ? dayjs(date).isSame(dayjs(), "day") : false;
-  const minTime = isToday ? dayjs().format("HH:mm") : undefined;
-
-  // 過去（現在の分より前）にならないよう補正する
-  const clampFuture = (candidate: dayjs.Dayjs) => {
-    const now = dayjs();
-    return candidate.isBefore(now, "minute") ? now : candidate;
-  };
+  const minTime = resolveMinTime(date);
 
   const handleDateChange = (d?: Date) => {
     if (!d) return;
     const [h, m] = time.split(":").map(Number);
-    onChange(clampFuture(dayjs(d).hour(h).minute(m)).format("YYYY-MM-DDTHH:mm"));
+    onChange(clampToFuture(dayjs(d).hour(h).minute(m)).format("YYYY-MM-DDTHH:mm"));
   };
 
   const handleTimeChange = (t: string) => {
     if (!date) return;
     const [h, m] = t.split(":").map(Number);
-    onChange(clampFuture(dayjs(date).hour(h).minute(m)).format("YYYY-MM-DDTHH:mm"));
+    onChange(clampToFuture(dayjs(date).hour(h).minute(m)).format("YYYY-MM-DDTHH:mm"));
   };
 
   return (
