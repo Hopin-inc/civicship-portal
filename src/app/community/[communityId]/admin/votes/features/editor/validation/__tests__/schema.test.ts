@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import dayjs from "dayjs";
 import { GqlRole, GqlVoteGateType, GqlVotePowerPolicyType } from "@/types/graphql";
 import { createVoteTopicSchema } from "../schema";
@@ -9,6 +9,17 @@ const t = (key: string) => key;
 const schema = createVoteTopicSchema(t);
 
 const fmt = (d: ReturnType<typeof dayjs>) => d.format("YYYY-MM-DDTHH:mm");
+
+// startsInPast の判定はスキーマ内部の dayjs()（現在時刻）に依存するため、
+// 分の境界でフレークしないよう現在時刻を固定する。
+beforeEach(() => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date("2026-07-10T14:30:00"));
+});
+
+afterEach(() => {
+  vi.useRealTimers();
+});
 
 const baseValues = (overrides: Partial<VoteTopicFormValues> = {}): VoteTopicFormValues => ({
   title: "テスト投票",
