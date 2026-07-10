@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useParams, notFound } from "next/navigation";
 import { useTranslations } from "next-intl";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
@@ -13,6 +13,7 @@ import { VoteDetail } from "../features/detail/components/VoteDetail";
 import { AdminVoteDetailFooter } from "../features/detail/components/AdminVoteDetailFooter";
 import { presentVoteDetail } from "../features/detail/presenters/presentVoteDetail";
 import { useVoteTopicActions } from "../features/list/hooks/useVoteTopicActions";
+import { ConfirmDialog } from "../features/shared/components/ConfirmDialog";
 
 export default function VoteDetailPage() {
   const t = useTranslations();
@@ -37,9 +38,10 @@ export default function VoteDetailPage() {
     fetchPolicy: "network-only",
   });
 
-  const { handleEdit, handleDelete } = useVoteTopicActions({
+  const { handleEdit, handleDelete, deleting } = useVoteTopicActions({
     refetch: () => router.push("/admin/votes"),
   });
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
   if (!communityId) {
     return null;
@@ -65,7 +67,20 @@ export default function VoteDetailPage() {
       <AdminVoteDetailFooter
         phase={view.phase}
         onEdit={() => handleEdit(view.id)}
-        onDelete={() => handleDelete(view.id)}
+        onDelete={() => setConfirmDeleteOpen(true)}
+      />
+      <ConfirmDialog
+        open={confirmDeleteOpen}
+        onOpenChange={(open) => {
+          if (!deleting) setConfirmDeleteOpen(open);
+        }}
+        title={t("adminVotes.list.actions.delete")}
+        description={t("adminVotes.list.deleteConfirm")}
+        confirmLabel={t("adminVotes.list.actions.delete")}
+        cancelLabel={t("adminVotes.common.cancel")}
+        onConfirm={() => handleDelete(view.id)}
+        confirming={deleting}
+        destructive
       />
     </>
   );

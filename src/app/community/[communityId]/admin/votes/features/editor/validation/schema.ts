@@ -71,6 +71,17 @@ export const createVoteTopicSchema = (t: Translator) => {
     })
     .refine(
       (values) => {
+        if (!values.startsAt) return true;
+        // 過去（現在の分より前）の開始日時は不可
+        return !dayjs(values.startsAt).isBefore(dayjs(), "minute");
+      },
+      {
+        path: ["startsAt"],
+        message: t("adminVotes.form.errors.startsInPast"),
+      },
+    )
+    .refine(
+      (values) => {
         if (!values.startsAt || !values.endsAt) return true;
         return dayjs(values.endsAt).isAfter(dayjs(values.startsAt));
       },
