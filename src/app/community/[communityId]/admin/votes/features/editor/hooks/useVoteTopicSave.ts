@@ -62,10 +62,27 @@ export function useVoteTopicSave({
   topicId,
 }: UseVoteTopicSaveParams) {
   const t = useTranslations();
-  const [createVoteTopic, { loading: creating }] =
-    useCreateVoteTopicMutation();
-  const [updateVoteTopic, { loading: updating }] =
-    useUpdateVoteTopicMutation();
+  // 作成/更新後に一覧(GetVoteTopics)へ戻った際、確実に最新を表示するため
+  // refetch に加えて voteTopics フィールドのキャッシュを破棄する
+  // （admin/opportunities の保存処理と同じ方式）。
+  const [createVoteTopic, createResult] = useCreateVoteTopicMutation({
+    refetchQueries: ["GetVoteTopics"],
+    awaitRefetchQueries: true,
+    onCompleted: () => {
+      createResult.client.cache.evict({ fieldName: "voteTopics" });
+      createResult.client.cache.gc();
+    },
+  });
+  const [updateVoteTopic, updateResult] = useUpdateVoteTopicMutation({
+    refetchQueries: ["GetVoteTopics"],
+    awaitRefetchQueries: true,
+    onCompleted: () => {
+      updateResult.client.cache.evict({ fieldName: "voteTopics" });
+      updateResult.client.cache.gc();
+    },
+  });
+  const creating = createResult.loading;
+  const updating = updateResult.loading;
 
   const save = useCallback(
     async (values: VoteTopicFormValues): Promise<string | null> => {
@@ -77,8 +94,6 @@ export function useVoteTopicSave({
             variables: {
               input: { ...input, communityId },
             },
-            refetchQueries: ["GetVoteTopics"],
-            awaitRefetchQueries: true,
           });
           const id = data?.voteTopicCreate?.voteTopic?.id ?? null;
           if (!id) {
@@ -94,8 +109,6 @@ export function useVoteTopicSave({
               id: topicId,
               input,
             },
-            refetchQueries: ["GetVoteTopics"],
-            awaitRefetchQueries: true,
           });
           const id = data?.voteTopicUpdate?.voteTopic?.id ?? null;
           if (!id) {

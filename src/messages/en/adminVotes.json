@@ -75,6 +75,7 @@
   "adminVotes.form.updating": "Saving...",
   "adminVotes.form.errors.titleRequired": "Please enter a title",
   "adminVotes.form.errors.startsAtRequired": "Please enter a start date and time",
+  "adminVotes.form.errors.startsInPast": "Start time must be now or later",
   "adminVotes.form.errors.endsAtRequired": "Please enter an end date and time",
   "adminVotes.form.errors.endsAfterStart": "End time must be after start time",
   "adminVotes.form.errors.minTwoOptions": "Please provide at least 2 options",

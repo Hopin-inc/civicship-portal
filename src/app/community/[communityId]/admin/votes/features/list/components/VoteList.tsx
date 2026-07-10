@@ -33,8 +33,8 @@ export function VoteList({ communityId }: VoteListProps) {
 
   const confirmDelete = async () => {
     if (!pendingDeleteId) return;
-    await handleDelete(pendingDeleteId);
-    setPendingDeleteId(null);
+    const ok = await handleDelete(pendingDeleteId);
+    if (ok) setPendingDeleteId(null);
   };
 
   const refetchRef = useRef<(() => void) | null>(null);

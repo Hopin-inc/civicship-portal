@@ -13,7 +13,7 @@ interface UseVoteTopicActionsParams {
 
 interface UseVoteTopicActionsReturn {
   handleEdit: (voteTopicId: string) => void;
-  handleDelete: (voteTopicId: string) => Promise<void>;
+  handleDelete: (voteTopicId: string) => Promise<boolean>;
   deleting: boolean;
 }
 
@@ -32,13 +32,14 @@ export function useVoteTopicActions({
   );
 
   const handleDelete = useCallback(
-    async (voteTopicId: string) => {
+    async (voteTopicId: string): Promise<boolean> => {
       try {
         await deleteVoteTopic({
           variables: { id: voteTopicId },
         });
         toast.success(t("adminVotes.toast.deleteSuccess"));
         refetch?.();
+        return true;
       } catch (error) {
         logger.warn("Failed to delete vote topic", {
           error: error instanceof Error ? error.message : String(error),
@@ -46,6 +47,7 @@ export function useVoteTopicActions({
           component: "useVoteTopicActions",
         });
         toast.error(t("adminVotes.toast.deleteError"));
+        return false;
       }
     },
     [deleteVoteTopic, refetch, t],

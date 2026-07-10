@@ -75,6 +75,7 @@
   "adminVotes.form.updating": "保存中...",
   "adminVotes.form.errors.titleRequired": "タイトルを入力してください",
   "adminVotes.form.errors.startsAtRequired": "開始日時を入力してください",
+  "adminVotes.form.errors.startsInPast": "開始日時は現在時刻以降に設定してください",
   "adminVotes.form.errors.endsAtRequired": "終了日時を入力してください",
   "adminVotes.form.errors.endsAfterStart": "終了日時は開始日時より後に設定してください",
   "adminVotes.form.errors.minTwoOptions": "選択肢を 2 件以上入力してください",
