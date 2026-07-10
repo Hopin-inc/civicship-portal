@@ -77,6 +77,8 @@ export function useVoteTopicSave({
             variables: {
               input: { ...input, communityId },
             },
+            refetchQueries: ["GetVoteTopics"],
+            awaitRefetchQueries: true,
           });
           const id = data?.voteTopicCreate?.voteTopic?.id ?? null;
           if (!id) {
@@ -92,6 +94,8 @@ export function useVoteTopicSave({
               id: topicId,
               input,
             },
+            refetchQueries: ["GetVoteTopics"],
+            awaitRefetchQueries: true,
           });
           const id = data?.voteTopicUpdate?.voteTopic?.id ?? null;
           if (!id) {

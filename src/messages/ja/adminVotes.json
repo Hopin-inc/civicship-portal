@@ -1,5 +1,6 @@
 {
   "adminVotes.page.title": "投票作成",
+  "adminVotes.common.cancel": "キャンセル",
   "adminVotes.list.title": "投票一覧",
   "adminVotes.list.createButton": "投票を作成",
   "adminVotes.list.emptyTitle": "投票はまだありません",

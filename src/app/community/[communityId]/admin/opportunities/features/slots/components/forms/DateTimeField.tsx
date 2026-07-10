@@ -66,7 +66,7 @@ export function DateTimeField({
             selected={date}
             onSelect={handleDateChange}
             disabled={(d) => {
-              if (d < new Date()) return true;
+              if (dayjs(d).isBefore(dayjs(), "day")) return true;
               if (minDate && dayjs(d).isBefore(dayjs(minDate), "day")) return true;
               return false;
             }}

@@ -1,5 +1,6 @@
 {
   "adminVotes.page.title": "Create Vote",
+  "adminVotes.common.cancel": "Cancel",
   "adminVotes.list.title": "Votes",
   "adminVotes.list.createButton": "Create vote",
   "adminVotes.list.emptyTitle": "No votes yet",

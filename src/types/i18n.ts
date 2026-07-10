@@ -43,6 +43,7 @@ export type TranslationKey =
   | "adminSetting.preview.sns"
   | "adminSetting.preview.titlePlaceholder"
   | "adminSetting.preview.wallet"
+  | "adminVotes.common.cancel"
   | "adminVotes.detail.deleteButton"
   | "adminVotes.detail.deleteDisabledHint"
   | "adminVotes.detail.editButton"
