@@ -79,7 +79,10 @@ export function VoteTopicFormEditor({
       <ConfirmDialog
         open={confirmOpen}
         onOpenChange={(open) => {
-          if (!saving) setConfirmOpen(open);
+          if (saving) return;
+          setConfirmOpen(open);
+          // 閉じるときは保留中の入力値も破棄する（古い値での保存を防ぐ）
+          if (!open) setPendingValues(null);
         }}
         title={t("adminVotes.list.createButton")}
         description={t("adminVotes.form.createConfirm")}
