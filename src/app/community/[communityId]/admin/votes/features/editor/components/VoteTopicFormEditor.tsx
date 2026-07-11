@@ -46,9 +46,11 @@ export function VoteTopicFormEditor({
   );
   useHeaderConfig(headerConfig);
 
-  const runSave = async (values: VoteTopicFormValues) => {
+  const runSave = async (values: VoteTopicFormValues): Promise<boolean> => {
     const id = await save(values);
-    if (id) onSuccess?.(id);
+    if (!id) return false;
+    onSuccess?.(id);
+    return true;
   };
 
   const handleSubmit = form.handleSubmit(async (values) => {
@@ -61,10 +63,16 @@ export function VoteTopicFormEditor({
   });
 
   const handleConfirm = async () => {
-    if (!pendingValues) return;
-    await runSave(pendingValues);
-    setConfirmOpen(false);
-    setPendingValues(null);
+    // saving 中の連打によるダブルサブミットを防ぐ（ボタンの disabled が
+    // 反映される前の隙間対策）。
+    if (!pendingValues || saving) return;
+    // 保存が成功したときのみ閉じる。失敗時はダイアログを開いたままにして
+    // 再試行/キャンセルできるようにする（削除フローと挙動を揃える）。
+    const ok = await runSave(pendingValues);
+    if (ok) {
+      setConfirmOpen(false);
+      setPendingValues(null);
+    }
   };
 
   return (
