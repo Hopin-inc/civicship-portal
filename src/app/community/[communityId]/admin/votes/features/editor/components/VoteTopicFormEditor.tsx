@@ -63,7 +63,9 @@ export function VoteTopicFormEditor({
   });
 
   const handleConfirm = async () => {
-    if (!pendingValues) return;
+    // saving 中の連打によるダブルサブミットを防ぐ（ボタンの disabled が
+    // 反映される前の隙間対策）。
+    if (!pendingValues || saving) return;
     // 保存が成功したときのみ閉じる。失敗時はダイアログを開いたままにして
     // 再試行/キャンセルできるようにする（削除フローと挙動を揃える）。
     const ok = await runSave(pendingValues);
