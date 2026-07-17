@@ -55,11 +55,12 @@ function UserSelectStep({
       <TabManager activeTab={activeTab} setActiveTab={setActiveTab} />
 
       {activeTab === TabsEnum.History && (
+        // 履歴タブはコミュニティへの送付履歴 (送ったpt) を並べる。
+        // 残高付きの固定行 (prependRow) はメンバータブのみに表示し、意味の混在を避ける
         <HistoryTab
           listType={listType}
           searchQuery={searchQuery}
           onSelect={onSelect}
-          prependRow={prependRow}
           onSelectCommunity={onSelectCommunity}
         />
       )}
