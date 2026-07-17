@@ -2,6 +2,7 @@
   "adminWallet.title": "Wallet",
   "adminWallet.buttons.issue": "Issue",
   "adminWallet.buttons.grant": "Send",
+  "adminWallet.buttons.receive": "Receive",
   "adminWallet.toast.refreshSuccess": "Wallet information updated",
   "adminWallet.toast.refreshError": "Failed to reload",
   "adminWallet.grant.selectRecipient": "Select recipient",
@@ -25,16 +26,13 @@
   "adminWallet.issue.errorGeneric": "Failed to issue points",
   "adminWallet.common.notSet": "Not set",
   "adminWallet.common.toConfirm": "To confirm",
-
   "adminWallet.buttons.settings": "Bonus Settings",
-
   "adminWallet.settings.title": "Bonus Settings",
   "adminWallet.settings.signupBonus.title": "Sign-up Bonus",
   "adminWallet.settings.signupBonus.points": "{points} pt granted",
   "adminWallet.settings.signupBonus.statusEnabled": "Auto-distribution enabled",
   "adminWallet.settings.signupBonus.statusDisabled": "Paused",
   "adminWallet.settings.signupBonus.edit": "Edit",
-
   "adminWallet.settings.signupBonus.form.title": "Edit Sign-up Bonus",
   "adminWallet.settings.signupBonus.form.pointsLabel": "Points to grant",
   "adminWallet.settings.signupBonus.form.messageLabel": "Welcome message (LINE notification)",
@@ -43,12 +41,10 @@
   "adminWallet.settings.signupBonus.form.success": "Settings saved successfully",
   "adminWallet.settings.signupBonus.form.invalidPoints": "Please enter an integer greater than or equal to 0",
   "adminWallet.settings.signupBonus.form.error": "Failed to save settings",
-
   "adminWallet.settings.signupBonus.alert": "Attention required",
   "adminWallet.settings.signupBonus.details.allGood": "All bonuses have been granted successfully",
   "adminWallet.settings.signupBonus.details.seeTransactions": "Grant details can be checked in wallet management",
   "adminWallet.settings.signupBonus.details.viewWallet": "Check",
-
   "adminWallet.settings.pending.title": "Failed Bonuses",
   "adminWallet.settings.pending.count": "{count} items",
   "adminWallet.settings.pending.description": "Members who have not received bonuses due to insufficient balance or other reasons",
@@ -64,7 +60,6 @@
   "adminWallet.settings.pending.retryError.NOT_FOUND": "Grant or wallet not found",
   "adminWallet.settings.pending.retryError.FORBIDDEN": "You do not have permission to perform this operation",
   "adminWallet.settings.pending.retryError.generic": "Failed to resend bonus",
-
   "adminWallet.settings.pending.failureReason.INSUFFICIENT_BALANCE": "Insufficient balance",
   "adminWallet.settings.pending.failureReason.INSUFFICIENT_FUNDS": "Insufficient balance",
   "adminWallet.settings.pending.failureReason.WALLET_NOT_FOUND": "Wallet not created",

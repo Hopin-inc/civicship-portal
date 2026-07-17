@@ -12,19 +12,17 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet";
-import { useReceiveUrl } from "../hooks/useReceiveUrl";
-
 const QRCode = dynamic(() => import("react-qr-code"), { ssr: false });
 
 interface ReceiveQRSheetProps {
-  userId: string;
+  /** QR / コピー対象の受け取りリンク。呼び出し側で useReceiveUrl / useCommunityReceiveUrl から生成する */
+  url: string;
   open: boolean;
   onClose: () => void;
 }
 
-export function ReceiveQRSheet({ userId, open, onClose }: ReceiveQRSheetProps) {
+export function ReceiveQRSheet({ url, open, onClose }: ReceiveQRSheetProps) {
   const t = useTranslations();
-  const { url } = useReceiveUrl(userId);
 
   const handleCopy = async () => {
     if (!url) return;
