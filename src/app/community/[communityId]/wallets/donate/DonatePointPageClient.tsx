@@ -10,12 +10,15 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";
+import { UserPointRow } from "@/components/shared/UserPointRow";
+import { Table, TableBody } from "@/components/ui/table";
 import { useTranslations } from "next-intl";
 import {
   GqlMembershipsConnection,
   GqlRole,
   GqlMembershipStatus,
   GqlMembershipStatusReason,
+  GqlUser,
   useGetUserFlexibleQuery,
 } from "@/types/graphql";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
@@ -69,9 +72,18 @@ export default function DonatePointPageClient({ initialCurrentPoint }: DonatePoi
     refetchRef.current = refetch;
   }, [refetch]);
 
-  const { selectedUser, setSelectedUser, handleDonate, isLoading, isAuthReady } = useDonateFlow(
-    user,
-    currentPoint,
+  const { selectedUser, setSelectedUser, selectCommunity, handleDonate, isLoading, isAuthReady } =
+    useDonateFlow(user, currentPoint);
+
+  // コミュニティ財布を「ユーザー」として扱うための疑似ユーザー (表示は名前/ロゴのみ使用)
+  const communityAsUser = useMemo<GqlUser>(
+    () => ({
+      __typename: "User",
+      id: communityId,
+      name: communityConfig?.title ?? "",
+      image: communityConfig?.squareLogoPath ?? "",
+    }),
+    [communityId, communityConfig?.title, communityConfig?.squareLogoPath],
   );
 
   const [notFoundInMembers, setNotFoundInMembers] = useState(false);
@@ -110,13 +122,29 @@ export default function DonatePointPageClient({ initialCurrentPoint }: DonatePoi
   return (
     <div className="max-w-xl mx-auto mt-6 space-y-4">
       {!selectedUser ? (
-        <DonateUserSelect
-          members={members}
-          onSelect={setSelectedUser}
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          initialConnection={initialConnection}
-        />
+        <>
+          {/* コミュニティ財布への送付 (CONTRIBUTION) をメンバー一覧の最上部に固定表示。
+              communityId 未ロード時は空 ID 送金を防ぐため表示しない */}
+          {communityId && (
+            <Table className="max-w-xl">
+              <TableBody>
+                <UserPointRow
+                  avatar={communityAsUser.image ?? ""}
+                  name={communityAsUser.name}
+                  subText={t("wallets.donate.communityWallet")}
+                  onClick={() => selectCommunity(communityAsUser)}
+                />
+              </TableBody>
+            </Table>
+          )}
+          <DonateUserSelect
+            members={members}
+            onSelect={setSelectedUser}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            initialConnection={initialConnection}
+          />
+        </>
       ) : (
         <TransferInputStep
           user={selectedUser}
