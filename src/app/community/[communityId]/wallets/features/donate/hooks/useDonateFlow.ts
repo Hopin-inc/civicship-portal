@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useAppRouter } from "@/lib/navigation";
 import { useAnalytics } from "@/hooks/analytics/useAnalytics";
 import { useDonatePoint } from "@/app/community/[communityId]/wallets/features/donate/hooks/index";
@@ -19,17 +19,18 @@ export function useDonateFlow(currentUser?: GqlUser | null, currentPoint?: bigin
   const [isCommunityRecipient, setIsCommunityRecipient] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // 通常のメンバー選択。コミュニティ送付フラグは解除する
-  const setSelectedUser = (user: GqlUser | null) => {
+  // 通常のメンバー選択。コミュニティ送付フラグは解除する。
+  // 参照を安定させ、呼び出し元の useEffect 依存に入っても不要な再実行を防ぐ
+  const setSelectedUser = useCallback((user: GqlUser | null) => {
     setIsCommunityRecipient(false);
     setSelectedUserState(user);
-  };
+  }, []);
 
   // コミュニティ財布への送付を選択。表示用に疑似ユーザー (コミュニティ名/ロゴ) を保持する
-  const selectCommunity = (community: GqlUser) => {
+  const selectCommunity = useCallback((community: GqlUser) => {
     setIsCommunityRecipient(true);
     setSelectedUserState(community);
-  };
+  }, []);
 
   const handleDonate = async (amount: number, comment?: string, images?: File[]) => {
     if (!selectedUser || !currentUser?.id) return;
