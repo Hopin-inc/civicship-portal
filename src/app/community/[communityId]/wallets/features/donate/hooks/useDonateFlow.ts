@@ -14,8 +14,22 @@ export function useDonateFlow(currentUser?: GqlUser | null, currentPoint?: bigin
   const router = useAppRouter();
   const track = useAnalytics();
   const { donate, isLoading: isDonating, isAuthReady } = useDonatePoint();
-  const [selectedUser, setSelectedUser] = useState<GqlUser | null>(null);
+  const [selectedUser, setSelectedUserState] = useState<GqlUser | null>(null);
+  // 送付先がコミュニティ財布 (CONTRIBUTION) かどうか。true のとき toUserId を省略する
+  const [isCommunityRecipient, setIsCommunityRecipient] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // 通常のメンバー選択。コミュニティ送付フラグは解除する
+  const setSelectedUser = (user: GqlUser | null) => {
+    setIsCommunityRecipient(false);
+    setSelectedUserState(user);
+  };
+
+  // コミュニティ財布への送付を選択。表示用に疑似ユーザー (コミュニティ名/ロゴ) を保持する
+  const selectCommunity = (community: GqlUser) => {
+    setIsCommunityRecipient(true);
+    setSelectedUserState(community);
+  };
 
   const handleDonate = async (amount: number, comment?: string, images?: File[]) => {
     if (!selectedUser || !currentUser?.id) return;
@@ -23,7 +37,7 @@ export function useDonateFlow(currentUser?: GqlUser | null, currentPoint?: bigin
 
     try {
       const res = await donate({
-        toUserId: selectedUser.id,
+        toUserId: isCommunityRecipient ? undefined : selectedUser.id,
         amount,
         comment,
         fromUserId: currentUser.id,
@@ -56,6 +70,8 @@ export function useDonateFlow(currentUser?: GqlUser | null, currentPoint?: bigin
   return {
     selectedUser,
     setSelectedUser,
+    selectCommunity,
+    isCommunityRecipient,
     handleDonate,
     isLoading: isDonating || isSubmitting,
     isAuthReady,
