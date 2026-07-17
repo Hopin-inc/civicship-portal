@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Plus } from "lucide-react";
 import { AppLink } from "@/lib/navigation";
@@ -17,6 +17,7 @@ import { ErrorState } from "@/components/shared";
 import { VoteListItem } from "./VoteListItem";
 import { useVoteTopics } from "../hooks/useVoteTopics";
 import { useVoteTopicActions } from "../hooks/useVoteTopicActions";
+import { ConfirmDialog } from "../../shared/components/ConfirmDialog";
 
 interface VoteListProps {
   communityId: string;
@@ -27,7 +28,14 @@ export function VoteList({ communityId }: VoteListProps) {
   const { items, loading, error, loadMoreRef, hasNextPage, isLoadingMore, refetch } =
     useVoteTopics({ communityId });
   const safeRefetch = () => { void refetch(); };
-  const { handleEdit, handleDelete } = useVoteTopicActions({ refetch: safeRefetch });
+  const { handleEdit, handleDelete, deleting } = useVoteTopicActions({ refetch: safeRefetch });
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+
+  const confirmDelete = async () => {
+    if (!pendingDeleteId) return;
+    const ok = await handleDelete(pendingDeleteId);
+    if (ok) setPendingDeleteId(null);
+  };
 
   const refetchRef = useRef<(() => void) | null>(null);
   refetchRef.current = refetch;
@@ -72,7 +80,7 @@ export function VoteList({ communityId }: VoteListProps) {
           <VoteListItem
             item={item}
             onEdit={() => handleEdit(item.id)}
-            onDelete={() => handleDelete(item.id)}
+            onDelete={() => setPendingDeleteId(item.id)}
           />
         </div>
       ))}
@@ -82,6 +90,20 @@ export function VoteList({ communityId }: VoteListProps) {
           {isLoadingMore && <LoadingIndicator fullScreen={false} />}
         </div>
       )}
+
+      <ConfirmDialog
+        open={pendingDeleteId !== null}
+        onOpenChange={(open) => {
+          if (!deleting && !open) setPendingDeleteId(null);
+        }}
+        title={t("adminVotes.list.actions.delete")}
+        description={t("adminVotes.list.deleteConfirm")}
+        confirmLabel={t("adminVotes.list.actions.delete")}
+        cancelLabel={t("adminVotes.common.cancel")}
+        onConfirm={confirmDelete}
+        confirming={deleting}
+        destructive
+      />
     </div>
   );
 }

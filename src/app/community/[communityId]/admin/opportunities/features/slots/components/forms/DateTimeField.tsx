@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { clampToFuture, resolveMinTime } from "./dateTimeUtils";
 
 interface DateTimeFieldProps {
   label: string;
@@ -30,16 +31,19 @@ export function DateTimeField({
   const date = value ? dayjs(value).toDate() : undefined;
   const time = value ? dayjs(value).format("HH:mm") : defaultTime;
 
+  // 選択中の日付が当日の場合、現在時刻より前は選べない（votes/募集スロット共通）
+  const minTime = resolveMinTime(date);
+
   const handleDateChange = (d?: Date) => {
     if (!d) return;
     const [h, m] = time.split(":").map(Number);
-    onChange(dayjs(d).hour(h).minute(m).format("YYYY-MM-DDTHH:mm"));
+    onChange(clampToFuture(dayjs(d).hour(h).minute(m)).format("YYYY-MM-DDTHH:mm"));
   };
 
   const handleTimeChange = (t: string) => {
     if (!date) return;
     const [h, m] = t.split(":").map(Number);
-    onChange(dayjs(date).hour(h).minute(m).format("YYYY-MM-DDTHH:mm"));
+    onChange(clampToFuture(dayjs(date).hour(h).minute(m)).format("YYYY-MM-DDTHH:mm"));
   };
 
   return (
@@ -66,7 +70,7 @@ export function DateTimeField({
             selected={date}
             onSelect={handleDateChange}
             disabled={(d) => {
-              if (d < new Date()) return true;
+              if (dayjs(d).isBefore(dayjs(), "day")) return true;
               if (minDate && dayjs(d).isBefore(dayjs(minDate), "day")) return true;
               return false;
             }}
@@ -77,6 +81,7 @@ export function DateTimeField({
             <Input
               type="time"
               value={time}
+              min={minTime}
               onChange={(e) => handleTimeChange(e.target.value)}
               disabled={disabled}
             />

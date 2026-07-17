@@ -15,6 +15,7 @@ import {
   MegaphoneIcon,
   Ticket,
   Users,
+  Vote,
   Wallet,
 } from "lucide-react";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
@@ -85,6 +86,12 @@ const operatorSettings = [
     href: "/admin/tickets",
     icon: Ticket,
     requiredFeature: "tickets" as FeaturesType,
+  },
+  {
+    title: "投票管理",
+    href: "/admin/votes",
+    icon: Vote,
+    requiredFeature: "votes" as FeaturesType,
   },
 ];
 
