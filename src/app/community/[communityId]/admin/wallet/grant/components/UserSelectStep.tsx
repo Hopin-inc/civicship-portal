@@ -18,6 +18,8 @@ interface Props {
   setActiveTab: React.Dispatch<React.SetStateAction<TabsEnum>>;
   listType: "donate" | "grant";
   initialConnection?: GqlMembershipsConnection | null;
+  /** リスト最上部に固定表示する行 (例: コミュニティ財布宛)。各タブの Table 内に描画して列幅を揃える */
+  prependRow?: React.ReactNode;
 }
 
 function UserSelectStep({
@@ -28,6 +30,7 @@ function UserSelectStep({
   setActiveTab,
   listType,
   initialConnection,
+  prependRow,
 }: Props) {
   const t = useTranslations();
   const [searchQuery, setSearchQuery] = useState("");
@@ -49,7 +52,12 @@ function UserSelectStep({
       <TabManager activeTab={activeTab} setActiveTab={setActiveTab} />
 
       {activeTab === TabsEnum.History && (
-        <HistoryTab listType={listType} searchQuery={searchQuery} onSelect={onSelect} />
+        <HistoryTab
+          listType={listType}
+          searchQuery={searchQuery}
+          onSelect={onSelect}
+          prependRow={prependRow}
+        />
       )}
 
       {activeTab === TabsEnum.Member && (
@@ -58,6 +66,7 @@ function UserSelectStep({
           searchQuery={searchQuery}
           onSelect={onSelect}
           initialConnection={initialConnection}
+          prependRow={prependRow}
         />
       )}
     </>

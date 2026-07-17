@@ -13,9 +13,11 @@ interface HistoryTabProps {
   listType: "donate" | "grant";
   searchQuery: string;
   onSelect: (user: GqlUser) => void;
+  /** リスト最上部に固定表示する行 (例: コミュニティ財布宛)。同一 Table 内に描画して列幅を揃える */
+  prependRow?: React.ReactNode;
 }
 
-export function HistoryTab({ listType, searchQuery, onSelect }: HistoryTabProps) {
+export function HistoryTab({ listType, searchQuery, onSelect, prependRow }: HistoryTabProps) {
   const t = useTranslations();
   const { user } = useAuth();
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
@@ -42,6 +44,11 @@ export function HistoryTab({ listType, searchQuery, onSelect }: HistoryTabProps)
   if (!loading && presentedTransactions.length === 0) {
     return (
       <div className="space-y-3 px-4">
+        {prependRow && (
+          <Table className={"max-w-xl"}>
+            <TableBody>{prependRow}</TableBody>
+          </Table>
+        )}
         <p className="text-sm text-center text-muted-foreground pt-4">
           {listType === "grant"
             ? t("wallets.shared.history.noGrant")
@@ -51,7 +58,18 @@ export function HistoryTab({ listType, searchQuery, onSelect }: HistoryTabProps)
     );
   }
 
-  if (loading) return <Loading />;
+  if (loading) {
+    return (
+      <div className="px-4">
+        {prependRow && (
+          <Table className={"max-w-xl"}>
+            <TableBody>{prependRow}</TableBody>
+          </Table>
+        )}
+        <Loading />
+      </div>
+    );
+  }
 
   const handleSelect = (user: GqlUser) => {
     // すでに選択されているユーザーをクリックした場合は選択解除
@@ -68,6 +86,7 @@ export function HistoryTab({ listType, searchQuery, onSelect }: HistoryTabProps)
     <div className="px-4">
       <Table className={"max-w-xl"}>
         <TableBody>
+          {prependRow}
           {presentedTransactions.map((tx, index) => {
             if (!tx.otherUser) return null;
 
