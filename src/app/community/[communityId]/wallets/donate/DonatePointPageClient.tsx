@@ -154,7 +154,8 @@ export default function DonatePointPageClient({ initialCurrentPoint }: DonatePoi
               />
             ) : undefined
           }
-          onSelectCommunity={() => selectCommunity(communityAsUser)}
+          // communityId 未ロード時は空 ID 送金を防ぐため無効化 (prependRow と対称)
+          onSelectCommunity={communityId ? () => selectCommunity(communityAsUser) : undefined}
         />
       ) : (
         <TransferInputStep
