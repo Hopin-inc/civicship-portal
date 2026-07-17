@@ -9,7 +9,7 @@ interface UserPointRowProps {
   avatar: string;
   name: string;
   subText: string;
-  pointValue?: number; // 表示用の値。省略時はポイントを表示しない (例: コミュニティ財布宛)
+  pointValue?: number; // 表示用の値。省略時はポイントを表示しない (残高/金額が無い行向け)
   onClick?: () => void;
   selected?: boolean; // 選択状態
 }
