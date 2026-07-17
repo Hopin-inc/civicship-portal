@@ -73,13 +73,21 @@ function presentDonateTransaction({
 
   const isReceive = toUser?.id === currentUserId;
   const otherUser = isReceive ? fromUser : toUser;
-  const otherName = otherUser?.name ?? "";
+
+  // 送付先がコミュニティ財布 (CONTRIBUTION) の場合、相手はユーザーではなくコミュニティ
+  const toCommunity = transaction.toWallet?.type === GqlWalletType.Community
+    ? transaction.toWallet?.community
+    : undefined;
+
+  const otherName = toCommunity?.name ?? otherUser?.name ?? "";
 
   return buildPresentedTransaction({
     transaction,
     isReceive,
     otherUser,
     otherName,
+    otherImage: toCommunity?.image ?? otherUser?.image ?? "",
+    isCommunity: !!toCommunity,
     actionType: "donation",
     didIssuanceRequests,
   });
@@ -119,6 +127,8 @@ function buildPresentedTransaction({
   isReceive,
   otherUser,
   otherName,
+  otherImage,
+  isCommunity = false,
   actionType,
   didIssuanceRequests,
 }: {
@@ -126,6 +136,9 @@ function buildPresentedTransaction({
   isReceive: boolean;
   otherUser?: Maybe<GqlUser>;
   otherName: string;
+  otherImage?: string;
+  /** 相手がコミュニティ財布 (CONTRIBUTION) かどうか */
+  isCommunity?: boolean;
   actionType: "donation" | "grant";
   didIssuanceRequests: GqlDidIssuanceRequest[];
 }) {
@@ -146,6 +159,8 @@ function buildPresentedTransaction({
     isReceive,
     otherUser,
     otherName,
+    otherImage: otherImage ?? otherUser?.image ?? "",
+    isCommunity,
     actionType,
     point,
     sign,

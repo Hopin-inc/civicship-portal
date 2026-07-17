@@ -19,6 +19,7 @@ import {
   GqlMembershipStatusReason,
   GqlUser,
   useGetUserFlexibleQuery,
+  useGetCommunityWalletQuery,
 } from "@/types/graphql";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
@@ -85,6 +86,18 @@ export default function DonatePointPageClient({ initialCurrentPoint }: DonatePoi
     [communityId, communityConfig?.title, communityConfig?.squareLogoPath],
   );
 
+  // コミュニティ財布の残高を取得し、選択行にメンバーと同じ形式で表示する
+  const { data: communityWalletData } = useGetCommunityWalletQuery({
+    variables: { communityId },
+    skip: !communityId,
+    fetchPolicy: "cache-and-network",
+  });
+  const communityPoint = useMemo<number | undefined>(() => {
+    const raw =
+      communityWalletData?.wallets?.edges?.[0]?.node?.currentPointView?.currentPoint;
+    return raw != null ? Number(raw) : undefined;
+  }, [communityWalletData]);
+
   const [notFoundInMembers, setNotFoundInMembers] = useState(false);
   const lastProcessedRecipientId = useRef<string | null>(null);
   useEffect(() => {
@@ -135,10 +148,12 @@ export default function DonatePointPageClient({ initialCurrentPoint }: DonatePoi
                 avatar={communityAsUser.image ?? ""}
                 name={communityAsUser.name}
                 subText={t("wallets.donate.communityWallet")}
+                pointValue={communityPoint}
                 onClick={() => selectCommunity(communityAsUser)}
               />
             ) : undefined
           }
+          onSelectCommunity={() => selectCommunity(communityAsUser)}
         />
       ) : (
         <TransferInputStep

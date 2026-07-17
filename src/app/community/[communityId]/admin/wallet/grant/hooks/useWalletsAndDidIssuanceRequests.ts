@@ -53,9 +53,21 @@ export function useWalletsAndDidIssuanceRequests({
               or: [{ fromUserId: currentUserId }, { toUserId: currentUserId }],
             },
             {
-              and: [
-                { fromWalletType: GqlWalletType.Member },
-                { toWalletType: GqlWalletType.Member },
+              or: [
+                // 従来: メンバー間送付 (DONATION)
+                {
+                  and: [
+                    { fromWalletType: GqlWalletType.Member },
+                    { toWalletType: GqlWalletType.Member },
+                  ],
+                },
+                // 追加: 自分からコミュニティ財布への送付 (CONTRIBUTION)
+                {
+                  and: [
+                    { toWalletType: GqlWalletType.Community },
+                    { reason: GqlTransactionReason.Contribution },
+                  ],
+                },
               ],
             },
           ],
