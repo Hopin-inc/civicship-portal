@@ -78,6 +78,7 @@ export default function DonatePointPageClient({ initialCurrentPoint }: DonatePoi
   // コミュニティ財布を「ユーザー」として扱うための疑似ユーザー (表示は名前/ロゴのみ使用)
   const communityAsUser = useMemo<GqlUser>(
     () => ({
+      __typename: "User",
       id: communityId,
       name: communityConfig?.title ?? "",
       image: communityConfig?.squareLogoPath ?? "",
@@ -122,17 +123,20 @@ export default function DonatePointPageClient({ initialCurrentPoint }: DonatePoi
     <div className="max-w-xl mx-auto mt-6 space-y-4">
       {!selectedUser ? (
         <>
-          {/* コミュニティ財布への送付 (CONTRIBUTION) をメンバー一覧の最上部に固定表示 */}
-          <Table className="max-w-xl">
-            <TableBody>
-              <UserPointRow
-                avatar={communityAsUser.image ?? ""}
-                name={communityAsUser.name}
-                subText={t("wallets.donate.communityWallet")}
-                onClick={() => selectCommunity(communityAsUser)}
-              />
-            </TableBody>
-          </Table>
+          {/* コミュニティ財布への送付 (CONTRIBUTION) をメンバー一覧の最上部に固定表示。
+              communityId 未ロード時は空 ID 送金を防ぐため表示しない */}
+          {communityId && (
+            <Table className="max-w-xl">
+              <TableBody>
+                <UserPointRow
+                  avatar={communityAsUser.image ?? ""}
+                  name={communityAsUser.name}
+                  subText={t("wallets.donate.communityWallet")}
+                  onClick={() => selectCommunity(communityAsUser)}
+                />
+              </TableBody>
+            </Table>
+          )}
           <DonateUserSelect
             members={members}
             onSelect={setSelectedUser}
