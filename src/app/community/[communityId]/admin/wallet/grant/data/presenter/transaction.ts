@@ -156,6 +156,7 @@ function buildPresentedTransaction({
   );
 
   return {
+    id: transaction.id,
     isReceive,
     otherUser,
     otherName,

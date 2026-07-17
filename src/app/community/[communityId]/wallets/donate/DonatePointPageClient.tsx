@@ -140,7 +140,8 @@ export default function DonatePointPageClient({ initialCurrentPoint }: DonatePoi
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           initialConnection={initialConnection}
-          // コミュニティ財布への送付 (CONTRIBUTION) をメンバー/履歴一覧の最上部に同一 Table で固定表示。
+          // コミュニティ財布への送付 (CONTRIBUTION) をメンバー一覧の最上部に同一 Table で固定表示
+          // (履歴タブには出さず、送付履歴の各行で表示)。
           // communityId 未ロード時は空 ID 送金を防ぐため表示しない
           prependRow={
             communityId ? (

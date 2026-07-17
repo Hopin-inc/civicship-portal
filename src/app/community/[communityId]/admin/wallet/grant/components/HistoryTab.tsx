@@ -80,7 +80,7 @@ export function HistoryTab({
             if (tx.isCommunity) {
               return (
                 <UserPointRow
-                  key={`community-${index}`}
+                  key={tx.id ?? `community-${index}`}
                   avatar={tx.otherImage || ""}
                   name={tx.otherName}
                   subText={
@@ -102,7 +102,7 @@ export function HistoryTab({
 
             return (
               <UserPointRow
-                key={`${tx.otherUser.id}-${index}`}
+                key={tx.id ?? `${tx.otherUser.id}-${index}`}
                 avatar={tx.otherUser.image || ""}
                 name={tx.otherUser.name || tx.otherName || ""}
                 subText={subText}
