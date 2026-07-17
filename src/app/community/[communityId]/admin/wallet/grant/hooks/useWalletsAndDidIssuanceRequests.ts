@@ -29,7 +29,16 @@ export function useWalletsAndDidIssuanceRequests({
   presentedTransactions: PresentedTransaction[];
   refetch: () => void;
 } {
-  const { communityId } = useCommunityConfig();
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId ?? "";
+  // コミュニティ財布行の表示は portalConfig を正として統一する
+  const community = useMemo(
+    () => ({
+      name: communityConfig?.title ?? "",
+      image: communityConfig?.squareLogoPath ?? "",
+    }),
+    [communityConfig?.title, communityConfig?.squareLogoPath],
+  );
   const walletTypeFilter: GqlTransactionFilterInput =
     listType === "grant"
       ? {
@@ -120,9 +129,10 @@ export function useWalletsAndDidIssuanceRequests({
         transaction,
         currentUserId,
         listType,
+        community,
       }),
     );
-  }, [allTransactions, currentUserId, listType]);
+  }, [allTransactions, currentUserId, listType, community]);
 
   return {
     // 待機中は空状態のちらつきを避けるため loading を維持する

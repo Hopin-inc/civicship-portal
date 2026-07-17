@@ -11,16 +11,23 @@ export function presentTransaction({
   transaction,
   currentUserId,
   listType,
+  community,
 }: {
   transaction: GqlTransaction;
   currentUserId?: string;
   listType: "donate" | "grant";
+  /**
+   * コミュニティ財布行 (CONTRIBUTION) の表示名/アイコン。
+   * portalConfig (title / squareLogoPath) を正として統一するため呼び出し側から渡す。
+   * 取引の community.name / community.image は nullable なため config を優先する。
+   */
+  community?: { name: string; image: string };
 }) {
   const didIssuanceRequests = resolveDidIssuanceRequests({ currentUserId, transaction, listType });
 
   return listType === "grant"
     ? presentGrantTransaction({ transaction, didIssuanceRequests })
-    : presentDonateTransaction({ transaction, currentUserId, didIssuanceRequests });
+    : presentDonateTransaction({ transaction, currentUserId, didIssuanceRequests, community });
 }
 
 const resolveDidIssuanceRequests = ({
@@ -63,10 +70,12 @@ function presentDonateTransaction({
   transaction,
   currentUserId,
   didIssuanceRequests,
+  community,
 }: {
   transaction: GqlTransaction;
   currentUserId?: string;
   didIssuanceRequests: GqlDidIssuanceRequest[];
+  community?: { name: string; image: string };
 }) {
   const fromUser = transaction.fromWallet?.user;
   const toUser = transaction.toWallet?.user;
@@ -74,19 +83,25 @@ function presentDonateTransaction({
   const isReceive = toUser?.id === currentUserId;
   const otherUser = isReceive ? fromUser : toUser;
 
-  // 送付先がコミュニティ財布 (CONTRIBUTION) の場合、相手はユーザーではなくコミュニティ
+  // 送付先がコミュニティ財布 (CONTRIBUTION) の場合、相手はユーザーではなくコミュニティ。
+  // 表示名/アイコンは portalConfig を正として統一し、無い場合のみ取引の community 値へフォールバック。
   const toCommunity = transaction.toWallet?.type === GqlWalletType.Community
     ? transaction.toWallet?.community
     : undefined;
 
-  const otherName = toCommunity?.name ?? otherUser?.name ?? "";
+  const otherName = toCommunity
+    ? community?.name || toCommunity.name || ""
+    : otherUser?.name ?? "";
+  const otherImage = toCommunity
+    ? community?.image || toCommunity.image || ""
+    : otherUser?.image ?? "";
 
   return buildPresentedTransaction({
     transaction,
     isReceive,
     otherUser,
     otherName,
-    otherImage: toCommunity?.image ?? otherUser?.image ?? "",
+    otherImage,
     isCommunity: !!toCommunity,
     actionType: "donation",
     didIssuanceRequests,
