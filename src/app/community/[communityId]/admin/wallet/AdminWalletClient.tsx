@@ -6,12 +6,14 @@ import { useAuth } from "@/contexts/AuthProvider";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import WalletCard from "@/components/shared/WalletCard";
 import { GqlMembership, GqlRole, GqlTransactionsConnection } from "@/types/graphql";
-import { Coins, Gift } from "lucide-react";
+import { Coins, Gift, QrCode } from "lucide-react";
 import { toast } from "react-toastify";
 import { InfiniteTransactionList } from "@/shared/transactions/components/InfiniteTransactionList";
 import { AppLink, useAppRouter } from "@/lib/navigation";
 import { useTranslations } from "next-intl";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
+import { ReceiveQRSheet } from "@/app/community/[communityId]/wallets/features/receive/components/ReceiveQRSheet";
+import { useCommunityReceiveUrl } from "@/app/community/[communityId]/wallets/features/receive/hooks/useReceiveUrl";
 
 interface Props {
   initialWallet: { id: string; currentPoint: number };
@@ -32,6 +34,9 @@ export function AdminWalletClient({ initialWallet, initialTransactions }: Props)
   // refresh 完了後にリストを強制再マウントするためのキー
   const [listKey, setListKey] = useState(0);
   const prevIsPendingRef = useRef(false);
+  const [isReceiveOpen, setIsReceiveOpen] = useState(false);
+  // メンバーがこのコミュニティ財布に送付 (CONTRIBUTION) するための受け取り QR リンク
+  const { url: receiveUrl } = useCommunityReceiveUrl();
 
   const headerConfig = useMemo(
     () => ({
@@ -89,7 +94,22 @@ export function AdminWalletClient({ initialWallet, initialTransactions }: Props)
           <Gift className="w-4 h-4 shrink-0" />
           <span className="text-base whitespace-nowrap">{t("adminWallet.buttons.grant")}</span>
         </Button>
+        <Button
+          onClick={() => setIsReceiveOpen(true)}
+          variant="secondary"
+          size="sm"
+          className="h-12 px-4"
+        >
+          <QrCode className="w-4 h-4 shrink-0" />
+          <span className="text-base whitespace-nowrap">{t("adminWallet.buttons.receive")}</span>
+        </Button>
       </div>
+
+      <ReceiveQRSheet
+        url={receiveUrl}
+        open={isReceiveOpen}
+        onClose={() => setIsReceiveOpen(false)}
+      />
 
       <div className="pt-10 flex justify-between items-center">
         <h2 className="text-display-sm">{t("transactions.list.title")}</h2>

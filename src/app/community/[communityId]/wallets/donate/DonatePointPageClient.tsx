@@ -22,6 +22,7 @@ import {
   useGetCommunityWalletQuery,
 } from "@/types/graphql";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
+import { COMMUNITY_RECIPIENT_ID } from "@/app/community/[communityId]/wallets/features/receive/hooks/useReceiveUrl";
 
 interface DonatePointPageClientProps {
   initialCurrentPoint: string;
@@ -101,7 +102,16 @@ export default function DonatePointPageClient({ initialCurrentPoint }: DonatePoi
   const [notFoundInMembers, setNotFoundInMembers] = useState(false);
   const lastProcessedRecipientId = useRef<string | null>(null);
   useEffect(() => {
-    if (!recipientId || loading || lastProcessedRecipientId.current === recipientId) return;
+    if (!recipientId || lastProcessedRecipientId.current === recipientId) return;
+    // QR 経由のコミュニティ財布あて (recipientId=community): communityId 確定後に
+    // コミュニティを送付先として選択。メンバー検索・fallback クエリは行わない。
+    if (recipientId === COMMUNITY_RECIPIENT_ID) {
+      if (!communityId) return; // communityId 未確定なら次のレンダーで再試行
+      lastProcessedRecipientId.current = recipientId;
+      selectCommunity(communityAsUser);
+      return;
+    }
+    if (loading) return;
     lastProcessedRecipientId.current = recipientId;
     setNotFoundInMembers(false);
     const found = members.find((m) => m.user.id === recipientId);
@@ -110,11 +120,15 @@ export default function DonatePointPageClient({ initialCurrentPoint }: DonatePoi
     } else {
       setNotFoundInMembers(true);
     }
-  }, [recipientId, loading, members, setSelectedUser]);
+  }, [recipientId, loading, members, setSelectedUser, communityId, selectCommunity, communityAsUser]);
 
   const { data: fallbackUserData } = useGetUserFlexibleQuery({
     variables: { id: recipientId ?? "", withDidIssuanceRequests: true },
-    skip: !notFoundInMembers || !recipientId || recipientId === user?.id,
+    skip:
+      !notFoundInMembers ||
+      !recipientId ||
+      recipientId === user?.id ||
+      recipientId === COMMUNITY_RECIPIENT_ID,
   });
   const lastSetFallbackId = useRef<string | null>(null);
   useEffect(() => {
