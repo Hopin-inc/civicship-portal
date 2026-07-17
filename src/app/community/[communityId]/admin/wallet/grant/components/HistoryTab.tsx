@@ -107,7 +107,7 @@ export function HistoryTab({
                     tx.createdAt ? new Date(tx.createdAt.toString()).toLocaleDateString() : ""
                   }
                   pointValue={Number(tx.point || 0)}
-                  onClick={() => onSelectCommunity?.()}
+                  onClick={onSelectCommunity}
                 />
               );
             }
