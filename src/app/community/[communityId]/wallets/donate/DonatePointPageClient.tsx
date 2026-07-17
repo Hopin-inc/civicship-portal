@@ -11,7 +11,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";
 import { UserPointRow } from "@/components/shared/UserPointRow";
-import { Table, TableBody } from "@/components/ui/table";
 import { useTranslations } from "next-intl";
 import {
   GqlMembershipsConnection,
@@ -122,29 +121,25 @@ export default function DonatePointPageClient({ initialCurrentPoint }: DonatePoi
   return (
     <div className="max-w-xl mx-auto mt-6 space-y-4">
       {!selectedUser ? (
-        <>
-          {/* コミュニティ財布への送付 (CONTRIBUTION) をメンバー一覧の最上部に固定表示。
-              communityId 未ロード時は空 ID 送金を防ぐため表示しない */}
-          {communityId && (
-            <Table className="max-w-xl">
-              <TableBody>
-                <UserPointRow
-                  avatar={communityAsUser.image ?? ""}
-                  name={communityAsUser.name}
-                  subText={t("wallets.donate.communityWallet")}
-                  onClick={() => selectCommunity(communityAsUser)}
-                />
-              </TableBody>
-            </Table>
-          )}
-          <DonateUserSelect
-            members={members}
-            onSelect={setSelectedUser}
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            initialConnection={initialConnection}
-          />
-        </>
+        <DonateUserSelect
+          members={members}
+          onSelect={setSelectedUser}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          initialConnection={initialConnection}
+          // コミュニティ財布への送付 (CONTRIBUTION) をメンバー/履歴一覧の最上部に同一 Table で固定表示。
+          // communityId 未ロード時は空 ID 送金を防ぐため表示しない
+          prependRow={
+            communityId ? (
+              <UserPointRow
+                avatar={communityAsUser.image ?? ""}
+                name={communityAsUser.name}
+                subText={t("wallets.donate.communityWallet")}
+                onClick={() => selectCommunity(communityAsUser)}
+              />
+            ) : undefined
+          }
+        />
       ) : (
         <TransferInputStep
           user={selectedUser}

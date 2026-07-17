@@ -14,9 +14,17 @@ interface MemberTabProps {
   searchQuery: string;
   onSelect: (user: GqlUser) => void;
   initialConnection?: GqlMembershipsConnection | null;
+  /** リスト最上部に固定表示する行 (例: コミュニティ財布宛)。同一 Table 内に描画して列幅を揃える */
+  prependRow?: React.ReactNode;
 }
 
-export function MemberTab({ members, searchQuery, onSelect, initialConnection }: MemberTabProps) {
+export function MemberTab({
+  members,
+  searchQuery,
+  onSelect,
+  initialConnection,
+  prependRow,
+}: MemberTabProps) {
   const t = useTranslations();
   const communityConfig = useCommunityConfig();
   const communityId = communityConfig?.communityId ?? "";
@@ -47,6 +55,11 @@ export function MemberTab({ members, searchQuery, onSelect, initialConnection }:
   if (searchMembershipData.length === 0) {
     return (
       <div className="space-y-3 px-4">
+        {prependRow && (
+          <Table className={"max-w-xl"}>
+            <TableBody>{prependRow}</TableBody>
+          </Table>
+        )}
         <p className="text-sm text-center text-muted-foreground pt-4">
           {t("wallets.shared.member.noMatch")}
         </p>
@@ -69,6 +82,7 @@ export function MemberTab({ members, searchQuery, onSelect, initialConnection }:
     <div className="px-4">
       <Table className={"max-w-xl"}>
         <TableBody>
+          {prependRow}
           {searchMembershipData?.map((m) => (
             <UserPointRow
               key={m.id}
