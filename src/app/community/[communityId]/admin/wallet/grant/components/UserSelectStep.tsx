@@ -20,6 +20,8 @@ interface Props {
   initialConnection?: GqlMembershipsConnection | null;
   /** リスト最上部に固定表示する行 (例: コミュニティ財布宛)。各タブの Table 内に描画して列幅を揃える */
   prependRow?: React.ReactNode;
+  /** 履歴内のコミュニティ財布宛 (CONTRIBUTION) 行をクリックしたときの選択ハンドラ */
+  onSelectCommunity?: () => void;
 }
 
 function UserSelectStep({
@@ -31,6 +33,7 @@ function UserSelectStep({
   listType,
   initialConnection,
   prependRow,
+  onSelectCommunity,
 }: Props) {
   const t = useTranslations();
   const [searchQuery, setSearchQuery] = useState("");
@@ -57,6 +60,7 @@ function UserSelectStep({
           searchQuery={searchQuery}
           onSelect={onSelect}
           prependRow={prependRow}
+          onSelectCommunity={onSelectCommunity}
         />
       )}
 

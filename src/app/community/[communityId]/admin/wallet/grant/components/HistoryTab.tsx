@@ -15,9 +15,17 @@ interface HistoryTabProps {
   onSelect: (user: GqlUser) => void;
   /** リスト最上部に固定表示する行 (例: コミュニティ財布宛)。同一 Table 内に描画して列幅を揃える */
   prependRow?: React.ReactNode;
+  /** 履歴内のコミュニティ財布宛 (CONTRIBUTION) 行をクリックしたときの選択ハンドラ */
+  onSelectCommunity?: () => void;
 }
 
-export function HistoryTab({ listType, searchQuery, onSelect, prependRow }: HistoryTabProps) {
+export function HistoryTab({
+  listType,
+  searchQuery,
+  onSelect,
+  prependRow,
+  onSelectCommunity,
+}: HistoryTabProps) {
   const t = useTranslations();
   const { user } = useAuth();
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
@@ -88,6 +96,22 @@ export function HistoryTab({ listType, searchQuery, onSelect, prependRow }: Hist
         <TableBody>
           {prependRow}
           {presentedTransactions.map((tx, index) => {
+            // コミュニティ財布宛 (CONTRIBUTION) の履歴行。相手はユーザーではないので専用に描画
+            if (tx.isCommunity) {
+              return (
+                <UserPointRow
+                  key={`community-${index}`}
+                  avatar={tx.otherImage || ""}
+                  name={tx.otherName}
+                  subText={
+                    tx.createdAt ? new Date(tx.createdAt.toString()).toLocaleDateString() : ""
+                  }
+                  pointValue={Number(tx.point || 0)}
+                  onClick={() => onSelectCommunity?.()}
+                />
+              );
+            }
+
             if (!tx.otherUser) return null;
 
             const subText = tx.createdAt
