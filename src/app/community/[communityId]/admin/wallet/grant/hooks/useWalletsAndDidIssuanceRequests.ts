@@ -29,7 +29,16 @@ export function useWalletsAndDidIssuanceRequests({
   presentedTransactions: PresentedTransaction[];
   refetch: () => void;
 } {
-  const { communityId } = useCommunityConfig();
+  const communityConfig = useCommunityConfig();
+  const communityId = communityConfig?.communityId ?? "";
+  // コミュニティ財布行の表示は portalConfig を正として統一する
+  const community = useMemo(
+    () => ({
+      name: communityConfig?.title ?? "",
+      image: communityConfig?.squareLogoPath ?? "",
+    }),
+    [communityConfig?.title, communityConfig?.squareLogoPath],
+  );
   const walletTypeFilter: GqlTransactionFilterInput =
     listType === "grant"
       ? {
@@ -53,9 +62,21 @@ export function useWalletsAndDidIssuanceRequests({
               or: [{ fromUserId: currentUserId }, { toUserId: currentUserId }],
             },
             {
-              and: [
-                { fromWalletType: GqlWalletType.Member },
-                { toWalletType: GqlWalletType.Member },
+              or: [
+                // 従来: メンバー間送付 (DONATION)
+                {
+                  and: [
+                    { fromWalletType: GqlWalletType.Member },
+                    { toWalletType: GqlWalletType.Member },
+                  ],
+                },
+                // 追加: 自分からコミュニティ財布への送付 (CONTRIBUTION)
+                {
+                  and: [
+                    { toWalletType: GqlWalletType.Community },
+                    { reason: GqlTransactionReason.Contribution },
+                  ],
+                },
               ],
             },
           ],
@@ -72,6 +93,11 @@ export function useWalletsAndDidIssuanceRequests({
       }
     : undefined;
 
+  // donate は currentUserId で自分の送受信に絞る。currentUserId 未確定のまま実行すると
+  // { fromUserId: undefined } が変数シリアライズで落ちて or:[{},{}] = 全件ヒットになり、
+  // 他メンバーの取引が一瞬表示されうるためクエリ自体を待機させる。
+  const isWaitingForCurrentUser = listType === "donate" && !currentUserId;
+
   const { data, error, loading, refetch } = useGetTransactionsQuery({
     variables: {
       filter: {
@@ -83,6 +109,7 @@ export function useWalletsAndDidIssuanceRequests({
     },
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
+    skip: isWaitingForCurrentUser,
   });
 
   const allTransactions = useMemo<GqlTransaction[]>(() => {
@@ -102,12 +129,14 @@ export function useWalletsAndDidIssuanceRequests({
         transaction,
         currentUserId,
         listType,
+        community,
       }),
     );
-  }, [allTransactions, currentUserId, listType]);
+  }, [allTransactions, currentUserId, listType, community]);
 
   return {
-    loading,
+    // 待機中は空状態のちらつきを避けるため loading を維持する
+    loading: loading || isWaitingForCurrentUser,
     error,
     allTransactions,
     presentedTransactions,

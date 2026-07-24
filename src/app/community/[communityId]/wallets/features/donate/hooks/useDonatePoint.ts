@@ -5,7 +5,8 @@ import { useTransactionMutations } from "@/app/community/[communityId]/admin/wal
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 
 interface DonatePointInput {
-  toUserId: string;
+  /** 省略時はコミュニティ財布への送付 (CONTRIBUTION) として扱われる */
+  toUserId?: string;
   amount: number;
   comment?: string;
   fromUserId: string;
@@ -26,7 +27,8 @@ export function useDonatePoint() {
         input: {
           communityId,
           transferPoints: amount,
-          toUserId,
+          // toUserId を省略するとコミュニティ財布への送付 (CONTRIBUTION) になる
+          ...(toUserId ? { toUserId } : {}),
           comment,
           images: imagesInput && imagesInput.length > 0 ? imagesInput : undefined,
         },

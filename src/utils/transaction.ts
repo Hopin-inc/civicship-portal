@@ -36,6 +36,9 @@ type TransactionActionMapping = {
 export const mapReasonToAction = (reason: GqlTransactionReason): TransactionActionMapping => {
   switch (reason) {
     case GqlTransactionReason.Donation:
+    // コミュニティ財布への送付 (CONTRIBUTION) は個人間送付 (DONATION) と同じ表示に揃える。
+    // 送付先名は getNameFromWallet がコミュニティ名に解決するため「◯◯に送った」と表示される。
+    case GqlTransactionReason.Contribution:
       return { actionType: "donation" };
     case GqlTransactionReason.Grant:
       return { actionType: "grant" };

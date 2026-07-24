@@ -13,9 +13,16 @@ interface HistoryTabProps {
   listType: "donate" | "grant";
   searchQuery: string;
   onSelect: (user: GqlUser) => void;
+  /** 履歴内のコミュニティ財布宛 (CONTRIBUTION) 行をクリックしたときの選択ハンドラ */
+  onSelectCommunity?: () => void;
 }
 
-export function HistoryTab({ listType, searchQuery, onSelect }: HistoryTabProps) {
+export function HistoryTab({
+  listType,
+  searchQuery,
+  onSelect,
+  onSelectCommunity,
+}: HistoryTabProps) {
   const t = useTranslations();
   const { user } = useAuth();
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
@@ -69,6 +76,22 @@ export function HistoryTab({ listType, searchQuery, onSelect }: HistoryTabProps)
       <Table className={"max-w-xl"}>
         <TableBody>
           {presentedTransactions.map((tx, index) => {
+            // コミュニティ財布宛 (CONTRIBUTION) の履歴行。相手はユーザーではないので専用に描画
+            if (tx.isCommunity) {
+              return (
+                <UserPointRow
+                  key={tx.id ?? `community-${index}`}
+                  avatar={tx.otherImage || ""}
+                  name={tx.otherName}
+                  subText={
+                    tx.createdAt ? new Date(tx.createdAt.toString()).toLocaleDateString() : ""
+                  }
+                  pointValue={Number(tx.point || 0)}
+                  onClick={onSelectCommunity}
+                />
+              );
+            }
+
             if (!tx.otherUser) return null;
 
             const subText = tx.createdAt
@@ -79,7 +102,7 @@ export function HistoryTab({ listType, searchQuery, onSelect }: HistoryTabProps)
 
             return (
               <UserPointRow
-                key={`${tx.otherUser.id}-${index}`}
+                key={tx.id ?? `${tx.otherUser.id}-${index}`}
                 avatar={tx.otherUser.image || ""}
                 name={tx.otherUser.name || tx.otherName || ""}
                 subText={subText}

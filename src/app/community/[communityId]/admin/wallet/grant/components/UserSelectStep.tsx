@@ -18,6 +18,10 @@ interface Props {
   setActiveTab: React.Dispatch<React.SetStateAction<TabsEnum>>;
   listType: "donate" | "grant";
   initialConnection?: GqlMembershipsConnection | null;
+  /** リスト最上部に固定表示する行 (例: コミュニティ財布宛)。各タブの Table 内に描画して列幅を揃える */
+  prependRow?: React.ReactNode;
+  /** 履歴内のコミュニティ財布宛 (CONTRIBUTION) 行をクリックしたときの選択ハンドラ */
+  onSelectCommunity?: () => void;
 }
 
 function UserSelectStep({
@@ -28,6 +32,8 @@ function UserSelectStep({
   setActiveTab,
   listType,
   initialConnection,
+  prependRow,
+  onSelectCommunity,
 }: Props) {
   const t = useTranslations();
   const [searchQuery, setSearchQuery] = useState("");
@@ -49,7 +55,14 @@ function UserSelectStep({
       <TabManager activeTab={activeTab} setActiveTab={setActiveTab} />
 
       {activeTab === TabsEnum.History && (
-        <HistoryTab listType={listType} searchQuery={searchQuery} onSelect={onSelect} />
+        // 履歴タブはコミュニティへの送付履歴 (送ったpt) を並べる。
+        // 残高付きの固定行 (prependRow) はメンバータブのみに表示し、意味の混在を避ける
+        <HistoryTab
+          listType={listType}
+          searchQuery={searchQuery}
+          onSelect={onSelect}
+          onSelectCommunity={onSelectCommunity}
+        />
       )}
 
       {activeTab === TabsEnum.Member && (
@@ -58,6 +71,7 @@ function UserSelectStep({
           searchQuery={searchQuery}
           onSelect={onSelect}
           initialConnection={initialConnection}
+          prependRow={prependRow}
         />
       )}
     </>

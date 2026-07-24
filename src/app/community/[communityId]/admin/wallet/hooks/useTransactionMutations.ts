@@ -121,7 +121,8 @@ export const useTransactionMutations = () => {
     const authError = checkAuth();
     if (authError) return authError;
 
-    if (!variables.input?.toUserId || !variables.input?.transferPoints) {
+    // toUserId は任意 (省略時はコミュニティ財布への送付=CONTRIBUTION)。transferPoints のみ必須。
+    if (!variables.input?.transferPoints) {
       return { success: false, code: GqlErrorCode.ValidationError };
     }
 

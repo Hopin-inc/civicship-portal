@@ -14,6 +14,7 @@
   "wallets.card.pointUnit": "pt",
   "wallets.card.refreshButton": "再読み込み",
   "wallets.donate.selectRecipient": "送り先を選ぶ",
+  "wallets.donate.communityWallet": "コミュニティウォレット",
   "wallets.donate.errorMembers": "送信先のメンバーを取得できませんでした",
   "wallets.shared.tabs.history": "履歴",
   "wallets.shared.tabs.member": "メンバー",

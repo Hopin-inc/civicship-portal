@@ -13,6 +13,10 @@ interface Props {
   activeTab: Tabs;
   setActiveTab: React.Dispatch<React.SetStateAction<Tabs>>;
   initialConnection?: GqlMembershipsConnection | null;
+  /** リスト最上部に固定表示する行 (例: コミュニティ財布宛) */
+  prependRow?: React.ReactNode;
+  /** 履歴内のコミュニティ財布宛 (CONTRIBUTION) 行をクリックしたときの選択ハンドラ */
+  onSelectCommunity?: () => void;
 }
 
 export function DonateUserSelect({
@@ -21,6 +25,8 @@ export function DonateUserSelect({
   activeTab,
   setActiveTab,
   initialConnection,
+  prependRow,
+  onSelectCommunity,
 }: Props) {
   const t = useTranslations();
   return (
@@ -32,6 +38,8 @@ export function DonateUserSelect({
       setActiveTab={setActiveTab}
       listType="donate"
       initialConnection={initialConnection}
+      prependRow={prependRow}
+      onSelectCommunity={onSelectCommunity}
     />
   );
 }

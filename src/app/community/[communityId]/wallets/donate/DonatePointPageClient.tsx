@@ -10,15 +10,19 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";
+import { UserPointRow } from "@/components/shared/UserPointRow";
 import { useTranslations } from "next-intl";
 import {
   GqlMembershipsConnection,
   GqlRole,
   GqlMembershipStatus,
   GqlMembershipStatusReason,
+  GqlUser,
   useGetUserFlexibleQuery,
+  useGetCommunityWalletQuery,
 } from "@/types/graphql";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
+import { COMMUNITY_RECIPIENT_ID } from "@/app/community/[communityId]/wallets/features/receive/hooks/useReceiveUrl";
 
 interface DonatePointPageClientProps {
   initialCurrentPoint: string;
@@ -69,15 +73,45 @@ export default function DonatePointPageClient({ initialCurrentPoint }: DonatePoi
     refetchRef.current = refetch;
   }, [refetch]);
 
-  const { selectedUser, setSelectedUser, handleDonate, isLoading, isAuthReady } = useDonateFlow(
-    user,
-    currentPoint,
+  const { selectedUser, setSelectedUser, selectCommunity, handleDonate, isLoading, isAuthReady } =
+    useDonateFlow(user, currentPoint);
+
+  // コミュニティ財布を「ユーザー」として扱うための疑似ユーザー (表示は名前/ロゴのみ使用)
+  const communityAsUser = useMemo<GqlUser>(
+    () => ({
+      __typename: "User",
+      id: communityId,
+      name: communityConfig?.title ?? "",
+      image: communityConfig?.squareLogoPath ?? "",
+    }),
+    [communityId, communityConfig?.title, communityConfig?.squareLogoPath],
   );
+
+  // コミュニティ財布の残高を取得し、選択行にメンバーと同じ形式で表示する
+  const { data: communityWalletData } = useGetCommunityWalletQuery({
+    variables: { communityId },
+    skip: !communityId,
+    fetchPolicy: "cache-and-network",
+  });
+  const communityPoint = useMemo<number | undefined>(() => {
+    const raw =
+      communityWalletData?.wallets?.edges?.[0]?.node?.currentPointView?.currentPoint;
+    return raw != null ? Number(raw) : undefined;
+  }, [communityWalletData]);
 
   const [notFoundInMembers, setNotFoundInMembers] = useState(false);
   const lastProcessedRecipientId = useRef<string | null>(null);
   useEffect(() => {
-    if (!recipientId || loading || lastProcessedRecipientId.current === recipientId) return;
+    if (!recipientId || lastProcessedRecipientId.current === recipientId) return;
+    // QR 経由のコミュニティ財布あて (recipientId=community): communityId 確定後に
+    // コミュニティを送付先として選択。メンバー検索・fallback クエリは行わない。
+    if (recipientId === COMMUNITY_RECIPIENT_ID) {
+      if (!communityId) return; // communityId 未確定なら次のレンダーで再試行
+      lastProcessedRecipientId.current = recipientId;
+      selectCommunity(communityAsUser);
+      return;
+    }
+    if (loading) return;
     lastProcessedRecipientId.current = recipientId;
     setNotFoundInMembers(false);
     const found = members.find((m) => m.user.id === recipientId);
@@ -86,11 +120,15 @@ export default function DonatePointPageClient({ initialCurrentPoint }: DonatePoi
     } else {
       setNotFoundInMembers(true);
     }
-  }, [recipientId, loading, members, setSelectedUser]);
+  }, [recipientId, loading, members, setSelectedUser, communityId, selectCommunity, communityAsUser]);
 
   const { data: fallbackUserData } = useGetUserFlexibleQuery({
     variables: { id: recipientId ?? "", withDidIssuanceRequests: true },
-    skip: !notFoundInMembers || !recipientId || recipientId === user?.id,
+    skip:
+      !notFoundInMembers ||
+      !recipientId ||
+      recipientId === user?.id ||
+      recipientId === COMMUNITY_RECIPIENT_ID,
   });
   const lastSetFallbackId = useRef<string | null>(null);
   useEffect(() => {
@@ -116,6 +154,22 @@ export default function DonatePointPageClient({ initialCurrentPoint }: DonatePoi
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           initialConnection={initialConnection}
+          // コミュニティ財布への送付 (CONTRIBUTION) をメンバー一覧の最上部に同一 Table で固定表示
+          // (履歴タブには出さず、送付履歴の各行で表示)。
+          // communityId 未ロード時は空 ID 送金を防ぐため表示しない
+          prependRow={
+            communityId ? (
+              <UserPointRow
+                avatar={communityAsUser.image ?? ""}
+                name={communityAsUser.name}
+                subText={t("wallets.donate.communityWallet")}
+                pointValue={communityPoint}
+                onClick={() => selectCommunity(communityAsUser)}
+              />
+            ) : undefined
+          }
+          // communityId 未ロード時は空 ID 送金を防ぐため無効化 (prependRow と対称)
+          onSelectCommunity={communityId ? () => selectCommunity(communityAsUser) : undefined}
         />
       ) : (
         <TransferInputStep

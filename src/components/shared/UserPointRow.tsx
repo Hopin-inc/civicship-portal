@@ -9,7 +9,7 @@ interface UserPointRowProps {
   avatar: string;
   name: string;
   subText: string;
-  pointValue: number; // 表示用の値という意味を明確化
+  pointValue?: number; // 表示用の値。省略時はポイントを表示しない (残高/金額が無い行向け)
   onClick?: () => void;
   selected?: boolean; // 選択状態
 }
@@ -45,8 +45,12 @@ export function UserPointRow({
       </TableCell>
       <TableCell className="align-middle w-24">
         <div className="flex justify-end items-center h-full">
-          {pointValue.toLocaleString()}
-          <span className="text-xs ml-0.5">pt</span>
+          {pointValue !== undefined && (
+            <>
+              {pointValue.toLocaleString()}
+              <span className="text-xs ml-0.5">pt</span>
+            </>
+          )}
           {selected && <Check className="h-5 w-5 text-primary ml-3" />}
         </div>
       </TableCell>

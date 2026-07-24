@@ -6,6 +6,8 @@ export const getStatusLabel = (
 ): React.ReactNode => {
   switch (reason) {
     case GqlTransactionReason.Donation:
+    // コミュニティ財布への送付 (CONTRIBUTION) は個人間送付 (DONATION) と同じ表示に揃える
+    case GqlTransactionReason.Contribution:
       return (
         <span className="text-label-xs  text-caption">{t("transactions.status.donation")}:</span>
       );

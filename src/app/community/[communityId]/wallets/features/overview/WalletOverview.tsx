@@ -12,12 +12,14 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import { ErrorState } from "@/components/shared";
 import { useWalletContext } from "@/app/community/[communityId]/wallets/features/shared/contexts/WalletContext";
 import { ReceiveQRSheet } from "@/app/community/[communityId]/wallets/features/receive/components/ReceiveQRSheet";
+import { useReceiveUrl } from "@/app/community/[communityId]/wallets/features/receive/hooks/useReceiveUrl";
 
 export function WalletOverview() {
   const router = useAppRouter();
   const t = useTranslations();
   const { currentPoint, userId, isLoadingWallet, error, refresh } = useWalletContext();
   const [isReceiveOpen, setIsReceiveOpen] = useState(false);
+  const { url: receiveUrl } = useReceiveUrl(userId ?? "");
 
   const headerConfig = useMemo(
     () => ({
@@ -74,7 +76,7 @@ export function WalletOverview() {
       </div>
 
       <ReceiveQRSheet
-        userId={userId ?? ""}
+        url={receiveUrl}
         open={isReceiveOpen}
         onClose={() => setIsReceiveOpen(false)}
       />
