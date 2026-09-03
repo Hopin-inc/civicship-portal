@@ -10,7 +10,14 @@ export const DEV_AUTH_COOKIE_NAME = "dev_auth_token";
 
 export const DEV_AUTH_HEADER_NAME = "x-dev-auth-token";
 
-/** Matches DEV_TOKEN_TTL_MS in civicship-api. */
+/**
+ * Cookie lifetime, in **seconds** — that is what `Set-Cookie: Max-Age` takes.
+ *
+ * Deliberately the same 12 hours as `DEV_TOKEN_TTL_MS` in civicship-api, which
+ * expresses it in milliseconds. Keeping the cookie no longer than the token it
+ * carries means the browser drops it around when the api would start rejecting
+ * it, instead of sending a dead token and rendering logged out.
+ */
 const DEV_AUTH_COOKIE_MAX_AGE_SECONDS = 12 * 60 * 60;
 
 /**
