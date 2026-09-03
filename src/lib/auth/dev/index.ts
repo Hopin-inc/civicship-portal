@@ -7,13 +7,13 @@
  * token cookie; from then on every request (SSR via the forwarded cookie, CSR
  * via the header) authenticates as that user.
  *
- * Gated identically on both sides. The portal will not even attempt this unless
- * DEV_LOGIN_ENABLED is "true", the build is not production, and DEV_LOGIN_SECRET
- * is present — and civicship-api independently refuses to mint or honour a token
- * unless its own three gates hold. Neither side trusts the other's gating.
+ * Needs no configuration. Both sides decide from the deployment identity they
+ * already carry: this one from the `ENV` the dev build is stamped with, and
+ * civicship-api independently from its own. Neither trusts the other's gate, and
+ * neither has a flag or a shared secret to set.
  */
 
-import { isProduction } from "@/lib/environment";
+import { isLocal, isStaging } from "@/lib/environment";
 import { DEV_AUTH_COOKIE_NAME } from "@/lib/auth/dev/constants";
 
 export {
@@ -23,16 +23,15 @@ export {
 } from "@/lib/auth/dev/constants";
 
 /**
- * Server-side only — DEV_LOGIN_SECRET is deliberately not NEXT_PUBLIC, so the
- * shared secret never reaches the browser. Client code decides what to do purely
- * from the presence of the cookie.
+ * Whether this build is a dev deployment.
+ *
+ * Stated positively rather than as `!isProduction` so that it is fail-closed: a
+ * build has to actively identify itself as staging or local to qualify, and
+ * anything unrecognised — including a production build — does not. The dev deploy
+ * workflow stamps `ENV=staging`; the prod one passes no `ENV` at all.
  */
 export function isDevLoginEnabled(): boolean {
-  return (
-    !isProduction &&
-    process.env.DEV_LOGIN_ENABLED === "true" &&
-    !!process.env.DEV_LOGIN_SECRET
-  );
+  return isStaging || isLocal;
 }
 
 /** Budget for the provisioning call, which blocks the first page render. */
@@ -41,7 +40,6 @@ const DEV_SESSION_TIMEOUT_MS = 3000;
 export interface DevSession {
   devToken: string;
   user: { id: string; name: string; uid: string };
-  provisioned: boolean;
 }
 
 /**
@@ -53,8 +51,7 @@ export interface DevSession {
  */
 export async function requestDevSession(communityId: string): Promise<DevSession | null> {
   const apiEndpoint = process.env.NEXT_PUBLIC_API_ENDPOINT;
-  const secret = process.env.DEV_LOGIN_SECRET;
-  if (!apiEndpoint || !secret) return null;
+  if (!apiEndpoint) return null;
 
   const apiBase = apiEndpoint.replace(/\/graphql\/?$/, "");
 
@@ -71,7 +68,6 @@ export async function requestDevSession(communityId: string): Promise<DevSession
       headers: {
         "Content-Type": "application/json",
         "X-Community-Id": communityId,
-        "x-dev-login-secret": secret,
       },
       body: JSON.stringify({}),
       cache: "no-store",

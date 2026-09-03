@@ -149,7 +149,6 @@ export async function middleware(request: NextRequest) {
       console.info("[Middleware] Dev auto-login applied", {
         communityId,
         userId: devSession.user.id,
-        provisioned: devSession.provisioned,
         communityChanged,
       });
     }

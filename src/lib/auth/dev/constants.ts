@@ -2,7 +2,7 @@
  * Shared names for the dev auto-login token.
  *
  * Kept free of any server-only logic so client bundles (the Apollo link) can
- * import it without dragging in DEV_LOGIN_SECRET handling.
+ * import it without dragging in the middleware's provisioning code.
  */
 
 /** Readable by client JS on purpose — the browser-side Apollo link forwards it as a header. */
