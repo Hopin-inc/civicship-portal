@@ -9,6 +9,7 @@ import {
   devAuthCookieOptions,
   isDevLoginEnabled,
   isDocumentNavigation,
+  isSecureRequest,
   requestDevSession,
   withDevAuthCookie,
 } from "@/lib/auth/dev";
@@ -154,7 +155,9 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  const devAuthCookieOpts = devAuthCookieOptions(request.nextUrl.protocol === "https:");
+  const devAuthCookieOpts = devAuthCookieOptions(
+    isSecureRequest(request.nextUrl.protocol, request.headers),
+  );
 
   const res = NextResponse.next({
     request: { headers: requestHeaders },
