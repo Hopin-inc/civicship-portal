@@ -14,11 +14,12 @@
  */
 
 import { isProduction } from "@/lib/environment";
+import { DEV_AUTH_COOKIE_NAME } from "@/lib/auth/dev/constants";
 
 export {
   DEV_AUTH_COOKIE_NAME,
-  DEV_AUTH_COOKIE_OPTIONS,
   DEV_AUTH_HEADER_NAME,
+  devAuthCookieOptions,
 } from "@/lib/auth/dev/constants";
 
 /**
@@ -93,6 +94,23 @@ export async function requestDevSession(communityId: string): Promise<DevSession
  * Without this, the several parallel RSC requests a single navigation fires would
  * each race to provision before the cookie lands, littering the dev DB with users.
  */
+/**
+ * Returns the request's cookie header with the dev token set to `token`,
+ * dropping any existing value for it.
+ *
+ * Used to make a freshly provisioned session visible to the current request's
+ * SSR. On a community switch the header still carries the previous community's
+ * token, and leaving both in would depend on which one the API's parser keeps.
+ */
+export function withDevAuthCookie(existingCookieHeader: string | null, token: string): string {
+  const kept = (existingCookieHeader ?? "")
+    .split(";")
+    .map((part) => part.trim())
+    .filter((part) => part && !part.startsWith(`${DEV_AUTH_COOKIE_NAME}=`));
+
+  return [...kept, `${DEV_AUTH_COOKIE_NAME}=${token}`].join("; ");
+}
+
 export function isDocumentNavigation(headers: Headers): boolean {
   if (headers.get("next-router-prefetch")) return false;
   if (headers.get("rsc")) return false;

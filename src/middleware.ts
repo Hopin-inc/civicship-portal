@@ -6,10 +6,11 @@ import { defaultLocale, locales } from "@/lib/i18n/config";
 import { ACTIVE_COMMUNITY_IDS } from "@/lib/communities/constants";
 import {
   DEV_AUTH_COOKIE_NAME,
-  DEV_AUTH_COOKIE_OPTIONS,
+  devAuthCookieOptions,
   isDevLoginEnabled,
   isDocumentNavigation,
   requestDevSession,
+  withDevAuthCookie,
 } from "@/lib/auth/dev";
 
 /**
@@ -123,39 +124,44 @@ export async function middleware(request: NextRequest) {
   // session is signed in as a freshly provisioned throwaway user so they can
   // start exercising the app immediately. Inert everywhere else: isDevLoginEnabled()
   // is false in production, and civicship-api refuses the request independently.
-  let devAuthToken: string | null = null;
-  if (
+  // A dev token is scoped to one community, so a token minted for the previous
+  // one is rejected by the API. Switching communities has to re-provision, or the
+  // stale cookie would leave the tester silently logged out on the new one.
+  const communityChanged = !!previousCommunityId && previousCommunityId !== communityId;
+  const needsDevSession =
     isDevLoginEnabled() &&
-    !request.cookies.get(DEV_AUTH_COOKIE_NAME) &&
     !hasExistingSessionCookie(request) &&
-    isDocumentNavigation(request.headers)
-  ) {
+    isDocumentNavigation(request.headers) &&
+    (!request.cookies.get(DEV_AUTH_COOKIE_NAME) || communityChanged);
+
+  let devAuthToken: string | null = null;
+  if (needsDevSession) {
     const devSession = await requestDevSession(communityId);
     if (devSession) {
       devAuthToken = devSession.devToken;
       // Make it visible to this request's SSR too, not just the next one —
       // otherwise the first page view still renders logged out.
-      const existingCookie = requestHeaders.get("cookie");
       requestHeaders.set(
         "cookie",
-        existingCookie
-          ? `${existingCookie}; ${DEV_AUTH_COOKIE_NAME}=${devSession.devToken}`
-          : `${DEV_AUTH_COOKIE_NAME}=${devSession.devToken}`,
+        withDevAuthCookie(requestHeaders.get("cookie"), devSession.devToken),
       );
       console.info("[Middleware] Dev auto-login applied", {
         communityId,
         userId: devSession.user.id,
         provisioned: devSession.provisioned,
+        communityChanged,
       });
     }
   }
+
+  const devAuthCookieOpts = devAuthCookieOptions(request.nextUrl.protocol === "https:");
 
   const res = NextResponse.next({
     request: { headers: requestHeaders },
   });
 
   if (devAuthToken) {
-    res.cookies.set(DEV_AUTH_COOKIE_NAME, devAuthToken, DEV_AUTH_COOKIE_OPTIONS);
+    res.cookies.set(DEV_AUTH_COOKIE_NAME, devAuthToken, devAuthCookieOpts);
   }
 
   // 3. DBから動的設定を取得（存在しないコミュニティは404）
@@ -193,7 +199,7 @@ export async function middleware(request: NextRequest) {
   if (redirectRes) {
     redirectRes.cookies.set("x-community-id", communityId, COMMUNITY_ID_COOKIE_OPTIONS);
     if (devAuthToken) {
-      redirectRes.cookies.set(DEV_AUTH_COOKIE_NAME, devAuthToken, DEV_AUTH_COOKIE_OPTIONS);
+      redirectRes.cookies.set(DEV_AUTH_COOKIE_NAME, devAuthToken, devAuthCookieOpts);
     }
     if (shouldClearSessionCookies) {
       clearLegacySessionCookies(redirectRes);
