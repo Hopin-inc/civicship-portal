@@ -4,6 +4,13 @@ import { fetchCommunityConfigForEdge } from "@/lib/communities/config-env";
 import { detectPreferredLocale } from "@/lib/i18n/languageDetection";
 import { defaultLocale, locales } from "@/lib/i18n/config";
 import { ACTIVE_COMMUNITY_IDS } from "@/lib/communities/constants";
+import {
+  DEV_AUTH_COOKIE_NAME,
+  DEV_AUTH_COOKIE_OPTIONS,
+  isDevLoginEnabled,
+  isDocumentNavigation,
+  requestDevSession,
+} from "@/lib/auth/dev";
 
 /**
  * パスベースルーティングのリダイレクト対象外パターン
@@ -112,9 +119,44 @@ export async function middleware(request: NextRequest) {
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-community-id", communityId);
 
+  // Dev-only auto login. On a non-production deployment, a visitor with no
+  // session is signed in as a freshly provisioned throwaway user so they can
+  // start exercising the app immediately. Inert everywhere else: isDevLoginEnabled()
+  // is false in production, and civicship-api refuses the request independently.
+  let devAuthToken: string | null = null;
+  if (
+    isDevLoginEnabled() &&
+    !request.cookies.get(DEV_AUTH_COOKIE_NAME) &&
+    !hasExistingSessionCookie(request) &&
+    isDocumentNavigation(request.headers)
+  ) {
+    const devSession = await requestDevSession(communityId);
+    if (devSession) {
+      devAuthToken = devSession.devToken;
+      // Make it visible to this request's SSR too, not just the next one —
+      // otherwise the first page view still renders logged out.
+      const existingCookie = requestHeaders.get("cookie");
+      requestHeaders.set(
+        "cookie",
+        existingCookie
+          ? `${existingCookie}; ${DEV_AUTH_COOKIE_NAME}=${devSession.devToken}`
+          : `${DEV_AUTH_COOKIE_NAME}=${devSession.devToken}`,
+      );
+      console.info("[Middleware] Dev auto-login applied", {
+        communityId,
+        userId: devSession.user.id,
+        provisioned: devSession.provisioned,
+      });
+    }
+  }
+
   const res = NextResponse.next({
     request: { headers: requestHeaders },
   });
+
+  if (devAuthToken) {
+    res.cookies.set(DEV_AUTH_COOKIE_NAME, devAuthToken, DEV_AUTH_COOKIE_OPTIONS);
+  }
 
   // 3. DBから動的設定を取得（存在しないコミュニティは404）
   // /sysAdmin はコミュニティスコープ外のため DB 設定チェックをスキップ。
@@ -150,6 +192,9 @@ export async function middleware(request: NextRequest) {
   const redirectRes = handleRootRedirect(request, pathname, rootPath, communityId);
   if (redirectRes) {
     redirectRes.cookies.set("x-community-id", communityId, COMMUNITY_ID_COOKIE_OPTIONS);
+    if (devAuthToken) {
+      redirectRes.cookies.set(DEV_AUTH_COOKIE_NAME, devAuthToken, DEV_AUTH_COOKIE_OPTIONS);
+    }
     if (shouldClearSessionCookies) {
       clearLegacySessionCookies(redirectRes);
     }
@@ -324,6 +369,21 @@ function handleLanguageSetting(request: NextRequest, res: NextResponse, enabledF
       sameSite: "lax",
     });
   }
+}
+
+/**
+ * True when the browser already carries a real (LINE/Firebase) session cookie.
+ * Dev auto-login must never displace a genuine login on a shared dev deployment.
+ */
+function hasExistingSessionCookie(request: NextRequest): boolean {
+  return request.cookies
+    .getAll()
+    .some(
+      (cookie) =>
+        cookie.name === "session" ||
+        cookie.name === "__session" ||
+        cookie.name.startsWith("__session_"),
+    );
 }
 
 function clearLegacySessionCookies(response: NextResponse) {

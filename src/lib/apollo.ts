@@ -13,6 +13,7 @@ import { logger } from "@/lib/logging";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { setContext } from "@apollo/client/link/context";
 import { getCommunityIdClient } from "@/lib/community/get-community-id-client";
+import { DEV_AUTH_COOKIE_NAME, DEV_AUTH_HEADER_NAME } from "@/lib/auth/dev/constants";
 
 const httpLink = createUploadLink({
   uri: process.env.NEXT_PUBLIC_API_ENDPOINT,
@@ -22,12 +23,29 @@ const httpLink = createUploadLink({
   },
 });
 
+/**
+ * Reads the dev auto-login token from the browser's cookies.
+ *
+ * The cookie lives on the portal's origin, so it is not sent automatically on
+ * cross-origin GraphQL requests — it has to travel as an explicit header. Absent
+ * (and therefore a no-op) on any deployment where dev login is not enabled.
+ */
+function readDevAuthToken(): string | null {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie.match(
+    new RegExp(`(?:^|;\\s*)${DEV_AUTH_COOKIE_NAME}=([^;]*)`),
+  );
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
 const requestLink = setContext(async (operation, prevContext) => {
   const isBrowser = typeof window !== "undefined";
   let token: string | null = null;
   let authMode: "session" | "id_token" = isBrowser ? "id_token" : "session";
   let authSource: "firebaseUser" | "lineTokens" | "none" = "none";
   let firebaseUserTenantId: string | null = null;
+
+  const devAuthToken = readDevAuthToken();
 
   if (isBrowser) {
     const { firebaseUser, authenticationState, lineTokens, hasSessionCookie } =
@@ -47,7 +65,8 @@ const requestLink = setContext(async (operation, prevContext) => {
 
       // firebaseUser / lineTokens.idToken / SSR で発行された session cookie のいずれかが必要。
       // session cookie は HttpOnly のため SSR から store に流したフラグで判定する。
-      if (!firebaseUser && !lineTokens.idToken && !hasSessionCookie) {
+      // dev 自動ログイン時は Firebase を一切通らないため、dev トークンも認証手段として認める。
+      if (!firebaseUser && !lineTokens.idToken && !hasSessionCookie && !devAuthToken) {
         throw new Error("認証情報が取得できませんでした。ページをリロードしてください");
       }
     }
@@ -103,6 +122,8 @@ const requestLink = setContext(async (operation, prevContext) => {
     ...prevContext.headers,
     // Only send Authorization header when we have a token
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    // Dev auto-login. Ignored by the API unless dev login is enabled there.
+    ...(devAuthToken ? { [DEV_AUTH_HEADER_NAME]: devAuthToken } : {}),
     "X-Auth-Mode": authMode,
     "X-Community-Id": communityId ?? "",
   };
