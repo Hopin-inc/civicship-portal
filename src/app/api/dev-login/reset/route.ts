@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { DEV_AUTH_COOKIE_NAME } from "@/lib/auth/dev/constants";
-import { isDevLoginEnabled } from "@/lib/auth/dev";
+import { isDevLoginEnabled, isSameOriginNavigation } from "@/lib/auth/dev";
 
 /**
  * GET /api/dev-login/reset
@@ -13,6 +13,13 @@ import { isDevLoginEnabled } from "@/lib/auth/dev";
  */
 export async function GET(request: NextRequest) {
   if (!isDevLoginEnabled()) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
+  // Clearing a cookie on GET is reachable cross-site — an <img> tag pointing here
+  // would log the tester out from any page on the internet. Restrict it to a
+  // top-level navigation the user made on this site.
+  if (!isSameOriginNavigation(request.headers)) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 

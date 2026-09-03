@@ -118,13 +118,6 @@ export function withDevAuthCookie(existingCookieHeader: string | null, token: st
 }
 
 /**
- * True for requests where auto-provisioning a user is appropriate: a real page
- * navigation, not an RSC payload or a router prefetch.
- *
- * Without this, the several parallel RSC requests a single navigation fires would
- * each race to provision before the cookie lands, littering the dev DB with users.
- */
-/**
  * Whether the request reached the user over HTTPS.
  *
  * `nextUrl.protocol` alone is not enough: behind a TLS-terminating proxy — which
@@ -141,6 +134,13 @@ export function isSecureRequest(protocol: string, headers: Headers): boolean {
   return forwarded === "https";
 }
 
+/**
+ * True for requests where auto-provisioning a user is appropriate: a real page
+ * navigation, not an RSC payload or a router prefetch.
+ *
+ * Without this, the several parallel RSC requests a single navigation fires would
+ * each race to provision before the cookie lands, littering the dev DB with users.
+ */
 export function isDocumentNavigation(headers: Headers): boolean {
   if (headers.get("next-router-prefetch")) return false;
   if (headers.get("rsc")) return false;
@@ -148,4 +148,26 @@ export function isDocumentNavigation(headers: Headers): boolean {
   const mode = headers.get("sec-fetch-mode");
   // Older browsers omit Sec-Fetch-Mode; treat only an explicit non-navigate as a skip.
   return mode === null || mode === "navigate";
+}
+
+/**
+ * True when the request is a top-level navigation the user initiated on this
+ * site — typing the URL, or following a link from the portal itself.
+ *
+ * Distinct from isDocumentNavigation, which only asks "is this a page load".
+ * This one also pins the *origin*, so a cross-site embed cannot trigger the
+ * request at all. That is what keeps GET /api/dev-login/reset from doubling as
+ * a logout anyone can fire from an <img> tag on another site.
+ */
+export function isSameOriginNavigation(headers: Headers): boolean {
+  const site = headers.get("sec-fetch-site");
+  const mode = headers.get("sec-fetch-mode");
+
+  // Browsers that send neither header cannot be checked; the dev-only blast
+  // radius of clearing a throwaway session does not justify locking them out.
+  if (site === null && mode === null) return true;
+
+  const originOk = site === null || site === "same-origin" || site === "none";
+  const modeOk = mode === null || mode === "navigate";
+  return originOk && modeOk;
 }

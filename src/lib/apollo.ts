@@ -35,7 +35,16 @@ function readDevAuthToken(): string | null {
   const match = document.cookie.match(
     new RegExp(`(?:^|;\\s*)${DEV_AUTH_COOKIE_NAME}=([^;]*)`),
   );
-  return match ? decodeURIComponent(match[1]) : null;
+  if (!match) return null;
+
+  try {
+    return decodeURIComponent(match[1]);
+  } catch {
+    // A malformed percent-escape makes decodeURIComponent throw. A corrupt dev
+    // cookie must not take out every GraphQL request in the app, so fall back to
+    // the raw value and let the API reject it as an invalid token.
+    return match[1] || null;
+  }
 }
 
 const requestLink = setContext(async (operation, prevContext) => {
