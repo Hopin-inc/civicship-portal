@@ -137,7 +137,7 @@ export async function middleware(request: NextRequest) {
     isDocumentNavigation(request.headers) &&
     (!request.cookies.get(DEV_AUTH_COOKIE_NAME) || communityChanged);
 
-  // /api/dev-login/reset?role=owner leaves this behind so the next provisioning
+  // /api/dev-login/reset?role=member leaves this behind so the next provisioning
   // picks the role up. Consumed once, then cleared below — a role asked for now
   // should not silently apply to every later re-provision.
   const requestedDevRole = needsDevSession

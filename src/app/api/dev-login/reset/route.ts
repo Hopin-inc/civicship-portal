@@ -9,11 +9,10 @@ import { isDevLoginEnabled, isSameOriginNavigation, parseDevRole } from "@/lib/a
  * middleware provisions a brand-new throwaway user. This is how a tester starts
  * over from a clean account — visiting it in the address bar is the whole flow.
  *
- * `?role=owner` (or `manager`) provisions the next user with that role instead of
- * a plain member, so the admin screens can be exercised. Switching back is the
- * same URL without the param, which is the point of making it per-reset rather
- * than a fixed setting: the member view is what most of the app renders, and its
- * permission-gated UI is what quietly breaks.
+ * Dev users are provisioned as OWNER, so the admin screens are reachable on
+ * arrival. `?role=member` (or `manager`) provisions the next one lower instead —
+ * worth doing when checking a member-facing screen, since permission-gated UI
+ * looks correct from an owner account whether or not it still is.
  *
  * `?next=/some/path` picks where to land afterwards.
  *
