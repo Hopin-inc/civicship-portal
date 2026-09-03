@@ -11,6 +11,21 @@ export const DEV_AUTH_COOKIE_NAME = "dev_auth_token";
 export const DEV_AUTH_HEADER_NAME = "x-dev-auth-token";
 
 /**
+ * Carries the role the next provisioning should use, set by the reset route and
+ * consumed once by the middleware.
+ *
+ * A cookie rather than a query param because the provisioning happens on a later
+ * request than the one that asked for it: reset clears the session and bounces,
+ * and the middleware provisions on the page load that follows.
+ */
+export const DEV_ROLE_COOKIE_NAME = "dev_login_role";
+
+/** Roles a dev session can be provisioned with, matching the api's allow-list. */
+export const DEV_ROLES = ["MEMBER", "MANAGER", "OWNER"] as const;
+
+export type DevRole = (typeof DEV_ROLES)[number];
+
+/**
  * Cookie lifetime, in **seconds** — that is what `Set-Cookie: Max-Age` takes.
  *
  * Deliberately the same 12 hours as `DEV_TOKEN_TTL_MS` in civicship-api, which
