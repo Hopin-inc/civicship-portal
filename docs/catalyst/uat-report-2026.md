@@ -1,6 +1,8 @@
+<a id="en"></a>
+
 # User Acceptance Test and Demonstration Experiment — Report
 
-*English below · [日本語は下段](#ユーザー受入テストおよび実証実験-報告書)*
+*English below · [日本語は下段へ](#ja)*
 
 
 Final Milestone, deliverable 3. Project Catalyst F12, Project ID 1200088.
@@ -237,9 +239,11 @@ credential-only community.
 ---
 ---
 
+<a id="ja"></a>
+
 # ユーザー受入テストおよび実証実験 — 報告書
 
-*[English is above](#user-acceptance-test-and-demonstration-experiment--report)*
+*[English is above](#en)*
 
 Final Milestone 成果物3。Project Catalyst F12、Project ID 1200088。
 

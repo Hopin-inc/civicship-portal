@@ -1,6 +1,8 @@
+<a id="en"></a>
+
 # Project Catalyst F12 — Submission Materials
 
-*English below · [日本語は下段](#project-catalyst-f12--提出資料日本語)*
+*English below · [日本語は下段へ](#ja)*
 
 
 Documentation produced for Project Catalyst Fund 12, *Creating social implementation
@@ -107,9 +109,11 @@ phase has concluded.
 ---
 ---
 
+<a id="ja"></a>
+
 # Project Catalyst F12 — 提出資料（日本語）
 
-*[English is above](#project-catalyst-f12--submission-materials)*
+*[English is above](#en)*
 
 Project Catalyst Fund 12「四国地域における Cardano の社会実装ユースケース創出」
 （Project ID 1200088）のために作成したドキュメント。
