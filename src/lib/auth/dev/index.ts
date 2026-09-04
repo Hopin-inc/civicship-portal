@@ -14,16 +14,13 @@
  */
 
 import { isLocal, isStaging } from "@/lib/environment";
-import { DEV_AUTH_COOKIE_NAME, DEV_ROLES, type DevRole } from "@/lib/auth/dev/constants";
+import { DEV_AUTH_COOKIE_NAME } from "@/lib/auth/dev/constants";
 
 export {
   DEV_AUTH_COOKIE_NAME,
   DEV_AUTH_HEADER_NAME,
-  DEV_ROLE_COOKIE_NAME,
-  DEV_ROLES,
   devAuthCookieOptions,
 } from "@/lib/auth/dev/constants";
-export type { DevRole } from "@/lib/auth/dev/constants";
 
 /**
  * Whether this build is a dev deployment.
@@ -42,19 +39,7 @@ const DEV_SESSION_TIMEOUT_MS = 3000;
 
 export interface DevSession {
   devToken: string;
-  user: { id: string; name: string; uid: string; role: DevRole };
-}
-
-/**
- * Narrows arbitrary input to a role the api will accept.
- *
- * Returns null for anything else, so a typo in the URL falls back to the default
- * rather than being forwarded for the api to reject.
- */
-export function parseDevRole(value: string | null | undefined): DevRole | null {
-  if (!value) return null;
-  const upper = value.toUpperCase();
-  return (DEV_ROLES as readonly string[]).includes(upper) ? (upper as DevRole) : null;
+  user: { id: string; name: string; uid: string };
 }
 
 /**
@@ -64,10 +49,7 @@ export function parseDevRole(value: string | null | undefined): DevRole | null {
  * portal down: if the API is unreachable or has dev login switched off, the
  * caller simply carries on unauthenticated.
  */
-export async function requestDevSession(
-  communityId: string,
-  role?: DevRole | null,
-): Promise<DevSession | null> {
+export async function requestDevSession(communityId: string): Promise<DevSession | null> {
   const apiEndpoint = process.env.NEXT_PUBLIC_API_ENDPOINT;
   if (!apiEndpoint) return null;
 
@@ -87,7 +69,6 @@ export async function requestDevSession(
         "Content-Type": "application/json",
         "X-Community-Id": communityId,
       },
-      body: JSON.stringify(role ? { role } : {}),
       cache: "no-store",
     });
 

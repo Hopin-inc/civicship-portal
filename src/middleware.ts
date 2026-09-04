@@ -6,12 +6,10 @@ import { defaultLocale, locales } from "@/lib/i18n/config";
 import { ACTIVE_COMMUNITY_IDS } from "@/lib/communities/constants";
 import {
   DEV_AUTH_COOKIE_NAME,
-  DEV_ROLE_COOKIE_NAME,
   devAuthCookieOptions,
   isDevLoginEnabled,
   isDocumentNavigation,
   isSecureRequest,
-  parseDevRole,
   requestDevSession,
   withDevAuthCookie,
 } from "@/lib/auth/dev";
@@ -137,16 +135,9 @@ export async function middleware(request: NextRequest) {
     isDocumentNavigation(request.headers) &&
     (!request.cookies.get(DEV_AUTH_COOKIE_NAME) || communityChanged);
 
-  // /api/dev-login/reset?role=member leaves this behind so the next provisioning
-  // picks the role up. Consumed once, then cleared below — a role asked for now
-  // should not silently apply to every later re-provision.
-  const requestedDevRole = needsDevSession
-    ? parseDevRole(request.cookies.get(DEV_ROLE_COOKIE_NAME)?.value)
-    : null;
-
   let devAuthToken: string | null = null;
   if (needsDevSession) {
-    const devSession = await requestDevSession(communityId, requestedDevRole);
+    const devSession = await requestDevSession(communityId);
     if (devSession) {
       devAuthToken = devSession.devToken;
       // Make it visible to this request's SSR too, not just the next one —
@@ -158,7 +149,6 @@ export async function middleware(request: NextRequest) {
       console.info("[Middleware] Dev auto-login applied", {
         communityId,
         userId: devSession.user.id,
-        role: devSession.user.role,
         communityChanged,
       });
     }
@@ -174,9 +164,6 @@ export async function middleware(request: NextRequest) {
 
   if (devAuthToken) {
     res.cookies.set(DEV_AUTH_COOKIE_NAME, devAuthToken, devAuthCookieOpts);
-  }
-  if (requestedDevRole) {
-    res.cookies.set(DEV_ROLE_COOKIE_NAME, "", { path: "/", expires: new Date(0) });
   }
 
   // 3. DBから動的設定を取得（存在しないコミュニティは404）
@@ -215,9 +202,6 @@ export async function middleware(request: NextRequest) {
     redirectRes.cookies.set("x-community-id", communityId, COMMUNITY_ID_COOKIE_OPTIONS);
     if (devAuthToken) {
       redirectRes.cookies.set(DEV_AUTH_COOKIE_NAME, devAuthToken, devAuthCookieOpts);
-    }
-    if (requestedDevRole) {
-      redirectRes.cookies.set(DEV_ROLE_COOKIE_NAME, "", { path: "/", expires: new Date(0) });
     }
     if (shouldClearSessionCookies) {
       clearLegacySessionCookies(redirectRes);
