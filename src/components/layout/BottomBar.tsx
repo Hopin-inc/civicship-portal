@@ -1,7 +1,7 @@
 "use client";
 
 import { AppLink } from "@/lib/navigation";
-import { Globe, Home, Search, User } from "lucide-react";
+import { Globe, Home, Search, User, Vote } from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
 import React from "react";
 import { cn } from "@/lib/utils";
@@ -94,6 +94,15 @@ const BottomBar: React.FC<HeaderProps> = ({ className }) => {
               <span className="text-xs mt-1">{t("navigation.bottomBar.places")}</span>
             </AppLink>
           )}
+          {/* 投票機能は現在どのコミュニティでも使っていないため導線を止めている。
+              画面とルートはそのまま残してあるので、戻すときはこのブロックの
+              コメントを外すだけでよい。 */}
+          {/* {communityConfig?.enableFeatures?.includes("votes") && (
+            <AppLink href="/votes" className={cn(getLinkStyle("/votes", "/votes/*"), "flex-grow")}>
+              <Vote size={24} />
+              <span className="text-xs mt-1">{t("navigation.bottomBar.votes")}</span>
+            </AppLink>
+          )} */}
           <AppLink
             href="/users/me"
             className={cn(getLinkStyle("/users/me", "/users/me/*"), "flex-grow")}

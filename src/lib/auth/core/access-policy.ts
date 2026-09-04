@@ -3,7 +3,7 @@ import { getCommunityIdClient } from "@/lib/community/get-community-id-client";
 import { matchPaths } from "@/utils/path";
 import { logger } from "@/lib/logging";
 
-const OWNER_ONLY_PATHS = ["/admin/wallet", "/admin/members"];
+const OWNER_ONLY_PATHS = ["/admin/wallet", "/admin/members", "/admin/analytics", "/admin/analytics/**"];
 const MANAGER_PATHS = ["/admin", "/admin/*"];
 
 export class AccessPolicy {

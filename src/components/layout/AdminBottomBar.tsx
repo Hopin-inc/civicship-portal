@@ -1,7 +1,7 @@
 "use client";
 
 import { AppLink } from "@/lib/navigation";
-import { Book, ClipboardList, Settings, Ticket } from "lucide-react";
+import { Book, ClipboardList, Settings, Ticket, Vote } from "lucide-react";
 import { usePathname } from "next/navigation";
 import React from "react";
 import { cn } from "@/lib/utils";
@@ -26,6 +26,7 @@ const AdminBottomBar: React.FC<AdminBottomBarProps> = ({ className }) => {
     pathname.startsWith("/admin/credentials/") ||
     pathname.startsWith("/admin/tickets/") ||
     pathname.startsWith("/admin/opportunities/") ||
+    pathname.startsWith("/admin/votes/") ||
     pathname.startsWith("/admin/members") ||
     pathname.startsWith("/admin/wallet/")
   ) {
@@ -74,6 +75,16 @@ const AdminBottomBar: React.FC<AdminBottomBarProps> = ({ className }) => {
               <span className="text-xs mt-1">{t("navigation.adminBottomBar.credentials")}</span>
             </AppLink>
           )}
+          {/* 投票機能の導線を停止中。BottomBar 側と対で外すこと。 */}
+          {/* {enabledFeatures.includes("votes") && (
+            <AppLink
+              href="/admin/votes"
+              className={cn(getLinkStyle("/admin/votes", "/admin/votes/*"), "flex-grow")}
+            >
+              <Vote size={24} />
+              <span className="text-xs mt-1">{t("navigation.adminBottomBar.votes")}</span>
+            </AppLink>
+          )} */}
           <AppLink
             href="/admin"
             className={cn(getLinkStyle("/admin", "/admin/*"), "flex-grow")}
