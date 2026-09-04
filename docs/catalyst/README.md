@@ -17,7 +17,7 @@ claim in them can be checked against the source it describes.
 | --- | --- | --- |
 | [Front-end documentation](./frontend-documentation.md) | Milestone 5 | Architecture of the front end, how it integrates with the API, and where the UI/UX design material and user instructions live |
 | [User Acceptance Test report](./uat-report-2026.md) | Final | Demonstration experiment results, provider feedback, analysis, and platform usage statistics |
-| [Security audit and remediation](../security/audit-2025-hexens.md) | Final | The Hexens third-party audit, each finding, and its remediation status verified against the code |
+| [Security audit and remediation](../security/audit-2025-hexens.md) | Final | The Hexens third-party audit, each finding, and its remediation status verified against the code. Note its [scope and currency](../security/audit-2025-hexens.md#scope-and-currency): the audit assessed the codebase as of September–December 2025 |
 
 ## On the gap between a submission and the code today
 
@@ -127,7 +127,7 @@ Project Catalyst Fund 12「四国地域における Cardano の社会実装ユ�
 | --- | --- | --- |
 | [フロントエンド ドキュメント](./frontend-documentation.md) | Milestone 5 | フロントエンドのアーキテクチャ、API との連携方法、UI/UX 設計資料と利用者向け手順書の所在 |
 | [ユーザー受入テスト報告書](./uat-report-2026.md) | Final | 実証実験の結果、事業者からのフィードバック、分析、プラットフォーム利用統計 |
-| [セキュリティ監査と対応状況](../security/audit-2025-hexens.md) | Final | Hexens による第三者監査、各指摘事項と、コードに対して検証した対応状況 |
+| [セキュリティ監査と対応状況](../security/audit-2025-hexens.md) | Final | Hexens による第三者監査、各指摘事項と、コードに対して検証した対応状況。監査は2025年9〜12月時点のコードベースを評価している点に注意（[監査の範囲と、現在との時間差](../security/audit-2025-hexens.md#監査の範囲と現在との時間差)） |
 
 ## 提出時点と現在のコードの差について
 
