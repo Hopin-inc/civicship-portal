@@ -75,7 +75,8 @@ const AdminBottomBar: React.FC<AdminBottomBarProps> = ({ className }) => {
               <span className="text-xs mt-1">{t("navigation.adminBottomBar.credentials")}</span>
             </AppLink>
           )}
-          {enabledFeatures.includes("votes") && (
+          {/* 投票機能の導線を停止中。BottomBar 側と対で外すこと。 */}
+          {/* {enabledFeatures.includes("votes") && (
             <AppLink
               href="/admin/votes"
               className={cn(getLinkStyle("/admin/votes", "/admin/votes/*"), "flex-grow")}
@@ -83,7 +84,7 @@ const AdminBottomBar: React.FC<AdminBottomBarProps> = ({ className }) => {
               <Vote size={24} />
               <span className="text-xs mt-1">{t("navigation.adminBottomBar.votes")}</span>
             </AppLink>
-          )}
+          )} */}
           <AppLink
             href="/admin"
             className={cn(getLinkStyle("/admin", "/admin/*"), "flex-grow")}

@@ -1,3 +1,5 @@
+import { withExtraFeatures } from "@/lib/communities/feature-overrides";
+
 /**
  * Edge Runtime compatible community configuration utilities
  * These functions can be used in middleware and edge runtime
@@ -82,7 +84,7 @@ export async function fetchCommunityConfigForEdge(
 
     if (config) {
       const entry: EdgeCommunityConfig = {
-        enableFeatures: config.enableFeatures || [],
+        enableFeatures: withExtraFeatures(communityId, config.enableFeatures || []),
         rootPath: config.rootPath || "/",
       };
       configCacheMap.set(communityId, { config: entry, timestamp: now });

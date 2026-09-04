@@ -44,11 +44,14 @@ const adminSettings = [
     icon: Gift,
     requiredFeature: "points" as FeaturesType,
   },
-  {
-    title: "アナリティクス",
-    href: "/admin/analytics",
-    icon: BarChart3,
-  },
+  // アナリティクスは現在使っていないため一覧から外している。
+  // 画面 (/admin/analytics) は残してあるので、戻すときはこの項目の
+  // コメントを外すだけでよい。
+  // {
+  //   title: "アナリティクス",
+  //   href: "/admin/analytics",
+  //   icon: BarChart3,
+  // },
 ];
 
 const operatorSettings = [
@@ -87,12 +90,13 @@ const operatorSettings = [
     icon: Ticket,
     requiredFeature: "tickets" as FeaturesType,
   },
-  {
-    title: "投票管理",
-    href: "/admin/votes",
-    icon: Vote,
-    requiredFeature: "votes" as FeaturesType,
-  },
+  // 投票管理も同様に導線のみ停止中。
+  // {
+  //   title: "投票管理",
+  //   href: "/admin/votes",
+  //   icon: Vote,
+  //   requiredFeature: "votes" as FeaturesType,
+  // },
 ];
 
 export default function AdminPage() {
