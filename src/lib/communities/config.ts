@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { executeServerGraphQLQuery } from "@/lib/graphql/server";
 import { COMMUNITY_LOCAL_CONFIGS } from "@/lib/communities/constants";
+import { withExtraFeatures } from "@/lib/communities/feature-overrides";
 import { logger } from "@/lib/logging";
 
 /**
@@ -97,6 +98,18 @@ interface CommunityPortalConfigResponse {
 }
 
 /**
+ * Folds the frontend's feature additions into a config, whether it came from the
+ * database or from the static LOCAL one, so every consumer of this module sees
+ * the same list.
+ */
+function withFrontendFeatures(
+  communityId: string,
+  config: CommunityPortalConfig,
+): CommunityPortalConfig {
+  return { ...config, enableFeatures: withExtraFeatures(communityId, config.enableFeatures) };
+}
+
+/**
  * Get community portal config from the database
  * Uses React cache for request deduplication within a single request
  */
@@ -109,7 +122,7 @@ export const getCommunityConfig = cache(
     }
     if (process.env.ENV === "LOCAL" && typeof window === "undefined") {
       console.log(`[LOCAL] Response Local Config for ${communityId}, using static config.`);
-      return COMMUNITY_LOCAL_CONFIGS;
+      return withFrontendFeatures(communityId, COMMUNITY_LOCAL_CONFIGS);
     }
     try {
       const data = await executeServerGraphQLQuery<CommunityPortalConfigResponse>(
@@ -140,7 +153,7 @@ export const getCommunityConfig = cache(
         });
       }
 
-      return config;
+      return config && withFrontendFeatures(communityId, config);
     } catch (error) {
       logger.error("[getCommunityConfig] Failed to fetch config from DB", {
         communityId,
