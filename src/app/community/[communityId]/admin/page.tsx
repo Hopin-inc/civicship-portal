@@ -6,7 +6,6 @@ import { useMemo } from "react";
 import useHeaderConfig from "@/hooks/useHeaderConfig";
 import {
   ArrowLeftRight,
-  BarChart3,
   CalendarCheck,
   ClipboardList,
   Gift,
@@ -15,7 +14,6 @@ import {
   MegaphoneIcon,
   Ticket,
   Users,
-  Vote,
   Wallet,
 } from "lucide-react";
 import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
@@ -43,11 +41,6 @@ const adminSettings = [
     href: "/admin/bonuses",
     icon: Gift,
     requiredFeature: "points" as FeaturesType,
-  },
-  {
-    title: "アナリティクス",
-    href: "/admin/analytics",
-    icon: BarChart3,
   },
 ];
 
@@ -86,12 +79,6 @@ const operatorSettings = [
     href: "/admin/tickets",
     icon: Ticket,
     requiredFeature: "tickets" as FeaturesType,
-  },
-  {
-    title: "投票管理",
-    href: "/admin/votes",
-    icon: Vote,
-    requiredFeature: "votes" as FeaturesType,
   },
 ];
 
