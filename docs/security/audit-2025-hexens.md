@@ -6,8 +6,8 @@
 
 
 A third-party security assessment of the civicship platform, and what was done
-about each finding. Published here so the findings and their remediation are
-verifiable against the source rather than taken on trust.
+about each finding. Published here so the findings and their remediation can be
+checked against the source.
 
 ## The audit
 
@@ -38,8 +38,7 @@ before the final report.
 
 ## Scope and currency
 
-Three things about this audit's relationship to the code as it stands today, stated
-here rather than left for a reader to work out.
+Three things about this audit's relationship to the code as it stands today.
 
 **The audit assessed the codebase as of September–December 2025.** Both
 repositories have moved considerably since — well over a hundred commits to
@@ -47,23 +46,22 @@ repositories have moved considerably since — well over a hundred commits to
 code has been audited; it is a record of an audit that happened, and of what was
 done about each finding.
 
-**"Fixed" below means two different things, and the difference matters.** Most
-entries were remediated during the audit and re-verified by Hexens before the
-final report of 16 December 2025. HOPIN-3 was not: the report files it as
-*Acknowledged*, and the fix landed afterwards. Its status here rests on reading
-the current source, not on Hexens confirming it.
+**"Fixed" below means two different things.** Most entries were remediated during
+the audit and re-verified by Hexens before the final report of 16 December 2025.
+HOPIN-3 was not: the report files it as *Acknowledged*, and the fix landed
+afterwards. Its status here rests on reading the current source, not on Hexens
+confirming it.
 
 **The audit targeted the NEO88 deployment, which has since concluded its
 demonstration phase.** The live deployments today are Kibotcha, Izu, Kotohira and
-DAIS. This matters less than it might: the scope was the `civicship-portal` and
-`civicship-api` repositories and their workflows, not one deployment's
-configuration, and every community runs the same codebase. The findings and their
-fixes are therefore in the shared code rather than in an environment that no
-longer serves traffic. The environment-specific parts — headers, workflow
-authentication — are set in that shared code and configuration too.
+DAIS. The scope was the `civicship-portal` and `civicship-api` repositories and
+their workflows, not one deployment's configuration, and every community runs the
+same codebase. The findings and their fixes are therefore in the shared code rather
+than in an environment that no longer serves traffic. The environment-specific
+parts — headers, workflow authentication — are set in that shared code and
+configuration too.
 
-A re-audit is worth scheduling as the platform continues to change. Nothing here
-should be read as evidence about code written after December 2025.
+Nothing here should be read as evidence about code written after December 2025.
 
 ## Remediation
 
@@ -163,8 +161,7 @@ pull request review, rather than by changing the workflow triggers.
 | HOPIN-10 Workflows trigger on direct push | Informational | Accepted — covered by branch protection |
 
 Both high-severity findings and all three medium-severity findings are fixed. The
-two remaining items are hardening measures beyond what closes the reported attack,
-and are tracked rather than silently dropped.
+two remaining items are hardening measures beyond what closes the reported attack.
 
 ## Reporting a vulnerability
 
@@ -180,7 +177,7 @@ See [`public/.well-known/security.txt`](../../public/.well-known/security.txt).
 *[English is above](#en)*
 
 civicship プラットフォームに対する第三者セキュリティ評価と、各指摘への対応。
-指摘とその対応を、信用ではなくソースコードとの突き合わせで検証できるよう、ここに公開する。
+指摘とその対応をソースコードと突き合わせて検証できるよう、ここに公開する。
 
 ## 監査の概要
 
@@ -210,29 +207,29 @@ civicship プラットフォームに対する第三者セキュリティ評価�
 
 ## 監査の範囲と、現在との時間差
 
-この監査と現在のコードの関係について、読み手に推測させず3点を明記しておく。
+この監査と現在のコードの関係について、3点を明記しておく。
 
 **監査は2025年9〜12月時点のコードベースを評価している。** 以降、両リポジトリは相当に
 動いており、`civicship-api` の `master` だけでも100を優に超えるコミットが入っている。
 本ドキュメントは現在のコードが監査済みであると主張するものではない。実施された監査と、
 各指摘に対して何を行ったかの記録である。
 
-**以下の「修正済み」には2種類あり、その違いは重要である。** ほとんどの項目は監査期間中に
-対応され、2025年12月16日の最終レポート発行前に Hexens によって再検証されている。
+**以下の「修正済み」には2種類ある。** ほとんどの項目は監査期間中に対応され、
+2025年12月16日の最終レポート発行前に Hexens によって再検証されている。
 HOPIN-3 はそうではない — レポートは *Acknowledged* として記録しており、修正はその後に
 入った。本ドキュメントでの同項目のステータスは、現在のソースコードを読んだ結果に
 基づくものであって、Hexens が確認したものではない。
 
 **監査対象は NEO88 環境であり、同環境は既に実証フェーズを終了している。** 現在稼働して
-いるのはキボッチャ、伊豆、琴平、DAIS である。ただしこの点の影響は限定的である —
-監査範囲は特定環境の設定ではなく `civicship-portal` と `civicship-api` のリポジトリ
-およびそのワークフローであり、すべてのコミュニティは同一のコードベースで動作している。
+いるのはキボッチャ、伊豆、琴平、DAIS である。監査範囲は特定環境の設定ではなく
+`civicship-portal` と `civicship-api` のリポジトリおよびそのワークフローであり、
+すべてのコミュニティは同一のコードベースで動作している。
 したがって指摘とその修正は、既にトラフィックを受けていない環境ではなく共有コードの側に
 存在する。環境固有の部分（ヘッダ、ワークフローの認証）も同じ共有コードと設定で規定されて
 いる。
 
-プラットフォームが変化し続ける以上、再監査の実施を計画する価値がある。本ドキュメントの
-いかなる記述も、2025年12月以降に書かれたコードに関する証拠として読まれるべきではない。
+本ドキュメントのいかなる記述も、2025年12月以降に書かれたコードに関する証拠として
+読まれるべきではない。
 
 ## 対応状況
 
@@ -332,7 +329,7 @@ SHA にピン留めされている。
 | HOPIN-10 直接 push によるワークフロー起動 | Informational | 受容 — ブランチ保護で担保 |
 
 **High の2件と Medium の3件はすべて修正済み。** 残る2件は、報告された攻撃を塞ぐ範囲を
-超えた追加のハードニング措置であり、黙って落とすのではなく記録して管理している。
+超えた追加のハードニング措置である。
 
 ## 脆弱性の報告
 

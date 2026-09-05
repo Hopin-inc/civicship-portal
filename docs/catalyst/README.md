@@ -11,7 +11,7 @@ use-cases of Cardano in the Shikoku region, Japan* (Project ID 1200088).
 These files live in the repository rather than in a document store so that every
 claim in them can be checked against the source it describes.
 
-These documents are current as of `517e9a4` (2026-09-04).
+These documents describe the code at `517e9a4` (2026-09-04).
 
 ## Deliverables and evidence
 
@@ -52,10 +52,10 @@ phase has concluded.
 
 ### 1. The commit these documents describe
 
-The documents are written against `517e9a4`. The repositories are not fixed at that
-commit: the backend milestone was submitted on 27 November 2025, and `civicship-api`
-has taken well over a hundred commits to `master` since. Code present at HEAD and
-not described by any document above is covered by note 2.
+The repositories are not fixed at that commit: the backend milestone was submitted
+on 27 November 2025, and `civicship-api` has taken well over a hundred commits to
+`master` since. Code present at HEAD and not described by any document above is
+covered by note 2.
 
 ### 2. Work in the repositories after Milestone 4
 
@@ -65,8 +65,7 @@ the documents. The authoritative record is `git log`; this is a summary of theme
 
 **Identity.** DID issuance was reworked and existing users were backfilled. A phased
 migration away from Identus as the DID/VC provider has been underway across several
-releases. The migration is not complete — Identus is still referenced in eight files
-at `517e9a4`.
+releases. The migration is not complete: `civicship-api` still references Identus.
 
 **Credentials and NFTs.** NFT issuance was built out, including the resident-card
 NFTs described in the DAO documentation. Authorization on VC issuance requests was
@@ -99,9 +98,8 @@ interface; the screens and their routes remain in the codebase.
 
 ### 3. Final Milestone deliverable 3
 
-Satisfaction was measured at 47.7% against a 70% threshold. The figure is reported
-as measured. [UAT report](./uat-report-2026.md) §2.1 gives the distribution and §4
-the analysis.
+Satisfaction was measured at 47.7% against a 70% threshold.
+[UAT report](./uat-report-2026.md) §2.1 gives the distribution and §4 the analysis.
 
 Tester information is partial. Company or personal name was collected for 36 of 44
 respondents; initials, region of residence and attribute were not collected as
@@ -128,7 +126,7 @@ Project Catalyst Fund 12「四国地域における Cardano の社会実装ユ�
 これらをドキュメントストアではなくリポジトリに置いているのは、記述の一つひとつを、
 それが説明している当のソースコードと突き合わせて検証できるようにするため。
 
-これらのドキュメントは `517e9a4`（2026-09-04）時点のもの。
+これらのドキュメントは `517e9a4`（2026-09-04）時点のコードについて記述している。
 
 ## 成果物と対応するエビデンス
 
@@ -168,9 +166,9 @@ DAIS はクレデンシャル情報を扱うためログイン後にのみ画面
 
 ### 1. これらのドキュメントが対象とするコミット
 
-各ドキュメントは `517e9a4` に対して書かれている。リポジトリ自体はそのコミットに
-固定されていない — バックエンドのマイルストーンは2025年11月27日に提出しており、
-`civicship-api` の `master` にはそれ以降100を優に超えるコミットが入っている。
+リポジトリ自体はそのコミットに固定されていない — バックエンドのマイルストーンは
+2025年11月27日に提出しており、`civicship-api` の `master` にはそれ以降100を優に
+超えるコミットが入っている。
 HEAD に存在し、上記のいずれのドキュメントにも記載が無いコードについては備考2で扱う。
 
 ### 2. Milestone 4 以降にリポジトリに入った作業
@@ -181,8 +179,7 @@ HEAD に存在し、上記のいずれのドキュメントにも記載が無い
 
 **アイデンティティ。** DID 発行を作り直し、既存ユーザーへのバックフィルを実施した。
 DID/VC プロバイダを Identus から段階的に移行する作業が複数リリースにわたって進行して
-いる。この移行は完了していない — `517e9a4` 時点で8ファイルが依然として Identus を
-参照している。
+いる。この移行は完了しておらず、`civicship-api` には依然として Identus への参照が残る。
 
 **クレデンシャルと NFT。** DAO ドキュメントに記載の住民証 NFT を含む NFT 発行機能を構築。
 VC 発行リクエストの認可を厳格化し、リクエストは本人か管理者にのみ見えるようにした。
@@ -211,7 +208,7 @@ VC 発行リクエストの認可を厳格化し、リクエストは本人か�
 
 ### 3. Final Milestone 成果物3について
 
-満足度の実測値は 47.7%、基準は70%超である。数値は実測のまま報告している。
+満足度の実測値は 47.7%、基準は70%超である。
 分布は [UAT 報告書](./uat-report-2026.md) §2.1、分析は §4 に記載。
 
 テスター情報は一部である。44件中36件について会社名または個人名を取得しているが、

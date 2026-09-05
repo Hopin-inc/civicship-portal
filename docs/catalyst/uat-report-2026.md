@@ -7,7 +7,7 @@
 
 Final Milestone, deliverable 3. Project Catalyst F12, Project ID 1200088.
 
-Current as of `517e9a4` (2026-09-04).
+Describes the code at `517e9a4` (2026-09-04).
 
 ---
 
@@ -55,9 +55,8 @@ below state their own denominator.
 **Satisfied or better: 21 of 44 — 47.7%.**
 
 The milestone's acceptance criterion asks for over 70% of community leaders
-satisfied. **This measurement does not meet that threshold, and we are reporting
-it as measured.** Section 4 sets out what the number reflects and what we are
-doing about it.
+satisfied. **This measurement does not meet that threshold.** Section 4 sets out
+what the number reflects and what we are doing about it.
 
 ### 2.2 Usability by function
 
@@ -72,10 +71,8 @@ Each function was rated 1–5. A small number of out-of-range entries (values ab
 | Registering an experience | 46 | 3.11 | 3.0 | 39.1% | 3 |
 | **Search / discovery** | **47** | **2.89** | **3.0** | **31.9%** | **2** |
 
-Every function has a median of 3.0. The application was usable — providers ran a
-real festival on it — but it was not experienced as effortless. **Search scores
-lowest on every measure**, and it is the only function whose mean falls below the
-midpoint.
+Every function has a median of 3.0. **Search scores lowest on every measure**, and
+it is the only function whose mean falls below the midpoint.
 
 ### 2.3 LINE integration
 
@@ -91,10 +88,8 @@ Multiple selection, n = 44, 56 selections.
 | A conventional ID / password would be better | 5 |
 | If we use LINE, I want to be reachable on LINE | 1 |
 
-Positive selections outnumber negative ones (25 to 18), which supports the design
-decision to deliver the application inside LINE rather than as a standalone app or
-a Web3 wallet. The dissenting group is real but small: five providers would have
-preferred a conventional account.
+Positive selections outnumber negative ones, 25 to 18. Five providers selected that
+a conventional ID / password account would be preferable.
 
 ### 2.4 The experience programme itself
 
@@ -116,11 +111,9 @@ Rated 4–5: **27 of 44 — 61.4%** (5: 19 · 4: 8 · 3: 12 · 2: 4 · 1: 1)
 Nine respondents left free-text comments. Three themes carry actionable content;
 the remainder were expressions of thanks and of interest in continuing.
 
-**Discoverability — the strongest signal.** One provider wrote that they wanted
-*"a way of presenting things that lets customers see at a glance what experiences
-exist and where."* This matches the quantitative result exactly: search is the
-lowest-scoring function (mean 2.89). Two independent measurements point at the
-same weakness, which makes it the clearest finding in this test.
+**Discoverability.** One provider wrote that they wanted *"a way of presenting
+things that lets customers see at a glance what experiences exist and where."*
+Search is also the lowest-scoring function quantitatively (mean 2.89).
 
 **Rigidity of the listing format.** A provider noted that *"the application felt
 inflexible — it would be better if the selection fields and notes could be built
@@ -198,10 +191,7 @@ consumer.
 | Feedback collected and analysed, improvement areas identified | Met — Sections 2–4 |
 | Tester initials, region, attribute, result shared | **Partially met** — names held for 36 respondents; region and attribute were not collected |
 
-We are reporting both shortfalls as measured rather than restating them against a
-more favourable denominator. Counting "neither" responses as satisfied would
-produce 75.0% and clear the threshold, and we have chosen not to present the
-figure that way.
+Both shortfalls are reported as measured.
 
 ---
 
@@ -247,7 +237,7 @@ credential-only community.
 
 Final Milestone 成果物3。Project Catalyst F12、Project ID 1200088。
 
-`517e9a4`（2026-09-04）時点。
+`517e9a4`（2026-09-04）時点のコードについて記述している。
 
 ---
 
@@ -290,8 +280,8 @@ community leaders に相当するのはこの層で、それぞれが地域の�
 **満足以上：44件中21件 — 47.7%。**
 
 マイルストーンの受入条件は community leaders の70%超が満足していることを求めている。
-**本測定はこの閾値を満たしておらず、実測値のまま報告する。** この数値が何を反映して
-いるか、それに対して何を行うかは第4節に記す。
+**本測定はこの閾値を満たしていない。** この数値が何を反映しているか、それに対して
+何を行うかは第4節に記す。
 
 ### 2.2 機能別の使いやすさ
 
@@ -306,9 +296,8 @@ community leaders に相当するのはこの層で、それぞれが地域の�
 | 体験の登録 | 46 | 3.11 | 3.0 | 39.1% | 3 |
 | **検索・発見** | **47** | **2.89** | **3.0** | **31.9%** | **2** |
 
-全機能の中央値が3.0である。アプリケーションは使用可能だった — 事業者は実際にこれで
-祭を運営した — が、労力を要しないものとしては受け止められていない。**検索はすべての
-指標で最下位**であり、平均が中間点を下回る唯一の機能である。
+全機能の中央値が3.0である。**検索はすべての指標で最下位**であり、平均が中間点を
+下回る唯一の機能である。
 
 ### 2.3 LINE 連携
 
@@ -324,9 +313,8 @@ community leaders に相当するのはこの層で、それぞれが地域の�
 | 一般的な ID・パスワードの登録の方が良い | 5 |
 | LINE を使うなら LINE で連絡が取れるようにしてほしい | 1 |
 
-肯定的な選択が否定的な選択を上回る（25対18）。これは、スタンドアロンアプリや Web3
-ウォレットではなく LINE 内でアプリケーションを提供するという設計判断を支持する結果である。
-反対する層は実在するが少数で、5名が従来型のアカウントを望んだ。
+肯定的な選択が否定的な選択を上回る（25対18）。5名が「一般的な ID・パスワードの登録の
+方が良い」を選択している。
 
 ### 2.4 提供した体験プログラム自体
 
@@ -348,10 +336,9 @@ community leaders に相当するのはこの層で、それぞれが地域の�
 9名から自由記述の回答を得た。うち3つのテーマが具体的な改善につながる内容を含み、
 残りは謝意および継続への関心の表明であった。
 
-**発見性 — 最も強いシグナル。** ある事業者は
+**発見性。** ある事業者は
 「お客様に、どんな体験がどこにあるかを俯瞰していただける見せ方を改善できたら」
-と記した。これは定量結果と正確に一致する — 検索は最下位の機能である（平均2.89）。
-独立した2つの測定が同じ弱点を指しており、本テストで最も明確な発見となった。
+と記した。検索は定量評価でも最下位の機能である（平均2.89）。
 
 **掲載形式の硬直性。** 別の事業者は
 「アプリの自由度が少ないように感じました。選択項目や留意事項などそれぞれの体験にあった
@@ -421,9 +408,7 @@ community leaders に相当するのはこの層で、それぞれが地域の�
 | フィードバックを収集・分析し、改善点を特定 | 達成 — 第2〜4節 |
 | テスターのイニシャル・居住地域・属性・結果の共有 | **部分的に達成** — 36名の氏名を保持。居住地域と属性は未取得 |
 
-いずれの未達も、より有利な分母に置き換えることなく実測のまま報告している。
-「どちらともいえない」を満足に数えれば 75.0% となり閾値を満たすが、その見せ方は
-採らなかった。
+いずれの未達も実測のまま報告している。
 
 ---
 
