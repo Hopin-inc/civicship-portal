@@ -9,8 +9,6 @@ Project Catalyst F12, Project ID 1200088. Code as of `517e9a4` (2026-09-04).
 
 ## Deliverable 2 — Reports on the demonstration experiment, user feedback and usage statistics
 
-The report: [PDF](https://drive.google.com/file/d/1adoOR0NUd4TNybY886zDs5EENyNpmBQJ/view) · [in this repository](./uat-report-2026.md). Same content.
-
 | Acceptance criterion | Evidence | Status |
 | --- | --- | --- |
 | Over 70% of community leaders satisfied with the application | [UAT report](./uat-report-2026.md) | 47.7% (21 of 44). Below the threshold; see note 1 |
@@ -56,8 +54,6 @@ The audit assessed the codebase as of September–December 2025.
 Project Catalyst F12、Project ID 1200088。`517e9a4`（2026-09-04）時点のコード。
 
 ## 成果物2 — 実証実験・利用者フィードバック・利用統計の報告
-
-報告書：[PDF](https://drive.google.com/file/d/1adoOR0NUd4TNybY886zDs5EENyNpmBQJ/view) · [本リポジトリ](./uat-report-2026.md)。内容は同一。
 
 | 受入条件 | エビデンス | 状況 |
 | --- | --- | --- |
