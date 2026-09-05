@@ -18,7 +18,7 @@ These documents are current as of `517e9a4` (2026-09-04).
 | Milestone | Deliverable | Acceptance criterion | Evidence | Status |
 | --- | --- | --- | --- | --- |
 | Milestone 5 | 1. Front-end development | Documentation covering UI/UX design principles, integration processes, and user instructions | [Front-end documentation](./frontend-documentation.md) | Met |
-| Milestone 5 | 3. Demo video | A demonstration of the delivered front end | [Demonstration videos](./demo/) — twenty use-case recordings in two sets: the eleven Milestone 3 demonstrated, and nine added since | Met |
+| Milestone 5 | 3. Demo video | A demonstration of the delivered front end | [Demonstration videos](./demo/) — twenty-one use-case recordings in two sets: the eleven Milestone 3 demonstrated, and ten it did not cover | Met |
 | Final | 3. User acceptance testing | Over 70% of community leaders satisfied | [UAT report](./uat-report-2026.md) §2.1 | 47.7% (21 of 44). Below the threshold; see note 3 |
 | Final | 3. User acceptance testing | Tester initials, region of residence, attribute and result | [UAT report](./uat-report-2026.md) §5 | Partial; see note 3 |
 | Final | 4. Bug fixes and security audit | Security audit results and an account of the bug fixes, published where the community can access them | [Security audit and remediation](../security/audit-2025-hexens.md) | Met |
@@ -135,7 +135,7 @@ Project Catalyst Fund 12「四国地域における Cardano の社会実装ユ�
 | マイルストーン | 成果物 | 受入条件 | エビデンス | 状況 |
 | --- | --- | --- | --- | --- |
 | Milestone 5 | 1. フロントエンド開発 | UI/UX 設計原則・バックエンド連携・利用者向け手順書を含むドキュメント | [フロントエンド ドキュメント](./frontend-documentation.md) | 充足 |
-| Milestone 5 | 3. デモ動画 | 完成したフロントエンドのデモンストレーション | [デモ動画](./demo/) — ユースケース別20本を2セットに分けて収録（Milestone 3 と同じ11件、以降に追加された9件） | 充足 |
+| Milestone 5 | 3. デモ動画 | 完成したフロントエンドのデモンストレーション | [デモ動画](./demo/) — ユースケース別21本を2セットに分けて収録（Milestone 3 と同じ11件、扱われていなかった10件） | 充足 |
 | Final | 3. ユーザー受入テスト | community leaders の70%超が満足していること | [UAT 報告書](./uat-report-2026.md) §2.1 | 47.7%（44件中21件）。基準を下回る。備考3を参照 |
 | Final | 3. ユーザー受入テスト | テスターのイニシャル・居住地域・属性・テスト結果 | [UAT 報告書](./uat-report-2026.md) §5 | 一部。備考3を参照 |
 | Final | 4. バグ修正とセキュリティ監査 | セキュリティ監査の結果とバグ修正の説明を、コミュニティがアクセスできる形で公開すること | [セキュリティ監査と対応状況](../security/audit-2025-hexens.md) | 充足 |
