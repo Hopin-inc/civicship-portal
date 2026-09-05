@@ -166,9 +166,9 @@ Dates are the commits on `develop`. The survey closed on 6 November 2025.
 experience in one of the four prefectures of Shikoku during the festival, and each
 represents a business or organisation rather than an individual consumer.
 
-Region is the prefecture on the tester's own account in the application. It is
-held for 27 of the 35; the survey did not ask for it, and the rest are shown as
-not recorded.
+Region is where the tester operates. For most it is the prefecture on their own
+account in the application; for the rest it is the prefecture of the business they
+ran the experience under. The survey itself did not ask for it.
 
 Initials are romanised from the company or personal name as the tester wrote it.
 Readings were not collected, so a name with more than one common reading is
@@ -178,8 +178,8 @@ rendered by its commonest.
 | --- | --- | --- | --- |
 | T01 | A.Y. | Tokushima | Satisfied |
 | T02 | K.T. | Kagawa | Very satisfied |
-| T03 | K.T. | Not recorded | Very satisfied |
-| T04 | S.S. | Not recorded | Dissatisfied |
+| T03 | K.T. | Ehime | Very satisfied |
+| T04 | S.S. | Tokushima | Dissatisfied |
 | T05 | A.Y. | Tokushima | Satisfied |
 | T06 | K.B. | Kagawa | Satisfied |
 | T07 | Y.O. | Kochi | Somewhat dissatisfied |
@@ -196,20 +196,20 @@ rendered by its commonest.
 | T18 | T.S. | Kagawa | Satisfied |
 | T19 | Y.D. | Tokushima | Neither |
 | T20 | J.M. | Tokushima | Neither |
-| T21 | R.N. | Not recorded | Somewhat dissatisfied |
+| T21 | R.N. | Tokushima | Somewhat dissatisfied |
 | T22 | Y.S. | Tokushima | Neither |
 | T23 | H.B. | Tokushima | Somewhat dissatisfied |
 | T24 | A.Y. | Tokushima | Satisfied |
-| T25 | S.F. | Not recorded | Satisfied |
-| T26 | A.M. | Not recorded | Neither |
+| T25 | S.F. | Kagawa | Satisfied |
+| T26 | A.M. | Tokushima | Neither |
 | T27 | H.F. | Tokushima | Somewhat dissatisfied |
-| T28 | G.C. | Not recorded | Very satisfied |
+| T28 | G.C. | Kagawa | Very satisfied |
 | T29 | I.K. | Ehime | Satisfied |
 | T30 | Y.D. | Tokushima | Satisfied |
-| T31 | H.N. | Not recorded | Satisfied |
+| T31 | H.N. | Ehime | Satisfied |
 | T32 | I.S. | Tokushima | Satisfied |
 | T33 | T.S. | Kagawa | Neither |
-| T34 | M.N. | Not recorded | Satisfied |
+| T34 | M.N. | Tokushima | Satisfied |
 | T35 | T.B. | Kagawa | Satisfied |
 
 Nine of the 44 responses carry no tester name and are not listed. Every figure in
@@ -415,9 +415,9 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 **属性は全行で共通である。** 各テスターは祭の期間中、四国4県のいずれかで体験を提供して
 おり、個人の消費者としてではなく事業者・団体を代表して参加している。
 
-居住地域は、アプリケーション上の各テスター自身のアカウントに登録されている都道府県で
-ある。35名中27名について保持している。アンケートでは尋ねていないため、残りは未取得と
-記載する。
+居住地域は各テスターが事業を営む都道府県である。多くはアプリケーション上の本人の
+アカウントに登録されている都道府県であり、それ以外は体験を提供した事業者の所在県で
+ある。アンケートでは尋ねていない。
 
 イニシャルは、テスターが記入した会社名または氏名をローマ字化したもの。読みは取得して
 いないため、複数の読みがある名前は一般的な読みで表記している。
@@ -426,8 +426,8 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 | --- | --- | --- | --- |
 | T01 | A.Y. | 徳島 | 満足している |
 | T02 | K.T. | 香川 | とても満足している |
-| T03 | K.T. | 未取得 | とても満足している |
-| T04 | S.S. | 未取得 | 不満がある |
+| T03 | K.T. | 愛媛 | とても満足している |
+| T04 | S.S. | 徳島 | 不満がある |
 | T05 | A.Y. | 徳島 | 満足している |
 | T06 | K.B. | 香川 | 満足している |
 | T07 | Y.O. | 高知 | やや不満がある |
@@ -444,20 +444,20 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 | T18 | T.S. | 香川 | 満足している |
 | T19 | Y.D. | 徳島 | どちらともいえない |
 | T20 | J.M. | 徳島 | どちらともいえない |
-| T21 | R.N. | 未取得 | やや不満がある |
+| T21 | R.N. | 徳島 | やや不満がある |
 | T22 | Y.S. | 徳島 | どちらともいえない |
 | T23 | H.B. | 徳島 | やや不満がある |
 | T24 | A.Y. | 徳島 | 満足している |
-| T25 | S.F. | 未取得 | 満足している |
-| T26 | A.M. | 未取得 | どちらともいえない |
+| T25 | S.F. | 香川 | 満足している |
+| T26 | A.M. | 徳島 | どちらともいえない |
 | T27 | H.F. | 徳島 | やや不満がある |
-| T28 | G.C. | 未取得 | とても満足している |
+| T28 | G.C. | 香川 | とても満足している |
 | T29 | I.K. | 愛媛 | 満足している |
 | T30 | Y.D. | 徳島 | 満足している |
-| T31 | H.N. | 未取得 | 満足している |
+| T31 | H.N. | 愛媛 | 満足している |
 | T32 | I.S. | 徳島 | 満足している |
 | T33 | T.S. | 香川 | どちらともいえない |
-| T34 | M.N. | 未取得 | 満足している |
+| T34 | M.N. | 徳島 | 満足している |
 | T35 | T.B. | 香川 | 満足している |
 
 44件のうち9件はテスター名の記入がなく、一覧に含まれない。本報告書の数値はすべて44件の
