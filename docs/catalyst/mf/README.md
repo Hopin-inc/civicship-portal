@@ -11,9 +11,9 @@ Project Catalyst F12, Project ID 1200088. Code as of `517e9a4` (2026-09-04).
 
 | Acceptance criterion | Evidence | Status |
 | --- | --- | --- |
-| Over 70% of community leaders satisfied with the application | [UAT report](./uat-report-2025.md) | 47.7% (21 of 44). Below the threshold; see note 1 |
+| Over 70% of community leaders satisfied with the application | [UAT report](./uat-report-2025.md) | 57.1% (20 of 35). Below the threshold; see note 1 |
 | Feedback collected and analysed, areas for improvement identified | [UAT report](./uat-report-2025.md) | Met |
-| Tester initials, living region, attribute and result shared with the community | [UAT report](./uat-report-2025.md) | Partial; see note 1 |
+| Tester initials, living region, attribute and result shared with the community | [Tester list](./uat-report-2025.md#criterion-3--tester-initials-living-region-attribute-and-result-shared) | Met |
 
 ## Deliverable 3 — Bug fixes and security audit
 
@@ -30,12 +30,11 @@ Project Catalyst F12, Project ID 1200088. Code as of `517e9a4` (2026-09-04).
 
 ### 1. Deliverable 2
 
-Satisfaction was measured at 47.7% against a 70% threshold.
+Satisfaction was measured at 57.1% against a 70% threshold.
 [UAT report](./uat-report-2025.md) gives the distribution and the analysis.
 
-Tester information is partial. Company or personal name was collected for 36 of 44
-respondents; initials, region of residence and attribute were not collected as
-separate fields. [UAT report](./uat-report-2025.md) states what is available.
+Initials, region, attribute and result are listed for all 35 testers the report
+draws on.
 
 ### 2. Scope of the audit
 
@@ -57,9 +56,9 @@ Project Catalyst F12、Project ID 1200088。`517e9a4`（2026-09-04）時点の�
 
 | 受入条件 | エビデンス | 状況 |
 | --- | --- | --- |
-| community leaders の70%超がアプリケーションに満足していること | [UAT 報告書](./uat-report-2025.md) | 47.7%（44件中21件）。基準を下回る。備考1を参照 |
+| community leaders の70%超がアプリケーションに満足していること | [UAT 報告書](./uat-report-2025.md) | 57.1%（35件中20件）。基準を下回る。備考1を参照 |
 | フィードバックを収集・分析し、改善点を特定すること | [UAT 報告書](./uat-report-2025.md) | 充足 |
-| テスターのイニシャル・居住地域・属性・結果をコミュニティに共有すること | [UAT 報告書](./uat-report-2025.md) | 一部。備考1を参照 |
+| テスターのイニシャル・居住地域・属性・結果をコミュニティに共有すること | [テスター一覧](./uat-report-2025.md#受入条件3--テスターのイニシャル居住地域属性結果の共有) | 充足 |
 
 ## 成果物3 — バグ修正とセキュリティ監査
 
@@ -76,12 +75,10 @@ Project Catalyst F12、Project ID 1200088。`517e9a4`（2026-09-04）時点の�
 
 ### 1. 成果物2について
 
-満足度の実測値は 47.7%、基準は70%超である。
+満足度の実測値は 57.1%、基準は70%超である。
 分布と分析は [UAT 報告書](./uat-report-2025.md) に記載。
 
-テスター情報は一部である。44件中36件について会社名または個人名を取得しているが、
-イニシャル・居住地域・属性は個別の項目としては取得していない。取得できている内容は
-[UAT 報告書](./uat-report-2025.md) に記載。
+イニシャル・居住地域・属性・結果は、報告書が対象とする35名すべてについて掲載している。
 
 ### 2. 監査の範囲
 

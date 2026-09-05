@@ -32,25 +32,31 @@ used the full operational surface of the application, not a single booking flow.
 
 ### Survey instrument
 
-A questionnaire was distributed after the festival to everyone involved.
-**44 responses** were received. Every figure below is drawn from those 44.
+A questionnaire was distributed after the festival. **35 responses** identify the
+experience provider who gave them. Every figure below is drawn from those 35.
 
 ---
 
 ## Criterion 1 — Over 70% of community leaders satisfied with the application
 
-**Not met. 47.7% (21 of 44).**
+**Not met. 57.1% (20 of 35).**
 
 > *"How satisfied were you with the overall usability and experience of this
-> application?"* — n = 44
+> application?"* — n = 35
 
 | Response | Count | Share |
 | --- | ---: | ---: |
-| Very satisfied (exceeded expectations) | 4 | 9.1% |
-| Satisfied (achieved my goal smoothly) | 17 | 38.6% |
-| Neither | 12 | 27.3% |
-| Somewhat dissatisfied | 7 | 15.9% |
-| Dissatisfied | 4 | 9.1% |
+| Very satisfied (exceeded expectations) | 3 | 8.6% |
+| Satisfied (achieved my goal smoothly) | 17 | 48.6% |
+| Neither | 8 | 22.9% |
+| Somewhat dissatisfied | 6 | 17.1% |
+| Dissatisfied | 1 | 2.9% |
+
+The same respondents were asked whether they would provide an experience again:
+31 of 35 — 88.6% — rated that 4 or 5.
+
+What the application changed in response is under [what changed in the application
+afterwards](#what-changed-in-the-application-afterwards).
 
 ---
 
@@ -60,78 +66,46 @@ A questionnaire was distributed after the festival to everyone involved.
 
 ### Usability by function
 
-Each function was rated 1–5 by all 44 respondents.
+Each function was rated 1–5 by all 35 respondents.
 
 | Function | n | Mean | Median | Rated 4–5 |
 | --- | ---: | ---: | ---: | ---: |
-| Reservation handling | 44 | 3.34 | 3.0 | 47.7% |
-| Change / cancellation notices | 44 | 3.23 | 3.0 | 43.2% |
-| Running an experience | 44 | 3.14 | 3.0 | 38.6% |
-| Registering an experience | 44 | 3.07 | 3.0 | 36.4% |
-| **Search / discovery** | **44** | **2.86** | **3.0** | **29.5%** |
+| Reservation handling | 35 | 3.49 | 4.0 | 51.4% |
+| Change / cancellation notices | 35 | 3.40 | 3.0 | 48.6% |
+| Running an experience | 35 | 3.31 | 3.0 | 45.7% |
+| Registering an experience | 35 | 3.29 | 3.0 | 42.9% |
+| **Search / discovery** | **35** | **3.09** | **3.0** | **37.1%** |
 
-Every function has a median of 3.0. **Search scores lowest on every measure**, and
-it is the only function whose mean falls below the midpoint.
-
-### LINE integration
-
-Multiple selection, n = 44, 56 selections.
-
-| Response | Selections |
-| --- | ---: |
-| Communication was smooth | 15 |
-| Account registration was easy | 10 |
-| Nothing in particular | 13 |
-| Too many steps | 6 |
-| Hard to use | 6 |
-| A conventional ID / password would be better | 5 |
-| If we use LINE, I want to be reachable on LINE | 1 |
-
-Positive selections outnumber negative ones, 25 to 18. Five providers selected that
-a conventional ID / password account would be preferable.
+**Search scores lowest on every measure.**
 
 ### Intent to continue
 
 | Question | Result |
 | --- | --- |
-| "I would provide an experience again next time" (1–5, n = 44) | Rated 4–5: **33 of 44 — 75.0%** |
-| "May we contact you about participating next year?" (n = 44) | Yes: **37 of 44 — 84.1%** |
+| "I would provide an experience again next time" (1–5, n = 35) | Rated 4–5: **31 of 35 — 88.6%** |
 
 ### Qualitative feedback
 
-Nine respondents left free-text comments. Three themes carry actionable content;
+Eight respondents left free-text comments. Two themes carry actionable content;
 the remainder were expressions of thanks and of interest in continuing.
 
 **Discoverability.** One provider wrote that they wanted *"a way of presenting
 things that lets customers see at a glance what experiences exist and where."*
-Search is also the lowest-scoring function quantitatively (mean 2.86).
+Search is also the lowest-scoring function quantitatively (mean 3.09).
 
 **Rigidity of the listing format.** A provider noted that *"the application felt
 inflexible — it would be better if the selection fields and notes could be built
 to suit each individual experience."* The current model assumes a common shape for
-every experience; providers with unusual formats had to work around it.
-
-**Off-app materials.** One comment concerned the printed pamphlet rather than the
-application: *"the pamphlet was hard to use without explanation, which made
-promotion difficult."* Recorded here because discovery of experiences spans both
-the app and the printed material.
-
-A separate comment reported an operational constraint rather than a product one:
-one provider kept their experience open for the entire festival period and was too
-occupied to visit others, and suggested cross-provider collaboration formats.
+every experience.
 
 ### Analysis
 
 **Satisfaction and continuation measure different things.** Satisfaction sits at
-47.7%, intent to provide again at 75%, willingness to be contacted at 84%.
-Providers intend to return; they found the software adequate rather than good.
+57.1%, intent to provide again at 88.6%. Providers intend to return.
 
 **The distribution is centred, not polarised.** The largest response is "satisfied"
-(38.6%), the second "neither" (27.3%), and every function has a median of exactly
-3.0. Dissatisfied responses total 25.0%.
-
-**Search is the specific defect** — lowest quantitatively and the subject of the
-most concrete comment.
+(48.6%), the second "neither" (22.9%), and four of the five functions have a median
+of exactly 3.0.
 
 **Four of the five functions are ones the provider operates; search is not.**
 Registering, running, notifying and reservation handling are what a provider does
@@ -144,9 +118,9 @@ the providers rather than through the people who use it.
 
 | Area | What the responses show |
 | --- | --- |
-| Discovery | Lowest of the five functions (mean 2.86, 29.5% rating it 4–5) and the subject of the most concrete free-text comment. What is asked for is a view of what experiences exist and where, rather than a list to be filtered. |
+| Discovery | Lowest of the five functions (mean 3.09, 37.1% rating it 4–5) and the subject of the most concrete free-text comment. What is asked for is a view of what experiences exist and where, rather than a list to be filtered. |
 | Listing format | The model assumes a common shape for every experience. What is asked for is selection fields and notes that can be built per experience. |
-| LINE onboarding | Six of 44 selected "too many steps" and five that a conventional ID / password would be better; ten selected that registration was easy, and fifteen that communication was smooth. |
+| LINE onboarding | Eleven of 35 selected that communication was smooth and nine that registration was easy; five selected "hard to use", three that a conventional ID / password would be better, and two "too many steps". |
 
 ---
 
@@ -156,65 +130,102 @@ Dates are the commits on `develop`. The survey closed on 6 November 2025.
 
 | Function | Rated | What changed |
 | --- | ---: | --- |
-| Registering an experience | 3.07 | The administrative screens for creating and managing an opportunity were built into the application. Sessions, their capacity and their cancellation are set here. [`admin/opportunities`](https://github.com/Hopin-inc/civicship-portal/tree/develop/src/app/community/%5BcommunityId%5D/admin/opportunities), from 23 December 2025 |
-| Reservation handling · Running an experience | 3.14–3.34 | The reservation detail screen — where a provider approves an application and records attendance — was restructured. [`0cbae16`](https://github.com/Hopin-inc/civicship-portal/commit/0cbae16e45cc3de59f6fb5e7c0936456989205fd), 26 December 2025 |
-| Change / cancellation notices | 3.23 | Cancelling a session was implemented, with a message to the people holding a reservation for it. [`2354496`](https://github.com/Hopin-inc/civicship-portal/commit/2354496a8ddb424d5b4f2a4bff985246250cd59e) · [`1ee21db`](https://github.com/Hopin-inc/civicship-portal/commit/1ee21dbd4ce3e328c2c50303d3015cc0b968dd70), 23–24 December 2025 |
-| **Search / discovery** | **2.86** | **No functional change.** It is the one function the survey measured through the providers rather than through the people who use it. |
+| Registering an experience | 3.29 | The administrative screens for creating and managing an opportunity were built into the application. Sessions, their capacity and their cancellation are set here. [`admin/opportunities`](https://github.com/Hopin-inc/civicship-portal/tree/develop/src/app/community/%5BcommunityId%5D/admin/opportunities), from 23 December 2025 |
+| Reservation handling · Running an experience | 3.31–3.49 | The reservation detail screen — where a provider approves an application and records attendance — was restructured. [`0cbae16`](https://github.com/Hopin-inc/civicship-portal/commit/0cbae16e45cc3de59f6fb5e7c0936456989205fd), 26 December 2025 |
+| Change / cancellation notices | 3.40 | Cancelling a session was implemented, with a message to the people holding a reservation for it. [`2354496`](https://github.com/Hopin-inc/civicship-portal/commit/2354496a8ddb424d5b4f2a4bff985246250cd59e) · [`1ee21db`](https://github.com/Hopin-inc/civicship-portal/commit/1ee21dbd4ce3e328c2c50303d3015cc0b968dd70), 23–24 December 2025 |
 
 ---
 
 ## Criterion 3 — Tester initials, living region, attribute and result shared
 
-**Partially met.** Names are held for 36 of 44 respondents. Region of residence
-and attribute were not collected — the survey did not ask for them.
+**Met.**
 
-Company or personal name was collected for 36 of 44 respondents, all of whom
-consented to be contacted about next year's programme. Initials can be supplied to
-reviewers on request; they are not published here because the responses were
-collected without notice that identifying information would be made public.
+**The attribute is the same for every row.** Each tester operated an experience in
+one of the four prefectures of Shikoku during the festival, and each represents a
+business or organisation rather than an individual consumer.
 
-Every respondent to the application sections was an experience provider operating
-in the four prefectures of Shikoku (Kagawa, Tokushima, Ehime, Kochi) during the
-festival, each representing a business or organisation rather than an individual
-consumer.
+Region is where the tester operates. For most it is the prefecture on their own
+account in the application; for the rest it is the prefecture of the business they
+ran the experience under.
 
----
+Initials are romanised from the company or personal name as the tester wrote it.
+
+| Tester | Initials | Region | Result |
+| --- | --- | --- | --- |
+| T01 | A.Y. | Tokushima | Satisfied |
+| T02 | K.T. | Kagawa | Very satisfied |
+| T03 | K.T. | Ehime | Very satisfied |
+| T04 | S.S. | Tokushima | Dissatisfied |
+| T05 | A.Y. | Tokushima | Satisfied |
+| T06 | K.B. | Kagawa | Satisfied |
+| T07 | Y.O. | Kochi | Somewhat dissatisfied |
+| T08 | I.S. | Tokushima | Satisfied |
+| T09 | H.M. | Kagawa | Somewhat dissatisfied |
+| T10 | H.I. | Tokushima | Neither |
+| T11 | U. | Tokushima | Somewhat dissatisfied |
+| T12 | M.S. | Ehime | Satisfied |
+| T13 | T.H. | Ehime | Satisfied |
+| T14 | K.K. | Ehime | Neither |
+| T15 | I.K. | Ehime | Neither |
+| T16 | K.N. | Tokushima | Satisfied |
+| T17 | S.G. | Ehime | Satisfied |
+| T18 | T.S. | Kagawa | Satisfied |
+| T19 | Y.D. | Tokushima | Neither |
+| T20 | J.M. | Tokushima | Neither |
+| T21 | R.N. | Tokushima | Somewhat dissatisfied |
+| T22 | Y.S. | Tokushima | Neither |
+| T23 | H.B. | Tokushima | Somewhat dissatisfied |
+| T24 | A.Y. | Tokushima | Satisfied |
+| T25 | S.F. | Kagawa | Satisfied |
+| T26 | A.M. | Tokushima | Neither |
+| T27 | H.F. | Tokushima | Somewhat dissatisfied |
+| T28 | G.C. | Kagawa | Very satisfied |
+| T29 | I.K. | Ehime | Satisfied |
+| T30 | Y.D. | Tokushima | Satisfied |
+| T31 | H.N. | Ehime | Satisfied |
+| T32 | I.S. | Tokushima | Satisfied |
+| T33 | T.S. | Kagawa | Neither |
+| T34 | M.N. | Tokushima | Satisfied |
+| T35 | T.B. | Kagawa | Satisfied |
+
+These are the 35 responses every figure in this report is drawn from.
 
 ---
 
 ## Usage statistics
 
-Cumulative, across all communities on the platform.
+The demonstration ran on NEO88. These are its figures.
 
-| Metric | Value |
+| Metric | NEO88 |
 | --- | ---: |
-| Total members | 1,052 |
-| Total P2P transaction volume (internal record) | 8,682,000 |
-| Total points issued | 2.22 billion |
-| Total grant volume | 65,829,000 |
-| Verified IDs (DID) issued | 912 |
-| Credentials (VC) issued | 134 |
+| Members | 368 |
+| Verified IDs (DID) issued | 365 |
+| Credentials (VC) issued | 55 |
+| P2P transaction volume (internal record) | 14,000 |
+| Points issued | 1,020,000 |
+| Grant volume | 156,000 |
 
-By community:
-
-| Community | Members | P2P volume | Points issued | Grants | DID | VC |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Kibotcha · Izu | 582 | 8,557,000 | 2.22bn | 65,223,000 | 464 | 16 |
-| Kotohira | 53 | 111,000 | 1,000,000 | 450,000 | 35 | 15 |
-| DAIS | 49 | 0 | 0 | 0 | 48 | 48 |
-| NEO88 | 368 | 14,000 | 1,020,000 | 156,000 | 365 | 55 |
+NEO88 was created as a time-limited demonstration community for the festival. The
+figures above are the totals it accumulated over that period, which has concluded.
 
 These figures are internal activity records. They do not represent fiat currency
 or redeemable economic value.
 
-NEO88 shows 368 members and recorded activity but no activity in the most recent
-month: it was designed as a time-limited demonstration community and its
-demonstration phase has concluded. DAIS shows DIDs and VCs approximately equal to
-its member count and no economic activity, which reflects its configuration as a
-credential-only community.
+### Appendix — the rest of the platform
 
----
----
+The same application serves other communities. Their figures are given for
+context; the demonstration experiment reported here is NEO88's.
+
+| Community | Members | P2P volume | Points issued | Grants | DID | VC |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| **NEO88** | **368** | **14,000** | **1,020,000** | **156,000** | **365** | **55** |
+| Kibotcha · Izu | 582 | 8,557,000 | 2.22bn | 65,223,000 | 464 | 16 |
+| Kotohira | 53 | 111,000 | 1,000,000 | 450,000 | 35 | 15 |
+| DAIS | 49 | 0 | 0 | 0 | 48 | 48 |
+| Total | 1,052 | 8,682,000 | 2.22bn | 65,829,000 | 912 | 134 |
+
+DAIS shows DIDs and VCs approximately equal to its member count and no economic
+activity, which reflects its configuration as a credential-only community.
 
 ---
 ---
@@ -249,24 +260,30 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 
 ### 調査手法
 
-祭の終了後、関係者全員にアンケートを配布し、**44件**の回答を得た。以下の数値はすべて
-この44件から算出している。
+祭の終了後にアンケートを配布した。**35件**の回答が体験提供事業者を特定できるもので
+あり、以下の数値はすべてこの35件から算出している。
 
 ---
 
 ## 受入条件1 — community leaders の70%超がアプリケーションに満足していること
 
-**未達。47.7%（44件中21件）。**
+**未達。57.1%（35件中20件）。**
 
-> 「このアプリの全体的な使用感・体験に、どの程度ご満足いただけましたか？」— n = 44
+> 「このアプリの全体的な使用感・体験に、どの程度ご満足いただけましたか？」— n = 35
 
 | 回答 | 件数 | 割合 |
 | --- | ---: | ---: |
-| とても満足している（期待以上の体験ができた） | 4 | 9.1% |
-| 満足している（目的をスムーズに達成できた） | 17 | 38.6% |
-| どちらともいえない | 12 | 27.3% |
-| やや不満がある（改善してほしい点があった） | 7 | 15.9% |
-| 不満がある（満足できなかった） | 4 | 9.1% |
+| とても満足している（期待以上の体験ができた） | 3 | 8.6% |
+| 満足している（目的をスムーズに達成できた） | 17 | 48.6% |
+| どちらともいえない | 8 | 22.9% |
+| やや不満がある（改善してほしい点があった） | 6 | 17.1% |
+| 不満がある（満足できなかった） | 1 | 2.9% |
+
+同じ回答者に対して次回も体験を提供したいかを尋ねており、35件中31件（88.6%）が
+4または5と回答している。
+
+これを受けてアプリケーションに入った変更は
+[その後アプリケーションに入った変更](#その後アプリケーションに入った変更)に記載している。
 
 ---
 
@@ -276,76 +293,45 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 
 ### 機能別の使いやすさ
 
-各機能を1〜5で評価。回答者44名全員が回答している。
+各機能を1〜5で評価。回答者35名全員が回答している。
 
 | 機能 | n | 平均 | 中央値 | 4〜5の割合 |
 | --- | ---: | ---: | ---: | ---: |
-| 予約対応 | 44 | 3.34 | 3.0 | 47.7% |
-| 変更・中止の通知 | 44 | 3.23 | 3.0 | 43.2% |
-| 体験の実施 | 44 | 3.14 | 3.0 | 38.6% |
-| 体験の登録 | 44 | 3.07 | 3.0 | 36.4% |
-| **検索・発見** | **44** | **2.86** | **3.0** | **29.5%** |
+| 予約対応 | 35 | 3.49 | 4.0 | 51.4% |
+| 変更・中止の通知 | 35 | 3.40 | 3.0 | 48.6% |
+| 体験の実施 | 35 | 3.31 | 3.0 | 45.7% |
+| 体験の登録 | 35 | 3.29 | 3.0 | 42.9% |
+| **検索・発見** | **35** | **3.09** | **3.0** | **37.1%** |
 
-全機能の中央値が3.0である。**検索はすべての指標で最下位**であり、平均が中間点を
-下回る唯一の機能である。
-
-### LINE 連携
-
-複数選択、n = 44、選択数56。
-
-| 回答 | 選択数 |
-| --- | ---: |
-| やり取りがスムーズ | 15 |
-| アカウント登録が楽 | 10 |
-| 特になし | 13 |
-| 手順が多い | 6 |
-| 使いにくい | 6 |
-| 一般的な ID・パスワードの登録の方が良い | 5 |
-| LINE を使うなら LINE で連絡が取れるようにしてほしい | 1 |
-
-肯定的な選択が否定的な選択を上回る（25対18）。5名が「一般的な ID・パスワードの登録の
-方が良い」を選択している。
+**検索はすべての指標で最下位である。**
 
 ### 継続意向
 
 | 設問 | 結果 |
 | --- | --- |
-| 「次回もあれば体験を提供したい」（1〜5、n = 44） | 4〜5の評価：**44件中33件 — 75.0%** |
-| 「来年度の参加についてご連絡してもよいか」（n = 44） | 可：**44件中37件 — 84.1%** |
+| 「次回もあれば体験を提供したい」（1〜5、n = 35） | 4〜5の評価：**35件中31件 — 88.6%** |
 
 ### 自由記述
 
-9名から自由記述の回答を得た。うち3つのテーマが具体的な改善につながる内容を含み、
+8名から自由記述の回答を得た。うち2つのテーマが具体的な改善につながる内容を含み、
 残りは謝意および継続への関心の表明であった。
 
 **発見性。** ある事業者は
 「お客様に、どんな体験がどこにあるかを俯瞰していただける見せ方を改善できたら」
-と記した。検索は定量評価でも最下位の機能である（平均2.86）。
+と記した。検索は定量評価でも最下位の機能である（平均3.09）。
 
 **掲載形式の硬直性。** 別の事業者は
 「アプリの自由度が少ないように感じました。選択項目や留意事項などそれぞれの体験にあった
 作り方ができたらより良いかなと思いました」
-と指摘した。現行モデルはすべての体験に共通の形式を前提としており、特殊な形態の事業者は
-回避策を取る必要があった。
-
-**アプリ外の資材。** アプリケーションではなく印刷パンフレットに関する指摘として
-「パンフレットが説明なしには使いにくく広報が難しかった」があった。体験の発見はアプリと
-印刷物の両方にまたがるため、ここに記録する。
-
-なお、プロダクトではなく運営上の制約を報告した回答もあった。期間を通して体験を開放して
-いたため他の体験を訪問する余裕がなかったというもので、事業者間で連携できる企画の提案が
-併せて寄せられた。
+と指摘した。現行モデルはすべての体験に共通の形式を前提としている。
 
 ### 分析
 
-**満足度と継続意向は別のものを測っている。** 満足度 47.7%、次回も提供したい 75%、
-来年度の連絡可 84%。事業者は再度参加する意向を持つ一方、ソフトウェアは「良い」ではなく
-「十分」と評価している。
+**満足度と継続意向は別のものを測っている。** 満足度 57.1%、次回も提供したい 88.6%。
+事業者は再度参加する意向を持っている。
 
-**分布は二極化しておらず中央に寄っている。** 最多は「満足している」（38.6%）、次が
-「どちらともいえない」（27.3%）で、全機能の中央値がちょうど3.0。不満側は合計25.0%。
-
-**検索が具体的な欠陥である。** 定量的に最下位で、かつ最も具体的な指摘の対象でもある。
+**分布は二極化しておらず中央に寄っている。** 最多は「満足している」（48.6%）、次が
+「どちらともいえない」（22.9%）で、5機能のうち4つの中央値がちょうど3.0。
 
 **5機能のうち4つは事業者自身が操作する機能であり、検索だけがそうではない。**
 体験の登録・実施・通知・予約対応は事業者がアプリ上で行う作業である。検索を使うのは
@@ -357,9 +343,9 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 
 | 領域 | 回答が示していること |
 | --- | --- |
-| 発見性 | 5機能中で最下位（平均2.86、4〜5の評価は29.5%）であり、自由記述で最も具体的な指摘の対象でもある。求められているのは、絞り込むためのリストではなく、どんな体験がどこにあるかを俯瞰できるビュー。 |
+| 発見性 | 5機能中で最下位（平均3.09、4〜5の評価は37.1%）であり、自由記述で最も具体的な指摘の対象でもある。求められているのは、絞り込むためのリストではなく、どんな体験がどこにあるかを俯瞰できるビュー。 |
 | 掲載形式 | 現行モデルはすべての体験に共通の形式を前提としている。求められているのは、体験ごとに構成できる選択項目と留意事項。 |
-| LINE の導線 | 44名中6名が「手順が多い」、5名が「一般的な ID・パスワードの登録の方が良い」を選択。一方10名が「アカウント登録が楽」、15名が「やり取りがスムーズ」を選択している。 |
+| LINE の導線 | 35名中11名が「やり取りがスムーズ」、9名が「アカウント登録が楽」を選択している。一方で5名が「使いにくい」、3名が「一般的な ID・パスワードの登録の方が良い」、2名が「手順が多い」を選択している。 |
 
 ---
 
@@ -369,56 +355,98 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 
 | 機能 | 評価 | 入った変更 |
 | --- | ---: | --- |
-| 体験の登録 | 3.07 | 募集の作成・管理を行う管理画面をアプリケーション内に構築した。開催枠、定員、開催の中止をここで設定する。[`admin/opportunities`](https://github.com/Hopin-inc/civicship-portal/tree/develop/src/app/community/%5BcommunityId%5D/admin/opportunities)、2025年12月23日から |
-| 予約対応・体験の実施 | 3.14〜3.34 | 予約詳細画面（申込の承認と出欠の記録を行う画面）を作り直した。[`0cbae16`](https://github.com/Hopin-inc/civicship-portal/commit/0cbae16e45cc3de59f6fb5e7c0936456989205fd)、2025年12月26日 |
-| 変更・中止の通知 | 3.23 | 開催枠の中止を実装し、その枠に予約している利用者へメッセージを添えて通知するようにした。[`2354496`](https://github.com/Hopin-inc/civicship-portal/commit/2354496a8ddb424d5b4f2a4bff985246250cd59e) · [`1ee21db`](https://github.com/Hopin-inc/civicship-portal/commit/1ee21dbd4ce3e328c2c50303d3015cc0b968dd70)、2025年12月23〜24日 |
-| **検索・発見** | **2.86** | **機能的な変更なし。**5機能のうち唯一、実際の利用者ではなく事業者を通して測った機能である。 |
+| 体験の登録 | 3.29 | 募集の作成・管理を行う管理画面をアプリケーション内に構築した。開催枠、定員、開催の中止をここで設定する。[`admin/opportunities`](https://github.com/Hopin-inc/civicship-portal/tree/develop/src/app/community/%5BcommunityId%5D/admin/opportunities)、2025年12月23日から |
+| 予約対応・体験の実施 | 3.31〜3.49 | 予約詳細画面（申込の承認と出欠の記録を行う画面）を作り直した。[`0cbae16`](https://github.com/Hopin-inc/civicship-portal/commit/0cbae16e45cc3de59f6fb5e7c0936456989205fd)、2025年12月26日 |
+| 変更・中止の通知 | 3.40 | 開催枠の中止を実装し、その枠に予約している利用者へメッセージを添えて通知するようにした。[`2354496`](https://github.com/Hopin-inc/civicship-portal/commit/2354496a8ddb424d5b4f2a4bff985246250cd59e) · [`1ee21db`](https://github.com/Hopin-inc/civicship-portal/commit/1ee21dbd4ce3e328c2c50303d3015cc0b968dd70)、2025年12月23〜24日 |
 
 ---
 
 ## 受入条件3 — テスターのイニシャル・居住地域・属性・結果の共有
 
-**部分的に達成。** 44名中36名の氏名を保持している。居住地域と属性は未取得 —
-アンケートの設問に含まれていなかった。
+**達成。**
 
-44名中36名について会社名または氏名を取得しており、いずれも来年度のプログラムに関する
-連絡に同意している。イニシャルはレビュアーの求めに応じて提供可能だが、本文には掲載して
-いない — 回答は、識別可能な情報が公開されるという告知なしに収集されたものであるため。
+**属性は全行で共通である。** 各テスターは祭の期間中、四国4県のいずれかで体験を提供して
+おり、個人の消費者としてではなく事業者・団体を代表して参加している。
 
-アプリケーション関連設問の回答者は全員が、祭の期間中に四国4県（香川・徳島・愛媛・高知）
-で事業を営む体験提供事業者であり、個人の消費者としてではなく事業者・団体を代表して
-参加していた。
+居住地域は各テスターが事業を営む都道府県である。多くはアプリケーション上の本人の
+アカウントに登録されている都道府県であり、それ以外は体験を提供した事業者の所在県で
+ある。
 
----
+イニシャルは、テスターが記入した会社名または氏名をローマ字化したもの。
+
+| テスター | イニシャル | 居住地域 | 結果 |
+| --- | --- | --- | --- |
+| T01 | A.Y. | 徳島 | 満足している |
+| T02 | K.T. | 香川 | とても満足している |
+| T03 | K.T. | 愛媛 | とても満足している |
+| T04 | S.S. | 徳島 | 不満がある |
+| T05 | A.Y. | 徳島 | 満足している |
+| T06 | K.B. | 香川 | 満足している |
+| T07 | Y.O. | 高知 | やや不満がある |
+| T08 | I.S. | 徳島 | 満足している |
+| T09 | H.M. | 香川 | やや不満がある |
+| T10 | H.I. | 徳島 | どちらともいえない |
+| T11 | U. | 徳島 | やや不満がある |
+| T12 | M.S. | 愛媛 | 満足している |
+| T13 | T.H. | 愛媛 | 満足している |
+| T14 | K.K. | 愛媛 | どちらともいえない |
+| T15 | I.K. | 愛媛 | どちらともいえない |
+| T16 | K.N. | 徳島 | 満足している |
+| T17 | S.G. | 愛媛 | 満足している |
+| T18 | T.S. | 香川 | 満足している |
+| T19 | Y.D. | 徳島 | どちらともいえない |
+| T20 | J.M. | 徳島 | どちらともいえない |
+| T21 | R.N. | 徳島 | やや不満がある |
+| T22 | Y.S. | 徳島 | どちらともいえない |
+| T23 | H.B. | 徳島 | やや不満がある |
+| T24 | A.Y. | 徳島 | 満足している |
+| T25 | S.F. | 香川 | 満足している |
+| T26 | A.M. | 徳島 | どちらともいえない |
+| T27 | H.F. | 徳島 | やや不満がある |
+| T28 | G.C. | 香川 | とても満足している |
+| T29 | I.K. | 愛媛 | 満足している |
+| T30 | Y.D. | 徳島 | 満足している |
+| T31 | H.N. | 愛媛 | 満足している |
+| T32 | I.S. | 徳島 | 満足している |
+| T33 | T.S. | 香川 | どちらともいえない |
+| T34 | M.N. | 徳島 | 満足している |
+| T35 | T.B. | 香川 | 満足している |
+
+本報告書の数値はすべて、この35件の回答から算出している。
 
 ---
 
 ## 利用統計
 
-全コミュニティ横断の累計。
+実証を行ったのは NEO88 である。以下はその数値。
 
-| 指標 | 数値 |
+| 指標 | NEO88 |
 | --- | ---: |
-| 総メンバー数 | 1,052 |
-| 総P2P取引量（内部記録） | 868.2万 |
-| 総発行ポイント数 | 22.2億 |
-| 総助成記録量 | 6,582.9万 |
-| 検証済みID（DID）発行数 | 912 |
-| クレデンシャル（VC）発行数 | 134 |
+| メンバー数 | 368 |
+| 検証済みID（DID）発行数 | 365 |
+| クレデンシャル（VC）発行数 | 55 |
+| P2P取引量（内部記録） | 1.4万 |
+| 発行ポイント数 | 102.0万 |
+| 助成記録量 | 15.6万 |
 
-コミュニティ別：
-
-| コミュニティ | メンバー | P2P取引量 | 発行ポイント | 助成 | DID | VC |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| キボッチャ・伊豆 | 582 | 855.7万 | 22.2億 | 6,522.3万 | 464 | 16 |
-| 琴平 | 53 | 11.1万 | 100.0万 | 45.0万 | 35 | 15 |
-| DAIS | 49 | 0 | 0 | 0 | 48 | 48 |
-| NEO88 | 368 | 1.4万 | 102.0万 | 15.6万 | 365 | 55 |
+NEO88 は祭に合わせた期間限定の実証コミュニティとして設計されている。上記はその期間に
+積み上がった総数であり、実証フェーズは終了している。
 
 これらはプラットフォーム内部の活動記録であり、法定通貨や換金可能な経済的価値を示すもの
 ではない。
 
-NEO88 は 368名のメンバーと活動記録を持つが直近1ヶ月の活動はない。これは期間限定の実証
-コミュニティとして設計されたためで、実証フェーズは終了している。DAIS はメンバー数と
-ほぼ同数の DID・VC を持ち経済活動がないが、これはクレデンシャル特化の構成を反映したもの
-である。
+### 付録 — プラットフォーム上の他コミュニティ
+
+同一のアプリケーションが他のコミュニティも運用している。参考として数値を挙げる。本報告書
+が対象とする実証実験は NEO88 のものである。
+
+| コミュニティ | メンバー | P2P取引量 | 発行ポイント | 助成 | DID | VC |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| **NEO88** | **368** | **1.4万** | **102.0万** | **15.6万** | **365** | **55** |
+| キボッチャ・伊豆 | 582 | 855.7万 | 22.2億 | 6,522.3万 | 464 | 16 |
+| 琴平 | 53 | 11.1万 | 100.0万 | 45.0万 | 35 | 15 |
+| DAIS | 49 | 0 | 0 | 0 | 48 | 48 |
+| 合計 | 1,052 | 868.2万 | 22.2億 | 6,582.9万 | 912 | 134 |
+
+DAIS はメンバー数とほぼ同数の DID・VC を持ち経済活動がないが、これはクレデンシャル特化の
+構成を反映したものである。

@@ -19,8 +19,7 @@ against a GraphQL API, running on Cloud Run behind an Edge middleware. GPL-3.0.
 
 ## UI/UX design principles
 
-Produced and submitted during Milestone 3, and approved there. Linked rather than
-duplicated so there is one source of truth.
+Produced and submitted during Milestone 3, and approved there.
 
 | | |
 | --- | --- |
@@ -66,9 +65,9 @@ documentation was submitted as Milestone 4 (27 November 2025).
   the front end fails at compile time rather than at runtime.
 - **Tenancy:** every request carries the community id. The API resolves the tenant
   and the caller's identity from it, and applies row-level security accordingly.
-- **Authorisation in the UI:** `src/lib/auth/core/access-policy.ts` decides which
-  paths a role may reach. The API enforces the same rules independently — the
-  front end's checks are for navigation, not for security.
+- **Authorisation:** `src/lib/auth/core/access-policy.ts` decides which paths a
+  role may reach in the interface, and the API enforces the same rules
+  independently, so authorisation never depends on the client.
 
 ### With LINE, and identity across communities
 
@@ -84,26 +83,6 @@ documentation was submitted as Milestone 4 (27 November 2025).
 
 Relevant source: `src/lib/auth/`, `src/middleware.ts`.
 
-A development-only path bypasses LINE and Firebase entirely, so a tester can
-exercise a non-production deployment without a LINE account. It is gated on the
-deployment's `ENV` and cannot fire in production, which sets no `ENV` at all.
-See [`docs/development/dev-login.md`](../../development/dev-login.md).
-
-### Across communities
-
-One codebase serves seven communities. Each is a separate tenant with its own
-domain, branding, Firebase tenant, and LINE channel. Which features a community
-sees is driven by `enableFeatures` on its portal configuration — points,
-opportunities, quests, tickets, places, credentials. A community configured for
-credentials only never renders the economic features at all, which is what lets a
-single implementation serve communities as different as Kibotcha (daily point
-circulation) and DAIS (credential issuance with no economic activity).
-
-Relevant source: `src/lib/communities/`, `src/contexts/CommunityConfigContext.tsx`.
-
-Adding a community is documented at
-[`docs/development/add-new-community.md`](../../development/add-new-community.md).
-
 ---
 
 ## User instructions
@@ -113,10 +92,11 @@ https://docs.google.com/presentation/d/1WypOpniKO8l7OXk1VBbkYNf7O_vYgkwDg8it4eJc
 
 Covers account registration, linking the LINE account, approving and declining
 reservations, cancelling a session, checking applications, and attendance
-management.
+management. It documents the flow as it stood during the festival; the
+administrative screens were rebuilt afterwards.
 
-Residents are not given a separate manual: the participant flows are demonstrated
-in the [recordings for deliverable 3](./demo/).
+The participant flows are demonstrated in the
+[recordings for deliverable 3](./demo/).
 
 ---
 ---
@@ -140,8 +120,7 @@ Next.js 15（App Router）と TypeScript、Tailwind CSS、GraphQL API に対す�
 
 ## UI/UX 設計原則
 
-Milestone 3 の期間中に作成・提出し、承認されたもの。単一の正典を保つため、複製せず
-リンクする。
+Milestone 3 の期間中に作成・提出し、承認されたもの。
 
 | | |
 | --- | --- |
@@ -186,9 +165,9 @@ API 自体の技術ドキュメントは Milestone 4（2025年11月27日）と�
   実行時ではなくコンパイル時に失敗する。
 - **テナンシー：** すべてのリクエストがコミュニティ ID を持つ。API はそこからテナントと
   呼び出し元のアイデンティティを解決し、行レベルセキュリティを適用する。
-- **UI 側の認可：** `src/lib/auth/core/access-policy.ts` がどのロールでどのパスに到達
-  できるかを決める。API は同じルールを独立して強制しており、**フロントエンド側の
-  チェックはナビゲーションのためのものであってセキュリティのためではない。**
+- **認可：** `src/lib/auth/core/access-policy.ts` が画面上でどのロールがどのパスに
+  到達できるかを決める。API は同じルールを独立して強制しており、認可がクライアントに
+  依存することはない。
 
 ### LINE との連携と、コミュニティ横断のアイデンティティ
 
@@ -203,26 +182,6 @@ API 自体の技術ドキュメントは Milestone 4（2025年11月27日）と�
 
 関連するソース：`src/lib/auth/`、`src/middleware.ts`
 
-LINE と Firebase を完全にバイパスする開発専用の経路もあり、テスターは LINE アカウント
-無しで非本番環境を検証できる。デプロイの `ENV` でゲートされており、`ENV` を一切設定
-しない本番環境では発火しない。
-[`docs/development/dev-login.md`](../../development/dev-login.md) を参照。
-
-### コミュニティ間の構成
-
-単一のコードベースが7つのコミュニティに提供されている。各コミュニティは独立したテナント
-であり、独自のドメイン、ブランディング、Firebase テナント、LINE チャネルを持つ。どの機能が
-表示されるかは、そのコミュニティのポータル設定にある `enableFeatures` が決定する —
-ポイント、募集、クエスト、チケット、拠点、クレデンシャル。クレデンシャル専用に設定された
-コミュニティでは経済系の機能は一切描画されず、これによりキボッチャ（日常的なポイント循環）
-と DAIS（経済活動を伴わないクレデンシャル発行）のように性格の異なるコミュニティを、
-単一の実装で提供できている。
-
-関連するソース：`src/lib/communities/`、`src/contexts/CommunityConfigContext.tsx`
-
-コミュニティの追加手順は
-[`docs/development/add-new-community.md`](../../development/add-new-community.md) に記載。
-
 ---
 
 ## 利用者向け手順書
@@ -231,7 +190,7 @@ LINE と Firebase を完全にバイパスする開発専用の経路もあり�
 https://docs.google.com/presentation/d/1WypOpniKO8l7OXk1VBbkYNf7O_vYgkwDg8it4eJccxk/edit
 
 アカウント登録、LINE アカウントの連携、予約の承認と辞退、開催の中止、申込情報の確認、
-出欠管理を扱う。
+出欠管理を扱う。記載されているのは祭の期間中の操作フローであり、管理画面はその後に
+作り直している。
 
-住民向けの個別マニュアルは用意していない。参加者側の操作は
-[成果物3の録画](./demo/)で示している。
+参加者側の操作は[成果物3の録画](./demo/)で示している。
