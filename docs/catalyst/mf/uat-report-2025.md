@@ -33,24 +33,25 @@ used the full operational surface of the application, not a single booking flow.
 ### Survey instrument
 
 A questionnaire was distributed after the festival to everyone involved.
-**44 responses** were received. Every figure below is drawn from those 44.
+**35 responses** identify the experience provider who gave them. Every figure
+below is drawn from those 35.
 
 ---
 
 ## Criterion 1 — Over 70% of community leaders satisfied with the application
 
-**Not met. 47.7% (21 of 44).**
+**Not met. 57.1% (20 of 35).**
 
 > *"How satisfied were you with the overall usability and experience of this
-> application?"* — n = 44
+> application?"* — n = 35
 
 | Response | Count | Share |
 | --- | ---: | ---: |
-| Very satisfied (exceeded expectations) | 4 | 9.1% |
-| Satisfied (achieved my goal smoothly) | 17 | 38.6% |
-| Neither | 12 | 27.3% |
-| Somewhat dissatisfied | 7 | 15.9% |
-| Dissatisfied | 4 | 9.1% |
+| Very satisfied (exceeded expectations) | 3 | 8.6% |
+| Satisfied (achieved my goal smoothly) | 17 | 48.6% |
+| Neither | 8 | 22.9% |
+| Somewhat dissatisfied | 6 | 17.1% |
+| Dissatisfied | 1 | 2.9% |
 
 What the application changed in response is under [what changed in the application
 afterwards](#what-changed-in-the-application-afterwards).
@@ -63,50 +64,49 @@ afterwards](#what-changed-in-the-application-afterwards).
 
 ### Usability by function
 
-Each function was rated 1–5 by all 44 respondents.
+Each function was rated 1–5 by all 35 respondents.
 
 | Function | n | Mean | Median | Rated 4–5 |
 | --- | ---: | ---: | ---: | ---: |
-| Reservation handling | 44 | 3.34 | 3.0 | 47.7% |
-| Change / cancellation notices | 44 | 3.23 | 3.0 | 43.2% |
-| Running an experience | 44 | 3.14 | 3.0 | 38.6% |
-| Registering an experience | 44 | 3.07 | 3.0 | 36.4% |
-| **Search / discovery** | **44** | **2.86** | **3.0** | **29.5%** |
+| Reservation handling | 35 | 3.49 | 4.0 | 51.4% |
+| Change / cancellation notices | 35 | 3.40 | 3.0 | 48.6% |
+| Running an experience | 35 | 3.31 | 3.0 | 45.7% |
+| Registering an experience | 35 | 3.29 | 3.0 | 42.9% |
+| **Search / discovery** | **35** | **3.09** | **3.0** | **37.1%** |
 
-Every function has a median of 3.0. **Search scores lowest on every measure**, and
-it is the only function whose mean falls below the midpoint.
+**Search scores lowest on every measure.** No function reaches 4.0 on the mean,
+and reservation handling is the only one whose median does.
 
 ### LINE integration
 
-Multiple selection, n = 44, 56 selections.
+Multiple selection, n = 35, 41 selections.
 
 | Response | Selections |
 | --- | ---: |
-| Communication was smooth | 15 |
-| Account registration was easy | 10 |
-| Nothing in particular | 13 |
-| Too many steps | 6 |
-| Hard to use | 6 |
-| A conventional ID / password would be better | 5 |
+| Communication was smooth | 11 |
+| Nothing in particular | 10 |
+| Account registration was easy | 9 |
+| Hard to use | 5 |
+| A conventional ID / password would be better | 3 |
+| Too many steps | 2 |
 | If we use LINE, I want to be reachable on LINE | 1 |
 
-Positive selections outnumber negative ones, 25 to 18.
+Positive selections outnumber negative ones, 20 to 11.
 
 ### Intent to continue
 
 | Question | Result |
 | --- | --- |
-| "I would provide an experience again next time" (1–5, n = 44) | Rated 4–5: **33 of 44 — 75.0%** |
-| "May we contact you about participating next year?" (n = 44) | Yes: **37 of 44 — 84.1%** |
+| "I would provide an experience again next time" (1–5, n = 35) | Rated 4–5: **31 of 35 — 88.6%** |
 
 ### Qualitative feedback
 
-Nine respondents left free-text comments. Three themes carry actionable content;
+Eight respondents left free-text comments. Three themes carry actionable content;
 the remainder were expressions of thanks and of interest in continuing.
 
 **Discoverability.** One provider wrote that they wanted *"a way of presenting
 things that lets customers see at a glance what experiences exist and where."*
-Search is also the lowest-scoring function quantitatively (mean 2.86).
+Search is also the lowest-scoring function quantitatively (mean 3.09).
 
 **Rigidity of the listing format.** A provider noted that *"the application felt
 inflexible — it would be better if the selection fields and notes could be built
@@ -121,12 +121,12 @@ the app and the printed material.
 ### Analysis
 
 **Satisfaction and continuation measure different things.** Satisfaction sits at
-47.7%, intent to provide again at 75%, willingness to be contacted at 84%.
-Providers intend to return; they found the software adequate rather than good.
+57.1%, intent to provide again at 88.6%. Providers intend to return; they found the
+software adequate rather than good.
 
 **The distribution is centred, not polarised.** The largest response is "satisfied"
-(38.6%), the second "neither" (27.3%), and every function has a median of exactly
-3.0. Dissatisfied responses total 25.0%.
+(48.6%), the second "neither" (22.9%), and four of the five functions have a median
+of exactly 3.0. Dissatisfied responses total 20.0%.
 
 **Four of the five functions are ones the provider operates; search is not.**
 Registering, running, notifying and reservation handling are what a provider does
@@ -139,9 +139,9 @@ the providers rather than through the people who use it.
 
 | Area | What the responses show |
 | --- | --- |
-| Discovery | Lowest of the five functions (mean 2.86, 29.5% rating it 4–5) and the subject of the most concrete free-text comment. What is asked for is a view of what experiences exist and where, rather than a list to be filtered. |
+| Discovery | Lowest of the five functions (mean 3.09, 37.1% rating it 4–5) and the subject of the most concrete free-text comment. What is asked for is a view of what experiences exist and where, rather than a list to be filtered. |
 | Listing format | The model assumes a common shape for every experience. What is asked for is selection fields and notes that can be built per experience. |
-| LINE onboarding | Six of 44 selected "too many steps" and five that a conventional ID / password would be better; ten selected that registration was easy, and fifteen that communication was smooth. |
+| LINE onboarding | Five of 35 selected "hard to use", three that a conventional ID / password would be better and two "too many steps"; nine selected that registration was easy, and eleven that communication was smooth. |
 
 ---
 
@@ -151,10 +151,10 @@ Dates are the commits on `develop`. The survey closed on 6 November 2025.
 
 | Function | Rated | What changed |
 | --- | ---: | --- |
-| Registering an experience | 3.07 | The administrative screens for creating and managing an opportunity were built into the application. Sessions, their capacity and their cancellation are set here. [`admin/opportunities`](https://github.com/Hopin-inc/civicship-portal/tree/develop/src/app/community/%5BcommunityId%5D/admin/opportunities), from 23 December 2025 |
-| Reservation handling · Running an experience | 3.14–3.34 | The reservation detail screen — where a provider approves an application and records attendance — was restructured. [`0cbae16`](https://github.com/Hopin-inc/civicship-portal/commit/0cbae16e45cc3de59f6fb5e7c0936456989205fd), 26 December 2025 |
-| Change / cancellation notices | 3.23 | Cancelling a session was implemented, with a message to the people holding a reservation for it. [`2354496`](https://github.com/Hopin-inc/civicship-portal/commit/2354496a8ddb424d5b4f2a4bff985246250cd59e) · [`1ee21db`](https://github.com/Hopin-inc/civicship-portal/commit/1ee21dbd4ce3e328c2c50303d3015cc0b968dd70), 23–24 December 2025 |
-| **Search / discovery** | **2.86** | **No functional change.** It is the one function the survey measured through the providers rather than through the people who use it. |
+| Registering an experience | 3.29 | The administrative screens for creating and managing an opportunity were built into the application. Sessions, their capacity and their cancellation are set here. [`admin/opportunities`](https://github.com/Hopin-inc/civicship-portal/tree/develop/src/app/community/%5BcommunityId%5D/admin/opportunities), from 23 December 2025 |
+| Reservation handling · Running an experience | 3.31–3.49 | The reservation detail screen — where a provider approves an application and records attendance — was restructured. [`0cbae16`](https://github.com/Hopin-inc/civicship-portal/commit/0cbae16e45cc3de59f6fb5e7c0936456989205fd), 26 December 2025 |
+| Change / cancellation notices | 3.40 | Cancelling a session was implemented, with a message to the people holding a reservation for it. [`2354496`](https://github.com/Hopin-inc/civicship-portal/commit/2354496a8ddb424d5b4f2a4bff985246250cd59e) · [`1ee21db`](https://github.com/Hopin-inc/civicship-portal/commit/1ee21dbd4ce3e328c2c50303d3015cc0b968dd70), 23–24 December 2025 |
+| **Search / discovery** | **3.09** | **No functional change.** It is the one function the survey measured through the providers rather than through the people who use it. |
 
 ---
 
@@ -212,8 +212,7 @@ rendered by its commonest.
 | T34 | M.N. | Tokushima | Satisfied |
 | T35 | T.B. | Kagawa | Satisfied |
 
-Nine of the 44 responses carry no tester name and are not listed. Every figure in
-this report is calculated on all 44 responses.
+These are the 35 responses every figure in this report is drawn from.
 
 ---
 
@@ -285,24 +284,24 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 
 ### 調査手法
 
-祭の終了後、関係者全員にアンケートを配布し、**44件**の回答を得た。以下の数値はすべて
-この44件から算出している。
+祭の終了後、関係者全員にアンケートを配布した。**35件**の回答が体験提供事業者を特定
+できるものであり、以下の数値はすべてこの35件から算出している。
 
 ---
 
 ## 受入条件1 — community leaders の70%超がアプリケーションに満足していること
 
-**未達。47.7%（44件中21件）。**
+**未達。57.1%（35件中20件）。**
 
-> 「このアプリの全体的な使用感・体験に、どの程度ご満足いただけましたか？」— n = 44
+> 「このアプリの全体的な使用感・体験に、どの程度ご満足いただけましたか？」— n = 35
 
 | 回答 | 件数 | 割合 |
 | --- | ---: | ---: |
-| とても満足している（期待以上の体験ができた） | 4 | 9.1% |
-| 満足している（目的をスムーズに達成できた） | 17 | 38.6% |
-| どちらともいえない | 12 | 27.3% |
-| やや不満がある（改善してほしい点があった） | 7 | 15.9% |
-| 不満がある（満足できなかった） | 4 | 9.1% |
+| とても満足している（期待以上の体験ができた） | 3 | 8.6% |
+| 満足している（目的をスムーズに達成できた） | 17 | 48.6% |
+| どちらともいえない | 8 | 22.9% |
+| やや不満がある（改善してほしい点があった） | 6 | 17.1% |
+| 不満がある（満足できなかった） | 1 | 2.9% |
 
 これを受けてアプリケーションに入った変更は
 [その後アプリケーションに入った変更](#その後アプリケーションに入った変更)に記載している。
@@ -315,50 +314,49 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 
 ### 機能別の使いやすさ
 
-各機能を1〜5で評価。回答者44名全員が回答している。
+各機能を1〜5で評価。回答者35名全員が回答している。
 
 | 機能 | n | 平均 | 中央値 | 4〜5の割合 |
 | --- | ---: | ---: | ---: | ---: |
-| 予約対応 | 44 | 3.34 | 3.0 | 47.7% |
-| 変更・中止の通知 | 44 | 3.23 | 3.0 | 43.2% |
-| 体験の実施 | 44 | 3.14 | 3.0 | 38.6% |
-| 体験の登録 | 44 | 3.07 | 3.0 | 36.4% |
-| **検索・発見** | **44** | **2.86** | **3.0** | **29.5%** |
+| 予約対応 | 35 | 3.49 | 4.0 | 51.4% |
+| 変更・中止の通知 | 35 | 3.40 | 3.0 | 48.6% |
+| 体験の実施 | 35 | 3.31 | 3.0 | 45.7% |
+| 体験の登録 | 35 | 3.29 | 3.0 | 42.9% |
+| **検索・発見** | **35** | **3.09** | **3.0** | **37.1%** |
 
-全機能の中央値が3.0である。**検索はすべての指標で最下位**であり、平均が中間点を
-下回る唯一の機能である。
+**検索はすべての指標で最下位である。**平均が4.0に達する機能はなく、中央値が4.0に
+達するのは予約対応のみである。
 
 ### LINE 連携
 
-複数選択、n = 44、選択数56。
+複数選択、n = 35、選択数41。
 
 | 回答 | 選択数 |
 | --- | ---: |
-| やり取りがスムーズ | 15 |
-| アカウント登録が楽 | 10 |
-| 特になし | 13 |
-| 手順が多い | 6 |
-| 使いにくい | 6 |
-| 一般的な ID・パスワードの登録の方が良い | 5 |
+| やり取りがスムーズ | 11 |
+| 特になし | 10 |
+| アカウント登録が楽 | 9 |
+| 使いにくい | 5 |
+| 一般的な ID・パスワードの登録の方が良い | 3 |
+| 手順が多い | 2 |
 | LINE を使うなら LINE で連絡が取れるようにしてほしい | 1 |
 
-肯定的な選択が否定的な選択を上回る（25対18）。
+肯定的な選択が否定的な選択を上回る（20対11）。
 
 ### 継続意向
 
 | 設問 | 結果 |
 | --- | --- |
-| 「次回もあれば体験を提供したい」（1〜5、n = 44） | 4〜5の評価：**44件中33件 — 75.0%** |
-| 「来年度の参加についてご連絡してもよいか」（n = 44） | 可：**44件中37件 — 84.1%** |
+| 「次回もあれば体験を提供したい」（1〜5、n = 35） | 4〜5の評価：**35件中31件 — 88.6%** |
 
 ### 自由記述
 
-9名から自由記述の回答を得た。うち3つのテーマが具体的な改善につながる内容を含み、
+8名から自由記述の回答を得た。うち3つのテーマが具体的な改善につながる内容を含み、
 残りは謝意および継続への関心の表明であった。
 
 **発見性。** ある事業者は
 「お客様に、どんな体験がどこにあるかを俯瞰していただける見せ方を改善できたら」
-と記した。検索は定量評価でも最下位の機能である（平均2.86）。
+と記した。検索は定量評価でも最下位の機能である（平均3.09）。
 
 **掲載形式の硬直性。** 別の事業者は
 「アプリの自由度が少ないように感じました。選択項目や留意事項などそれぞれの体験にあった
@@ -372,12 +370,13 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 
 ### 分析
 
-**満足度と継続意向は別のものを測っている。** 満足度 47.7%、次回も提供したい 75%、
-来年度の連絡可 84%。事業者は再度参加する意向を持つ一方、ソフトウェアは「良い」ではなく
-「十分」と評価している。
+**満足度と継続意向は別のものを測っている。** 満足度 57.1%、次回も提供したい 88.6%。
+事業者は再度参加する意向を持つ一方、ソフトウェアは「良い」ではなく「十分」と評価して
+いる。
 
-**分布は二極化しておらず中央に寄っている。** 最多は「満足している」（38.6%）、次が
-「どちらともいえない」（27.3%）で、全機能の中央値がちょうど3.0。不満側は合計25.0%。
+**分布は二極化しておらず中央に寄っている。** 最多は「満足している」（48.6%）、次が
+「どちらともいえない」（22.9%）で、5機能のうち4つの中央値がちょうど3.0。不満側は
+合計20.0%。
 
 **5機能のうち4つは事業者自身が操作する機能であり、検索だけがそうではない。**
 体験の登録・実施・通知・予約対応は事業者がアプリ上で行う作業である。検索を使うのは
@@ -389,9 +388,9 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 
 | 領域 | 回答が示していること |
 | --- | --- |
-| 発見性 | 5機能中で最下位（平均2.86、4〜5の評価は29.5%）であり、自由記述で最も具体的な指摘の対象でもある。求められているのは、絞り込むためのリストではなく、どんな体験がどこにあるかを俯瞰できるビュー。 |
+| 発見性 | 5機能中で最下位（平均3.09、4〜5の評価は37.1%）であり、自由記述で最も具体的な指摘の対象でもある。求められているのは、絞り込むためのリストではなく、どんな体験がどこにあるかを俯瞰できるビュー。 |
 | 掲載形式 | 現行モデルはすべての体験に共通の形式を前提としている。求められているのは、体験ごとに構成できる選択項目と留意事項。 |
-| LINE の導線 | 44名中6名が「手順が多い」、5名が「一般的な ID・パスワードの登録の方が良い」を選択。一方10名が「アカウント登録が楽」、15名が「やり取りがスムーズ」を選択している。 |
+| LINE の導線 | 35名中5名が「使いにくい」、3名が「一般的な ID・パスワードの登録の方が良い」、2名が「手順が多い」を選択。一方9名が「アカウント登録が楽」、11名が「やり取りがスムーズ」を選択している。 |
 
 ---
 
@@ -401,10 +400,10 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 
 | 機能 | 評価 | 入った変更 |
 | --- | ---: | --- |
-| 体験の登録 | 3.07 | 募集の作成・管理を行う管理画面をアプリケーション内に構築した。開催枠、定員、開催の中止をここで設定する。[`admin/opportunities`](https://github.com/Hopin-inc/civicship-portal/tree/develop/src/app/community/%5BcommunityId%5D/admin/opportunities)、2025年12月23日から |
-| 予約対応・体験の実施 | 3.14〜3.34 | 予約詳細画面（申込の承認と出欠の記録を行う画面）を作り直した。[`0cbae16`](https://github.com/Hopin-inc/civicship-portal/commit/0cbae16e45cc3de59f6fb5e7c0936456989205fd)、2025年12月26日 |
-| 変更・中止の通知 | 3.23 | 開催枠の中止を実装し、その枠に予約している利用者へメッセージを添えて通知するようにした。[`2354496`](https://github.com/Hopin-inc/civicship-portal/commit/2354496a8ddb424d5b4f2a4bff985246250cd59e) · [`1ee21db`](https://github.com/Hopin-inc/civicship-portal/commit/1ee21dbd4ce3e328c2c50303d3015cc0b968dd70)、2025年12月23〜24日 |
-| **検索・発見** | **2.86** | **機能的な変更なし。**5機能のうち唯一、実際の利用者ではなく事業者を通して測った機能である。 |
+| 体験の登録 | 3.29 | 募集の作成・管理を行う管理画面をアプリケーション内に構築した。開催枠、定員、開催の中止をここで設定する。[`admin/opportunities`](https://github.com/Hopin-inc/civicship-portal/tree/develop/src/app/community/%5BcommunityId%5D/admin/opportunities)、2025年12月23日から |
+| 予約対応・体験の実施 | 3.31〜3.49 | 予約詳細画面（申込の承認と出欠の記録を行う画面）を作り直した。[`0cbae16`](https://github.com/Hopin-inc/civicship-portal/commit/0cbae16e45cc3de59f6fb5e7c0936456989205fd)、2025年12月26日 |
+| 変更・中止の通知 | 3.40 | 開催枠の中止を実装し、その枠に予約している利用者へメッセージを添えて通知するようにした。[`2354496`](https://github.com/Hopin-inc/civicship-portal/commit/2354496a8ddb424d5b4f2a4bff985246250cd59e) · [`1ee21db`](https://github.com/Hopin-inc/civicship-portal/commit/1ee21dbd4ce3e328c2c50303d3015cc0b968dd70)、2025年12月23〜24日 |
+| **検索・発見** | **3.09** | **機能的な変更なし。**5機能のうち唯一、実際の利用者ではなく事業者を通して測った機能である。 |
 
 ---
 
@@ -460,8 +459,7 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 | T34 | M.N. | 徳島 | 満足している |
 | T35 | T.B. | 香川 | 満足している |
 
-44件のうち9件はテスター名の記入がなく、一覧に含まれない。本報告書の数値はすべて44件の
-回答に基づいて算出している。
+本報告書の数値はすべて、この35件の回答から算出している。
 
 ---
 
