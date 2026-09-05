@@ -62,7 +62,7 @@ Relevant source: `src/lib/auth/`, `src/middleware.ts`.
 There is also a development-only path that bypasses LINE and Firebase entirely so
 testers can exercise non-production deployments without a LINE account. It is
 gated on the deployment's `ENV` and cannot fire in production, which sets no
-`ENV` at all. See [`docs/development/dev-login.md`](../development/dev-login.md).
+`ENV` at all. See [`docs/development/dev-login.md`](../../development/dev-login.md).
 
 ## Integration with the backend
 
@@ -133,10 +133,10 @@ management.
 
 | | |
 | --- | --- |
-| Adding a new community | [`docs/development/add-new-community.md`](../development/add-new-community.md) |
-| Development login (LINE / Firebase bypass) | [`docs/development/dev-login.md`](../development/dev-login.md) |
-| Logging standards | [`docs/development/logging-standards.md`](../development/logging-standards.md) |
-| i18n style guide | [`docs/i18n-style-guide.md`](../i18n-style-guide.md) |
+| Adding a new community | [`docs/development/add-new-community.md`](../../development/add-new-community.md) |
+| Development login (LINE / Firebase bypass) | [`docs/development/dev-login.md`](../../development/dev-login.md) |
+| Logging standards | [`docs/development/logging-standards.md`](../../development/logging-standards.md) |
+| i18n style guide | [`docs/i18n-style-guide.md`](../../i18n-style-guide.md) |
 
 ---
 ---
@@ -200,7 +200,7 @@ UX は LINE 内のモバイルブラウザを前提としている。対象と�
 なお、テスターが LINE アカウント無しに非本番環境を検証できるよう、LINE と Firebase を
 完全にバイパスする開発専用の経路も存在する。デプロイの `ENV` でゲートされており、
 `ENV` を一切設定しない本番環境では発火しない。
-[`docs/development/dev-login.md`](../development/dev-login.md) を参照。
+[`docs/development/dev-login.md`](../../development/dev-login.md) を参照。
 
 ## バックエンドとの連携
 
@@ -268,7 +268,7 @@ https://docs.google.com/presentation/d/1WypOpniKO8l7OXk1VBbkYNf7O_vYgkwDg8it4eJc
 
 | | |
 | --- | --- |
-| 新しいコミュニティの追加方法 | [`docs/development/add-new-community.md`](../development/add-new-community.md) |
-| 開発用ログイン（LINE / Firebase バイパス） | [`docs/development/dev-login.md`](../development/dev-login.md) |
-| ログ出力の規約 | [`docs/development/logging-standards.md`](../development/logging-standards.md) |
-| i18n スタイルガイド | [`docs/i18n-style-guide.md`](../i18n-style-guide.md) |
+| 新しいコミュニティの追加方法 | [`docs/development/add-new-community.md`](../../development/add-new-community.md) |
+| 開発用ログイン（LINE / Firebase バイパス） | [`docs/development/dev-login.md`](../../development/dev-login.md) |
+| ログ出力の規約 | [`docs/development/logging-standards.md`](../../development/logging-standards.md) |
+| i18n スタイルガイド | [`docs/i18n-style-guide.md`](../../i18n-style-guide.md) |

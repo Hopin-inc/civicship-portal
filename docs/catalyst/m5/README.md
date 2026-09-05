@@ -9,6 +9,8 @@ Project Catalyst F12, Project ID 1200088. Evidence for the deliverables of this
 milestone that are evidenced from this repository. Deliverables 2 (event
 planning) and 4 (NEO88 DAO) are submitted separately.
 
+These documents describe the code at `517e9a4` (2026-09-04).
+
 ## Deliverable 1 — Front-end development
 
 | Acceptance criterion | Evidence | Status |
@@ -61,6 +63,8 @@ phase has concluded.
 
 Project Catalyst F12、Project ID 1200088。本マイルストーンの成果物のうち、本リポジトリ
 からエビデンスを示すもの。成果物2（イベント計画）と成果物4（NEO88 DAO）は別途提出。
+
+これらのドキュメントは `517e9a4`（2026-09-04）時点のコードについて記述している。
 
 ## 成果物1 — フロントエンド開発
 
