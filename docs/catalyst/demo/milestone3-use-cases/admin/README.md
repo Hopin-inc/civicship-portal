@@ -11,9 +11,9 @@ Milestone 5, deliverable 3. Project Catalyst F12, Project ID 1200088.
 
 | | Use case | Video |
 | --- | --- | --- |
-| ① | The admin manages reservations | [`01_the-admin-manages-reservations.mp4`](./01_the-admin-manages-reservations.mp4) |
-| ② | The admin manages event dates | [`02_the-admin-manages-event-dates.mp4`](./02_the-admin-manages-event-dates.mp4) |
-| ③ | The admin issues tickets | [`03_the-admin-issues-tickets.mp4`](./03_the-admin-issues-tickets.mp4) |
+| ① | The admin manages reservations | [`01_manage-reservations.mp4`](./01_manage-reservations.mp4) |
+| ② | The admin manages event dates | [`02_manage-event-dates.mp4`](./02_manage-event-dates.mp4) |
+| ③ | The admin issues tickets | [`03_issue-tickets.mp4`](./03_issue-tickets.mp4) |
 
 ---
 ---
@@ -30,6 +30,6 @@ Milestone 5 成果物3。Project Catalyst F12、Project ID 1200088。
 
 | | ユースケース | 動画 |
 | --- | --- | --- |
-| ① | 予約を管理する | [`01_the-admin-manages-reservations.mp4`](./01_the-admin-manages-reservations.mp4) |
-| ② | 開催日程を管理する | [`02_the-admin-manages-event-dates.mp4`](./02_the-admin-manages-event-dates.mp4) |
-| ③ | チケットを発行する | [`03_the-admin-issues-tickets.mp4`](./03_the-admin-issues-tickets.mp4) |
+| ① | 予約を管理する | [`01_manage-reservations.mp4`](./01_manage-reservations.mp4) |
+| ② | 開催日程を管理する | [`02_manage-event-dates.mp4`](./02_manage-event-dates.mp4) |
+| ③ | チケットを発行する | [`03_issue-tickets.mp4`](./03_issue-tickets.mp4) |
