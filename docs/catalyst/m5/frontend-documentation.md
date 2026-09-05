@@ -95,11 +95,6 @@ The backend's own technical documentation was submitted as Milestone 4
 | Identity | User profile, DID / VC credentials |
 | Operations | Admin area — reservations, members, wallet, opportunities, tickets |
 
-## Internationalisation
-
-Japanese and English, with message catalogues under `src/messages/` and
-generated key types (`src/types/i18n.ts`) so a missing translation is a type error.
-
 ## Component documentation
 
 206 Storybook stories, published on every pull request through Chromatic. Running
@@ -230,11 +225,6 @@ UX は LINE 内のモバイルブラウザを前提としている。対象と�
 | 拠点 | 拠点（マップと詳細） |
 | アイデンティティ | ユーザープロフィール、DID / VC クレデンシャル |
 | 運用 | 管理エリア — 予約、メンバー、ウォレット、募集、チケット |
-
-## 多言語対応
-
-日本語と英語。メッセージカタログは `src/messages/` 配下にあり、キーの型を生成している
-（`src/types/i18n.ts`）ため、翻訳の欠落は型エラーになる。
 
 ## コンポーネントドキュメント
 

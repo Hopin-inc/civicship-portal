@@ -7,8 +7,6 @@
 
 The eight resident use cases Milestone 3 demonstrated, recorded again on the application as it stands today.
 
-Milestone 5, deliverable 3. Project Catalyst F12, Project ID 1200088.
-
 | | Use case | Video |
 | --- | --- | --- |
 | ① | A visitor accesses the app via the official LINE account | [`01_access-via-line.mp4`](./01_access-via-line.mp4) |
@@ -30,8 +28,6 @@ Milestone 5, deliverable 3. Project Catalyst F12, Project ID 1200088.
 *[English is above](#en)*
 
 Milestone 3 でデモンストレーションした住民向け8件を、現在のアプリケーションで撮り直したもの。
-
-Milestone 5 成果物3。Project Catalyst F12、Project ID 1200088。
 
 | | ユースケース | 動画 |
 | --- | --- | --- |
