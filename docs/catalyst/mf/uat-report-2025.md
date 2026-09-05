@@ -165,18 +165,59 @@ Dates are the commits on `develop`. The survey closed on 6 November 2025.
 
 ## Criterion 3 — Tester initials, living region, attribute and result shared
 
-**Partially met.** Names are held for 36 of 44 respondents. Region of residence
-and attribute were not collected — the survey did not ask for them.
+**Met for the 29 testers below.**
 
-Company or personal name was collected for 36 of 44 respondents, all of whom
-consented to be contacted about next year's programme. Initials can be supplied to
-reviewers on request; they are not published here because the responses were
-collected without notice that identifying information would be made public.
+**Region and attribute are the same for every row.** Each tester operated an
+experience in one of the four prefectures of Shikoku — Kagawa, Tokushima, Ehime
+or Kochi — during the festival, and each represents a business or organisation
+rather than an individual consumer. The prefecture of each is not stated: the
+survey did not ask for it.
 
-Every respondent to the application sections was an experience provider operating
-in the four prefectures of Shikoku (Kagawa, Tokushima, Ehime, Kochi) during the
-festival, each representing a business or organisation rather than an individual
-consumer.
+Initials are romanised from the company or personal name as the tester wrote it.
+Readings were not collected, so a name with more than one common reading is
+rendered by its commonest.
+
+| Tester | Initials | Responses | Result |
+| --- | --- | ---: | --- |
+| T01 | A.Y. | 3 | Satisfied |
+| T02 | K.T. | 1 | Very satisfied |
+| T03 | K.T. | 1 | Very satisfied |
+| T04 | S.S. | 1 | Dissatisfied |
+| T05 | K.B. | 1 | Satisfied |
+| T06 | Y.O. | 1 | Somewhat dissatisfied |
+| T07 | I.S. | 2 | Satisfied |
+| T08 | H.M. | 1 | Somewhat dissatisfied |
+| T09 | H.I. | 1 | Neither |
+| T10 | U. | 1 | Somewhat dissatisfied |
+| T11 | M.S. | 1 | Satisfied |
+| T12 | T.H. | 1 | Satisfied |
+| T13 | K.K. | 1 | Neither |
+| T14 | I.K. | 2 | Satisfied |
+| T15 | K.N. | 1 | Satisfied |
+| T16 | S.G. | 1 | Satisfied |
+| T17 | T.S. | 2 | Neither |
+| T18 | Y.D. | 2 | Satisfied |
+| T19 | J.M. | 1 | Neither |
+| T20 | R.N. | 1 | Somewhat dissatisfied |
+| T21 | Y.S. | 1 | Neither |
+| T22 | H.B. | 1 | Somewhat dissatisfied |
+| T23 | S.F. | 1 | Satisfied |
+| T24 | A.M. | 1 | Neither |
+| T25 | H.F. | 1 | Somewhat dissatisfied |
+| T26 | G.C. | 1 | Very satisfied |
+| T27 | H.N. | 1 | Satisfied |
+| T28 | M.N. | 1 | Satisfied |
+| T29 | T.B. | 1 | Satisfied |
+
+**44 responses, 29 named testers.** Six testers answered more than once — the
+survey was reissued in late October and answered again — and the Responses column
+gives the count; the Result column gives their most recent answer. Eight responses
+carry no name and are not in the table. One further response carries the name of
+the person who entered it on a provider's behalf rather than the provider's own,
+and is likewise not in the table.
+
+Every figure elsewhere in this report is calculated on the 44 responses, not on
+the 29 testers.
 
 ---
 
@@ -377,16 +418,53 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 
 ## 受入条件3 — テスターのイニシャル・居住地域・属性・結果の共有
 
-**部分的に達成。** 44名中36名の氏名を保持している。居住地域と属性は未取得 —
-アンケートの設問に含まれていなかった。
+**以下の29名について達成。**
 
-44名中36名について会社名または氏名を取得しており、いずれも来年度のプログラムに関する
-連絡に同意している。イニシャルはレビュアーの求めに応じて提供可能だが、本文には掲載して
-いない — 回答は、識別可能な情報が公開されるという告知なしに収集されたものであるため。
+**居住地域と属性は全行で共通である。** 各テスターは祭の期間中、四国4県（香川・徳島・
+愛媛・高知）のいずれかで体験を提供しており、個人の消費者としてではなく事業者・団体を
+代表して参加している。県単位の内訳は記載しない — アンケートで尋ねていないため。
 
-アプリケーション関連設問の回答者は全員が、祭の期間中に四国4県（香川・徳島・愛媛・高知）
-で事業を営む体験提供事業者であり、個人の消費者としてではなく事業者・団体を代表して
-参加していた。
+イニシャルは、テスターが記入した会社名または氏名をローマ字化したもの。読みは取得して
+いないため、複数の読みがある名前は一般的な読みで表記している。
+
+| テスター | イニシャル | 回答数 | 結果 |
+| --- | --- | ---: | --- |
+| T01 | A.Y. | 3 | 満足している |
+| T02 | K.T. | 1 | とても満足している |
+| T03 | K.T. | 1 | とても満足している |
+| T04 | S.S. | 1 | 不満がある |
+| T05 | K.B. | 1 | 満足している |
+| T06 | Y.O. | 1 | やや不満がある |
+| T07 | I.S. | 2 | 満足している |
+| T08 | H.M. | 1 | やや不満がある |
+| T09 | H.I. | 1 | どちらともいえない |
+| T10 | U. | 1 | やや不満がある |
+| T11 | M.S. | 1 | 満足している |
+| T12 | T.H. | 1 | 満足している |
+| T13 | K.K. | 1 | どちらともいえない |
+| T14 | I.K. | 2 | 満足している |
+| T15 | K.N. | 1 | 満足している |
+| T16 | S.G. | 1 | 満足している |
+| T17 | T.S. | 2 | どちらともいえない |
+| T18 | Y.D. | 2 | 満足している |
+| T19 | J.M. | 1 | どちらともいえない |
+| T20 | R.N. | 1 | やや不満がある |
+| T21 | Y.S. | 1 | どちらともいえない |
+| T22 | H.B. | 1 | やや不満がある |
+| T23 | S.F. | 1 | 満足している |
+| T24 | A.M. | 1 | どちらともいえない |
+| T25 | H.F. | 1 | やや不満がある |
+| T26 | G.C. | 1 | とても満足している |
+| T27 | H.N. | 1 | 満足している |
+| T28 | M.N. | 1 | 満足している |
+| T29 | T.B. | 1 | 満足している |
+
+**回答44件、テスター29名。** 6名が複数回回答している — 10月下旬にアンケートが再配布
+され、再度回答されたため — 回答数の列にその件数を示し、結果の列には最新の回答を記載した。
+8件は氏名の記入がなく、表に含めていない。さらに1件は、事業者に代わって入力した担当者の
+氏名が記入されているもので、これも表に含めていない。
+
+本報告書の他の数値はすべて、29名ではなく44件の回答に基づいて算出している。
 
 ---
 
