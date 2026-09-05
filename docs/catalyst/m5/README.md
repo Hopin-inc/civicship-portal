@@ -39,19 +39,6 @@ be used without a LINE account. The interface is a LINE mini app: it is laid out
 for a phone, adapts to the viewport width, and on a desktop browser the mobile
 layout is centred on the page.
 
-## Other deployments
-
-| Community | URL |
-| --- | --- |
-| Kibotcha DAO | https://kibotcha.civicship.app/transactions |
-| Izu DAO | https://izu.civicship.app/transactions |
-| Kotohira DAO | https://kotohira.civicship.app/opportunities |
-| DAIS (DID / VC only) | https://dais.civicship.app/users/me |
-
-DAIS renders only after login because it handles credential data. NEO88
-(https://www.neo88.app/) was the initial demonstration partner; its demonstration
-phase has concluded.
-
 ---
 ---
 
@@ -93,15 +80,3 @@ https://dev.civicship.app/community/neo88
 インターフェースは LINE ミニアプリであり、スマートフォン向けにレイアウトされ、
 ビューポート幅に追随する。デスクトップブラウザではモバイル向けレイアウトが画面中央に
 配置される。
-
-## その他の稼働環境
-
-| コミュニティ | URL |
-| --- | --- |
-| キボッチャ DAO | https://kibotcha.civicship.app/transactions |
-| 伊豆 DAO | https://izu.civicship.app/transactions |
-| 琴平 DAO | https://kotohira.civicship.app/opportunities |
-| DAIS（DID / VC 特化） | https://dais.civicship.app/users/me |
-
-DAIS はクレデンシャル情報を扱うためログイン後にのみ画面が表示される。NEO88（[www.neo88.app](https://www.neo88.app/)）は当初の実証パートナーであり、
-実証フェーズは終了している。
