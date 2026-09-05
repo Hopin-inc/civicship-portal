@@ -32,10 +32,7 @@ used the full operational surface of the application, not a single booking flow.
 ### Survey instrument
 
 A questionnaire was distributed after the festival to everyone involved.
-**144 responses** were received in total. The questionnaire served both audiences,
-and the application-specific sections were shown only to experience providers, so
-those sections carry **44–47 responses** depending on the question. All figures
-below state their own denominator.
+**44 responses** were received. Every figure below is drawn from those 44.
 
 ---
 
@@ -62,16 +59,15 @@ below state their own denominator.
 
 ### Usability by function
 
-Each function was rated 1–5. A small number of out-of-range entries (values above
-5) were excluded as data-entry errors; the count excluded is stated per row.
+Each function was rated 1–5 by all 44 respondents.
 
-| Function | n | Mean | Median | Rated 4–5 | Excluded |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| Reservation handling | 45 | 3.36 | 3.0 | 48.9% | 4 |
-| Change / cancellation notices | 45 | 3.24 | 3.0 | 44.4% | 4 |
-| Running an experience | 46 | 3.17 | 3.0 | 41.3% | 3 |
-| Registering an experience | 46 | 3.11 | 3.0 | 39.1% | 3 |
-| **Search / discovery** | **47** | **2.89** | **3.0** | **31.9%** | **2** |
+| Function | n | Mean | Median | Rated 4–5 |
+| --- | ---: | ---: | ---: | ---: |
+| Reservation handling | 44 | 3.34 | 3.0 | 47.7% |
+| Change / cancellation notices | 44 | 3.23 | 3.0 | 43.2% |
+| Running an experience | 44 | 3.14 | 3.0 | 38.6% |
+| Registering an experience | 44 | 3.07 | 3.0 | 36.4% |
+| **Search / discovery** | **44** | **2.86** | **3.0** | **29.5%** |
 
 Every function has a median of 3.0. **Search scores lowest on every measure**, and
 it is the only function whose mean falls below the midpoint.
@@ -107,7 +103,7 @@ the remainder were expressions of thanks and of interest in continuing.
 
 **Discoverability.** One provider wrote that they wanted *"a way of presenting
 things that lets customers see at a glance what experiences exist and where."*
-Search is also the lowest-scoring function quantitatively (mean 2.89).
+Search is also the lowest-scoring function quantitatively (mean 2.86).
 
 **Rigidity of the listing format.** A provider noted that *"the application felt
 inflexible — it would be better if the selection fields and notes could be built
@@ -147,7 +143,7 @@ the providers rather than through the people who use it.
 
 | Area | What the responses show |
 | --- | --- |
-| Discovery | Lowest of the five functions (mean 2.89, 31.9% rating it 4–5) and the subject of the most concrete free-text comment. What is asked for is a view of what experiences exist and where, rather than a list to be filtered. |
+| Discovery | Lowest of the five functions (mean 2.86, 29.5% rating it 4–5) and the subject of the most concrete free-text comment. What is asked for is a view of what experiences exist and where, rather than a list to be filtered. |
 | Listing format | The model assumes a common shape for every experience. What is asked for is selection fields and notes that can be built per experience. |
 | LINE onboarding | Six of 44 selected "too many steps" and five that a conventional ID / password would be better; ten selected that registration was easy, and fifteen that communication was smooth. |
 
@@ -252,10 +248,8 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 
 ### 調査手法
 
-祭の終了後、関係者全員にアンケートを配布し、**144件**の回答を得た。アンケートは両方の
-利用者群を対象としており、アプリケーションに関する設問は体験提供事業者にのみ表示された。
-そのため該当セクションの回答数は設問により **44〜47件** となる。以下の数値はすべて
-分母を併記している。
+祭の終了後、関係者全員にアンケートを配布し、**44件**の回答を得た。以下の数値はすべて
+この44件から算出している。
 
 ---
 
@@ -281,16 +275,15 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 
 ### 機能別の使いやすさ
 
-各機能を1〜5で評価。5を超える範囲外の入力が少数あり、入力ミスとして除外した。
-除外件数は行ごとに明記する。
+各機能を1〜5で評価。回答者44名全員が回答している。
 
-| 機能 | n | 平均 | 中央値 | 4〜5の割合 | 除外 |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| 予約対応 | 45 | 3.36 | 3.0 | 48.9% | 4 |
-| 変更・中止の通知 | 45 | 3.24 | 3.0 | 44.4% | 4 |
-| 体験の実施 | 46 | 3.17 | 3.0 | 41.3% | 3 |
-| 体験の登録 | 46 | 3.11 | 3.0 | 39.1% | 3 |
-| **検索・発見** | **47** | **2.89** | **3.0** | **31.9%** | **2** |
+| 機能 | n | 平均 | 中央値 | 4〜5の割合 |
+| --- | ---: | ---: | ---: | ---: |
+| 予約対応 | 44 | 3.34 | 3.0 | 47.7% |
+| 変更・中止の通知 | 44 | 3.23 | 3.0 | 43.2% |
+| 体験の実施 | 44 | 3.14 | 3.0 | 38.6% |
+| 体験の登録 | 44 | 3.07 | 3.0 | 36.4% |
+| **検索・発見** | **44** | **2.86** | **3.0** | **29.5%** |
 
 全機能の中央値が3.0である。**検索はすべての指標で最下位**であり、平均が中間点を
 下回る唯一の機能である。
@@ -326,7 +319,7 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 
 **発見性。** ある事業者は
 「お客様に、どんな体験がどこにあるかを俯瞰していただける見せ方を改善できたら」
-と記した。検索は定量評価でも最下位の機能である（平均2.89）。
+と記した。検索は定量評価でも最下位の機能である（平均2.86）。
 
 **掲載形式の硬直性。** 別の事業者は
 「アプリの自由度が少ないように感じました。選択項目や留意事項などそれぞれの体験にあった
@@ -363,7 +356,7 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 
 | 領域 | 回答が示していること |
 | --- | --- |
-| 発見性 | 5機能中で最下位（平均2.89、4〜5の評価は31.9%）であり、自由記述で最も具体的な指摘の対象でもある。求められているのは、絞り込むためのリストではなく、どんな体験がどこにあるかを俯瞰できるビュー。 |
+| 発見性 | 5機能中で最下位（平均2.86、4〜5の評価は29.5%）であり、自由記述で最も具体的な指摘の対象でもある。求められているのは、絞り込むためのリストではなく、どんな体験がどこにあるかを俯瞰できるビュー。 |
 | 掲載形式 | 現行モデルはすべての体験に共通の形式を前提としている。求められているのは、体験ごとに構成できる選択項目と留意事項。 |
 | LINE の導線 | 44名中6名が「手順が多い」、5名が「一般的な ID・パスワードの登録の方が良い」を選択。一方10名が「アカウント登録が楽」、15名が「やり取りがスムーズ」を選択している。 |
 
