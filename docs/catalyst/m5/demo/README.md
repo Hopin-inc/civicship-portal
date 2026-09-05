@@ -14,7 +14,7 @@ Milestone 5, deliverable 3. Project Catalyst F12, Project ID 1200088.
 | [`beyond-milestone3/`](./beyond-milestone3/) | Ten use cases the Milestone 3 playlists did not cover. Three resident, seven host. |
 
 Each set is split into `user/` and `admin/`, matching the two playlists used at
-Milestone 3. Recording conditions are stated in each directory's README.
+Milestone 3.
 
 ---
 ---
@@ -34,4 +34,3 @@ Milestone 5 成果物3。Project Catalyst F12、Project ID 1200088。
 | [`beyond-milestone3/`](./beyond-milestone3/) | Milestone 3 のプレイリストが扱っていなかった10件。住民向け3件、ホスト向け7件。 |
 
 各セットは Milestone 3 の2つのプレイリストに合わせ、`user/` と `admin/` に分けている。
-録画条件は各ディレクトリの README に記載。

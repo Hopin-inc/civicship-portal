@@ -5,7 +5,7 @@
 *English below · [日本語は下段へ](#ja)*
 
 
-Milestone 5 deliverable 1. Current as of `517e9a4` (2026-09-04).
+Milestone 5 deliverable 1. Describes the code at `517e9a4` (2026-09-04).
 
 The acceptance criterion asks for documentation covering UI/UX design principles,
 integration processes, and user instructions. This page is the index: the
@@ -17,9 +17,9 @@ manual are linked where they live.
 ## What the application is
 
 A mutual-assistance application for residents, delivered as a **LINE mini app
-(LIFF)**. The UX assumes a mobile browser inside LINE, because the residents this
-serves already use LINE daily — asking them to install an app or manage a Web3
-wallet would have excluded most of them.
+(LIFF)**. The UX assumes a mobile browser inside LINE: the residents it serves
+already use LINE daily, and reaching the application requires no app installation
+and no Web3 wallet.
 
 | | |
 | --- | --- |
@@ -62,7 +62,7 @@ Relevant source: `src/lib/auth/`, `src/middleware.ts`.
 There is also a development-only path that bypasses LINE and Firebase entirely so
 testers can exercise non-production deployments without a LINE account. It is
 gated on the deployment's `ENV` and cannot fire in production, which sets no
-`ENV` at all. See [`docs/development/dev-login.md`](../development/dev-login.md).
+`ENV` at all. See [`docs/development/dev-login.md`](../../development/dev-login.md).
 
 ## Integration with the backend
 
@@ -83,7 +83,7 @@ through the GraphQL API in
   front end's checks are for navigation, not for security.
 
 The backend's own technical documentation was submitted as Milestone 4
-(27 November 2025). See the note on drift in [the index](./README.md).
+(27 November 2025).
 
 ## Main screens
 
@@ -133,10 +133,10 @@ management.
 
 | | |
 | --- | --- |
-| Adding a new community | [`docs/development/add-new-community.md`](../development/add-new-community.md) |
-| Development login (LINE / Firebase bypass) | [`docs/development/dev-login.md`](../development/dev-login.md) |
-| Logging standards | [`docs/development/logging-standards.md`](../development/logging-standards.md) |
-| i18n style guide | [`docs/i18n-style-guide.md`](../i18n-style-guide.md) |
+| Adding a new community | [`docs/development/add-new-community.md`](../../development/add-new-community.md) |
+| Development login (LINE / Firebase bypass) | [`docs/development/dev-login.md`](../../development/dev-login.md) |
+| Logging standards | [`docs/development/logging-standards.md`](../../development/logging-standards.md) |
+| i18n style guide | [`docs/i18n-style-guide.md`](../../i18n-style-guide.md) |
 
 ---
 ---
@@ -147,7 +147,7 @@ management.
 
 *[English is above](#en)*
 
-Milestone 5 成果物1。`517e9a4`（2026-09-04）時点。
+Milestone 5 成果物1。`517e9a4`（2026-09-04）時点のコードについて記述している。
 
 受入条件は、UI/UX 設計原則・バックエンド連携・利用者向け手順書を含むドキュメントを
 求めている。本ページはその索引である — アーキテクチャと連携方式はここに記述し、
@@ -159,8 +159,7 @@ Milestone 5 成果物1。`517e9a4`（2026-09-04）時点。
 
 住民同士の助け合いのためのアプリケーションで、**LINE ミニアプリ（LIFF）** として提供する。
 UX は LINE 内のモバイルブラウザを前提としている。対象となる住民は既に LINE を日常的に
-使っており、アプリのインストールや Web3 ウォレットの管理を求めれば、その大半を排除する
-ことになるためである。
+使っており、利用にあたってアプリのインストールも Web3 ウォレットの管理も必要としない。
 
 | | |
 | --- | --- |
@@ -201,7 +200,7 @@ UX は LINE 内のモバイルブラウザを前提としている。対象と�
 なお、テスターが LINE アカウント無しに非本番環境を検証できるよう、LINE と Firebase を
 完全にバイパスする開発専用の経路も存在する。デプロイの `ENV` でゲートされており、
 `ENV` を一切設定しない本番環境では発火しない。
-[`docs/development/dev-login.md`](../development/dev-login.md) を参照。
+[`docs/development/dev-login.md`](../../development/dev-login.md) を参照。
 
 ## バックエンドとの連携
 
@@ -221,7 +220,6 @@ UX は LINE 内のモバイルブラウザを前提としている。対象と�
   チェックはナビゲーションのためのものであってセキュリティのためではない。**
 
 バックエンド自体の技術ドキュメントは Milestone 4（2025年11月27日）として提出済み。
-提出時点との差分については[索引のドリフトの節](./README.md)を参照。
 
 ## 主な画面
 
@@ -270,7 +268,7 @@ https://docs.google.com/presentation/d/1WypOpniKO8l7OXk1VBbkYNf7O_vYgkwDg8it4eJc
 
 | | |
 | --- | --- |
-| 新しいコミュニティの追加方法 | [`docs/development/add-new-community.md`](../development/add-new-community.md) |
-| 開発用ログイン（LINE / Firebase バイパス） | [`docs/development/dev-login.md`](../development/dev-login.md) |
-| ログ出力の規約 | [`docs/development/logging-standards.md`](../development/logging-standards.md) |
-| i18n スタイルガイド | [`docs/i18n-style-guide.md`](../i18n-style-guide.md) |
+| 新しいコミュニティの追加方法 | [`docs/development/add-new-community.md`](../../development/add-new-community.md) |
+| 開発用ログイン（LINE / Firebase バイパス） | [`docs/development/dev-login.md`](../../development/dev-login.md) |
+| ログ出力の規約 | [`docs/development/logging-standards.md`](../../development/logging-standards.md) |
+| i18n スタイルガイド | [`docs/i18n-style-guide.md`](../../i18n-style-guide.md) |
