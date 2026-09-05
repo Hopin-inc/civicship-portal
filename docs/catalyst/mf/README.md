@@ -11,6 +11,8 @@ submitted separately.
 
 ## Deliverable 2 — Reports on the demonstration experiment, user feedback and usage statistics
 
+The report: [Google Doc](https://docs.google.com/document/d/1ACGxRxBfJRke61ywrEfX0W22Tw5PHXbcNBIKL4-HbsM/edit) · [in this repository](./uat-report-2026.md). Same content.
+
 | Acceptance criterion | Evidence | Status |
 | --- | --- | --- |
 | Over 70% of community leaders satisfied with the application | [UAT report](./uat-report-2026.md) §2.1 | 47.7% (21 of 44). Below the threshold; see note 1 |
@@ -58,6 +60,8 @@ Project Catalyst F12、Project ID 1200088。`517e9a4`（2026-09-04）時点の�
 は別途提出。
 
 ## 成果物2 — 実証実験・利用者フィードバック・利用統計の報告
+
+報告書：[Google ドキュメント](https://docs.google.com/document/d/1ACGxRxBfJRke61ywrEfX0W22Tw5PHXbcNBIKL4-HbsM/edit) · [本リポジトリ](./uat-report-2026.md)。内容は同一。
 
 | 受入条件 | エビデンス | 状況 |
 | --- | --- | --- |
