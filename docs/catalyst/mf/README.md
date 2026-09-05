@@ -34,8 +34,8 @@ Satisfaction was measured at 47.7% against a 70% threshold.
 [UAT report](./uat-report-2025.md) gives the distribution and the analysis.
 
 Initials, region, attribute and result are listed for 35 testers. Nine of the 44
-responses carry no tester name and are not in the list. Region is stated as the
-four prefectures of Shikoku: the survey did not ask which one.
+responses carry no tester name and are not in the list; every figure in the report
+is calculated on all 44.
 
 ### 2. Scope of the audit
 
@@ -80,8 +80,7 @@ Project Catalyst F12、Project ID 1200088。`517e9a4`（2026-09-04）時点の�
 分布と分析は [UAT 報告書](./uat-report-2025.md) に記載。
 
 イニシャル・居住地域・属性・結果は35名分を掲載している。44件のうち9件はテスター名の
-記入がなく、一覧に含まれない。居住地域は四国4県と記載している — アンケートで県を
-尋ねていないため。
+記入がなく、一覧に含まれない。報告書の数値はすべて44件の回答に基づいて算出している。
 
 ### 2. 監査の範囲
 
