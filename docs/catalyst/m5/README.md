@@ -13,14 +13,14 @@ Project Catalyst F12, Project ID 1200088. Code as of `517e9a4` (2026-09-04).
 | --- | --- | --- |
 | The front-end source code is published on GitHub | https://github.com/Hopin-inc/civicship-portal — GPL-3.0 | Met |
 | Detailed documentation, including UI/UX design principles, integration processes, and user instructions | [Front-end documentation](./frontend-documentation.md) | Met |
-| A link is provided to try out the completed mutual app | https://civicship.app/community/neo88 — see [Trying the application](#trying-the-application) | Met |
-| Fully functional and responsive across different devices | The same link, opened on a phone and on a desktop browser — see [Trying the application](#trying-the-application) | Met |
+| A link is provided to try out the completed mutual app | https://civicship.app/community/neo88 · https://dev.civicship.app/community/neo88 for a reviewer without a LINE account — see [Trying the application](#trying-the-application) | Met |
+| Fully functional and responsive across different devices | Either link, opened on a phone, a tablet or a desktop browser — see [Trying the application](#trying-the-application) | Met |
 
 ## Deliverable 3 — Sharing of a demo video
 
 | Acceptance criterion | Evidence | Status |
 | --- | --- | --- |
-| The demo video is published on YouTube and is freely accessible to the community | [Demonstration videos](./demo/) — twenty-one use-case recordings in two sets: the eleven Milestone 3 demonstrated, and ten it did not cover | Recorded; YouTube publication pending |
+| The demo video is published on YouTube and is freely accessible to the community | [Demonstration videos](./demo/) — twenty-one use-case recordings: the eleven demonstrated at Milestone 3, recorded again on the current application, and ten further use cases | Recorded; YouTube publication pending |
 | The video includes an access link to the application for usability testing | https://dev.civicship.app/community/neo88 | Pending — to be carried in the YouTube descriptions |
 
 ---
@@ -29,14 +29,15 @@ Project Catalyst F12, Project ID 1200088. Code as of `517e9a4` (2026-09-04).
 
 https://civicship.app/community/neo88 — the application. Sign-in is by LINE account.
 
-https://dev.civicship.app/community/neo88 — the same build, on a deployment that
-signs a visitor in as a throwaway account. A reviewer can evaluate the application
-there without a LINE account and without giving up any personal information.
+https://dev.civicship.app/community/neo88 — the same build on a development
+deployment, which signs a visitor in automatically. A reviewer can evaluate the
+application there — participant screens and administrative screens alike — without
+a LINE account and without giving up any personal information.
 
-The application is a LINE mini app (LIFF). It is opened from inside LINE, whose
-in-app browser is a phone browser, so the interface is built for phone widths. On a
-tablet or a desktop browser the same interface is centred rather than stretched, and
-every screen and every function behaves identically on all three.
+Every screen and every function works identically on a phone, a tablet and a
+desktop browser. The layout targets phone widths because the application is a LINE
+mini app (LIFF), opened from inside LINE's in-app browser; on wider screens the
+same interface is centred in the viewport.
 
 ---
 ---
@@ -55,14 +56,14 @@ Project Catalyst F12、Project ID 1200088。`517e9a4`（2026-09-04）時点の�
 | --- | --- | --- |
 | フロントエンドのソースコードが GitHub で公開されていること | https://github.com/Hopin-inc/civicship-portal — GPL-3.0 | 充足 |
 | UI/UX 設計原則・バックエンド連携・利用者向け手順書を含む詳細なドキュメント | [フロントエンド ドキュメント](./frontend-documentation.md) | 充足 |
-| 完成したアプリを試せるリンクが提供されていること | https://civicship.app/community/neo88 — [アプリを試す](#アプリを試す)を参照 | 充足 |
-| 各種デバイスで完全に動作し、レスポンシブであること | 同じリンクをスマートフォンとデスクトップブラウザで開く — [アプリを試す](#アプリを試す)を参照 | 充足 |
+| 完成したアプリを試せるリンクが提供されていること | https://civicship.app/community/neo88 · LINE アカウントを持たないレビュアー向けに https://dev.civicship.app/community/neo88 — [アプリを試す](#アプリを試す)を参照 | 充足 |
+| 各種デバイスで完全に動作し、レスポンシブであること | いずれかのリンクをスマートフォン・タブレット・デスクトップブラウザで開く — [アプリを試す](#アプリを試す)を参照 | 充足 |
 
 ## 成果物3 — デモ動画の共有
 
 | 受入条件 | エビデンス | 状況 |
 | --- | --- | --- |
-| デモ動画が YouTube で公開され、コミュニティが自由にアクセスできること | [デモ動画](./demo/) — ユースケース別21本を2セットに分けて収録（Milestone 3 と同じ11件、扱われていなかった10件） | 収録済み。YouTube 公開は未了 |
+| デモ動画が YouTube で公開され、コミュニティが自由にアクセスできること | [デモ動画](./demo/) — ユースケース別21本を収録（Milestone 3 でデモンストレーションした11件を現在のアプリケーションで撮り直したもの、および追加の10件） | 収録済み。YouTube 公開は未了 |
 | 動画に、使用性テスト用のアプリへのアクセスリンクが含まれること | https://dev.civicship.app/community/neo88 | 未了。YouTube の概要欄に記載する |
 
 ---
@@ -71,11 +72,11 @@ Project Catalyst F12、Project ID 1200088。`517e9a4`（2026-09-04）時点の�
 
 https://civicship.app/community/neo88 — アプリケーション本体。サインインは LINE アカウント。
 
-https://dev.civicship.app/community/neo88 — 同じビルドで、訪問者を使い捨てアカウント
-としてサインインさせる環境。レビュアーは LINE アカウントも個人情報も渡さずに
-アプリケーションを評価できる。
+https://dev.civicship.app/community/neo88 — 同じビルドの開発環境で、訪問者を自動的に
+サインインさせる。レビュアーは LINE アカウントも個人情報も渡すことなく、参加者向け画面と
+管理画面の両方を評価できる。
 
-本アプリケーションは LINE ミニアプリ（LIFF）である。LINE 内から起動され、その
-アプリ内ブラウザはスマートフォンのブラウザであるため、画面はスマートフォンの幅に
-合わせて構成している。タブレットやデスクトップのブラウザでは、同じ画面が引き伸ばされず
-中央に配置される。3種類のいずれでも画面構成と機能は同一に動作する。
+画面構成と機能は、スマートフォン・タブレット・デスクトップブラウザのいずれでも同一に
+動作する。レイアウトをスマートフォンの幅に合わせているのは、本アプリケーションが LINE
+ミニアプリ（LIFF）であり、LINE のアプリ内ブラウザから起動されるためである。より広い画面
+では、同じ画面が中央に配置される。

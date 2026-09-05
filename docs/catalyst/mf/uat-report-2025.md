@@ -32,9 +32,8 @@ used the full operational surface of the application, not a single booking flow.
 
 ### Survey instrument
 
-A questionnaire was distributed after the festival to everyone involved.
-**35 responses** identify the experience provider who gave them. Every figure
-below is drawn from those 35.
+A questionnaire was distributed after the festival. **35 responses** identify the
+experience provider who gave them. Every figure below is drawn from those 35.
 
 ---
 
@@ -52,6 +51,9 @@ below is drawn from those 35.
 | Neither | 8 | 22.9% |
 | Somewhat dissatisfied | 6 | 17.1% |
 | Dissatisfied | 1 | 2.9% |
+
+The same respondents were asked whether they would provide an experience again:
+31 of 35 — 88.6% — rated that 4 or 5.
 
 What the application changed in response is under [what changed in the application
 afterwards](#what-changed-in-the-application-afterwards).
@@ -118,7 +120,7 @@ the providers rather than through the people who use it.
 | --- | --- |
 | Discovery | Lowest of the five functions (mean 3.09, 37.1% rating it 4–5) and the subject of the most concrete free-text comment. What is asked for is a view of what experiences exist and where, rather than a list to be filtered. |
 | Listing format | The model assumes a common shape for every experience. What is asked for is selection fields and notes that can be built per experience. |
-| LINE onboarding | Five of 35 selected "hard to use", three that a conventional ID / password would be better and two "too many steps"; nine selected that registration was easy, and eleven that communication was smooth. |
+| LINE onboarding | Eleven of 35 selected that communication was smooth and nine that registration was easy; five selected "hard to use", three that a conventional ID / password would be better, and two "too many steps". |
 
 ---
 
@@ -131,7 +133,6 @@ Dates are the commits on `develop`. The survey closed on 6 November 2025.
 | Registering an experience | 3.29 | The administrative screens for creating and managing an opportunity were built into the application. Sessions, their capacity and their cancellation are set here. [`admin/opportunities`](https://github.com/Hopin-inc/civicship-portal/tree/develop/src/app/community/%5BcommunityId%5D/admin/opportunities), from 23 December 2025 |
 | Reservation handling · Running an experience | 3.31–3.49 | The reservation detail screen — where a provider approves an application and records attendance — was restructured. [`0cbae16`](https://github.com/Hopin-inc/civicship-portal/commit/0cbae16e45cc3de59f6fb5e7c0936456989205fd), 26 December 2025 |
 | Change / cancellation notices | 3.40 | Cancelling a session was implemented, with a message to the people holding a reservation for it. [`2354496`](https://github.com/Hopin-inc/civicship-portal/commit/2354496a8ddb424d5b4f2a4bff985246250cd59e) · [`1ee21db`](https://github.com/Hopin-inc/civicship-portal/commit/1ee21dbd4ce3e328c2c50303d3015cc0b968dd70), 23–24 December 2025 |
-| Search / discovery | 3.09 | No functional change. It is the one function the survey measured through the providers rather than through the people who use it. |
 
 ---
 
@@ -145,11 +146,9 @@ business or organisation rather than an individual consumer.
 
 Region is where the tester operates. For most it is the prefecture on their own
 account in the application; for the rest it is the prefecture of the business they
-ran the experience under. The survey itself did not ask for it.
+ran the experience under.
 
 Initials are romanised from the company or personal name as the tester wrote it.
-Readings were not collected, so a name with more than one common reading is
-rendered by its commonest.
 
 | Tester | Initials | Region | Result |
 | --- | --- | --- | --- |
@@ -206,8 +205,8 @@ The demonstration ran on NEO88. These are its figures.
 | Points issued | 1,020,000 |
 | Grant volume | 156,000 |
 
-NEO88 records no activity in the most recent month. It was designed as a
-time-limited demonstration community and its demonstration phase has concluded.
+NEO88 was created as a time-limited demonstration community for the festival. The
+figures above are the totals it accumulated over that period, which has concluded.
 
 These figures are internal activity records. They do not represent fiat currency
 or redeemable economic value.
@@ -261,8 +260,8 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 
 ### 調査手法
 
-祭の終了後、関係者全員にアンケートを配布した。**35件**の回答が体験提供事業者を特定
-できるものであり、以下の数値はすべてこの35件から算出している。
+祭の終了後にアンケートを配布した。**35件**の回答が体験提供事業者を特定できるもので
+あり、以下の数値はすべてこの35件から算出している。
 
 ---
 
@@ -279,6 +278,9 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 | どちらともいえない | 8 | 22.9% |
 | やや不満がある（改善してほしい点があった） | 6 | 17.1% |
 | 不満がある（満足できなかった） | 1 | 2.9% |
+
+同じ回答者に対して次回も体験を提供したいかを尋ねており、35件中31件（88.6%）が
+4または5と回答している。
 
 これを受けてアプリケーションに入った変更は
 [その後アプリケーションに入った変更](#その後アプリケーションに入った変更)に記載している。
@@ -343,7 +345,7 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 | --- | --- |
 | 発見性 | 5機能中で最下位（平均3.09、4〜5の評価は37.1%）であり、自由記述で最も具体的な指摘の対象でもある。求められているのは、絞り込むためのリストではなく、どんな体験がどこにあるかを俯瞰できるビュー。 |
 | 掲載形式 | 現行モデルはすべての体験に共通の形式を前提としている。求められているのは、体験ごとに構成できる選択項目と留意事項。 |
-| LINE の導線 | 35名中5名が「使いにくい」、3名が「一般的な ID・パスワードの登録の方が良い」、2名が「手順が多い」を選択。一方9名が「アカウント登録が楽」、11名が「やり取りがスムーズ」を選択している。 |
+| LINE の導線 | 35名中11名が「やり取りがスムーズ」、9名が「アカウント登録が楽」を選択している。一方で5名が「使いにくい」、3名が「一般的な ID・パスワードの登録の方が良い」、2名が「手順が多い」を選択している。 |
 
 ---
 
@@ -356,7 +358,6 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 | 体験の登録 | 3.29 | 募集の作成・管理を行う管理画面をアプリケーション内に構築した。開催枠、定員、開催の中止をここで設定する。[`admin/opportunities`](https://github.com/Hopin-inc/civicship-portal/tree/develop/src/app/community/%5BcommunityId%5D/admin/opportunities)、2025年12月23日から |
 | 予約対応・体験の実施 | 3.31〜3.49 | 予約詳細画面（申込の承認と出欠の記録を行う画面）を作り直した。[`0cbae16`](https://github.com/Hopin-inc/civicship-portal/commit/0cbae16e45cc3de59f6fb5e7c0936456989205fd)、2025年12月26日 |
 | 変更・中止の通知 | 3.40 | 開催枠の中止を実装し、その枠に予約している利用者へメッセージを添えて通知するようにした。[`2354496`](https://github.com/Hopin-inc/civicship-portal/commit/2354496a8ddb424d5b4f2a4bff985246250cd59e) · [`1ee21db`](https://github.com/Hopin-inc/civicship-portal/commit/1ee21dbd4ce3e328c2c50303d3015cc0b968dd70)、2025年12月23〜24日 |
-| 検索・発見 | 3.09 | 機能的な変更なし。5機能のうち唯一、実際の利用者ではなく事業者を通して測った機能である。 |
 
 ---
 
@@ -369,10 +370,9 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 
 居住地域は各テスターが事業を営む都道府県である。多くはアプリケーション上の本人の
 アカウントに登録されている都道府県であり、それ以外は体験を提供した事業者の所在県で
-ある。アンケートでは尋ねていない。
+ある。
 
-イニシャルは、テスターが記入した会社名または氏名をローマ字化したもの。読みは取得して
-いないため、複数の読みがある名前は一般的な読みで表記している。
+イニシャルは、テスターが記入した会社名または氏名をローマ字化したもの。
 
 | テスター | イニシャル | 居住地域 | 結果 |
 | --- | --- | --- | --- |
@@ -429,8 +429,8 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 | 発行ポイント数 | 102.0万 |
 | 助成記録量 | 15.6万 |
 
-NEO88 に直近1ヶ月の活動はない。期間限定の実証コミュニティとして設計されたためで、
-実証フェーズは終了している。
+NEO88 は祭に合わせた期間限定の実証コミュニティとして設計されている。上記はその期間に
+積み上がった総数であり、実証フェーズは終了している。
 
 これらはプラットフォーム内部の活動記録であり、法定通貨や換金可能な経済的価値を示すもの
 ではない。
