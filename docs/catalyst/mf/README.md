@@ -15,9 +15,9 @@ The report: [Google Doc](https://docs.google.com/document/d/1ACGxRxBfJRke61ywrEf
 
 | Acceptance criterion | Evidence | Status |
 | --- | --- | --- |
-| Over 70% of community leaders satisfied with the application | [UAT report](./uat-report-2026.md) §2.1 | 47.7% (21 of 44). Below the threshold; see note 1 |
-| Feedback collected and analysed, areas for improvement identified | [UAT report](./uat-report-2026.md) §§2–4 | Met |
-| Tester initials, living region, attribute and result shared with the community | [UAT report](./uat-report-2026.md) §5 | Partial; see note 1 |
+| Over 70% of community leaders satisfied with the application | [UAT report](./uat-report-2026.md) | 47.7% (21 of 44). Below the threshold; see note 1 |
+| Feedback collected and analysed, areas for improvement identified | [UAT report](./uat-report-2026.md) | Met |
+| Tester initials, living region, attribute and result shared with the community | [UAT report](./uat-report-2026.md) | Partial; see note 1 |
 
 ## Deliverable 3 — Bug fixes and security audit
 
@@ -35,11 +35,11 @@ The report: [Google Doc](https://docs.google.com/document/d/1ACGxRxBfJRke61ywrEf
 ### 1. Deliverable 2
 
 Satisfaction was measured at 47.7% against a 70% threshold.
-[UAT report](./uat-report-2026.md) §2.1 gives the distribution and §4 the analysis.
+[UAT report](./uat-report-2026.md) gives the distribution and the analysis.
 
 Tester information is partial. Company or personal name was collected for 36 of 44
 respondents; initials, region of residence and attribute were not collected as
-separate fields. [UAT report](./uat-report-2026.md) §5 states what is available.
+separate fields. [UAT report](./uat-report-2026.md) states what is available.
 
 ### 2. Scope of the audit
 
@@ -65,9 +65,9 @@ Project Catalyst F12、Project ID 1200088。`517e9a4`（2026-09-04）時点の�
 
 | 受入条件 | エビデンス | 状況 |
 | --- | --- | --- |
-| community leaders の70%超がアプリケーションに満足していること | [UAT 報告書](./uat-report-2026.md) §2.1 | 47.7%（44件中21件）。基準を下回る。備考1を参照 |
-| フィードバックを収集・分析し、改善点を特定すること | [UAT 報告書](./uat-report-2026.md) §2〜4 | 充足 |
-| テスターのイニシャル・居住地域・属性・結果をコミュニティに共有すること | [UAT 報告書](./uat-report-2026.md) §5 | 一部。備考1を参照 |
+| community leaders の70%超がアプリケーションに満足していること | [UAT 報告書](./uat-report-2026.md) | 47.7%（44件中21件）。基準を下回る。備考1を参照 |
+| フィードバックを収集・分析し、改善点を特定すること | [UAT 報告書](./uat-report-2026.md) | 充足 |
+| テスターのイニシャル・居住地域・属性・結果をコミュニティに共有すること | [UAT 報告書](./uat-report-2026.md) | 一部。備考1を参照 |
 
 ## 成果物3 — バグ修正とセキュリティ監査
 
@@ -85,11 +85,11 @@ Project Catalyst F12、Project ID 1200088。`517e9a4`（2026-09-04）時点の�
 ### 1. 成果物2について
 
 満足度の実測値は 47.7%、基準は70%超である。
-分布は [UAT 報告書](./uat-report-2026.md) §2.1、分析は §4 に記載。
+分布と分析は [UAT 報告書](./uat-report-2026.md) に記載。
 
 テスター情報は一部である。44件中36件について会社名または個人名を取得しているが、
 イニシャル・居住地域・属性は個別の項目としては取得していない。取得できている内容は
-[UAT 報告書](./uat-report-2026.md) §5 に記載。
+[UAT 報告書](./uat-report-2026.md) に記載。
 
 ### 2. 監査の範囲
 

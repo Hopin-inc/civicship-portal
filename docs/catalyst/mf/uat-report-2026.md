@@ -9,9 +9,12 @@ Final Milestone, deliverable 2. Project Catalyst F12, Project ID 1200088.
 
 Describes the code at `517e9a4` (2026-09-04).
 
+The deliverable's three acceptance criteria are the three headings below. Usage
+statistics, named in the deliverable itself, are the fourth section.
+
 ---
 
-## 1. What was tested, and with whom
+## What was tested, and with whom
 
 The demonstration ran during the NEO Shikoku 88 Festival across Kagawa, Tokushima,
 Ehime and Kochi. The application was used in production by two distinct groups:
@@ -36,9 +39,9 @@ below state their own denominator.
 
 ---
 
-## 2. Results
+## Criterion 1 — Over 70% of community leaders satisfied with the application
 
-### 2.1 Overall satisfaction with the application
+**Not met. 47.7% (21 of 44).**
 
 > *"How satisfied were you with the overall usability and experience of this
 > application?"* — n = 44
@@ -57,7 +60,7 @@ The milestone's acceptance criterion asks for over 70% of community leaders
 satisfied. **This measurement does not meet that threshold.** Section 4 sets out
 what the number reflects and what we are doing about it.
 
-### 2.2 Usability by function
+### Usability by function
 
 Each function was rated 1–5. A small number of out-of-range entries (values above
 5) were excluded as data-entry errors; the count excluded is stated per row.
@@ -73,7 +76,7 @@ Each function was rated 1–5. A small number of out-of-range entries (values ab
 Every function has a median of 3.0. **Search scores lowest on every measure**, and
 it is the only function whose mean falls below the midpoint.
 
-### 2.3 LINE integration
+### LINE integration
 
 Multiple selection, n = 44, 56 selections.
 
@@ -90,7 +93,7 @@ Multiple selection, n = 44, 56 selections.
 Positive selections outnumber negative ones, 25 to 18. Five providers selected that
 a conventional ID / password account would be preferable.
 
-### 2.4 Intent to continue
+### Intent to continue
 
 | Question | Result |
 | --- | --- |
@@ -99,7 +102,11 @@ a conventional ID / password account would be preferable.
 
 ---
 
-## 3. Qualitative feedback
+## Criterion 2 — Feedback collected and analysed, areas for improvement identified
+
+**Met.** The qualitative responses, the analysis of them, and the resulting actions follow.
+
+### Qualitative feedback
 
 Nine respondents left free-text comments. Three themes carry actionable content;
 the remainder were expressions of thanks and of interest in continuing.
@@ -122,9 +129,7 @@ A separate comment reported an operational constraint rather than a product one:
 one provider kept their experience open for the entire festival period and was too
 occupied to visit others, and suggested cross-provider collaboration formats.
 
----
-
-## 4. Analysis
+### Analysis
 
 **Satisfaction and continuation measure different things.** Satisfaction sits at
 47.7%, intent to provide again at 75%, willingness to be contacted at 84%.
@@ -149,7 +154,10 @@ satisfaction figure.
 
 ---
 
-## 5. Tester information
+## Criterion 3 — Tester initials, living region, attribute and result shared
+
+**Partially met.** Names are held for 36 of 44 respondents; region of residence
+and attribute were not collected.
 
 The acceptance criterion asks for tester initials, region of residence, attribute
 and result.
@@ -171,7 +179,7 @@ consumer.
 
 ---
 
-## Appendix — Platform usage statistics
+## Usage statistics
 
 Cumulative, across all communities on the platform.
 
@@ -205,6 +213,9 @@ credential-only community.
 ---
 ---
 
+---
+---
+
 <a id="ja"></a>
 
 # ユーザー受入テストおよび実証実験 — 報告書
@@ -215,9 +226,12 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 
 `517e9a4`（2026-09-04）時点のコードについて記述している。
 
+本成果物の3つの受入条件が、以下の3つの見出しである。成果物名に含まれる利用統計を
+4節目に置く。
+
 ---
 
-## 1. 何を、誰に対して検証したか
+## 何を、誰に対して検証したか
 
 実証は NEO 四国88祭の期間中、香川・徳島・愛媛・高知の4県で実施した。アプリケーションは
 本番環境で、性質の異なる2つの利用者群によって使われた。
@@ -239,9 +253,9 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 
 ---
 
-## 2. 結果
+## 受入条件1 — community leaders の70%超がアプリケーションに満足していること
 
-### 2.1 アプリケーション全体の満足度
+**未達。47.7%（44件中21件）。**
 
 > 「このアプリの全体的な使用感・体験に、どの程度ご満足いただけましたか？」— n = 44
 
@@ -259,7 +273,7 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 **本測定はこの閾値を満たしていない。** この数値が何を反映しているか、それに対して
 何を行うかは第4節に記す。
 
-### 2.2 機能別の使いやすさ
+### 機能別の使いやすさ
 
 各機能を1〜5で評価。5を超える範囲外の入力が少数あり、入力ミスとして除外した。
 除外件数は行ごとに明記する。
@@ -275,7 +289,7 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 全機能の中央値が3.0である。**検索はすべての指標で最下位**であり、平均が中間点を
 下回る唯一の機能である。
 
-### 2.3 LINE 連携
+### LINE 連携
 
 複数選択、n = 44、選択数56。
 
@@ -292,7 +306,7 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 肯定的な選択が否定的な選択を上回る（25対18）。5名が「一般的な ID・パスワードの登録の
 方が良い」を選択している。
 
-### 2.4 継続意向
+### 継続意向
 
 | 設問 | 結果 |
 | --- | --- |
@@ -301,7 +315,11 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 
 ---
 
-## 3. 自由記述
+## 受入条件2 — フィードバックを収集・分析し、改善点を特定すること
+
+**達成。** 自由記述、その分析、および導かれた対応を以下に記す。
+
+### 自由記述
 
 9名から自由記述の回答を得た。うち3つのテーマが具体的な改善につながる内容を含み、
 残りは謝意および継続への関心の表明であった。
@@ -324,9 +342,7 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 いたため他の体験を訪問する余裕がなかったというもので、事業者間で連携できる企画の提案が
 併せて寄せられた。
 
----
-
-## 4. 分析
+### 分析
 
 **満足度と継続意向は別のものを測っている。** 満足度 47.7%、次回も提供したい 75%、
 来年度の連絡可 84%。事業者は再度参加する意向を持つ一方、ソフトウェアは「良い」ではなく
@@ -349,7 +365,9 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 
 ---
 
-## 5. テスター情報
+## 受入条件3 — テスターのイニシャル・居住地域・属性・結果の共有
+
+**部分的に達成。** 44名中36名の氏名を保持している。居住地域と属性は未取得。
 
 受入条件はテスターのイニシャル、居住地域、属性、テスト結果を求めている。
 
@@ -367,7 +385,7 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 
 ---
 
-## 付録 — プラットフォーム利用統計
+## 利用統計
 
 全コミュニティ横断の累計。
 
