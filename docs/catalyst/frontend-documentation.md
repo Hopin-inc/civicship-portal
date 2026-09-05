@@ -83,8 +83,7 @@ through the GraphQL API in
   front end's checks are for navigation, not for security.
 
 The backend's own technical documentation was submitted as Milestone 4
-(27 November 2025). Work in the repositories since is summarised in
-[note 2 of the index](./README.md#2-work-in-the-repositories-after-milestone-4).
+(27 November 2025).
 
 ## Main screens
 
@@ -221,7 +220,6 @@ UX は LINE 内のモバイルブラウザを前提としている。対象と�
   チェックはナビゲーションのためのものであってセキュリティのためではない。**
 
 バックエンド自体の技術ドキュメントは Milestone 4（2025年11月27日）として提出済み。
-提出後にリポジトリに入った作業は[索引の備考2](./README.md#2-milestone-4-以降にリポジトリに入った作業)にまとめている。
 
 ## 主な画面
 
