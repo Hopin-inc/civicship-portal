@@ -7,8 +7,6 @@
 
 Resident use cases the Milestone 3 playlists did not cover.
 
-Milestone 5, deliverable 3. Project Catalyst F12, Project ID 1200088.
-
 | | Use case | Video |
 | --- | --- | --- |
 | ⑧ | The user sends points to another member | [`08_send-points.mp4`](./08_send-points.mp4) |
@@ -25,8 +23,6 @@ Milestone 5, deliverable 3. Project Catalyst F12, Project ID 1200088.
 *[English is above](#en)*
 
 Milestone 3 のプレイリストが扱っていなかった住民向けのユースケース。
-
-Milestone 5 成果物3。Project Catalyst F12、Project ID 1200088。
 
 | | ユースケース | 動画 |
 | --- | --- | --- |

@@ -5,31 +5,22 @@
 *English below · [日本語は下段へ](#ja)*
 
 
-[Hexens](https://hexens.io/) assessed the civicship platform between September and
-December 2025. **[The report](https://drive.google.com/file/d/1T3v22q6stRceDy9eDbvpKB1rWGgGpO0W/view)**
-is published as Hexens wrote it: it carries the scope, the findings, their
-severities, the reproduction steps and the status Hexens recorded for each one.
-None of that is restated here.
-
-This page records the other half — what changed in the code in response to each
-finding, so that the fixes can be checked against the source.
+[Hexens](https://hexens.io/) assessed the civicship platform, September–December
+2025. **[The report](https://drive.google.com/file/d/1T3v22q6stRceDy9eDbvpKB1rWGgGpO0W/view)**
+carries the findings, their severities and the status Hexens recorded for each.
+This page records what changed in the code.
 
 ## Scope and currency
 
-The audit assessed the codebase as of September–December 2025 and targeted the
-NEO88 deployment, whose demonstration phase has since concluded. The live
-deployments today are Kibotcha, Izu, Kotohira and DAIS. The audit's scope was the
-`civicship-portal` and `civicship-api` repositories and their workflows rather
-than one deployment's configuration, and every community runs the same codebase,
-so the findings and their fixes are in shared code.
+The audit targeted the NEO88 deployment, but its scope was the `civicship-portal`
+and `civicship-api` repositories and their workflows, and every community runs the
+same codebase — so the fixes below are in shared code, not in one environment.
 
-Both repositories have moved since — well over a hundred commits to
-`civicship-api`'s `master` alone. Nothing here should be read as evidence about
-code written after December 2025.
+Both repositories have moved on since December 2025. Nothing here is evidence
+about code written after that.
 
-One fix landed after the report was issued: HOPIN-3, which the report records as
-*Acknowledged*, was resolved afterwards. Its entry below rests on the current
-source, not on Hexens confirming it.
+HOPIN-3's fix landed after the report was issued, so its entry rests on the
+current source rather than on Hexens confirming it.
 
 ## What changed, by finding
 
@@ -100,30 +91,22 @@ See [`public/.well-known/security.txt`](../../../public/.well-known/security.txt
 
 *[English is above](#en)*
 
-[Hexens](https://hexens.io/) が2025年9月から12月にかけて civicship プラットフォームを
-評価した。**[レポート](https://drive.google.com/file/d/1T3v22q6stRceDy9eDbvpKB1rWGgGpO0W/view)**
-は Hexens が作成したまま公開している。監査範囲、指摘事項、重大度、再現手順、および
-各指摘に対して Hexens が記録したステータスはすべてレポートに記載されており、
-本ページでは繰り返さない。
-
-本ページが記録するのはもう一方、すなわち各指摘を受けてコードで何を変更したかであり、
-修正内容をソースコードと突き合わせて検証できるようにするためのものである。
+[Hexens](https://hexens.io/) が2025年9〜12月に civicship プラットフォームを評価した。
+指摘事項・重大度・各指摘のステータスは
+**[レポート](https://drive.google.com/file/d/1T3v22q6stRceDy9eDbvpKB1rWGgGpO0W/view)**
+に記載。本ページはコードで何を変更したかを記録する。
 
 ## 監査の範囲と、現在との時間差
 
-監査は2025年9〜12月時点のコードベースを評価し、NEO88 の環境を対象としている。同環境の
-実証フェーズは既に終了しており、現在稼働しているのはキボッチャ、伊豆、琴平、DAIS である。
-監査範囲は特定環境の設定ではなく `civicship-portal` と `civicship-api` のリポジトリ
-およびそのワークフローであり、すべてのコミュニティは同一のコードベースで動作している
-ため、指摘とその修正は共有コードの側に存在する。
+監査対象は NEO88 の環境だが、監査範囲は `civicship-portal` と `civicship-api` の
+リポジトリおよびそのワークフローであり、すべてのコミュニティは同一のコードベースで
+動作している。したがって以下の修正は特定環境ではなく共有コードに存在する。
 
-以降、両リポジトリは相当に動いており、`civicship-api` の `master` だけでも100を優に
-超えるコミットが入っている。本ドキュメントのいかなる記述も、2025年12月以降に書かれた
-コードに関する証拠として読まれるべきではない。
+両リポジトリは2025年12月以降も動いている。本ドキュメントは、それ以降に書かれた
+コードに関する証拠ではない。
 
-1件のみ、レポート発行後に修正が入っている。HOPIN-3 はレポート上 *Acknowledged* と
-記録されているが、その後に解消された。同項目の記載は現在のソースコードに基づくもので
-あって、Hexens が確認したものではない。
+HOPIN-3 の修正はレポート発行後に入ったため、同項目の記載は現在のソースコードに
+基づくものであって、Hexens が確認したものではない。
 
 ## 指摘ごとの変更内容
 
