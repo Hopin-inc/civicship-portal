@@ -87,8 +87,7 @@ Multiple selection, n = 44, 56 selections.
 | A conventional ID / password would be better | 5 |
 | If we use LINE, I want to be reachable on LINE | 1 |
 
-Positive selections outnumber negative ones, 25 to 18. Five providers selected that
-a conventional ID / password account would be preferable.
+Positive selections outnumber negative ones, 25 to 18.
 
 ### Intent to continue
 
@@ -116,10 +115,6 @@ application: *"the pamphlet was hard to use without explanation, which made
 promotion difficult."* Recorded here because discovery of experiences spans both
 the app and the printed material.
 
-A separate comment reported an operational constraint rather than a product one:
-one provider kept their experience open for the entire festival period and was too
-occupied to visit others, and suggested cross-provider collaboration formats.
-
 ### Analysis
 
 **Satisfaction and continuation measure different things.** Satisfaction sits at
@@ -129,9 +124,6 @@ Providers intend to return; they found the software adequate rather than good.
 **The distribution is centred, not polarised.** The largest response is "satisfied"
 (38.6%), the second "neither" (27.3%), and every function has a median of exactly
 3.0. Dissatisfied responses total 25.0%.
-
-**Search is the specific defect** — lowest quantitatively and the subject of the
-most concrete comment.
 
 **Four of the five functions are ones the provider operates; search is not.**
 Registering, running, notifying and reservation handling are what a provider does
@@ -342,8 +334,7 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 | 一般的な ID・パスワードの登録の方が良い | 5 |
 | LINE を使うなら LINE で連絡が取れるようにしてほしい | 1 |
 
-肯定的な選択が否定的な選択を上回る（25対18）。5名が「一般的な ID・パスワードの登録の
-方が良い」を選択している。
+肯定的な選択が否定的な選択を上回る（25対18）。
 
 ### 継続意向
 
@@ -371,10 +362,6 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 「パンフレットが説明なしには使いにくく広報が難しかった」があった。体験の発見はアプリと
 印刷物の両方にまたがるため、ここに記録する。
 
-なお、プロダクトではなく運営上の制約を報告した回答もあった。期間を通して体験を開放して
-いたため他の体験を訪問する余裕がなかったというもので、事業者間で連携できる企画の提案が
-併せて寄せられた。
-
 ### 分析
 
 **満足度と継続意向は別のものを測っている。** 満足度 47.7%、次回も提供したい 75%、
@@ -383,8 +370,6 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 
 **分布は二極化しておらず中央に寄っている。** 最多は「満足している」（38.6%）、次が
 「どちらともいえない」（27.3%）で、全機能の中央値がちょうど3.0。不満側は合計25.0%。
-
-**検索が具体的な欠陥である。** 定量的に最下位で、かつ最も具体的な指摘の対象でもある。
 
 **5機能のうち4つは事業者自身が操作する機能であり、検索だけがそうではない。**
 体験の登録・実施・通知・予約対応は事業者がアプリ上で行う作業である。検索を使うのは

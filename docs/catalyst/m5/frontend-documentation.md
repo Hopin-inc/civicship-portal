@@ -84,26 +84,6 @@ documentation was submitted as Milestone 4 (27 November 2025).
 
 Relevant source: `src/lib/auth/`, `src/middleware.ts`.
 
-A development-only path bypasses LINE and Firebase entirely, so a tester can
-exercise a non-production deployment without a LINE account. It is gated on the
-deployment's `ENV` and cannot fire in production, which sets no `ENV` at all.
-See [`docs/development/dev-login.md`](../../development/dev-login.md).
-
-### Across communities
-
-One codebase serves seven communities. Each is a separate tenant with its own
-domain, branding, Firebase tenant, and LINE channel. Which features a community
-sees is driven by `enableFeatures` on its portal configuration — points,
-opportunities, quests, tickets, places, credentials. A community configured for
-credentials only never renders the economic features at all, which is what lets a
-single implementation serve communities as different as Kibotcha (daily point
-circulation) and DAIS (credential issuance with no economic activity).
-
-Relevant source: `src/lib/communities/`, `src/contexts/CommunityConfigContext.tsx`.
-
-Adding a community is documented at
-[`docs/development/add-new-community.md`](../../development/add-new-community.md).
-
 ---
 
 ## User instructions
@@ -203,26 +183,6 @@ API 自体の技術ドキュメントは Milestone 4（2025年11月27日）と�
 5. 検証済みの電話番号に対して **DID** を発行する。
 
 関連するソース：`src/lib/auth/`、`src/middleware.ts`
-
-LINE と Firebase を完全にバイパスする開発専用の経路もあり、テスターは LINE アカウント
-無しで非本番環境を検証できる。デプロイの `ENV` でゲートされており、`ENV` を一切設定
-しない本番環境では発火しない。
-[`docs/development/dev-login.md`](../../development/dev-login.md) を参照。
-
-### コミュニティ間の構成
-
-単一のコードベースが7つのコミュニティに提供されている。各コミュニティは独立したテナント
-であり、独自のドメイン、ブランディング、Firebase テナント、LINE チャネルを持つ。どの機能が
-表示されるかは、そのコミュニティのポータル設定にある `enableFeatures` が決定する —
-ポイント、募集、クエスト、チケット、拠点、クレデンシャル。クレデンシャル専用に設定された
-コミュニティでは経済系の機能は一切描画されず、これによりキボッチャ（日常的なポイント循環）
-と DAIS（経済活動を伴わないクレデンシャル発行）のように性格の異なるコミュニティを、
-単一の実装で提供できている。
-
-関連するソース：`src/lib/communities/`、`src/contexts/CommunityConfigContext.tsx`
-
-コミュニティの追加手順は
-[`docs/development/add-new-community.md`](../../development/add-new-community.md) に記載。
 
 ---
 
