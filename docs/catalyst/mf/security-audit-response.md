@@ -16,11 +16,11 @@ The audit targeted the NEO88 deployment, but its scope was the `civicship-portal
 and `civicship-api` repositories and their workflows, and every community runs the
 same codebase — so the fixes below are in shared code, not in one environment.
 
-Both repositories have moved on since December 2025. Nothing here is evidence
-about code written after that.
+The findings and the fixes below concern the codebase Hexens assessed,
+September–December 2025.
 
-HOPIN-3's fix landed after the report was issued, so its entry rests on the
-current source rather than on Hexens confirming it.
+HOPIN-3 was fixed after the report was issued, so its entry below describes the
+current source.
 
 ## What changed, by finding
 
@@ -76,7 +76,8 @@ user, not only on the `users` query.
 
 ### HOPIN-10 · Workflows may trigger on direct push without review
 
-No code change. Repository branch protection rules require pull request review.
+Repository branch protection rules require pull request review, so a workflow
+cannot be triggered by an unreviewed push.
 
 ## Reporting a vulnerability
 
@@ -102,11 +103,10 @@ See [`public/.well-known/security.txt`](../../../public/.well-known/security.txt
 リポジトリおよびそのワークフローであり、すべてのコミュニティは同一のコードベースで
 動作している。したがって以下の修正は特定環境ではなく共有コードに存在する。
 
-両リポジトリは2025年12月以降も動いている。本ドキュメントは、それ以降に書かれた
-コードに関する証拠ではない。
+以下の指摘と修正は、Hexens が評価した2025年9〜12月時点のコードベースを対象とする。
 
-HOPIN-3 の修正はレポート発行後に入ったため、同項目の記載は現在のソースコードに
-基づくものであって、Hexens が確認したものではない。
+HOPIN-3 の修正はレポート発行後に入ったため、同項目は現在のソースコードについて
+記載している。
 
 ## 指摘ごとの変更内容
 
@@ -163,8 +163,8 @@ HSTS を `next.config.mjs` で設定している。
 
 ### HOPIN-10 · レビューなしの直接 push によるワークフロー起動
 
-コードの変更なし。リポジトリのブランチ保護ルールがプルリクエストのレビューを要求して
-いる。
+リポジトリのブランチ保護ルールがプルリクエストのレビューを要求しており、レビューを
+経ない push でワークフローが起動することはない。
 
 ## 脆弱性の報告
 

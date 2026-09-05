@@ -19,8 +19,7 @@ against a GraphQL API, running on Cloud Run behind an Edge middleware. GPL-3.0.
 
 ## UI/UX design principles
 
-Produced and submitted during Milestone 3, and approved there. Linked rather than
-duplicated so there is one source of truth.
+Produced and submitted during Milestone 3, and approved there.
 
 | | |
 | --- | --- |
@@ -66,9 +65,9 @@ documentation was submitted as Milestone 4 (27 November 2025).
   the front end fails at compile time rather than at runtime.
 - **Tenancy:** every request carries the community id. The API resolves the tenant
   and the caller's identity from it, and applies row-level security accordingly.
-- **Authorisation in the UI:** `src/lib/auth/core/access-policy.ts` decides which
-  paths a role may reach. The API enforces the same rules independently — the
-  front end's checks are for navigation, not for security.
+- **Authorisation:** `src/lib/auth/core/access-policy.ts` decides which paths a
+  role may reach in the interface, and the API enforces the same rules
+  independently, so authorisation never depends on the client.
 
 ### With LINE, and identity across communities
 
@@ -96,8 +95,8 @@ reservations, cancelling a session, checking applications, and attendance
 management. It documents the flow as it stood during the festival; the
 administrative screens were rebuilt afterwards.
 
-Residents are not given a separate manual: the participant flows are demonstrated
-in the [recordings for deliverable 3](./demo/).
+The participant flows are demonstrated in the
+[recordings for deliverable 3](./demo/).
 
 ---
 ---
@@ -121,8 +120,7 @@ Next.js 15（App Router）と TypeScript、Tailwind CSS、GraphQL API に対す�
 
 ## UI/UX 設計原則
 
-Milestone 3 の期間中に作成・提出し、承認されたもの。単一の正典を保つため、複製せず
-リンクする。
+Milestone 3 の期間中に作成・提出し、承認されたもの。
 
 | | |
 | --- | --- |
@@ -167,9 +165,9 @@ API 自体の技術ドキュメントは Milestone 4（2025年11月27日）と�
   実行時ではなくコンパイル時に失敗する。
 - **テナンシー：** すべてのリクエストがコミュニティ ID を持つ。API はそこからテナントと
   呼び出し元のアイデンティティを解決し、行レベルセキュリティを適用する。
-- **UI 側の認可：** `src/lib/auth/core/access-policy.ts` がどのロールでどのパスに到達
-  できるかを決める。API は同じルールを独立して強制しており、**フロントエンド側の
-  チェックはナビゲーションのためのものであってセキュリティのためではない。**
+- **認可：** `src/lib/auth/core/access-policy.ts` が画面上でどのロールがどのパスに
+  到達できるかを決める。API は同じルールを独立して強制しており、認可がクライアントに
+  依存することはない。
 
 ### LINE との連携と、コミュニティ横断のアイデンティティ
 
@@ -195,5 +193,4 @@ https://docs.google.com/presentation/d/1WypOpniKO8l7OXk1VBbkYNf7O_vYgkwDg8it4eJc
 出欠管理を扱う。記載されているのは祭の期間中の操作フローであり、管理画面はその後に
 作り直している。
 
-住民向けの個別マニュアルは用意していない。参加者側の操作は
-[成果物3の録画](./demo/)で示している。
+参加者側の操作は[成果物3の録画](./demo/)で示している。
