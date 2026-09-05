@@ -180,8 +180,6 @@ consumer.
 
 ---
 
----
-
 ## Usage statistics
 
 Cumulative, across all communities on the platform.
@@ -212,9 +210,6 @@ month: it was designed as a time-limited demonstration community and its
 demonstration phase has concluded. DAIS shows DIDs and VCs approximately equal to
 its member count and no economic activity, which reflects its configuration as a
 credential-only community.
-
----
----
 
 ---
 ---
@@ -388,8 +383,6 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 アプリケーション関連設問の回答者は全員が、祭の期間中に四国4県（香川・徳島・愛媛・高知）
 で事業を営む体験提供事業者であり、個人の消費者としてではなく事業者・団体を代表して
 参加していた。
-
----
 
 ---
 
