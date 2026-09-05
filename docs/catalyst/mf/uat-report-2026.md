@@ -137,14 +137,13 @@ Providers intend to return; they found the software adequate rather than good.
 most concrete comment. Improving discovery is the change most likely to move the
 satisfaction figure.
 
-### Actions taken and planned
+### Areas for improvement identified
 
-| Finding | Action |
+| Area | What the responses show |
 | --- | --- |
-| Search / discovery rated lowest | Prioritised for redesign. The requirement is a view that lets a participant see what experiences exist and where, rather than a list to be filtered. |
-| Listing format too rigid | Per-experience configurable fields and notes are under consideration for the next iteration. |
-| LINE onboarding has too many steps for some | The step count is being reviewed. Replacing LINE authentication with ID/password is not planned, as the majority found registration easy and LINE is what the target residents already use. |
-| Off-app discovery materials | Handed to the event organising side; outside the application's scope. |
+| Discovery | Lowest of the five functions (mean 2.89, 31.9% rating it 4–5) and the subject of the most concrete free-text comment. What is asked for is a view of what experiences exist and where, rather than a list to be filtered. |
+| Listing format | The model assumes a common shape for every experience. What is asked for is selection fields and notes that can be built per experience. |
+| LINE onboarding | Six of 44 selected "too many steps" and five that a conventional ID / password would be better; ten selected that registration was easy, and fifteen that communication was smooth. |
 
 ---
 
@@ -336,14 +335,13 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 **検索が具体的な欠陥である。** 定量的に最下位で、かつ最も具体的な指摘の対象でもある。
 発見性の改善が、満足度の数値を動かす可能性が最も高い変更である。
 
-### 実施済みおよび予定している対応
+### 特定した改善点
 
-| 指摘 | 対応 |
+| 領域 | 回答が示していること |
 | --- | --- |
-| 検索・発見が最低評価 | 再設計の優先対象とする。要件は、絞り込むためのリストではなく、どんな体験がどこにあるかを参加者が俯瞰できるビュー。 |
-| 掲載形式が硬直的 | 体験ごとに設定可能な項目と留意事項を、次のイテレーションで検討中。 |
-| 一部の事業者にとって LINE の導線が長い | 手順数を見直し中。LINE 認証を ID・パスワードに置き換える予定はない — 多数は登録を楽と回答しており、対象となる住民が日常的に使っているのは LINE であるため。 |
-| アプリ外の発見用資材 | イベント運営側に引き継いだ。アプリケーションの範囲外。 |
+| 発見性 | 5機能中で最下位（平均2.89、4〜5の評価は31.9%）であり、自由記述で最も具体的な指摘の対象でもある。求められているのは、絞り込むためのリストではなく、どんな体験がどこにあるかを俯瞰できるビュー。 |
+| 掲載形式 | 現行モデルはすべての体験に共通の形式を前提としている。求められているのは、体験ごとに構成できる選択項目と留意事項。 |
+| LINE の導線 | 44名中6名が「手順が多い」、5名が「一般的な ID・パスワードの登録の方が良い」を選択。一方10名が「アカウント登録が楽」、15名が「やり取りがスムーズ」を選択している。 |
 
 ---
 

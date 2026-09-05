@@ -6,8 +6,6 @@
 
 
 Project Catalyst F12, Project ID 1200088. Code as of `517e9a4` (2026-09-04).
-Deliverables 1 (event hosting), 4 (close-out report) and 5 (close-out video) are
-submitted separately.
 
 ## Deliverable 2 — Reports on the demonstration experiment, user feedback and usage statistics
 
@@ -56,8 +54,6 @@ The audit assessed the codebase as of September–December 2025.
 *[English is above](#en)*
 
 Project Catalyst F12、Project ID 1200088。`517e9a4`（2026-09-04）時点のコード。
-成果物1（イベント開催）、成果物4（クローズアウト報告書）、成果物5（クローズアウト動画）
-は別途提出。
 
 ## 成果物2 — 実証実験・利用者フィードバック・利用統計の報告
 
