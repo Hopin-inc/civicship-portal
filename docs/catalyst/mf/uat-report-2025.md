@@ -77,22 +77,6 @@ Each function was rated 1–5 by all 35 respondents.
 **Search scores lowest on every measure.** No function reaches 4.0 on the mean,
 and reservation handling is the only one whose median does.
 
-### LINE integration
-
-Multiple selection, n = 35, 41 selections.
-
-| Response | Selections |
-| --- | ---: |
-| Communication was smooth | 11 |
-| Nothing in particular | 10 |
-| Account registration was easy | 9 |
-| Hard to use | 5 |
-| A conventional ID / password would be better | 3 |
-| Too many steps | 2 |
-| If we use LINE, I want to be reachable on LINE | 1 |
-
-Positive selections outnumber negative ones, 20 to 11.
-
 ### Intent to continue
 
 | Question | Result |
@@ -101,7 +85,7 @@ Positive selections outnumber negative ones, 20 to 11.
 
 ### Qualitative feedback
 
-Eight respondents left free-text comments. Three themes carry actionable content;
+Eight respondents left free-text comments. Two themes carry actionable content;
 the remainder were expressions of thanks and of interest in continuing.
 
 **Discoverability.** One provider wrote that they wanted *"a way of presenting
@@ -112,11 +96,6 @@ Search is also the lowest-scoring function quantitatively (mean 3.09).
 inflexible — it would be better if the selection fields and notes could be built
 to suit each individual experience."* The current model assumes a common shape for
 every experience; providers with unusual formats had to work around it.
-
-**Off-app materials.** One comment concerned the printed pamphlet rather than the
-application: *"the pamphlet was hard to use without explanation, which made
-promotion difficult."* Recorded here because discovery of experiences spans both
-the app and the printed material.
 
 ### Analysis
 
@@ -327,22 +306,6 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 **検索はすべての指標で最下位である。**平均が4.0に達する機能はなく、中央値が4.0に
 達するのは予約対応のみである。
 
-### LINE 連携
-
-複数選択、n = 35、選択数41。
-
-| 回答 | 選択数 |
-| --- | ---: |
-| やり取りがスムーズ | 11 |
-| 特になし | 10 |
-| アカウント登録が楽 | 9 |
-| 使いにくい | 5 |
-| 一般的な ID・パスワードの登録の方が良い | 3 |
-| 手順が多い | 2 |
-| LINE を使うなら LINE で連絡が取れるようにしてほしい | 1 |
-
-肯定的な選択が否定的な選択を上回る（20対11）。
-
 ### 継続意向
 
 | 設問 | 結果 |
@@ -351,7 +314,7 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 
 ### 自由記述
 
-8名から自由記述の回答を得た。うち3つのテーマが具体的な改善につながる内容を含み、
+8名から自由記述の回答を得た。うち2つのテーマが具体的な改善につながる内容を含み、
 残りは謝意および継続への関心の表明であった。
 
 **発見性。** ある事業者は
@@ -363,10 +326,6 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 作り方ができたらより良いかなと思いました」
 と指摘した。現行モデルはすべての体験に共通の形式を前提としており、特殊な形態の事業者は
 回避策を取る必要があった。
-
-**アプリ外の資材。** アプリケーションではなく印刷パンフレットに関する指摘として
-「パンフレットが説明なしには使いにくく広報が難しかった」があった。体験の発見はアプリと
-印刷物の両方にまたがるため、ここに記録する。
 
 ### 分析
 
