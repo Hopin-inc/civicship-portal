@@ -89,7 +89,7 @@ No code change. Repository branch protection rules require pull request review.
 
 ## Reporting a vulnerability
 
-See [`public/.well-known/security.txt`](../../public/.well-known/security.txt).
+See [`public/.well-known/security.txt`](../../../public/.well-known/security.txt).
 
 ---
 ---
@@ -185,4 +185,4 @@ HSTS を `next.config.mjs` で設定している。
 
 ## 脆弱性の報告
 
-[`public/.well-known/security.txt`](../../public/.well-known/security.txt) を参照。
+[`public/.well-known/security.txt`](../../../public/.well-known/security.txt) を参照。
