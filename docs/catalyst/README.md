@@ -27,6 +27,7 @@ These documents describe the code at `517e9a4` (2026-09-04).
 | Final | 2. Reports on the demonstration experiment, user feedback and usage statistics | Tester initials, living region, attribute and result shared with the community | [UAT report](./uat-report-2026.md) §5 | Partial; see note 1 |
 | Final | 3. Bug fixes and security audit | Detailed report of bug fixes from user acceptance tests and security audits, shared with the community | [Security audit and remediation](../security/audit-2025-hexens.md) | Met |
 | Final | 3. Bug fixes and security audit | Security audit conducted by a recognised third-party organisation | [Security audit and remediation](../security/audit-2025-hexens.md) — Hexens | Met |
+| Final | 3. Bug fixes and security audit | Audit report and evidence of fixes publicly accessible | [Hexens report, final](https://drive.google.com/file/d/1T3v22q6stRceDy9eDbvpKB1rWGgGpO0W/view) · [Security audit and remediation](../security/audit-2025-hexens.md) | Met |
 | Final | 3. Bug fixes and security audit | Fixed code publicly available on GitHub | https://github.com/Hopin-inc/civicship-portal · https://github.com/Hopin-inc/civicship-api | Met |
 
 This index covers the deliverables evidenced from this repository. Other
@@ -112,6 +113,7 @@ Project Catalyst Fund 12「四国地域における Cardano の社会実装ユ�
 | Final | 2. 実証実験・利用者フィードバック・利用統計の報告 | テスターのイニシャル・居住地域・属性・結果をコミュニティに共有すること | [UAT 報告書](./uat-report-2026.md) §5 | 一部。備考1を参照 |
 | Final | 3. バグ修正とセキュリティ監査 | 受入テストと監査で判明したバグ修正の詳細な報告を、コミュニティに共有すること | [セキュリティ監査と対応状況](../security/audit-2025-hexens.md) | 充足 |
 | Final | 3. バグ修正とセキュリティ監査 | 認知された第三者機関による監査が実施されていること | [セキュリティ監査と対応状況](../security/audit-2025-hexens.md) — Hexens | 充足 |
+| Final | 3. バグ修正とセキュリティ監査 | 監査レポートと修正の証跡が公開されていること | [Hexens レポート（最終版）](https://drive.google.com/file/d/1T3v22q6stRceDy9eDbvpKB1rWGgGpO0W/view) · [セキュリティ監査と対応状況](../security/audit-2025-hexens.md) | 充足 |
 | Final | 3. バグ修正とセキュリティ監査 | 修正済みコードが GitHub で公開されていること | https://github.com/Hopin-inc/civicship-portal · https://github.com/Hopin-inc/civicship-api | 充足 |
 
 この索引が対象としているのは、本リポジトリからエビデンスを示す成果物のみである。

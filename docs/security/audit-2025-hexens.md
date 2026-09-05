@@ -21,6 +21,7 @@ checked against the source.
 | **Initial report** | 7 October 2025 |
 | **Revision submitted** | 12 December 2025 |
 | **Final report** | 16 December 2025 |
+| **The report** | [Hopin Security Assessment Report, final](https://drive.google.com/file/d/1T3v22q6stRceDy9eDbvpKB1rWGgGpO0W/view) — published by Hopin, the client, with Hexens' findings and their recorded status |
 
 ### Findings by severity
 
@@ -139,6 +140,10 @@ were reachable through `communities → memberships → user`.
 caller is permitted to see it, so the field is protected on every path that reaches
 a user, not only on the `users` query.
 
+*Residual, tracked:* the report's remediation also suggests restricting the EVM
+wallet address where users are not intended to publish it. `User.nftWallet` is
+still resolved without a viewer check.
+
 ### HOPIN-10 · Workflows may trigger on direct push without review — **Informational**
 
 **Acknowledged.** Workflow definitions do not themselves verify that branch
@@ -157,7 +162,7 @@ pull request review, rather than by changing the workflow triggers.
 | HOPIN-8 Floating action versions | Low | Fixed · two actions tracked |
 | HOPIN-9 Lockfile integrity not enforced | Low | Fixed |
 | HOPIN-11 Missing Strict-Transport-Security | Informational | Fixed |
-| HOPIN-3 PII via alternative GraphQL path | Informational | Fixed |
+| HOPIN-3 PII via alternative GraphQL path | Informational | Fixed · one hardening item tracked |
 | HOPIN-10 Workflows trigger on direct push | Informational | Accepted — covered by branch protection |
 
 Both high-severity findings and all three medium-severity findings are fixed. The
@@ -191,6 +196,7 @@ civicship プラットフォームに対する第三者セキュリティ評価�
 | **初版レポート** | 2025年10月7日 |
 | **修正提出** | 2025年12月12日 |
 | **最終レポート** | 2025年12月16日 |
+| **レポート本体** | [Hopin Security Assessment Report（最終版）](https://drive.google.com/file/d/1T3v22q6stRceDy9eDbvpKB1rWGgGpO0W/view) — 依頼主である Hopin が公開。Hexens の指摘と、レポート上の対応状況を含む |
 
 ### 重大度別の件数
 
@@ -307,6 +313,10 @@ SHA にピン留めされている。
 ようになった。これによりレポートが指摘した `users` クエリだけでなく、**ユーザーに到達
 するすべての経路で保護される。**
 
+*残存・記録中：* レポートは併せて、利用者が公開を意図していない場合に EVM ウォレット
+アドレスも制限することを推奨している。`User.nftWallet` は現在も閲覧者チェックなしで
+解決されている。
+
 ### HOPIN-10 · ワークフローがレビューなしの直接 push で起動しうる — **Informational**
 
 **受容。** ワークフロー定義自体はブランチ保護の存在を検証しない。これはワークフローの
@@ -325,7 +335,7 @@ SHA にピン留めされている。
 | HOPIN-8 Actions のバージョン浮動 | Low | 修正済 · 2件を記録中 |
 | HOPIN-9 ロックファイル整合性の未強制 | Low | 修正済 |
 | HOPIN-11 Strict-Transport-Security の欠如 | Informational | 修正済 |
-| HOPIN-3 別経路経由の PII 露出 | Informational | 修正済 |
+| HOPIN-3 別経路経由の PII 露出 | Informational | 修正済 · ハードニング1件を記録中 |
 | HOPIN-10 直接 push によるワークフロー起動 | Informational | 受容 — ブランチ保護で担保 |
 
 **High の2件と Medium の3件はすべて修正済み。** 残る2件は、報告された攻撃を塞ぐ範囲を
