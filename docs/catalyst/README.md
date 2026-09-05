@@ -17,11 +17,17 @@ These documents describe the code at `517e9a4` (2026-09-04).
 
 | Milestone | Deliverable | Acceptance criterion | Evidence | Status |
 | --- | --- | --- | --- | --- |
-| Milestone 5 | 1. Front-end development | Documentation covering UI/UX design principles, integration processes, and user instructions | [Front-end documentation](./frontend-documentation.md) | Met |
-| Milestone 5 | 3. Demo video | A demonstration of the delivered front end | [Demonstration videos](./demo/) — twenty-one use-case recordings in two sets: the eleven Milestone 3 demonstrated, and ten it did not cover | Met |
-| Final | 3. User acceptance testing | Over 70% of community leaders satisfied | [UAT report](./uat-report-2026.md) §2.1 | 47.7% (21 of 44). Below the threshold; see note 1 |
-| Final | 3. User acceptance testing | Tester initials, region of residence, attribute and result | [UAT report](./uat-report-2026.md) §5 | Partial; see note 1 |
-| Final | 4. Bug fixes and security audit | Security audit results and an account of the bug fixes, published where the community can access them | [Security audit and remediation](../security/audit-2025-hexens.md) | Met |
+| Milestone 5 | 1. Front-end development | The front-end source code is published on GitHub | https://github.com/Hopin-inc/civicship-portal — GPL-3.0 | Met |
+| Milestone 5 | 1. Front-end development | Detailed documentation, including UI/UX design principles, integration processes, and user instructions | [Front-end documentation](./frontend-documentation.md) | Met |
+| Milestone 5 | 1. Front-end development | A link is provided to try out the completed mutual app | https://dev.civicship.app/community/neo88 — see [Trying the application](#trying-the-application) | Met |
+| Milestone 5 | 1. Front-end development | Fully functional and responsive across different devices | The same link, opened on a phone and on a desktop browser — see [Trying the application](#trying-the-application) | Met |
+| Milestone 5 | 3. Demo video | The demo video is published on YouTube and is freely accessible to the community | [Demonstration videos](./demo/) — twenty-one use-case recordings in two sets: the eleven Milestone 3 demonstrated, and ten it did not cover | Recorded; YouTube publication pending |
+| Milestone 5 | 3. Demo video | The video includes an access link to the application for usability testing | https://dev.civicship.app/community/neo88 | Pending — carried in the YouTube descriptions |
+| Final | 2. Reports on the demonstration experiment, user feedback and usage statistics | Over 70% of community leaders satisfied with the application | [UAT report](./uat-report-2026.md) §2.1 | 47.7% (21 of 44). Below the threshold; see note 1 |
+| Final | 2. Reports on the demonstration experiment, user feedback and usage statistics | Tester initials, living region, attribute and result shared with the community | [UAT report](./uat-report-2026.md) §5 | Partial; see note 1 |
+| Final | 3. Bug fixes and security audit | Detailed report of bug fixes from user acceptance tests and security audits, shared with the community | [Security audit and remediation](../security/audit-2025-hexens.md) | Met |
+| Final | 3. Bug fixes and security audit | Security audit conducted by a recognised third-party organisation | [Security audit and remediation](../security/audit-2025-hexens.md) — Hexens | Met |
+| Final | 3. Bug fixes and security audit | Fixed code publicly available on GitHub | https://github.com/Hopin-inc/civicship-portal · https://github.com/Hopin-inc/civicship-api | Met |
 
 This index covers the deliverables evidenced from this repository. Other
 deliverables in these milestones are submitted separately and are not indexed here.
@@ -45,6 +51,16 @@ deliverables in these milestones are submitted separately and are not indexed he
 DAIS renders only after login because it handles credential data. NEO88
 (https://www.neo88.app/) was the initial demonstration partner; its demonstration
 phase has concluded.
+
+## Trying the application
+
+https://dev.civicship.app/community/neo88
+
+The NEO88 community on the development deployment. A visitor arriving without a
+session is signed in automatically as a throwaway account, so the application can
+be used without a LINE account. The interface is a LINE mini app: it is laid out
+for a phone, adapts to the viewport width, and on a desktop browser the mobile
+layout is centred on the page.
 
 ---
 
@@ -86,11 +102,17 @@ Project Catalyst Fund 12「四国地域における Cardano の社会実装ユ�
 
 | マイルストーン | 成果物 | 受入条件 | エビデンス | 状況 |
 | --- | --- | --- | --- | --- |
-| Milestone 5 | 1. フロントエンド開発 | UI/UX 設計原則・バックエンド連携・利用者向け手順書を含むドキュメント | [フロントエンド ドキュメント](./frontend-documentation.md) | 充足 |
-| Milestone 5 | 3. デモ動画 | 完成したフロントエンドのデモンストレーション | [デモ動画](./demo/) — ユースケース別21本を2セットに分けて収録（Milestone 3 と同じ11件、扱われていなかった10件） | 充足 |
-| Final | 3. ユーザー受入テスト | community leaders の70%超が満足していること | [UAT 報告書](./uat-report-2026.md) §2.1 | 47.7%（44件中21件）。基準を下回る。備考1を参照 |
-| Final | 3. ユーザー受入テスト | テスターのイニシャル・居住地域・属性・テスト結果 | [UAT 報告書](./uat-report-2026.md) §5 | 一部。備考1を参照 |
-| Final | 4. バグ修正とセキュリティ監査 | セキュリティ監査の結果とバグ修正の説明を、コミュニティがアクセスできる形で公開すること | [セキュリティ監査と対応状況](../security/audit-2025-hexens.md) | 充足 |
+| Milestone 5 | 1. フロントエンド開発 | フロントエンドのソースコードが GitHub で公開されていること | https://github.com/Hopin-inc/civicship-portal — GPL-3.0 | 充足 |
+| Milestone 5 | 1. フロントエンド開発 | UI/UX 設計原則・バックエンド連携・利用者向け手順書を含む詳細なドキュメント | [フロントエンド ドキュメント](./frontend-documentation.md) | 充足 |
+| Milestone 5 | 1. フロントエンド開発 | 完成したアプリを試せるリンクが提供されていること | https://dev.civicship.app/community/neo88 — [アプリを試す](#アプリを試す)を参照 | 充足 |
+| Milestone 5 | 1. フロントエンド開発 | 各種デバイスで完全に動作し、レスポンシブであること | 同じリンクをスマートフォンとデスクトップブラウザで開く — [アプリを試す](#アプリを試す)を参照 | 充足 |
+| Milestone 5 | 3. デモ動画 | デモ動画が YouTube で公開され、コミュニティが自由にアクセスできること | [デモ動画](./demo/) — ユースケース別21本を2セットに分けて収録（Milestone 3 と同じ11件、扱われていなかった10件） | 収録済み。YouTube 公開は未了 |
+| Milestone 5 | 3. デモ動画 | 動画に、使用性テスト用のアプリへのアクセスリンクが含まれること | https://dev.civicship.app/community/neo88 | 未了。YouTube の概要欄に記載する |
+| Final | 2. 実証実験・利用者フィードバック・利用統計の報告 | community leaders の70%超がアプリケーションに満足していること | [UAT 報告書](./uat-report-2026.md) §2.1 | 47.7%（44件中21件）。基準を下回る。備考1を参照 |
+| Final | 2. 実証実験・利用者フィードバック・利用統計の報告 | テスターのイニシャル・居住地域・属性・結果をコミュニティに共有すること | [UAT 報告書](./uat-report-2026.md) §5 | 一部。備考1を参照 |
+| Final | 3. バグ修正とセキュリティ監査 | 受入テストと監査で判明したバグ修正の詳細な報告を、コミュニティに共有すること | [セキュリティ監査と対応状況](../security/audit-2025-hexens.md) | 充足 |
+| Final | 3. バグ修正とセキュリティ監査 | 認知された第三者機関による監査が実施されていること | [セキュリティ監査と対応状況](../security/audit-2025-hexens.md) — Hexens | 充足 |
+| Final | 3. バグ修正とセキュリティ監査 | 修正済みコードが GitHub で公開されていること | https://github.com/Hopin-inc/civicship-portal · https://github.com/Hopin-inc/civicship-api | 充足 |
 
 この索引が対象としているのは、本リポジトリからエビデンスを示す成果物のみである。
 これらのマイルストーンに含まれる他の成果物は別途提出しており、ここには載せていない。
@@ -113,6 +135,16 @@ Project Catalyst Fund 12「四国地域における Cardano の社会実装ユ�
 
 DAIS はクレデンシャル情報を扱うためログイン後にのみ画面が表示される。NEO88
 （https://www.neo88.app/）は当初の実証パートナーであり、実証フェーズは終了している。
+
+## アプリを試す
+
+https://dev.civicship.app/community/neo88
+
+開発環境上の NEO88 コミュニティ。セッションを持たない訪問者は使い捨てアカウントとして
+自動的にサインインするため、LINE アカウント無しでアプリケーションを操作できる。
+インターフェースは LINE ミニアプリであり、スマートフォン向けにレイアウトされ、
+ビューポート幅に追随する。デスクトップブラウザではモバイル向けレイアウトが画面中央に
+配置される。
 
 ---
 
