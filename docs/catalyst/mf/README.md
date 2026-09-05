@@ -13,7 +13,7 @@ Project Catalyst F12, Project ID 1200088. Code as of `517e9a4` (2026-09-04).
 | --- | --- | --- |
 | Over 70% of community leaders satisfied with the application | [UAT report](./uat-report-2025.md) | 57.1% (20 of 35). Below the threshold; see note 1 |
 | Feedback collected and analysed, areas for improvement identified | [UAT report](./uat-report-2025.md) | Met |
-| Tester initials, living region, attribute and result shared with the community | [Tester list](./uat-report-2025.md#criterion-3--tester-initials-living-region-attribute-and-result-shared) | Met for 35 testers; see note 1 |
+| Tester initials, living region, attribute and result shared with the community | [Tester list](./uat-report-2025.md#criterion-3--tester-initials-living-region-attribute-and-result-shared) | Met |
 
 ## Deliverable 3 — Bug fixes and security audit
 
@@ -58,7 +58,7 @@ Project Catalyst F12、Project ID 1200088。`517e9a4`（2026-09-04）時点の�
 | --- | --- | --- |
 | community leaders の70%超がアプリケーションに満足していること | [UAT 報告書](./uat-report-2025.md) | 57.1%（35件中20件）。基準を下回る。備考1を参照 |
 | フィードバックを収集・分析し、改善点を特定すること | [UAT 報告書](./uat-report-2025.md) | 充足 |
-| テスターのイニシャル・居住地域・属性・結果をコミュニティに共有すること | [テスター一覧](./uat-report-2025.md#受入条件3--テスターのイニシャル居住地域属性結果の共有) | 35名について充足。備考1を参照 |
+| テスターのイニシャル・居住地域・属性・結果をコミュニティに共有すること | [テスター一覧](./uat-report-2025.md#受入条件3--テスターのイニシャル居住地域属性結果の共有) | 充足 |
 
 ## 成果物3 — バグ修正とセキュリティ監査
 

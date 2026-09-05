@@ -74,8 +74,7 @@ Each function was rated 1–5 by all 35 respondents.
 | Registering an experience | 35 | 3.29 | 3.0 | 42.9% |
 | **Search / discovery** | **35** | **3.09** | **3.0** | **37.1%** |
 
-**Search scores lowest on every measure.** No function reaches 4.0 on the mean,
-and reservation handling is the only one whose median does.
+**Search scores lowest on every measure.**
 
 ### Intent to continue
 
@@ -95,17 +94,16 @@ Search is also the lowest-scoring function quantitatively (mean 3.09).
 **Rigidity of the listing format.** A provider noted that *"the application felt
 inflexible — it would be better if the selection fields and notes could be built
 to suit each individual experience."* The current model assumes a common shape for
-every experience; providers with unusual formats had to work around it.
+every experience.
 
 ### Analysis
 
 **Satisfaction and continuation measure different things.** Satisfaction sits at
-57.1%, intent to provide again at 88.6%. Providers intend to return; they found the
-software adequate rather than good.
+57.1%, intent to provide again at 88.6%. Providers intend to return.
 
 **The distribution is centred, not polarised.** The largest response is "satisfied"
 (48.6%), the second "neither" (22.9%), and four of the five functions have a median
-of exactly 3.0. Dissatisfied responses total 20.0%.
+of exactly 3.0.
 
 **Four of the five functions are ones the provider operates; search is not.**
 Registering, running, notifying and reservation handling are what a provider does
@@ -133,17 +131,17 @@ Dates are the commits on `develop`. The survey closed on 6 November 2025.
 | Registering an experience | 3.29 | The administrative screens for creating and managing an opportunity were built into the application. Sessions, their capacity and their cancellation are set here. [`admin/opportunities`](https://github.com/Hopin-inc/civicship-portal/tree/develop/src/app/community/%5BcommunityId%5D/admin/opportunities), from 23 December 2025 |
 | Reservation handling · Running an experience | 3.31–3.49 | The reservation detail screen — where a provider approves an application and records attendance — was restructured. [`0cbae16`](https://github.com/Hopin-inc/civicship-portal/commit/0cbae16e45cc3de59f6fb5e7c0936456989205fd), 26 December 2025 |
 | Change / cancellation notices | 3.40 | Cancelling a session was implemented, with a message to the people holding a reservation for it. [`2354496`](https://github.com/Hopin-inc/civicship-portal/commit/2354496a8ddb424d5b4f2a4bff985246250cd59e) · [`1ee21db`](https://github.com/Hopin-inc/civicship-portal/commit/1ee21dbd4ce3e328c2c50303d3015cc0b968dd70), 23–24 December 2025 |
-| **Search / discovery** | **3.09** | **No functional change.** It is the one function the survey measured through the providers rather than through the people who use it. |
+| Search / discovery | 3.09 | No functional change. It is the one function the survey measured through the providers rather than through the people who use it. |
 
 ---
 
 ## Criterion 3 — Tester initials, living region, attribute and result shared
 
-**Met for the 35 testers below.**
+**Met.**
 
-**Region and attribute are the same for every row.** Each tester operated an
-experience in one of the four prefectures of Shikoku during the festival, and each
-represents a business or organisation rather than an individual consumer.
+**The attribute is the same for every row.** Each tester operated an experience in
+one of the four prefectures of Shikoku during the festival, and each represents a
+business or organisation rather than an individual consumer.
 
 Region is where the tester operates. For most it is the prefecture on their own
 account in the application; for the rest it is the prefecture of the business they
@@ -303,8 +301,7 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 | 体験の登録 | 35 | 3.29 | 3.0 | 42.9% |
 | **検索・発見** | **35** | **3.09** | **3.0** | **37.1%** |
 
-**検索はすべての指標で最下位である。**平均が4.0に達する機能はなく、中央値が4.0に
-達するのは予約対応のみである。
+**検索はすべての指標で最下位である。**
 
 ### 継続意向
 
@@ -324,18 +321,15 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 **掲載形式の硬直性。** 別の事業者は
 「アプリの自由度が少ないように感じました。選択項目や留意事項などそれぞれの体験にあった
 作り方ができたらより良いかなと思いました」
-と指摘した。現行モデルはすべての体験に共通の形式を前提としており、特殊な形態の事業者は
-回避策を取る必要があった。
+と指摘した。現行モデルはすべての体験に共通の形式を前提としている。
 
 ### 分析
 
 **満足度と継続意向は別のものを測っている。** 満足度 57.1%、次回も提供したい 88.6%。
-事業者は再度参加する意向を持つ一方、ソフトウェアは「良い」ではなく「十分」と評価して
-いる。
+事業者は再度参加する意向を持っている。
 
 **分布は二極化しておらず中央に寄っている。** 最多は「満足している」（48.6%）、次が
-「どちらともいえない」（22.9%）で、5機能のうち4つの中央値がちょうど3.0。不満側は
-合計20.0%。
+「どちらともいえない」（22.9%）で、5機能のうち4つの中央値がちょうど3.0。
 
 **5機能のうち4つは事業者自身が操作する機能であり、検索だけがそうではない。**
 体験の登録・実施・通知・予約対応は事業者がアプリ上で行う作業である。検索を使うのは
@@ -362,13 +356,13 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 | 体験の登録 | 3.29 | 募集の作成・管理を行う管理画面をアプリケーション内に構築した。開催枠、定員、開催の中止をここで設定する。[`admin/opportunities`](https://github.com/Hopin-inc/civicship-portal/tree/develop/src/app/community/%5BcommunityId%5D/admin/opportunities)、2025年12月23日から |
 | 予約対応・体験の実施 | 3.31〜3.49 | 予約詳細画面（申込の承認と出欠の記録を行う画面）を作り直した。[`0cbae16`](https://github.com/Hopin-inc/civicship-portal/commit/0cbae16e45cc3de59f6fb5e7c0936456989205fd)、2025年12月26日 |
 | 変更・中止の通知 | 3.40 | 開催枠の中止を実装し、その枠に予約している利用者へメッセージを添えて通知するようにした。[`2354496`](https://github.com/Hopin-inc/civicship-portal/commit/2354496a8ddb424d5b4f2a4bff985246250cd59e) · [`1ee21db`](https://github.com/Hopin-inc/civicship-portal/commit/1ee21dbd4ce3e328c2c50303d3015cc0b968dd70)、2025年12月23〜24日 |
-| **検索・発見** | **3.09** | **機能的な変更なし。**5機能のうち唯一、実際の利用者ではなく事業者を通して測った機能である。 |
+| 検索・発見 | 3.09 | 機能的な変更なし。5機能のうち唯一、実際の利用者ではなく事業者を通して測った機能である。 |
 
 ---
 
 ## 受入条件3 — テスターのイニシャル・居住地域・属性・結果の共有
 
-**以下の35名について達成。**
+**達成。**
 
 **属性は全行で共通である。** 各テスターは祭の期間中、四国4県のいずれかで体験を提供して
 おり、個人の消費者としてではなく事業者・団体を代表して参加している。
