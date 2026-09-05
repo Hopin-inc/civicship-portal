@@ -21,7 +21,7 @@ The report: [PDF](https://drive.google.com/file/d/1adoOR0NUd4TNybY886zDs5EENyNpm
 
 | Acceptance criterion | Evidence | Status |
 | --- | --- | --- |
-| Detailed report of bug fixes from user acceptance tests and security audits, shared with the community | [What changed in response to the audit](./security-audit-response.md) | Met |
+| Detailed report of bug fixes from user acceptance tests and security audits, shared with the community | [What changed in response to the audit](./security-audit-response.md) · [what changed after the user acceptance test](./uat-report-2026.md#what-changed-in-the-application-afterwards) | Met |
 | Security audit conducted by a recognised third-party organisation | [Hexens](https://hexens.io/) — [the report](https://drive.google.com/file/d/1T3v22q6stRceDy9eDbvpKB1rWGgGpO0W/view) | Met |
 | Audit report and evidence of fixes publicly accessible | [The report](https://drive.google.com/file/d/1T3v22q6stRceDy9eDbvpKB1rWGgGpO0W/view) · [what changed](./security-audit-response.md) | Met |
 | Fixed code publicly available on GitHub | https://github.com/Hopin-inc/civicship-portal · https://github.com/Hopin-inc/civicship-api | Met |
@@ -69,7 +69,7 @@ Project Catalyst F12、Project ID 1200088。`517e9a4`（2026-09-04）時点の�
 
 | 受入条件 | エビデンス | 状況 |
 | --- | --- | --- |
-| 受入テストと監査で判明したバグ修正の詳細な報告を、コミュニティに共有すること | [監査を受けて変更した内容](./security-audit-response.md) | 充足 |
+| 受入テストと監査で判明したバグ修正の詳細な報告を、コミュニティに共有すること | [監査を受けて変更した内容](./security-audit-response.md) · [受入テスト後に入った変更](./uat-report-2026.md#その後アプリケーションに入った変更) | 充足 |
 | 認知された第三者機関による監査が実施されていること | [Hexens](https://hexens.io/) — [レポート](https://drive.google.com/file/d/1T3v22q6stRceDy9eDbvpKB1rWGgGpO0W/view) | 充足 |
 | 監査レポートと修正の証跡が公開されていること | [レポート](https://drive.google.com/file/d/1T3v22q6stRceDy9eDbvpKB1rWGgGpO0W/view) · [変更内容](./security-audit-response.md) | 充足 |
 | 修正済みコードが GitHub で公開されていること | https://github.com/Hopin-inc/civicship-portal · https://github.com/Hopin-inc/civicship-api | 充足 |
