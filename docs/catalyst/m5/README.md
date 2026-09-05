@@ -14,7 +14,7 @@ Deliverables 2 (event planning) and 4 (NEO88 DAO) are submitted separately.
 | --- | --- | --- |
 | The front-end source code is published on GitHub | https://github.com/Hopin-inc/civicship-portal — GPL-3.0 | Met |
 | Detailed documentation, including UI/UX design principles, integration processes, and user instructions | [Front-end documentation](./frontend-documentation.md) | Met |
-| A link is provided to try out the completed mutual app | https://dev.civicship.app/community/neo88 — see [Trying the application](#trying-the-application) | Met |
+| A link is provided to try out the completed mutual app | https://civicship.app/community/neo88 — see [Trying the application](#trying-the-application) | Met |
 | Fully functional and responsive across different devices | The same link, opened on a phone and on a desktop browser — see [Trying the application](#trying-the-application) | Met |
 
 ## Deliverable 3 — Sharing of a demo video
@@ -28,10 +28,13 @@ Deliverables 2 (event planning) and 4 (NEO88 DAO) are submitted separately.
 
 ## Trying the application
 
-https://dev.civicship.app/community/neo88
+https://civicship.app/community/neo88 — the application. Sign-in is by LINE account.
 
-Signs you in automatically — no LINE account needed. It is a LINE mini app, so
-the layout is a phone layout, centred on a desktop browser.
+https://dev.civicship.app/community/neo88 — the same build, on a deployment that
+signs a visitor in as a throwaway account. A reviewer can evaluate the application
+there without a LINE account and without giving up any personal information.
+
+A LINE mini app: the layout is a phone layout, centred on a desktop browser.
 
 ---
 ---
@@ -51,7 +54,7 @@ Project Catalyst F12、Project ID 1200088。`517e9a4`（2026-09-04）時点の�
 | --- | --- | --- |
 | フロントエンドのソースコードが GitHub で公開されていること | https://github.com/Hopin-inc/civicship-portal — GPL-3.0 | 充足 |
 | UI/UX 設計原則・バックエンド連携・利用者向け手順書を含む詳細なドキュメント | [フロントエンド ドキュメント](./frontend-documentation.md) | 充足 |
-| 完成したアプリを試せるリンクが提供されていること | https://dev.civicship.app/community/neo88 — [アプリを試す](#アプリを試す)を参照 | 充足 |
+| 完成したアプリを試せるリンクが提供されていること | https://civicship.app/community/neo88 — [アプリを試す](#アプリを試す)を参照 | 充足 |
 | 各種デバイスで完全に動作し、レスポンシブであること | 同じリンクをスマートフォンとデスクトップブラウザで開く — [アプリを試す](#アプリを試す)を参照 | 充足 |
 
 ## 成果物3 — デモ動画の共有
@@ -65,7 +68,11 @@ Project Catalyst F12、Project ID 1200088。`517e9a4`（2026-09-04）時点の�
 
 ## アプリを試す
 
-https://dev.civicship.app/community/neo88
+https://civicship.app/community/neo88 — アプリケーション本体。サインインは LINE アカウント。
 
-自動でサインインするため LINE アカウントは不要。LINE ミニアプリのため画面は
-スマートフォン向けレイアウトで、デスクトップでは中央に配置される。
+https://dev.civicship.app/community/neo88 — 同じビルドで、訪問者を使い捨てアカウント
+としてサインインさせる環境。レビュアーは LINE アカウントも個人情報も渡さずに
+アプリケーションを評価できる。
+
+LINE ミニアプリのため画面はスマートフォン向けレイアウトで、デスクトップでは中央に
+配置される。

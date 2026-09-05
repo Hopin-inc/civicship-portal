@@ -5,7 +5,7 @@
 *English below · [日本語は下段へ](#ja)*
 
 
-Final Milestone, deliverable 3. Project Catalyst F12, Project ID 1200088.
+Final Milestone, deliverable 2. Project Catalyst F12, Project ID 1200088.
 
 Describes the code at `517e9a4` (2026-09-04).
 
@@ -235,7 +235,7 @@ credential-only community.
 
 *[English is above](#en)*
 
-Final Milestone 成果物3。Project Catalyst F12、Project ID 1200088。
+Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 
 `517e9a4`（2026-09-04）時点のコードについて記述している。
 
