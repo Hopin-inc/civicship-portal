@@ -54,7 +54,11 @@ below state their own denominator.
 | Somewhat dissatisfied | 7 | 15.9% |
 | Dissatisfied | 4 | 9.1% |
 
-**Satisfied or better: 21 of 44 — 47.7%.**
+---
+
+## Criterion 2 — Feedback collected and analysed, areas for improvement identified
+
+**Met.**
 
 ### Usability by function
 
@@ -95,12 +99,6 @@ a conventional ID / password account would be preferable.
 | --- | --- |
 | "I would provide an experience again next time" (1–5, n = 44) | Rated 4–5: **33 of 44 — 75.0%** |
 | "May we contact you about participating next year?" (n = 44) | Yes: **37 of 44 — 84.1%** |
-
----
-
-## Criterion 2 — Feedback collected and analysed, areas for improvement identified
-
-**Met.**
 
 ### Qualitative feedback
 
@@ -257,7 +255,11 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 | やや不満がある（改善してほしい点があった） | 7 | 15.9% |
 | 不満がある（満足できなかった） | 4 | 9.1% |
 
-**満足以上：44件中21件 — 47.7%。**
+---
+
+## 受入条件2 — フィードバックを収集・分析し、改善点を特定すること
+
+**達成。**
 
 ### 機能別の使いやすさ
 
@@ -298,12 +300,6 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 | --- | --- |
 | 「次回もあれば体験を提供したい」（1〜5、n = 44） | 4〜5の評価：**44件中33件 — 75.0%** |
 | 「来年度の参加についてご連絡してもよいか」（n = 44） | 可：**44件中37件 — 84.1%** |
-
----
-
-## 受入条件2 — フィードバックを収集・分析し、改善点を特定すること
-
-**達成。**
 
 ### 自由記述
 
