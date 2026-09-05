@@ -155,14 +155,11 @@ the providers rather than through the people who use it.
 
 ## What changed in the application afterwards
 
-The Final Milestone's third deliverable asks for a report of bug fixes from the
-user acceptance test as well as from the security audit. Below is what changed in
-the four functions the providers operate, and what did not change in the fifth.
-Dates are the commits on `develop`; the survey closed on 6 November 2025.
+Dates are the commits on `develop`. The survey closed on 6 November 2025.
 
 | Function | Rated | What changed |
 | --- | ---: | --- |
-| Registering an experience | 2.86–3.07 | The administrative screens for creating and managing an opportunity were built into the application, replacing a separate tool. Sessions, their capacity and their cancellation are now set here. [`admin/opportunities`](https://github.com/Hopin-inc/civicship-portal/tree/develop/src/app/community/%5BcommunityId%5D/admin/opportunities), from 23 December 2025 |
+| Registering an experience | 3.07 | The administrative screens for creating and managing an opportunity were built into the application. Sessions, their capacity and their cancellation are set here. [`admin/opportunities`](https://github.com/Hopin-inc/civicship-portal/tree/develop/src/app/community/%5BcommunityId%5D/admin/opportunities), from 23 December 2025 |
 | Reservation handling · Running an experience | 3.14–3.34 | The reservation detail screen — where a provider approves an application and records attendance — was restructured. [`0cbae16`](https://github.com/Hopin-inc/civicship-portal/commit/0cbae16e45cc3de59f6fb5e7c0936456989205fd), 26 December 2025 |
 | Change / cancellation notices | 3.23 | Cancelling a session was implemented, with a message to the people holding a reservation for it. [`2354496`](https://github.com/Hopin-inc/civicship-portal/commit/2354496a8ddb424d5b4f2a4bff985246250cd59e) · [`1ee21db`](https://github.com/Hopin-inc/civicship-portal/commit/1ee21dbd4ce3e328c2c50303d3015cc0b968dd70), 23–24 December 2025 |
 | **Search / discovery** | **2.86** | **No functional change.** It is the one function the survey measured through the providers rather than through the people who use it. |
@@ -374,13 +371,11 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 
 ## その後アプリケーションに入った変更
 
-Final Milestone の成果物3は、セキュリティ監査に加えて受入テストから出たバグ修正の
-報告を求めている。以下は、事業者が操作する4機能に入った変更と、5つ目に入らなかった
-ことである。日付は `develop` のコミット。アンケートの締切は2025年11月6日。
+日付は `develop` のコミット。アンケートの締切は2025年11月6日。
 
 | 機能 | 評価 | 入った変更 |
 | --- | ---: | --- |
-| 体験の登録 | 2.86〜3.07 | 募集の作成・管理を行う管理画面をアプリケーション内に構築し、それまで使っていた別ツールを置き換えた。開催枠、定員、開催の中止をここで設定する。[`admin/opportunities`](https://github.com/Hopin-inc/civicship-portal/tree/develop/src/app/community/%5BcommunityId%5D/admin/opportunities)、2025年12月23日から |
+| 体験の登録 | 3.07 | 募集の作成・管理を行う管理画面をアプリケーション内に構築した。開催枠、定員、開催の中止をここで設定する。[`admin/opportunities`](https://github.com/Hopin-inc/civicship-portal/tree/develop/src/app/community/%5BcommunityId%5D/admin/opportunities)、2025年12月23日から |
 | 予約対応・体験の実施 | 3.14〜3.34 | 予約詳細画面（申込の承認と出欠の記録を行う画面）を作り直した。[`0cbae16`](https://github.com/Hopin-inc/civicship-portal/commit/0cbae16e45cc3de59f6fb5e7c0936456989205fd)、2025年12月26日 |
 | 変更・中止の通知 | 3.23 | 開催枠の中止を実装し、その枠に予約している利用者へメッセージを添えて通知するようにした。[`2354496`](https://github.com/Hopin-inc/civicship-portal/commit/2354496a8ddb424d5b4f2a4bff985246250cd59e) · [`1ee21db`](https://github.com/Hopin-inc/civicship-portal/commit/1ee21dbd4ce3e328c2c50303d3015cc0b968dd70)、2025年12月23〜24日 |
 | **検索・発見** | **2.86** | **機能的な変更なし。**5機能のうち唯一、実際の利用者ではなく事業者を通して測った機能である。 |
