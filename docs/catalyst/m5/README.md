@@ -6,7 +6,6 @@
 
 
 Project Catalyst F12, Project ID 1200088. Code as of `517e9a4` (2026-09-04).
-Deliverables 2 (event planning) and 4 (NEO88 DAO) are submitted separately.
 
 ## Deliverable 1 — Front-end development
 
@@ -46,7 +45,6 @@ A LINE mini app: the layout is a phone layout, centred on a desktop browser.
 *[English is above](#en)*
 
 Project Catalyst F12、Project ID 1200088。`517e9a4`（2026-09-04）時点のコード。
-成果物2（イベント計画）と成果物4（NEO88 DAO）は別途提出。
 
 ## 成果物1 — フロントエンド開発
 
