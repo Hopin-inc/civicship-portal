@@ -113,7 +113,8 @@ https://docs.google.com/presentation/d/1WypOpniKO8l7OXk1VBbkYNf7O_vYgkwDg8it4eJc
 
 Covers account registration, linking the LINE account, approving and declining
 reservations, cancelling a session, checking applications, and attendance
-management.
+management. It documents the flow as it stood during the festival; the
+administrative screens were rebuilt afterwards.
 
 Residents are not given a separate manual: the participant flows are demonstrated
 in the [recordings for deliverable 3](./demo/).
@@ -231,7 +232,8 @@ LINE と Firebase を完全にバイパスする開発専用の経路もあり�
 https://docs.google.com/presentation/d/1WypOpniKO8l7OXk1VBbkYNf7O_vYgkwDg8it4eJccxk/edit
 
 アカウント登録、LINE アカウントの連携、予約の承認と辞退、開催の中止、申込情報の確認、
-出欠管理を扱う。
+出欠管理を扱う。記載されているのは祭の期間中の操作フローであり、管理画面はその後に
+作り直している。
 
 住民向けの個別マニュアルは用意していない。参加者側の操作は
 [成果物3の録画](./demo/)で示している。

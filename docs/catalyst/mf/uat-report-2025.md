@@ -182,34 +182,38 @@ consumer.
 
 ## Usage statistics
 
-Cumulative, across all communities on the platform.
+The demonstration ran on NEO88. These are its figures.
 
-| Metric | Value |
+| Metric | NEO88 |
 | --- | ---: |
-| Total members | 1,052 |
-| Total P2P transaction volume (internal record) | 8,682,000 |
-| Total points issued | 2.22 billion |
-| Total grant volume | 65,829,000 |
-| Verified IDs (DID) issued | 912 |
-| Credentials (VC) issued | 134 |
+| Members | 368 |
+| Verified IDs (DID) issued | 365 |
+| Credentials (VC) issued | 55 |
+| P2P transaction volume (internal record) | 14,000 |
+| Points issued | 1,020,000 |
+| Grant volume | 156,000 |
 
-By community:
-
-| Community | Members | P2P volume | Points issued | Grants | DID | VC |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Kibotcha · Izu | 582 | 8,557,000 | 2.22bn | 65,223,000 | 464 | 16 |
-| Kotohira | 53 | 111,000 | 1,000,000 | 450,000 | 35 | 15 |
-| DAIS | 49 | 0 | 0 | 0 | 48 | 48 |
-| NEO88 | 368 | 14,000 | 1,020,000 | 156,000 | 365 | 55 |
+NEO88 records no activity in the most recent month. It was designed as a
+time-limited demonstration community and its demonstration phase has concluded.
 
 These figures are internal activity records. They do not represent fiat currency
 or redeemable economic value.
 
-NEO88 shows 368 members and recorded activity but no activity in the most recent
-month: it was designed as a time-limited demonstration community and its
-demonstration phase has concluded. DAIS shows DIDs and VCs approximately equal to
-its member count and no economic activity, which reflects its configuration as a
-credential-only community.
+### Appendix — the rest of the platform
+
+The same application serves other communities. Their figures are given for
+context; the demonstration experiment reported here is NEO88's.
+
+| Community | Members | P2P volume | Points issued | Grants | DID | VC |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| **NEO88** | **368** | **14,000** | **1,020,000** | **156,000** | **365** | **55** |
+| Kibotcha · Izu | 582 | 8,557,000 | 2.22bn | 65,223,000 | 464 | 16 |
+| Kotohira | 53 | 111,000 | 1,000,000 | 450,000 | 35 | 15 |
+| DAIS | 49 | 0 | 0 | 0 | 48 | 48 |
+| Total | 1,052 | 8,682,000 | 2.22bn | 65,829,000 | 912 | 134 |
+
+DAIS shows DIDs and VCs approximately equal to its member count and no economic
+activity, which reflects its configuration as a credential-only community.
 
 ---
 ---
@@ -388,30 +392,35 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 
 ## 利用統計
 
-全コミュニティ横断の累計。
+実証を行ったのは NEO88 である。以下はその数値。
 
-| 指標 | 数値 |
+| 指標 | NEO88 |
 | --- | ---: |
-| 総メンバー数 | 1,052 |
-| 総P2P取引量（内部記録） | 868.2万 |
-| 総発行ポイント数 | 22.2億 |
-| 総助成記録量 | 6,582.9万 |
-| 検証済みID（DID）発行数 | 912 |
-| クレデンシャル（VC）発行数 | 134 |
+| メンバー数 | 368 |
+| 検証済みID（DID）発行数 | 365 |
+| クレデンシャル（VC）発行数 | 55 |
+| P2P取引量（内部記録） | 1.4万 |
+| 発行ポイント数 | 102.0万 |
+| 助成記録量 | 15.6万 |
 
-コミュニティ別：
-
-| コミュニティ | メンバー | P2P取引量 | 発行ポイント | 助成 | DID | VC |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| キボッチャ・伊豆 | 582 | 855.7万 | 22.2億 | 6,522.3万 | 464 | 16 |
-| 琴平 | 53 | 11.1万 | 100.0万 | 45.0万 | 35 | 15 |
-| DAIS | 49 | 0 | 0 | 0 | 48 | 48 |
-| NEO88 | 368 | 1.4万 | 102.0万 | 15.6万 | 365 | 55 |
+NEO88 に直近1ヶ月の活動はない。期間限定の実証コミュニティとして設計されたためで、
+実証フェーズは終了している。
 
 これらはプラットフォーム内部の活動記録であり、法定通貨や換金可能な経済的価値を示すもの
 ではない。
 
-NEO88 は 368名のメンバーと活動記録を持つが直近1ヶ月の活動はない。これは期間限定の実証
-コミュニティとして設計されたためで、実証フェーズは終了している。DAIS はメンバー数と
-ほぼ同数の DID・VC を持ち経済活動がないが、これはクレデンシャル特化の構成を反映したもの
-である。
+### 付録 — プラットフォーム上の他コミュニティ
+
+同一のアプリケーションが他のコミュニティも運用している。参考として数値を挙げる。本報告書
+が対象とする実証実験は NEO88 のものである。
+
+| コミュニティ | メンバー | P2P取引量 | 発行ポイント | 助成 | DID | VC |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| **NEO88** | **368** | **1.4万** | **102.0万** | **15.6万** | **365** | **55** |
+| キボッチャ・伊豆 | 582 | 855.7万 | 22.2億 | 6,522.3万 | 464 | 16 |
+| 琴平 | 53 | 11.1万 | 100.0万 | 45.0万 | 35 | 15 |
+| DAIS | 49 | 0 | 0 | 0 | 48 | 48 |
+| 合計 | 1,052 | 868.2万 | 22.2億 | 6,582.9万 | 912 | 134 |
+
+DAIS はメンバー数とほぼ同数の DID・VC を持ち経済活動がないが、これはクレデンシャル特化の
+構成を反映したものである。
