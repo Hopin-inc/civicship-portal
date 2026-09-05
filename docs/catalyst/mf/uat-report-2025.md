@@ -16,8 +16,9 @@ statistics, named in the deliverable itself, are the fourth section.
 
 ## What was tested, and with whom
 
-The demonstration ran during the NEO Shikoku 88 Festival across Kagawa, Tokushima,
-Ehime and Kochi. The application was used in production by two distinct groups:
+The demonstration ran during the NEO Shikoku 88 Festival, 1 July to 31 August
+2025, across Kagawa, Tokushima, Ehime and Kochi. The application was used in
+production by two distinct groups:
 
 - **Experience providers** — local businesses and organisations who listed an
   experience, received reservations through the app, approved or declined them,
@@ -235,8 +236,8 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 
 ## 何を、誰に対して検証したか
 
-実証は NEO 四国88祭の期間中、香川・徳島・愛媛・高知の4県で実施した。アプリケーションは
-本番環境で、性質の異なる2つの利用者群によって使われた。
+実証は NEO 四国88祭（2025年7月1日〜8月31日）の期間中、香川・徳島・愛媛・高知の4県で
+実施した。アプリケーションは本番環境で、性質の異なる2つの利用者群によって使われた。
 
 - **体験提供事業者** — 体験を掲載し、アプリ経由で予約を受け、承認または辞退し、
   変更を参加者に通知し、出欠を記録した地域の事業者・団体。
