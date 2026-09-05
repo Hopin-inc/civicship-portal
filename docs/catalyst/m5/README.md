@@ -103,5 +103,5 @@ https://dev.civicship.app/community/neo88
 | 琴平 DAO | https://kotohira.civicship.app/opportunities |
 | DAIS（DID / VC 特化） | https://dais.civicship.app/users/me |
 
-DAIS はクレデンシャル情報を扱うためログイン後にのみ画面が表示される。NEO88
-（https://www.neo88.app/）は当初の実証パートナーであり、実証フェーズは終了している。
+DAIS はクレデンシャル情報を扱うためログイン後にのみ画面が表示される。NEO88（[www.neo88.app](https://www.neo88.app/)）は当初の実証パートナーであり、
+実証フェーズは終了している。
