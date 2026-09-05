@@ -23,9 +23,9 @@ const DEFAULT_OPEN_GRAPH_IMAGE = [
 export const generateMetadata = async ({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }): Promise<Metadata> => {
-  const id = params.id;
+  const { id } = await params;
   const communityId = await getCommunityIdFromHeader();
   const communityConfig = communityId ? await getCommunityConfig(communityId) : null;
   const place = await fetchPlace(id);

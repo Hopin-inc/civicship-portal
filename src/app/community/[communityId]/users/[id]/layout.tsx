@@ -8,7 +8,7 @@ import { DEFAULT_ASSET_PATHS } from "@/lib/communities/constants";
 import { mapGqlPortfolio, UserProfileProvider } from "@/app/community/[communityId]/users/features/shared";
 
 type Props = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 const DEFAULT_OPEN_GRAPH_IMAGE = [
@@ -62,7 +62,7 @@ export default async function Layout({
   params,
 }: {
   children: React.ReactNode;
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
   const gqlUser = await fetchUserServer(id);
