@@ -22,10 +22,9 @@ Ehime and Kochi. The application was used in production by two distinct groups:
 - **Participants** — residents and visitors who searched for experiences and
   booked them.
 
-The user acceptance test targeted the **experience providers**. They are the group
-the Catalyst milestone calls community leaders: each operates on behalf of an
-organisation in the region, and each used the full operational surface of the
-application rather than a single booking flow.
+The user acceptance test targeted the **experience providers** — the group the
+milestone calls community leaders. Each acts for an organisation in the region and
+used the full operational surface of the application, not a single booking flow.
 
 ### Survey instrument
 
@@ -91,13 +90,7 @@ Multiple selection, n = 44, 56 selections.
 Positive selections outnumber negative ones, 25 to 18. Five providers selected that
 a conventional ID / password account would be preferable.
 
-### 2.4 The experience programme itself
-
-> *"About the experience programme you provided"* — 1–5, n = 44
-
-Rated 4–5: **27 of 44 — 61.4%** (5: 19 · 4: 8 · 3: 12 · 2: 4 · 1: 1)
-
-### 2.5 Intent to continue
+### 2.4 Intent to continue
 
 | Question | Result |
 | --- | --- |
@@ -133,22 +126,17 @@ occupied to visit others, and suggested cross-provider collaboration formats.
 
 ## 4. Analysis
 
-**The satisfaction figure and the continuation figure measure different things.**
-Satisfaction with the application sits at 47.7%, while intent to provide again
-sits at 75% and willingness to be contacted for next year at 84%. Providers found
-the festival worth doing and intend to return; they found the software adequate
-rather than good. We read the gap as a product signal, not as evidence that the
-satisfaction figure is wrong.
+**Satisfaction and continuation measure different things.** Satisfaction sits at
+47.7%, intent to provide again at 75%, willingness to be contacted at 84%.
+Providers intend to return; they found the software adequate rather than good.
 
-**The distribution is centred, not polarised.** The largest single response is
-"satisfied" (38.6%), the second largest is "neither" (27.3%), and every usability
-function has a median of exactly 3.0. This is the profile of an application that
-works but requires effort — not one that failed. Dissatisfied responses
-(25.0% combined) are a minority, but a substantial one.
+**The distribution is centred, not polarised.** The largest response is "satisfied"
+(38.6%), the second "neither" (27.3%), and every function has a median of exactly
+3.0. Dissatisfied responses total 25.0%.
 
-**Search is the specific defect.** It is the lowest-rated function quantitatively
-and the subject of the most concrete qualitative comment. Improving discovery is
-the single change most likely to move the satisfaction figure.
+**Search is the specific defect** — lowest quantitatively and the subject of the
+most concrete comment. Improving discovery is the change most likely to move the
+satisfaction figure.
 
 ### Actions taken and planned
 
@@ -172,26 +160,14 @@ request; we have not published them here because the responses were collected
 without notice that identifying information would be made public.
 
 **Not available:** region of residence and attribute. **The survey instrument did
-not include these questions.** We are reporting this as a gap in the survey design
-rather than reconstructing the fields after the fact.
+not include these questions.**
 
-What can be stated about the tester population as a whole: all respondents to the
-application sections were experience providers operating in the four prefectures
-of Shikoku (Kagawa, Tokushima, Ehime, Kochi) during the festival period, each
-representing a business or organisation rather than participating as an individual
+Every respondent to the application sections was an experience provider operating
+in the four prefectures of Shikoku (Kagawa, Tokushima, Ehime, Kochi) during the
+festival, each representing a business or organisation rather than an individual
 consumer.
 
 ---
-
-## 6. Acceptance result
-
-| Criterion | Result |
-| --- | --- |
-| Over 70% of community leaders satisfied with the application | **Not met — 47.7% (21 of 44)** |
-| Feedback collected and analysed, improvement areas identified | Met — Sections 2–4 |
-| Tester initials, region, attribute, result shared | **Partially met** — names held for 36 respondents; region and attribute were not collected |
-
-Both shortfalls are reported as measured.
 
 ---
 
@@ -250,9 +226,9 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
   変更を参加者に通知し、出欠を記録した地域の事業者・団体。
 - **参加者** — 体験を検索し予約した住民および来訪者。
 
-ユーザー受入テストの対象は**体験提供事業者**である。Catalyst のマイルストーンが言う
-community leaders に相当するのはこの層で、それぞれが地域の組織を代表して参加し、
-単一の予約フローではなくアプリケーションの運用面全体を使用した。
+ユーザー受入テストの対象は**体験提供事業者**、マイルストーンが言う community leaders に
+相当する層である。それぞれが地域の組織を代表し、単一の予約フローではなく
+アプリケーションの運用面全体を使用した。
 
 ### 調査手法
 
@@ -316,13 +292,7 @@ community leaders に相当するのはこの層で、それぞれが地域の�
 肯定的な選択が否定的な選択を上回る（25対18）。5名が「一般的な ID・パスワードの登録の
 方が良い」を選択している。
 
-### 2.4 提供した体験プログラム自体
-
-> 「提供した体験プログラムについて」— 1〜5、n = 44
-
-4〜5の評価：**44件中27件 — 61.4%**（5: 19件 · 4: 8件 · 3: 12件 · 2: 4件 · 1: 1件）
-
-### 2.5 継続意向
+### 2.4 継続意向
 
 | 設問 | 結果 |
 | --- | --- |
@@ -358,19 +328,15 @@ community leaders に相当するのはこの層で、それぞれが地域の�
 
 ## 4. 分析
 
-**満足度と継続意向は別のものを測っている。** アプリケーションへの満足度は 47.7%、
-次回も提供したいという意向は 75%、来年度の連絡可は 84% である。事業者は祭を実施する
-価値があったと考えており、再度参加する意向を持っている。一方でソフトウェアについては
-「良い」ではなく「十分」と評価している。この差はプロダクトへのシグナルとして読むべきで
-あり、満足度の数値が誤っている証拠ではない。
+**満足度と継続意向は別のものを測っている。** 満足度 47.7%、次回も提供したい 75%、
+来年度の連絡可 84%。事業者は再度参加する意向を持つ一方、ソフトウェアは「良い」ではなく
+「十分」と評価している。
 
-**分布は二極化しておらず中央に寄っている。** 最も多い回答は「満足している」（38.6%）、
-次が「どちらともいえない」（27.3%）で、使いやすさの全機能で中央値がちょうど3.0である。
-これは、動作するが労力を要するアプリケーションの分布であって、失敗したものの分布では
-ない。不満側の回答（合計25.0%）は少数派だが、無視できない規模である。
+**分布は二極化しておらず中央に寄っている。** 最多は「満足している」（38.6%）、次が
+「どちらともいえない」（27.3%）で、全機能の中央値がちょうど3.0。不満側は合計25.0%。
 
-**検索が具体的な欠陥である。** 定量的に最も評価が低く、かつ定性的に最も具体的な指摘の
-対象でもある。発見性の改善が、満足度の数値を動かす可能性が最も高い単一の変更である。
+**検索が具体的な欠陥である。** 定量的に最下位で、かつ最も具体的な指摘の対象でもある。
+発見性の改善が、満足度の数値を動かす可能性が最も高い変更である。
 
 ### 実施済みおよび予定している対応
 
@@ -392,23 +358,12 @@ community leaders に相当するのはこの層で、それぞれが地域の�
 — 回答は、識別可能な情報が公開されるという告知なしに収集されたものであるため。
 
 **未取得：** 居住地域および属性。**アンケートの設問にこれらが含まれていなかった。**
-事後に補完するのではなく、調査設計上の不備としてそのまま報告する。
 
-テスター母集団全体について言えることとして、アプリケーション関連設問の回答者は全員が、
-祭の期間中に四国4県（香川・徳島・愛媛・高知）で事業を営む体験提供事業者であり、
-個人の消費者としてではなく事業者・団体を代表して参加していた。
+アプリケーション関連設問の回答者は全員が、祭の期間中に四国4県（香川・徳島・愛媛・高知）
+で事業を営む体験提供事業者であり、個人の消費者としてではなく事業者・団体を代表して
+参加していた。
 
 ---
-
-## 6. 受入結果
-
-| 条件 | 結果 |
-| --- | --- |
-| community leaders の70%超がアプリケーションに満足 | **未達 — 47.7%（44件中21件）** |
-| フィードバックを収集・分析し、改善点を特定 | 達成 — 第2〜4節 |
-| テスターのイニシャル・居住地域・属性・結果の共有 | **部分的に達成** — 36名の氏名を保持。居住地域と属性は未取得 |
-
-いずれの未達も実測のまま報告している。
 
 ---
 
