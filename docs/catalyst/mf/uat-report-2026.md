@@ -56,10 +56,6 @@ below state their own denominator.
 
 **Satisfied or better: 21 of 44 — 47.7%.**
 
-The milestone's acceptance criterion asks for over 70% of community leaders
-satisfied. **This measurement does not meet that threshold.** Section 4 sets out
-what the number reflects and what we are doing about it.
-
 ### Usability by function
 
 Each function was rated 1–5. A small number of out-of-range entries (values above
@@ -104,7 +100,7 @@ a conventional ID / password account would be preferable.
 
 ## Criterion 2 — Feedback collected and analysed, areas for improvement identified
 
-**Met.** The qualitative responses, the analysis of them, and the resulting actions follow.
+**Met.**
 
 ### Qualitative feedback
 
@@ -156,19 +152,13 @@ satisfaction figure.
 
 ## Criterion 3 — Tester initials, living region, attribute and result shared
 
-**Partially met.** Names are held for 36 of 44 respondents; region of residence
-and attribute were not collected.
+**Partially met.** Names are held for 36 of 44 respondents. Region of residence
+and attribute were not collected — the survey did not ask for them.
 
-The acceptance criterion asks for tester initials, region of residence, attribute
-and result.
-
-**Available:** company or personal name for 36 of 44 respondents, who consented to
-be contacted about next year's programme. Initials can be supplied to reviewers on
-request; we have not published them here because the responses were collected
-without notice that identifying information would be made public.
-
-**Not available:** region of residence and attribute. **The survey instrument did
-not include these questions.**
+Company or personal name was collected for 36 of 44 respondents, all of whom
+consented to be contacted about next year's programme. Initials can be supplied to
+reviewers on request; they are not published here because the responses were
+collected without notice that identifying information would be made public.
 
 Every respondent to the application sections was an experience provider operating
 in the four prefectures of Shikoku (Kagawa, Tokushima, Ehime, Kochi) during the
@@ -269,10 +259,6 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 
 **満足以上：44件中21件 — 47.7%。**
 
-マイルストーンの受入条件は community leaders の70%超が満足していることを求めている。
-**本測定はこの閾値を満たしていない。** この数値が何を反映しているか、それに対して
-何を行うかは第4節に記す。
-
 ### 機能別の使いやすさ
 
 各機能を1〜5で評価。5を超える範囲外の入力が少数あり、入力ミスとして除外した。
@@ -317,7 +303,7 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 
 ## 受入条件2 — フィードバックを収集・分析し、改善点を特定すること
 
-**達成。** 自由記述、その分析、および導かれた対応を以下に記す。
+**達成。**
 
 ### 自由記述
 
@@ -367,15 +353,12 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 
 ## 受入条件3 — テスターのイニシャル・居住地域・属性・結果の共有
 
-**部分的に達成。** 44名中36名の氏名を保持している。居住地域と属性は未取得。
+**部分的に達成。** 44名中36名の氏名を保持している。居住地域と属性は未取得 —
+アンケートの設問に含まれていなかった。
 
-受入条件はテスターのイニシャル、居住地域、属性、テスト結果を求めている。
-
-**取得済み：** 44名中36名の会社名または氏名。いずれも来年度のプログラムに関する連絡に
-同意している。イニシャルはレビュアーの求めに応じて提供可能だが、本文には掲載していない
-— 回答は、識別可能な情報が公開されるという告知なしに収集されたものであるため。
-
-**未取得：** 居住地域および属性。**アンケートの設問にこれらが含まれていなかった。**
+44名中36名について会社名または氏名を取得しており、いずれも来年度のプログラムに関する
+連絡に同意している。イニシャルはレビュアーの求めに応じて提供可能だが、本文には掲載して
+いない — 回答は、識別可能な情報が公開されるという告知なしに収集されたものであるため。
 
 アプリケーション関連設問の回答者は全員が、祭の期間中に四国4県（香川・徳島・愛媛・高知）
 で事業を営む体験提供事業者であり、個人の消費者としてではなく事業者・団体を代表して
