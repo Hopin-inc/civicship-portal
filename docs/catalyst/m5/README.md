@@ -33,7 +33,10 @@ https://dev.civicship.app/community/neo88 — the same build, on a deployment th
 signs a visitor in as a throwaway account. A reviewer can evaluate the application
 there without a LINE account and without giving up any personal information.
 
-A LINE mini app: the layout is a phone layout, centred on a desktop browser.
+The application is a LINE mini app (LIFF). It is opened from inside LINE, whose
+in-app browser is a phone browser, so the interface is built for phone widths. On a
+tablet or a desktop browser the same interface is centred rather than stretched, and
+every screen and every function behaves identically on all three.
 
 ---
 ---
@@ -72,5 +75,7 @@ https://dev.civicship.app/community/neo88 — 同じビルドで、訪問者を�
 としてサインインさせる環境。レビュアーは LINE アカウントも個人情報も渡さずに
 アプリケーションを評価できる。
 
-LINE ミニアプリのため画面はスマートフォン向けレイアウトで、デスクトップでは中央に
-配置される。
+本アプリケーションは LINE ミニアプリ（LIFF）である。LINE 内から起動され、その
+アプリ内ブラウザはスマートフォンのブラウザであるため、画面はスマートフォンの幅に
+合わせて構成している。タブレットやデスクトップのブラウザでは、同じ画面が引き伸ばされず
+中央に配置される。3種類のいずれでも画面構成と機能は同一に動作する。

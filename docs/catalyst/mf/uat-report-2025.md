@@ -52,6 +52,9 @@ A questionnaire was distributed after the festival to everyone involved.
 | Somewhat dissatisfied | 7 | 15.9% |
 | Dissatisfied | 4 | 9.1% |
 
+What the application changed in response is under [what changed in the application
+afterwards](#what-changed-in-the-application-afterwards).
+
 ---
 
 ## Criterion 2 — Feedback collected and analysed, areas for improvement identified
@@ -298,6 +301,9 @@ Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088。
 | どちらともいえない | 12 | 27.3% |
 | やや不満がある（改善してほしい点があった） | 7 | 15.9% |
 | 不満がある（満足できなかった） | 4 | 9.1% |
+
+これを受けてアプリケーションに入った変更は
+[その後アプリケーションに入った変更](#その後アプリケーションに入った変更)に記載している。
 
 ---
 
