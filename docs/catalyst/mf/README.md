@@ -5,11 +5,9 @@
 *English below · [日本語は下段へ](#ja)*
 
 
-Project Catalyst F12, Project ID 1200088. Evidence for the deliverables of this
-milestone that are evidenced from this repository. Deliverables 1 (event
-hosting), 4 (close-out report) and 5 (close-out video) are submitted separately.
-
-These documents describe the code at `517e9a4` (2026-09-04).
+Project Catalyst F12, Project ID 1200088. Code as of `517e9a4` (2026-09-04).
+Deliverables 1 (event hosting), 4 (close-out report) and 5 (close-out video) are
+submitted separately.
 
 ## Deliverable 2 — Reports on the demonstration experiment, user feedback and usage statistics
 
@@ -43,9 +41,8 @@ separate fields. [UAT report](./uat-report-2026.md) §5 states what is available
 
 ### 2. Scope of the audit
 
-The audit assessed the codebase as of September–December 2025 and targeted the NEO88
-deployment. [Scope and currency](./security-audit-response.md#scope-and-currency)
-sets out how its findings relate to the code today.
+The audit assessed the codebase as of September–December 2025.
+[Scope and currency](./security-audit-response.md#scope-and-currency).
 
 ---
 ---
@@ -56,11 +53,9 @@ sets out how its findings relate to the code today.
 
 *[English is above](#en)*
 
-Project Catalyst F12、Project ID 1200088。本マイルストーンの成果物のうち、本リポジトリ
-からエビデンスを示すもの。成果物1（イベント開催）、成果物4（クローズアウト報告書）、
-成果物5（クローズアウト動画）は別途提出。
-
-これらのドキュメントは `517e9a4`（2026-09-04）時点のコードについて記述している。
+Project Catalyst F12、Project ID 1200088。`517e9a4`（2026-09-04）時点のコード。
+成果物1（イベント開催）、成果物4（クローズアウト報告書）、成果物5（クローズアウト動画）
+は別途提出。
 
 ## 成果物2 — 実証実験・利用者フィードバック・利用統計の報告
 
@@ -94,6 +89,5 @@ Project Catalyst F12、Project ID 1200088。本マイルストーンの成果物
 
 ### 2. 監査の範囲
 
-監査は2025年9〜12月時点のコードベースを評価し、NEO88 の環境を対象としている。
-指摘事項が現在のコードとどう対応するかは
-[監査の範囲と、現在との時間差](./security-audit-response.md#監査の範囲と現在との時間差)に記載。
+監査は2025年9〜12月時点のコードベースを評価している。
+[監査の範囲と、現在との時間差](./security-audit-response.md#監査の範囲と現在との時間差)。

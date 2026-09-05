@@ -5,11 +5,8 @@
 *English below · [日本語は下段へ](#ja)*
 
 
-Project Catalyst F12, Project ID 1200088. Evidence for the deliverables of this
-milestone that are evidenced from this repository. Deliverables 2 (event
-planning) and 4 (NEO88 DAO) are submitted separately.
-
-These documents describe the code at `517e9a4` (2026-09-04).
+Project Catalyst F12, Project ID 1200088. Code as of `517e9a4` (2026-09-04).
+Deliverables 2 (event planning) and 4 (NEO88 DAO) are submitted separately.
 
 ## Deliverable 1 — Front-end development
 
@@ -33,11 +30,8 @@ These documents describe the code at `517e9a4` (2026-09-04).
 
 https://dev.civicship.app/community/neo88
 
-The NEO88 community on the development deployment. A visitor arriving without a
-session is signed in automatically as a throwaway account, so the application can
-be used without a LINE account. The interface is a LINE mini app: it is laid out
-for a phone, adapts to the viewport width, and on a desktop browser the mobile
-layout is centred on the page.
+Signs you in automatically — no LINE account needed. It is a LINE mini app, so
+the layout is a phone layout, centred on a desktop browser.
 
 ---
 ---
@@ -48,10 +42,8 @@ layout is centred on the page.
 
 *[English is above](#en)*
 
-Project Catalyst F12、Project ID 1200088。本マイルストーンの成果物のうち、本リポジトリ
-からエビデンスを示すもの。成果物2（イベント計画）と成果物4（NEO88 DAO）は別途提出。
-
-これらのドキュメントは `517e9a4`（2026-09-04）時点のコードについて記述している。
+Project Catalyst F12、Project ID 1200088。`517e9a4`（2026-09-04）時点のコード。
+成果物2（イベント計画）と成果物4（NEO88 DAO）は別途提出。
 
 ## 成果物1 — フロントエンド開発
 
@@ -75,8 +67,5 @@ Project Catalyst F12、Project ID 1200088。本マイルストーンの成果物
 
 https://dev.civicship.app/community/neo88
 
-開発環境上の NEO88 コミュニティ。セッションを持たない訪問者は使い捨てアカウントとして
-自動的にサインインするため、LINE アカウント無しでアプリケーションを操作できる。
-インターフェースは LINE ミニアプリであり、スマートフォン向けにレイアウトされ、
-ビューポート幅に追随する。デスクトップブラウザではモバイル向けレイアウトが画面中央に
-配置される。
+自動でサインインするため LINE アカウントは不要。LINE ミニアプリのため画面は
+スマートフォン向けレイアウトで、デスクトップでは中央に配置される。
