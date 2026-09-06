@@ -38,11 +38,7 @@ Project Catalyst F12, Project ID 1200088. Code as of `517e9a4` (2026-09-04).
 ### Audit report and evidence of fixes publicly accessible
 
 - [The report](https://drive.google.com/file/d/1T3v22q6stRceDy9eDbvpKB1rWGgGpO0W/view) — each finding carries the
-  status Hexens recorded for it
-- Hexens received the revision on 12 December 2025 and issued the final report
-  on 16 December, so those statuses are its own re-test of the fixes
-- The changes: [civicship-portal #732](https://github.com/Hopin-inc/civicship-portal/pull/732),
-  [civicship-api #501](https://github.com/Hopin-inc/civicship-api/pull/501)
+  status Hexens recorded for it after re-testing the fixes
 
 ### Detailed report of bug fixes from user acceptance tests and security audits, shared with the community
 
@@ -94,12 +90,8 @@ Project Catalyst F12、Project ID 1200088。`517e9a4`（2026-09-04）時点の�
 
 ### 監査レポートと修正の証跡が公開されていること
 
-- [レポート](https://drive.google.com/file/d/1T3v22q6stRceDy9eDbvpKB1rWGgGpO0W/view) — 各指摘に Hexens が記録した
-  ステータスが付されている
-- Hexens は2025年12月12日に修正版を受領し、12月16日に最終レポートを発行している。
-  上記ステータスは Hexens 自身による再テストの結果である
-- 変更内容: [civicship-portal #732](https://github.com/Hopin-inc/civicship-portal/pull/732)、
-  [civicship-api #501](https://github.com/Hopin-inc/civicship-api/pull/501)
+- [レポート](https://drive.google.com/file/d/1T3v22q6stRceDy9eDbvpKB1rWGgGpO0W/view) — 各指摘に、修正後の
+  再テストを経て Hexens が記録したステータスが付されている
 
 ### 受入テストと監査で判明したバグ修正の詳細な報告を、コミュニティに共有すること
 
