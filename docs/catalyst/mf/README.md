@@ -5,7 +5,7 @@
 *English below · [日本語は下段へ](#ja)*
 
 
-Project Catalyst F12, Project ID 1200088. Code as of `517e9a4` (2026-09-04).
+Project Catalyst F12, Project ID 1200088. Code as of `522f270` (2026-09-06).
 
 ## Deliverable 2 — Reports on the demonstration experiment, user feedback and usage statistics
 
@@ -17,14 +17,11 @@ Project Catalyst F12, Project ID 1200088. Code as of `517e9a4` (2026-09-04).
 ### Feedback collected and analysed, areas for improvement identified
 
 - [UAT report](./uat-report-2025.md)
-- The ratings, the free-text comments, the analysis, and the three areas for
-  improvement
 
 ### Tester initials, living region, attribute and result shared with the community
 
 - [Tester
   list](./uat-report-2025.md#criterion-3--tester-initials-living-region-attribute-and-result-shared)
-- All four, for each of the 35 testers
 
 ## Deliverable 3 — Bug fixes and security audit
 
@@ -57,7 +54,7 @@ Project Catalyst F12, Project ID 1200088. Code as of `517e9a4` (2026-09-04).
 
 *[English is above](#en)*
 
-Project Catalyst F12、Project ID 1200088。`517e9a4`（2026-09-04）時点のコード。
+Project Catalyst F12、Project ID 1200088。`522f270`（2026-09-06）時点のコード。
 
 ## 成果物2 — 実証実験・利用者フィードバック・利用統計の報告
 
@@ -69,12 +66,10 @@ Project Catalyst F12、Project ID 1200088。`517e9a4`（2026-09-04）時点の�
 ### フィードバックを収集・分析し、改善点を特定すること
 
 - [UAT 報告書](./uat-report-2025.md)
-- 機能別評価、自由記述、分析、および特定した3つの改善点
 
 ### テスターのイニシャル・居住地域・属性・結果をコミュニティに共有すること
 
 - [テスター一覧](./uat-report-2025.md#受入条件3--テスターのイニシャル居住地域属性結果の共有)
-- 対象35名すべてについて4項目を掲載
 
 ## 成果物3 — バグ修正とセキュリティ監査
 

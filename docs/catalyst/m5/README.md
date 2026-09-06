@@ -5,25 +5,23 @@
 *English below · [日本語は下段へ](#ja)*
 
 
-Project Catalyst F12, Project ID 1200088. Code as of `517e9a4` (2026-09-04).
+Project Catalyst F12, Project ID 1200088. Code as of `522f270` (2026-09-06).
 
 ## Deliverable 1 — Front-end development
 
 ### The front-end source code is published on GitHub
 
 - https://github.com/Hopin-inc/civicship-portal
-- GPL-3.0
 
 ### Detailed documentation, including UI/UX design principles, integration processes, and user instructions
 
 - [Front-end documentation](./frontend-documentation.md)
-- Those three, in that order, are its three sections
 
 ### A link is provided to try out the completed mutual app
 
 - https://civicship.app/community/neo88
-- https://dev.civicship.app/community/neo88 — the same build, without needing a
-  LINE account
+- https://dev.civicship.app/community/neo88 — the development deployment,
+  which needs no LINE account
 - [Trying the application](#trying-the-application)
 
 ### Fully functional and responsive across different devices
@@ -51,10 +49,10 @@ Project Catalyst F12, Project ID 1200088. Code as of `517e9a4` (2026-09-04).
 **https://civicship.app/community/neo88** is the application as residents use it.
 Sign-in is by LINE account.
 
-**https://dev.civicship.app/community/neo88** is the same build on a development
-deployment, which signs a visitor in automatically. A reviewer can evaluate the
-participant screens and the administrative screens there without a LINE account
-and without giving up any personal information.
+**https://dev.civicship.app/community/neo88** is the development deployment of
+the same application, which signs a visitor in automatically. A reviewer can
+evaluate the participant screens and the administrative screens there without a
+LINE account and without giving up any personal information.
 
 It is a LINE mini app (LIFF), so the interface is built for the in-app browser it
 opens in. The same screens and the same functions work on a phone, a tablet and a
@@ -69,24 +67,22 @@ desktop browser.
 
 *[English is above](#en)*
 
-Project Catalyst F12、Project ID 1200088。`517e9a4`（2026-09-04）時点のコード。
+Project Catalyst F12、Project ID 1200088。`522f270`（2026-09-06）時点のコード。
 
 ## 成果物1 — フロントエンド開発
 
 ### フロントエンドのソースコードが GitHub で公開されていること
 
 - https://github.com/Hopin-inc/civicship-portal
-- GPL-3.0
 
 ### UI/UX 設計原則・連携方式・利用者向け手順書を含む詳細なドキュメント
 
 - [フロントエンド ドキュメント](./frontend-documentation.md)
-- この3つが、この順でそのまま3つの節になっている
 
 ### 完成したアプリを試せるリンクが提供されていること
 
 - https://civicship.app/community/neo88
-- https://dev.civicship.app/community/neo88 — 同じビルドを LINE アカウント無しで
+- https://dev.civicship.app/community/neo88 — 開発環境。LINE アカウント不要
 - [アプリを試す](#アプリを試す)
 
 ### 各種デバイスで完全に動作し、レスポンシブであること
@@ -114,8 +110,8 @@ Project Catalyst F12、Project ID 1200088。`517e9a4`（2026-09-04）時点の�
 **https://civicship.app/community/neo88** — 住民が実際に使っているアプリケーション。
 サインインは LINE アカウント。
 
-**https://dev.civicship.app/community/neo88** — 同じビルドの開発環境で、訪問者を
-自動的にサインインさせる。レビュアーは LINE アカウントも個人情報も渡すことなく、
+**https://dev.civicship.app/community/neo88** — 同じアプリケーションの開発環境で、
+訪問者を自動的にサインインさせる。レビュアーは LINE アカウントも個人情報も渡すことなく、
 参加者向け画面と管理画面の両方を評価できる。
 
 LINE ミニアプリ（LIFF）であるため、画面は起動元であるアプリ内ブラウザに合わせて

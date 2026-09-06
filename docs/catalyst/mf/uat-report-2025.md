@@ -6,8 +6,7 @@
 
 
 - Final Milestone, deliverable 2. Project Catalyst F12, Project ID 1200088
-- Describes the code at `517e9a4` (2026-09-04)
-- The deliverable's three acceptance criteria are the three headings below
+- Describes the code at `522f270` (2026-09-06)
 - Usage statistics, named in the deliverable itself, are the fourth section
 
 ---
@@ -229,8 +228,7 @@ The demonstration ran on NEO88. These are its figures.
 *[English is above](#en)*
 
 - Final Milestone 成果物2。Project Catalyst F12、Project ID 1200088
-- `517e9a4`（2026-09-04）時点のコードについて記述している
-- 本成果物の3つの受入条件が、以下の3つの見出しである
+- `522f270`（2026-09-06）時点のコードについて記述している
 - 成果物名に含まれる利用統計を4節目に置く
 
 ---

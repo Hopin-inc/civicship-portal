@@ -5,9 +5,7 @@
 *English below · [日本語は下段へ](#ja)*
 
 
-- Milestone 5 deliverable 1, describing the code at `517e9a4` (2026-09-04)
-- The criterion asks for UI/UX design principles, integration processes and user
-  instructions; those three are the sections below
+- Milestone 5 deliverable 1, describing the code at `522f270` (2026-09-06)
 - A mutual-assistance application for residents, delivered as a **LINE mini app
   (LIFF)**
 - Next.js 15 (App Router) and TypeScript, Tailwind CSS, Apollo Client against a
@@ -106,8 +104,7 @@ The screens that result:
 
 *[English is above](#en)*
 
-- Milestone 5 成果物1。`517e9a4`（2026-09-04）時点のコードについて記述している
-- 受入条件が求める UI/UX 設計原則・連携方式・利用者向け手順書が、以下の3節にあたる
+- Milestone 5 成果物1。`522f270`（2026-09-06）時点のコードについて記述している
 - 住民同士の助け合いのためのアプリケーションで、**LINE ミニアプリ（LIFF）** として
   提供する
 - Next.js 15（App Router）と TypeScript、Tailwind CSS、GraphQL API に対する Apollo
