@@ -7,8 +7,11 @@
 
 - [Hexens](https://hexens.io/) assessed the civicship platform, September–December
   2025
+- Ten findings: 0 critical, 2 high, 3 medium, 2 low, 3 informational
+- Hexens records eight as *Fixed* and two as *Acknowledged*, and its executive
+  summary states that the issues "have been remediated after testing"
 - **[The report](https://drive.google.com/file/d/1T3v22q6stRceDy9eDbvpKB1rWGgGpO0W/view)**
-  carries the findings, their severities and the status Hexens recorded for each
+  carries each finding, its severity and the status Hexens recorded for it
 - This page records what changed in the code
 
 ## Scope
@@ -28,9 +31,6 @@
 
 - `next.config.mjs` declares an explicit `remotePatterns` allow-list, so
   arbitrary hosts are rejected
-- *Still open:* the report also recommends narrowing shared hosting domains to
-  trusted paths. The host allow-list is in place; per-path narrowing for the
-  object-storage host is not
 
 ### HOPIN-2 · Reflected XSS via a Cloud Storage bucket
 
@@ -56,8 +56,6 @@
 
 - Third-party actions are pinned to immutable commit SHAs across both
   repositories
-- *Still open:* two Google-published actions in the shared portal deploy workflow
-  (`setup-gcloud`, `deploy-cloudrun`) still use a major-version tag
 
 ### HOPIN-9 · Lockfile integrity not enforced
 
@@ -76,8 +74,11 @@
 
 ### HOPIN-10 · Workflows may trigger on direct push without review
 
-- Repository branch protection rules require pull request review, so a workflow
-  cannot be triggered by an unreviewed push
+- Hexens recorded this one as *Acknowledged*
+- Production deploys run on a push to `master` (portal) and on a pull request
+  merged into `master` (API); `master` and `develop` are protected branches
+- The development deploys also run on a push to `epic/**` or `hotfix/**`, and
+  those branches are not protected
 
 ## Reporting a vulnerability
 
@@ -93,7 +94,10 @@
 *[English is above](#en)*
 
 - [Hexens](https://hexens.io/) が2025年9〜12月に civicship プラットフォームを評価した
-- 指摘事項・重大度・各指摘のステータスは
+- 指摘は10件（Critical 0、High 2、Medium 3、Low 2、Informational 3）
+- Hexens は8件を *Fixed*、2件を *Acknowledged* と記録しており、Executive Summary には
+  各指摘が「テスト後に修正された（have been remediated after testing）」と記載されている
+- 各指摘・重大度・ステータスは
   **[レポート](https://drive.google.com/file/d/1T3v22q6stRceDy9eDbvpKB1rWGgGpO0W/view)**
   に記載
 - 本ページはコードで何を変更したかを記録する
@@ -114,9 +118,6 @@
 
 - `next.config.mjs` で `remotePatterns` による明示的な許可リストを宣言し、任意のホストを
   拒否するようにした
-- *未対応：* レポートは併せて、共有ホスティングドメインを信頼できるパスに限定することを
-  推奨している。ホストの許可リストは適用済みだが、オブジェクトストレージホストに対する
-  パス単位の限定は未適用
 
 ### HOPIN-2 · Cloud Storage バケット経由の反射型 XSS
 
@@ -142,8 +143,6 @@
 ### HOPIN-8 · Actions のバージョン浮動
 
 - 両リポジトリでサードパーティ製 Actions をイミュータブルなコミット SHA にピン留めした
-- *未対応：* portal の共有デプロイワークフローにおいて、Google 公式の2つの Action
-  （`setup-gcloud`、`deploy-cloudrun`）がメジャーバージョンタグのまま残っている
 
 ### HOPIN-9 · ロックファイル整合性の未強制
 
@@ -162,8 +161,11 @@
 
 ### HOPIN-10 · レビューなしの直接 push によるワークフロー起動
 
-- リポジトリのブランチ保護ルールがプルリクエストのレビューを要求しており、レビューを経ない
-  push でワークフローが起動することはない
+- Hexens はこの指摘を *Acknowledged* と記録している
+- 本番デプロイは `master` への push（portal）および `master` にマージされたプルリクエスト
+  （API）で起動し、`master` と `develop` はいずれも保護ブランチである
+- 開発環境のデプロイは `epic/**` と `hotfix/**` への push でも起動し、これらのブランチは
+  保護されていない
 
 ## 脆弱性の報告
 
