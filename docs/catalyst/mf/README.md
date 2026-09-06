@@ -32,16 +32,23 @@ Project Catalyst F12, Project ID 1200088. Code as of `517e9a4` (2026-09-04).
 
 - [Hexens](https://hexens.io/)
 - September–December 2025
+- The report names the NEO88 deployment; every community runs the same
+  `civicship-portal` and `civicship-api` codebase
 
 ### Audit report and evidence of fixes publicly accessible
 
-- [The report](https://drive.google.com/file/d/1T3v22q6stRceDy9eDbvpKB1rWGgGpO0W/view)
-- [What changed in the code](./security-audit-response.md)
+- [The report](https://drive.google.com/file/d/1T3v22q6stRceDy9eDbvpKB1rWGgGpO0W/view) — each finding carries the
+  status Hexens recorded for it
+- Hexens received the revision on 12 December 2025 and issued the final report
+  on 16 December, so those statuses are its own re-test of the fixes
+- The changes: [civicship-portal #732](https://github.com/Hopin-inc/civicship-portal/pull/732),
+  [civicship-api #501](https://github.com/Hopin-inc/civicship-api/pull/501)
 
 ### Detailed report of bug fixes from user acceptance tests and security audits, shared with the community
 
-- [What changed in the code](./security-audit-response.md)
-- [What changed in the application
+- From the audit: [civicship-portal #732](https://github.com/Hopin-inc/civicship-portal/pull/732),
+  [civicship-api #501](https://github.com/Hopin-inc/civicship-api/pull/501)
+- From the user acceptance tests: [what changed in the application
   afterwards](./uat-report-2025.md#what-changed-in-the-application-afterwards)
 
 ### Fixed code publicly available on GitHub
@@ -83,16 +90,23 @@ Project Catalyst F12、Project ID 1200088。`517e9a4`（2026-09-04）時点の�
 
 - [Hexens](https://hexens.io/)
 - 2025年9〜12月
+- レポートは NEO88 の環境を対象として記載しているが、すべてのコミュニティは同一の
+  `civicship-portal` / `civicship-api` のコードベースで動作している
 
 ### 監査レポートと修正の証跡が公開されていること
 
-- [レポート](https://drive.google.com/file/d/1T3v22q6stRceDy9eDbvpKB1rWGgGpO0W/view)
-- [コードで何を変更したか](./security-audit-response.md)
+- [レポート](https://drive.google.com/file/d/1T3v22q6stRceDy9eDbvpKB1rWGgGpO0W/view) — 各指摘に Hexens が記録した
+  ステータスが付されている
+- Hexens は2025年12月12日に修正版を受領し、12月16日に最終レポートを発行している。
+  上記ステータスは Hexens 自身による再テストの結果である
+- 変更内容: [civicship-portal #732](https://github.com/Hopin-inc/civicship-portal/pull/732)、
+  [civicship-api #501](https://github.com/Hopin-inc/civicship-api/pull/501)
 
 ### 受入テストと監査で判明したバグ修正の詳細な報告を、コミュニティに共有すること
 
-- [コードで何を変更したか](./security-audit-response.md)
-- [その後アプリケーションに入った変更](./uat-report-2025.md#その後アプリケーションに入った変更)
+- 監査分: [civicship-portal #732](https://github.com/Hopin-inc/civicship-portal/pull/732)、
+  [civicship-api #501](https://github.com/Hopin-inc/civicship-api/pull/501)
+- 受入テスト分: [その後アプリケーションに入った変更](./uat-report-2025.md#その後アプリケーションに入った変更)
 
 ### 修正済みコードが GitHub で公開されていること
 
