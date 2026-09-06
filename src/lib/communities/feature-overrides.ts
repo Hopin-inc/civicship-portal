@@ -13,10 +13,7 @@
  */
 const EXTRA_FEATURES: Record<string, readonly string[]> = {
   // neo88 wants the places tab, and its row does not list "places".
-  // "languageSwitcher" puts the Japanese/English selector on the settings screen
-  // and lets the middleware pick the locale from the browser's Accept-Language,
-  // so a visitor who does not read Japanese lands on the English interface.
-  neo88: ["places", "languageSwitcher"],
+  neo88: ["places"],
 };
 
 /**
