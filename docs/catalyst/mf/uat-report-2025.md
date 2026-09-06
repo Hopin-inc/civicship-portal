@@ -105,8 +105,7 @@ Each function was rated 1–5 by all 35 respondents.
   registering, running, notifying and reservation handling are what a provider
   does in the application. Search is what their customers do, and the free-text
   comment asks for it on their behalf: *"a way of presenting things that lets
-  **customers** see at a glance what experiences exist and where."* This survey
-  measured it through the providers rather than through the people who use it
+  **customers** see at a glance what experiences exist and where."*
 
 ### Areas for improvement identified
 
@@ -322,8 +321,7 @@ The demonstration ran on NEO88. These are its figures.
 - **5機能のうち4つは事業者自身が操作する機能であり、検索だけがそうではない** — 体験の
   登録・実施・通知・予約対応は事業者がアプリ上で行う作業である。検索を使うのはその顧客で
   あり、自由記述もその立場からの要望である：「**お客様に**、どんな体験がどこにあるかを
-  俯瞰していただける見せ方を改善できたら」。本調査は、この機能を実際の利用者ではなく
-  事業者を通して測っている
+  俯瞰していただける見せ方を改善できたら」
 
 ### 特定した改善点
 

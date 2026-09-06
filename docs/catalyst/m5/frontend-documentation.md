@@ -94,10 +94,8 @@ The screens that result:
 - It covers account registration, linking the LINE account, approving and
   declining reservations, cancelling a session, checking applications, and
   attendance management
-- It documents the flow as it stood during the festival; the administrative
-  screens were rebuilt afterwards
-- The participant flows are demonstrated in the [recordings for deliverable
-  3](./demo/)
+- The [recordings for deliverable 3](./demo/) show the current flow, including
+  the administrative screens rebuilt after the festival
 
 ---
 ---
@@ -193,5 +191,5 @@ Milestone 3 の期間中に作成・提出し、承認されたもの。
   https://docs.google.com/presentation/d/1WypOpniKO8l7OXk1VBbkYNf7O_vYgkwDg8it4eJccxk/edit
 - アカウント登録、LINE アカウントの連携、予約の承認と辞退、開催の中止、申込情報の確認、
   出欠管理を扱う
-- 記載されているのは祭の期間中の操作フローであり、管理画面はその後に作り直している
-- 参加者側の操作は[成果物3の録画](./demo/)で示している
+- 祭の後に作り直した管理画面を含め、現在の操作フローは[成果物3の録画](./demo/)で
+  示している
