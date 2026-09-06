@@ -54,8 +54,9 @@
 
 ### HOPIN-8 · Floating action versions
 
-- Third-party actions are pinned to immutable commit SHAs across both
-  repositories
+- Third-party actions are pinned to immutable commit SHAs, except
+  `google-github-actions/setup-gcloud` and `google-github-actions/deploy-cloudrun`
+  in the portal deploy workflow, which remain on a major-version tag
 
 ### HOPIN-9 · Lockfile integrity not enforced
 
@@ -142,7 +143,9 @@
 
 ### HOPIN-8 · Actions のバージョン浮動
 
-- 両リポジトリでサードパーティ製 Actions をイミュータブルなコミット SHA にピン留めした
+- サードパーティ製 Actions をイミュータブルなコミット SHA にピン留めした。ただし portal の
+  デプロイワークフローの `google-github-actions/setup-gcloud` と
+  `google-github-actions/deploy-cloudrun` はメジャーバージョンタグのままである
 
 ### HOPIN-9 · ロックファイル整合性の未強制
 
