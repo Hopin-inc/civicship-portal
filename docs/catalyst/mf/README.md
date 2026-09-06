@@ -46,8 +46,7 @@ Project Catalyst F12, Project ID 1200088. Code as of `517e9a4` (2026-09-04).
 
 ### Detailed report of bug fixes from user acceptance tests and security audits, shared with the community
 
-- From the audit: [civicship-portal #732](https://github.com/Hopin-inc/civicship-portal/pull/732),
-  [civicship-api #501](https://github.com/Hopin-inc/civicship-api/pull/501)
+- From the audit: [the report](https://drive.google.com/file/d/1T3v22q6stRceDy9eDbvpKB1rWGgGpO0W/view)
 - From the user acceptance tests: [what changed in the application
   afterwards](./uat-report-2025.md#what-changed-in-the-application-afterwards)
 
@@ -104,8 +103,7 @@ Project Catalyst F12、Project ID 1200088。`517e9a4`（2026-09-04）時点の�
 
 ### 受入テストと監査で判明したバグ修正の詳細な報告を、コミュニティに共有すること
 
-- 監査分: [civicship-portal #732](https://github.com/Hopin-inc/civicship-portal/pull/732)、
-  [civicship-api #501](https://github.com/Hopin-inc/civicship-api/pull/501)
+- 監査分: [レポート](https://drive.google.com/file/d/1T3v22q6stRceDy9eDbvpKB1rWGgGpO0W/view)
 - 受入テスト分: [その後アプリケーションに入った変更](./uat-report-2025.md#その後アプリケーションに入った変更)
 
 ### 修正済みコードが GitHub で公開されていること
