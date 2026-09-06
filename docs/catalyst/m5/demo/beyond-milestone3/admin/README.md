@@ -1,11 +1,11 @@
 <a id="en"></a>
 
-# Beyond Milestone 3 — Host
+# Further Use Cases — Host
 
 *English below · [日本語は下段へ](#ja)*
 
 
-Host use cases the Milestone 3 playlists did not cover.
+Seven host use cases beyond the Milestone 3 playlists.
 
 | | Use case | Video |
 | --- | --- | --- |
@@ -22,11 +22,11 @@ Host use cases the Milestone 3 playlists did not cover.
 
 <a id="ja"></a>
 
-# Milestone 3 の範囲外 — ホスト向け
+# 追加のユースケース — ホスト向け
 
 *[English is above](#en)*
 
-Milestone 3 のプレイリストが扱っていなかったホスト向けのユースケース。
+Milestone 3 のプレイリストに加えてのホスト向け7件。
 
 | | ユースケース | 動画 |
 | --- | --- | --- |

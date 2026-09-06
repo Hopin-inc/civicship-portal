@@ -70,9 +70,8 @@ Each function was rated 1–5 by all 35 respondents.
 | Change / cancellation notices | 35 | 3.40 | 3.0 | 48.6% |
 | Running an experience | 35 | 3.31 | 3.0 | 45.7% |
 | Registering an experience | 35 | 3.29 | 3.0 | 42.9% |
-| **Search / discovery** | **35** | **3.09** | **3.0** | **37.1%** |
+| Search / discovery | 35 | 3.09 | 3.0 | 37.1% |
 
-- **Search scores lowest on every measure**
 
 ### Intent to continue
 
@@ -83,8 +82,8 @@ Each function was rated 1–5 by all 35 respondents.
 ### Qualitative feedback
 
 - Eight respondents left free-text comments
-- Two themes carry actionable content; the remainder were expressions of thanks
-  and of interest in continuing
+- Two identify something to change and are carried into the areas for improvement
+  below; the others expressed thanks and an intention to continue
 - **Discoverability** — one provider wrote that they wanted *"a way of presenting
   things that lets customers see at a glance what experiences exist and where."*
   Search is also the lowest-scoring function quantitatively (mean 3.09)
@@ -131,7 +130,7 @@ Each function was rated 1–5 by all 35 respondents.
 
 ## Criterion 3 — Tester initials, living region, attribute and result shared
 
-- **The attribute is the same for every row** — each tester operated an experience
+- **Attribute** — each tester operated an experience
   in one of the four prefectures of Shikoku during the festival, and each
   represents a business or organisation rather than an individual consumer
 - **Region** is where the tester operates. For most it is the prefecture on their
@@ -196,27 +195,10 @@ The demonstration ran on NEO88. These are its figures.
 | Grant volume | 156,000 |
 
 - NEO88 was created as a time-limited demonstration community for the festival
-- The figures above are the totals it accumulated over that period, which has
-  concluded
+- The figures above are the totals it accumulated over that period
 - These are internal activity records. They do not represent fiat currency or
   redeemable economic value
-
-### Appendix — the rest of the platform
-
-- The same application serves other communities
-- Their figures are given for context; the demonstration experiment reported here
-  is NEO88's
-
-| Community | Members | P2P volume | Points issued | Grants | DID | VC |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| **NEO88** | **368** | **14,000** | **1,020,000** | **156,000** | **365** | **55** |
-| Kibotcha · Izu | 582 | 8,557,000 | 2.22bn | 65,223,000 | 464 | 16 |
-| Kotohira | 53 | 111,000 | 1,000,000 | 450,000 | 35 | 15 |
-| DAIS | 49 | 0 | 0 | 0 | 48 | 48 |
-| Total | 1,052 | 8,682,000 | 2.22bn | 65,829,000 | 912 | 134 |
-
-- DAIS shows DIDs and VCs approximately equal to its member count and no economic
-  activity, which reflects its configuration as a credential-only community
+- The same application also serves Kibotcha · Izu, Kotohira and DAIS
 
 ---
 ---
@@ -289,9 +271,8 @@ The demonstration ran on NEO88. These are its figures.
 | 変更・中止の通知 | 35 | 3.40 | 3.0 | 48.6% |
 | 体験の実施 | 35 | 3.31 | 3.0 | 45.7% |
 | 体験の登録 | 35 | 3.29 | 3.0 | 42.9% |
-| **検索・発見** | **35** | **3.09** | **3.0** | **37.1%** |
+| 検索・発見 | 35 | 3.09 | 3.0 | 37.1% |
 
-- **検索はすべての指標で最下位である**
 
 ### 継続意向
 
@@ -302,8 +283,8 @@ The demonstration ran on NEO88. These are its figures.
 ### 自由記述
 
 - 8名から自由記述の回答を得た
-- うち2つのテーマが具体的な改善につながる内容を含み、残りは謝意および継続への関心の
-  表明であった
+- うち2つは変更すべき点を挙げており、後述の改善点に引き継いでいる。残りは謝意と継続の
+  意向を述べたものであった
 - **発見性** — ある事業者は「お客様に、どんな体験がどこにあるかを俯瞰していただける
   見せ方を改善できたら」と記した。検索は定量評価でも最下位の機能である（平均3.09）
 - **掲載形式の硬直性** — 別の事業者は「アプリの自由度が少ないように感じました。選択項目
@@ -346,7 +327,7 @@ The demonstration ran on NEO88. These are its figures.
 
 ## 受入条件3 — テスターのイニシャル・居住地域・属性・結果の共有
 
-- **属性は全行で共通である** — 各テスターは祭の期間中、四国4県のいずれかで体験を提供
+- **属性** — 各テスターは祭の期間中、四国4県のいずれかで体験を提供
   しており、個人の消費者としてではなく事業者・団体を代表して参加している
 - **居住地域**は各テスターが事業を営む都道府県である。多くはアプリケーション上の本人の
   アカウントに登録されている都道府県であり、それ以外は体験を提供した事業者の所在県である
@@ -408,22 +389,7 @@ The demonstration ran on NEO88. These are its figures.
 | 助成記録量 | 15.6万 |
 
 - NEO88 は祭に合わせた期間限定の実証コミュニティとして設計されている
-- 上記はその期間に積み上がった総数であり、実証フェーズは終了している
+- 上記はその期間に積み上がった総数である
 - これらはプラットフォーム内部の活動記録であり、法定通貨や換金可能な経済的価値を示す
   ものではない
-
-### 付録 — プラットフォーム上の他コミュニティ
-
-- 同一のアプリケーションが他のコミュニティも運用している
-- 参考として数値を挙げる。本報告書が対象とする実証実験は NEO88 のものである
-
-| コミュニティ | メンバー | P2P取引量 | 発行ポイント | 助成 | DID | VC |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| **NEO88** | **368** | **1.4万** | **102.0万** | **15.6万** | **365** | **55** |
-| キボッチャ・伊豆 | 582 | 855.7万 | 22.2億 | 6,522.3万 | 464 | 16 |
-| 琴平 | 53 | 11.1万 | 100.0万 | 45.0万 | 35 | 15 |
-| DAIS | 49 | 0 | 0 | 0 | 48 | 48 |
-| 合計 | 1,052 | 868.2万 | 22.2億 | 6,582.9万 | 912 | 134 |
-
-- DAIS はメンバー数とほぼ同数の DID・VC を持ち経済活動がないが、これはクレデンシャル
-  特化の構成を反映したものである
+- 同一のアプリケーションは、キボッチャ・伊豆、琴平、DAIS でも運用されている

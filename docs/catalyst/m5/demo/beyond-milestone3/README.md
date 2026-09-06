@@ -1,11 +1,11 @@
 <a id="en"></a>
 
-# Beyond Milestone 3
+# Further Use Cases
 
 *English below · [日本語は下段へ](#ja)*
 
 
-Ten use cases the Milestone 3 playlists did not cover.
+Ten use cases beyond the eleven the Milestone 3 playlists covered.
 
 | | |
 | --- | --- |
@@ -17,11 +17,11 @@ Ten use cases the Milestone 3 playlists did not cover.
 
 <a id="ja"></a>
 
-# Milestone 3 の範囲外
+# 追加のユースケース
 
 *[English is above](#en)*
 
-Milestone 3 のプレイリストが扱っていなかった10件。
+Milestone 3 のプレイリストの11件に加えての10件。
 
 | | |
 | --- | --- |
