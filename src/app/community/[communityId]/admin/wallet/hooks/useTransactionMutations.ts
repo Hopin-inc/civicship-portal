@@ -13,15 +13,17 @@ import {
 } from "@/types/graphql";
 import { logger } from "@/lib/logging";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
+import {
+  isAuthenticatedSession,
+  useIsAuthenticatedSession,
+} from "@/lib/auth/core/session";
 
 type Result<T> = { success: true; data: T } | { success: false; code: GqlErrorCode };
 
-// 認証チェック: firebaseUser または exchange経由のlineTokens.idTokenが必要
-// apollo.ts の requestLink と同じロジックを使用
+// 認証チェック: Firebase / LINE / dev 自動ログインのいずれかが必要
 const checkAuth = (): { success: false; code: GqlErrorCode } | null => {
-  const { firebaseUser, lineTokens } = useAuthStore.getState().state;
-  if (!firebaseUser && !lineTokens.idToken) {
-    logger.warn("Transaction mutation blocked: not authenticated (no firebaseUser or lineTokens.idToken)", {
+  if (!isAuthenticatedSession(useAuthStore.getState().state)) {
+    logger.warn("Transaction mutation blocked: no Firebase user, LINE token, or dev session", {
       component: "useTransactionMutations",
       errorCategory: "auth",
     });
@@ -31,8 +33,8 @@ const checkAuth = (): { success: false; code: GqlErrorCode } | null => {
 };
 
 export const useTransactionMutations = () => {
-  // firebaseUser または exchange経由のlineTokens.idTokenをsubscribeしてUIが反応的に更新されるようにする
-  const isAuthReady = useAuthStore((s) => !!s.state.firebaseUser || !!s.state.lineTokens.idToken);
+  // 認証情報の到着でUIが反応的に更新されるよう、subscribe する形で判定する
+  const isAuthReady = useIsAuthenticatedSession();
 
   // Apollo Hooks
   const [issuePointMutation, { loading: loadingIssue }] = usePointIssueMutation();

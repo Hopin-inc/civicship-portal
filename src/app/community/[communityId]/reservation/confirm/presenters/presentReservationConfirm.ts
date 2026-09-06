@@ -228,9 +228,13 @@ function presentAvailableTickets(
     };
   });
 
-  if (!opportunity?.targetUtilities.length) {
-    return groupedTickets;
-  }
+  // utility を要求していない募集はチケットを受け付けない。API 側は
+  // requiredUtilities が空だとチケット決済の処理ごと素通りするため、ここで
+  // 出してしまうと「チケットで支払う」トグルと割引後の金額だけが表示され、
+  // 予約は通るのにチケットは消費されない。opportunity 自体が未確定の場合は
+  // 絞り込む材料がないので従来どおり全件返す。
+  if (!opportunity) return groupedTickets;
+  if (!opportunity.targetUtilities?.length) return [];
 
   const requiredUtilityIds = new Set(opportunity.targetUtilities.map((u) => u.id));
 

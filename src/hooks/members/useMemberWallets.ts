@@ -5,7 +5,7 @@ import { useCommunityConfig } from "@/contexts/CommunityConfigContext";
 import { useGetMemberWalletsQuery, GqlGetMemberWalletsQuery } from "@/types/graphql";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { toast } from "react-toastify";
-import { useAuthStore } from "@/lib/auth/core/auth-store";
+import { useIsAuthenticatedSession } from "@/lib/auth/core/session";
 
 export interface UseMemberWalletsResult {
   data: GqlGetMemberWalletsQuery | undefined;
@@ -19,7 +19,7 @@ export interface UseMemberWalletsResult {
 
 export const useMemberWallets = (): UseMemberWalletsResult => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const hasAuth = useAuthStore((s) => !!s.state.firebaseUser || !!s.state.lineTokens.idToken);
+  const hasAuth = useIsAuthenticatedSession();
   const communityConfig = useCommunityConfig();
   const communityId = communityConfig?.communityId ?? "";
 
@@ -33,7 +33,7 @@ export const useMemberWallets = (): UseMemberWalletsResult => {
     },
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
-    skip: !hasAuth, // Wait for Firebase auth or exchange session before querying
+    skip: !hasAuth, // Wait for Firebase, LINE, or dev auth before querying
   });
 
   const wallets = data?.wallets || {

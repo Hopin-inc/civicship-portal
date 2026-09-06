@@ -52,3 +52,9 @@ jobs:
       runtime_env_vars: |
         ENV=staging
       image_tag: ${{ github.sha }}
+      # Keeps one instance warm so the deployment answers immediately. It is
+      # here rather than set by hand on the service because every deploy
+      # overwrites the service's flags, so a manual setting lasts until the
+      # next merge. For the Catalyst review period only — drop back to 0 at
+      # the end of October 2026.
+      min_instances: 1

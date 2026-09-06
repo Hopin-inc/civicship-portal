@@ -20,6 +20,14 @@ on:
         description: Additional image tag (typically the commit SHA)
         required: true
         type: string
+      min_instances:
+        description: >-
+          Warm Cloud Run instances to keep. 0 lets the service scale to nothing
+          and pay for a cold start on the next visit; 1 keeps one running and
+          billed. Defaults to 0, which is what every caller had hardcoded.
+        required: false
+        type: number
+        default: 0
 
 permissions:
   contents: read
@@ -107,5 +115,5 @@ jobs:
           region: ${{ env.GCP_REGION }}
           env_vars: ${{ inputs.runtime_env_vars }}
           flags: >
-            --min-instances=0
+            --min-instances=${{ inputs.min_instances }}
             --max-instances=10
