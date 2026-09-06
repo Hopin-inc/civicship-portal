@@ -43,7 +43,7 @@ application](#trying-the-application) says why the layout targets phone widths.
 [`demo/`](./demo/) — the eleven demonstrated at Milestone 3, recorded again on
 the current application, and ten further use cases. Each one is listed against
 the screen it was recorded on in [where to try each
-recording](./demo/#where-to-try-each-recording).
+recording](./demo/README.md#where-to-try-each-recording).
 
 ### The video includes an access link to the application for usability testing
 
@@ -111,7 +111,7 @@ https://dev.civicship.app/community/neo88 を使える。それぞれで何が�
 **収録済み。YouTube 公開は未了。** ユースケース別21本を [`demo/`](./demo/) に収録して
 いる。Milestone 3 でデモンストレーションした11本を現在のアプリケーションで撮り直した
 ものと、追加の10本である。各動画がアプリのどの画面に対応するかは
-[各録画を試せる画面](./demo/#各録画を試せる画面)に一覧している。
+[各録画を試せる画面](./demo/README.md#各録画を試せる画面)に一覧している。
 
 ### 動画に、使用性テスト用のアプリへのアクセスリンクが含まれること
 
