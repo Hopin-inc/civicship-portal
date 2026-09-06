@@ -13,7 +13,7 @@ import { logger } from "@/lib/logging";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
 import { setContext } from "@apollo/client/link/context";
 import { getCommunityIdClient } from "@/lib/community/get-community-id-client";
-import { DEV_AUTH_COOKIE_NAME, DEV_AUTH_HEADER_NAME } from "@/lib/auth/dev/constants";
+import { DEV_AUTH_HEADER_NAME, readDevAuthToken } from "@/lib/auth/dev/constants";
 
 const httpLink = createUploadLink({
   uri: process.env.NEXT_PUBLIC_API_ENDPOINT,
@@ -22,30 +22,6 @@ const httpLink = createUploadLink({
     "Apollo-Require-Preflight": "true",
   },
 });
-
-/**
- * Reads the dev auto-login token from the browser's cookies.
- *
- * The cookie lives on the portal's origin, so it is not sent automatically on
- * cross-origin GraphQL requests — it has to travel as an explicit header. Absent
- * (and therefore a no-op) on any deployment where dev login is not enabled.
- */
-function readDevAuthToken(): string | null {
-  if (typeof document === "undefined") return null;
-  const match = document.cookie.match(
-    new RegExp(`(?:^|;\\s*)${DEV_AUTH_COOKIE_NAME}=([^;]*)`),
-  );
-  if (!match) return null;
-
-  try {
-    return decodeURIComponent(match[1]);
-  } catch {
-    // A malformed percent-escape makes decodeURIComponent throw. A corrupt dev
-    // cookie must not take out every GraphQL request in the app, so fall back to
-    // the raw value and let the API reject it as an invalid token.
-    return match[1] || null;
-  }
-}
 
 const requestLink = setContext(async (operation, prevContext) => {
   const isBrowser = typeof window !== "undefined";

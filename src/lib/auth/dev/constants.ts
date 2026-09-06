@@ -11,6 +11,28 @@ export const DEV_AUTH_COOKIE_NAME = "dev_auth_token";
 export const DEV_AUTH_HEADER_NAME = "x-dev-auth-token";
 
 /**
+ * Reads the dev auto-login token from the browser's cookies.
+ *
+ * Returns null on the server, where there is no `document`. Absent — and
+ * therefore a no-op — on any deployment where dev login is not enabled, since
+ * nothing sets the cookie there.
+ */
+export function readDevAuthToken(): string | null {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie.match(new RegExp(`(?:^|;\\s*)${DEV_AUTH_COOKIE_NAME}=([^;]*)`));
+  if (!match) return null;
+
+  try {
+    return decodeURIComponent(match[1]);
+  } catch {
+    // A malformed percent-escape makes decodeURIComponent throw. A corrupt dev
+    // cookie must not take out every GraphQL request in the app, so fall back to
+    // the raw value and let the API reject it as an invalid token.
+    return match[1] || null;
+  }
+}
+
+/**
  * Cookie lifetime, in **seconds** — that is what `Set-Cookie: Max-Age` takes.
  *
  * Deliberately the same 12 hours as `DEV_TOKEN_TTL_MS` in civicship-api, which

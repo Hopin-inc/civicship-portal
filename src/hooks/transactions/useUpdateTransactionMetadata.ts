@@ -9,6 +9,7 @@ import {
 } from "@/types/graphql";
 import { logger } from "@/lib/logging";
 import { useAuthStore } from "@/lib/auth/core/auth-store";
+import { isAuthenticatedSession } from "@/lib/auth/core/session";
 
 type Result<T> = { success: true; data: T } | { success: false; code: GqlErrorCode };
 
@@ -37,8 +38,7 @@ export function useUpdateTransactionMetadata() {
     payload: { comment?: string | null; images?: File[] },
     permissionOverride?: UpdatePermission,
   ): Promise<Result<GqlTransactionUpdateMetadataMutation>> => {
-    const { firebaseUser, lineTokens } = useAuthStore.getState().state;
-    if (!firebaseUser && !lineTokens.idToken) {
+    if (!isAuthenticatedSession(useAuthStore.getState().state)) {
       return { success: false, code: GqlErrorCode.Unauthenticated };
     }
 
