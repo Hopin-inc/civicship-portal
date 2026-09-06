@@ -30,10 +30,7 @@ Project Catalyst F12, Project ID 1200088. Code as of `517e9a4` (2026-09-04).
 
 ### Security audit conducted by a recognised third-party organisation
 
-- [Hexens](https://hexens.io/)
-- September–December 2025
-- The report names the NEO88 deployment; every community runs the same
-  `civicship-portal` and `civicship-api` codebase
+- [The report](https://drive.google.com/file/d/1T3v22q6stRceDy9eDbvpKB1rWGgGpO0W/view)
 
 ### Audit report and evidence of fixes publicly accessible
 
@@ -83,10 +80,7 @@ Project Catalyst F12、Project ID 1200088。`517e9a4`（2026-09-04）時点の�
 
 ### 認知された第三者機関による監査が実施されていること
 
-- [Hexens](https://hexens.io/)
-- 2025年9〜12月
-- レポートは NEO88 の環境を対象として記載しているが、すべてのコミュニティは同一の
-  `civicship-portal` / `civicship-api` のコードベースで動作している
+- [レポート](https://drive.google.com/file/d/1T3v22q6stRceDy9eDbvpKB1rWGgGpO0W/view)
 
 ### 監査レポートと修正の証跡が公開されていること
 
