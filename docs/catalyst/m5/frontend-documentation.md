@@ -5,15 +5,14 @@
 *English below · [日本語は下段へ](#ja)*
 
 
-Milestone 5 deliverable 1. Describes the code at `517e9a4` (2026-09-04).
-
-The acceptance criterion asks for detailed documentation, including UI/UX design
-principles, integration processes, and user instructions. Those three are the
-sections below.
-
-A mutual-assistance application for residents, delivered as a **LINE mini app
-(LIFF)**. Next.js 15 (App Router) and TypeScript, Tailwind CSS, Apollo Client
-against a GraphQL API, running on Cloud Run behind an Edge middleware. GPL-3.0.
+- Milestone 5 deliverable 1, describing the code at `517e9a4` (2026-09-04)
+- The criterion asks for UI/UX design principles, integration processes and user
+  instructions; those three are the sections below
+- A mutual-assistance application for residents, delivered as a **LINE mini app
+  (LIFF)**
+- Next.js 15 (App Router) and TypeScript, Tailwind CSS, Apollo Client against a
+  GraphQL API, on Cloud Run behind an Edge middleware
+- GPL-3.0
 
 ---
 
@@ -29,9 +28,11 @@ Produced and submitted during Milestone 3, and approved there.
 | Design walkthrough — participant side | https://youtube.com/playlist?list=PL0Jg6Cs8E9r3ynDqeweM-kWII2znYjr2v |
 | Design walkthrough — host / admin side | https://youtube.com/playlist?list=PL0Jg6Cs8E9r1tfJ25FdtOguzyt6KWkiCV |
 
-The principle those documents apply here: the UX assumes a mobile browser inside
-LINE. The residents it serves already use LINE daily, and reaching the application
-requires no app installation and no Web3 wallet.
+The principle those documents apply here:
+
+- The UX assumes a mobile browser inside LINE
+- The residents it serves already use LINE daily
+- Reaching the application requires no app installation and no Web3 wallet
 
 The screens that result:
 
@@ -43,8 +44,8 @@ The screens that result:
 | Identity | User profile, DID / VC credentials |
 | Operations | Admin area — reservations, members, wallet, opportunities, tickets |
 
-206 Storybook stories document the components these are built from, published on
-every pull request through Chromatic.
+- 206 Storybook stories document the components these are built from, published
+  on every pull request through Chromatic
 
 ---
 
@@ -52,10 +53,11 @@ every pull request through Chromatic.
 
 ### With the backend
 
-The front end holds no business logic and no database access. Everything goes
-through the GraphQL API in
-[`civicship-api`](https://github.com/Hopin-inc/civicship-api), whose own technical
-documentation was submitted as Milestone 4 (27 November 2025).
+- The front end holds no business logic and no database access
+- Everything goes through the GraphQL API in
+  [`civicship-api`](https://github.com/Hopin-inc/civicship-api)
+- That API's own technical documentation was submitted as Milestone 4
+  (27 November 2025)
 
 - **Transport:** Apollo Client. Server components and the Edge middleware call the
   same API over HTTP with the community's session cookie; the browser sends the
@@ -81,22 +83,21 @@ documentation was submitted as Milestone 4 (27 November 2025).
    one person.
 5. A **DID** is issued against the verified phone number.
 
-Relevant source: `src/lib/auth/`, `src/middleware.ts`.
+- Relevant source: `src/lib/auth/`, `src/middleware.ts`
 
 ---
 
 ## User instructions
 
-**NEO88 App Manual** — for experience providers:
-https://docs.google.com/presentation/d/1WypOpniKO8l7OXk1VBbkYNf7O_vYgkwDg8it4eJccxk/edit
-
-Covers account registration, linking the LINE account, approving and declining
-reservations, cancelling a session, checking applications, and attendance
-management. It documents the flow as it stood during the festival; the
-administrative screens were rebuilt afterwards.
-
-The participant flows are demonstrated in the
-[recordings for deliverable 3](./demo/).
+- **NEO88 App Manual**, for experience providers:
+  https://docs.google.com/presentation/d/1WypOpniKO8l7OXk1VBbkYNf7O_vYgkwDg8it4eJccxk/edit
+- It covers account registration, linking the LINE account, approving and
+  declining reservations, cancelling a session, checking applications, and
+  attendance management
+- It documents the flow as it stood during the festival; the administrative
+  screens were rebuilt afterwards
+- The participant flows are demonstrated in the [recordings for deliverable
+  3](./demo/)
 
 ---
 ---
@@ -107,14 +108,13 @@ The participant flows are demonstrated in the
 
 *[English is above](#en)*
 
-Milestone 5 成果物1。`517e9a4`（2026-09-04）時点のコードについて記述している。
-
-受入条件は、UI/UX 設計原則・連携方式・利用者向け手順書を含む詳細なドキュメントを
-求めている。以下の3節がその3つである。
-
-住民同士の助け合いのためのアプリケーションで、**LINE ミニアプリ（LIFF）** として提供する。
-Next.js 15（App Router）と TypeScript、Tailwind CSS、GraphQL API に対する Apollo Client、
-実行環境は Cloud Run で前段に Edge middleware。GPL-3.0。
+- Milestone 5 成果物1。`517e9a4`（2026-09-04）時点のコードについて記述している
+- 受入条件が求める UI/UX 設計原則・連携方式・利用者向け手順書が、以下の3節にあたる
+- 住民同士の助け合いのためのアプリケーションで、**LINE ミニアプリ（LIFF）** として
+  提供する
+- Next.js 15（App Router）と TypeScript、Tailwind CSS、GraphQL API に対する Apollo
+  Client、実行環境は Cloud Run で前段に Edge middleware
+- GPL-3.0
 
 ---
 
@@ -130,9 +130,11 @@ Milestone 3 の期間中に作成・提出し、承認されたもの。
 | デザイン ウォークスルー — 参加者側 | https://youtube.com/playlist?list=PL0Jg6Cs8E9r3ynDqeweM-kWII2znYjr2v |
 | デザイン ウォークスルー — ホスト / 管理者側 | https://youtube.com/playlist?list=PL0Jg6Cs8E9r1tfJ25FdtOguzyt6KWkiCV |
 
-それらの資料が本実装に適用している原則：UX は LINE 内のモバイルブラウザを前提とする。
-対象となる住民は既に LINE を日常的に使っており、利用にあたってアプリのインストールも
-Web3 ウォレットの管理も必要としない。
+それらの資料が本実装に適用している原則：
+
+- UX は LINE 内のモバイルブラウザを前提とする
+- 対象となる住民は既に LINE を日常的に使っている
+- 利用にあたってアプリのインストールも Web3 ウォレットの管理も必要としない
 
 結果として構成される画面：
 
@@ -144,8 +146,8 @@ Web3 ウォレットの管理も必要としない。
 | アイデンティティ | ユーザープロフィール、DID / VC クレデンシャル |
 | 運用 | 管理エリア — 予約、メンバー、ウォレット、募集、チケット |
 
-これらを構成するコンポーネントは206個の Storybook ストーリーとして文書化されており、
-プルリクエストごとに Chromatic 経由で公開される。
+- これらを構成するコンポーネントは206個の Storybook ストーリーとして文書化されており、
+  プルリクエストごとに Chromatic 経由で公開される
 
 ---
 
@@ -153,9 +155,10 @@ Web3 ウォレットの管理も必要としない。
 
 ### バックエンドとの連携
 
-フロントエンドは業務ロジックもデータベースアクセスも持たない。すべては
-[`civicship-api`](https://github.com/Hopin-inc/civicship-api) の GraphQL API を経由する。
-API 自体の技術ドキュメントは Milestone 4（2025年11月27日）として提出済み。
+- フロントエンドは業務ロジックもデータベースアクセスも持たない
+- すべては [`civicship-api`](https://github.com/Hopin-inc/civicship-api) の
+  GraphQL API を経由する
+- API 自体の技術ドキュメントは Milestone 4（2025年11月27日）として提出済み
 
 - **通信：** Apollo Client。サーバーコンポーネントと Edge middleware は同じ API を
   コミュニティのセッション cookie 付きで HTTP 呼び出しし、ブラウザはセッション cookie に
@@ -180,17 +183,15 @@ API 自体の技術ドキュメントは Milestone 4（2025年11月27日）と�
    同一人物が2つのコミュニティに参加した場合も1人として認識される。
 5. 検証済みの電話番号に対して **DID** を発行する。
 
-関連するソース：`src/lib/auth/`、`src/middleware.ts`
+- 関連するソース：`src/lib/auth/`、`src/middleware.ts`
 
 ---
 
 ## 利用者向け手順書
 
-**NEO88 アプリマニュアル** — 体験提供事業者向け：
-https://docs.google.com/presentation/d/1WypOpniKO8l7OXk1VBbkYNf7O_vYgkwDg8it4eJccxk/edit
-
-アカウント登録、LINE アカウントの連携、予約の承認と辞退、開催の中止、申込情報の確認、
-出欠管理を扱う。記載されているのは祭の期間中の操作フローであり、管理画面はその後に
-作り直している。
-
-参加者側の操作は[成果物3の録画](./demo/)で示している。
+- **NEO88 アプリマニュアル**（体験提供事業者向け）：
+  https://docs.google.com/presentation/d/1WypOpniKO8l7OXk1VBbkYNf7O_vYgkwDg8it4eJccxk/edit
+- アカウント登録、LINE アカウントの連携、予約の承認と辞退、開催の中止、申込情報の確認、
+  出欠管理を扱う
+- 記載されているのは祭の期間中の操作フローであり、管理画面はその後に作り直している
+- 参加者側の操作は[成果物3の録画](./demo/)で示している
