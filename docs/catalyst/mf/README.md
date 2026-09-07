@@ -5,7 +5,7 @@
 *English below · [日本語は下段へ](#ja)*
 
 
-Project Catalyst F12, Project ID 1200088. Code as of `522f270` (2026-09-06).
+Project Catalyst F12, Project ID 1200088. Code as of `49d34a0` (2026-09-06).
 
 ## Deliverable 2 — Reports on the demonstration experiment, user feedback and usage statistics
 
@@ -54,7 +54,7 @@ Project Catalyst F12, Project ID 1200088. Code as of `522f270` (2026-09-06).
 
 *[English is above](#en)*
 
-Project Catalyst F12、Project ID 1200088。`522f270`（2026-09-06）時点のコード。
+Project Catalyst F12、Project ID 1200088。`49d34a0`（2026-09-06）時点のコード。
 
 ## 成果物2 — 実証実験・利用者フィードバック・利用統計の報告
 

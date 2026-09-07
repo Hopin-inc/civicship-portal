@@ -5,7 +5,7 @@
 *English below · [日本語は下段へ](#ja)*
 
 
-Project Catalyst F12, Project ID 1200088. Code as of `522f270` (2026-09-06).
+Project Catalyst F12, Project ID 1200088. Code as of `49d34a0` (2026-09-06).
 
 ## Deliverable 1 — Front-end development
 
@@ -67,7 +67,7 @@ desktop browser.
 
 *[English is above](#en)*
 
-Project Catalyst F12、Project ID 1200088。`522f270`（2026-09-06）時点のコード。
+Project Catalyst F12、Project ID 1200088。`49d34a0`（2026-09-06）時点のコード。
 
 ## 成果物1 — フロントエンド開発
 
