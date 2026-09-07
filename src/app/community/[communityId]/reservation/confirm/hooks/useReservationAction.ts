@@ -13,26 +13,27 @@ import { ApolloError } from "@apollo/client";
 import { logger } from "@/lib/logging";
 import { isPointsOnlyOpportunity } from "@/utils/opportunity/isPointsOnlyOpportunity";
 
+/**
+ * 選択された枚数を、API へ渡すチケット個々の id に展開する。
+ *
+ * 画面のチケット一覧は utility 単位でまとめられていて、その `id` は utility の id
+ * である。API が求めるのはチケットの id なので、まとまりが持っている実体の id を
+ * 使う。ここで `wallet.tickets` を生のチケット配列と見なして要素の `id` を積むと、
+ * utility の id が ticketIdsIfNeed として送られ、API 側が該当するチケットを引けずに
+ * 予約ごと失敗する。
+ *
+ * 引数のキーは `TicketsToggle` が数えている単位、つまりまとまりの id。
+ */
 const getSelectedTicketIds = (
   wallet: ReservationWallet | null,
-  selectedTickets: { [ticketId: string]: number } | undefined,
+  selectedTickets: { [groupId: string]: number } | undefined,
 ): string[] => {
   if (!selectedTickets || !wallet) return [];
-  
-  const ticketIds: string[] = [];
-  const allTickets = wallet.tickets;
-  
-  Object.entries(selectedTickets).forEach(([utilityId, count]) => {
-    const availableTickets = allTickets.filter(ticket => 
-      ticket.utility?.id === utilityId && ticket.status === "AVAILABLE"
-    );
-    
-    for (let i = 0; i < count && i < availableTickets.length; i++) {
-      ticketIds.push(availableTickets[i].id);
-    }
+
+  return Object.entries(selectedTickets).flatMap(([groupId, count]) => {
+    const group = wallet.tickets.find((t) => t.id === groupId);
+    return group ? group.ticketIds.slice(0, count) : [];
   });
-  
-  return ticketIds;
 };
 
 type Result =
