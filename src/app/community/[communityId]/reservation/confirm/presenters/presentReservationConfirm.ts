@@ -26,7 +26,15 @@ import { isDateReservable } from "@/app/community/[communityId]/reservation/data
  * 利用可能なチケット情報
  */
 export interface AvailableTicket {
+  /** utility の id。この一覧は utility 単位でまとめられている */
   id: string;
+  /**
+   * このまとまりに含まれる、利用可能なチケット個々の id。
+   *
+   * 予約時に API へ渡すのはこちらで、上の `id` ではない。API はチケットの id で
+   * 該当行を引くため、utility の id を渡すと見つからず失敗する。
+   */
+  ticketIds: string[];
   utility: {
     id: string;
     name: string | null;
@@ -216,6 +224,7 @@ function presentAvailableTickets(
 
     return {
       id: utilityId,
+      ticketIds: availableTickets.map((ticket) => ticket.id),
       utility: firstTicket.utility
         ? {
           id: firstTicket.utility.id,
