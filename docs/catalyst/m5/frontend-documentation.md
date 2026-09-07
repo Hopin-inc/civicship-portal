@@ -5,7 +5,7 @@
 *English below · [日本語は下段へ](#ja)*
 
 
-- Milestone 5 deliverable 1, describing the code at `49d34a0` (2026-09-06)
+- Milestone 5 deliverable 1, describing the code at `df68a9a` (2026-09-07)
 - A mutual-assistance application for residents, delivered as a **LINE mini app
   (LIFF)**
 - Next.js 15 (App Router) and TypeScript, Tailwind CSS, Apollo Client against a
@@ -104,7 +104,7 @@ The screens that result:
 
 *[English is above](#en)*
 
-- Milestone 5 成果物1。`49d34a0`（2026-09-06）時点のコードについて記述している
+- Milestone 5 成果物1。`df68a9a`（2026-09-07）時点のコードについて記述している
 - 住民同士の助け合いのためのアプリケーションで、**LINE ミニアプリ（LIFF）** として
   提供する
 - Next.js 15（App Router）と TypeScript、Tailwind CSS、GraphQL API に対する Apollo
